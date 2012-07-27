@@ -1,6 +1,16 @@
 /*Panels variables*/
 //Will come from APM telem port
 
+static float	nav_roll = 0; // Current desired roll in degrees
+static float  nav_pitch = 0; // Current desired pitch in degrees
+static int16_t	nav_bearing = 0; // Current desired heading in degrees
+static int16_t	target_bearing = 0; // Bearing to current MISSION/target in degrees
+static uint16_t wp_dist = 0; // Distance to active MISSION in meters
+static float	alt_error = 0; // Current altitude error in meters
+static float aspd_error = 0; // Current airspeed error in meters/second
+static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+
+
 static float    osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static float    osd_curr_A = 0;                 // Battery A current
 static uint16_t osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
@@ -20,7 +30,7 @@ static uint16_t osd_off_switch = 0;
 static uint16_t osd_switch_last = 0;
 static long osd_switch_time = 0;
 static long wind_time = 0;
-
+static float osd_climb = 0;
 
 
 static float    osd_lat = 0;                    // latidude
@@ -120,4 +130,6 @@ byte panHorizon_XY[2]; // = {8,centercalc}
 byte panWarn_XY[2];
 byte panOff_XY[2];
 byte panWindSpeed_XY[2];
+byte panClimb_XY[2];
+byte panTune_XY[2];
 

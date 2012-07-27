@@ -48,7 +48,8 @@
 #define Warn_BIT       0
 #define Off_BIT        1
 #define WindS_BIT      2
-
+#define Climb_BIT      3
+#define Tune_BIT       4
 
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -148,6 +149,12 @@
 #define panWindSpeed_en_ADDR 176
 #define panWindSpeed_x_ADDR 178
 #define panWindSpeed_y_ADDR 180
+#define panClimb_en_ADDR 182
+#define panClimb_x_ADDR 184
+#define panClimb_y_ADDR 186
+#define panTune_en_ADDR 188
+#define panTune_x_ADDR 190
+#define panTune_y_ADDR 192
 
 #define CHK1 1000
 #define CHK2 1006

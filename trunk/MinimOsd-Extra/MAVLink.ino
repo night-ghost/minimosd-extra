@@ -135,6 +135,7 @@ void read_mavlink(){
             if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
             if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
             osd_alt = mavlink_msg_vfr_hud_get_alt(&msg);
+            osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
           }
           break;
         case MAVLINK_MSG_ID_ATTITUDE:
@@ -144,6 +145,19 @@ void read_mavlink(){
             osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
           }
           break;
+          case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+          {
+          nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
+          nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
+          nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
+          target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
+          wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
+          alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+          aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+          xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
+          }
+          break;
+     
         default:
           //Do nothing
           break;

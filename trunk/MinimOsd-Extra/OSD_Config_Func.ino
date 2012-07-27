@@ -152,6 +152,12 @@ void writeSettings() {
  writeEEPROM(on, panWindSpeed_en_ADDR);
  writeEEPROM(10, panWindSpeed_x_ADDR);
  writeEEPROM(4,  panWindSpeed_y_ADDR);
+ writeEEPROM(on, panClimb_en_ADDR);
+ writeEEPROM(10, panClimb_x_ADDR);
+ writeEEPROM(4,  panClimb_y_ADDR);
+ writeEEPROM(on, panTune_en_ADDR);
+ writeEEPROM(10, panTune_x_ADDR);
+ writeEEPROM(4,  panTune_y_ADDR);
 }
 
 void readSettings() {
@@ -273,6 +279,14 @@ void readSettings() {
   setBit(panD_REG, WindS_BIT, readEEPROM(panWindSpeed_en_ADDR));
   panWindSpeed_XY[0] = readEEPROM(panWindSpeed_x_ADDR);
   panWindSpeed_XY[1] = checkPAL(readEEPROM(panWindSpeed_y_ADDR));
+  
+  setBit(panD_REG, Climb_BIT, readEEPROM(panClimb_en_ADDR));
+  panClimb_XY[0] = readEEPROM(panClimb_x_ADDR);
+  panClimb_XY[1] = checkPAL(readEEPROM(panClimb_y_ADDR));
+  
+  setBit(panD_REG, Tune_BIT, readEEPROM(panTune_en_ADDR));
+  panTune_XY[0] = readEEPROM(panTune_x_ADDR);
+  panTune_XY[1] = checkPAL(readEEPROM(panTune_y_ADDR));
 }
 
 int checkPAL(int line){
