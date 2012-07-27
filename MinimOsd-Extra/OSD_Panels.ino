@@ -3,7 +3,7 @@
 void startPanels(){
   osd.clear();
   // Display our logo  
-  panLogo(10,5);
+  panLogo(8,5);
 }
 
 /******* PANELS - POSITION *******/
@@ -59,6 +59,8 @@ void writePanels(){
     if(ISd(Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]);
     if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
     if(ISd(WindS_BIT)) panWindSpeed(panWindSpeed_XY[0], panWindSpeed_XY[1]);
+    if(ISd(Climb_BIT)) panClimb(panClimb_XY[0], panClimb_XY[1]);
+    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
     }
   else{
     osd.clear();
@@ -318,6 +320,25 @@ if (osd_off_switch == osd_switch_last){
 }
 
 /* **************************************************************** */
+// Panel  : panTune
+// Needs  : X, Y locations
+// Output : Current symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+void panTune(int first_col, int first_line){
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  if (osd_off == 0){
+  osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
+  }
+  else{
+  osd.clear();
+  }
+  osd.closePanel();
+}
+
+/* **************************************************************** */
 // Panel  : panCur_A
 // Needs  : X, Y locations
 // Output : Current symbol and altitude value in meters from MAVLink
@@ -350,6 +371,25 @@ void panAlt(int first_col, int first_line){
   //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
   if (osd_off == 0){
   osd.printf("%c%5.0f%c",0xE6, (double)(osd_alt), 0x8D);
+  }
+  else{
+  osd.clear();
+  }
+  osd.closePanel();
+}
+
+/* **************************************************************** */
+// Panel  : panClimb
+// Needs  : X, Y locations
+// Output : Alt symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+void panClimb(int first_col, int first_line){
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  if (osd_off == 0){
+  osd.printf("%c%3.0f%c",0x16, (double)(osd_climb), 0x88);
   }
   else{
   osd.clear();
@@ -724,7 +764,7 @@ void panLogo(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   if (osd_off == 0){
-  osd.printf_P(PSTR("\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|ArduCam OSD"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.27"));
   }
   else{
   osd.clear();
@@ -735,7 +775,7 @@ void panLogo(int first_col, int first_line){
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
 void panWaitMAVBeats(int first_col, int first_line){
-  panLogo(10,5);
+  panLogo(8,5);
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
