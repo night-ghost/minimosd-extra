@@ -76,6 +76,16 @@ namespace OSD
         static uint16_t osd_throttle = 100;               // throtle
         static float osd_curr_A = 453;
         static float osd_windspeed = 10;
+        static float osd_climb = 2;
+        static float nav_roll = 0;
+        static float nav_pitch = 0;
+        static uint16_t nav_bearing = 0; // Current desired heading in degrees
+        static uint16_t target_bearing = 0; // Bearing to current MISSION/target in degrees
+        static uint16_t wp_dist = 0; // Distance to active MISSION in meters
+        static float alt_error = 0; // Current altitude error in meters
+        static float aspd_error = 0; // Current airspeed error in meters/second
+        static float xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+
 
         //MAVLink session control
         static boolean mavbeat = 1;
@@ -88,6 +98,46 @@ namespace OSD
 
         /******* PANELS - DEFINITION *******/
 
+        /* **************************************************************** */
+        // Panel  : panTune
+        // Needs  : X, Y locations
+        // Output : Current symbol and altitude value in meters from MAVLink
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panTune(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            
+            {
+               osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
+            }
+           
+            return 0;
+            osd.closePanel();
+        }
+
+        /* **************************************************************** */
+        // Panel  : panClimb
+        // Needs  : X, Y locations
+        // Output : Alt symbol and altitude value in meters from MAVLink
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panClimb(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            
+            {
+                osd.printf("%c%3.0f%c", 0x16, (double)(osd_climb), 0x88);
+            }
+            
+            osd.closePanel();
+            return 0;
+        }
+        
         /* **************************************************************** */
         // Panel  : pan wind speed
         // Needs  : X, Y locations
