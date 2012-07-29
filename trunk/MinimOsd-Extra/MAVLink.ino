@@ -158,6 +158,13 @@ void read_mavlink(){
           }
           break;
      
+     case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
+          {
+           chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
+           chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
+          }
+          break;
+     
         default:
           //Do nothing
           break;

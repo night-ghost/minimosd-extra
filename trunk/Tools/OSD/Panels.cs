@@ -105,18 +105,18 @@ namespace OSD
         // Size   : 1 x 7Hea  (rows x chars)
         // Staus  : done
 
-        public int panTune(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
+  //      public int panTune(int first_col, int first_line)
+  //      {
+  //          osd.setPanel(first_col, first_line);
+  //          osd.openPanel();
             
-            {
-               osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
-            }
+  //          {
+  //             osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
+  //          }
            
-            return 0;
-            osd.closePanel();
-        }
+  //          return 0;
+  //          osd.closePanel();
+   //     }
 
         /* **************************************************************** */
         // Panel  : panClimb
