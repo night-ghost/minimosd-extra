@@ -10,7 +10,20 @@ static float	alt_error = 0; // Current altitude error in meters
 static float aspd_error = 0; // Current airspeed error in meters/second
 static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 
+static int16_t chan1_raw = 0;
+static int16_t chan2_raw = 0;
+static int16_t chan1_raw_middle = 0;
+static int16_t chan2_raw_middle = 0;
+static int osd_set = 0;
 
+static int setup_menu = 0;
+static int converts = 0;
+static int converth = 0;
+static int overspeed = 0;
+static int stall = 0;
+
+static uint8_t spe = 0;
+static uint8_t high = 0;
 static float    osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static float    osd_curr_A = 0;                 // Battery A current
 static uint16_t osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
@@ -27,11 +40,15 @@ static int warning_type = 0;
 static int char_update = 0;
 static int osd_off = 0;
 static uint16_t osd_off_switch = 0;
-static uint16_t osd_switch_last = 0;
+static uint16_t osd_switch_last = 100;
 static long osd_switch_time = 0;
 static long wind_time = 0;
 static float osd_climb = 0;
-
+static int szi = 0;
+static int szi2 = 0;
+static int szi3 = 0;
+static long a = 0;
+static long b = 0;
 
 static float    osd_lat = 0;                    // latidude
 static float    osd_lon = 0;                    // longitude
@@ -64,6 +81,7 @@ static char wind_arrow_set1 = 0x20;
 static char wind_arrow_set2 = 0x20;
 static uint8_t  osd_alt_cnt = 0;              // counter for stable osd_alt
 static float    osd_alt_prev = 0;             // previous altitude
+
 
 
 static float    osd_groundspeed = 0;            // ground speed
@@ -131,5 +149,6 @@ byte panWarn_XY[2];
 byte panOff_XY[2];
 byte panWindSpeed_XY[2];
 byte panClimb_XY[2];
-byte panTune_XY[2];
+//byte panTune_XY[2];
+byte panSetup_XY[2];
 
