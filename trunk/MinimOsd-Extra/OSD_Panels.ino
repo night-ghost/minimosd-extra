@@ -632,7 +632,7 @@ switch(warning_type){
     break;
   case 6:
     osd_off = 0;
-    osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x70\x21\x20"));
+    osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
     break;
 }
    
