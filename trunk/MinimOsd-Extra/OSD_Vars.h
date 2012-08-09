@@ -44,9 +44,6 @@ static uint16_t osd_switch_last = 100;
 static long osd_switch_time = 0;
 static long wind_time = 0;
 static float osd_climb = 0;
-static int szi = 0;
-static int szi2 = 0;
-static int szi3 = 0;
 static long a = 0;
 static long b = 0;
 
