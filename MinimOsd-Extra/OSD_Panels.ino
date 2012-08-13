@@ -201,7 +201,7 @@ void panWindSpeed(int first_col, int first_line){
   if (osd_off == 0){
    
     
-    if (osd_airspeed > 4){
+    if (osd_airspeed > 6){
    if (heding_check == -2){
    heding_check = osd_heading;
    }
@@ -210,18 +210,21 @@ void panWindSpeed(int first_col, int first_line){
     if (heding_check == -1){
       osd_windspeed = osd_windspeed_check;
       osd_winddirection = osd_winddirection_check;
-      osd_windspeed_check = 0;}
-      heding_check = osd_heading;
+      osd_windspeed_check = 0;
       wind = 1;
-      }
-         
-      if (heding_check > 180){
-      if (osd_heading >= (heding_check - 182.5) && osd_heading <= (heding_check - 177.5)){
-      heding_check = -1;
-      }}
-      else if (osd_heading >= (heding_check + 177.5) && osd_heading <= (heding_check + 182.5)){
-      heding_check = -1;
-      }
+    }
+      heding_check = osd_heading;      
+      
+    }
+        
+        if ((heding_check - osd_heading) < 0 ){
+        if (((heding_check - osd_heading) * -1) >= 177.5 && ((heding_check - osd_heading) * -1) <= 182.5){
+        heding_check = -1;
+        }
+        }
+        else if ((heding_check - osd_heading) >= 177.5 && (heding_check - osd_heading) <= 182.5){
+        heding_check = -1;
+        }
       
     if (osd_airspeed > osd_groundspeed){
     if ((osd_airspeed - osd_groundspeed) > osd_windspeed_check){
@@ -241,7 +244,7 @@ void panWindSpeed(int first_col, int first_line){
   }
   }  
 
-  
+    }
   osd_wind_arrow_rotate = osd_winddirection - osd_heading;
   if (osd_winddirection - osd_heading < 0){
   osd_wind_arrow_rotate = osd_wind_arrow_rotate + 360;
@@ -307,7 +310,7 @@ void panWindSpeed(int first_col, int first_line){
  
   
     
-    }
+    
     if (wind == 1){
     osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, wind_arrow_set1, wind_arrow_set2);
     }
@@ -797,7 +800,7 @@ void panLogo(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   if (osd_off == 0){
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.28.2"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.28.3"));
   }
 
   osd.closePanel();
