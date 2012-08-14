@@ -100,12 +100,12 @@ void writeSettings() {
  writeEEPROM(on, panHomeDis_en_ADDR);
  writeEEPROM(2,  panHomeDis_x_ADDR);
  writeEEPROM(1,  panHomeDis_y_ADDR);
- writeEEPROM(off,panWPDir_en_ADDR);
- writeEEPROM(0,  panWPDir_x_ADDR);
- writeEEPROM(0,  panWPDir_y_ADDR);
- writeEEPROM(off,panWPDis_en_ADDR);
- writeEEPROM(0,  panWPDis_x_ADDR);
- writeEEPROM(0,  panWPDis_y_ADDR);
+// writeEEPROM(off,panWPDir_en_ADDR);
+// writeEEPROM(0,  panWPDir_x_ADDR);
+// writeEEPROM(0,  panWPDir_y_ADDR);
+// writeEEPROM(off,panWPDis_en_ADDR);
+// writeEEPROM(0,  panWPDis_x_ADDR);
+// writeEEPROM(0,  panWPDis_y_ADDR);
  //writeEEPROM(on, panRSSI_en_ADDR);
  //writeEEPROM(21, panRSSI_x_ADDR);
  //writeEEPROM(5,  panRSSI_y_ADDR);
