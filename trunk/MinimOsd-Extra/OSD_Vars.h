@@ -21,6 +21,8 @@ static int converts = 0;
 static int converth = 0;
 static int overspeed = 0;
 static int stall = 0;
+static float battv = 0;
+//static int battp = 0;
 
 static uint8_t spe = 0;
 static uint8_t high = 0;

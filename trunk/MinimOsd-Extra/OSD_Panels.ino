@@ -4,6 +4,7 @@ void startPanels(){
   osd.clear();
   // Display our logo  
   panLogo(8,5);
+ 
 }
 
 /******* PANELS - POSITION *******/
@@ -13,17 +14,8 @@ void writePanels(){
 //  if (osd_set != 2){
 //    osd.clear();}
 //  }
-  if (osd_set == 1){ 
-  EEPROM.write(194, 1);
-  EEPROM.write(196, 9);
-  EEPROM.write(198, 7);
-  
-  overspeed = EEPROM.read(202);
-  stall = EEPROM.read(204);  
-  osd_set = 2;
-    
-  
-  }
+
+
  
   if (EEPROM.read(200) == 0){
   converts = 3.6;
@@ -128,7 +120,7 @@ void panSetup(int first_col, int first_line){
   }
   
 
-  if (osd_set == 2){
+  if (osd_set == 1){
    if (millis() - a > 500){
      a = millis();
    if ((chan2_raw - 100) > chan2_raw_middle ){
@@ -140,8 +132,8 @@ void panSetup(int first_col, int first_line){
    if (setup_menu < 0){
    setup_menu = 0;
    }
-   if (setup_menu > 2){
-   setup_menu = 2;}
+   if (setup_menu > 3){
+   setup_menu = 3;}
    
 }
     switch (setup_menu){
@@ -149,14 +141,14 @@ void panSetup(int first_col, int first_line){
         if (millis() - b > 500){
         b = millis();
         if (EEPROM.read(200) == 0){
-        osd.printf_P(PSTR("metric system    "));
+        osd.printf_P(PSTR("    metric system    "));
         if ((chan1_raw - 100) > chan1_raw_middle || (chan1_raw + 100) < chan1_raw_middle ){
         EEPROM.write(200, 1);
         
         }
         }
         else {
-        osd.printf_P(PSTR("US system        "));
+        osd.printf_P(PSTR("      US system       "));
         if ((chan1_raw - 100) > chan1_raw_middle || (chan1_raw + 100) < chan1_raw_middle){
         EEPROM.write(200, 0);
         
@@ -165,7 +157,7 @@ void panSetup(int first_col, int first_line){
         }
         break;
       case 1:
-        osd.printf_P(PSTR("Overspeed   "));
+        osd.printf_P(PSTR("    Overspeed    "));
         osd.printf("%3.0i%c", overspeed, spe);
         if ((chan1_raw - 100) > chan1_raw_middle ){
         overspeed = overspeed - 1;}
@@ -174,7 +166,7 @@ void panSetup(int first_col, int first_line){
         EEPROM.write(202, overspeed);
         break;
       case 2:
-        osd.printf_P(PSTR("Stall Speed "));
+        osd.printf_P(PSTR("   Stall Speed   "));
         osd.printf("%3.0i%c", stall , spe);
         if ((chan1_raw - 100) > chan1_raw_middle ){
         stall = stall - 1;}
@@ -182,6 +174,24 @@ void panSetup(int first_col, int first_line){
         stall = stall + 1;} 
         EEPROM.write(204, stall);
         break;
+      case 3:
+        osd.printf_P(PSTR("Battery warning "));
+        osd.printf("%3.1f%c", battv , 0x76, 0x20);
+        if ((chan1_raw - 100) > chan1_raw_middle ){
+        battv = battv - 0.1;}
+        if ((chan1_raw + 100) < chan1_raw_middle ){
+        battv = battv + 0.1;} 
+        EEPROM.write(206, battv);
+        break;
+//      case 4:
+//        osd.printf_P(PSTR("Battery warning "));
+//        osd.printf("%3.0i%c", battp , 0x25);
+//        if ((chan1_raw - 100) > chan1_raw_middle ){
+//        battp = battp - 1;}
+//        if ((chan1_raw + 100) < chan1_raw_middle ){
+//        battp = battp + 1;} 
+//        EEPROM.write(208, battp);
+//        break;
  }
   }
   
@@ -332,8 +342,7 @@ void panOff(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
 
-if(apm_mav_type == 1){
-if((osd_mode != 11) && (osd_mode != 1)){
+if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
   if (osd_off_switch != osd_mode){ 
     osd_off_switch = osd_mode;
     osd_switch_time = millis();
@@ -356,28 +365,6 @@ if (osd_off_switch == osd_switch_last){
  if ((millis() - osd_switch_time) > 2000){
     osd_switch_last = osd_mode;
   }
-}
-}
-
-if(apm_mav_type == 0){
-if((osd_mode != 6) && (osd_mode != 7)){
-  if (osd_off_switch != osd_mode){ 
-    osd_off_switch = osd_mode;
-    osd_switch_time = millis();
- 
-if (osd_off_switch == osd_switch_last){
-  if (osd_off == 1){
-  osd_off = 0;
-}
-  else {
-  osd_off = 1;
-  }
-}
-  }
- if ((millis() - osd_switch_time) > 2000){
-    osd_switch_last = osd_mode;
-  }
-}
 }
 
   osd.closePanel();
@@ -514,6 +501,8 @@ void panVel(int first_col, int first_line){
   void panWarn(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
+ 
+  
 if (osd_set == 0){
 if ((start_Time - text_blink) > 0){
 if (warning_type == 1){
@@ -556,7 +545,7 @@ if (warning_type == 4){
       else{
     if (warning_type > 4){}
       else {
-      if (osd_vbat_A < 10.5){
+      if (osd_vbat_A < battv){
       warning_type = 4;
 text_blink = start_Time + 1;
       goto Warning;}
@@ -568,23 +557,23 @@ if (warning_type == 5){
       else{
     if (warning_type > 5){}
       else {
-      if (osd_battery_remaining_A < 15){
+      if (osd_battery_remaining_A < 10){
       warning_type = 5;
 text_blink = start_Time + 1;
       goto Warning;}
     }
 }
-if (warning_type == 6){
-  warning_type = 0; }
-      else{
-    if (warning_type > 6){}
-      else {
-      if ((osd_alt - osd_home_alt) < 10 && (osd_alt - osd_home_alt) > 0){
-      warning_type = 6;
-text_blink = start_Time + 1;
-      goto Warning;}
-    }
-}
+//if (warning_type == 6){
+//  warning_type = 0; }
+//      else{
+//    if (warning_type > 6){}
+//      else {
+//      if ((osd_alt - osd_home_alt) < 10 && (osd_alt - osd_home_alt) > 0){
+//      warning_type = 6;
+//text_blink = start_Time + 1;
+//      goto Warning;}
+//    }
+//}
 }
 Warning:
 
@@ -613,10 +602,10 @@ switch(warning_type){
     osd_off = 0;
     osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
     break;
-  case 6:
-    osd_off = 0;
-    osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
-    break;
+//  case 6:
+//    osd_off = 0;
+//    osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
+//    break;
 }
    
 }
@@ -799,8 +788,16 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  if (osd_off == 0){
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.28.3"));
+  overspeed = EEPROM.read(202);
+  stall = EEPROM.read(204);
+  battv = EEPROM.read(206);
+//  battp = EEPROM.read(208);
+  EEPROM.write(194, 1);
+  EEPROM.write(196, 5);
+  EEPROM.write(198, 7);
+  
+  {
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.0"));
   }
 
   osd.closePanel();
