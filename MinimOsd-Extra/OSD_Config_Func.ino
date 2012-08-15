@@ -7,6 +7,8 @@
 #define ISc(whichBit) getBit(panC_REG, whichBit)
 #define ISd(whichBit) getBit(panD_REG, whichBit)
 
+ 
+
 boolean getBit(byte Reg, byte whichBit) {
   boolean State;
   State = Reg & (1 << whichBit);
@@ -164,6 +166,14 @@ void writeSettings() {
 }
 
 void readSettings() {
+  
+  overspeed = EEPROM.read(202);
+  stall = EEPROM.read(204);
+  battv = EEPROM.read(206);
+//  battp = EEPROM.read(208);
+  EEPROM.write(194, 1);
+  EEPROM.write(196, 5);
+  EEPROM.write(198, 7);
   
   //****** First set of 8 Panels ******
   

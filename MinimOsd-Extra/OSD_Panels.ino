@@ -788,13 +788,6 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  overspeed = EEPROM.read(202);
-  stall = EEPROM.read(204);
-  battv = EEPROM.read(206);
-//  battp = EEPROM.read(208);
-  EEPROM.write(194, 1);
-  EEPROM.write(196, 5);
-  EEPROM.write(198, 7);
   
   {
   osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.0"));
