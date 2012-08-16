@@ -169,13 +169,13 @@ void readSettings() {
   
   overspeed = EEPROM.read(202);
   stall = EEPROM.read(204);
-  battv = (float(EEPROM.read(206))/10);
+  battv = EEPROM.read(206);
 //  battp = EEPROM.read(208);
-if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
-  EEPROM.write(194, 1);
-  EEPROM.write(196, 5);
-  EEPROM.write(198, 7);
-}
+  if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
+      EEPROM.write(194, 1);
+      EEPROM.write(196, 5);
+      EEPROM.write(198, 7);
+  }
   //****** First set of 8 Panels ******
   
   setBit(panA_REG, Cen_BIT, readEEPROM(panCenter_en_ADDR));
