@@ -142,14 +142,14 @@ void panSetup(int first_col, int first_line){
         b = millis();
         if (EEPROM.read(200) == 0){
         osd.printf_P(PSTR("    metric system    "));
-        if ((chan1_raw - 100) > chan1_raw_middle || (chan1_raw + 100) < chan1_raw_middle ){
+        if ((chan1_raw - 100) > chan1_raw_middle){
         EEPROM.write(200, 1);
         
         }
         }
         else {
         osd.printf_P(PSTR("      US system       "));
-        if ((chan1_raw - 100) > chan1_raw_middle || (chan1_raw + 100) < chan1_raw_middle){
+        if ((chan1_raw + 100) < chan1_raw_middle){
         EEPROM.write(200, 0);
         
         }
@@ -790,7 +790,7 @@ void panLogo(int first_col, int first_line){
   osd.openPanel();
   
   {
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.0"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.1"));
   }
 
   osd.closePanel();
