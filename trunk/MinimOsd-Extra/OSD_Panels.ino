@@ -181,7 +181,7 @@ void panSetup(int first_col, int first_line){
         battv = battv - 0.1;}
         if ((chan1_raw + 100) < chan1_raw_middle ){
         battv = battv + 0.1;} 
-        EEPROM.write(206, battv);
+        EEPROM.write(206, (battv * 10));
         break;
 //      case 4:
 //        osd.printf_P(PSTR("Battery warning "));
