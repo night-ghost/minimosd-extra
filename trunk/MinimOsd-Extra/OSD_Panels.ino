@@ -736,7 +736,7 @@ void panLogo(int first_col, int first_line){
     osd.openPanel();
 
     {
-        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.1"));
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra| 1.29.2 Beta"));
     }
 
     osd.closePanel();
