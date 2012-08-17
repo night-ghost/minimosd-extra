@@ -711,15 +711,8 @@ void panBatt_A(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     /*************** This commented code is for the next ArduPlane Version
-    #ifdef MAVLINK10
     if(osd_battery_remaining_A > 100){
-    osd.printf(" %c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
-    }
-    #else
-    if(osd_battery_remaining_A > 1000){
-    osd.printf(" %c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
-    }
-    #endif //MAVLINK10
+        osd.printf(" %c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
     else osd.printf("%c%5.2f%c%c", 0xE2, (double)osd_vbat_A, 0x8E, osd_battery_pic_A);
     */
     if (osd_off == 0){
@@ -736,7 +729,7 @@ void panLogo(int first_col, int first_line){
     osd.openPanel();
 
     {
-        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra| 1.29.2 Beta"));
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.2 Pre-Release"));
     }
 
     osd.closePanel();
@@ -937,7 +930,6 @@ void panFlightMode(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     if (osd_off == 0){
-#ifndef MAVLINK10
         if(apm_mav_type == 2){//ArduCopter MultiRotor or ArduCopter Heli
             if(osd_mode == 100) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
             if(osd_mode == 101) osd.printf_P(PSTR("\xE0""acro"));//Acrobatic
@@ -962,33 +954,6 @@ void panFlightMode(int first_col, int first_line){
             if(osd_mode == MAV_MODE_AUTO && osd_nav_mode == MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\xE0""auto"));//AUTO
             if(osd_mode == MAV_MODE_TEST3) osd.printf_P(PSTR("\xE0""circ"));//CIRCLE
         }
-
-#else 
-        if(apm_mav_type == 2){//ArduCopter MultiRotor or ArduCopter Heli
-            if(osd_mode == 0) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-            if(osd_mode == 1) osd.printf_P(PSTR("\xE0""acro"));//Acrobatic
-            if(osd_mode == 2) osd.printf_P(PSTR("\xE0""alth"));//Alt Hold
-            if(osd_mode == 3) osd.printf_P(PSTR("\xE0""auto"));//Auto
-            if(osd_mode == 4) osd.printf_P(PSTR("\xE0""guid"));//Guided
-            if(osd_mode == 5) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-            if(osd_mode == 6) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-            if(osd_mode == 7) osd.printf_P(PSTR("\xE0""circ")); // Circle
-            if(osd_mode == 8) osd.printf_P(PSTR("\xE0""posi")); // Position
-            if(osd_mode == 9) osd.printf_P(PSTR("\xE0""land")); // Land
-            if(osd_mode == 10) osd.printf_P(PSTR("\xE0""oflo")); // OF_Loiter
-        }
-        else if(apm_mav_type == 1){//ArduPlane
-            if(osd_mode == 2 ) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-            if(osd_mode == 0) osd.printf_P(PSTR("\xE0""manu"));//Manual
-            if(osd_mode == 12) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-            if(osd_mode == 11 ) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-            if(osd_mode == 5 ) osd.printf_P(PSTR("\xE0""fbwa"));//FLY_BY_WIRE_A
-            if(osd_mode == 6 ) osd.printf_P(PSTR("\xE0""fbwb"));//FLY_BY_WIRE_B
-            if(osd_mode == 15) osd.printf_P(PSTR("\xE0""guid"));//GUIDED
-            if(osd_mode == 10 ) osd.printf_P(PSTR("\xE0""auto"));//AUTO
-            if(osd_mode == 1) osd.printf_P(PSTR("\xE0""circ"));//CIRCLE
-        }
-#endif
     }
 
     osd.closePanel();

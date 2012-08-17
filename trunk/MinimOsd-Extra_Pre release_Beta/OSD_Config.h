@@ -170,4 +170,5 @@
 #define CHK1 1000
 #define CHK2 1006
 
+
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip

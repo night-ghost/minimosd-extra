@@ -19,9 +19,9 @@ static int          osd_set = 0;
 static int          setup_menu = 0;
 static int          converts = 0;
 static int          converth = 0;
-static uint8_t     overspeed = 0;
-static uint8_t     stall = 0;
-static uint8_t     battv = 0;                //Batery warning voltage - units Volt *10 
+static uint8_t      overspeed = 0;
+static uint8_t      stall = 0;
+static uint8_t      battv = 0;                //Batery warning voltage - units Volt *10 
 //static int        battp = 0;
 
 static uint8_t      spe = 0;
@@ -49,17 +49,17 @@ static float        osd_climb = 0;
 static long         a = 0;
 static long         b = 0;
 
-static float    osd_lat = 0;                    // latidude
-static float    osd_lon = 0;                    // longitude
-static uint8_t  osd_satellites_visible = 0;     // number of satelites
-static uint8_t  osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
+static float        osd_lat = 0;                    // latidude
+static float        osd_lon = 0;                    // longitude
+static uint8_t      osd_satellites_visible = 0;     // number of satelites
+static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 
-static uint8_t  osd_got_home = 0;               // tels if got home position or not
-static float    osd_home_lat = 0;               // home latidude
-static float    osd_home_lon = 0;               // home longitude
-static float    osd_home_alt = 0; 
-static long     osd_home_distance = 0;          // distance from home
-static uint8_t  osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
+static uint8_t      osd_got_home = 0;               // tels if got home position or not
+static float        osd_home_lat = 0;               // home latidude
+static float        osd_home_lon = 0;               // home longitude
+static float        osd_home_alt = 0; 
+static long         osd_home_distance = 0;          // distance from home
+static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 
 static int8_t       osd_pitch = 0;                  // pitch form DCM
 static int8_t       osd_roll = 0;                   // roll form DCM
@@ -75,23 +75,23 @@ static float        osd_winddirection_check = 0;
 static float        osd_wind_arrow_rotate = 0;
 static uint8_t      osd_wind_arrow_rotate_int;
 
-static int wind = 0;
+static int          wind = 0;
 //static int osd_wind_arrow = 0;
 
-static uint8_t  osd_alt_cnt = 0;              // counter for stable osd_alt
-static float    osd_alt_prev = 0;             // previous altitude
+static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
+static float        osd_alt_prev = 0;             // previous altitude
 
-static float    osd_groundspeed = 0;            // ground speed
-static uint16_t osd_throttle = 0;               // throtle
+static float        osd_groundspeed = 0;            // ground speed
+static uint16_t     osd_throttle = 0;               // throtle
 
 //MAVLink session control
-static boolean  mavbeat = 0;
-static float    lastMAVBeat = 0;
-static boolean  waitingMAVBeats = 1;
-static uint8_t  apm_mav_type;
-static uint8_t  apm_mav_system; 
-static uint8_t  apm_mav_component;
-static boolean  enable_mav_request = 0;
+static boolean      mavbeat = 0;
+static float        lastMAVBeat = 0;
+static boolean      waitingMAVBeats = 1;
+static uint8_t      apm_mav_type;
+static uint8_t      apm_mav_system; 
+static uint8_t      apm_mav_component;
+static boolean      enable_mav_request = 0;
 
 // Panel BIT registers
 byte panA_REG = 0b00000000;
