@@ -93,6 +93,8 @@ static uint8_t      apm_mav_system;
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
 
+static uint8_t      delay_setup = 0;
+
 // Panel BIT registers
 byte panA_REG = 0b00000000;
 byte panB_REG = 0b00000000;

@@ -78,7 +78,21 @@ void writePanels(){
         if(ISd(WindS_BIT)) panWindSpeed(panWindSpeed_XY[0], panWindSpeed_XY[1]);
         if(ISd(Climb_BIT)) panClimb(panClimb_XY[0], panClimb_XY[1]);
         //    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
-        if(ISd(Setup_BIT)) panSetup(panSetup_XY[0], panSetup_XY[1]);
+        switch(delay_setup){
+        case(0):
+            delay_setup++;
+            break;
+        case(1):
+            delay_setup++;
+            break;
+        case(2):
+            delay_setup++;
+            break;
+        case(3):
+            delay_setup = 0;
+            if(ISd(Setup_BIT)) panSetup(panSetup_XY[0], panSetup_XY[1]);
+            break;
+        }
     }
     else{
         osd.clear();
