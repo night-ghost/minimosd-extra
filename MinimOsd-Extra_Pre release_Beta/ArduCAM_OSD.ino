@@ -43,7 +43,6 @@
 #undef PSTR 
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
 
-#define MAVLINK10
 
 /* **********************************************/
 /* ***************** INCLUDES *******************/
