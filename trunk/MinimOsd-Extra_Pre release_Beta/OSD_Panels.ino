@@ -175,10 +175,7 @@ void panSetup(int first_col, int first_line){
             osd.printf_P(PSTR("    Overspeed    "));
             osd.printf("%3.0i%c", overspeed, spe);
             uint8_t overspeed_old = overspeed;
-            if ((chan1_raw - 100) > chan1_raw_middle ){
-                overspeed = overspeed - 1;}
-            if ((chan1_raw + 100) < chan1_raw_middle ){
-                overspeed = overspeed + 1;} 
+            overspeed = overspeed + (chan1_raw - chan1_raw_middle) / 100;
             if(overspeed != overspeed_old) EEPROM.write(202, overspeed);
             break;
         }
@@ -187,10 +184,7 @@ void panSetup(int first_col, int first_line){
             osd.printf_P(PSTR("   Stall Speed   "));
             osd.printf("%3.0i%c", stall , spe);
             uint8_t stall_old = stall;
-            if ((chan1_raw - 100) > chan1_raw_middle ){
-                stall = stall - 1;}
-            if ((chan1_raw + 100) < chan1_raw_middle ){
-                stall = stall + 1;} 
+            stall = stall + (chan1_raw - chan1_raw_middle) / 100;
             if(stall != stall_old) EEPROM.write(204, stall);
             break;
         }
@@ -199,14 +193,7 @@ void panSetup(int first_col, int first_line){
             osd.printf_P(PSTR("Battery warning "));
             osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
             uint8_t battv_old = battv;
-            if ((chan1_raw - 100) > chan1_raw_middle )
-            {
-                battv = battv - 1;
-            }
-            if ((chan1_raw + 100) < chan1_raw_middle )
-            {
-                battv = battv + 1;
-            } 
+            battv = battv + (chan1_raw - chan1_raw_middle) / 100;
             if(battv != battv_old) EEPROM.write(206, battv);
             break;
         }
