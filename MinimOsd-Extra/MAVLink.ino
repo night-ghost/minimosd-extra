@@ -1,22 +1,5 @@
-#define MAVLINK_COMM_NUM_BUFFERS 1
-#define MAVLINK_USE_CONVENIENCE_FUNCTIONS
-
-// this code was moved from libraries/GCS_MAVLink to allow compile
-// time selection of MAVLink 1.0
-BetterStream	*mavlink_comm_0_port;
-BetterStream	*mavlink_comm_1_port;
-
-mavlink_system_t mavlink_system = {12,1,0,0};
-
-#include "Mavlink_compat.h"
-
-#ifdef MAVLINK10
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
-#else
-#include "../GCS_MAVLink/include/mavlink/v0.9/mavlink_types.h"
-#include "../GCS_MAVLink/include/mavlink/v0.9/ardupilotmega/mavlink.h"
-#endif
 
 // true when we have received at least 1 MAVLink packet
 static bool mavlink_active;
@@ -50,10 +33,8 @@ void read_mavlink(){
   while(Serial.available() > 0) { 
     uint8_t c = Serial.read();
     
-            /* allow CLI to be started by hitting enter 3 times, if no
-           heartbeat packets have been received */
-
-
+        /* allow CLI to be started by hitting enter 3 times, if no
+        heartbeat packets have been received */
         if (mavlink_active == 0 && millis() < 20000 && millis() > 5000) {
             if (c == '\n' || c == '\r') {
                 crlf_count++;
@@ -65,7 +46,6 @@ void read_mavlink(){
             }
         }
       
-    
     //trying to grab msg  
     if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
        mavlink_active = 1;
@@ -76,11 +56,9 @@ void read_mavlink(){
             mavbeat = 1;
 	    apm_mav_system    = msg.sysid;
 	    apm_mav_component = msg.compid;
-            apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);
-#ifdef MAVLINK10             
+            apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
             osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
-            osd_nav_mode = 0;
-#endif            
+            osd_nav_mode = 0;          
             lastMAVBeat = millis();
             if(waitingMAVBeats == 1){
               enable_mav_request = 1;
@@ -89,33 +67,15 @@ void read_mavlink(){
           break;
         case MAVLINK_MSG_ID_SYS_STATUS:
           {
-#ifndef MAVLINK10            
-            osd_vbat_A = (mavlink_msg_sys_status_get_vbat(&msg) / 1000.0f);
-            osd_mode = mavlink_msg_sys_status_get_mode(&msg);
-            osd_nav_mode = mavlink_msg_sys_status_get_nav_mode(&msg);
-#else
+
             osd_vbat_A = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f);
-            osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg);
-#endif            
+            osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg);         
             osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg);
             //osd_mode = apm_mav_component;//Debug
             //osd_nav_mode = apm_mav_system;//Debug
           }
           break;
-#ifndef MAVLINK10 
-        case MAVLINK_MSG_ID_GPS_RAW:
-          {
-            osd_lat = mavlink_msg_gps_raw_get_lat(&msg);
-            osd_lon = mavlink_msg_gps_raw_get_lon(&msg);
-            osd_fix_type = mavlink_msg_gps_raw_get_fix_type(&msg);
-          }
-          break;
-        case MAVLINK_MSG_ID_GPS_STATUS:
-          {
-            osd_satellites_visible = mavlink_msg_gps_status_get_satellites_visible(&msg);
-          }
-          break;
-#else
+
         case MAVLINK_MSG_ID_GPS_RAW_INT:
           {
             osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
@@ -123,8 +83,7 @@ void read_mavlink(){
             osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
             osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
           }
-          break;
-#endif          
+          break; 
 
         case MAVLINK_MSG_ID_VFR_HUD:
           {
