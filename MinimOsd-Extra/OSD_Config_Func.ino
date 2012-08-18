@@ -170,10 +170,10 @@ void readSettings() {
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
     //  battp = EEPROM.read(208);
-    if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
-        EEPROM.write(194, 1);
-        EEPROM.write(196, 5);
-        EEPROM.write(198, 7);
+    if (EEPROM.read(panSetup_en_ADDR) != 1 || EEPROM.read(panSetup_x_ADDR) != 5 || EEPROM.read(panSetup_y_ADDR) != 7){
+        EEPROM.write(panSetup_en_ADDR, 1);
+        EEPROM.write(panSetup_x_ADDR, 5);
+        EEPROM.write(panSetup_y_ADDR, 7);
     }
     //****** First set of 8 Panels ******
 
