@@ -144,59 +144,52 @@ void panSetup(int first_col, int first_line){
                 setup_menu = setup_menu - 1;
             }
             if (setup_menu < 0){
-                setup_menu = 0;
+                setup_menu = 3;
             }
             if (setup_menu > 3){
-                setup_menu = 3;}
+                setup_menu = 0;}
 
         }
         switch (setup_menu){
         case 0:
-            if (millis() - b > 500){
-                b = millis();
-                if (EEPROM.read(200) == 0){
-                    osd.printf_P(PSTR("    metric system    "));
-                    if ((chan1_raw - 100) > chan1_raw_middle){
-                        EEPROM.write(200, 1);
+          {
+              if (EEPROM.read(measure_ADDR) == 0){
+                  osd.printf_P(PSTR("    metric system    "));
+                  if ((chan1_raw - 100) > chan1_raw_middle){
+                      EEPROM.write(measure_ADDR, 1);
 
-                    }
-                }
-                else {
-                    osd.printf_P(PSTR("      US system       "));
-                    if ((chan1_raw + 100) < chan1_raw_middle){
-                        EEPROM.write(200, 0);
+                  }
+              }
+              else {
+                  osd.printf_P(PSTR("      US system       "));
+                  if ((chan1_raw + 100) < chan1_raw_middle){
+                      EEPROM.write(measure_ADDR, 0);
 
-                    }
-                }
-            }
+                  }
+              }
             break;
+          }
         case 1:
-        {
+          {
             osd.printf_P(PSTR("    Overspeed    "));
             osd.printf("%3.0i%c", overspeed, spe);
-            uint8_t overspeed_old = overspeed;
-            overspeed = overspeed + (chan1_raw - chan1_raw_middle) / 100;
-            if(overspeed != overspeed_old) EEPROM.write(202, overspeed);
+            overspeed = change_val(overspeed, overspeed_ADDR);
             break;
-        }
+          }
         case 2:
-        {
+          {
             osd.printf_P(PSTR("   Stall Speed   "));
             osd.printf("%3.0i%c", stall , spe);
-            uint8_t stall_old = stall;
-            stall = stall + (chan1_raw - chan1_raw_middle) / 100;
-            if(stall != stall_old) EEPROM.write(204, stall);
+            stall = change_val(stall, stall_ADDR);
             break;
-        }
+          }
         case 3:
-        {
+          {
             osd.printf_P(PSTR("Battery warning "));
             osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
-            uint8_t battv_old = battv;
-            battv = battv + (chan1_raw - chan1_raw_middle) / 100;
-            if(battv != battv_old) EEPROM.write(206, battv);
+            battv = change_val(battv, battv_ADDR);
             break;
-        }
+          }
             //      case 4:
             //        osd.printf_P(PSTR("Battery warning "));
             //        osd.printf("%3.0i%c", battp , 0x25);
@@ -211,6 +204,18 @@ void panSetup(int first_col, int first_line){
 
     osd.closePanel();
 }
+ 
+int change_val(int value, int address)
+{
+  uint8_t value_old = value;
+  if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
+  if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
+  if (chan1_raw > chan1_raw_middle + 400) value = value - 4;
+  if (chan1_raw < chan1_raw_middle - 400) value = value + 4;
+  if(value != value_old) EEPROM.write(address, value);
+  return value;
+}
+
 
 /* **************************************************************** */
 // Panel  : pan wind speed
