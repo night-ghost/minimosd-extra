@@ -17,7 +17,7 @@ void writePanels(){
 
 
 
-    if (EEPROM.read(200) == 0){
+    if (EEPROM.read(measure_ADDR) == 0){
         converts = 3.6;
         converth = 1;
         spe = 0x81;
@@ -145,17 +145,17 @@ void panSetup(int first_col, int first_line){
         case 0:
             if (millis() - b > 500){
                 b = millis();
-                if (EEPROM.read(200) == 0){
+                if (EEPROM.read(measure_ADDR) == 0){
                     osd.printf_P(PSTR("    metric system    "));
                     if ((chan1_raw - 100) > chan1_raw_middle){
-                        EEPROM.write(200, 1);
+                        EEPROM.write(measure_ADDR, 1);
 
                     }
                 }
                 else {
                     osd.printf_P(PSTR("      US system       "));
                     if ((chan1_raw + 100) < chan1_raw_middle){
-                        EEPROM.write(200, 0);
+                        EEPROM.write(measure_ADDR, 0);
 
                     }
                 }
@@ -170,7 +170,7 @@ void panSetup(int first_col, int first_line){
                 overspeed = overspeed - 1;}
             if ((chan1_raw + 100) < chan1_raw_middle ){
                 overspeed = overspeed + 1;} 
-            if(overspeed != overspeed_old) EEPROM.write(202, overspeed);
+            if(overspeed != overspeed_old) EEPROM.write(overspeed_ADDR, overspeed);
             break;
         }
         case 2:
@@ -182,7 +182,7 @@ void panSetup(int first_col, int first_line){
                 stall = stall - 1;}
             if ((chan1_raw + 100) < chan1_raw_middle ){
                 stall = stall + 1;} 
-            if(stall != stall_old) EEPROM.write(204, stall);
+            if(stall != stall_old) EEPROM.write(stall_ADDR, stall);
             break;
         }
         case 3:
@@ -198,7 +198,7 @@ void panSetup(int first_col, int first_line){
             {
                 battv = battv + 1;
             } 
-            if(battv != battv_old) EEPROM.write(206, battv);
+            if(battv != battv_old) EEPROM.write(battv_ADDR, battv);
             break;
         }
             //      case 4:
