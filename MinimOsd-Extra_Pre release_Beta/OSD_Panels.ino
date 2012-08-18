@@ -208,10 +208,10 @@ void panSetup(int first_col, int first_line){
 int change_val(int value, int address)
 {
   uint8_t value_old = value;
-  if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
-  if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
-  if (chan1_raw > chan1_raw_middle + 400) value = value - 4;
-  if (chan1_raw < chan1_raw_middle - 400) value = value + 4;
+  if (chan1_raw > chan1_raw_middle + 100) value = value + 1;
+  if (chan1_raw  < chan1_raw_middle - 100) value = value - 1;
+  if (chan1_raw > chan1_raw_middle + 400) value = value + 4;
+  if (chan1_raw < chan1_raw_middle - 400) value = value - 4;
   if(value != value_old) EEPROM.write(address, value);
   return value;
 }
