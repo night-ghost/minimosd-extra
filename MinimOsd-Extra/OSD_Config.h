@@ -2,7 +2,7 @@
 #define on 1
 #define off 0
 
-// Versio number, incrementing this will erase/upload factory settings.
+// Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
 #define VER 74
 
