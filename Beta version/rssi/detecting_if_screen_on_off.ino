@@ -4,7 +4,7 @@
 // Output : OSD off
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
-
+//test file change
 void panOff(){
 if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
   if (osd_off_switch != osd_mode){ 
