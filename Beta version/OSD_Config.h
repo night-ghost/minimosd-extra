@@ -162,15 +162,16 @@
 #define panSetup_x_ADDR 196
 #define panSetup_y_ADDR 198
 
-#define measure_ADDR 200
-#define overspeed_ADDR 202
-#define stall_ADDR 204
-#define battv_ADDR 206
-//#define battp_ADDR 208
 
+
+
+#define measure_ADDR 990
+#define overspeed_ADDR 992
+#define stall_ADDR 994
+#define battv_ADDR 996
+//#define battp_ADDR 998
 
 #define CHK1 1000
 #define CHK2 1006
-
 
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip
