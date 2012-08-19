@@ -2,7 +2,7 @@
 #define on 1
 #define off 0
 
-// Versio number, incrementing this will erase/upload factory settings.
+// Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
 #define VER 74
 
@@ -54,6 +54,8 @@
 
 /* *********************************************** */
 // EEPROM Storage addresses
+
+#define OffsetBITpanel       200
 
 // First of 8 panels
 #define panCenter_en_ADDR 0
@@ -169,5 +171,6 @@
 
 #define CHK1 1000
 #define CHK2 1006
+
 
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip
