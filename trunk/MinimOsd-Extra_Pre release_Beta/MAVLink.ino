@@ -1,15 +1,3 @@
-#define MAVLINK_COMM_NUM_BUFFERS 1
-#define MAVLINK_USE_CONVENIENCE_FUNCTIONS
-
-// this code was moved from libraries/GCS_MAVLink to allow compile
-// time selection of MAVLink 1.0
-BetterStream	*mavlink_comm_0_port;
-BetterStream	*mavlink_comm_1_port;
-
-mavlink_system_t mavlink_system = {12,1,0,0};
-
-#include "Mavlink_compat.h"
-
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
 
