@@ -69,6 +69,7 @@ static float        heding_check = -2;
 static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // air speed
 static float        osd_windspeed = 0;
+static float        osd_windspeedz = 0;
 static float        osd_windspeed_check = 0;
 static float        osd_winddirection = 0;
 static float        osd_winddirection_check = 0;
