@@ -456,114 +456,73 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-
     if (osd_set == 0){
-        if ((start_Time - text_blink) > 0){
-            if (warning_type == 1){
-                warning_type = 0;}
-            else{
-                if (warning_type > 1){ }
-                else{
-                    if ((osd_fix_type) < 2){ 
-                        warning_type = 1;
-                        text_blink = start_Time + 1;
-                        goto Warning;}
-                }
+      if (start_Time > text_blink){ // if the text has been shown for a while
+        if (warning_type != 0) {
+          last_warning = warning_type; // save the warining type for cycling
+          warning_type = 0; // blank the text
+        } else {
+          int x = last_warning; // start the warning checks where we left it last time
+          while (warning_type == 0) { // cycle through the warning checks
+            x++;
+            if (x > 6) x = 1; // change the 6 if you add more warning types
+            switch(x) {
+              case 1:
+                if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
+                break;
+              case 2:
+                if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
+                break;
+              case 3:
+                if ((osd_airspeed * converts) > overspeed) warning_type = 3;
+                break;
+              case 4:
+                if (osd_vbat_A < float(battv)/10.0) warning_type = 4;
+                break;
+              case 5:
+                if (osd_battery_remaining_A < 10) warning_type = 5;
+                break;
+              case 6:
+              //  if ((osd_alt - osd_home_alt) < 10 && (osd_alt - osd_home_alt) > 0) warning = 6;
+              break;
             }
+     
+            if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
+          }
+	}
 
-            if (warning_type == 2){
-                warning_type = 0;}
-            else{
-                if (warning_type > 2){}
-                else{
-                    if ((osd_airspeed * converts) < stall && (osd_airspeed) > 1.12){
-                        warning_type = 2;
-                        text_blink = start_Time + 1;
-                        goto Warning;}
-                }
-            }
-            if (warning_type == 3){
-                warning_type = 0; }
-            else{
-                if (warning_type > 3){}
-                else {
-                    if ((osd_airspeed * converts) > overspeed){
-                        warning_type = 3;
-                        text_blink = start_Time + 1;
-                        goto Warning;}
-                }
-            }
-
-            if (warning_type == 4){
-                warning_type = 0; }
-            else{
-                if (warning_type > 4){}
-                else {
-                    if (osd_vbat_A < float(battv)/10.0){
-                        warning_type = 4;
-                        text_blink = start_Time + 1;
-                        goto Warning;}
-                }
-            }
-
-            if (warning_type == 5){
-                warning_type = 0; }
-            else{
-                if (warning_type > 5){}
-                else {
-                    if (osd_battery_remaining_A < 10){
-                        warning_type = 5;
-                        text_blink = start_Time + 1;
-                        goto Warning;}
-                }
-            }
-            //if (warning_type == 6){
-            //  warning_type = 0; }
-            //      else{
-            //    if (warning_type > 6){}
-            //      else {
-            //      if ((osd_alt - osd_home_alt) < 10 && (osd_alt - osd_home_alt) > 0){
-            //      warning_type = 6;
-            //text_blink = start_Time + 1;
-            //      goto Warning;}
-            //    }
-            //}
-        }
-Warning:
+        text_blink = start_Time + 0.3; // blink every 0.3 secs
+        if (warning_type > 0) osd_off = 0; // turn OSD on if there is a warning
+         
         switch(warning_type){
-        case 0:
+          case 0:
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
             break;   
-        case 1:  
-            osd_off = 0;
+          case 1:  
             osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
             break;
-        case 2:
-            osd_off = 0;
+          case 2:
             osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
             break;
-        case 3:
-            osd_off = 0;
+          case 3:
             osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
             break;
-        case 4:
-            osd_off = 0;
+          case 4:
             osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
             break;
-        case 5:
-            osd_off = 0;
+          case 5:
             osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
             break;
-            //  case 6:
-            //    osd_off = 0;
-            //    osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
-            //    break;
-        }
-
+          case 6:
+          //  osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
+            break;
+          }
+       }
     }
-
     osd.closePanel();
-}
+  }
+
+  
 /* **************************************************************** */
 // Panel  : panThr
 // Needs  : X, Y locations
@@ -610,7 +569,7 @@ void panTime(int first_col, int first_line){
     osd.openPanel();
     start_Time = millis()/1000;
     if (osd_off == 0){
-        osd.printf("%c%2i%c%02i", 0xB3,(start_Time/60)%60,0x3A,start_Time%60);
+        osd.printf("%c%2i%c%02i", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
     }
 
     osd.closePanel();

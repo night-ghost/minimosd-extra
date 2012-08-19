@@ -34,10 +34,10 @@ static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery r
 //static float      osd_curr_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
-static int          start_Time = -1;
+static float        start_Time = -1.0;
 static uint16_t     osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-static int          text_blink = 0;
+static float        text_blink = 0.0;
 static uint8_t      warning_type = 0;
 //static int        char_update = 0;
 static int          osd_off = 0;
