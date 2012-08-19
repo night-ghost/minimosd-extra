@@ -160,9 +160,10 @@ void writeSettings(uint8_t panel) {
     // writeEEPROM(on, panTune_en_ADDR);
     // writeEEPROM(10, panTune_x_ADDR);
     // writeEEPROM(4,  panTune_y_ADDR);
-    writeEEPROM(on, panSetup_en_ADDR + offset);
-    writeEEPROM(10, panSetup_x_ADDR + offset);
-    writeEEPROM(4,  panSetup_y_ADDR + offset);
+
+    writeEEPROM(on, panSetup_en_ADDR);
+    writeEEPROM(10, panSetup_x_ADDR);
+    writeEEPROM(4,  panSetup_y_ADDR);
 }
 
 void readSettings(uint8_t panel) {

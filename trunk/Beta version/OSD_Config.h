@@ -158,12 +158,15 @@
 //#define panTune_en_ADDR 188
 //#define panTune_x_ADDR 190
 //#define panTune_y_ADDR 192
-#define panSetup_en_ADDR 194
-#define panSetup_x_ADDR 196
-#define panSetup_y_ADDR 198
 
 
 
+
+
+
+#define panSetup_en_ADDR 984
+#define panSetup_x_ADDR 986
+#define panSetup_y_ADDR 988
 
 #define measure_ADDR 990
 #define overspeed_ADDR 992
