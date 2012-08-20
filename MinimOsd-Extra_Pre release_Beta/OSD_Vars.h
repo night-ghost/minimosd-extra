@@ -39,6 +39,7 @@ static uint16_t     osd_mode = 0;                   // Navigation mode from RC A
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static float        text_blink = 0.0;
 static uint8_t      warning_type = 0;
+static uint8_t      last_warning = 0;
 //static int        char_update = 0;
 static int          osd_off = 0;
 static uint16_t     osd_off_switch = 0;
@@ -151,4 +152,11 @@ byte panWindSpeed_XY[2];
 byte panClimb_XY[2];
 //byte panTune_XY[2];
 byte panSetup_XY[2];
-
+//*************************************************************************************************************
+//rssi varables
+static uint8_t  rssi = 0;
+static uint8_t  rssipersent = 0;
+static uint8_t  rssical = 0;
+static uint8_t  osd_rssi = 0;
+static uint8_t  radio_setup_flag = 0;
+static int16_t  osd_chan6_raw = 2000;

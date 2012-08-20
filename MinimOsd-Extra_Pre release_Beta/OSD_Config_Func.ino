@@ -149,8 +149,8 @@ void writeSettings() {
  writeEEPROM(10, panWarn_x_ADDR);
  writeEEPROM(4,  panWarn_y_ADDR);
  writeEEPROM(on, panOff_en_ADDR);
- writeEEPROM(10, panOff_x_ADDR);
- writeEEPROM(4,  panOff_y_ADDR);
+ //writeEEPROM(10, panOff_x_ADDR);
+ //writeEEPROM(4,  panOff_y_ADDR);
  writeEEPROM(on, panWindSpeed_en_ADDR);
  writeEEPROM(10, panWindSpeed_x_ADDR);
  writeEEPROM(4,  panWindSpeed_y_ADDR);
@@ -161,8 +161,8 @@ void writeSettings() {
 // writeEEPROM(10, panTune_x_ADDR);
 // writeEEPROM(4,  panTune_y_ADDR);
  writeEEPROM(on, panSetup_en_ADDR);
- writeEEPROM(10, panSetup_x_ADDR);
- writeEEPROM(4,  panSetup_y_ADDR);
+// writeEEPROM(10, panSetup_x_ADDR);
+// writeEEPROM(4,  panSetup_y_ADDR);
 }
 
 void readSettings() {
@@ -176,6 +176,8 @@ void readSettings() {
       EEPROM.write(196, 5);
       EEPROM.write(198, 7);
   }
+   rssical = EEPROM.read(OSD_HIGH_ADDR);
+   rssipersent = EEPROM.read(OSD_LOW_ADDR);
   //****** First set of 8 Panels ******
   
   setBit(panA_REG, Cen_BIT, readEEPROM(panCenter_en_ADDR));
@@ -287,8 +289,8 @@ void readSettings() {
   panWarn_XY[1] = checkPAL(readEEPROM(panWarn_y_ADDR));
   
   setBit(panD_REG, Off_BIT, readEEPROM(panOff_en_ADDR));
-  panOff_XY[0] = readEEPROM(panOff_x_ADDR);
-  panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR));
+  //panOff_XY[0] = readEEPROM(panOff_x_ADDR);
+  //panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR));
   
   setBit(panD_REG, WindS_BIT, readEEPROM(panWindSpeed_en_ADDR));
   panWindSpeed_XY[0] = readEEPROM(panWindSpeed_x_ADDR);
@@ -303,8 +305,8 @@ void readSettings() {
 //  panTune_XY[1] = checkPAL(readEEPROM(panTune_y_ADDR));
   
   setBit(panD_REG, Setup_BIT, readEEPROM(panSetup_en_ADDR));
-  panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
-  panSetup_XY[1] = checkPAL(readEEPROM(panSetup_y_ADDR));
+//  panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
+//  panSetup_XY[1] = checkPAL(readEEPROM(panSetup_y_ADDR));
 }
 
 int checkPAL(int line){
