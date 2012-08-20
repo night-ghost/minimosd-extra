@@ -165,7 +165,9 @@
 #define stall_ADDR 204
 #define battv_ADDR 206
 //#define battp_ADDR 208
-
+#define OSD_HIGH_ADDR 900
+#define OSD_LOW_ADDR 902
+#define RADIO_ON_ADDR 904
 
 #define CHK1 1000
 #define CHK2 1006

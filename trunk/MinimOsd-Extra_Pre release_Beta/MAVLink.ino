@@ -42,7 +42,7 @@ void read_mavlink(){
                 crlf_count = 0;
             }
             if (crlf_count == 3) {
-                uploadFont();
+                //uploadFont();
             }
         }
 
@@ -121,6 +121,8 @@ void read_mavlink(){
                 {
                     chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
                     chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
+                    osd_chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
+                    rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
                 break;
             case MAVLINK_MSG_ID_WIND:

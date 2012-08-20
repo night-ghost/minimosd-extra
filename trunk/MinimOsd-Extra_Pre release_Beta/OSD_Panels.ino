@@ -3,7 +3,7 @@
 void startPanels(){
     osd.clear();
     // Display our logo  
-    panLogo(8,5);
+    panLogo(5,5);
 
 }
 
@@ -46,7 +46,7 @@ void writePanels(){
         //Testing bits from 8 bit register B
         if(ISb(Rose_BIT)) panRose(panRose_XY[0], panRose_XY[1]);        //13x3
         if(ISb(Head_BIT)) panHeading(panHeading_XY[0], panHeading_XY[1]); //13x3
-        if(ISb(MavB_BIT)) panMavBeat(panMavBeat_XY[0], panMavBeat_XY[1]); //13x3
+        //if(ISb(MavB_BIT)) panMavBeat(panMavBeat_XY[0], panMavBeat_XY[1]); //13x3
 
         if(osd_got_home == 1){
             if(ISb(HDis_BIT)) panHomeDis(panHomeDis_XY[0], panHomeDis_XY[1]); //13x3
@@ -57,7 +57,7 @@ void writePanels(){
         if(ISb(Time_BIT)) panTime(panTime_XY[0], panTime_XY[1]);
         //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
         //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
-        //  if(ISb(WRSSI_BIT)) panRSSI(panRSSI_XY[0], panRSSI_XY[1]); //??x??
+        if(ISb(MavB_BIT)) panRSSI(panMavBeat_XY[0], panMavBeat_XY[1]); //??x??
 
         //Testing bits from 8 bit register C 
         //if(osd_got_home == 1){
@@ -74,7 +74,8 @@ void writePanels(){
 
         //Testing bits from 8 bit register D 
         if(ISd(Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]);
-        if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
+        //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
+        if(ISd(Off_BIT)) panOff();
         if(ISd(WindS_BIT)) panWindSpeed(panWindSpeed_XY[0], panWindSpeed_XY[1]);
         if(ISd(Climb_BIT)) panClimb(panClimb_XY[0], panClimb_XY[1]);
         //    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
@@ -90,7 +91,7 @@ void writePanels(){
             break;
         case(3):
             delay_setup = 0;
-            if(ISd(Setup_BIT)) panSetup(panSetup_XY[0], panSetup_XY[1]);
+            panSetup();
             break;
         }
     }
@@ -123,9 +124,9 @@ void writePanels(){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
 
-void panSetup(int first_col, int first_line){
+void panSetup(){
 
-    osd.setPanel(first_col, first_line);
+    osd.setPanel(2, 3);
     osd.openPanel();
 
     if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
@@ -144,9 +145,9 @@ void panSetup(int first_col, int first_line){
                 setup_menu = setup_menu - 1;
             }
             if (setup_menu < 0){
-                setup_menu = 3;
+                setup_menu = 5;
             }
-            if (setup_menu > 3){
+            if (setup_menu > 5){
                 setup_menu = 0;}
 
         }
@@ -155,6 +156,7 @@ void panSetup(int first_col, int first_line){
           {
               if (EEPROM.read(measure_ADDR) == 0){
                   osd.printf_P(PSTR("    metric system    "));
+                  overwritedisplay();
                   if ((chan1_raw - 100) > chan1_raw_middle){
                       EEPROM.write(measure_ADDR, 1);
 
@@ -162,6 +164,7 @@ void panSetup(int first_col, int first_line){
               }
               else {
                   osd.printf_P(PSTR("      US system       "));
+                  overwritedisplay();
                   if ((chan1_raw + 100) < chan1_raw_middle){
                       EEPROM.write(measure_ADDR, 0);
 
@@ -180,6 +183,7 @@ void panSetup(int first_col, int first_line){
           {
             osd.printf_P(PSTR("   Stall Speed   "));
             osd.printf("%3.0i%c", stall , spe);
+            //overwritedisplay();
             stall = change_val(stall, stall_ADDR);
             break;
           }
@@ -187,6 +191,7 @@ void panSetup(int first_col, int first_line){
           {
             osd.printf_P(PSTR("Battery warning "));
             osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
+            overwritedisplay();
             battv = change_val(battv, battv_ADDR);
             break;
           }
@@ -199,12 +204,39 @@ void panSetup(int first_col, int first_line){
             //        battp = battp + 1;} 
             //        EEPROM.write(208, battp);
             //        break;
+         case 4:
+         {
+            osd.setPanel(2, 3);
+            osd.printf_P(PSTR("set RSSI good value       "));
+            osd.printf_P(PSTR("|RSSI strong value ="));
+            osd.printf("%3.0i", rssi);
+            osd.printf_P(PSTR("     |epromm value ="));
+            //rssical = EEPROM.read(OSD_HIGH_ADDR);
+            osd.printf("%3.0i", rssical);
+            rssical = change_val(rssical, OSD_HIGH_ADDR);
+            break;
+         }
+         case 5:
+         {
+            osd.setPanel(2, 3);
+            osd.printf_P(PSTR("set RSSI low value      "));
+            osd.printf_P(PSTR("|RSSI transmitter off ="));
+            osd.printf("%3.0i", rssi);
+            rssipersent = EEPROM.read(OSD_LOW_ADDR);
+            osd.printf_P(PSTR("       |epromm value ="));
+            osd.printf("%3.0i", rssipersent);
+            rssipersent = change_val(rssipersent, OSD_LOW_ADDR);
+            break;
+         }
         }
     }
 
     osd.closePanel();
 }
- 
+void overwritedisplay(){
+     osd.printf_P(PSTR("|                                "));
+     osd.printf_P(PSTR("|                                "));
+} 
 int change_val(int value, int address)
 {
   uint8_t value_old = value;
@@ -292,9 +324,10 @@ void panWindSpeed(int first_col, int first_line){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
 
-void panOff(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
+//void panOff(int first_col, int first_line){
+void panOff(){
+    //osd.setPanel(first_col, first_line);
+    //osd.openPanel();
 
     if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
         if (osd_off_switch != osd_mode){ 
@@ -321,7 +354,7 @@ void panOff(int first_col, int first_line){
         }
     }
 
-    osd.closePanel();
+    //osd.closePanel();
 }
 
 /* **************************************************************** */
@@ -694,7 +727,7 @@ void panLogo(int first_col, int first_line){
     osd.openPanel();
 
     {
-        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|    1.29.2 Pre-Release"));
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|RSSI 1.29.3 Pre-Release"));
     }
 
     osd.closePanel();
@@ -703,7 +736,7 @@ void panLogo(int first_col, int first_line){
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
 void panWaitMAVBeats(int first_col, int first_line){
-    panLogo(8,5);
+    panLogo(5,5);
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
