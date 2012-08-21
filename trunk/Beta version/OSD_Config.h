@@ -4,7 +4,7 @@
 
 // Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
-#define VER 74
+#define VER 75
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
@@ -158,11 +158,6 @@
 //#define panTune_en_ADDR 188
 //#define panTune_x_ADDR 190
 //#define panTune_y_ADDR 192
-
-
-
-
-
 
 #define panSetup_en_ADDR 984
 #define panSetup_x_ADDR 986

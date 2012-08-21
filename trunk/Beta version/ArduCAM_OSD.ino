@@ -201,8 +201,12 @@ void OnMavlinkTimer()
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
-    //For now only panel 0 (the default)
-    writePanels(0);       // writing enabled panels (check OSD_Panels Tab)
+    //Test function to change panel number
+    if ((chan1_raw + 100) < chan1_raw_middle ){
+        panel++;
+        if(panel > 1) panel = 0;
+    } 
+    writePanels(panel);       // writing enabled panels (check OSD_Panels Tab)
 }
 
 
