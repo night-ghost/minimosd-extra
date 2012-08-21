@@ -96,18 +96,21 @@ static boolean      enable_mav_request = 0;
 
 static uint8_t      delay_setup = 0;
 
+
+static const uint8_t npanels = 2; 
+static uint8_t panel = 0; 
+
 // Panel BIT registers
-byte panA_REG = 0b00000000;
-byte panB_REG = 0b00000000;
-byte panC_REG = 0b00000000;
-byte panD_REG = 0b00000000;
+byte panA_REG[npanels] = {0b00000000};
+byte panB_REG[npanels] = {0b00000000};
+byte panC_REG[npanels] = {0b00000000};
+byte panD_REG[npanels] = {0b00000000};
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
 byte SerCMD1 = 0;
 byte SerCMD2 = 0;
 
-static const uint8_t npanels = 3; 
 // First 8 panels and their X,Y coordinate holders
 byte panCenter_XY[2][npanels]; // = { 13,7,0 };
 byte panPitch_XY[2][npanels]; // = { 11,1 };
