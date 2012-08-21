@@ -19,12 +19,17 @@ namespace OSD
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
         //ntsc = 13r 30 char
+        Int16 panel_number = 0;
+        const Int16 npanel = 2;
+
         Size basesize = new Size(30, 16);
         /// <summary>
         /// the un-scaled font render image
         /// </summary>
-        Bitmap screen = new Bitmap(30 * 12, 16 * 18);
-        Bitmap screen2 = new Bitmap(30 * 12, 16 * 18);
+        //Bitmap[] screen = new Bitmap[npanel];
+
+        Bitmap[] screen = new Bitmap[npanel];
+        //Bitmap screen2 = new Bitmap(30 * 12, 16 * 18);
         /// <summary>
         /// the scaled to size background control
         /// </summary>
@@ -40,8 +45,7 @@ namespace OSD
         /// <summary>
         /// used to track currently selected panel across calls
         /// </summary>
-        string currentlyselected1 = "";
-        string currentlyselected2 = "";
+        string[] currentlyselected = new string[npanel];
         /// <summary>
         /// used to track current processing panel across calls (because i maintained the original code for panel drawing)
         /// </summary>
@@ -63,10 +67,9 @@ namespace OSD
         /// </summary>
         Image bgpicture;
 
-        Int16 panel_number = 1;
-
-        bool mousedown1 = false;
-        bool mousedown2 = false;
+        bool[] mousedown = new bool[npanel];
+        //bool mousedown1 = false;
+        //bool mousedown2 = false;
 
         SerialPort comPort = new SerialPort();
 
@@ -75,12 +78,12 @@ namespace OSD
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[30];
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[30];
 
-        Graphics gr;
-        Graphics gr2;
-
+        Graphics[] gr = new Graphics[npanel];
+        //Graphics gr2;
         // in pixels
-        int x = 0, y = 0;
-        int x2 = 0, y2 = 0;
+        int[] x = new int[npanel];
+        int[] y = new int[npanel];
+        //int x2 = 0, y2 = 0;
 
         public OSD()
         {
@@ -94,9 +97,14 @@ namespace OSD
                 bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
             }
             catch { }
-
-            gr = Graphics.FromImage(screen);
-            gr2 = Graphics.FromImage(screen2);
+            for(int i = 0; i < npanel;i++) {
+                screen[i] = new Bitmap(30 * 12, 16 * 18);
+                gr[i] = Graphics.FromImage(screen[i]);
+                mousedown[i] = false;
+                x[i] = 0;
+                y[i] = 0;
+                currentlyselected[i] = "";
+            }
 
             pan = new Panels(this);
 
@@ -109,9 +117,9 @@ namespace OSD
             if (pal)
             {
                 basesize = new Size(30, 16);
-
-                screen = new Bitmap(30 * 12, 16 * 18);
-                screen2 = new Bitmap(30 * 12, 16 * 18);
+                for(int i = 0; i < npanel;i++){
+                    screen[i] = new Bitmap(30 * 12, 16 * 18);
+                }
                 image = new Bitmap(30 * 12, 16 * 18);
 
                 NUM_X.Maximum = 29;
@@ -122,9 +130,10 @@ namespace OSD
             else
             {
                 basesize = new Size(30, 13);
-
-                screen = new Bitmap(30 * 12, 13 * 18);
-                screen2 = new Bitmap(30 * 12, 13 * 18);
+                for (int i = 0; i < npanel; i++)
+                {
+                    screen[i] = new Bitmap(30 * 12, 13 * 18);
+                }
                 image = new Bitmap(30 * 12, 13 * 18);
 
                 NUM_X.Maximum = 29;
@@ -138,8 +147,8 @@ namespace OSD
         //Set item boxes
         void setupFunctions()
         {
-            currentlyselected1 = "";
-            currentlyselected2 = "";
+            //currentlyselected1 = "";
+            //currentlyselected2 = "";
             processingpanel = "";
 
             int a = 0;
@@ -321,24 +330,14 @@ namespace OSD
 
         public void setPanel(int x, int y)
         {
-            if (panel_number == 1)
-            {
-                this.x = x * 12;
-                this.y = y * 18;
-            }
-            else if (panel_number == 2)
-            {
-                this.x2 = x * 12;
-                this.y2 = y * 18;
-            }
+            this.x[panel_number] = x * 12;
+            this.y[panel_number] = y * 18;
         }
 
         public void openPanel()
         {
-            d = 0;
-            r = 0;
-            d2 = 0;
-            r2 = 0;
+            d[panel_number] = 0;
+            r[panel_number] = 0;
         }
 
         public void openSingle(int x, int y)
@@ -355,9 +354,8 @@ namespace OSD
         }
 
         // used for printf tracking line and row
-        int d = 0, r = 0;
-        // used for printf tracking line and row
-        int d2 = 0, r2 = 0;
+        int[] d = new int[npanel];
+        int[] r = new int[npanel];
 
         public void printf(string format, params object[] args)
         {
@@ -369,14 +367,12 @@ namespace OSD
 
             //Console.WriteLine(sb.ToString());
 
-            if(panel_number ==1)
-            {
             foreach (char ch in sb.ToString().ToCharArray())
             {
                 if (ch == '|')
                 {
-                    d += 1;
-                    r = 0;
+                    d[panel_number] += 1;
+                    r[panel_number] = 0;
                     continue;
                 }
 
@@ -385,11 +381,11 @@ namespace OSD
                     // draw red boxs
                     if (selectedrectangle)
                     {
-                        gr.DrawRectangle(Pens.Red, (this.x + r * 12) % screen.Width, (this.y + d * 18), 12, 18);
+                        gr[panel_number].DrawRectangle(Pens.Red, (this.x[panel_number] + r[panel_number] * 12) % screen[panel_number].Width, (this.y[panel_number] + d[panel_number] * 18), 12, 18);
                     }
 
-                    int w1 = (this.x / 12 + r) % basesize.Width;
-                    int h1 = (this.y / 18 + d);
+                    int w1 = (this.x[panel_number] / 12 + r[panel_number]) % basesize.Width;
+                    int h1 = (this.y[panel_number] / 18 + d[panel_number]);
 
                     if (w1 < basesize.Width && h1 < basesize.Height)
                     {
@@ -400,56 +396,14 @@ namespace OSD
                         }
                         else
                         {
-                            gr.DrawImage(chars[ch], (this.x + r * 12) % screen.Width, (this.y + d * 18), 12, 18);
+                            gr[panel_number].DrawImage(chars[ch], (this.x[panel_number] + r[panel_number] * 12) % screen[panel_number].Width, (this.y[panel_number] + d[panel_number] * 18), 12, 18);
                         }
 
                         usedPostion[w1][h1] = processingpanel;
                     }
                 }
                 catch { System.Diagnostics.Debug.WriteLine("printf exception"); }
-                r++;
-                }
-            }
-            else if(panel_number == 2)
-            {
-            foreach (char ch in sb.ToString().ToCharArray())
-            {
-                if (ch == '|')
-                {
-                    d2 += 1;
-                    r2 = 0;
-                    continue;
-                }
-
-                try
-                {
-                    // draw red boxs
-                    if (selectedrectangle)
-                    {
-                        gr2.DrawRectangle(Pens.Red, (this.x2 + r2 * 12) % screen2.Width, (this.y2 + d2 * 18), 12, 18);
-                    }
-
-                    int w1 = (this.x2 / 12 + r2) % basesize.Width;
-                    int h1 = (this.y2 / 18 + d2);
-
-                    if (w1 < basesize.Width && h1 < basesize.Height)
-                    {
-                        // check if this box has bene used
-                        if (usedPostion[w1][h1] != null)
-                        {
-                            //System.Diagnostics.Debug.WriteLine("'" + used[this.x / 12 + r * 12 / 12][this.y / 18 + d * 18 / 18] + "'");
-                        }
-                        else
-                        {
-                            gr2.DrawImage(chars[ch], (this.x2 + r2 * 12) % screen2.Width, (this.y2 + d2 * 18), 12, 18);
-                        }
-
-                        usedPostion[w1][h1] = processingpanel;
-                    }
-                }
-                catch { System.Diagnostics.Debug.WriteLine("printf exception"); }
-                r2++;
-            }
+                r[panel_number]++;
             }
 
         }
@@ -491,8 +445,8 @@ namespace OSD
             x = Constrain(x, 0, pictureBox1.Width - 1);
             y = Constrain(y, 0, pictureBox1.Height - 1);
 
-            float scaleW = pictureBox1.Width / (float)screen.Width;
-            float scaleH = pictureBox1.Height / (float)screen.Height;
+            float scaleW = pictureBox1.Width / (float)screen[panel_number].Width;
+            float scaleH = pictureBox1.Height / (float)screen[panel_number].Height;
 
             int ansW = (int)((x / scaleW / 12) % 30);
             int ansH = 0;
@@ -515,8 +469,8 @@ namespace OSD
             x = Constrain(x, 0, pictureBox2.Width - 1);
             y = Constrain(y, 0, pictureBox2.Height - 1);
 
-            float scaleW = pictureBox2.Width / (float)screen2.Width;
-            float scaleH = pictureBox2.Height / (float)screen2.Height;
+            float scaleW = pictureBox2.Width / (float)screen[panel_number].Width;
+            float scaleH = pictureBox2.Height / (float)screen[panel_number].Height;
 
             int ansW = (int)((x / scaleW / 12) % 30);
             int ansH = 0;
@@ -540,21 +494,13 @@ namespace OSD
 
         public void closePanel()
         {
-            if (panel_number == 1)
-            {
-                x = 0;
-                y = 0;
-            }
-            else if (panel_number == 2)
-            {
-                x2 = 0;
-                y2 = 0;
-            }
+            x[panel_number] = 0;
+            y[panel_number] = 0;
         }
         // draw image and characters overlay
         void osdDraw1()
         {
-            panel_number = 1;
+            panel_number = 0;
             if (startup)
                 return;
 
@@ -565,12 +511,12 @@ namespace OSD
 
             image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
-            float scaleW = pictureBox1.Width / (float)screen.Width;
-            float scaleH = pictureBox1.Height / (float)screen.Height;
+            float scaleW = pictureBox1.Width / (float)screen[panel_number].Width;
+            float scaleH = pictureBox1.Height / (float)screen[panel_number].Height;
 
-            screen = new Bitmap(screen.Width, screen.Height);
+            screen[panel_number] = new Bitmap(screen[panel_number].Width, screen[panel_number].Height);
 
-            gr = Graphics.FromImage(screen);
+            gr[panel_number] = Graphics.FromImage(screen[panel_number]);
 
             image = new Bitmap(image.Width, image.Height);
 
@@ -615,7 +561,7 @@ namespace OSD
                     {
                         if (thing.Item1 == it)
                         {
-                            if (thing.Item1 == currentlyselected1)
+                            if (thing.Item1 == currentlyselected[0])
                             {
                                 selectedrectangle = true;
                             }
@@ -637,7 +583,7 @@ namespace OSD
                 }
             }
 
-            grfull.DrawImage(screen, 0, 0, image.Width, image.Height);
+            grfull.DrawImage(screen[panel_number], 0, 0, image.Width, image.Height);
 
             pictureBox1.Image = image;
         }
@@ -645,7 +591,7 @@ namespace OSD
         // draw image and characters overlay for second panel
         void osdDraw2()
         {
-            panel_number = 2;
+            panel_number = 1;
             if (startup)
                 return;
 
@@ -656,12 +602,12 @@ namespace OSD
 
             image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
 
-            float scaleW = pictureBox2.Width / (float)screen2.Width;
-            float scaleH = pictureBox2.Height / (float)screen2.Height;
+            float scaleW = pictureBox2.Width / (float)screen[panel_number].Width;
+            float scaleH = pictureBox2.Height / (float)screen[panel_number].Height;
 
-            screen2 = new Bitmap(screen2.Width, screen2.Height);
+            screen[panel_number] = new Bitmap(screen[panel_number].Width, screen[panel_number].Height);
 
-            gr2 = Graphics.FromImage(screen2);
+            gr[panel_number] = Graphics.FromImage(screen[panel_number]);
 
             image = new Bitmap(image.Width, image.Height);
 
@@ -706,7 +652,7 @@ namespace OSD
                     {
                         if (thing.Item1 == it)
                         {
-                            if (thing.Item1 == currentlyselected2)
+                            if (thing.Item1 == currentlyselected[1])
                             {
                                 selectedrectangle = true;
                             }
@@ -728,7 +674,7 @@ namespace OSD
                 }
             }
 
-            grfull.DrawImage(screen2, 0, 0, image.Width, image.Height);
+            grfull.DrawImage(screen[panel_number], 0, 0, image.Width, image.Height);
 
             pictureBox2.Image = image;
         }
@@ -766,7 +712,7 @@ namespace OSD
         {
             string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
-            currentlyselected1 = item;
+            currentlyselected[0] = item;
 
             osdDraw1();
 
@@ -784,7 +730,7 @@ namespace OSD
         {
             string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
-            currentlyselected2 = item;
+            currentlyselected[panel_number] = item;
 
             osdDraw2();
 
@@ -957,7 +903,7 @@ namespace OSD
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
             this.toolStripStatusLabel1.Text = ""; 
-
+            //First Panel 
             foreach (string str in this.LIST_items.Items)
             {
                 foreach (var tuple in this.panelItems)
@@ -968,11 +914,36 @@ namespace OSD
                         eeprom[tuple.Item6] = (byte)tuple.Item3; // x
                         eeprom[tuple.Item7] = (byte)tuple.Item4; // y
 
-                        Console.WriteLine(str);
+                        //Console.WriteLine(str);
                     }
                 }
             }
+            //Second Panel 
+            foreach (string str in this.LIST_items2.Items)
+            {
+                foreach (var tuple in this.panelItems2)
+                {
+                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                    {
+                        eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items.CheckedItems.Contains(str) ? 1 : 0);
+                        eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
+                        eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
 
+                        //Console.WriteLine(str);
+                    }
+                }
+            }
+            //for(int i=0;i<201;i++)
+            //{
+            //    Console.Write(i);
+            //    Console.Write(" , ");
+            //    Console.Write(eeprom[i]);
+            //    Console.Write(" vs ");
+            //    Console.Write(i + OffsetBITpanel);
+            //    Console.Write(" , ");
+            //    Console.WriteLine(eeprom[i + OffsetBITpanel]);
+
+            //}
             ArduinoSTK sp;
 
             try
@@ -993,7 +964,7 @@ namespace OSD
             {
                 try
                 {
-                    if (sp.upload(eeprom, 0, 200, 0))
+                    if (sp.upload(eeprom, 0, 200 + (npanel-1)*OffsetBITpanel, 0))
                     {
                         MessageBox.Show("Done!");
                     }
@@ -1029,7 +1000,7 @@ namespace OSD
 
         /* *********************************************** */
         // EEPROM Storage addresses
-
+        const int OffsetBITpanel = 200;
         // First of 8 panels
         const int panCenter_en_ADDR = 0;
         const int panCenter_x_ADDR = 2;
@@ -1398,19 +1369,19 @@ namespace OSD
         {
             getMouseOverItem(e.X, e.Y);
 
-            mousedown1 = false;
+            mousedown[0] = false;
         }
         
         private void pictureBox2_MouseUp(object sender, MouseEventArgs e)
         {
             getMouseOverItem2(e.X, e.Y);
 
-            mousedown2 = false;
+            mousedown[1] = false;
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown1 == true)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown[0] == true)
             {
                 int ansW, ansH;
                 getCharLoc(e.X, e.Y, out ansW, out ansH);
@@ -1426,13 +1397,13 @@ namespace OSD
             }
             else
             {
-                mousedown1 = false;
+                mousedown[0] = false;
             }
         }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown2 == true)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown[1] == true)
             {
                 int ansW, ansH;
                 getCharLoc2(e.X, e.Y, out ansW, out ansH);
@@ -1448,22 +1419,22 @@ namespace OSD
             }
             else
             {
-                mousedown2 = false;
+                mousedown[1] = false;
             }
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            currentlyselected1 = getMouseOverItem(e.X, e.Y);
+            currentlyselected[0] = getMouseOverItem(e.X, e.Y);
 
-            mousedown1 = true;
+            mousedown[0] = true;
         }
 
         private void pictureBox2_MouseDown(object sender, MouseEventArgs e)
         {
-            currentlyselected2 = getMouseOverItem2(e.X, e.Y);
+            currentlyselected[1] = getMouseOverItem2(e.X, e.Y);
 
-            mousedown2 = true;
+            mousedown[1] = true;
         }
 
                 
