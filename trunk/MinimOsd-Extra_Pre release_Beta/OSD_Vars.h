@@ -37,18 +37,16 @@ static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery r
 static float        start_Time = -1.0;
 static uint16_t     osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-static float        text_blink = 0.0;
+static unsigned long        text_timer = 0;
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
 //static int        char_update = 0;
-static int          osd_off = 0;
+static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
 static uint16_t     osd_switch_last = 100;
-static long         osd_switch_time = 0;
-static long         wind_time = 0;
+static unsigned long         osd_switch_time = 0;
+static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
-static long         a = 0;
-static long         b = 0;
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude

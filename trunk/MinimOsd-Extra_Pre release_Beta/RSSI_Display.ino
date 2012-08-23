@@ -1,5 +1,4 @@
 void panRSSI(int first_col, int first_line){
- if (osd_off == 0){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   //rssical = EEPROM.read(OSD_HIGH_ADDR);
@@ -19,6 +18,5 @@ void panRSSI(int first_col, int first_line){
   osd.printf("rssi ");
   osd.printf("%3i%c",osd_rssi,0x25); 
   osd.closePanel();
- }
 }
 
