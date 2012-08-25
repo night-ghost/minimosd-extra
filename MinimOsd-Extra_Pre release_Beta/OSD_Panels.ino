@@ -2,8 +2,7 @@
 
 void startPanels(){
     osd.clear();
-    panLogo(5,5); // Display our logo  
-    do_converts(); // load the unit conversion preferences
+    panLogo(); // Display our logo  
 }
 
 /******* PANELS - POSITION *******/
@@ -97,6 +96,28 @@ void writePanels(){
 
 /******* PANELS - DEFINITION *******/
 
+//------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
+
+void panLogo(){
+  int first_col = 5;
+  int first_line = 5;
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r76"));
+  osd.closePanel();
+}
+
+//------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
+
+void panWaitMAVBeats(int first_col, int first_line){
+    panLogo();
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
+    osd.closePanel();
+}
+
+
 /* **************************************************************** */
 // Panel  : panSetup
 // Needs  : Nothing, uses whole screen
@@ -118,10 +139,15 @@ void panSetup(){
         chan2_raw_middle = chan2_raw;
     }
     
-    if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
-    if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
-    if (setup_menu < 0) setup_menu = 5;
-    if (setup_menu > 5) setup_menu = 0;
+    if ((chan2_raw - 100) > chan2_raw_middle) {
+      setup_menu = setup_menu + 1;
+      if (setup_menu > 5) setup_menu = 0;
+    }
+      
+    if ((chan2_raw + 100) < chan2_raw_middle) {
+      setup_menu = setup_menu - 1;
+      if (setup_menu < 0) setup_menu = 5;
+    }
 
     switch (setup_menu){
     case 0:
@@ -193,19 +219,20 @@ void panSetup(){
         osd.printf("%3.0i", rssipersent);
         rssipersent = change_val(rssipersent, OSD_LOW_ADDR);
         break;
-     }
-   }
- }
- osd.closePanel();
+      }
+    }
+  }
+  osd.closePanel();
 }
 
 int change_val(int value, int address)
 {
   uint8_t value_old = value;
+  text_timer = text_timer + 500;
   if (chan1_raw > chan1_raw_middle + 100) value = value + 1;
-  if (chan1_raw  < chan1_raw_middle - 100) value = value - 1;
-  if (chan1_raw > chan1_raw_middle + 400) value = value + 4;
-  if (chan1_raw < chan1_raw_middle - 400) value = value - 4;
+  if (chan1_raw < chan1_raw_middle - 100) value = value - 1;
+  if (chan1_raw > chan1_raw_middle + 400) text_timer = text_timer - 900;
+  if (chan1_raw < chan1_raw_middle - 400) text_timer = text_timer - 900;
   if(value != value_old) EEPROM.write(address, value);
   return value;
 }
@@ -631,25 +658,6 @@ void panBatt_A(int first_col, int first_line){
     else osd.printf("%c%5.2f%c%c", 0xE2, (double)osd_vbat_A, 0x8E, osd_battery_pic_A);
     */
     osd.printf("%c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
-    osd.closePanel();
-}
-
-//------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
-
-void panLogo(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release|r75"));
-    osd.closePanel();
-}
-
-//------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
-
-void panWaitMAVBeats(int first_col, int first_line){
-    panLogo(5,5);
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
     osd.closePanel();
 }
 
