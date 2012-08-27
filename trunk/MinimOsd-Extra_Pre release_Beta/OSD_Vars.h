@@ -130,7 +130,6 @@ byte panHomeDis_XY[2]; // = { 0,0 };
 byte panWPDir_XY[2]; // = { 0,0 };
 byte panWPDis_XY[2]; // = { 0,0 };
 byte panTime_XY[2];
-//byte panRSSI_XY[2] = { 0,0 };
 
 // Third set of panels and their X,Y coordinate holders
 byte panCur_A_XY[2]; // = { 23,1 };
@@ -143,13 +142,14 @@ byte panThr_XY[2]; // = { 0,0 };
 byte panFMod_XY[2]; // = { 0,0 };
 byte panHorizon_XY[2]; // = {8,centercalc}
 
-// Third set of panels and their X,Y coordinate holders
+// Fourth set of panels and their X,Y coordinate holders
 byte panWarn_XY[2];
 byte panOff_XY[2];
 byte panWindSpeed_XY[2];
 byte panClimb_XY[2];
 //byte panTune_XY[2];
 byte panSetup_XY[2];
+byte panRSSI_XY[2];
 //*************************************************************************************************************
 //rssi varables
 static uint8_t  rssi = 0;

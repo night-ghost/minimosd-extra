@@ -108,9 +108,9 @@ void writeSettings() {
 // writeEEPROM(off,panWPDis_en_ADDR);
 // writeEEPROM(0,  panWPDis_x_ADDR);
 // writeEEPROM(0,  panWPDis_y_ADDR);
- //writeEEPROM(on, panRSSI_en_ADDR);
- //writeEEPROM(21, panRSSI_x_ADDR);
- //writeEEPROM(5,  panRSSI_y_ADDR);
+ writeEEPROM(on, panRSSI_en_ADDR);
+ writeEEPROM(21, panRSSI_x_ADDR);
+ writeEEPROM(5,  panRSSI_y_ADDR);
  
  writeEEPROM(on, panCur_A_en_ADDR);
  writeEEPROM(21, panCur_A_x_ADDR);
@@ -241,10 +241,6 @@ void readSettings() {
   setBit(panB_REG, Time_BIT, readEEPROM(panTime_en_ADDR));
   panTime_XY[0] = readEEPROM(panTime_x_ADDR);
   panTime_XY[1] = checkPAL(readEEPROM(panTime_y_ADDR));
-  
-  //setBit(panB_REG, RSSI_BIT, readEEPROM(panRSSI_en_ADDR));
-  //panRSSI_XY[0] = readEEPROM(panRSSI_x_ADDR);
-  //panRSSI_XY[1] = checkPAL(readEEPROM(panRSSI_y_ADDR));
 
   //****** Third set of 8 Panels ******
 
@@ -307,6 +303,10 @@ void readSettings() {
   setBit(panD_REG, Setup_BIT, readEEPROM(panSetup_en_ADDR));
 //  panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
 //  panSetup_XY[1] = checkPAL(readEEPROM(panSetup_y_ADDR));
+
+  setBit(panD_REG, RSSI_BIT, readEEPROM(panRSSI_en_ADDR));
+  panRSSI_XY[0] = readEEPROM(panRSSI_x_ADDR);
+  panRSSI_XY[1] = checkPAL(readEEPROM(panRSSI_y_ADDR));
 }
 
 int checkPAL(int line){

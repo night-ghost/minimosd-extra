@@ -95,8 +95,28 @@ namespace OSD
         //static uint8_t apm_mav_system = 7;
         //static uint8_t apm_mav_component = 0;
         //static boolean enable_mav_request = 0;
-
+        static int osd_rssi = 2; 
         /******* PANELS - DEFINITION *******/
+
+        /* **************************************************************** */
+        // Panel  : panClimb
+        // Needs  : X, Y locations
+        // Output : Alt symbol and altitude value in meters from MAVLink
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panRSSI(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+
+            {
+                osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
+            }
+
+            osd.closePanel();
+            return 0;
+        }
 
         /* **************************************************************** */
         // Panel  : panTune

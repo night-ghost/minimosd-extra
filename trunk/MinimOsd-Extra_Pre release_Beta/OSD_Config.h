@@ -51,7 +51,7 @@
 #define Climb_BIT      3
 //#define Tune_BIT       4
 #define Setup_BIT      5
-
+#define RSSI_BIT       6
 /* *********************************************** */
 // EEPROM Storage addresses
 
