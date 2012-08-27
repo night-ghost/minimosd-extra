@@ -45,7 +45,7 @@ void writePanels(){
           if(ISb(Time_BIT)) panTime(panTime_XY[0], panTime_XY[1]);
           //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
           //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
-          if(ISb(MavB_BIT)) panRSSI(panMavBeat_XY[0], panMavBeat_XY[1]); //??x??
+          if(ISd(RSSI_BIT)) panRSSI(panMavBeat_XY[0], panMavBeat_XY[1]); //??x??
   
           //Testing bits from 8 bit register C 
           //if(osd_got_home == 1){
@@ -96,6 +96,34 @@ void writePanels(){
 
 /******* PANELS - DEFINITION *******/
 
+/* **************************************************************** */
+// Panel  : panRSSI
+// Needs  : X, Y locations
+// Output : Alt symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+void panRSSI(int first_col, int first_line){
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  //rssical = EEPROM.read(OSD_HIGH_ADDR);
+  //rssipersent = EEPROM.read(OSD_LOW_ADDR);
+  osd_rssi = rssi;
+  if (osd_rssi > rssical){
+    osd_rssi = rssical;
+  }
+  if (osd_rssi < rssipersent){
+    osd_rssi = rssipersent;
+  }
+  osd_rssi = osd_rssi - rssipersent;
+  osd_rssi = (osd_rssi * 100)/rssipersent;
+  if(osd_rssi >100){
+    osd_rssi = 100;
+  }
+  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
+  osd.closePanel();
+}
+
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
 void panLogo(){
@@ -103,7 +131,7 @@ void panLogo(){
   int first_line = 5;
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r76"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r77"));
   osd.closePanel();
 }
 
