@@ -132,7 +132,7 @@ void panLogo(){
   int first_line = 5;
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r78"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.4 Pre-Release r81"));
   osd.closePanel();
 }
 
@@ -279,7 +279,7 @@ void panWindSpeed(int first_col, int first_line){
     osd.openPanel();
 
     osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
-    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int =+ 16; //normalize
+    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
     showWindOSD(); //print data to OSD
 
     osd.closePanel();
