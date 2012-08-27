@@ -45,7 +45,7 @@ void writePanels(){
           if(ISb(Time_BIT)) panTime(panTime_XY[0], panTime_XY[1]);
           //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
           //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
-          if(ISd(RSSI_BIT)) panRSSI(panMavBeat_XY[0], panMavBeat_XY[1]); //??x??
+          if(ISb(MavB_BIT)) panMavBeat(panMavBeat_XY[0], panMavBeat_XY[1]); //13x3
   
           //Testing bits from 8 bit register C 
           //if(osd_got_home == 1){
@@ -65,6 +65,7 @@ void writePanels(){
           if(ISd(WindS_BIT)) panWindSpeed(panWindSpeed_XY[0], panWindSpeed_XY[1]);
           if(ISd(Climb_BIT)) panClimb(panClimb_XY[0], panClimb_XY[1]);
           //    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
+          if(ISd(RSSI_BIT)) panRSSI(panRSSI_XY[0], panRSSI_XY[1]); //??x??
         }
       } else { // if (osd_set == 1)
         panSetup();
@@ -131,7 +132,7 @@ void panLogo(){
   int first_line = 5;
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r77"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release r78"));
   osd.closePanel();
 }
 
