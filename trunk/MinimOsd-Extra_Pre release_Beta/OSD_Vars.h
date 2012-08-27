@@ -45,7 +45,7 @@ static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
 static uint16_t     osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
-static unsigned long         wind_time = 0;
+//static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
 
 static float        osd_lat = 0;                    // latidude
@@ -64,15 +64,12 @@ static int8_t       osd_pitch = 0;                  // pitch form DCM
 static int8_t       osd_roll = 0;                   // roll form DCM
 static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
-static float        heding_check = -2;
 static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // air speed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
-static float        osd_windspeed_check = 0;
 static float        osd_winddirection = 0;
-static float        osd_winddirection_check = 0;
-static float        osd_wind_arrow_rotate = 0;
+static float        osd_wind_arrow_rotate = 0.0;
 static uint8_t      osd_wind_arrow_rotate_int;
 
 static int          wind = 0;
@@ -93,7 +90,7 @@ static uint8_t      apm_mav_system;
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
 
-static uint8_t      delay_setup = 0;
+//static uint8_t      delay_setup = 0;
 
 // Panel BIT registers
 byte panA_REG = 0b00000000;

@@ -277,58 +277,15 @@ int change_val(int value, int address)
 void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-        if (osd_airspeed > 6){
-            if (heding_check == -2){
-                heding_check = osd_heading;
-            }
-            if (millis() - wind_time > 60000){
-                wind_time = millis();
-                if (heding_check == -1){
-                    osd_windspeed = osd_windspeed_check;
-                    osd_winddirection = osd_winddirection_check;
-                    osd_windspeed_check = 0;
-                    wind = 1;
-                }
-                heding_check = osd_heading;      
+    osd_wind_arrow_rotate = osd_winddirection - osd_heading;
+    
+    if (osd_winddirection - osd_heading < 0.0){
+        osd_wind_arrow_rotate = osd_wind_arrow_rotate + 360.0;
+    }
 
-            }
+    osd_wind_arrow_rotate_int = round(osd_wind_arrow_rotate/360.0 * 16.0); //Convert to int 0-16 
 
-            if ((heding_check - osd_heading) < 0 ){
-                if (((heding_check - osd_heading) * -1) >= 177.5 && ((heding_check - osd_heading) * -1) <= 182.5){
-                    heding_check = -1;
-                }
-            }
-            else if ((heding_check - osd_heading) >= 177.5 && (heding_check - osd_heading) <= 182.5){
-                heding_check = -1;
-            }
-
-            if (osd_airspeed > osd_groundspeed){
-                if ((osd_airspeed - osd_groundspeed) > osd_windspeed_check){
-                    osd_windspeed_check = (osd_airspeed - osd_groundspeed);
-                    if (osd_heading > 180){
-                        osd_winddirection_check = (osd_heading - 180);}
-                    else {
-                        osd_winddirection_check = (osd_heading + 180);
-                    }
-                }
-            }
-
-            else if (osd_groundspeed > osd_airspeed){
-                if ((osd_groundspeed - osd_airspeed) > osd_windspeed_check){
-                    osd_windspeed_check = (osd_groundspeed - osd_airspeed);
-                    osd_winddirection_check = osd_heading;
-                }
-            }  
-
-        }
-        osd_wind_arrow_rotate = osd_winddirection - osd_heading;
-        if (osd_winddirection - osd_heading < 0){
-            osd_wind_arrow_rotate = osd_wind_arrow_rotate + 360;
-        }
-
-        osd_wind_arrow_rotate_int = round(osd_wind_arrow_rotate/360.0 * 16.0); //Convert to int 1-16 
-
-        showWindOSD(); //print data to OSD
+    showWindOSD(); //print data to OSD
 
     osd.closePanel();
 }

@@ -89,7 +89,7 @@ void read_mavlink(){
                 {
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
-                    osd_heading = mavlink_msg_vfr_hud_get_heading(&msg);// * 3.60f;//0-100% of 360
+                    osd_heading = mavlink_msg_vfr_hud_get_heading(&msg);// 0..360 deg, 0=north
                     osd_throttle = mavlink_msg_vfr_hud_get_throttle(&msg);
                     if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
                     if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
@@ -127,7 +127,7 @@ void read_mavlink(){
                 break;
             case MAVLINK_MSG_ID_WIND:
                 {
-                osd_winddirection = mavlink_msg_wind_get_direction(&msg); //degrees
+                osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
                 osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
                 osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }
