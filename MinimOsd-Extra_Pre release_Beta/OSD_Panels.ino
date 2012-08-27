@@ -270,21 +270,16 @@ int change_val(int value, int address)
 /* **************************************************************** */
 // Panel  : pan wind speed
 // Needs  : X, Y locations
-// Output : Velocity value from MAVlink with symbols
+// Output : Wind direction symbol (arrow) and velocity
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
 void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd_wind_arrow_rotate = osd_winddirection - osd_heading;
-    
-    if (osd_winddirection - osd_heading < 0.0){
-        osd_wind_arrow_rotate = osd_wind_arrow_rotate + 360.0;
-    }
 
-    osd_wind_arrow_rotate_int = round(osd_wind_arrow_rotate/360.0 * 16.0); //Convert to int 0-16 
-
+    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
+    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int =+ 16; //normalize
     showWindOSD(); //print data to OSD
 
     osd.closePanel();

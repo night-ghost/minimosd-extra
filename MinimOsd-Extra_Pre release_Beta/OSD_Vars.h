@@ -69,8 +69,7 @@ static float        osd_airspeed = -1;              // air speed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
 static float        osd_winddirection = 0;
-static float        osd_wind_arrow_rotate = 0.0;
-static uint8_t      osd_wind_arrow_rotate_int;
+static int8_t       osd_wind_arrow_rotate_int;
 
 static int          wind = 0;
 //static int osd_wind_arrow = 0;
