@@ -89,7 +89,7 @@ void read_mavlink(){
                 {
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
-                    osd_heading = mavlink_msg_vfr_hud_get_heading(&msg);// 0..360 deg, 0=north
+                    osd_heading = mavlink_msg_vfr_hud_get_heading(&msg);// * 3.60f;//0-100% of 360
                     osd_throttle = mavlink_msg_vfr_hud_get_throttle(&msg);
                     if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
                     if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
@@ -121,27 +121,15 @@ void read_mavlink(){
                 {
                     chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
                     chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
-                    switch (osd_toggle_chan)
-                    {
-                      case 0:
-                        osd_toggle_chan_raw = 1500;  // This is probably unnecessary
-                        break;
-                      case 1:
-                        osd_toggle_chan_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
-                        break;
-                      case 2:
-                        osd_toggle_chan_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                        break;
-                      case 3:
-                        osd_toggle_chan_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                        break;
-                    }
+                    osd_chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
+                    osd_chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
+                    osd_chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
                     rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
                 break;
             case MAVLINK_MSG_ID_WIND:
                 {
-                osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
+                osd_winddirection = mavlink_msg_wind_get_direction(&msg); //degrees
                 osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
                 osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }

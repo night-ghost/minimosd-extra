@@ -163,7 +163,6 @@ void writeSettings() {
  writeEEPROM(on, panSetup_en_ADDR);
 // writeEEPROM(10, panSetup_x_ADDR);
 // writeEEPROM(4,  panSetup_y_ADDR);
- writeEEPROM(0, OSD_Toggle_ADDR);
 }
 
 void readSettings() {
@@ -171,16 +170,17 @@ void readSettings() {
   overspeed = EEPROM.read(202);
   stall = EEPROM.read(204);
   battv = EEPROM.read(206);
+//  ch_off = EEPROM.read(906);
+  ch_off = 8;
 //  battp = EEPROM.read(208);
-  if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
+//  if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
+  if (EEPROM.read(194) != 1){
       EEPROM.write(194, 1);
-      EEPROM.write(196, 5);
-      EEPROM.write(198, 7);
+  //    EEPROM.write(196, 5);
+  //    EEPROM.write(198, 7);
   }
-  rssical = EEPROM.read(OSD_HIGH_ADDR);
-  rssipersent = EEPROM.read(OSD_LOW_ADDR);
-  osd_toggle_chan = EEPROM.read(OSD_Toggle_ADDR);
-  
+   rssical = EEPROM.read(OSD_HIGH_ADDR);
+   rssipersent = EEPROM.read(OSD_LOW_ADDR);
   //****** First set of 8 Panels ******
   
   setBit(panA_REG, Cen_BIT, readEEPROM(panCenter_en_ADDR));
@@ -310,7 +310,6 @@ void readSettings() {
   setBit(panD_REG, RSSI_BIT, readEEPROM(panRSSI_en_ADDR));
   panRSSI_XY[0] = readEEPROM(panRSSI_x_ADDR);
   panRSSI_XY[1] = checkPAL(readEEPROM(panRSSI_y_ADDR));
-  
 }
 
 int checkPAL(int line){
