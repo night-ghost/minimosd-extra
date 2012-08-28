@@ -2,9 +2,9 @@
 #define on 1
 #define off 0
 
-// Versio number, incrementing this will erase/upload factory settings.
+// Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
-#define VER 74
+#define VER 84
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
@@ -52,6 +52,8 @@
 //#define Tune_BIT       4
 #define Setup_BIT      5
 #define RSSI_BIT       6
+
+
 /* *********************************************** */
 // EEPROM Storage addresses
 
@@ -168,6 +170,7 @@
 #define OSD_HIGH_ADDR 900
 #define OSD_LOW_ADDR 902
 #define RADIO_ON_ADDR 904
+#define OSD_Toggle_ADDR 906
 
 #define CHK1 1000
 #define CHK2 1006

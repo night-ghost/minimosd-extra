@@ -18,7 +18,6 @@ void writePanels(){
     if(millis() < (lastMAVBeat + 2000)){
       if(ISd(Off_BIT)) panOff(); // This must be first so you can always toggle
       if (osd_set == 0) { // setup panel is called in the else at the end
-        if(ISd(Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
         if (osd_on == 1)
         {
           //Testing bits from 8 bit register A 
@@ -67,6 +66,7 @@ void writePanels(){
           //    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
           if(ISd(RSSI_BIT)) panRSSI(panRSSI_XY[0], panRSSI_XY[1]); //??x??
         }
+        if(ISd(Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings overwrite OSD
       } else { // if (osd_set == 1)
         panSetup();
       }
@@ -132,7 +132,7 @@ void panLogo(){
   int first_line = 5;
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.4 Pre-Release r81"));
+  osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.5 Pre-Release r83"));
   osd.closePanel();
 }
 
@@ -170,19 +170,19 @@ void panSetup(){
     
     if ((chan2_raw - 100) > chan2_raw_middle) {
       setup_menu = setup_menu + 1;
-      if (setup_menu > 5) setup_menu = 0;
+      if (setup_menu > 6) setup_menu = 0;
     }
       
     if ((chan2_raw + 100) < chan2_raw_middle) {
       setup_menu = setup_menu - 1;
-      if (setup_menu < 0) setup_menu = 5;
+      if (setup_menu < 0) setup_menu = 6;
     }
 
     switch (setup_menu){
     case 0:
       {
           if (EEPROM.read(measure_ADDR) == 0){
-              osd.printf_P(PSTR("    metric system    "));
+              osd.printf_P(PSTR("    Metric system    "));
               if ((chan1_raw - 100) > chan1_raw_middle){
                   EEPROM.write(measure_ADDR, 1);
                   do_converts();
@@ -197,13 +197,41 @@ void panSetup(){
         break;
       }
     case 1:
+    {
+        osd.printf_P(PSTR("OSD on/off switch"));
+        switch (osd_toggle_temp)
+        {
+          case 0:
+            osd.printf_P(PSTR("|Flight Mode Toggle"));
+            break;
+          case 1:
+            osd.printf_P(PSTR("|Ch 5"));
+            break;
+          case 2:
+            osd.printf_P(PSTR("|Ch 6"));
+            break;
+          case 3:
+            osd.printf_P(PSTR("|Ch 7"));
+            break;
+        }
+        if ((chan1_raw - 100) > chan1_raw_middle){
+          osd_toggle_temp++;
+          if (osd_toggle_temp > 3) osd_toggle_temp = 0;
+        }
+        if ((chan1_raw + 100) < chan1_raw_middle){
+          osd_toggle_temp--;
+          if (osd_toggle_temp < 0) osd_toggle_temp = 3;
+        }
+        break;
+    }
+    case 2:
       {
         osd.printf_P(PSTR("    Overspeed    "));
         osd.printf("%3.0i%c", overspeed, spe);
         overspeed = change_val(overspeed, overspeed_ADDR);
         break;
       }
-    case 2:
+    case 3:
       {
         osd.printf_P(PSTR("   Stall Speed   "));
         osd.printf("%3.0i%c", stall , spe);
@@ -211,7 +239,7 @@ void panSetup(){
         stall = change_val(stall, stall_ADDR);
         break;
       }
-    case 3:
+    case 4:
       {
         osd.printf_P(PSTR("Battery warning "));
         osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
@@ -227,7 +255,7 @@ void panSetup(){
         //        battp = battp + 1;} 
         //        EEPROM.write(208, battp);
         //        break;
-     case 4:
+     case 5:
      {
         osd.printf_P(PSTR("set RSSI good value       "));
         osd.printf_P(PSTR("|RSSI strong value ="));
@@ -238,7 +266,7 @@ void panSetup(){
         rssical = change_val(rssical, OSD_HIGH_ADDR);
         break;
      }
-     case 5:
+     case 6:
      {
         osd.printf_P(PSTR("set RSSI low value      "));
         osd.printf_P(PSTR("|RSSI transmitter off ="));
@@ -296,35 +324,59 @@ void panWindSpeed(int first_col, int first_line){
 void panOff(){
     //osd.setPanel(first_col, first_line);
     //osd.openPanel();
-
+    if (osd_toggle_chan > 3) osd_toggle_chan = 0;
+    
+  if (osd_toggle_chan == 0) {
     if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
-        if (osd_off_switch != osd_mode){ 
-            osd_off_switch = osd_mode;
-            osd_switch_time = millis();
+      if (osd_off_switch != osd_mode){ 
+        osd_off_switch = osd_mode;
+        osd_switch_time = millis();
 
-            if (osd_off_switch == osd_switch_last){
-                if (osd_on == 0){
-                    osd_on = 1;
-                    osd_set = 0;
-                    osd.clear();
-                }
-                else {
-                    osd_on = 0;
-                    osd.clear();
-                    if (millis() <= 60000){
-                        osd_set = 1;  
-                    }
-                }
-            }
+        if (osd_off_switch == osd_switch_last){
+          if (osd_on == 0)
+            turn_osd_on();
+          else
+            turn_osd_off();
         }
-        if ((millis() - osd_switch_time) > 2000){
-            osd_switch_last = osd_mode;
-        }
+      }
+      if ((millis() - osd_switch_time) > 2000){
+          osd_switch_last = osd_mode;
+      }
+    } 
+  } else {
+    if (osd_toggle_chan_raw < 1300)
+      turn_osd_off();
+    if (osd_toggle_chan_raw > 1700)
+      turn_osd_on();
+  }
+}
+  //osd.closePanel();
+
+
+void turn_osd_on()
+{
+  if (osd_on == 0)
+  {
+    osd.clear();
+    osd_on = 1;
+    if (osd_set == 1) // Exiting setup
+    {
+      osd_toggle_chan = osd_toggle_temp;
+      EEPROM.write(OSD_Toggle_ADDR, osd_toggle_chan);
+      osd_set = 0;
     }
-
-    //osd.closePanel();
+  }
 }
 
+void turn_osd_off()
+{
+  if (osd_on == 1)
+  {
+    osd.clear();
+    osd_on = 0;
+    if (millis() <= 60000) osd_set = 1;
+  }
+}
 /* **************************************************************** */
 // Panel  : panTune
 // Needs  : X, Y locations
@@ -474,28 +526,26 @@ void panWarn(int first_col, int first_line){
 	}
 
         text_timer = millis() + 300; // blink every 0.3 secs
-        if (warning_type > 0) osd_on = 1; // turn OSD on if there is a warning
+        if (warning_type > 0 && osd_toggle_chan == 0) osd_on = 1; // turn OSD on if there is a warning and we're using flight modes to toggle OSD
          
         switch(warning_type){
-          case 0:
+          case 0: // Blank (all spaces)
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
             break;   
-          case 1:  
-            osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
+          case 1: // No GPS Fix!
+            osd.printf_P(PSTR("\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
             break;
-          case 2:
+          case 2: // Stall!
             osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
             break;
-          case 3:
+          case 3: // Overspeed!
             osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
             break;
-          case 4:
+          case 4: 
+          case 5: // Battery Low!
             osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
             break;
-          case 5:
-            osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-            break;
-          case 6:
+          case 6: // Pull Up!
           //  osd.printf_P(PSTR("\x20\x20\x50\x75\x6c\x6c\x20\x55\x70\x21\x20\x20"));
             break;
           }
@@ -685,7 +735,8 @@ void panGPL(int first_col, int first_line){
 void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
+//    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
+    osd.printf("%c%2i", 0x0f,osd_toggle_chan);
     osd.closePanel();
 }
 
