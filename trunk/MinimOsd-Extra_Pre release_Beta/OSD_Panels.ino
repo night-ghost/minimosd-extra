@@ -116,8 +116,8 @@ void panRSSI(int first_col, int first_line){
   if (osd_rssi < rssipersent){
     osd_rssi = rssipersent;
   }
-  osd_rssi = osd_rssi - rssipersent;
-  osd_rssi = (osd_rssi * 100)/rssipersent;
+  osd_rssi = osd_rssi - (rssical - rssipersent);
+  osd_rssi = (osd_rssi * 100)/(rssical - rssipersent);
   if(osd_rssi >100){
     osd_rssi = 100;
   }
