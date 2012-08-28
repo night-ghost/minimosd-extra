@@ -179,8 +179,8 @@ void readSettings() {
   //    EEPROM.write(196, 5);
   //    EEPROM.write(198, 7);
   }
-   rssical = EEPROM.read(OSD_HIGH_ADDR);
-   rssipersent = EEPROM.read(OSD_LOW_ADDR);
+   rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
+   rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
   //****** First set of 8 Panels ******
   
   setBit(panA_REG, Cen_BIT, readEEPROM(panCenter_en_ADDR));
