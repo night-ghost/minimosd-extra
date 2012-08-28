@@ -735,8 +735,7 @@ void panGPL(int first_col, int first_line){
 void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-//    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
-    osd.printf("%c%2i", 0x0f,osd_toggle_chan);
+    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
     osd.closePanel();
 }
 
