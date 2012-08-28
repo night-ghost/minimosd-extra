@@ -1,6 +1,6 @@
 /*Panels variables*/
 //Will come from APM telem port
-//28688
+
 //static float	nav_roll = 0; // Current desired roll in degrees
 //static float  nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t	nav_bearing = 0; // Current desired heading in degrees
@@ -14,7 +14,7 @@ static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
 static int16_t      chan1_raw_middle = 0;
 static int16_t      chan2_raw_middle = 0;
-static int16_t      osd_toggle_chan_raw = 1500;
+static int16_t      ch_off = 0;
 static int          osd_set = 0;
 
 static int          setup_menu = 0;
@@ -46,10 +46,8 @@ static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
 static uint16_t     osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
-//static unsigned long         wind_time = 0;
+static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
-static int      osd_toggle_chan = 0;             // Sets what channel turns osd on/off 0=flight_mode, 1=Ch_5, 2=Ch_6, 3=Ch_7
-static int      osd_toggle_temp = 0;             // Sets what channel turns osd on/off 0=flight_mode, 1=Ch_5, 2=Ch_6, 3=Ch_7
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
@@ -67,12 +65,16 @@ static int8_t       osd_pitch = 0;                  // pitch form DCM
 static int8_t       osd_roll = 0;                   // roll form DCM
 static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
+static float        heding_check = -2;
 static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // air speed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
+static float        osd_windspeed_check = 0;
 static float        osd_winddirection = 0;
-static int8_t       osd_wind_arrow_rotate_int;
+static float        osd_winddirection_check = 0;
+static float        osd_wind_arrow_rotate = 0;
+static uint8_t      osd_wind_arrow_rotate_int;
 
 static int          wind = 0;
 //static int osd_wind_arrow = 0;
@@ -83,6 +85,8 @@ static float        osd_alt_prev = 0;             // previous altitude
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
 
+static float  ch_raw = 0;
+
 //MAVLink session control
 static boolean      mavbeat = 0;
 static float        lastMAVBeat = 0;
@@ -92,7 +96,7 @@ static uint8_t      apm_mav_system;
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
 
-//static uint8_t      delay_setup = 0;
+static uint8_t      delay_setup = 0;
 
 // Panel BIT registers
 byte panA_REG = 0b00000000;
@@ -130,6 +134,7 @@ byte panWPDir_XY[2]; // = { 0,0 };
 byte panWPDis_XY[2]; // = { 0,0 };
 byte panTime_XY[2];
 
+
 // Third set of panels and their X,Y coordinate holders
 byte panCur_A_XY[2]; // = { 23,1 };
 //byte panCur_B_XY[2]; // = { 23,3 };
@@ -141,7 +146,7 @@ byte panThr_XY[2]; // = { 0,0 };
 byte panFMod_XY[2]; // = { 0,0 };
 byte panHorizon_XY[2]; // = {8,centercalc}
 
-// Fourth set of panels and their X,Y coordinate holders
+// Third set of panels and their X,Y coordinate holders
 byte panWarn_XY[2];
 byte panOff_XY[2];
 byte panWindSpeed_XY[2];
@@ -149,6 +154,7 @@ byte panClimb_XY[2];
 //byte panTune_XY[2];
 byte panSetup_XY[2];
 byte panRSSI_XY[2];
+
 //*************************************************************************************************************
 //rssi varables
 static uint8_t  rssi = 0;
@@ -156,4 +162,7 @@ static uint8_t  rssipersent = 0;
 static uint8_t  rssical = 0;
 static uint8_t  osd_rssi = 0;
 static uint8_t  radio_setup_flag = 0;
+static int16_t  osd_chan6_raw = 1000;
+static int16_t  osd_chan7_raw = 1000;
+static int16_t  osd_chan8_raw = 1000;
 
