@@ -17,19 +17,19 @@ static int16_t      chan2_raw_middle = 0;
 static int16_t      ch_off = 0;
 static int          osd_set = 0;
 
-static int          setup_menu = 0;
-static int          converts = 0;
-static int          converth = 0;
+static int8_t       setup_menu = 0;
+static float        converts = 0;
+static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
-static uint8_t      battv = 0;                //Batery warning voltage - units Volt *10 
+static uint8_t      battv = 0;                //Battery warning voltage - units Volt *10 
 //static int        battp = 0;
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
-static float        osd_curr_A = 0;                 // Battery A current
-static uint16_t     osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
+static int16_t      osd_curr_A = 0;                 // Battery A current
+static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 //static float      osd_vbat_B = 0;               // voltage in milivolt
 //static float      osd_curr_B = 0;                 // Battery B current
@@ -61,20 +61,16 @@ static float        osd_home_alt = 0;
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 
-static int8_t       osd_pitch = 0;                  // pitch form DCM
-static int8_t       osd_roll = 0;                   // roll form DCM
+static int8_t       osd_pitch = 0;                  // pitch from DCM
+static int8_t       osd_roll = 0;                   // roll from DCM
 static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
-static float        heding_check = -2;
 static float        osd_alt = 0;                    // altitude
-static float        osd_airspeed = -1;              // air speed
+static float        osd_airspeed = -1;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
-static float        osd_windspeed_check = 0;
 static float        osd_winddirection = 0;
-static float        osd_winddirection_check = 0;
-static float        osd_wind_arrow_rotate = 0;
-static uint8_t      osd_wind_arrow_rotate_int;
+static int8_t       osd_wind_arrow_rotate_int;
 
 static int          wind = 0;
 //static int osd_wind_arrow = 0;

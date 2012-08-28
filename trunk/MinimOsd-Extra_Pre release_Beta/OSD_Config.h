@@ -4,7 +4,7 @@
 
 // Versio number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
-#define VER 74
+#define VER 75
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
@@ -160,13 +160,13 @@
 //#define panSetup_x_ADDR 196
 //#define panSetup_y_ADDR 198
 
-#define measure_ADDR 200
-#define overspeed_ADDR 202
-#define stall_ADDR 204
-#define battv_ADDR 206
-//#define battp_ADDR 208
-#define OSD_HIGH_ADDR 900
-#define OSD_LOW_ADDR 902
+#define measure_ADDR 890
+#define overspeed_ADDR 892
+#define stall_ADDR 894
+#define battv_ADDR 896
+//#define battp_ADDR 898
+#define OSD_RSSI_HIGH_ADDR 900
+#define OSD_RSSI_LOW_ADDR 902
 #define RADIO_ON_ADDR 904
 #define ch_off_ADDR 906
 

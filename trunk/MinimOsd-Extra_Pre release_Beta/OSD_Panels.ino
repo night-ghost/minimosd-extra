@@ -210,7 +210,7 @@ void panSetup(){
         osd.printf_P(PSTR("     |epromm value ="));
         //rssical = EEPROM.read(OSD_HIGH_ADDR);
         osd.printf("%3.0i", rssical);
-        rssical = change_val(rssical, OSD_HIGH_ADDR);
+        rssical = change_val(rssical, OSD_RSSI_HIGH_ADDR);
         break;
      }
      case 5:
@@ -218,10 +218,10 @@ void panSetup(){
         osd.printf_P(PSTR("set RSSI low value      "));
         osd.printf_P(PSTR("|RSSI transmitter off ="));
         osd.printf("%3.0i", rssi);
-        rssipersent = EEPROM.read(OSD_LOW_ADDR);
+        rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
         osd.printf_P(PSTR("       |epromm value ="));
         osd.printf("%3.0i", rssipersent);
-        rssipersent = change_val(rssipersent, OSD_LOW_ADDR);
+        rssipersent = change_val(rssipersent, OSD_RSSI_LOW_ADDR);
         break;
      }
      case 6:
@@ -250,69 +250,20 @@ int change_val(int value, int address)
   return value;
 }
 
-
 /* **************************************************************** */
 // Panel  : pan wind speed
 // Needs  : X, Y locations
-// Output : Velocity value from MAVlink with symbols
+// Output : Wind direction symbol (arrow) and velocity
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
 void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-        if (osd_airspeed > 6){
-            if (heding_check == -2){
-                heding_check = osd_heading;
-            }
-            if (millis() - wind_time > 60000){
-                wind_time = millis();
-                if (heding_check == -1){
-                    osd_windspeed = osd_windspeed_check;
-                    osd_winddirection = osd_winddirection_check;
-                    osd_windspeed_check = 0;
-                    wind = 1;
-                }
-                heding_check = osd_heading;      
 
-            }
-
-            if ((heding_check - osd_heading) < 0 ){
-                if (((heding_check - osd_heading) * -1) >= 177.5 && ((heding_check - osd_heading) * -1) <= 182.5){
-                    heding_check = -1;
-                }
-            }
-            else if ((heding_check - osd_heading) >= 177.5 && (heding_check - osd_heading) <= 182.5){
-                heding_check = -1;
-            }
-
-            if (osd_airspeed > osd_groundspeed){
-                if ((osd_airspeed - osd_groundspeed) > osd_windspeed_check){
-                    osd_windspeed_check = (osd_airspeed - osd_groundspeed);
-                    if (osd_heading > 180){
-                        osd_winddirection_check = (osd_heading - 180);}
-                    else {
-                        osd_winddirection_check = (osd_heading + 180);
-                    }
-                }
-            }
-
-            else if (osd_groundspeed > osd_airspeed){
-                if ((osd_groundspeed - osd_airspeed) > osd_windspeed_check){
-                    osd_windspeed_check = (osd_groundspeed - osd_airspeed);
-                    osd_winddirection_check = osd_heading;
-                }
-            }  
-
-        }
-        osd_wind_arrow_rotate = osd_winddirection - osd_heading;
-        if (osd_winddirection - osd_heading < 0){
-            osd_wind_arrow_rotate = osd_wind_arrow_rotate + 360;
-        }
-
-        osd_wind_arrow_rotate_int = round(osd_wind_arrow_rotate/360.0 * 16.0); //Convert to int 1-16 
-
-        showWindOSD(); //print data to OSD
+    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
+    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
+    showWindOSD(); //print data to OSD
 
     osd.closePanel();
 }
@@ -329,65 +280,65 @@ void panOff(){
     //osd.setPanel(first_col, first_line);
     //osd.openPanel();
 
-if (ch_off == 5){
-  if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
-        if (osd_off_switch != osd_mode){ 
-            osd_off_switch = osd_mode;
-            osd_switch_time = millis();
+    if (ch_off == 5){
+        if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
+            if (osd_off_switch != osd_mode){ 
+                osd_off_switch = osd_mode;
+                osd_switch_time = millis();
 
-            if (osd_off_switch == osd_switch_last){
-                if (osd_on == 0){
-                    osd_on = 1;
-                    osd_set = 0;
-                    osd.clear();
-                }
-                else {
-                    osd_on = 0;
-                    osd.clear();
-                    if (millis() <= 60000){
-                        osd_set = 1;  
+                if (osd_off_switch == osd_switch_last){
+                    if (osd_on == 0){
+                        osd_on = 1;
+                        osd_set = 0;
+                        osd.clear();
+                    }
+                    else {
+                        osd_on = 0;
+                        osd.clear();
+                        if (millis() <= 60000){
+                            osd_set = 1;  
+                        }
                     }
                 }
             }
-        }
-        if ((millis() - osd_switch_time) > 2000){
-            osd_switch_last = osd_mode;
+            if ((millis() - osd_switch_time) > 2000){
+                osd_switch_last = osd_mode;
+            }
         }
     }
-}
-else {
+    else {
 
-switch (ch_off){
+        switch (ch_off){
         case 6:
-        {
-        ch_raw = osd_chan6_raw;
-        break;
-        }
+            {
+                ch_raw = osd_chan6_raw;
+                break;
+            }
         case 7:
-        {
-        ch_raw = osd_chan7_raw;
-        break;
-        }
+            {
+                ch_raw = osd_chan7_raw;
+                break;
+            }
         case 8:
-        {
-        ch_raw = osd_chan8_raw;
-        break;
+            {
+                ch_raw = osd_chan8_raw;
+                break;
+            }
+
         }
-        
+
+        if (ch_raw > 1500) {
+            osd_on = 0;
+            if (millis() <= 60000){
+                osd_set = 1;  
+            }
+            else if (osd_set != 1){osd.clear();}
         }
-  
-if (ch_raw > 1500) {
-osd_on = 0;
-if (millis() <= 60000){
-osd_set = 1;  
-}
-else if (osd_set != 1){osd.clear();}
-}
-if (ch_raw < 1500) {
-osd_on = 1;
-osd_set = 0;
-}
-}
+        if (ch_raw < 1500) {
+            osd_on = 1;
+            osd_set = 0;
+        }
+    }
     //osd.closePanel();
 }
 
@@ -418,7 +369,7 @@ osd_set = 0;
 void panCur_A(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.2f%c", 0xE4, (osd_curr_A * .01), 0x8F);
+    osd.printf("%c%5.2f%c", 0xE4, (float(osd_curr_A) * .01), 0x8F);
     osd.closePanel();
 }
 
@@ -507,7 +458,7 @@ void panWarn(int first_col, int first_line){
 
       if (millis() > text_timer){ // if the text has been shown for a while
         if (warning_type != 0) {
-          last_warning = warning_type; // save the warining type for cycling
+          last_warning = warning_type; // save the warning type for cycling
           warning_type = 0; // blank the text
         } else {
           int x = last_warning; // start the warning checks where we left it last time
