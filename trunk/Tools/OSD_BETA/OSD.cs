@@ -200,6 +200,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("On/Off", pan.panOff, 16, 15, panOff_en_ADDR, panOff_x_ADDR, panOff_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
         //    panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             
             //Fill List of items in tabe number 1
@@ -275,7 +276,8 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("On/Off", pan.panOff, 16, 15, panOff_en_ADDR, panOff_x_ADDR, panOff_y_ADDR);
-            //    panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
+        //    panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
 
             
             //Fill List of items in tabe number 2
@@ -730,7 +732,7 @@ namespace OSD
         {
             string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
-            currentlyselected[panel_number] = item;
+            currentlyselected[1] = item;
 
             osdDraw2();
 
@@ -1103,7 +1105,16 @@ namespace OSD
         const int panTune_en_ADDR = 188;
         const int panTune_x_ADDR = 190;
         const int panTune_y_ADDR = 192;
-
+        
+        const int measure_ADDR = 890;
+        const int overspeed_ADDR = 892;
+        const int stall_ADDR = 894;
+        const int battv_ADDR = 896;
+        //const int battp_ADDR = 898;
+        const int OSD_RSSI_HIGH_ADDR = 900;
+        const int OSD_RSSI_LOW_ADDR = 902;
+        const int RADIO_ON_ADDR = 904;
+        const int OSD_Toggle_ADDR = 906;
         const int CHK1 = 1000;
         const int CHK2 = 1006;
 
@@ -1833,22 +1844,37 @@ namespace OSD
             catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
         }
 
-        private void tabPage1_Click(object sender, EventArgs e)
-        {
 
+        private void STALL_numeric_ValueChanged(object sender, EventArgs e)
+        {
+            pan.stall = (byte)STALL_numeric.Value;
         }
 
-        private void groupBox2_Enter(object sender, EventArgs e)
+        private void RSSI_numeric_min_ValueChanged(object sender, EventArgs e)
         {
-
+            pan.rssipersent = (byte)RSSI_numeric_min.Value;
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
+        private void RSSI_numeric_max_ValueChanged(object sender, EventArgs e)
         {
-
+            pan.rssical = (byte)RSSI_numeric_max.Value;
         }
 
+        private void OVERSPEED_numeric_ValueChanged(object sender, EventArgs e)
+        {
+            pan.overspeed = (byte)OVERSPEED_numeric.Value;
+        }
 
+        private void UNITS_combo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(UNITS_combo.SelectedIndex == 0) pan.converts = 1; //metric
+            else if (UNITS_combo.SelectedIndex == 1) pan.converts = 0; //imperial
+        }
+
+        private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
+        {
+            pan.battv = (byte) (MINVOLT_numeric.Value * 10);
+        }
 
     }
 }
