@@ -1,6 +1,6 @@
 /*Panels variables*/
 //Will come from APM telem port
-
+//28688
 //static float	nav_roll = 0; // Current desired roll in degrees
 //static float  nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t	nav_bearing = 0; // Current desired heading in degrees
@@ -14,6 +14,7 @@ static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
 static int16_t      chan1_raw_middle = 0;
 static int16_t      chan2_raw_middle = 0;
+static int16_t      osd_toggle_chan_raw = 1500;
 static int          osd_set = 0;
 
 static int          setup_menu = 0;
@@ -47,6 +48,8 @@ static uint16_t     osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
 //static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
+static int      osd_toggle_chan = 0;             // Sets what channel turns osd on/off 0=flight_mode, 1=Ch_5, 2=Ch_6, 3=Ch_7
+static int      osd_toggle_temp = 0;             // Sets what channel turns osd on/off 0=flight_mode, 1=Ch_5, 2=Ch_6, 3=Ch_7
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
@@ -153,4 +156,4 @@ static uint8_t  rssipersent = 0;
 static uint8_t  rssical = 0;
 static uint8_t  osd_rssi = 0;
 static uint8_t  radio_setup_flag = 0;
-static int16_t  osd_chan6_raw = 2000;
+
