@@ -989,14 +989,25 @@ namespace OSD
             {
                 try
                 {
-                    if (sp.upload(eeprom, 0, 910, 0))
+                    //Panel settings
+                    if (sp.upload(eeprom, 0, 200 + OffsetBITpanel*(npanel-1), 0))
                     {
-                        MessageBox.Show("Done!");
+                        MessageBox.Show("Done navigation!");
                     }
                     else
                     {
-                        MessageBox.Show("Failed to upload new settings");
+                        MessageBox.Show("Failed to upload new navigation screen settings");
                     }
+                    //Configuration 
+                    if (sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR))
+                    {
+                        MessageBox.Show("Done configuration!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to upload new configuration");
+                    }
+
                 }                 
                 catch (Exception ex) {
                     MessageBox.Show(ex.Message);
@@ -1128,7 +1139,7 @@ namespace OSD
         const int panTune_en_ADDR = 188;
         const int panTune_x_ADDR = 190;
         const int panTune_y_ADDR = 192;
-        
+        //
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
         const int stall_ADDR = 894;
