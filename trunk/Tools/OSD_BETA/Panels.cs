@@ -46,10 +46,10 @@ namespace OSD
         //Will come from APM telem port
 
         //Config vars
-        public uint8_t overspeed = 0;
-        public uint8_t stall = 0;
-        public uint8_t battv = 0;                //Batery warning voltage - units Volt *10 
-        public uint8_t converts = 0;                //0- Imperial; 1- Metric
+        public uint8_t overspeed = 40;
+        public uint8_t stall = 5;
+        public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
+        public uint8_t converts = 1;                //0- Imperial; 1- Metric
 
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
@@ -104,7 +104,7 @@ namespace OSD
         //rssi varables
         //public uint8_t rssi = 0;
         public uint8_t rssipersent = 0;
-        public uint8_t rssical = 0;
+        public uint8_t rssical = 255;
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
 
