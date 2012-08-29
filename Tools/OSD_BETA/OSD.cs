@@ -322,13 +322,13 @@ namespace OSD
             if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
             else if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (ft/s)";
                 OVERSPEED_label.Text = "Overspeed (ft/s)";
             }
 
@@ -1256,13 +1256,13 @@ namespace OSD
             if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
             else if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (ft/s)";
                 OVERSPEED_label.Text = "Overspeed (ft/s)";
             }
 
@@ -1956,12 +1956,12 @@ namespace OSD
         {
             if(UNITS_combo.SelectedIndex == 0) {
                 pan.converts = 1; //metric
-                STALL_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
             else if (UNITS_combo.SelectedIndex == 1){
                 pan.converts = 0; //imperial
-                STALL_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (ft/s)";
                 OVERSPEED_label.Text = "Overspeed (ft/s)";
             }
         }
