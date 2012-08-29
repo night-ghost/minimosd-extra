@@ -151,6 +151,7 @@ namespace OSD
             //currentlyselected2 = "";
             processingpanel = "";
 
+
             int a = 0;
 
             for (a = 0; a < usedPostion.Length; a++)
@@ -311,6 +312,19 @@ namespace OSD
 
             osdDraw1();
             osdDraw2();
+
+            //Setup configuration panel
+            STALL_numeric.Value = pan.stall;
+            RSSI_numeric_min.Value = pan.rssipersent;
+            RSSI_numeric_max.Value = pan.rssical;
+            OVERSPEED_numeric.Value = pan.overspeed;
+
+            if (pan.converts == 1) UNITS_combo.SelectedIndex = 0; //metric
+            else if (pan.converts == 0) UNITS_combo.SelectedIndex = 1; //imperial
+
+            MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+
+
         }
 
         private string[] GetPortNames()
@@ -927,7 +941,7 @@ namespace OSD
                 {
                     if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                     {
-                        eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items.CheckedItems.Contains(str) ? 1 : 0);
+                        eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items2.CheckedItems.Contains(str) ? 1 : 0);
                         eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
                         eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
 
@@ -935,6 +949,15 @@ namespace OSD
                     }
                 }
             }
+
+            //Setup configuration panel
+            eeprom[measure_ADDR] = pan.converts;
+            eeprom[overspeed_ADDR] = pan.overspeed;
+            eeprom[stall_ADDR] = pan.stall;
+            eeprom[battv_ADDR] = pan.battv;
+
+            eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
+            eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
             //for(int i=0;i<201;i++)
             //{
             //    Console.Write(i);
@@ -966,7 +989,7 @@ namespace OSD
             {
                 try
                 {
-                    if (sp.upload(eeprom, 0, 200 + (npanel-1)*OffsetBITpanel, 0))
+                    if (sp.upload(eeprom, 0, 910, 0))
                     {
                         MessageBox.Show("Done!");
                     }
@@ -1189,10 +1212,32 @@ namespace OSD
                             panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, eeprom[panelItems[a].Item6], eeprom[panelItems[a].Item7], panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
                     }
                 }
+                //Second panel
+                for (int a = 0; a < panelItems2.Length; a++)
+                {
+                    if (panelItems2[a] != null)
+                    {
+                        if (panelItems2[a].Item5 >= 0)
+                            LIST_items2.SetItemCheckState(a, eeprom[panelItems2[a].Item5 + OffsetBITpanel] == 0 ? CheckState.Unchecked : CheckState.Checked);
+
+                        if (panelItems2[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
+                            panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, eeprom[panelItems2[a].Item6 + OffsetBITpanel], eeprom[panelItems2[a].Item7 + OffsetBITpanel], panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
+                    }
+                }
             }
 
             osdDraw1();
             osdDraw2();
+
+            //Setup configuration panel
+            pan.converts = eeprom[measure_ADDR];
+            pan.overspeed = eeprom[overspeed_ADDR];
+            pan.stall = eeprom[stall_ADDR];
+            pan.battv = eeprom[battv_ADDR];
+
+            pan.rssical = eeprom[OSD_RSSI_HIGH_ADDR];
+            pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
+
 
             if (!fail)
                 MessageBox.Show("Done!");
