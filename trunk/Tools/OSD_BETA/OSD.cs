@@ -319,8 +319,18 @@ namespace OSD
             RSSI_numeric_max.Value = pan.rssical;
             OVERSPEED_numeric.Value = pan.overspeed;
 
-            if (pan.converts == 1) UNITS_combo.SelectedIndex = 0; //metric
-            else if (pan.converts == 0) UNITS_combo.SelectedIndex = 1; //imperial
+            if (pan.converts == 1)
+            {
+                UNITS_combo.SelectedIndex = 0; //metric
+                STALL_label.Text = "Overspeed (m/s)";
+                OVERSPEED_label.Text = "Overspeed (m/s)";
+            }
+            else if (pan.converts == 0)
+            {
+                UNITS_combo.SelectedIndex = 1; //imperial
+                STALL_label.Text = "Overspeed (ft/s)";
+                OVERSPEED_label.Text = "Overspeed (ft/s)";
+            }
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
@@ -1242,13 +1252,34 @@ namespace OSD
 
             //Setup configuration panel
             pan.converts = eeprom[measure_ADDR];
+            //Modify units
+            if (pan.converts == 1)
+            {
+                UNITS_combo.SelectedIndex = 0; //metric
+                STALL_label.Text = "Overspeed (m/s)";
+                OVERSPEED_label.Text = "Overspeed (m/s)";
+            }
+            else if (pan.converts == 0)
+            {
+                UNITS_combo.SelectedIndex = 1; //imperial
+                STALL_label.Text = "Overspeed (ft/s)";
+                OVERSPEED_label.Text = "Overspeed (ft/s)";
+            }
+
             pan.overspeed = eeprom[overspeed_ADDR];
+            OVERSPEED_numeric.Value = pan.overspeed;
+
             pan.stall = eeprom[stall_ADDR];
+            STALL_numeric.Value = pan.stall;
+
             pan.battv = eeprom[battv_ADDR];
+            MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
             pan.rssical = eeprom[OSD_RSSI_HIGH_ADDR];
-            pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
+            RSSI_numeric_max.Value = pan.rssical;
 
+            pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
+            RSSI_numeric_min.Value = pan.rssipersent;
 
             if (!fail)
                 MessageBox.Show("Done!");
@@ -1923,8 +1954,16 @@ namespace OSD
 
         private void UNITS_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(UNITS_combo.SelectedIndex == 0) pan.converts = 1; //metric
-            else if (UNITS_combo.SelectedIndex == 1) pan.converts = 0; //imperial
+            if(UNITS_combo.SelectedIndex == 0) {
+                pan.converts = 1; //metric
+                STALL_label.Text = "Overspeed (m/s)";
+                OVERSPEED_label.Text = "Overspeed (m/s)";
+            }
+            else if (UNITS_combo.SelectedIndex == 1){
+                pan.converts = 0; //imperial
+                STALL_label.Text = "Overspeed (ft/s)";
+                OVERSPEED_label.Text = "Overspeed (ft/s)";
+            }
         }
 
         private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
