@@ -999,24 +999,29 @@ namespace OSD
             {
                 try
                 {
+                    //bool nav_up = false;
+                    //bool conf_up = false;
                     //Panel settings
-                    if (sp.upload(eeprom, 0, 200 + OffsetBITpanel*(npanel-1), 0))
+                    //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
+                    //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
+                    //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
+                    if (sp.upload(eeprom, 0, OSD_RSSI_LOW_ADDR, 0))
                     {
-                        MessageBox.Show("Done navigation!");
+                        MessageBox.Show("Done navigation and configuration!");
                     }
                     else
                     {
                         MessageBox.Show("Failed to upload new navigation screen settings");
                     }
                     //Configuration 
-                    if (sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR))
-                    {
-                        MessageBox.Show("Done configuration!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Failed to upload new configuration");
-                    }
+                    //if (conf_up)
+                    //{
+                    //    MessageBox.Show("Done configuration!");
+                    //}
+                    //else
+                    //{
+                    //    MessageBox.Show("Failed to upload new configuration");
+                    //}
 
                 }                 
                 catch (Exception ex) {
@@ -1030,6 +1035,8 @@ namespace OSD
 
             sp.Close();
         }
+
+
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
