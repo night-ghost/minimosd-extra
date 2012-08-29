@@ -69,13 +69,13 @@
             this.UNITS_combo = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.OVERSPEED_label = new System.Windows.Forms.Label();
             this.OVERSPEED_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
             this.MINVOLT_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.STALL_label = new System.Windows.Forms.Label();
             this.STALL_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBoxRSSI = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -522,7 +522,7 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.label9);
+            this.groupBox5.Controls.Add(this.OVERSPEED_label);
             this.groupBox5.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox5.Location = new System.Drawing.Point(217, 101);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
@@ -532,15 +532,15 @@
             this.groupBox5.TabIndex = 6;
             this.groupBox5.TabStop = false;
             // 
-            // label9
+            // OVERSPEED_label
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(9, 25);
-            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(114, 17);
-            this.label9.TabIndex = 2;
-            this.label9.Text = "Overspeed (m/s)";
+            this.OVERSPEED_label.AutoSize = true;
+            this.OVERSPEED_label.Location = new System.Drawing.Point(9, 25);
+            this.OVERSPEED_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.OVERSPEED_label.Name = "OVERSPEED_label";
+            this.OVERSPEED_label.Size = new System.Drawing.Size(114, 17);
+            this.OVERSPEED_label.TabIndex = 2;
+            this.OVERSPEED_label.Text = "Overspeed (m/s)";
             // 
             // OVERSPEED_numeric
             // 
@@ -600,7 +600,7 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
             this.groupBox3.Location = new System.Drawing.Point(217, 25);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
@@ -610,15 +610,15 @@
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             // 
-            // label8
+            // STALL_label
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(9, 25);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(116, 17);
-            this.label8.TabIndex = 2;
-            this.label8.Text = "Stall Speed (m/s)";
+            this.STALL_label.AutoSize = true;
+            this.STALL_label.Location = new System.Drawing.Point(9, 25);
+            this.STALL_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.STALL_label.Name = "STALL_label";
+            this.STALL_label.Size = new System.Drawing.Size(116, 17);
+            this.STALL_label.TabIndex = 2;
+            this.STALL_label.Text = "Stall Speed (m/s)";
             // 
             // STALL_numeric
             // 
@@ -921,10 +921,10 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown MINVOLT_numeric;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label STALL_label;
         private System.Windows.Forms.NumericUpDown STALL_numeric;
         private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label OVERSPEED_label;
         private System.Windows.Forms.NumericUpDown OVERSPEED_numeric;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.ComboBox UNITS_combo;
