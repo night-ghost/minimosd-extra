@@ -60,7 +60,7 @@
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
@@ -97,7 +97,7 @@
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tabControl1.SuspendLayout();
+            this.PANEL_tabs.SuspendLayout();
             this.tabPageConfig.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -195,12 +195,12 @@
             // BUT_WriteOSD
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_WriteOSD.Location = new System.Drawing.Point(740, 522);
+            this.BUT_WriteOSD.Location = new System.Drawing.Point(701, 522);
             this.BUT_WriteOSD.Margin = new System.Windows.Forms.Padding(4);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
-            this.BUT_WriteOSD.Size = new System.Drawing.Size(133, 28);
+            this.BUT_WriteOSD.Size = new System.Drawing.Size(175, 28);
             this.BUT_WriteOSD.TabIndex = 2;
-            this.BUT_WriteOSD.Text = "Save to OSD";
+            this.BUT_WriteOSD.Text = "Save current tab to OSD";
             this.BUT_WriteOSD.UseVisualStyleBackColor = true;
             this.BUT_WriteOSD.Click += new System.EventHandler(this.BUT_WriteOSD_Click);
             // 
@@ -208,18 +208,17 @@
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
-            this.CMB_ComPort.Location = new System.Drawing.Point(461, 522);
+            this.CMB_ComPort.Location = new System.Drawing.Point(418, 522);
             this.CMB_ComPort.Margin = new System.Windows.Forms.Padding(4);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(129, 24);
             this.CMB_ComPort.TabIndex = 4;
-            this.CMB_ComPort.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             this.CMB_ComPort.Click += new System.EventHandler(this.comboBox1_Click);
             // 
             // BUT_ReadOSD
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_ReadOSD.Location = new System.Drawing.Point(599, 522);
+            this.BUT_ReadOSD.Location = new System.Drawing.Point(559, 522);
             this.BUT_ReadOSD.Margin = new System.Windows.Forms.Padding(4);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(133, 28);
@@ -425,16 +424,16 @@
             this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
             // 
-            // tabControl1
+            // PANEL_tabs
             // 
-            this.tabControl1.Controls.Add(this.tabPageConfig);
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(0, 30);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(889, 485);
-            this.tabControl1.TabIndex = 0;
+            this.PANEL_tabs.Controls.Add(this.tabPageConfig);
+            this.PANEL_tabs.Controls.Add(this.tabPage1);
+            this.PANEL_tabs.Controls.Add(this.tabPage2);
+            this.PANEL_tabs.Location = new System.Drawing.Point(0, 30);
+            this.PANEL_tabs.Name = "PANEL_tabs";
+            this.PANEL_tabs.SelectedIndex = 0;
+            this.PANEL_tabs.Size = new System.Drawing.Size(889, 485);
+            this.PANEL_tabs.TabIndex = 0;
             // 
             // tabPageConfig
             // 
@@ -456,7 +455,7 @@
             // 
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(21, 252);
+            this.groupBox7.Location = new System.Drawing.Point(10, 190);
             this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Padding = new System.Windows.Forms.Padding(4);
@@ -470,11 +469,13 @@
             this.ONOFF_combo.Items.AddRange(new object[] {
             "Ch 5",
             "Ch 6",
-            "Ch 7"});
+            "Ch 7",
+            "Ch 8"});
             this.ONOFF_combo.Location = new System.Drawing.Point(12, 44);
             this.ONOFF_combo.Name = "ONOFF_combo";
             this.ONOFF_combo.Size = new System.Drawing.Size(121, 24);
             this.ONOFF_combo.TabIndex = 3;
+            this.ONOFF_combo.SelectedIndexChanged += new System.EventHandler(this.ONOFF_combo_SelectedIndexChanged);
             // 
             // label11
             // 
@@ -814,7 +815,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(889, 582);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.PANEL_tabs);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.BUT_ReadOSD);
@@ -837,7 +838,7 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.tabControl1.ResumeLayout(false);
+            this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
@@ -901,7 +902,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripMenuItem updateFontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl PANEL_tabs;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.CheckedListBox LIST_items2;
