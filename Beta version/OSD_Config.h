@@ -52,6 +52,7 @@
 //#define Tune_BIT       4
 #define Setup_BIT      5
 
+#define RSSI_BIT       6
 /* *********************************************** */
 // EEPROM Storage addresses
 
@@ -159,17 +160,22 @@
 //#define panTune_x_ADDR 190
 //#define panTune_y_ADDR 192
 
-#define panSetup_en_ADDR 984
-#define panSetup_x_ADDR 986
-#define panSetup_y_ADDR 988
+#define panSetup_en_ADDR 194
+//#define panSetup_x_ADDR 196
+//#define panSetup_y_ADDR 198
 
-#define measure_ADDR 990
-#define overspeed_ADDR 992
-#define stall_ADDR 994
-#define battv_ADDR 996
-//#define battp_ADDR 998
+#define measure_ADDR 890
+#define overspeed_ADDR 892
+#define stall_ADDR 894
+#define battv_ADDR 896
+//#define battp_ADDR 898
+#define OSD_RSSI_HIGH_ADDR 900
+#define OSD_RSSI_LOW_ADDR 902
+#define RADIO_ON_ADDR 904
+#define ch_off_ADDR 906
 
 #define CHK1 1000
 #define CHK2 1006
+
 
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip
