@@ -107,7 +107,7 @@ namespace OSD
         public uint8_t rssical = 255;
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
-
+        public uint8_t ch_off = 8; //CH8
 
  	    /******* PANELS - DEFINITION *******/
 

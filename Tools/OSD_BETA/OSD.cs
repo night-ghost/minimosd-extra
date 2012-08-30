@@ -333,6 +333,8 @@ namespace OSD
             }
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+            
+            ONOFF_combo.SelectedIndex = pan.ch_off - 5;
 
 
         }
@@ -928,46 +930,60 @@ namespace OSD
         private void BUT_WriteOSD_Click(object sender, EventArgs e)
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
-            this.toolStripStatusLabel1.Text = ""; 
-            //First Panel 
-            foreach (string str in this.LIST_items.Items)
+            this.toolStripStatusLabel1.Text = "";
+            
+            TabPage current = PANEL_tabs.SelectedTab;
+            if (current.Text == "Panel 1") 
             {
-                foreach (var tuple in this.panelItems)
+                //First Panel 
+                foreach (string str in this.LIST_items.Items)
                 {
-                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                    foreach (var tuple in this.panelItems)
                     {
-                        eeprom[tuple.Item5] = (byte)(this.LIST_items.CheckedItems.Contains(str) ? 1 : 0);
-                        eeprom[tuple.Item6] = (byte)tuple.Item3; // x
-                        eeprom[tuple.Item7] = (byte)tuple.Item4; // y
+                        if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                        {
+                            eeprom[tuple.Item5] = (byte)(this.LIST_items.CheckedItems.Contains(str) ? 1 : 0);
+                            eeprom[tuple.Item6] = (byte)tuple.Item3; // x
+                            eeprom[tuple.Item7] = (byte)tuple.Item4; // y
 
-                        //Console.WriteLine(str);
+                            //Console.WriteLine(str);
+                        }
                     }
                 }
             }
-            //Second Panel 
-            foreach (string str in this.LIST_items2.Items)
+            else if (current.Text == "Panel 2") 
             {
-                foreach (var tuple in this.panelItems2)
+                //Second Panel 
+                foreach (string str in this.LIST_items2.Items)
                 {
-                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                    foreach (var tuple in this.panelItems2)
                     {
-                        eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items2.CheckedItems.Contains(str) ? 1 : 0);
-                        eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
-                        eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
+                        if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                        {
+                            eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items2.CheckedItems.Contains(str) ? 1 : 0);
+                            eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
+                            eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
 
-                        //Console.WriteLine(str);
+                            //Console.WriteLine(str);
+                        }
                     }
                 }
             }
+            else if (current.Text == "Config") 
+            {
+                //Setup configuration panel
+                eeprom[measure_ADDR] = pan.converts;
+                eeprom[overspeed_ADDR] = pan.overspeed;
+                eeprom[stall_ADDR] = pan.stall;
+                eeprom[battv_ADDR] = pan.battv;
 
-            //Setup configuration panel
-            eeprom[measure_ADDR] = pan.converts;
-            eeprom[overspeed_ADDR] = pan.overspeed;
-            eeprom[stall_ADDR] = pan.stall;
-            eeprom[battv_ADDR] = pan.battv;
+                eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
+                eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
 
-            eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
-            eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
+                eeprom[OSD_Toggle_ADDR] = pan.ch_off;
+            } 
+
+
             //for(int i=0;i<201;i++)
             //{
             //    Console.Write(i);
@@ -999,30 +1015,26 @@ namespace OSD
             {
                 try
                 {
-                    //bool nav_up = false;
-                    //bool conf_up = false;
-                    //Panel settings
-                    //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
+                    bool spupload_flag = false;
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
-                    if (sp.upload(eeprom, 0, OSD_RSSI_LOW_ADDR, 0))
-                    {
-                        MessageBox.Show("Done navigation and configuration!");
+                    if (current.Text == "Panel 1") {
+                        spupload_flag = sp.upload(eeprom, 0, OffsetBITpanel, 0);
+                        if (spupload_flag) MessageBox.Show("Done writing Panel 1 data!");
+                        else MessageBox.Show("Failed to upload new Panel 1 data");
                     }
-                    else
+                    else if (current.Text == "Panel 2")
                     {
-                        MessageBox.Show("Failed to upload new navigation screen settings");
+                        spupload_flag = sp.upload(eeprom, OffsetBITpanel, OffsetBITpanel * 2, OffsetBITpanel);
+                        if (spupload_flag) MessageBox.Show("Done writing Panel 2 data!");
+                        else MessageBox.Show("Failed to upload new Panel 2 data");
                     }
-                    //Configuration 
-                    //if (conf_up)
-                    //{
-                    //    MessageBox.Show("Done configuration!");
-                    //}
-                    //else
-                    //{
-                    //    MessageBox.Show("Failed to upload new configuration");
-                    //}
-
+                    else if (current.Text == "Config")
+                    {
+                        spupload_flag = sp.upload(eeprom, measure_ADDR, (OSD_Toggle_ADDR - measure_ADDR), measure_ADDR);
+                        if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+                        else MessageBox.Show("Failed to upload new configuration data");
+                    } 
                 }                 
                 catch (Exception ex) {
                     MessageBox.Show(ex.Message);
@@ -1036,12 +1048,6 @@ namespace OSD
             sp.Close();
         }
 
-
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void comboBox1_Click(object sender, EventArgs e)
         {
@@ -1166,6 +1172,7 @@ namespace OSD
         const int OSD_RSSI_LOW_ADDR = 902;
         const int RADIO_ON_ADDR = 904;
         const int OSD_Toggle_ADDR = 906;
+        
         const int CHK1 = 1000;
         const int CHK2 = 1006;
 
@@ -1254,8 +1261,6 @@ namespace OSD
                 }
             }
 
-            osdDraw1();
-            osdDraw2();
 
             //Setup configuration panel
             pan.converts = eeprom[measure_ADDR];
@@ -1287,6 +1292,12 @@ namespace OSD
 
             pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
             RSSI_numeric_min.Value = pan.rssipersent;
+
+            pan.ch_off = eeprom[OSD_Toggle_ADDR];
+            ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+
+            osdDraw1();
+            osdDraw2();
 
             if (!fail)
                 MessageBox.Show("Done!");
@@ -1976,6 +1987,11 @@ namespace OSD
         private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
         {
             pan.battv = (byte) (MINVOLT_numeric.Value * 10);
+        }
+
+        private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.ch_off = (byte)(ONOFF_combo.SelectedIndex + 5);
         }
 
     }
