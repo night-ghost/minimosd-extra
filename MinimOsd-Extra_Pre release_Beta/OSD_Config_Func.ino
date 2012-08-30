@@ -167,20 +167,18 @@ void writeSettings() {
 
 void readSettings() {
   
-  overspeed = EEPROM.read(202);
-  stall = EEPROM.read(204);
-  battv = EEPROM.read(206);
-//  ch_off = EEPROM.read(906);
-  ch_off = 8;
-//  battp = EEPROM.read(208);
+  overspeed = EEPROM.read(overspeed_ADDR);
+  stall = EEPROM.read(stall_ADDR);
+  battv = EEPROM.read(battv_ADDR);
+  ch_off = EEPROM.read(ch_off_ADDR);
+  //ch_off = 8;
+//  battp = EEPROM.read(battp_ADDR);
 //  if (EEPROM.read(194) != 1 || EEPROM.read(196) != 5 || EEPROM.read(198) != 7){
-  if (EEPROM.read(194) != 1){
-      EEPROM.write(194, 1);
-  //    EEPROM.write(196, 5);
-  //    EEPROM.write(198, 7);
+  if (EEPROM.read(panSetup_en_ADDR) != 1){
+      EEPROM.write(panSetup_en_ADDR, 1);
   }
-   rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
-   rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
+  rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
+  rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
   //****** First set of 8 Panels ******
   
   setBit(panA_REG, Cen_BIT, readEEPROM(panCenter_en_ADDR));
