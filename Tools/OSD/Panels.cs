@@ -45,6 +45,12 @@ namespace OSD
         /*Panels variables*/
         //Will come from APM telem port
 
+        //Config vars
+        public uint8_t overspeed = 40;
+        public uint8_t stall = 5;
+        public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
+        public uint8_t converts = 0;                //1- Imperial; 0- Metric
+
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
         static uint16_t osd_battery_remaining = 10;      // 0 to 100 <=> 0 to 1000
@@ -95,28 +101,35 @@ namespace OSD
         //static uint8_t apm_mav_system = 7;
         //static uint8_t apm_mav_component = 0;
         //static boolean enable_mav_request = 0;
-        static int osd_rssi = 2; 
-        /******* PANELS - DEFINITION *******/
+        //rssi varables
+        //public uint8_t rssi = 0;
+        public uint8_t rssipersent = 0;
+        public uint8_t rssical = 255;
+        static uint8_t osd_rssi = 2;
+        public uint8_t radio_setup_flag = 0;
+        public uint8_t ch_off = 8; //CH8
 
-        /* **************************************************************** */
-        // Panel  : panClimb
-        // Needs  : X, Y locations
-        // Output : Alt symbol and altitude value in meters from MAVLink
-        // Size   : 1 x 7Hea  (rows x chars)
-        // Staus  : done
+ 	    /******* PANELS - DEFINITION *******/
 
-        public int panRSSI(int first_col, int first_line)
+ 	    /* **************************************************************** */
+ 	    // Panel  : panRSSI
+ 	    // Needs  : X, Y locations
+ 	    // Output : Alt symbol and altitude value in meters from MAVLink
+ 	    // Size   : 1 x 7Hea  (rows x chars)
+  	    // Staus  : done
+
+ 	    public int panRSSI(int first_col, int first_line)
         {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-
-            {
-                osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
-            }
-
+ 	        osd.setPanel(first_col, first_line);
+ 	        osd.openPanel();
+ 	        {
+ 	            osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25);
+ 	        }
             osd.closePanel();
-            return 0;
-        }
+ 	        return 0;
+
+ 	    }
+        /******* PANELS - DEFINITION *******/
 
         /* **************************************************************** */
         // Panel  : panTune

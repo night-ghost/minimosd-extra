@@ -83,12 +83,12 @@ namespace ArdupilotMega
             {
                 return false;
             }
-            this.ReadTimeout = 1000;
+            this.ReadTimeout = 1500; //before 1000
             int f = 0;
             while (this.BytesToRead < 1)
             {
                 f++;
-                System.Threading.Thread.Sleep(1);
+                System.Threading.Thread.Sleep(2); //before 1
                 if (f > 1000)
                     return false;
             }
@@ -107,7 +107,7 @@ namespace ArdupilotMega
                     }
                 }
                 Console.WriteLine("btr {0}", this.BytesToRead);
-                Thread.Sleep(10);
+                Thread.Sleep(20); //before 10
                 a++;
             }
             return false;
@@ -274,8 +274,8 @@ namespace ArdupilotMega
             {
                 return false;
             }
-            int loops = (length / 0x100);
-            int totalleft = length;
+            int loops = ((int)length / 0x100); //0x100 = 256
+            int totalleft = (int)length;
             int sending = 0;
 
             for (int a = 0; a <= loops; a++)
@@ -290,7 +290,7 @@ namespace ArdupilotMega
                 }
 
                 if (sending == 0)
-                    return true;
+                    return true; //no more data to send
 
                 setaddress(startaddress);
                 startaddress += (short)sending;
@@ -306,7 +306,7 @@ namespace ArdupilotMega
 
                 if (!sync())
                 {
-                    Console.WriteLine("No Sync");
+                    Console.WriteLine("No Sync in loop count " + a + " of " + loops);
                     return false;
                 }
             }
