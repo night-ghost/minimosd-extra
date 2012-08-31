@@ -291,12 +291,18 @@ void panOff(){
                         osd_on = 1;
                         osd_set = 0;
                         osd.clear();
+                        
                     }
-                    else {
+                    else if (osd_on == 1){
+                        osd_on = 2;
+                        osd.clear(); 
+                        }
+                    
+                    else if (osd_on == 2){
                         osd_on = 0;
                         osd.clear();
                         if (millis() <= 60000){
-                            osd_set = 1;  
+                            osd_set = 1; 
                         }
                     }
                 }
