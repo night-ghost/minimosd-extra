@@ -41,6 +41,7 @@ static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC A
 static unsigned long        text_timer = 0;
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
+static uint8_t      warning = 0;
 //static int        char_update = 0;
 static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
