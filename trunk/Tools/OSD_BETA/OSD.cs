@@ -1009,6 +1009,7 @@ namespace OSD
                 sp.StopBits = StopBits.One;
                 sp.Parity = Parity.None;
                 sp.DtrEnable = true;
+                sp.RtsEnable = true; //added
 
                 sp.Open();
             }
