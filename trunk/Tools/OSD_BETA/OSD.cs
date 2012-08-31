@@ -319,13 +319,13 @@ namespace OSD
             RSSI_numeric_max.Value = pan.rssical;
             OVERSPEED_numeric.Value = pan.overspeed;
 
-            if (pan.converts == 1)
+            if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
                 STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
-            else if (pan.converts == 0)
+            else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
                 STALL_label.Text = "Stall Speed (ft/s)";
@@ -1035,7 +1035,7 @@ namespace OSD
                     }
                     else if (current.Text == "Config")
                     {
-                        spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR), (short)measure_ADDR);
+                        spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
                         if (spupload_flag) MessageBox.Show("Done writing configuration data!");
                         else MessageBox.Show("Failed to upload new configuration data");
                     } 
@@ -1269,13 +1269,13 @@ namespace OSD
             //Setup configuration panel
             pan.converts = eeprom[measure_ADDR];
             //Modify units
-            if (pan.converts == 1)
+            if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
                 STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
-            else if (pan.converts == 0)
+            else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
                 STALL_label.Text = "Stall Speed (ft/s)";
@@ -1298,8 +1298,8 @@ namespace OSD
             RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.ch_off = eeprom[OSD_Toggle_ADDR];
-            ONOFF_combo.SelectedIndex = pan.ch_off - 5;
-
+            if (pan.ch_off - 5 >= 0) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+            else ONOFF_combo.SelectedIndex = 0;
             osdDraw1();
             osdDraw2();
 
@@ -1977,12 +1977,12 @@ namespace OSD
         private void UNITS_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(UNITS_combo.SelectedIndex == 0) {
-                pan.converts = 1; //metric
+                pan.converts = 0; //metric
                 STALL_label.Text = "Stall Speed (m/s)";
                 OVERSPEED_label.Text = "Overspeed (m/s)";
             }
             else if (UNITS_combo.SelectedIndex == 1){
-                pan.converts = 0; //imperial
+                pan.converts = 1; //imperial
                 STALL_label.Text = "Stall Speed (ft/s)";
                 OVERSPEED_label.Text = "Overspeed (ft/s)";
             }
