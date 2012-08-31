@@ -8,7 +8,7 @@ void startPanels(){
 
 /******* PANELS - POSITION *******/
 
-void writePanels(uint8_t panel){ 
+void writePanels(){ 
     //  if (osd_off == 1){
     //  if (osd_set != 2){
     //    osd.clear();}
@@ -289,12 +289,14 @@ void panOff(){
                 if (osd_off_switch == osd_switch_last){
                     if (osd_on == 0){
                         osd_on = 1;
+                        panel = 0;
                         osd_set = 0;
                         osd.clear();
                         
                     }
                     else if (osd_on == 1){
                         osd_on = 2;
+                        panel = 1;
                         osd.clear(); 
                         }
                     
