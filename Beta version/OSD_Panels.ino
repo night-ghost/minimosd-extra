@@ -20,7 +20,7 @@ void writePanels(){
       if(ISd(panel,Off_BIT)) panOff(); // This must be first so you can always toggle
       if (osd_set == 0) { // setup panel is called in the else at the end
         if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
-        if (osd_on == 1)
+        if (osd_on > 0)
         {
           //Testing bits from 8 bit register A 
           if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
@@ -43,7 +43,7 @@ void writePanels(){
               if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
           }
           
-          if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+         if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
           //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
           //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
           
