@@ -227,11 +227,12 @@ void panSetup(){
      }
      case 6:
       {
-        osd.printf_P(PSTR("OSD on/off mode  "));
-        if (ch_off < 5) ch_off = 5;        
-        else if (ch_off > 8) ch_off = 8; 
- //       else if (ch_off > 8) ch_off = 8;
+        osd.printf_P(PSTR("OSD on/off mode  "));        
+        if (ch_off == 5){
+        osd.printf("%c%c%c", 0x20, 0x6D, 0x73);
+        } else {
         osd.printf("%i%c%c%c", ch_off , 0x20, 0x63, 0x68);
+        }        
         ch_off = change_val(ch_off, ch_off_ADDR);               
         break;
       }
@@ -246,8 +247,14 @@ int change_val(int value, int address)
   if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
   if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
 //  if (chan1_raw > chan1_raw_middle + 200) value = value - 2;
-//  if (chan1_raw < chan1_raw_middle - 200) value = value + 2;
-  if(value != value_old && setup_menu ) EEPROM.write(address, value);
+//  if (chan1_raw < chan1_raw_middle - 200) value = value + 2; 
+  if (ch_off < 5){ 
+    ch_off = 5;        
+  }
+  else if (ch_off > 8) {
+    ch_off = 8;
+  }
+  if(value != value_old) EEPROM.write(address, value);
   return value;
 }
 
@@ -662,7 +669,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release|r86"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.4 Pre-Release|r101"));
     osd.closePanel();
 }
 
