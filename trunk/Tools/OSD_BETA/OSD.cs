@@ -1005,6 +1005,9 @@ namespace OSD
                 sp = new ArduinoSTK();
                 sp.PortName = CMB_ComPort.Text;
                 sp.BaudRate = 57600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
                 sp.DtrEnable = true;
 
                 sp.Open();
@@ -1019,19 +1022,19 @@ namespace OSD
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
                     if (current.Text == "Panel 1") {
-                        spupload_flag = sp.upload(eeprom, 0, OffsetBITpanel, 0);
+                        spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
                         if (spupload_flag) MessageBox.Show("Done writing Panel 1 data!");
                         else MessageBox.Show("Failed to upload new Panel 1 data");
                     }
                     else if (current.Text == "Panel 2")
                     {
-                        spupload_flag = sp.upload(eeprom, OffsetBITpanel, OffsetBITpanel * 2, OffsetBITpanel);
+                        spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel * 2), (short)OffsetBITpanel);
                         if (spupload_flag) MessageBox.Show("Done writing Panel 2 data!");
                         else MessageBox.Show("Failed to upload new Panel 2 data");
                     }
                     else if (current.Text == "Config")
                     {
-                        spupload_flag = sp.upload(eeprom, measure_ADDR, (OSD_Toggle_ADDR - measure_ADDR), measure_ADDR);
+                        spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR), (short)measure_ADDR);
                         if (spupload_flag) MessageBox.Show("Done writing configuration data!");
                         else MessageBox.Show("Failed to upload new configuration data");
                     } 
