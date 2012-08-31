@@ -110,6 +110,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="Gabor.mcm" />
     <None Include="key.snk" />
     <None Include="OSD_SA_v5.mcm">
