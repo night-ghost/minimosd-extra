@@ -123,7 +123,8 @@ void panRSSI(int first_col, int first_line){
   if(osd_rssi >100){
     osd_rssi = 100;
   }
-  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
+  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25);
+//  osd.printf("%c%3i%c", 0xE1, ch_off, 0x25);
   osd.closePanel();
 }
 
@@ -150,8 +151,8 @@ void panSetup(){
     
     if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
     if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
-    if (setup_menu < 0) setup_menu = 6;
-    if (setup_menu > 6) setup_menu = 0;
+    if (setup_menu < 0) setup_menu = 0;
+    if (setup_menu > 6) setup_menu = 6;
 
     switch (setup_menu){
     case 0:
@@ -230,8 +231,8 @@ void panSetup(){
         if (ch_off < 5) ch_off = 5;        
         else if (ch_off > 8) ch_off = 8; 
  //       else if (ch_off > 8) ch_off = 8;
-        osd.printf("%i%c%c", ch_off , 0x20, 0x63, 0x68);
-        ch_off = change_val(ch_off, ch_off_ADDR);        
+        osd.printf("%i%c%c%c", ch_off , 0x20, 0x63, 0x68);
+        ch_off = change_val(ch_off, ch_off_ADDR);               
         break;
       }
    }
@@ -244,9 +245,9 @@ int change_val(int value, int address)
   uint8_t value_old = value;
   if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
   if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
-  if (chan1_raw > chan1_raw_middle + 200) value = value - 4;
-  if (chan1_raw < chan1_raw_middle - 200) value = value + 4;
-  if(value != value_old) EEPROM.write(address, value);
+//  if (chan1_raw > chan1_raw_middle + 200) value = value - 2;
+//  if (chan1_raw < chan1_raw_middle - 200) value = value + 2;
+  if(value != value_old && setup_menu ) EEPROM.write(address, value);
   return value;
 }
 
@@ -328,15 +329,19 @@ void panOff(){
         }
 
         if (ch_raw > 1500) {
-            osd_on = 0;
             if (millis() <= 60000){
-                osd_set = 1;  
+              osd_on = 0;
+              osd_set = 1;  
             }
-            else if (osd_set != 1){osd.clear();}
+            else if (osd_set != 1 && warning != 1){
+            osd_on = 0;
+            osd.clear();
+          }
         }
-        if (ch_raw < 1500) {
+        if (ch_raw < 1500 && setup_menu != 6 && osd_on != 1) {            
             osd_on = 1;
             osd_set = 0;
+            osd.clear();
         }
     }
     //osd.closePanel();
@@ -460,7 +465,9 @@ void panWarn(int first_col, int first_line){
         if (warning_type != 0) {
           last_warning = warning_type; // save the warning type for cycling
           warning_type = 0; // blank the text
+          if ((millis() - 3000) > text_timer) warning = 0;
         } else {
+          warning = 1;
           int x = last_warning; // start the warning checks where we left it last time
           while (warning_type == 0) { // cycle through the warning checks
             x++;
