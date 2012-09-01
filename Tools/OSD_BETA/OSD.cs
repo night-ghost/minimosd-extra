@@ -1331,8 +1331,8 @@ namespace OSD
             RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.ch_off = eeprom[OSD_Toggle_ADDR];
-            if (pan.ch_off - 5 >= 0 || pan.ch_off > 4) ONOFF_combo.SelectedIndex = pan.ch_off - 5; //reject garbage from EEPROM
-            else ONOFF_combo.SelectedIndex = 0;
+            if (pan.ch_off >= 5 || pan.ch_off < 9) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+            else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
             osdDraw1();
             osdDraw2();
 
