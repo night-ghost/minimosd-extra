@@ -29,7 +29,7 @@ namespace ArdupilotMega
             base.DtrEnable = true;
             base.RtsEnable = true;
 
-            System.Threading.Thread.Sleep(50);
+            //System.Threading.Thread.Sleep(50);
         }
 
         /// <summary>
@@ -71,6 +71,10 @@ namespace ArdupilotMega
         /// <returns>true = passed, false = lost connection</returns>
         public bool keepalive()
         {
+            base.DtrEnable = false; //force ATmega reset
+            System.Threading.Thread.Sleep(50);
+            base.DtrEnable = true; 
+            System.Threading.Thread.Sleep(50);
             return connectAP();
         }
         /// <summary>
@@ -83,13 +87,14 @@ namespace ArdupilotMega
             {
                 return false;
             }
-            this.ReadTimeout = 1500; //before 1000
+            this.ReadTimeout = 1000; 
             int f = 0;
             while (this.BytesToRead < 1)
             {
                 f++;
-                System.Threading.Thread.Sleep(2); //before 1
+                System.Threading.Thread.Sleep(1); 
                 if (f > 1000)
+                    Console.WriteLine("no sync timeout (no data received)");
                     return false;
             }
             int a = 0;

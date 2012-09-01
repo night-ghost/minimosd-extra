@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OSD")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Michael Oborne")]
+[assembly: AssemblyCompany("Michael Oborne & MinimOSD Extra Team")]
 [assembly: AssemblyProduct("OSD")]
-[assembly: AssemblyCopyright("Copyright ©  2012 Michael Oborne")]
+[assembly: AssemblyCopyright("Copyright ©  2012 Michael Oborne & MinimOSD Extra Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.1.28")]
+[assembly: AssemblyVersion("2.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
