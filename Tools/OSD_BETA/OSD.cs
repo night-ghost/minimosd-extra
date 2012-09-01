@@ -1023,7 +1023,7 @@ namespace OSD
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
                     if (current.Text == "Panel 1") {
-                        for(int i = 0; i < 2; i++)
+                        for(int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
                             spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
                             if (!spupload_flag) {
@@ -1037,7 +1037,7 @@ namespace OSD
                     }
                     else if (current.Text == "Panel 2")
                     {
-                        for (int i = 0; i < 2; i++)
+                        for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
                             spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel * 2), (short)OffsetBITpanel);
                             if (!spupload_flag)
@@ -1053,7 +1053,7 @@ namespace OSD
                     else if (current.Text == "Config")
                     {
                         spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
-                        for (int i = 0; i < 2; i++)
+                        for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
                             spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
                             if (!spupload_flag)
