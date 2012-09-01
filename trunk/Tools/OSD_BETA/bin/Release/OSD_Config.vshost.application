@@ -4,14 +4,14 @@
   <description asmv2:publisher="OSD_Config" asmv2:product="OSD_Config" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <deployment install="true" mapFileExtensions="true" />
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="OSD_Config.exe.manifest" size="5861">
+    <dependentAssembly dependencyType="install" codebase="OSD_Config.exe.manifest" size="5859">
       <assemblyIdentity name="OSD_Config.exe" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>bH7SsPxsR0o4+ZmZME80V/u0yZg=</dsig:DigestValue>
+        <dsig:DigestValue>ujgmJD7EUFnBWSgeu64xwK9JwSQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

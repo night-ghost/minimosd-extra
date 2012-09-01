@@ -1008,8 +1008,8 @@ namespace OSD
                 sp.DataBits = 8;
                 sp.StopBits = StopBits.One;
                 sp.Parity = Parity.None;
-                sp.DtrEnable = true;
-                sp.RtsEnable = true; //added
+                sp.DtrEnable = false;
+                sp.RtsEnable = false; //added
 
                 sp.Open();
             }
@@ -1023,19 +1023,46 @@ namespace OSD
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
                     if (current.Text == "Panel 1") {
-                        spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
+                        for(int i = 0; i < 2; i++)
+                        { //try to upload two times if it fail
+                            spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
+                            if (!spupload_flag) {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter "+ i + ")");
+                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+                            } 
+                            else break;
+                        }
                         if (spupload_flag) MessageBox.Show("Done writing Panel 1 data!");
                         else MessageBox.Show("Failed to upload new Panel 1 data");
                     }
                     else if (current.Text == "Panel 2")
                     {
-                        spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel * 2), (short)OffsetBITpanel);
+                        for (int i = 0; i < 2; i++)
+                        { //try to upload two times if it fail
+                            spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel * 2), (short)OffsetBITpanel);
+                            if (!spupload_flag)
+                            {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+                            }
+                            else break;
+                        }
                         if (spupload_flag) MessageBox.Show("Done writing Panel 2 data!");
                         else MessageBox.Show("Failed to upload new Panel 2 data");
                     }
                     else if (current.Text == "Config")
                     {
                         spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
+                        for (int i = 0; i < 2; i++)
+                        { //try to upload two times if it fail
+                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
+                            if (!spupload_flag)
+                            {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+                            }
+                            else break;
+                        }
                         if (spupload_flag) MessageBox.Show("Done writing configuration data!");
                         else MessageBox.Show("Failed to upload new configuration data");
                     } 
@@ -1280,6 +1307,12 @@ namespace OSD
                 UNITS_combo.SelectedIndex = 1; //imperial
                 STALL_label.Text = "Stall Speed (ft/s)";
                 OVERSPEED_label.Text = "Overspeed (ft/s)";
+            } else //garbage value in EEPROM - default to metric
+            {
+                pan.converts = 0; //correct value
+                UNITS_combo.SelectedIndex = 0; //metric
+                STALL_label.Text = "Stall Speed (m/s)";
+                OVERSPEED_label.Text = "Overspeed (m/s)";
             }
 
             pan.overspeed = eeprom[overspeed_ADDR];
@@ -1298,7 +1331,7 @@ namespace OSD
             RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.ch_off = eeprom[OSD_Toggle_ADDR];
-            if (pan.ch_off - 5 >= 0) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+            if (pan.ch_off - 5 >= 0 || pan.ch_off > 4) ONOFF_combo.SelectedIndex = pan.ch_off - 5; //reject garbage from EEPROM
             else ONOFF_combo.SelectedIndex = 0;
             osdDraw1();
             osdDraw2();

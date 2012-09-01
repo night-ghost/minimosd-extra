@@ -49,7 +49,7 @@ namespace OSD
         public uint8_t overspeed = 40;
         public uint8_t stall = 5;
         public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
-        public uint8_t converts = 1;                //0- Imperial; 1- Metric
+        public uint8_t converts = 0;                //1- Imperial; 0- Metric
 
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
