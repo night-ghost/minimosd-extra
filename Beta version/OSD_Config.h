@@ -4,7 +4,7 @@
 
 // Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
-#define VER 75
+#define VER 76
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be

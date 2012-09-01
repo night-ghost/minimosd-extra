@@ -146,8 +146,8 @@ void setup()
     }
 
     // Get correct panel settings from EEPROM
-    for(int i=0; i < npanels; i++) readSettings(i);
-
+    for(panel = 0; panel < npanels; panel++) readSettings();
+    panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
     loadBar();
 

@@ -43,7 +43,7 @@ void InitializeOSD() {
 
     writeEEPROM(42, CHK1);
     writeEEPROM(VER-42,CHK2);
-    for(int i=0; i < npanels; i++) writeSettings(i);
+    for(panel = 0; panel < npanels; panel++) writeSettings();
 
     osd.setPanel(4,9);
     osd.openPanel();
@@ -56,7 +56,7 @@ void InitializeOSD() {
 }
 
 // Write our latest FACTORY settings to EEPROM
-void writeSettings(uint8_t panel) {
+void writeSettings() {
     // Writing all default parameters to EEPROM, ON = panel enabled  
     // All panels have 3 values:
     //  - Enable/Disable
@@ -169,7 +169,7 @@ void writeSettings(uint8_t panel) {
     }
 }
 
-void readSettings(uint8_t panel) {
+void readSettings() {
 
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
@@ -324,16 +324,16 @@ int checkPAL(int line){
     return line;
 }
 
-void updateSettings(byte panel, byte panel_x, byte panel_y, byte panel_s ) {
+void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
     if(panel >= 1 && panel <= 32) {
 
-        writeEEPROM(panel_s, (6 * panel) - 6 + 0);
+        writeEEPROM(panel_s, (6 * panelu) - 6 + 0);
         if(panel_s != 0) {
-            writeEEPROM(panel_x, (6 * panel) - 6 + 2);
-            writeEEPROM(panel_y, (6 * panel) - 6 + 4);
+            writeEEPROM(panel_x, (6 * panelu) - 6 + 2);
+            writeEEPROM(panel_y, (6 * panelu) - 6 + 4);
         }
         osd.clear();
-        for(int i=0; i < npanels; i++) readSettings(i);
+        for(panel = 0; panel < npanels; panel++) readSettings();
     } 
 }
 
