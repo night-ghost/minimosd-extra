@@ -1052,7 +1052,6 @@ namespace OSD
                     }
                     else if (current.Text == "Config")
                     {
-                        spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
                             spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_Toggle_ADDR - measure_ADDR + 1), (short)measure_ADDR);
