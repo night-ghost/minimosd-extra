@@ -14,6 +14,8 @@ namespace ArdupilotMega
 
         public event ProgressEventHandler Progress;
 
+        public bool down_flag = false;
+
         public new void Open()
         {
             // default dtr status is false
@@ -145,12 +147,19 @@ namespace ArdupilotMega
                 }
 
                 if (this.ReadByte() != 0x10)  // 0x10
-                    throw new Exception("Lost Sync 0x10");
+                {
+                    down_flag = false;
+                    return data;
+                    //throw new Exception("Lost Sync 0x10");
+                }
             }
             else
             {
-                throw new Exception("Lost Sync 0x14");
+                down_flag = false;
+                return data;
+                //throw new Exception("Lost Sync 0x14");
             }
+            down_flag = true;
             return data;
         }
 

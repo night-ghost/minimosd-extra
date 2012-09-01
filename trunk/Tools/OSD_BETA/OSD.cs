@@ -1039,7 +1039,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel * 2), (short)OffsetBITpanel);
+                            spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel), (short)OffsetBITpanel);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1248,10 +1248,18 @@ namespace OSD
             {
                 try
                 {
-                    eeprom = sp.download(1024);
+                    for (int i = 0; i < 5; i++)
+                    { //try to download two times if it fail
+                        eeprom = sp.download(1024);
+                        if (!sp.down_flag)
+                        {
+                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+                        }
+                        else break;
+                    }
                 }
                 catch (Exception ex) {
-                    fail = true;
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -1335,8 +1343,12 @@ namespace OSD
             osdDraw1();
             osdDraw2();
 
-            if (!fail)
-                MessageBox.Show("Done!");
+            //if (!fail)
+            //    MessageBox.Show("Done!");
+            if (sp.down_flag) MessageBox.Show("Done downloading data!");
+            else MessageBox.Show("Failed to download data!");
+            sp.down_flag = false;
+
         }
 
 
