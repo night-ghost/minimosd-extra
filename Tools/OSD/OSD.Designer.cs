@@ -825,7 +825,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "OSD";
-            this.Text = "ArduCAM OSD Config - By Michael Oborne";
+            this.Text = "ArduCAM OSD Config - By Michael Oborne & MinimOSD Extra Team";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OSD_FormClosed);
             this.Load += new System.EventHandler(this.OSD_Load);
             this.Resize += new System.EventHandler(this.OSD_Resize);

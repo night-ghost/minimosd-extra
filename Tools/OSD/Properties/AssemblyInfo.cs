@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OSD")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Michael Oborne")]
+[assembly: AssemblyCompany("Michael Oborne & MinimOSD Extra Team")]
 [assembly: AssemblyProduct("OSD")]
-[assembly: AssemblyCopyright("Copyright ©  2012 Michael Oborne")]
+[assembly: AssemblyCopyright("Copyright ©  2012 Michael Oborne & MinimOSD Extra Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
