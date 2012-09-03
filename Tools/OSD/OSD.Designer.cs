@@ -468,7 +468,6 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Ch 5",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
@@ -484,9 +483,9 @@
             this.label11.Location = new System.Drawing.Point(9, 25);
             this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(120, 17);
+            this.label11.Size = new System.Drawing.Size(142, 17);
             this.label11.TabIndex = 2;
-            this.label11.Text = "OSD on/off switch";
+            this.label11.Text = "OSD Toggle Channel";
             // 
             // groupBox6
             // 
