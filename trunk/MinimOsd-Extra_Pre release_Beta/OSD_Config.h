@@ -2,7 +2,7 @@
 #define on 1
 #define off 0
 
-// Versio number, incrementing this will erase/upload factory settings.
+// Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
 #define VER 75
 
@@ -51,9 +51,12 @@
 #define Climb_BIT      3
 //#define Tune_BIT       4
 #define Setup_BIT      5
+
 #define RSSI_BIT       6
 /* *********************************************** */
 // EEPROM Storage addresses
+
+#define OffsetBITpanel       200
 
 // First of 8 panels
 #define panCenter_en_ADDR 0
@@ -156,6 +159,7 @@
 //#define panTune_en_ADDR 188
 //#define panTune_x_ADDR 190
 //#define panTune_y_ADDR 192
+
 #define panSetup_en_ADDR 194
 //#define panSetup_x_ADDR 196
 //#define panSetup_y_ADDR 198
