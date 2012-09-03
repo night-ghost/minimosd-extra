@@ -322,14 +322,14 @@ namespace OSD
             if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (m/s)";
-                OVERSPEED_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (km/h)";
+                OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Stall Speed (ft/s)";
-                OVERSPEED_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (mph)";
+                OVERSPEED_label.Text = "Overspeed (mph)";
             }
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
@@ -1307,20 +1307,20 @@ namespace OSD
             if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (m/s)";
-                OVERSPEED_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (km/h)";
+                OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Stall Speed (ft/s)";
-                OVERSPEED_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (mph)";
+                OVERSPEED_label.Text = "Overspeed (mph)";
             } else //garbage value in EEPROM - default to metric
             {
                 pan.converts = 0; //correct value
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (m/s)";
-                OVERSPEED_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (km/h)";
+                OVERSPEED_label.Text = "Overspeed (km/h)";
             }
 
             pan.overspeed = eeprom[overspeed_ADDR];
@@ -1568,21 +1568,21 @@ namespace OSD
                         if (pan.converts == 0)
                         {
                             UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = "Stall Speed (m/s)";
-                            OVERSPEED_label.Text = "Overspeed (m/s)";
+                            STALL_label.Text = "Stall Speed (km/h)";
+                            OVERSPEED_label.Text = "Overspeed (km/h)";
                         }
                         else if (pan.converts == 1)
                         {
                             UNITS_combo.SelectedIndex = 1; //imperial
-                            STALL_label.Text = "Stall Speed (ft/s)";
-                            OVERSPEED_label.Text = "Overspeed (ft/s)";
+                            STALL_label.Text = "Stall Speed (mph)";
+                            OVERSPEED_label.Text = "Overspeed (mph)";
                         }
                         else //red garbage value in EEPROM - default to metric
                         {
                             pan.converts = 0; //correct value
                             UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = "Stall Speed (m/s)";
-                            OVERSPEED_label.Text = "Overspeed (m/s)";
+                            STALL_label.Text = "Stall Speed (km/h)";
+                            OVERSPEED_label.Text = "Overspeed (km/h)";
                         }
 
                         OVERSPEED_numeric.Value = pan.overspeed;
@@ -2128,13 +2128,13 @@ namespace OSD
         {
             if(UNITS_combo.SelectedIndex == 0) {
                 pan.converts = 0; //metric
-                STALL_label.Text = "Stall Speed (m/s)";
-                OVERSPEED_label.Text = "Overspeed (m/s)";
+                STALL_label.Text = "Stall Speed (km/h)";
+                OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (UNITS_combo.SelectedIndex == 1){
                 pan.converts = 1; //imperial
-                STALL_label.Text = "Stall Speed (ft/s)";
-                OVERSPEED_label.Text = "Overspeed (ft/s)";
+                STALL_label.Text = "Stall Speed (mph)";
+                OVERSPEED_label.Text = "Overspeed (mph)";
             }
         }
 

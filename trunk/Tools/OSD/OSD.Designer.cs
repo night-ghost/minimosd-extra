@@ -542,7 +542,7 @@
             this.OVERSPEED_label.Name = "OVERSPEED_label";
             this.OVERSPEED_label.Size = new System.Drawing.Size(114, 17);
             this.OVERSPEED_label.TabIndex = 2;
-            this.OVERSPEED_label.Text = "Overspeed (m/s)";
+            this.OVERSPEED_label.Text = "Overspeed (km/h)";
             // 
             // OVERSPEED_numeric
             // 
@@ -620,7 +620,7 @@
             this.STALL_label.Name = "STALL_label";
             this.STALL_label.Size = new System.Drawing.Size(116, 17);
             this.STALL_label.TabIndex = 2;
-            this.STALL_label.Text = "Stall Speed (m/s)";
+            this.STALL_label.Text = "Stall Speed (km/h)";
             // 
             // STALL_numeric
             // 
