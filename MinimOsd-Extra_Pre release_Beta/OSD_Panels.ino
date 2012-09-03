@@ -17,56 +17,56 @@ void writePanels(){
 
 
     if(millis() < (lastMAVBeat + 2000)){
-      if(ISd(Off_BIT)) panOff(); // This must be first so you can always toggle
+      if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
       if (osd_set == 0) { // setup panel is called in the else at the end
-        if(ISd(Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
-        if (osd_on == 1)
+        if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
+        if (osd_on > 0)
         {
           //Testing bits from 8 bit register A 
-          if(ISa(Cen_BIT)) panCenter(panCenter_XY[0], panCenter_XY[1]);   //4x2
-          if(ISa(Pit_BIT)) panPitch(panPitch_XY[0], panPitch_XY[1]); //5x1
-          if(ISa(Rol_BIT)) panRoll(panRoll_XY[0], panRoll_XY[1]); //5x1
-          if(ISa(BatA_BIT)) panBatt_A(panBatt_A_XY[0], panBatt_A_XY[1]); //7x1
-          //  if(ISa(BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1]); //7x1
-          if(ISa(GPSats_BIT)) panGPSats(panGPSats_XY[0], panGPSats_XY[1]); //5x1
-          if(ISa(GPL_BIT)) panGPL(panGPL_XY[0], panGPL_XY[1]); //2x1
-          if(ISa(GPS_BIT)) panGPS(panGPS_XY[0], panGPS_XY[1]); //12x3
-          if(ISa(Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0], panBatteryPercent_XY[1]); //
+          if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+          if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
+          if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
+          if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
+          //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
+          if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
+          if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
+          if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
+          if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
   
           //Testing bits from 8 bit register B
-          if(ISb(Rose_BIT)) panRose(panRose_XY[0], panRose_XY[1]);        //13x3
-          if(ISb(Head_BIT)) panHeading(panHeading_XY[0], panHeading_XY[1]); //13x3
-          if(ISb(MavB_BIT)) panMavBeat(panMavBeat_XY[0], panMavBeat_XY[1]); //13x3
+          if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
+          if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
+          if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
   
           if(osd_got_home == 1){
-              if(ISb(HDis_BIT)) panHomeDis(panHomeDis_XY[0], panHomeDis_XY[1]); //13x3
-              if(ISb(HDir_BIT)) panHomeDir(panHomeDir_XY[0], panHomeDir_XY[1]); //13x3
+              if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
+              if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
           }
           
-          if(ISb(Time_BIT)) panTime(panTime_XY[0], panTime_XY[1]);
+         if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
           //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
           //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
           
   
           //Testing bits from 8 bit register C 
           //if(osd_got_home == 1){
-          if(ISc(Alt_BIT)) panAlt(panAlt_XY[0], panAlt_XY[1]); //
-          if(ISc(Halt_BIT)) panHomeAlt(panHomeAlt_XY[0], panHomeAlt_XY[1]); //
-          if(ISc(Vel_BIT)) panVel(panVel_XY[0], panVel_XY[1]); //
-          if(ISc(As_BIT)) panAirSpeed(panAirSpeed_XY[0], panAirSpeed_XY[1]); //
+          if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
+          if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
+          if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
+          if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
   
           //}
-          if(ISc(Thr_BIT)) panThr(panThr_XY[0], panThr_XY[1]); //
-          if(ISc(FMod_BIT)) panFlightMode(panFMod_XY[0], panFMod_XY[1]);  //
-          if(ISc(Hor_BIT)) panHorizon(panHorizon_XY[0], panHorizon_XY[1]); //14x5
-          if(ISc(CurA_BIT)) panCur_A(panCur_A_XY[0], panCur_A_XY[1]);
+          if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
+          if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
+          if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
+          if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
   
           //Testing bits from 8 bit register D 
           //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
-          if(ISd(WindS_BIT)) panWindSpeed(panWindSpeed_XY[0], panWindSpeed_XY[1]);
-          if(ISd(Climb_BIT)) panClimb(panClimb_XY[0], panClimb_XY[1]);
-          //    if(ISd(Tune_BIT)) panTune(panTune_XY[0], panTune_XY[1]);
-          if(ISd(RSSI_BIT)) panRSSI(panRSSI_XY[0], panRSSI_XY[1]); //??x??
+          if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
+          if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+          //    if(ISd(Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+          if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
         }
       } else { // if (osd_set == 1)
         panSetup();
@@ -123,8 +123,7 @@ void panRSSI(int first_col, int first_line){
   if(osd_rssi >100){
     osd_rssi = 100;
   }
-  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25);
-//  osd.printf("%c%3i%c", 0xE1, ch_off, 0x25);
+  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
   osd.closePanel();
 }
 
@@ -151,8 +150,8 @@ void panSetup(){
     
     if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
     if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
-    if (setup_menu < 0) setup_menu = 0;
-    if (setup_menu > 6) setup_menu = 6;
+    if (setup_menu < 0) setup_menu = 6;
+    if (setup_menu > 6) setup_menu = 0;
 
     switch (setup_menu){
     case 0:
@@ -227,13 +226,12 @@ void panSetup(){
      }
      case 6:
       {
-        osd.printf_P(PSTR("OSD on/off mode  "));        
-        if (ch_off == 5){
-        osd.printf("%c%c%c", 0x20, 0x6D, 0x73);
-        } else {
-        osd.printf("%i%c%c%c", ch_off , 0x20, 0x63, 0x68);
-        }        
-        ch_off = change_val(ch_off, ch_off_ADDR);               
+        osd.printf_P(PSTR("OSD on/off mode  "));
+        if (ch_off < 5) ch_off = 5;        
+        else if (ch_off > 8) ch_off = 8; 
+ //       else if (ch_off > 8) ch_off = 8;
+        osd.printf("%i%c%c", ch_off , 0x20, 0x63, 0x68);
+        ch_off = change_val(ch_off, ch_off_ADDR);        
         break;
       }
    }
@@ -246,14 +244,8 @@ int change_val(int value, int address)
   uint8_t value_old = value;
   if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
   if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
-//  if (chan1_raw > chan1_raw_middle + 200) value = value - 2;
-//  if (chan1_raw < chan1_raw_middle - 200) value = value + 2; 
-  if (ch_off < 5){ 
-    ch_off = 5;        
-  }
-  else if (ch_off > 8) {
-    ch_off = 8;
-  }
+  if (chan1_raw > chan1_raw_middle + 200) value = value - 4;
+  if (chan1_raw < chan1_raw_middle - 200) value = value + 4;
   if(value != value_old) EEPROM.write(address, value);
   return value;
 }
@@ -297,14 +289,22 @@ void panOff(){
                 if (osd_off_switch == osd_switch_last){
                     if (osd_on == 0){
                         osd_on = 1;
+                        panel = 0;
                         osd_set = 0;
                         osd.clear();
+                        
                     }
-                    else {
+                    else if (osd_on == 1){
+                        osd_on = 2;
+                        panel = 1;
+                        osd.clear(); 
+                        }
+                    
+                    else if (osd_on == 2){
                         osd_on = 0;
                         osd.clear();
                         if (millis() <= 60000){
-                            osd_set = 1;  
+                            osd_set = 1; 
                         }
                     }
                 }
@@ -336,19 +336,15 @@ void panOff(){
         }
 
         if (ch_raw > 1500) {
-            if (millis() <= 60000){
-              osd_on = 0;
-              osd_set = 1;  
-            }
-            else if (osd_set != 1 && warning != 1){
             osd_on = 0;
-            osd.clear();
-          }
+            if (millis() <= 60000){
+                osd_set = 1;  
+            }
+            else if (osd_set != 1){osd.clear();}
         }
-        if (ch_raw < 1500 && setup_menu != 6 && osd_on != 1) {            
+        if (ch_raw < 1500) {
             osd_on = 1;
             osd_set = 0;
-            osd.clear();
         }
     }
     //osd.closePanel();
@@ -472,9 +468,7 @@ void panWarn(int first_col, int first_line){
         if (warning_type != 0) {
           last_warning = warning_type; // save the warning type for cycling
           warning_type = 0; // blank the text
-          if ((millis() - 3000) > text_timer) warning = 0;
         } else {
-          warning = 1;
           int x = last_warning; // start the warning checks where we left it last time
           while (warning_type == 0) { // cycle through the warning checks
             x++;
@@ -669,7 +663,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.30.0 Pre-Release|r117"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|1.29.3 Pre-Release|r86"));
     osd.closePanel();
 }
 

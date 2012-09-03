@@ -39,9 +39,9 @@ static float        start_Time = -1.0;
 static uint16_t     osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long        text_timer = 0;
+
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
-static uint8_t      warning = 0;
 //static int        char_update = 0;
 static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
@@ -49,6 +49,8 @@ static uint16_t     osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
 static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
+
+
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
@@ -66,11 +68,15 @@ static int8_t       osd_pitch = 0;                  // pitch from DCM
 static int8_t       osd_roll = 0;                   // roll from DCM
 static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
+
 static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
+
 static float        osd_winddirection = 0;
+
+
 static int8_t       osd_wind_arrow_rotate_int;
 
 static int          wind = 0;
@@ -93,64 +99,61 @@ static uint8_t      apm_mav_system;
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
 
-static uint8_t      delay_setup = 0;
-
+static const uint8_t npanels = 2;
+static uint8_t panel = 0; 
 // Panel BIT registers
-byte panA_REG = 0b00000000;
-byte panB_REG = 0b00000000;
-byte panC_REG = 0b00000000;
-byte panD_REG = 0b00000000;
+byte panA_REG[npanels] = {0b00000000};
+byte panB_REG[npanels] = {0b00000000};
+byte panC_REG[npanels] = {0b00000000};
+byte panD_REG[npanels] = {0b00000000};
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
 byte SerCMD1 = 0;
 byte SerCMD2 = 0;
 
-
-//int tempvar;      // Temporary variable used on many places around the OSD
-
 // First 8 panels and their X,Y coordinate holders
-byte panCenter_XY[2]; // = { 13,7,0 };
-byte panPitch_XY[2]; // = { 11,1 };
-byte panRoll_XY[2]; // = { 23,7 };
-byte panBatt_A_XY[2]; // = { 23,1 };
+byte panCenter_XY[2][npanels]; // = { 13,7,0 };
+byte panPitch_XY[2][npanels]; // = { 11,1 };
+byte panRoll_XY[2][npanels]; // = { 23,7 };
+byte panBatt_A_XY[2][npanels]; // = { 23,1 };
 //byte panBatt_B_XY[2]; // = { 23,3 };
-byte panGPSats_XY[2]; // = { 2,12 };
-byte panGPL_XY[2]; // = { 2,11 };
-byte panGPS_XY[2]; // = { 2,13 };
-byte panBatteryPercent_XY[2];
+byte panGPSats_XY[2][npanels]; // = { 2,12 };
+byte panGPL_XY[2][npanels]; // = { 2,11 };
+byte panGPS_XY[2][npanels]; // = { 2,13 };
+byte panBatteryPercent_XY[2][npanels];
 
 
 // Second 8 set of panels and their X,Y coordinate holders
-byte panRose_XY[2]; // = { 16,13 };
-byte panHeading_XY[2]; // = { 16,12 };
-byte panMavBeat_XY[2]; // = { 2,10 };
-byte panHomeDir_XY[2]; // = { 0,0 };
-byte panHomeDis_XY[2]; // = { 0,0 };
-byte panWPDir_XY[2]; // = { 0,0 };
-byte panWPDis_XY[2]; // = { 0,0 };
-byte panTime_XY[2];
+byte panRose_XY[2][npanels]; // = { 16,13 };
+byte panHeading_XY[2][npanels]; // = { 16,12 };
+byte panMavBeat_XY[2][npanels]; // = { 2,10 };
+byte panHomeDir_XY[2][npanels]; // = { 0,0 };
+byte panHomeDis_XY[2][npanels]; // = { 0,0 };
+byte panWPDir_XY[2][npanels]; // = { 0,0 };
+byte panWPDis_XY[2][npanels]; // = { 0,0 };
+byte panTime_XY[2][npanels];
 
 
 // Third set of panels and their X,Y coordinate holders
-byte panCur_A_XY[2]; // = { 23,1 };
+byte panCur_A_XY[2][npanels]; // = { 23,1 };
 //byte panCur_B_XY[2]; // = { 23,3 };
-byte panAlt_XY[2]; // = { 0,0 };
-byte panHomeAlt_XY[2]; // = { 0,0 };
-byte panVel_XY[2]; // = { 0,0 };
-byte panAirSpeed_XY[2]; // = { 0,0 };
-byte panThr_XY[2]; // = { 0,0 };
-byte panFMod_XY[2]; // = { 0,0 };
-byte panHorizon_XY[2]; // = {8,centercalc}
+byte panAlt_XY[2][npanels]; // = { 0,0 };
+byte panHomeAlt_XY[2][npanels]; // = { 0,0 };
+byte panVel_XY[2][npanels]; // = { 0,0 };
+byte panAirSpeed_XY[2][npanels]; // = { 0,0 };
+byte panThr_XY[2][npanels]; // = { 0,0 };
+byte panFMod_XY[2][npanels]; // = { 0,0 };
+byte panHorizon_XY[2][npanels]; // = {8,centercalc}
 
 // Third set of panels and their X,Y coordinate holders
 byte panWarn_XY[2];
 byte panOff_XY[2];
-byte panWindSpeed_XY[2];
-byte panClimb_XY[2];
+byte panWindSpeed_XY[2][npanels];
+byte panClimb_XY[2][npanels];
 //byte panTune_XY[2];
 byte panSetup_XY[2];
-byte panRSSI_XY[2];
+byte panRSSI_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables
@@ -162,4 +165,3 @@ static uint8_t  radio_setup_flag = 0;
 static int16_t  osd_chan6_raw = 1000;
 static int16_t  osd_chan7_raw = 1000;
 static int16_t  osd_chan8_raw = 1000;
-
