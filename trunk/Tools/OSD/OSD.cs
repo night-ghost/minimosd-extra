@@ -333,8 +333,9 @@ namespace OSD
             }
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
-            
-            ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+
+            if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
+            else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
 
         }
@@ -980,7 +981,7 @@ namespace OSD
                 eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
                 eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
 
-                eeprom[OSD_Toggle_ADDR] = pan.ch_off;
+                eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
             } 
 
 
@@ -1337,8 +1338,8 @@ namespace OSD
             pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
             RSSI_numeric_min.Value = pan.rssipersent;
 
-            pan.ch_off = eeprom[OSD_Toggle_ADDR];
-            if (pan.ch_off >= 5 && pan.ch_off < 9) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+            pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
+            if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
             osdDraw1();
             osdDraw2();
@@ -1483,7 +1484,7 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "Battery", pan.battv);
                         sw.WriteLine("{0}\t{1}", "RSSI High", pan.rssical);
                         sw.WriteLine("{0}\t{1}", "RSSI Low", pan.rssipersent);
-                        sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_off);
+                        sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_toggle);
                         
                         sw.Close();
                     }
@@ -1560,7 +1561,7 @@ namespace OSD
                             else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
-                            else if (strings[0] == "Toggle Channel") pan.ch_off = byte.Parse(strings[1]);
+                            else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
                         }
 
                         //Modify units
@@ -1589,7 +1590,7 @@ namespace OSD
                         MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
                         RSSI_numeric_max.Value = pan.rssical;
                         RSSI_numeric_min.Value = pan.rssipersent;
-                        if (pan.ch_off >= 5 && pan.ch_off < 9) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+                        if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
                     }
                 }
@@ -2144,7 +2145,7 @@ namespace OSD
 
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pan.ch_off = (byte)(ONOFF_combo.SelectedIndex + 5);
+            pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + 6);
         }
 
     }
