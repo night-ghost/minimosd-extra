@@ -1700,6 +1700,7 @@ namespace OSD
             if (ofd.FileName != "")
             {
                 byte[] FLASH;
+                bool spuploadflash_flag = false;
                 try
                 {
                     toolStripStatusLabel1.Text = "Reading Hex File";
@@ -1710,7 +1711,7 @@ namespace OSD
                 }
                 catch { MessageBox.Show("Bad Hex File"); return; }
 
-                bool fail = false;
+                //bool fail = false;
                 ArduinoSTK sp;
 
                 try
@@ -1721,7 +1722,11 @@ namespace OSD
                     sp = new ArduinoSTK();
                     sp.PortName = CMB_ComPort.Text;
                     sp.BaudRate = 57600;
-                    sp.DtrEnable = true;
+                    sp.DataBits = 8;
+                    sp.StopBits = StopBits.One;
+                    sp.Parity = Parity.None;
+                    sp.DtrEnable = false;
+                    sp.RtsEnable = false; //added
 
                     sp.Open();
                 }
@@ -1734,20 +1739,32 @@ namespace OSD
                     sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);
                     try
                     {
-                        if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
-                        {
-                            if (sp.IsOpen)
-                                sp.Close();
-
-                            MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",                                    
-                                "Error",                            
-                                MessageBoxButtons.OK,        
-                                MessageBoxIcon.Warning); 
+                        for (int i = 0; i < 3; i++) //try to upload 3 times
+                        { //try to upload n times if it fail
+                            spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+                            if (!spuploadflash_flag)
+                            {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+                                //toolStripStatusLabel1.Text = "Lost sync. Reconnecting...";
+                            }
+                            else break;
                         }
+
+                        //if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
+                        //{
+                        //    if (sp.IsOpen)
+                        //        sp.Close();
+
+                        //    MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",                                    
+                        //        "Error",                            
+                        //        MessageBoxButtons.OK,        
+                        //        MessageBoxIcon.Warning); 
+                        //}
                     }
                     catch (Exception ex)
                     {
-                        fail = true;
+                        //fail = true;
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
@@ -1759,7 +1776,7 @@ namespace OSD
 
                 sp.Close();
 
-                if (!fail)
+                if (spuploadflash_flag)
                 {
 
                     toolStripStatusLabel1.Text = "Done";
@@ -1768,6 +1785,10 @@ namespace OSD
                 }
                 else
                 {
+                    MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
                     toolStripStatusLabel1.Text = "Failed";
                 }
             }
