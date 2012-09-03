@@ -465,6 +465,7 @@
             // 
             // ONOFF_combo
             // 
+            this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
             "Ch 5",
@@ -501,6 +502,7 @@
             // 
             // UNITS_combo
             // 
+            this.UNITS_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.UNITS_combo.FormattingEnabled = true;
             this.UNITS_combo.Items.AddRange(new object[] {
             "Metric",

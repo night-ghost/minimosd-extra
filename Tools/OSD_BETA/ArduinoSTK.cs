@@ -31,7 +31,7 @@ namespace ArdupilotMega
             base.DtrEnable = true;
             base.RtsEnable = true;
 
-            //System.Threading.Thread.Sleep(50);
+            System.Threading.Thread.Sleep(50);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ArdupilotMega
                 f++;
                 System.Threading.Thread.Sleep(1); 
                 if (f > 1000)
-                    Console.WriteLine("no sync timeout (no data received)");
+                    //Console.WriteLine("no sync timeout (no data received)");
                     return false;
             }
             int a = 0;
@@ -241,6 +241,7 @@ namespace ArdupilotMega
                 if (!sync())
                 {
                     Console.WriteLine("No Sync");
+                    Progress(0); //reset progress bar
                     return false;
                 }
             }
