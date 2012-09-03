@@ -174,8 +174,10 @@ void readSettings() {
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
+    if (EEPROM.read(ch_off_ADDR) < 5 || EEPROM.read(ch_off_ADDR) > 8){
+     	EEPROM.write(ch_off_ADDR, 5);
+	}
     ch_off = EEPROM.read(ch_off_ADDR);
-    //ch_off = 8;
     //  battp = EEPROM.read(battp_ADDR);
     if (EEPROM.read(panSetup_en_ADDR) != 1){
         EEPROM.write(panSetup_en_ADDR, 1);

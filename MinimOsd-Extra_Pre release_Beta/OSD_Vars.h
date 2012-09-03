@@ -42,6 +42,7 @@ static unsigned long        text_timer = 0;
 
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
+static uint8_t      warning = 0;
 //static int        char_update = 0;
 static int          osd_on = 1;
 static uint16_t     osd_off_switch = 0;
@@ -75,7 +76,6 @@ static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
 
 static float        osd_winddirection = 0;
-
 
 static int8_t       osd_wind_arrow_rotate_int;
 

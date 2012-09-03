@@ -42,7 +42,7 @@ void read_mavlink(){
                 crlf_count = 0;
             }
             if (crlf_count == 3) {
-                //uploadFont();
+                uploadFont();
             }
         }
 

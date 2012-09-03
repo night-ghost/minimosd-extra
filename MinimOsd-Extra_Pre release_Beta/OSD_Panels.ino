@@ -150,35 +150,18 @@ void panSetup(){
     
     if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
     if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
-    if (setup_menu < 0) setup_menu = 6;
-    if (setup_menu > 6) setup_menu = 0;
+    if (setup_menu < 0) setup_menu = 0;
+    if (setup_menu > 3) setup_menu = 3;
 
     switch (setup_menu){
     case 0:
-      {
-          if (EEPROM.read(measure_ADDR) == 0){
-              osd.printf_P(PSTR("    metric system    "));
-              if ((chan1_raw - 100) > chan1_raw_middle){
-                  EEPROM.write(measure_ADDR, 1);
-                  do_converts();
-              }
-          } else {
-              osd.printf_P(PSTR("      US system       "));
-              if ((chan1_raw + 100) < chan1_raw_middle){
-                  EEPROM.write(measure_ADDR, 0);
-                  do_converts();
-              }
-          }
-        break;
-      }
-    case 1:
       {
         osd.printf_P(PSTR("    Overspeed    "));
         osd.printf("%3.0i%c", overspeed, spe);
         overspeed = change_val(overspeed, overspeed_ADDR);
         break;
       }
-    case 2:
+    case 1:
       {
         osd.printf_P(PSTR("   Stall Speed   "));
         osd.printf("%3.0i%c", stall , spe);
@@ -186,7 +169,7 @@ void panSetup(){
         stall = change_val(stall, stall_ADDR);
         break;
       }
-    case 3:
+    case 2:
       {
         osd.printf_P(PSTR("Battery warning "));
         osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
@@ -202,38 +185,6 @@ void panSetup(){
         //        battp = battp + 1;} 
         //        EEPROM.write(208, battp);
         //        break;
-     case 4:
-     {
-        osd.printf_P(PSTR("set RSSI good value       "));
-        osd.printf_P(PSTR("|RSSI strong value ="));
-        osd.printf("%3.0i", rssi);
-        osd.printf_P(PSTR("     |epromm value ="));
-        //rssical = EEPROM.read(OSD_HIGH_ADDR);
-        osd.printf("%3.0i", rssical);
-        rssical = change_val(rssical, OSD_RSSI_HIGH_ADDR);
-        break;
-     }
-     case 5:
-     {
-        osd.printf_P(PSTR("set RSSI low value      "));
-        osd.printf_P(PSTR("|RSSI transmitter off ="));
-        osd.printf("%3.0i", rssi);
-        rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
-        osd.printf_P(PSTR("       |epromm value ="));
-        osd.printf("%3.0i", rssipersent);
-        rssipersent = change_val(rssipersent, OSD_RSSI_LOW_ADDR);
-        break;
-     }
-     case 6:
-      {
-        osd.printf_P(PSTR("OSD on/off mode  "));
-        if (ch_off < 5) ch_off = 5;        
-        else if (ch_off > 8) ch_off = 8; 
- //       else if (ch_off > 8) ch_off = 8;
-        osd.printf("%i%c%c", ch_off , 0x20, 0x63, 0x68);
-        ch_off = change_val(ch_off, ch_off_ADDR);        
-        break;
-      }
    }
  }
  osd.closePanel();
@@ -244,9 +195,9 @@ int change_val(int value, int address)
   uint8_t value_old = value;
   if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
   if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
-  if (chan1_raw > chan1_raw_middle + 200) value = value - 4;
-  if (chan1_raw < chan1_raw_middle - 200) value = value + 4;
-  if(value != value_old) EEPROM.write(address, value);
+  //if (chan1_raw > chan1_raw_middle + 200) value = value - 4;
+  //if (chan1_raw < chan1_raw_middle - 200) value = value + 4;
+  if(value != value_old && setup_menu ) EEPROM.write(address, value);
   return value;
 }
 
@@ -292,14 +243,14 @@ void panOff(){
                         panel = 0;
                         osd_set = 0;
                         osd.clear();
-                        
+
                     }
                     else if (osd_on == 1){
                         osd_on = 2;
                         panel = 1;
                         osd.clear(); 
-                        }
-                    
+                    }
+
                     else if (osd_on == 2){
                         osd_on = 0;
                         osd.clear();
@@ -336,16 +287,20 @@ void panOff(){
         }
 
         if (ch_raw > 1500) {
-            osd_on = 0;
             if (millis() <= 60000){
-                osd_set = 1;  
+                osd_on = 0;
+                osd_set = 1;
             }
-            else if (osd_set != 1){osd.clear();}
+            else if (osd_set != 1 && warning != 1){
+                osd_on = 0;
+                osd.clear();
+            }
         }
-        if (ch_raw < 1500) {
+        if (ch_raw < 1500 && setup_menu != 6 && osd_on != 1) {
             osd_on = 1;
             osd_set = 0;
-        }
+            osd.clear();
+        }    
     }
     //osd.closePanel();
 }
@@ -468,7 +423,9 @@ void panWarn(int first_col, int first_line){
         if (warning_type != 0) {
           last_warning = warning_type; // save the warning type for cycling
           warning_type = 0; // blank the text
+          if ((millis() - 3000) > text_timer) warning = 0;
         } else {
+          warning = 1;
           int x = last_warning; // start the warning checks where we left it last time
           while (warning_type == 0) { // cycle through the warning checks
             x++;
