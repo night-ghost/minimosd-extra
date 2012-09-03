@@ -151,7 +151,7 @@ void panSetup(){
     if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
     if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
     if (setup_menu < 0) setup_menu = 0;
-    if (setup_menu > 3) setup_menu = 3;
+    if (setup_menu > 2) setup_menu = 2;
 
     switch (setup_menu){
     case 0:
@@ -286,21 +286,31 @@ void panOff(){
 
         }
 
-        if (ch_raw > 1500) {
+       if (ch_raw > 1800) {
             if (millis() <= 60000){
                 osd_on = 0;
                 osd_set = 1;
+                panel = 0;
             }
             else if (osd_set != 1 && warning != 1){
                 osd_on = 0;
                 osd.clear();
+                panel = 0;
             }
         }
-        if (ch_raw < 1500 && setup_menu != 6 && osd_on != 1) {
+        if (ch_raw < 1200 && ch_raw < 1800 && osd_on != 1) {
             osd_on = 1;
             osd_set = 0;
             osd.clear();
+            panel = 0;
         }    
+        
+        if (ch_raw > 1200 && ch_raw < 1800 && setup_menu != 6 && osd_on != 2) {
+            osd_on = 2;
+            osd_set = 0;
+            osd.clear();
+            panel = 1;
+        }        
     }
     //osd.closePanel();
 }

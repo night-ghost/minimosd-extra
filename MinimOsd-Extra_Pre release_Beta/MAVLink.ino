@@ -57,7 +57,8 @@ void read_mavlink(){
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                     apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
-                    osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
+                 //   osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
+                    osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg);
                     osd_nav_mode = 0;          
                     lastMAVBeat = millis();
                     if(waitingMAVBeats == 1){
