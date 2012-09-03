@@ -1459,13 +1459,32 @@ namespace OSD
                 try
                 {
                     using (StreamWriter sw = new StreamWriter(sfd.OpenFile()))
+                    //Write
                     {
-
+                        //Panel 1
+                        sw.WriteLine("{0}", "Panel 1");
                         foreach (var item in panelItems)
                         {
                             if (item != null)
                                 sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, LIST_items.GetItemChecked(LIST_items.Items.IndexOf(item.Item1)).ToString());
                         }
+                        //Panel 2
+                        sw.WriteLine("{0}", "Panel 2");
+                        foreach (var item in panelItems2)
+                        {
+                            if (item != null)
+                                sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, LIST_items2.GetItemChecked(LIST_items2.Items.IndexOf(item.Item1)).ToString());
+                        }
+                        //Config 
+                        sw.WriteLine("{0}", "Configuration");
+                        sw.WriteLine("{0}\t{1}", "Units", pan.converts);
+                        sw.WriteLine("{0}\t{1}", "Overspeed", pan.overspeed);
+                        sw.WriteLine("{0}\t{1}", "Stall", pan.stall);
+                        sw.WriteLine("{0}\t{1}", "Battery", pan.battv);
+                        sw.WriteLine("{0}\t{1}", "RSSI High", pan.rssical);
+                        sw.WriteLine("{0}\t{1}", "RSSI Low", pan.rssipersent);
+                        sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_off);
+                        
                         sw.Close();
                     }
                 }
@@ -1479,7 +1498,7 @@ namespace OSD
         private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
-
+            const int nosdfunctions = 27;
             ofd.ShowDialog();
 
             if (ofd.FileName != "")
@@ -1488,11 +1507,13 @@ namespace OSD
                 {
                     using (StreamReader sr = new StreamReader(ofd.OpenFile()))
                     {
-                        while (!sr.EndOfStream)
+                        //Panel 1
+                        string stringh = sr.ReadLine(); //
+                        //while (!sr.EndOfStream)
+                        for( int i = 0; i < nosdfunctions; i++)
                         {
                             string[] strings = sr.ReadLine().Split(new char[] {'\t'},StringSplitOptions.RemoveEmptyEntries);
-
-                            for (int a = 0; a < panelItems.Length; a++)
+                            for (int a = 0; a < panelItems.Length ; a++)
                             {
                                 if (panelItems[a] != null && panelItems[a].Item1 == strings[0])
                                 {
@@ -1507,6 +1528,69 @@ namespace OSD
                                 }
                             }
                         }
+                        //Panel 2
+                        stringh = sr.ReadLine(); //
+                        //while (!sr.EndOfStream)
+                        for (int i = 0; i < nosdfunctions; i++)
+                        {
+                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int a = 0; a < panelItems.Length; a++)
+                            {
+                                if (panelItems2[a] != null && panelItems2[a].Item1 == strings[0])
+                                {
+                                    // incase there is an invalid line number or to shore
+                                    try
+                                    {
+                                        panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
+
+                                        LIST_items2.SetItemChecked(a, strings[3] == "True");
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                        //Config 
+                        stringh = sr.ReadLine(); //
+                        while (!sr.EndOfStream)
+                        {
+                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (strings[0] == "Units") pan.converts = byte.Parse(strings[1]);
+                            else if (strings[0] == "Overspeed") pan.overspeed = byte.Parse(strings[1]);
+                            else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
+                            else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
+                            else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
+                            else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
+                            else if (strings[0] == "Toggle Channel") pan.ch_off = byte.Parse(strings[1]);
+                        }
+
+                        //Modify units
+                        if (pan.converts == 0)
+                        {
+                            UNITS_combo.SelectedIndex = 0; //metric
+                            STALL_label.Text = "Stall Speed (m/s)";
+                            OVERSPEED_label.Text = "Overspeed (m/s)";
+                        }
+                        else if (pan.converts == 1)
+                        {
+                            UNITS_combo.SelectedIndex = 1; //imperial
+                            STALL_label.Text = "Stall Speed (ft/s)";
+                            OVERSPEED_label.Text = "Overspeed (ft/s)";
+                        }
+                        else //red garbage value in EEPROM - default to metric
+                        {
+                            pan.converts = 0; //correct value
+                            UNITS_combo.SelectedIndex = 0; //metric
+                            STALL_label.Text = "Stall Speed (m/s)";
+                            OVERSPEED_label.Text = "Overspeed (m/s)";
+                        }
+
+                        OVERSPEED_numeric.Value = pan.overspeed;
+                        STALL_numeric.Value = pan.stall;
+                        MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+                        RSSI_numeric_max.Value = pan.rssical;
+                        RSSI_numeric_min.Value = pan.rssipersent;
+                        if (pan.ch_off >= 5 && pan.ch_off < 9) ONOFF_combo.SelectedIndex = pan.ch_off - 5;
+                        else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
                     }
                 }
                 catch
