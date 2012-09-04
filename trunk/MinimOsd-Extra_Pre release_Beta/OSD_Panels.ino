@@ -2,19 +2,13 @@
 
 void startPanels(){
     osd.clear();
-    panLogo(5,5); // Display our logo  
+    panLogo(); // Display our logo  
     do_converts(); // load the unit conversion preferences
 }
 
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
-    //  if (osd_off == 1){
-    //  if (osd_set != 2){
-    //    osd.clear();}
-    //  }
-
-
 
     if(millis() < (lastMAVBeat + 2000)){
       if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
@@ -68,7 +62,7 @@ void writePanels(){
           //    if(ISd(Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
           if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
         }
-      } else { // if (osd_set == 1)
+      } else { // if (osd_on > 0)
         panSetup();
       }
     } else { // if no mavlink update for 2 secs
@@ -80,7 +74,7 @@ void writePanels(){
       // Display our logo and wait... 
       panWaitMAVBeats(5,10); //Waiting for MAVBeats...
     }
-      
+   
 
 
 
@@ -94,8 +88,6 @@ void writePanels(){
 
 }
 
-
-
 /******* PANELS - DEFINITION *******/
 
 /* **************************************************************** */
@@ -105,24 +97,18 @@ void writePanels(){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
 
-
 void panRSSI(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  //rssical = EEPROM.read(OSD_HIGH_ADDR);
-  //rssipersent = EEPROM.read(OSD_LOW_ADDR);
-  osd_rssi = rssi;
-  if (osd_rssi > rssical){
-    osd_rssi = rssical;
-  }
-  if (osd_rssi < rssipersent){
-    osd_rssi = rssipersent;
-  }
-  osd_rssi = osd_rssi - (rssical - rssipersent);
-  osd_rssi = (osd_rssi * 100)/(rssical - rssipersent);
-  if(osd_rssi >100){
-    osd_rssi = 100;
-  }
+ 
+  if (osd_rssi > rssical) osd_rssi = rssical;
+  else if (osd_rssi < rssipersent) osd_rssi = rssipersent;
+
+  uint8_t den = rssical - rssipersent;
+  osd_rssi = osd_rssi - den;
+  osd_rssi = (osd_rssi * 100)/den;
+  //if(osd_rssi > 100) osd_rssi = 100;
+
   osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
   osd.closePanel();
 }
@@ -148,10 +134,10 @@ void panSetup(){
         chan2_raw_middle = chan2_raw;
     }
     
-    if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu = setup_menu + 1;
-    if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu = setup_menu - 1;
+    if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu++;  //= setup_menu + 1;
+    else if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu--;  //= setup_menu - 1;
     if (setup_menu < 0) setup_menu = 0;
-    if (setup_menu > 2) setup_menu = 2;
+    else if (setup_menu > 2) setup_menu = 2;
 
     switch (setup_menu){
     case 0:
@@ -193,10 +179,9 @@ void panSetup(){
 int change_val(int value, int address)
 {
   uint8_t value_old = value;
-  if (chan1_raw > chan1_raw_middle + 100) value = value - 1;
-  if (chan1_raw  < chan1_raw_middle - 100) value = value + 1;
-  //if (chan1_raw > chan1_raw_middle + 200) value = value - 4;
-  //if (chan1_raw < chan1_raw_middle - 200) value = value + 4;
+  if (chan1_raw > chan1_raw_middle + 100) value--;
+  if (chan1_raw  < chan1_raw_middle - 100) value++;
+
   if(value != value_old && setup_menu ) EEPROM.write(address, value);
   return value;
 }
@@ -226,38 +211,37 @@ void panWindSpeed(int first_col, int first_line){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
 
-//void panOff(int first_col, int first_line){
 void panOff(){
-    //osd.setPanel(first_col, first_line);
-    //osd.openPanel();
 
-    if (ch_off == 5){
+    if (ch_toggle == 5){
         if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
                 osd_switch_time = millis();
 
                 if (osd_off_switch == osd_switch_last){
-                    if (osd_on == 0){
-                        osd_on = 1;
-                        panel = 0;
-                        osd_set = 0;
-                        osd.clear();
-
-                    }
-                    else if (osd_on == 1){
-                        osd_on = 2;
-                        panel = 1;
-                        osd.clear(); 
-                    }
-
-                    else if (osd_on == 2){
-                        osd_on = 0;
-                        osd.clear();
-                        if (millis() <= 60000){
-                            osd_set = 1; 
+                    switch(osd_on){
+                    case 0:
+                        {
+                            osd_on = 1;
+                            panel = 0;
+                            osd_set = 0;
+                            break;
+                        }
+                    case 1:
+                        {
+                            osd_on = 2;
+                            panel = 1;
+                            break;
+                        }
+                    case 2:
+                        {
+                            osd_on = 0;
+                            if (millis() <= 60000) osd_set = 1; 
+                            break;
                         }
                     }
+                    osd.clear();
                 }
             }
             if ((millis() - osd_switch_time) > 2000){
@@ -267,7 +251,7 @@ void panOff(){
     }
     else {
 
-        switch (ch_off){
+        switch (ch_toggle){
         case 6:
             {
                 ch_raw = osd_chan6_raw;
@@ -286,26 +270,25 @@ void panOff(){
 
         }
 
-       if (ch_raw > 1800) {
+        if (ch_raw > 1800) {
             if (millis() <= 60000){
                 osd_on = 0;
                 osd_set = 1;
-                panel = 0;
             }
             else if (osd_set != 1 && warning != 1){
                 osd_on = 0;
                 osd.clear();
-                panel = 0;
             }
+            panel = 0;
         }
-        if (ch_raw < 1200 && ch_raw < 1800 && osd_on != 1) {
+        else if (ch_raw < 1200 && osd_on != 1) {
             osd_on = 1;
             osd_set = 0;
             osd.clear();
             panel = 0;
         }    
-        
-        if (ch_raw > 1200 && ch_raw < 1800 && setup_menu != 6 && osd_on != 2) {
+
+        else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && osd_on != 2) {
             osd_on = 2;
             osd_set = 0;
             osd.clear();
@@ -429,63 +412,63 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-      if (millis() > text_timer){ // if the text has been shown for a while
+    if (millis() > text_timer){ // if the text has been shown for a while
         if (warning_type != 0) {
-          last_warning = warning_type; // save the warning type for cycling
-          warning_type = 0; // blank the text
-          if ((millis() - 3000) > text_timer) warning = 0;
+            last_warning = warning_type; // save the warning type for cycling
+            warning_type = 0; // blank the text
+            if ((millis() - 3000) > text_timer) warning = 0;
         } else {
-          warning = 1;
-          int x = last_warning; // start the warning checks where we left it last time
-          while (warning_type == 0) { // cycle through the warning checks
-            x++;
-            if (x > 6) x = 1; // change the 6 if you add more warning types
-            switch(x) {
-              case 1:
-                if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
-                break;
-              case 2:
-                if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
-                break;
-              case 3:
-                if ((osd_airspeed * converts) > overspeed) warning_type = 3;
-                break;
-              case 4:
-                if (osd_vbat_A < float(battv)/10.0) warning_type = 4;
-                break;
-              case 5:
-                if (osd_battery_remaining_A < 10) warning_type = 4;
-                break;
+            warning = 1;
+            int x = last_warning; // start the warning checks where we left it last time
+            while (warning_type == 0) { // cycle through the warning checks
+                x++;
+                if (x > 6) x = 1; // change the 6 if you add more warning types
+                switch(x) {
+                case 1:
+                    if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
+                    break;
+                case 2:
+                    if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
+                    break;
+                case 3:
+                    if ((osd_airspeed * converts) > overspeed) warning_type = 3;
+                    break;
+                case 4:
+                    if (osd_vbat_A < float(battv)/10.0) warning_type = 4;
+                    break;
+                case 5:
+                    if (osd_battery_remaining_A < 10) warning_type = 4;
+                    break;
+                }
+
+                if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
-     
-            if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
-          }
-	}
+        }
 
         text_timer = millis() + 1000; // blink every 1 secs
         if (warning_type > 0) osd_on = 1; // turn OSD on if there is a warning
-         
+
         switch(warning_type){
-          case 0:
+        case 0:
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
             break;   
-          case 1:  
+        case 1:  
             osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
             break;
-          case 2:
+        case 2:
             osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
             break;
-          case 3:
+        case 3:
             osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
             break;
-          case 4:
+        case 4:
             osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
             break;
-          }
-       }
-   
+        }
+    }
+
     osd.closePanel();
-  }
+}
 
   
 /* **************************************************************** */
@@ -512,7 +495,7 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0i%c", 0xB9, (osd_battery_remaining_A), 0x25);
+    osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
     osd.closePanel();
 }
 
@@ -627,8 +610,8 @@ void panBatt_A(int first_col, int first_line){
 
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
-void panLogo(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
+void panLogo(){
+    osd.setPanel(5, 5);
     osd.openPanel();
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r125"));
     osd.closePanel();
@@ -637,7 +620,7 @@ void panLogo(int first_col, int first_line){
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
 void panWaitMAVBeats(int first_col, int first_line){
-    panLogo(5,5);
+    panLogo();
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
@@ -813,29 +796,28 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     if(apm_mav_type == 2){//ArduCopter MultiRotor or ArduCopter Heli
         if(osd_mode == 0) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-        if(osd_mode == 1) osd.printf_P(PSTR("\xE0""acro"));//Acrobatic
-        if(osd_mode == 2) osd.printf_P(PSTR("\xE0""alth"));//Alt Hold
-        if(osd_mode == 3) osd.printf_P(PSTR("\xE0""auto"));//Auto
-        if(osd_mode == 4) osd.printf_P(PSTR("\xE0""guid"));//Guided
-        if(osd_mode == 5) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-        if(osd_mode == 6) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-        if(osd_mode == 7) osd.printf_P(PSTR("\xE0""circ")); // Circle
-        if(osd_mode == 8) osd.printf_P(PSTR("\xE0""posi")); // Position
-        if(osd_mode == 9) osd.printf_P(PSTR("\xE0""land")); // Land
-        if(osd_mode == 10) osd.printf_P(PSTR("\xE0""oflo")); // OF_Loiter
+        else if(osd_mode == 1) osd.printf_P(PSTR("\xE0""acro"));//Acrobatic
+        else if(osd_mode == 2) osd.printf_P(PSTR("\xE0""alth"));//Alt Hold
+        else if(osd_mode == 3) osd.printf_P(PSTR("\xE0""auto"));//Auto
+        else if(osd_mode == 4) osd.printf_P(PSTR("\xE0""guid"));//Guided
+        else if(osd_mode == 5) osd.printf_P(PSTR("\xE0""loit"));//Loiter
+        else if(osd_mode == 6) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
+        else if(osd_mode == 7) osd.printf_P(PSTR("\xE0""circ")); // Circle
+        else if(osd_mode == 8) osd.printf_P(PSTR("\xE0""posi")); // Position
+        else if(osd_mode == 9) osd.printf_P(PSTR("\xE0""land")); // Land
+        else if(osd_mode == 10) osd.printf_P(PSTR("\xE0""oflo")); // OF_Loiter
     }
     else if(apm_mav_type == 1){//ArduPlane
         if(osd_mode == 2 ) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-        if(osd_mode == 0) osd.printf_P(PSTR("\xE0""manu"));//Manual
-        if(osd_mode == 12) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-        if(osd_mode == 11 ) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-        if(osd_mode == 5 ) osd.printf_P(PSTR("\xE0""fbwa"));//FLY_BY_WIRE_A
-        if(osd_mode == 6 ) osd.printf_P(PSTR("\xE0""fbwb"));//FLY_BY_WIRE_B
-        if(osd_mode == 15) osd.printf_P(PSTR("\xE0""guid"));//GUIDED
-        if(osd_mode == 10 ) osd.printf_P(PSTR("\xE0""auto"));//AUTO
-        if(osd_mode == 1) osd.printf_P(PSTR("\xE0""circ"));//CIRCLE
+        else if(osd_mode == 0) osd.printf_P(PSTR("\xE0""manu"));//Manual
+        else if(osd_mode == 12) osd.printf_P(PSTR("\xE0""loit"));//Loiter
+        else if(osd_mode == 11 ) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
+        else if(osd_mode == 5 ) osd.printf_P(PSTR("\xE0""fbwa"));//FLY_BY_WIRE_A
+        else if(osd_mode == 6 ) osd.printf_P(PSTR("\xE0""fbwb"));//FLY_BY_WIRE_B
+        else if(osd_mode == 15) osd.printf_P(PSTR("\xE0""guid"));//GUIDED
+        else if(osd_mode == 10 ) osd.printf_P(PSTR("\xE0""auto"));//AUTO
+        else if(osd_mode == 1) osd.printf_P(PSTR("\xE0""circ"));//CIRCLE
     }
-
     osd.closePanel();
 
 }
@@ -975,7 +957,7 @@ void showWindOSD() // Arrow direction pointing WIND (0-16 to CW loop)
         wind_arrow_set2 = 0x91;
         break;
     }  
-    if (wind == 1){
+    if (wind == true){
         osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, wind_arrow_set1, wind_arrow_set2);
     }
 }
@@ -985,8 +967,8 @@ void showWindOSD() // Arrow direction pointing WIND (0-16 to CW loop)
 void showHorizon(int start_col, int start_row) { 
 
     int x, nose, row, minval, hit, subval = 0;
-    int cols = 12;
-    int rows = 5;
+    const int cols = 12;
+    const int rows = 5;
     int col_hit[cols];
     float  pitch, roll;
 
@@ -1049,17 +1031,17 @@ void printHit(byte col, byte row, byte subval){
 
 void do_converts()
 {
-  if (EEPROM.read(measure_ADDR) == 0) {
-    converts = 3.6;
-    converth = 1;
-    spe = 0x81;
-    high = 0x8D;
-  } else {
-    converts = 2.23;
-    converth = 3.28;
-    spe = 0xfb;
-    high = 0x66;
-  }
+    if (EEPROM.read(measure_ADDR) == 0) {
+        converts = 3.6;
+        converth = 1.0;
+        spe = 0x81;
+        high = 0x8D;
+    } else {
+        converts = 2.23;
+        converth = 3.28;
+        spe = 0xfb;
+        high = 0x66;
+    }
 }
 
 

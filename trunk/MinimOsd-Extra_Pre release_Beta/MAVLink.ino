@@ -92,8 +92,8 @@ void read_mavlink(){
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                     osd_heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
                     osd_throttle = mavlink_msg_vfr_hud_get_throttle(&msg);
-                    if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
-                    if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
+                    //if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
+                    //if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
                     osd_alt = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
                 }
@@ -125,14 +125,14 @@ void read_mavlink(){
                     osd_chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
                     osd_chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
                     osd_chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
-                    rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
+                    osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
                 break;
             case MAVLINK_MSG_ID_WIND:
                 {
-                osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
-                osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
-                osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+                    osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
+                    osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
+                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }
                 break;
             default:
