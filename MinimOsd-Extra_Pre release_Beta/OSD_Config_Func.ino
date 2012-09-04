@@ -165,7 +165,6 @@ void writeSettings() {
         writeEEPROM(30,overspeed_ADDR);
         writeEEPROM(0,stall_ADDR);
         writeEEPROM(100,battv_ADDR); //10Volts
-        ch_toggle = EEPROM.read(ch_toggle_ADDR);
         writeEEPROM(6,ch_toggle_ADDR);
     }
 }
