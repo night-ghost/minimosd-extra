@@ -21,7 +21,7 @@ namespace OSD
         //ntsc = 13r 30 char
         Int16 panel_number = 0;
         const Int16 npanel = 2;
-
+        const Int16 toggle_offset = 5;
         Size basesize = new Size(30, 16);
         /// <summary>
         /// the un-scaled font render image
@@ -334,7 +334,7 @@ namespace OSD
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
-            if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
+            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
 
@@ -1339,7 +1339,7 @@ namespace OSD
             RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
-            if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
+            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
             osdDraw1();
             osdDraw2();
@@ -1590,7 +1590,7 @@ namespace OSD
                         MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
                         RSSI_numeric_max.Value = pan.rssical;
                         RSSI_numeric_min.Value = pan.rssipersent;
-                        if (pan.ch_toggle >= 6 && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - 6;
+                        if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
                     }
                 }
@@ -2145,7 +2145,7 @@ namespace OSD
 
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + 6);
+            pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + toggle_offset);
         }
 
     }
