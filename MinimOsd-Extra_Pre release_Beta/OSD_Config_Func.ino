@@ -162,10 +162,11 @@ void writeSettings() {
 
     if(panel == 0) {
         writeEEPROM(on, panSetup_en_ADDR);
-      
         writeEEPROM(30,overspeed_ADDR);
         writeEEPROM(0,stall_ADDR);
         writeEEPROM(100,battv_ADDR); //10Volts
+        ch_toggle = EEPROM.read(ch_toggle_ADDR);
+        writeEEPROM(6,ch_toggle_ADDR);
     }
 }
 
@@ -174,10 +175,10 @@ void readSettings() {
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
-    if (EEPROM.read(ch_off_ADDR) < 5 || EEPROM.read(ch_off_ADDR) > 8){
-     	EEPROM.write(ch_off_ADDR, 5);
+    if (EEPROM.read(ch_toggle_ADDR) < 5 || EEPROM.read(ch_toggle_ADDR) > 8){
+     	EEPROM.write(ch_toggle_ADDR, 5);
 	}
-    ch_off = EEPROM.read(ch_off_ADDR);
+    ch_toggle = EEPROM.read(ch_toggle_ADDR);
     //  battp = EEPROM.read(battp_ADDR);
     if (EEPROM.read(panSetup_en_ADDR) != 1){
         EEPROM.write(panSetup_en_ADDR, 1);

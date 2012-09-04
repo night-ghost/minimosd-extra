@@ -14,7 +14,7 @@ static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
 static int16_t      chan1_raw_middle = 0;
 static int16_t      chan2_raw_middle = 0;
-static int16_t      ch_off = 0;
+static uint8_t      ch_toggle = 0;
 static boolean      osd_set = 0;
 
 static int8_t       setup_menu = 0;
@@ -30,13 +30,13 @@ static uint8_t      high = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
-static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
+//static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 //static float      osd_vbat_B = 0;               // voltage in milivolt
 //static float      osd_curr_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
 static float        start_Time = -1.0;
-static uint8_t     osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
+static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long        text_timer = 0;
 
@@ -45,10 +45,9 @@ static uint8_t      last_warning = 0;
 static uint8_t      warning = 0;
 //static int        char_update = 0;
 static uint8_t      osd_on = 1;
-static uint16_t     osd_off_switch = 0;
-static uint16_t     osd_switch_last = 100;
+static uint8_t      osd_off_switch = 0;
+static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
-static unsigned long         wind_time = 0;
 static float        osd_climb = 0;
 
 
@@ -74,12 +73,10 @@ static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
-
 static float        osd_winddirection = 0;
-
 static int8_t       osd_wind_arrow_rotate_int;
 
-static int          wind = 0;
+static bool         wind = 0;
 //static int osd_wind_arrow = 0;
 
 static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
@@ -152,16 +149,15 @@ byte panOff_XY[2];
 byte panWindSpeed_XY[2][npanels];
 byte panClimb_XY[2][npanels];
 //byte panTune_XY[2];
-byte panSetup_XY[2];
+//byte panSetup_XY[2];
 byte panRSSI_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables
-static uint8_t  rssi = 0;
 static uint8_t  rssipersent = 0;
 static uint8_t  rssical = 0;
 static uint8_t  osd_rssi = 0;
-static uint8_t  radio_setup_flag = 0;
+//static uint8_t  radio_setup_flag = 0;
 static int16_t  osd_chan6_raw = 1000;
 static int16_t  osd_chan7_raw = 1000;
 static int16_t  osd_chan8_raw = 1000;
