@@ -468,6 +468,7 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
+            "Ch 5",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
@@ -540,7 +541,7 @@
             this.OVERSPEED_label.Location = new System.Drawing.Point(9, 25);
             this.OVERSPEED_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
-            this.OVERSPEED_label.Size = new System.Drawing.Size(114, 17);
+            this.OVERSPEED_label.Size = new System.Drawing.Size(122, 17);
             this.OVERSPEED_label.TabIndex = 2;
             this.OVERSPEED_label.Text = "Overspeed (km/h)";
             // 
@@ -618,7 +619,7 @@
             this.STALL_label.Location = new System.Drawing.Point(9, 25);
             this.STALL_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.STALL_label.Name = "STALL_label";
-            this.STALL_label.Size = new System.Drawing.Size(116, 17);
+            this.STALL_label.Size = new System.Drawing.Size(124, 17);
             this.STALL_label.TabIndex = 2;
             this.STALL_label.Text = "Stall Speed (km/h)";
             // 
