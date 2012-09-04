@@ -468,7 +468,7 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Ch 5",
+            "Mode switch",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
