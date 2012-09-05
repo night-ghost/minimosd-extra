@@ -85,7 +85,6 @@ void read_mavlink(){
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
                 }
                 break; 
-
             case MAVLINK_MSG_ID_VFR_HUD:
                 {
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
