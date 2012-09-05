@@ -27,9 +27,9 @@
   panB_REG.4    13    panHomeDis      "IDDDDDI" N/Y     - Distance to home
   panB_REG.5    14    panWPDir        "II"      N/Y     - Waypoint location arrows (!Not Implemented)
   panB_REG.6    15    panWPDis        "IDDDDDI"         - Distance to next waypoint (!Not Implemented)
-  panB_REG.7    16    panRSSI                           - RSSI data from RC (!Not Implemented)
+  panB_REG.7    16    panRSSI                           - RSSI data from RC 
   
-  panC_REG.0    17    panCurrent1                       - Current sensing #1  (!Not Implemented)
+  panC_REG.0    17    panCurrent1                       - Current sensing #1  
   panC_REG.1    18    panCurrent2                       - Current sensing #2 (!Not Implemented)
   panC_REG.2    19    panAlt          "IDDDDDI"         - Altitude information
   panC_REG.3    20    panVel          "IDDDDDI"         - Velocity information
