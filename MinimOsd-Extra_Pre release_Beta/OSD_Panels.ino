@@ -95,19 +95,19 @@ void writePanels(){
 // Staus  : done
 
 void panRSSI(int first_col, int first_line){
-  osd.setPanel(first_col, first_line);
-  osd.openPanel();
- 
-  if (osd_rssi > rssical) osd_rssi = rssical;
-  else if (osd_rssi < rssipersent) osd_rssi = rssipersent;
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    uint8_t rssi = osd_rssi;
+    if (rssi > rssical) rssi = rssical;
+    else if (rssi < rssipersent) rssi = rssipersent;
 
-  uint8_t den = rssical - rssipersent;
-  //osd_rssi -=  den;
-  osd_rssi = ((osd_rssi- den) * 100)/den;
-  //if(osd_rssi > 100) osd_rssi = 100;
+    uint8_t den = rssical - rssipersent;
+    //osd_rssi -=  den;
+    rssi = ((rssi- den) * 100)/den;
+    //if(osd_rssi > 100) osd_rssi = 100;
 
-  osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25); 
-  osd.closePanel();
+    osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
+    osd.closePanel();
 }
 
 /* **************************************************************** */
@@ -194,9 +194,9 @@ void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
+    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
     if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
-    showWindOSD(); //print data to OSD
+    showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
 
     osd.closePanel();
 }
@@ -762,11 +762,11 @@ void panMavBeat(int first_col, int first_line){
 void panWPDir(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    
-    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
+   
+    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
     if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
 
-    showArrow(wp_target_bearing_rotate_int);
+    showArrow((uint8_t)wp_target_bearing_rotate_int,0);
     osd.closePanel();
 }
 
@@ -794,7 +794,7 @@ void panWPDis(int first_col, int first_line){
 void panHomeDir(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    showArrow(osd_home_direction);
+    showArrow((uint8_t)osd_home_direction,0);
     osd.closePanel();
 }
 
@@ -839,143 +839,86 @@ void panFlightMode(int first_col, int first_line){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-void showArrow(uint8_t rotate_arrow) {  
+void showArrow(uint8_t rotate_arrow,uint8_t method) {  
+    char arrow_set1 = 0x0;
+    char arrow_set2 = 0x0;   
     switch(rotate_arrow) {
     case 0: 
-        osd.printf_P(PSTR("\x90\x91"));
+        arrow_set1 = 0x90;
+        arrow_set2 = 0x91;
         break;
     case 1: 
-        osd.printf_P(PSTR("\x90\x91"));
+        arrow_set1 = 0x90;
+        arrow_set2 = 0x91;
         break;
     case 2: 
-        osd.printf_P(PSTR("\x92\x93"));
+        arrow_set1 = 0x92;
+        arrow_set2 = 0x93;
         break;
     case 3: 
-        osd.printf_P(PSTR("\x94\x95"));
+        arrow_set1 = 0x94;
+        arrow_set2 = 0x95;
         break;
     case 4: 
-        osd.printf_P(PSTR("\x96\x97"));
+        arrow_set1 = 0x96;
+        arrow_set2 = 0x97;
         break;
     case 5: 
-        osd.printf_P(PSTR("\x98\x99"));
+        arrow_set1 = 0x98;
+        arrow_set2 = 0x99;
         break;
     case 6: 
-        osd.printf_P(PSTR("\x9A\x9B"));
+        arrow_set1 = 0x9A;
+        arrow_set2 = 0x9B;
         break;
     case 7: 
-        osd.printf_P(PSTR("\x9C\x9D"));
+        arrow_set1 = 0x9C;
+        arrow_set2 = 0x9D;
         break;
     case 8: 
-        osd.printf_P(PSTR("\x9E\x9F"));
+        arrow_set1 = 0x9E;
+        arrow_set2 = 0x9F;
         break;
     case 9: 
-        osd.printf_P(PSTR("\xA0\xA1"));
+        arrow_set1 = 0xA0;
+        arrow_set2 = 0xA1;
         break;
     case 10: 
-        osd.printf_P(PSTR("\xA2\xA3"));
+        arrow_set1 = 0xA2;
+        arrow_set2 = 0xA3;
         break;
     case 11: 
-        osd.printf_P(PSTR("\xA4\xA5"));
+        arrow_set1 = 0xA4;
+        arrow_set2 = 0xA5;
         break;
     case 12: 
-        osd.printf_P(PSTR("\xA6\xA7"));
+        arrow_set1 = 0xA6;
+        arrow_set2 = 0xA7;
         break;
     case 13: 
-        osd.printf_P(PSTR("\xA8\xA9"));
+        arrow_set1 = 0xA8;
+        arrow_set2 = 0xA9;
         break;
     case 14: 
-        osd.printf_P(PSTR("\xAA\xAB"));
+        arrow_set1 = 0xAA;
+        arrow_set2 = 0xAB;
         break;
     case 15: 
-        osd.printf_P(PSTR("\xAC\xAD"));
+        arrow_set1 = 0xAC;
+        arrow_set2 = 0xAd;
         break;
     case 16: 
-        osd.printf_P(PSTR("\xAE\xAF"));
+        arrow_set1 = 0xAE;
+        arrow_set2 = 0xAF;
         break;
-    }  
-
-}
-
-// Show 2 char arrows
-void showWindOSD() // Arrow direction pointing WIND (0-16 to CW loop) 
-{        
-    char wind_arrow_set1;
-    char wind_arrow_set2;   
-    switch(osd_wind_arrow_rotate_int) {
-    case 0: 
-        wind_arrow_set1 = 0x90;
-        wind_arrow_set2 = 0x91;
-        break;
-    case 1: 
-        wind_arrow_set1 = 0x92;
-        wind_arrow_set2 = 0x93;
-        break;
-    case 2: 
-        wind_arrow_set1 = 0x94;
-        wind_arrow_set2 = 0x95;
-        break;
-    case 3: 
-        wind_arrow_set1 = 0x96;
-        wind_arrow_set2 = 0x97;
-        break;
-    case 4: 
-        wind_arrow_set1 = 0x98;
-        wind_arrow_set2 = 0x99;
-        break;
-    case 5: 
-        wind_arrow_set1 = 0x9A;
-        wind_arrow_set2 = 0x9B;
-        break;
-    case 6: 
-        wind_arrow_set1 = 0x9C;
-        wind_arrow_set2 = 0x9D;
-        break;
-    case 7: 
-        wind_arrow_set1 = 0x9E;
-        wind_arrow_set2 = 0x9F;
-        break;
-    case 8: 
-        wind_arrow_set1 = 0xA0;
-        wind_arrow_set2 = 0xA1;
-        break;
-    case 9: 
-        wind_arrow_set1 = 0xA2;
-        wind_arrow_set2 = 0xA3;
-        break;
-    case 10: 
-        wind_arrow_set1 = 0xA4;
-        wind_arrow_set2 = 0xA5;
-        break;
-    case 11: 
-        wind_arrow_set1 = 0xA6;
-        wind_arrow_set2 = 0xA7;
-        break;
-    case 12: 
-        wind_arrow_set1 = 0xA8;
-        wind_arrow_set2 = 0xA9;
-        break;
-    case 13: 
-        wind_arrow_set1 = 0xAA;
-        wind_arrow_set2 = 0xAB;
-        break;
-    case 14: 
-        wind_arrow_set1 = 0xAC;
-        wind_arrow_set2 = 0xAd;
-        break;
-    case 15: 
-        wind_arrow_set1 = 0xAE;
-        wind_arrow_set2 = 0xAF;
-        break;
-    case 16:
-        wind_arrow_set1 = 0x90;
-        wind_arrow_set2 = 0x91;
-        break;
-    }  
-    if (wind == true){
-        osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, wind_arrow_set1, wind_arrow_set2);
+    } 
+    if(method == 1) {
+        if (wind == true){
+            osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
+        }
     }
+    else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
-
 
 // Calculate and shows Artificial Horizon
 void showHorizon(int start_col, int start_row) { 

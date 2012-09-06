@@ -142,7 +142,7 @@ void setup()
         osd.openPanel();
         osd.printf_P(PSTR("Missing/Old Config")); 
         osd.closePanel();
-        InitializeOSD();
+        //InitializeOSD();
     }
 
     // Get correct panel settings from EEPROM
