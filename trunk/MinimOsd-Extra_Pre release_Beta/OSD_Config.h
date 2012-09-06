@@ -30,9 +30,9 @@
 #define MavB_BIT       2
 #define HDir_BIT       3
 #define HDis_BIT       4
-//#define WDir_BIT       5 //(!Not implemented)
-//#define WDis_BIT       6 //(!Not implemented)
-#define Time_BIT       7 //(!Not implemented)
+#define WDir_BIT       5 //
+#define WDis_BIT       6 //
+#define Time_BIT       7 
 
 // panC_REG Byte has:
 #define CurA_BIT       0
@@ -100,20 +100,20 @@
 #define panHomeDis_en_ADDR 72
 #define panHomeDis_x_ADDR 74
 #define panHomeDis_y_ADDR 76
-//#define panWPDir_en_ADDR 80 //(!Not implemented)
-//#define panWPDir_x_ADDR 82  //
-//#define panWPDir_y_ADDR 84  //
-//#define panWPDis_en_ADDR 86 //(!Not implemented)
-//#define panWPDis_x_ADDR 88  //
-//#define panWPDis_y_ADDR 90  //
-#define panRSSI_en_ADDR 92 //(!Not implemented)
-#define panRSSI_x_ADDR 94  //
-#define panRSSI_y_ADDR 96  //
+#define panWPDir_en_ADDR 80 //(!Not implemented)
+#define panWPDir_x_ADDR 82  //
+#define panWPDir_y_ADDR 84  //
+#define panWPDis_en_ADDR 86 //(!Not implemented)
+#define panWPDis_x_ADDR 88  //
+#define panWPDis_y_ADDR 90  //
+#define panRSSI_en_ADDR 92 
+#define panRSSI_x_ADDR 94  
+#define panRSSI_y_ADDR 96  
 
 // Third set of 8 panels
-#define panCur_A_en_ADDR 98 //(!Not implemented)
-#define panCur_A_x_ADDR 100 //
-#define panCur_A_y_ADDR 102 //
+#define panCur_A_en_ADDR 98 
+#define panCur_A_x_ADDR 100 
+#define panCur_A_y_ADDR 102 
 #define panCurB_en_ADDR 104 //(!Not implemented)
 #define panCurB_x_ADDR 106 //
 #define panCurB_y_ADDR 108 //
