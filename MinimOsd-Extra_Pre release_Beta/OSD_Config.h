@@ -100,12 +100,12 @@
 #define panHomeDis_en_ADDR 72
 #define panHomeDis_x_ADDR 74
 #define panHomeDis_y_ADDR 76
-#define panWPDir_en_ADDR 80 //(!Not implemented)
-#define panWPDir_x_ADDR 82  //
-#define panWPDir_y_ADDR 84  //
-#define panWPDis_en_ADDR 86 //(!Not implemented)
-#define panWPDis_x_ADDR 88  //
-#define panWPDis_y_ADDR 90  //
+#define panWPDir_en_ADDR 80 
+#define panWPDir_x_ADDR 82  
+#define panWPDir_y_ADDR 84  
+#define panWPDis_en_ADDR 86 
+#define panWPDis_x_ADDR 88  
+#define panWPDis_y_ADDR 90  
 #define panRSSI_en_ADDR 92 
 #define panRSSI_x_ADDR 94  
 #define panRSSI_y_ADDR 96  
