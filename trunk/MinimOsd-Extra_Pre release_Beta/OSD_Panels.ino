@@ -14,7 +14,7 @@ void writePanels(){
         if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
             if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
-            if (osd_on > 0)
+            if (panel != npanels)
             {
                 //Testing bits from 8 bit register A 
                 if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
@@ -217,27 +217,10 @@ void panOff(){
                 osd_switch_time = millis();
 
                 if (osd_off_switch == osd_switch_last){
-                    switch(osd_on){
-                    case 0:
-                        {
-                            osd_on = 1;
-                            panel = 0;
-                            osd_set = 0;
-                            break;
-                        }
-                    case 1:
-                        {
-                            osd_on = 2;
-                            panel = 1;
-                            break;
-                        }
-                    case 2:
-                        {
-                            osd_on = 0;
-                            if (millis() <= 60000) osd_set = 1; 
-                            break;
-                        }
-                    }
+                    panel++;
+	  	            if (panel > npanels ) panel = 0;
+                    if (panel == 0) osd_set = 0;
+                    if (millis() <= 60000 && panel == npanels) osd_set = 1; // npanels is the osd off panel
                     osd.clear();
                 }
             }
@@ -247,52 +230,31 @@ void panOff(){
         }
     }
     else {
-
-        switch (ch_toggle){
-        case 6:
-            {
-                ch_raw = osd_chan6_raw;
-                break;
-            }
-        case 7:
-            {
-                ch_raw = osd_chan7_raw;
-                break;
-            }
-        case 8:
-            {
-                ch_raw = osd_chan8_raw;
-                break;
-            }
-
-        }
+        if(ch_toggle == 6) ch_raw = osd_chan6_raw;
+        else if(ch_toggle == 7) ch_raw = osd_chan7_raw;
+        else if(ch_toggle == 8) ch_raw = osd_chan8_raw;
 
         if (ch_raw > 1800) {
             if (millis() <= 60000){
-                osd_on = 0;
                 osd_set = 1;
             }
             else if (osd_set != 1 && warning != 1){
-                osd_on = 0;
                 osd.clear();
             }
-            panel = 0;
+            panel = npanels; //off panel
         }
-        else if (ch_raw < 1200 && osd_on != 1) {
-            osd_on = 1;
+        else if (ch_raw < 1200 && panel != 0) { //first panel
             osd_set = 0;
             osd.clear();
             panel = 0;
         }    
 
-        else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && osd_on != 2) {
-            osd_on = 2;
+        else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1) { //second panel
             osd_set = 0;
             osd.clear();
             panel = 1;
         }        
     }
-    //osd.closePanel();
 }
 
 /* **************************************************************** */
@@ -428,7 +390,7 @@ void panWarn(int first_col, int first_line){
                     if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
                     break;
                 case 3:
-                    if ((osd_airspeed * converts) > overspeed) warning_type = 3;
+                    if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
                 case 4:
                     if (osd_vbat_A < float(battv)/10.0) warning_type = 4;
@@ -443,27 +405,33 @@ void panWarn(int first_col, int first_line){
         }
 
         text_timer = millis() + 1000; // blink every 1 secs
-        if (warning_type > 0) osd_on = 1; // turn OSD on if there is a warning
+        if (warning_type > 0) panel = 0; // turn OSD on if there is a warning
+        char* warning_string;
 
-        switch(warning_type){
+        switch(warning_type){ 
         case 0:
-            osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+            //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+            warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
             break;   
         case 1:  
-            osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
+            //osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
+            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
             break;
         case 2:
-            osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
+            //osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
+            warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
             break;
         case 3:
-            osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
+            //osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
+            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
             break;
         case 4:
-            osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+            //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
             break;
         }
+        osd.printf("%s",warning_string);
     }
-
     osd.closePanel();
 }
 
@@ -954,35 +922,46 @@ void showHorizon(int start_col, int start_row) {
 
 void printHit(byte col, byte row, byte subval){
     osd.openSingle(col, row);
+    char subval_char;
         switch (subval){
         case 1:
-            osd.printf_P(PSTR("\x06"));
+            //osd.printf_P(PSTR("\x06"));
+            subval_char = 0x06;
             break;
         case 2:
-            osd.printf_P(PSTR("\x07"));
+            //osd.printf_P(PSTR("\x07"));
+            subval_char = 0x07; 
             break;
         case 3:
-            osd.printf_P(PSTR("\x08"));
+            //osd.printf_P(PSTR("\x08"));
+            subval_char = 0x08;
             break;
         case 4:
-            osd.printf_P(PSTR("\x09"));
+            //osd.printf_P(PSTR("\x09"));
+            subval_char = 0x09;
             break;
         case 5:
-            osd.printf_P(PSTR("\x0a"));
+            //osd.printf_P(PSTR("\x0a"));
+            subval_char = 0x0a; 
             break;
         case 6:
-            osd.printf_P(PSTR("\x0b"));
+            //osd.printf_P(PSTR("\x0b"));
+            subval_char = 0x0b;
             break;
         case 7:
-            osd.printf_P(PSTR("\x0c"));
+            //osd.printf_P(PSTR("\x0c"));
+            subval_char = 0x0c;
             break;
         case 8:
-            osd.printf_P(PSTR("\x0d"));
+            //osd.printf_P(PSTR("\x0d"));
+            subval_char = 0x0d;
             break;
         case 9:
-            osd.printf_P(PSTR("\x0e"));
+            //osd.printf_P(PSTR("\x0e"));
+            subval_char = 0x0e;
             break;
         }
+        osd.printf("%c", subval_char);
 
 }
 
