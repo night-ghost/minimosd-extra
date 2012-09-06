@@ -104,19 +104,23 @@ void read_mavlink(){
                     osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
                 }
                 break;
-                //          case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
-                //        {
-                //          nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
-                //          nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
-                //          nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
-                //          target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
-                //          wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-                //          alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-                //          aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
-                //          xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
-                //      }
-                //    break;
-
+            case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+                {
+        //          nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
+        //          nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
+        //          nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
+                    wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
+                    wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
+        //          alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+        //          aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+        //          xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
+                }
+                break;
+            case MAVLINK_MSG_ID_MISSION_CURRENT:
+                {
+                    wp_number = (uint8_t)mavlink_msg_mission_current_get_seq(&msg);
+                }
+                break;
             case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 {
                     chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);

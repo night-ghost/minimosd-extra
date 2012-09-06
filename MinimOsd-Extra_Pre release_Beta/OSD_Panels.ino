@@ -38,8 +38,8 @@ void writePanels(){
                 }
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
-                //  if(ISb(WDir_BIT)) panWayPDir(panWayPDir_XY[0], panWayPDir_XY[1]); //??x??
-                //  if(ISb(WDis_BIT)) panWayPDis(panWayPDis_XY[0], panWayPDis_XY[1]); //??x??
+                if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
+                if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
 
 
                 //Testing bits from 8 bit register C 
@@ -762,7 +762,25 @@ void panMavBeat(int first_col, int first_line){
 void panWPDir(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    showArrow();
+    
+    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0); //Convert to int 0-16 
+    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
+
+    showArrow(wp_target_bearing_rotate_int);
+    osd.closePanel();
+}
+
+/* **************************************************************** */
+// Panel  : panWPDis
+// Needs  : X, Y locations
+// Output : W then distance in Km - Distance to next waypoint
+// Size   : 1 x 2  (rows x chars)
+// Staus  : not ready TODO - CHANGE the Waypoint symbol - Now only a W!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+void panWPDis(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf("%c%2i%2.2f", 0x57,wp_number,(double)wp_dist/1000.0); //Print in Km 
     osd.closePanel();
 }
 
@@ -776,7 +794,7 @@ void panWPDir(int first_col, int first_line){
 void panHomeDir(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    showArrow();
+    showArrow(osd_home_direction);
     osd.closePanel();
 }
 
@@ -821,8 +839,8 @@ void panFlightMode(int first_col, int first_line){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-void showArrow() {  
-    switch(osd_home_direction) {
+void showArrow(uint8_t rotate_arrow) {  
+    switch(rotate_arrow) {
     case 0: 
         osd.printf_P(PSTR("\x90\x91"));
         break;

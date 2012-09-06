@@ -4,8 +4,10 @@
 //static float	nav_roll = 0; // Current desired roll in degrees
 //static float  nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t	nav_bearing = 0; // Current desired heading in degrees
-//static int16_t	target_bearing = 0; // Bearing to current MISSION/target in degrees
-//static uint16_t wp_dist = 0; // Distance to active MISSION in meters
+static int16_t	wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
+static int8_t   wp_target_bearing_rotate_int = 0;
+static uint16_t wp_dist = 0; // Distance to active MISSION in meters
+static uint8_t wp_number = 0; // Current waypoint number
 //static float	alt_error = 0; // Current altitude error in meters
 //static float aspd_error = 0; // Current airspeed error in meters/second
 //static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
@@ -127,8 +129,8 @@ byte panHeading_XY[2][npanels]; // = { 16,12 };
 byte panMavBeat_XY[2][npanels]; // = { 2,10 };
 byte panHomeDir_XY[2][npanels]; // = { 0,0 };
 byte panHomeDis_XY[2][npanels]; // = { 0,0 };
-byte panWPDir_XY[2][npanels]; // = { 0,0 };
-byte panWPDis_XY[2][npanels]; // = { 0,0 };
+byte panWPDir_XY[2][npanels]; // = { 27,12 };
+byte panWPDis_XY[2][npanels]; // = { 23,11 };
 byte panTime_XY[2][npanels];
 
 
