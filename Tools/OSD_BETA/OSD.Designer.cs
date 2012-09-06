@@ -484,9 +484,9 @@
             this.label11.Location = new System.Drawing.Point(9, 25);
             this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(120, 17);
+            this.label11.Size = new System.Drawing.Size(142, 17);
             this.label11.TabIndex = 2;
-            this.label11.Text = "OSD on/off switch";
+            this.label11.Text = "OSD Toggle Channel";
             // 
             // groupBox6
             // 
@@ -541,9 +541,9 @@
             this.OVERSPEED_label.Location = new System.Drawing.Point(9, 25);
             this.OVERSPEED_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
-            this.OVERSPEED_label.Size = new System.Drawing.Size(114, 17);
+            this.OVERSPEED_label.Size = new System.Drawing.Size(122, 17);
             this.OVERSPEED_label.TabIndex = 2;
-            this.OVERSPEED_label.Text = "Overspeed (m/s)";
+            this.OVERSPEED_label.Text = "Overspeed (km/h)";
             // 
             // OVERSPEED_numeric
             // 
@@ -619,9 +619,9 @@
             this.STALL_label.Location = new System.Drawing.Point(9, 25);
             this.STALL_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.STALL_label.Name = "STALL_label";
-            this.STALL_label.Size = new System.Drawing.Size(116, 17);
+            this.STALL_label.Size = new System.Drawing.Size(124, 17);
             this.STALL_label.TabIndex = 2;
-            this.STALL_label.Text = "Stall Speed (m/s)";
+            this.STALL_label.Text = "Stall Speed (km/h)";
             // 
             // STALL_numeric
             // 
