@@ -98,13 +98,10 @@ void panRSSI(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     uint8_t rssi = osd_rssi;
-    if (rssi > rssical) rssi = rssical;
-    else if (rssi < rssipersent) rssi = rssipersent;
+    //if (rssi > rssical) rssi = rssical;
+    //else if (rssi < rssipersent) rssi = rssipersent;
 
-    uint8_t den = rssical - rssipersent;
-    //osd_rssi -=  den;
-    rssi = ((rssi- den) * 100)/den;
-    //if(osd_rssi > 100) osd_rssi = 100;
+    rssi =(uint8_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
 
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
     osd.closePanel();
