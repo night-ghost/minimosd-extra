@@ -13,7 +13,7 @@ void writePanels(){
     if(millis() < (lastMAVBeat + 2000)){
         if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
-            if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
+            if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
             if (panel != npanels)
             {
                 //Testing bits from 8 bit register A 
