@@ -773,32 +773,32 @@ void panHomeDir(int first_col, int first_line){
 void panFlightMode(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(apm_mav_type == 2){//ArduCopter MultiRotor or ArduCopter Heli
-        if(osd_mode == 0) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-        else if(osd_mode == 1) osd.printf_P(PSTR("\xE0""acro"));//Acrobatic
-        else if(osd_mode == 2) osd.printf_P(PSTR("\xE0""alth"));//Alt Hold
-        else if(osd_mode == 3) osd.printf_P(PSTR("\xE0""auto"));//Auto
-        else if(osd_mode == 4) osd.printf_P(PSTR("\xE0""guid"));//Guided
-        else if(osd_mode == 5) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-        else if(osd_mode == 6) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-        else if(osd_mode == 7) osd.printf_P(PSTR("\xE0""circ")); // Circle
-        else if(osd_mode == 8) osd.printf_P(PSTR("\xE0""posi")); // Position
-        else if(osd_mode == 9) osd.printf_P(PSTR("\xE0""land")); // Land
-        else if(osd_mode == 10) osd.printf_P(PSTR("\xE0""oflo")); // OF_Loiter
+    char c1; char c2; char c3; char c4; char c5; 
+    if (apm_mav_type == 2){ //ArduCopter MultiRotor or ArduCopter Heli
+      if (osd_mode == 0) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
+      else if (osd_mode == 1) {c1=0xE0;c2=0x61;c3=0x63;c4=0x72;c5=0x6F;} //Acrobatic
+      else if (osd_mode == 2) {c1=0xE0;c2=0x61;c3=0x6C;c4=0x74;c5=0x68;} //Alt Hold
+      else if (osd_mode == 3) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //Auto
+      else if (osd_mode == 4) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //Guided
+      else if (osd_mode == 5) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
+      else if (osd_mode == 6) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
+      else if (osd_mode == 7) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} // Circle
+      else if (osd_mode == 8) {c1=0xE0;c2=0x70;c3=0x67;c4=0x73;c5=0x69;} // Position
+      else if (osd_mode == 9) {c1=0xE0;c2=0x6C;c3=0x61;c4=0x6E;c5=0x64;} // Land
+      else if (osd_mode == 10) {c1=0xE0;c2=0x6F;c3=0x66;c4=0x6C;c5=0x6F;} // OF_Loiter
+    } else if(apm_mav_type == 1){ //ArduPlane
+      if (osd_mode == 0) {c1=0xE0;c2=0x6D;c3=0x61;c4=0x6E;c5=0x75;} //Manual
+      else if (osd_mode == 1) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} //CIRCLE
+      else if (osd_mode == 2) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
+      else if (osd_mode == 5) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x61;} //FLY_BY_WIRE_A
+      else if (osd_mode == 6) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x62;} //FLY_BY_WIRE_B
+      else if (osd_mode == 10) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //AUTO
+      else if (osd_mode == 11) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
+      else if (osd_mode == 12) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
+      else if (osd_mode == 15) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //GUIDED
     }
-    else if(apm_mav_type == 1){//ArduPlane
-        if(osd_mode == 2 ) osd.printf_P(PSTR("\xE0""stab"));//Stabilize
-        else if(osd_mode == 0) osd.printf_P(PSTR("\xE0""manu"));//Manual
-        else if(osd_mode == 12) osd.printf_P(PSTR("\xE0""loit"));//Loiter
-        else if(osd_mode == 11 ) osd.printf_P(PSTR("\xE0""retl"));//Return to Launch
-        else if(osd_mode == 5 ) osd.printf_P(PSTR("\xE0""fbwa"));//FLY_BY_WIRE_A
-        else if(osd_mode == 6 ) osd.printf_P(PSTR("\xE0""fbwb"));//FLY_BY_WIRE_B
-        else if(osd_mode == 15) osd.printf_P(PSTR("\xE0""guid"));//GUIDED
-        else if(osd_mode == 10 ) osd.printf_P(PSTR("\xE0""auto"));//AUTO
-        else if(osd_mode == 1) osd.printf_P(PSTR("\xE0""circ"));//CIRCLE
-    }
+    osd.printf("%c%c%c%c%c", c1, c2, c3, c4, c5);
     osd.closePanel();
-
 }
 
 
