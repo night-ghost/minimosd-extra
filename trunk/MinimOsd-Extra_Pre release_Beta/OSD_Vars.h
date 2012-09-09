@@ -149,7 +149,8 @@ byte panRSSI_XY[2][npanels];
 //rssi varables
 static uint8_t  rssipersent = 0;
 static uint8_t  rssical = 0;
-static uint8_t  osd_rssi = 0;
+static uint8_t  osd_rssi = 0; //raw value from mavlink
+static int16_t  rssi = 0; // scaled value 0-100%
 //static uint8_t  radio_setup_flag = 0;
 static uint16_t  ch_raw = 0;
 static uint16_t  osd_chan6_raw = 1000;
