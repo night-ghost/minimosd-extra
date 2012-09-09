@@ -4,10 +4,10 @@
 //static float	nav_roll = 0; // Current desired roll in degrees
 //static float  nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t	nav_bearing = 0; // Current desired heading in degrees
-static int16_t	wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
-static int8_t   wp_target_bearing_rotate_int = 0;
-static uint16_t wp_dist = 0; // Distance to active MISSION in meters
-static uint8_t wp_number = 0; // Current waypoint number
+static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
+static int8_t       wp_target_bearing_rotate_int = 0;
+static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
+static uint8_t      wp_number = 0; // Current waypoint number
 //static float	alt_error = 0; // Current altitude error in meters
 //static float aspd_error = 0; // Current airspeed error in meters/second
 //static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
@@ -45,14 +45,10 @@ static unsigned long        text_timer = 0;
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
 static uint8_t      warning = 0;
-//static int        char_update = 0;
-//static uint8_t      osd_on = 1;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
 static float        osd_climb = 0;
-
-
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
@@ -78,16 +74,11 @@ static float        osd_windspeedz = 0;
 static float        osd_winddirection = 0;
 static int8_t       osd_wind_arrow_rotate_int;
 
-static bool         wind = 0;
-//static int osd_wind_arrow = 0;
-
 static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
 static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
-
-static float  ch_raw = 0;
 
 //MAVLink session control
 static boolean      mavbeat = 0;
@@ -108,8 +99,8 @@ byte panD_REG[npanels] = {0b00000000};
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
-byte SerCMD1 = 0;
-byte SerCMD2 = 0;
+//byte SerCMD1 = 0;
+//byte SerCMD2 = 0;
 
 // First 8 panels and their X,Y coordinate holders
 byte panCenter_XY[2][npanels]; // = { 13,7,0 };
@@ -123,7 +114,7 @@ byte panGPS_XY[2][npanels]; // = { 2,13 };
 byte panBatteryPercent_XY[2][npanels];
 
 
-// Second 8 set of panels and their X,Y coordinate holders
+//Second 8 set of panels and their X,Y coordinate holders
 byte panRose_XY[2][npanels]; // = { 16,13 };
 byte panHeading_XY[2][npanels]; // = { 16,12 };
 byte panMavBeat_XY[2][npanels]; // = { 2,10 };
@@ -160,6 +151,7 @@ static uint8_t  rssipersent = 0;
 static uint8_t  rssical = 0;
 static uint8_t  osd_rssi = 0;
 //static uint8_t  radio_setup_flag = 0;
-static int16_t  osd_chan6_raw = 1000;
-static int16_t  osd_chan7_raw = 1000;
-static int16_t  osd_chan8_raw = 1000;
+static uint16_t  ch_raw = 0;
+static uint16_t  osd_chan6_raw = 1000;
+static uint16_t  osd_chan7_raw = 1000;
+static uint16_t  osd_chan8_raw = 1000;
