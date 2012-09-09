@@ -378,7 +378,7 @@ void panWarn(int first_col, int first_line){
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
-                if (x > 6) x = 1; // change the 6 if you add more warning types
+                if (x > 5) x = 1; // change the 6 if you add more warning types
                 switch(x) {
                 case 1:
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
@@ -390,13 +390,9 @@ void panWarn(int first_col, int first_line){
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
                 case 4:
-                    if (osd_vbat_A < float(battv)/10.0) warning_type = 4;
-                    break;
-                case 5:
-                    if (osd_battery_remaining_A < 10) warning_type = 4;
+                    if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < 10) warning_type = 4;
                     break;
                 }
-
                 if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
         }
@@ -575,7 +571,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r141"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r143"));
     osd.closePanel();
 }
 
