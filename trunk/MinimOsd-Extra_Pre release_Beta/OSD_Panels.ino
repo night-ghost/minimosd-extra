@@ -575,7 +575,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r125"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r141"));
     osd.closePanel();
 }
 
@@ -599,20 +599,12 @@ void panWaitMAVBeats(int first_col, int first_line){
 void panGPL(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    switch(osd_fix_type) {
-    case 0: 
-        osd.printf_P(PSTR("\x10\x20"));
-        break;
-    case 1: 
-        osd.printf_P(PSTR("\x10\x20"));
-        break;
-    case 2: 
-        osd.printf_P(PSTR("\x11\x20"));//If not APM, x01 would show 2D fix
-        break;
-    case 3: 
-        osd.printf_P(PSTR("\x11\x20"));//If not APM, x02 would show 3D fix
-        break;
-}
+    char* gps_str;
+    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20"; 
+        //osd.printf_P(PSTR("\x10\x20"));
+    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
+        //osd.printf_P(PSTR("\x11\x20"));
+    osd.printf("%s",gps_str);
 
     /*  if(osd_fix_type <= 1) {
     osd.printf_P(PSTR("\x10"));
@@ -775,27 +767,27 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     char c1; char c2; char c3; char c4; char c5; 
     if (apm_mav_type == 2){ //ArduCopter MultiRotor or ArduCopter Heli
-      if (osd_mode == 0) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
-      else if (osd_mode == 1) {c1=0xE0;c2=0x61;c3=0x63;c4=0x72;c5=0x6F;} //Acrobatic
-      else if (osd_mode == 2) {c1=0xE0;c2=0x61;c3=0x6C;c4=0x74;c5=0x68;} //Alt Hold
-      else if (osd_mode == 3) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //Auto
-      else if (osd_mode == 4) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //Guided
-      else if (osd_mode == 5) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
-      else if (osd_mode == 6) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
-      else if (osd_mode == 7) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} // Circle
-      else if (osd_mode == 8) {c1=0xE0;c2=0x70;c3=0x67;c4=0x73;c5=0x69;} // Position
-      else if (osd_mode == 9) {c1=0xE0;c2=0x6C;c3=0x61;c4=0x6E;c5=0x64;} // Land
-      else if (osd_mode == 10) {c1=0xE0;c2=0x6F;c3=0x66;c4=0x6C;c5=0x6F;} // OF_Loiter
+        if (osd_mode == 0) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
+        else if (osd_mode == 1) {c1=0xE0;c2=0x61;c3=0x63;c4=0x72;c5=0x6F;} //Acrobatic
+        else if (osd_mode == 2) {c1=0xE0;c2=0x61;c3=0x6C;c4=0x74;c5=0x68;} //Alt Hold
+        else if (osd_mode == 3) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //Auto
+        else if (osd_mode == 4) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //Guided
+        else if (osd_mode == 5) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
+        else if (osd_mode == 6) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
+        else if (osd_mode == 7) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} // Circle
+        else if (osd_mode == 8) {c1=0xE0;c2=0x70;c3=0x67;c4=0x73;c5=0x69;} // Position
+        else if (osd_mode == 9) {c1=0xE0;c2=0x6C;c3=0x61;c4=0x6E;c5=0x64;} // Land
+        else if (osd_mode == 10) {c1=0xE0;c2=0x6F;c3=0x66;c4=0x6C;c5=0x6F;} // OF_Loiter
     } else if(apm_mav_type == 1){ //ArduPlane
-      if (osd_mode == 0) {c1=0xE0;c2=0x6D;c3=0x61;c4=0x6E;c5=0x75;} //Manual
-      else if (osd_mode == 1) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} //CIRCLE
-      else if (osd_mode == 2) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
-      else if (osd_mode == 5) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x61;} //FLY_BY_WIRE_A
-      else if (osd_mode == 6) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x62;} //FLY_BY_WIRE_B
-      else if (osd_mode == 10) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //AUTO
-      else if (osd_mode == 11) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
-      else if (osd_mode == 12) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
-      else if (osd_mode == 15) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //GUIDED
+        if (osd_mode == 0) {c1=0xE0;c2=0x6D;c3=0x61;c4=0x6E;c5=0x75;} //Manual
+        else if (osd_mode == 1) {c1=0xE0;c2=0x63;c3=0x69;c4=0x72;c5=0x63;} //CIRCLE
+        else if (osd_mode == 2) {c1=0xE0;c2=0x73;c3=0x74;c4=0x61;c5=0x62;} //Stabilize
+        else if (osd_mode == 5) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x61;} //FLY_BY_WIRE_A
+        else if (osd_mode == 6) {c1=0xE0;c2=0x66;c3=0x62;c4=0x77;c5=0x62;} //FLY_BY_WIRE_B
+        else if (osd_mode == 10) {c1=0xE0;c2=0x61;c3=0x75;c4=0x74;c5=0x6F;} //AUTO
+        else if (osd_mode == 11) {c1=0xE0;c2=0x72;c3=0x65;c4=0x74;c5=0x6C;} //Return to Launch
+        else if (osd_mode == 12) {c1=0xE0;c2=0x6C;c3=0x6F;c4=0x69;c5=0x74;} //Loiter
+        else if (osd_mode == 15) {c1=0xE0;c2=0x67;c3=0x75;c4=0x69;c5=0x64;} //GUIDED
     }
     osd.printf("%c%c%c%c%c", c1, c2, c3, c4, c5);
     osd.closePanel();
@@ -877,11 +869,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
         arrow_set2 = 0xAF;
         break;
     } 
-    if(method == 1) {
-        if (wind == true){
-            osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
-        }
-    }
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
