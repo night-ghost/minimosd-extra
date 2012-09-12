@@ -206,7 +206,6 @@ void panWindSpeed(int first_col, int first_line){
 // Staus  : done
 
 void panOff(){
-
     if (ch_toggle == 5){
         if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
             if (osd_off_switch != osd_mode){ 
@@ -214,10 +213,29 @@ void panOff(){
                 osd_switch_time = millis();
 
                 if (osd_off_switch == osd_switch_last){
-                    panel++;
-	  	            if (panel > npanels ) panel = 0;
-                    if (panel == 0) osd_set = 0;
-                    if (millis() <= 60000 && panel == npanels) osd_set = 1; // npanels is the osd off panel
+                    switch(panel){
+                    case 0:
+                        {
+                            panel = 1;                                                        
+                            if (millis() <= 60000){
+                            osd_set = 1;
+                            }else{
+                            osd_set = 0;
+                            }                            
+                            break;
+                        }
+                    case 1:
+                        {
+                            panel = npanels;
+                            osd_set = 0;                            
+                            break;
+                        }
+                    case npanels:
+                        {
+                            panel = 0;
+                            break;
+                        }
+                    }
                     osd.clear();
                 }
             }
@@ -230,6 +248,7 @@ void panOff(){
         if(ch_toggle == 6) ch_raw = osd_chan6_raw;
         else if(ch_toggle == 7) ch_raw = osd_chan7_raw;
         else if(ch_toggle == 8) ch_raw = osd_chan8_raw;
+
 
         if (ch_raw > 1800) {
             if (millis() <= 60000){
@@ -246,14 +265,14 @@ void panOff(){
             panel = 0;
         }    
 
-        else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1) { //second panel
+        else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1 && warning != 1) { //second panel
             osd_set = 0;
             osd.clear();
             panel = 1;
         }        
-    }
+    
 }
-
+}
 /* **************************************************************** */
 // Panel  : panTune
 // Needs  : X, Y locations
@@ -368,13 +387,16 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
+
     if (millis() > text_timer){ // if the text has been shown for a while
         if (warning_type != 0) {
             last_warning = warning_type; // save the warning type for cycling
             warning_type = 0; // blank the text
             if ((millis() - 3000) > text_timer) warning = 0;
         } else {
-            warning = 1;
+  //        if (millis() > 60000){
+          warning = 1;
+ //         }          
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
@@ -397,9 +419,14 @@ void panWarn(int first_col, int first_line){
             }
         }
 
+
         text_timer = millis() + 1000; // blink every 1 secs
-        if (warning_type > 0) panel = 0; // turn OSD on if there is a warning
+        if (warning == 1){ 
+          if (panel == 1) osd.clear();
+          panel = 0; // turn OSD on if there is a warning                  
+        }
         char* warning_string;
+
 
         switch(warning_type){ 
         case 0:
@@ -571,7 +598,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r143"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r144"));
     osd.closePanel();
 }
 
