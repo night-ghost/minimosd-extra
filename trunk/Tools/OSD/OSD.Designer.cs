@@ -78,6 +78,7 @@
             this.STALL_label = new System.Windows.Forms.Label();
             this.STALL_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBoxRSSI = new System.Windows.Forms.GroupBox();
+            this.RSSI_RAW = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
@@ -91,7 +92,6 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.RSSI_RAW = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -469,7 +469,7 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Ch 5",
+            "Mode Switch",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
@@ -653,6 +653,17 @@
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
             // 
+            // RSSI_RAW
+            // 
+            this.RSSI_RAW.AutoSize = true;
+            this.RSSI_RAW.Location = new System.Drawing.Point(13, 131);
+            this.RSSI_RAW.Name = "RSSI_RAW";
+            this.RSSI_RAW.Size = new System.Drawing.Size(140, 21);
+            this.RSSI_RAW.TabIndex = 9;
+            this.RSSI_RAW.Text = "RSSI Enable Raw";
+            this.RSSI_RAW.UseVisualStyleBackColor = true;
+            this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -813,17 +824,6 @@
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
-            // 
-            // RSSI_RAW
-            // 
-            this.RSSI_RAW.AutoSize = true;
-            this.RSSI_RAW.Location = new System.Drawing.Point(13, 131);
-            this.RSSI_RAW.Name = "RSSI_RAW";
-            this.RSSI_RAW.Size = new System.Drawing.Size(140, 21);
-            this.RSSI_RAW.TabIndex = 9;
-            this.RSSI_RAW.Text = "RSSI Enable Raw";
-            this.RSSI_RAW.UseVisualStyleBackColor = true;
-            this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // OSD
             // 
