@@ -106,6 +106,7 @@ namespace OSD
         //public uint8_t rssi = 0;
         public uint8_t rssipersent = 0;
         public uint8_t rssical = 255;
+        public uint8_t rssiraw_on = 0;
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
         public uint8_t ch_toggle = 8; //CH8
