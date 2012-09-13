@@ -173,6 +173,7 @@
 #define OSD_RSSI_LOW_ADDR 902
 #define RADIO_ON_ADDR 904
 #define ch_toggle_ADDR 906
+#define OSD_RSSI_RAW_ADDR 908
 
 #define CHK1 1000
 #define CHK2 1006
