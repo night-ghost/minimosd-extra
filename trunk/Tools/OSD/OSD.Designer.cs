@@ -91,6 +91,7 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.RSSI_RAW = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -468,7 +469,7 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Mode switch",
+            "Ch 5",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
@@ -639,6 +640,7 @@
             // 
             // groupBoxRSSI
             // 
+            this.groupBoxRSSI.Controls.Add(this.RSSI_RAW);
             this.groupBoxRSSI.Controls.Add(this.label5);
             this.groupBoxRSSI.Controls.Add(this.label6);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
@@ -812,6 +814,17 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // RSSI_RAW
+            // 
+            this.RSSI_RAW.AutoSize = true;
+            this.RSSI_RAW.Location = new System.Drawing.Point(13, 131);
+            this.RSSI_RAW.Name = "RSSI_RAW";
+            this.RSSI_RAW.Size = new System.Drawing.Size(140, 21);
+            this.RSSI_RAW.TabIndex = 9;
+            this.RSSI_RAW.Text = "RSSI Enable Raw";
+            this.RSSI_RAW.UseVisualStyleBackColor = true;
+            this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -935,6 +948,7 @@
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.ComboBox ONOFF_combo;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.CheckBox RSSI_RAW;
     }
 }
 

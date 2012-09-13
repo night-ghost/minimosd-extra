@@ -178,8 +178,8 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Dir", pan.panWPDir, 14, 4, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Dir", pan.panWPDis, 14, 4, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 27, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 23, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
             // third 8
@@ -254,8 +254,8 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Dir", pan.panWPDir, 14, 4, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Dir", pan.panWPDis, 14, 4, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 27, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 23, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
             // third 8
@@ -317,6 +317,8 @@ namespace OSD
             STALL_numeric.Value = pan.stall;
             RSSI_numeric_min.Value = pan.rssipersent;
             RSSI_numeric_max.Value = pan.rssical;
+            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
+
             OVERSPEED_numeric.Value = pan.overspeed;
 
             if (pan.converts == 0)
@@ -980,6 +982,7 @@ namespace OSD
 
                 eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
                 eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
+                eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
 
                 eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
             } 
@@ -1203,6 +1206,7 @@ namespace OSD
         const int OSD_RSSI_LOW_ADDR = 902;
         const int RADIO_ON_ADDR = 904;
         const int OSD_Toggle_ADDR = 906;
+        const int OSD_RSSI_RAW_ADDR = 908;
         
         const int CHK1 = 1000;
         const int CHK2 = 1006;
@@ -1337,6 +1341,9 @@ namespace OSD
 
             pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
             RSSI_numeric_min.Value = pan.rssipersent;
+
+            pan.rssiraw_on = eeprom[OSD_RSSI_RAW_ADDR];
+            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
@@ -1484,6 +1491,7 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "Battery", pan.battv);
                         sw.WriteLine("{0}\t{1}", "RSSI High", pan.rssical);
                         sw.WriteLine("{0}\t{1}", "RSSI Low", pan.rssipersent);
+                        sw.WriteLine("{0}\t{1}", "RSSI Enable Raw", pan.rssiraw_on);
                         sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_toggle);
                         
                         sw.Close();
@@ -1499,7 +1507,7 @@ namespace OSD
         private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
-            const int nosdfunctions = 27;
+            const int nosdfunctions = 29;
             ofd.ShowDialog();
 
             if (ofd.FileName != "")
@@ -1561,6 +1569,7 @@ namespace OSD
                             else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
+                            else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
                         }
 
@@ -1590,6 +1599,7 @@ namespace OSD
                         MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
                         RSSI_numeric_max.Value = pan.rssical;
                         RSSI_numeric_min.Value = pan.rssipersent;
+                        RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
                     }
@@ -2146,6 +2156,11 @@ namespace OSD
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
             pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + toggle_offset);
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.rssiraw_on = Convert.ToByte(RSSI_RAW.Checked);
         }
 
     }
