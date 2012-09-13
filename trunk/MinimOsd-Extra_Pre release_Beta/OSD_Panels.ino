@@ -10,7 +10,7 @@ void startPanels(){
 
 void writePanels(){ 
 
-    if(millis() < (lastMAVBeat + 2000)){
+    if(millis() < (lastMAVBeat + 2200)){
         if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
             if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
@@ -598,7 +598,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0 Pre-Release|r144"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.3 Pre-Release|r149"));
     osd.closePanel();
 }
 
