@@ -86,8 +86,9 @@ namespace OSD
         static float nav_roll = 0;
         static float nav_pitch = 0;
         static uint16_t nav_bearing = 0; // Current desired heading in degrees
-        static uint16_t target_bearing = 0; // Bearing to current MISSION/target in degrees
-        static uint16_t wp_dist = 0; // Distance to active MISSION in meters
+        static uint16_t wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
+        static uint16_t wp_dist = 9000; // Distance to active MISSION in meters
+        static uint16_t wp_number = 99; // Distance to active MISSION in meters
         static float alt_error = 0; // Current altitude error in meters
         static float aspd_error = 0; // Current airspeed error in meters/second
         static float xtrack_error = 0; // Current crosstrack error on x-y plane in meters
@@ -105,6 +106,7 @@ namespace OSD
         //public uint8_t rssi = 0;
         public uint8_t rssipersent = 0;
         public uint8_t rssical = 255;
+        public uint8_t rssiraw_on = 0;
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
         public uint8_t ch_toggle = 8; //CH8
@@ -635,7 +637,25 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            showArrow();
+            {
+                osd.printf("%c%c",  0xA4, 0xA5);
+            }
+            osd.closePanel();
+            return 0;
+        }
+
+        /* **************************************************************** */
+        // Panel  : panWPDis
+        // Needs  : X, Y locations
+        // Output : W then distance in Km - Distance to next waypoint
+        // Size   : 1 x 2  (rows x chars)
+        // Staus  : not ready TODO - CHANGE the Waypoint symbol - Now only a W!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        public int panWPDis(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            osd.printf("%c%2i|%2.2f", 0x57, wp_number, (double)wp_dist / 1000.0); //Print in Km 
             osd.closePanel();
             return 0;
         }
