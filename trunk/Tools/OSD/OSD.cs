@@ -74,7 +74,7 @@ namespace OSD
         SerialPort comPort = new SerialPort();
 
         Panels pan;
-
+        int nosdfunctions=0;
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[30];
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[30];
 
@@ -203,7 +203,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("On/Off", pan.panOff, 16, 15, panOff_en_ADDR, panOff_x_ADDR, panOff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
-            
+            nosdfunctions = a;
             //Fill List of items in tabe number 1
             LIST_items.Items.Clear();
 
@@ -1507,7 +1507,7 @@ namespace OSD
         private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
-            const int nosdfunctions = 29;
+            //const int nosdfunctions = 29;
             ofd.ShowDialog();
 
             if (ofd.FileName != "")
