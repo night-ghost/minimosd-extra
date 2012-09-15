@@ -1,16 +1,16 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-//static float	nav_roll = 0; // Current desired roll in degrees
-//static float  nav_pitch = 0; // Current desired pitch in degrees
-//static int16_t	nav_bearing = 0; // Current desired heading in degrees
+static float	nav_roll = 0; // Current desired roll in degrees
+static float  nav_pitch = 0; // Current desired pitch in degrees
+static int16_t	nav_bearing = 0; // Current desired heading in degrees
 static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
 static int8_t       wp_target_bearing_rotate_int = 0;
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
-//static float	alt_error = 0; // Current altitude error in meters
-//static float aspd_error = 0; // Current airspeed error in meters/second
-//static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+static float	alt_error = 0; // Current altitude error in meters
+static float aspd_error = 0; // Current airspeed error in meters/second
+static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
@@ -142,7 +142,7 @@ byte panWarn_XY[2];
 byte panOff_XY[2];
 byte panWindSpeed_XY[2][npanels];
 byte panClimb_XY[2][npanels];
-//byte panTune_XY[2];
+byte panTune_XY[2][npanels];
 //byte panSetup_XY[2];
 byte panRSSI_XY[2][npanels];
 

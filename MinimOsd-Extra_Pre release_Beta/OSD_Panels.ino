@@ -59,7 +59,7 @@ void writePanels(){
                 //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
                 if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-                //    if(ISd(Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
             }
         } else { // if (osd_on > 0)
@@ -273,22 +273,21 @@ void panOff(){
     
 }
 }
-/* **************************************************************** */
+//* **************************************************************** */
 // Panel  : panTune
 // Needs  : X, Y locations
 // Output : Current symbol and altitude value in meters from MAVLink
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
+    
+  void panTune(int first_col, int first_line){
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
 
-//void panTune(int first_col, int first_line){
-//  osd.setPanel(first_col, first_line);
-//  osd.openPanel();
-//  if (osd_off == 0){
-//  osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
-//  }
+  osd.printf("%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (wp_target_bearing), 0xB0, 0x57, 0x44, (wp_dist), 0x6D, 0x41, 0x45, (alt_error), 0x6D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, (aspd_error * 3.6), 0x81);
 
-//  osd.closePanel();
-//}
+  osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : panCur_A

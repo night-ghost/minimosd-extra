@@ -156,9 +156,9 @@ void writeSettings() {
     writeEEPROM(on, panClimb_en_ADDR + offset);
     writeEEPROM(10, panClimb_x_ADDR + offset);
     writeEEPROM(4,  panClimb_y_ADDR + offset);
-    // writeEEPROM(on, panTune_en_ADDR);
-    // writeEEPROM(10, panTune_x_ADDR);
-    // writeEEPROM(4,  panTune_y_ADDR);
+    writeEEPROM(on, panTune_en_ADDR + offset);
+    writeEEPROM(10, panTune_x_ADDR + offset);
+    writeEEPROM(4,  panTune_y_ADDR + offset);
 
     if(panel == 0) {
         writeEEPROM(on, panSetup_en_ADDR);
@@ -317,9 +317,9 @@ void readSettings() {
     panClimb_XY[0][panel] = readEEPROM(panClimb_x_ADDR + offset);
     panClimb_XY[1][panel] = checkPAL(readEEPROM(panClimb_y_ADDR + offset));
 
-    //  setBit(panD_REG, Tune_BIT, readEEPROM(panTune_en_ADDR));
-    //  panTune_XY[0] = readEEPROM(panTune_x_ADDR);
-    //  panTune_XY[1] = checkPAL(readEEPROM(panTune_y_ADDR));
+    setBit(panD_REG[panel], Tune_BIT, readEEPROM(panTune_en_ADDR + offset));
+    panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
+    panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
 
     setBit(panD_REG[panel], Setup_BIT, readEEPROM(panSetup_en_ADDR));
     //panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
