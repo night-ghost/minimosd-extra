@@ -102,8 +102,8 @@ void panRSSI(int first_col, int first_line){
     //else if (rssi < rssipersent) rssi = rssipersent;
 
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
-
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
+//    osd.printf("%c%3i%c", 0xE1, warning, 0x25); 
     osd.closePanel();
 }
 
@@ -392,15 +392,15 @@ void panWarn(int first_col, int first_line){
         if (warning_type != 0) {
             last_warning = warning_type; // save the warning type for cycling
             warning_type = 0; // blank the text
-            if ((millis() - 3000) > text_timer) warning = 0;
+            warning = 1;
+            warning_timer = millis();            
         } else {
-  //        if (millis() > 60000){
-          warning = 1;
- //         }          
+          if ((millis() - 10000) > warning_timer ) warning = 0;
+            
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
-                if (x > 5) x = 1; // change the 6 if you add more warning types
+                if (x > 4) x = 1; // change the 6 if you add more warning types
                 switch(x) {
                 case 1:
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
@@ -598,7 +598,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.3 Pre-Release|r149"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.4 Pre-Release|r151"));
     osd.closePanel();
 }
 
@@ -760,7 +760,7 @@ void panWPDir(int first_col, int first_line){
 void panWPDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i%2.2f", 0x57,wp_number,(double)wp_dist/1000.0); //Print in Km 
+      osd.printf("%c%2i%c%4.0f%c",0x57,wp_number,0x0,(double)((float)(wp_dist) * converth),high);
     osd.closePanel();
 }
 
