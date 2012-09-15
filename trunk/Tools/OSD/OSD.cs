@@ -178,8 +178,8 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 27, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 23, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 21, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 21, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
             // third 8
@@ -202,7 +202,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("On/Off", pan.panOff, 16, 15, panOff_en_ADDR, panOff_x_ADDR, panOff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-        //    panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             
             //Fill List of items in tabe number 1
             LIST_items.Items.Clear();
@@ -254,8 +254,8 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 27, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 23, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 21, 11, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 21, 13, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
             // third 8
@@ -278,7 +278,7 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("On/Off", pan.panOff, 16, 15, panOff_en_ADDR, panOff_x_ADDR, panOff_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-        //    panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 0, 0, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
 
             
             //Fill List of items in tabe number 2
