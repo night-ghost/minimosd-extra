@@ -50,7 +50,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.videoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nTSCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CHK_ntsc = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_pal = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,6 +63,7 @@
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -92,10 +93,6 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.video_modecombo = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -121,14 +118,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            this.groupBox8.SuspendLayout();
             this.SuspendLayout();
             // 
             // LIST_items
             // 
             this.LIST_items.FormattingEnabled = true;
             this.LIST_items.Location = new System.Drawing.Point(4, 4);
-            this.LIST_items.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LIST_items.Margin = new System.Windows.Forms.Padding(4);
             this.LIST_items.Name = "LIST_items";
             this.LIST_items.Size = new System.Drawing.Size(183, 344);
             this.LIST_items.TabIndex = 1;
@@ -143,9 +139,9 @@
             this.groupBox1.Controls.Add(this.NUM_Y);
             this.groupBox1.Controls.Add(this.NUM_X);
             this.groupBox1.Location = new System.Drawing.Point(4, 351);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(184, 101);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
@@ -173,7 +169,7 @@
             // NUM_Y
             // 
             this.NUM_Y.Location = new System.Drawing.Point(40, 57);
-            this.NUM_Y.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NUM_Y.Margin = new System.Windows.Forms.Padding(4);
             this.NUM_Y.Maximum = new decimal(new int[] {
             15,
             0,
@@ -187,7 +183,7 @@
             // NUM_X
             // 
             this.NUM_X.Location = new System.Drawing.Point(40, 25);
-            this.NUM_X.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NUM_X.Margin = new System.Windows.Forms.Padding(4);
             this.NUM_X.Maximum = new decimal(new int[] {
             29,
             0,
@@ -202,7 +198,7 @@
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BUT_WriteOSD.Location = new System.Drawing.Point(701, 522);
-            this.BUT_WriteOSD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BUT_WriteOSD.Margin = new System.Windows.Forms.Padding(4);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
             this.BUT_WriteOSD.Size = new System.Drawing.Size(175, 28);
             this.BUT_WriteOSD.TabIndex = 2;
@@ -215,7 +211,7 @@
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
             this.CMB_ComPort.Location = new System.Drawing.Point(419, 522);
-            this.CMB_ComPort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CMB_ComPort.Margin = new System.Windows.Forms.Padding(4);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(129, 24);
             this.CMB_ComPort.TabIndex = 4;
@@ -225,7 +221,7 @@
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BUT_ReadOSD.Location = new System.Drawing.Point(559, 522);
-            this.BUT_ReadOSD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BUT_ReadOSD.Margin = new System.Windows.Forms.Padding(4);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(133, 28);
             this.BUT_ReadOSD.TabIndex = 6;
@@ -328,30 +324,32 @@
             // videoModeToolStripMenuItem
             // 
             this.videoModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.nTSCToolStripMenuItem,
+            this.CHK_ntsc,
             this.CHK_pal});
             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
             this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(103, 24);
             this.videoModeToolStripMenuItem.Text = "Video Mode";
             // 
-            // nTSCToolStripMenuItem
+            // CHK_ntsc
             // 
-            this.nTSCToolStripMenuItem.CheckOnClick = true;
-            this.nTSCToolStripMenuItem.Name = "nTSCToolStripMenuItem";
-            this.nTSCToolStripMenuItem.Size = new System.Drawing.Size(114, 24);
-            this.nTSCToolStripMenuItem.Text = "NTSC";
-            this.nTSCToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
+            this.CHK_ntsc.CheckOnClick = true;
+            this.CHK_ntsc.Name = "CHK_ntsc";
+            this.CHK_ntsc.Size = new System.Drawing.Size(152, 24);
+            this.CHK_ntsc.Text = "NTSC";
+            this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
+            this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
             // 
             // CHK_pal
             // 
             this.CHK_pal.Checked = true;
             this.CHK_pal.CheckOnClick = true;
-            this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
+            //this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(114, 24);
+            this.CHK_pal.Size = new System.Drawing.Size(152, 24);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
+            this.CHK_pal.Click += new System.EventHandler(this.CHK_pal_Click);
             // 
             // optionsToolStripMenuItem
             // 
@@ -421,7 +419,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Location = new System.Drawing.Point(205, 17);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(663, 422);
             this.pictureBox1.TabIndex = 0;
@@ -444,7 +442,6 @@
             // 
             // tabPageConfig
             // 
-            this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
             this.tabPageConfig.Controls.Add(this.groupBox6);
             this.tabPageConfig.Controls.Add(this.groupBox5);
@@ -466,12 +463,24 @@
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
             this.groupBox7.Location = new System.Drawing.Point(9, 192);
-            this.groupBox7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox7.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox7.Size = new System.Drawing.Size(185, 124);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
+            // 
+            // TOGGLE_BEH
+            // 
+            this.TOGGLE_BEH.AutoSize = true;
+            this.TOGGLE_BEH.Location = new System.Drawing.Point(13, 83);
+            this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.TOGGLE_BEH.Name = "TOGGLE_BEH";
+            this.TOGGLE_BEH.Size = new System.Drawing.Size(146, 21);
+            this.TOGGLE_BEH.TabIndex = 10;
+            this.TOGGLE_BEH.Text = "Rotation Switching";
+            this.TOGGLE_BEH.UseVisualStyleBackColor = true;
+            this.TOGGLE_BEH.CheckedChanged += new System.EventHandler(this.TOGGLE_BEHChanged);
             // 
             // ONOFF_combo
             // 
@@ -505,9 +514,9 @@
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Location = new System.Drawing.Point(425, 24);
-            this.groupBox6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox6.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox6.Size = new System.Drawing.Size(185, 78);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
@@ -541,9 +550,9 @@
             this.groupBox5.Controls.Add(this.OVERSPEED_label);
             this.groupBox5.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox5.Location = new System.Drawing.Point(217, 101);
-            this.groupBox5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox5.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox5.Size = new System.Drawing.Size(185, 82);
             this.groupBox5.TabIndex = 6;
             this.groupBox5.TabStop = false;
@@ -561,7 +570,7 @@
             // OVERSPEED_numeric
             // 
             this.OVERSPEED_numeric.Location = new System.Drawing.Point(12, 46);
-            this.OVERSPEED_numeric.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OVERSPEED_numeric.Margin = new System.Windows.Forms.Padding(4);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -577,9 +586,9 @@
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
             this.groupBox4.Location = new System.Drawing.Point(425, 101);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox4.Size = new System.Drawing.Size(185, 82);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
@@ -603,7 +612,7 @@
             0,
             65536});
             this.MINVOLT_numeric.Location = new System.Drawing.Point(12, 46);
-            this.MINVOLT_numeric.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MINVOLT_numeric.Margin = new System.Windows.Forms.Padding(4);
             this.MINVOLT_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -619,9 +628,9 @@
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
             this.groupBox3.Location = new System.Drawing.Point(217, 24);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox3.Size = new System.Drawing.Size(185, 78);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
@@ -639,7 +648,7 @@
             // STALL_numeric
             // 
             this.STALL_numeric.Location = new System.Drawing.Point(12, 46);
-            this.STALL_numeric.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.STALL_numeric.Margin = new System.Windows.Forms.Padding(4);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -658,9 +667,9 @@
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
             this.groupBoxRSSI.Location = new System.Drawing.Point(9, 25);
-            this.groupBoxRSSI.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxRSSI.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
-            this.groupBoxRSSI.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxRSSI.Padding = new System.Windows.Forms.Padding(4);
             this.groupBoxRSSI.Size = new System.Drawing.Size(185, 159);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
@@ -700,7 +709,7 @@
             // RSSI_numeric_max
             // 
             this.RSSI_numeric_max.Location = new System.Drawing.Point(12, 94);
-            this.RSSI_numeric_max.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.RSSI_numeric_max.Margin = new System.Windows.Forms.Padding(4);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
             255,
             0,
@@ -714,7 +723,7 @@
             // RSSI_numeric_min
             // 
             this.RSSI_numeric_min.Location = new System.Drawing.Point(12, 46);
-            this.RSSI_numeric_min.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.RSSI_numeric_min.Margin = new System.Windows.Forms.Padding(4);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
             255,
             0,
@@ -755,7 +764,7 @@
             // 
             this.LIST_items2.FormattingEnabled = true;
             this.LIST_items2.Location = new System.Drawing.Point(4, 4);
-            this.LIST_items2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LIST_items2.Margin = new System.Windows.Forms.Padding(4);
             this.LIST_items2.Name = "LIST_items2";
             this.LIST_items2.Size = new System.Drawing.Size(183, 344);
             this.LIST_items2.TabIndex = 2;
@@ -770,9 +779,9 @@
             this.groupBox2.Controls.Add(this.NUM_Y2);
             this.groupBox2.Controls.Add(this.NUM_X2);
             this.groupBox2.Location = new System.Drawing.Point(4, 351);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(184, 101);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
@@ -800,7 +809,7 @@
             // NUM_Y2
             // 
             this.NUM_Y2.Location = new System.Drawing.Point(40, 57);
-            this.NUM_Y2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NUM_Y2.Margin = new System.Windows.Forms.Padding(4);
             this.NUM_Y2.Maximum = new decimal(new int[] {
             15,
             0,
@@ -814,7 +823,7 @@
             // NUM_X2
             // 
             this.NUM_X2.Location = new System.Drawing.Point(40, 25);
-            this.NUM_X2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NUM_X2.Margin = new System.Windows.Forms.Padding(4);
             this.NUM_X2.Maximum = new decimal(new int[] {
             29,
             0,
@@ -831,7 +840,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox2.Location = new System.Drawing.Point(205, 17);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(663, 422);
             this.pictureBox2.TabIndex = 3;
@@ -839,54 +848,6 @@
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
-            // 
-            // TOGGLE_BEH
-            // 
-            this.TOGGLE_BEH.AutoSize = true;
-            this.TOGGLE_BEH.Location = new System.Drawing.Point(13, 83);
-            this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.TOGGLE_BEH.Name = "TOGGLE_BEH";
-            this.TOGGLE_BEH.Size = new System.Drawing.Size(146, 21);
-            this.TOGGLE_BEH.TabIndex = 10;
-            this.TOGGLE_BEH.Text = "Rotation Switching";
-            this.TOGGLE_BEH.UseVisualStyleBackColor = true;
-            this.TOGGLE_BEH.CheckedChanged += new System.EventHandler(this.TOGGLE_BEHChanged);
-            // 
-            // groupBox8
-            // 
-            this.groupBox8.Controls.Add(this.video_modecombo);
-            this.groupBox8.Controls.Add(this.label8);
-            this.groupBox8.Location = new System.Drawing.Point(217, 192);
-            this.groupBox8.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox8.Size = new System.Drawing.Size(185, 78);
-            this.groupBox8.TabIndex = 9;
-            this.groupBox8.TabStop = false;
-            // 
-            // video_modecombo
-            // 
-            this.video_modecombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.video_modecombo.FormattingEnabled = true;
-            this.video_modecombo.Items.AddRange(new object[] {
-            "PAL",
-            "NTSC"});
-            this.video_modecombo.Location = new System.Drawing.Point(12, 44);
-            this.video_modecombo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.video_modecombo.Name = "video_modecombo";
-            this.video_modecombo.Size = new System.Drawing.Size(121, 24);
-            this.video_modecombo.TabIndex = 3;
-            this.video_modecombo.SelectedIndexChanged += new System.EventHandler(this.video_modecombo_SelectedIndexChanged);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(9, 25);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(83, 17);
-            this.label8.TabIndex = 2;
-            this.label8.Text = "Video Mode";
             // 
             // OSD
             // 
@@ -901,7 +862,7 @@
             this.Controls.Add(this.BUT_WriteOSD);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "OSD";
             this.Text = "ArduCAM OSD Config - By Michael Oborne & MinimOSD Extra Team";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OSD_FormClosed);
@@ -942,8 +903,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            this.groupBox8.ResumeLayout(false);
-            this.groupBox8.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -965,7 +924,7 @@
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem videoModeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nTSCToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CHK_ntsc;
         private System.Windows.Forms.ToolStripMenuItem CHK_pal;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToFileToolStripMenuItem;
@@ -1015,9 +974,6 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox RSSI_RAW;
         private System.Windows.Forms.CheckBox TOGGLE_BEH;
-        private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.ComboBox video_modecombo;
-        private System.Windows.Forms.Label label8;
     }
 }
 

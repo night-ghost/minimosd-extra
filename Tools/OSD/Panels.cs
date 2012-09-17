@@ -111,7 +111,7 @@ namespace OSD
         public uint8_t radio_setup_flag = 0;
         public uint8_t ch_toggle = 8; //CH8
         public boolean switch_mode = 0;
-        public boolean pal_ntsc = 0;
+        public boolean pal_ntsc = 1; //PAL 1 - NTSC 0
  	    /******* PANELS - DEFINITION *******/
 
  	    /* **************************************************************** */
