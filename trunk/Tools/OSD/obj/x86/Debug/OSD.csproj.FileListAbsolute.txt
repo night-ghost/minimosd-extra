@@ -72,3 +72,5 @@ C:\MinimOsd\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe.manifest
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.pdb
+C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\ResGen.read.1.tlog
+C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\ResGen.write.1.tlog

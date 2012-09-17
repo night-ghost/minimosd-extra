@@ -21,7 +21,7 @@ namespace OSD
         //ntsc = 13r 30 char
         Int16 panel_number = 0;
         const Int16 npanel = 2;
-        const Int16 toggle_offset = 5;
+        const Int16 toggle_offset = 4;
         Size basesize = new Size(30, 16);
         /// <summary>
         /// the un-scaled font render image
@@ -339,6 +339,8 @@ namespace OSD
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
+            TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
+            video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
 
         }
 
@@ -985,6 +987,9 @@ namespace OSD
                 eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
 
                 eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
+                eeprom[switch_mode_ADDR] = pan.switch_mode;
+
+                eeprom[pal_ntsc_ADDR] = pan.pal_ntsc;
             } 
 
 
@@ -1058,7 +1063,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_RSSI_RAW_ADDR - measure_ADDR + 1), (short)measure_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(pal_ntsc_ADDR - measure_ADDR + 1), (short)measure_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1207,6 +1212,8 @@ namespace OSD
         const int RADIO_ON_ADDR = 904;
         const int OSD_Toggle_ADDR = 906;
         const int OSD_RSSI_RAW_ADDR = 908;
+        const int switch_mode_ADDR = 910;
+        const int pal_ntsc_ADDR = 912;
         
         const int CHK1 = 1000;
         const int CHK2 = 1006;
@@ -1348,6 +1355,13 @@ namespace OSD
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
+
+            pan.switch_mode = eeprom[switch_mode_ADDR];
+            TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
+
+            pan.pal_ntsc = eeprom[pal_ntsc_ADDR];
+            video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
+            
             osdDraw1();
             osdDraw2();
 
@@ -1493,7 +1507,8 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "RSSI Low", pan.rssipersent);
                         sw.WriteLine("{0}\t{1}", "RSSI Enable Raw", pan.rssiraw_on);
                         sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_toggle);
-                        
+                        sw.WriteLine("{0}\t{1}", "Chanel Rotation Switching", pan.switch_mode);
+                        sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
                         sw.Close();
                     }
                 }
@@ -1571,6 +1586,8 @@ namespace OSD
                             else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
+                            else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
+                            else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
                         }
 
                         //Modify units
@@ -1602,6 +1619,10 @@ namespace OSD
                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
+
+                        TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
+
+                        video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
                     }
                 }
                 catch
@@ -2161,6 +2182,16 @@ namespace OSD
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             pan.rssiraw_on = Convert.ToByte(RSSI_RAW.Checked);
+        }
+
+        private void TOGGLE_BEHChanged(object sender, EventArgs e)
+        {
+            pan.switch_mode = Convert.ToByte(TOGGLE_BEH.Checked);
+        }
+
+        private void video_modecombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.pal_ntsc = Convert.ToByte(video_modecombo.SelectedIndex);
         }
 
     }

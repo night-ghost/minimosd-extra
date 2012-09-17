@@ -110,7 +110,8 @@ namespace OSD
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
         public uint8_t ch_toggle = 8; //CH8
-
+        public boolean switch_mode = 0;
+        public boolean pal_ntsc = 0;
  	    /******* PANELS - DEFINITION *******/
 
  	    /* **************************************************************** */
