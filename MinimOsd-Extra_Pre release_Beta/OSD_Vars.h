@@ -155,6 +155,7 @@ static int16_t  rssi = 0; // scaled value 0-100%
 static bool rssiraw_on = false; // 0- display scale value | 1- display raw value
 //static uint8_t  radio_setup_flag = 0;
 static uint16_t  ch_raw = 0;
+static uint16_t  osd_chan5_raw = 1000;
 static uint16_t  osd_chan6_raw = 1000;
 static uint16_t  osd_chan7_raw = 1000;
 static uint16_t  osd_chan8_raw = 1000;
