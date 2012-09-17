@@ -206,7 +206,7 @@ void panWindSpeed(int first_col, int first_line){
 // Staus  : done
 
 void panOff(){
-    if (ch_toggle == 5){
+    if (ch_toggle == 0){
         if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
@@ -245,10 +245,10 @@ void panOff(){
         }
     }
     else {
-        if(ch_toggle == 6) ch_raw = osd_chan6_raw;
+        if(ch_toggle == 5) ch_raw = osd_chan5_raw;
+        else if(ch_toggle == 6) ch_raw = osd_chan6_raw;
         else if(ch_toggle == 7) ch_raw = osd_chan7_raw;
         else if(ch_toggle == 8) ch_raw = osd_chan8_raw;
-
 
         if (ch_raw > 1800) {
             if (millis() <= 60000){
@@ -597,7 +597,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.5 Pre-Release|r154"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.5 Pre-Release|r155"));
     osd.closePanel();
 }
 
