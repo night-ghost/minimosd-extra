@@ -18,6 +18,8 @@ static int16_t      chan1_raw_middle = 0;
 static int16_t      chan2_raw_middle = 0;
 static uint8_t      ch_toggle = 0;
 static boolean      osd_set = 0;
+static boolean      switch_mode = 0;
+static boolean      pal_ntsc = 0;
 
 static int8_t       setup_menu = 0;
 static float        converts = 0;

@@ -250,6 +250,7 @@ void panOff(){
         else if(ch_toggle == 7) ch_raw = osd_chan7_raw;
         else if(ch_toggle == 8) ch_raw = osd_chan8_raw;
 
+    if (switch_mode == 0){
         if (ch_raw > 1800) {
             if (millis() <= 60000){
                 osd_set = 1;
@@ -270,8 +271,29 @@ void panOff(){
             osd.clear();
             panel = 1;
         }        
-    
-}
+    } else {
+      
+        if (ch_raw > 1200)
+           if (millis() <= 60000 && osd_set != 1){
+            if (osd_switch_time + 1000 < millis()){
+               osd_set = 1;
+               osd_switch_time = millis();
+              }
+            } else {
+              if (osd_switch_time + 1000 < millis()){
+                osd_set = 0;
+                osd.clear();
+                if (panel == npanels) {
+                  panel = 0;
+                } else {
+                panel++;
+                }
+            if (panel > 1) panel = npanels;
+              osd_switch_time = millis();
+              }
+            }
+        }    
+    }
 }
 //* **************************************************************** */
 // Panel  : panTune
@@ -597,7 +619,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.5 Pre-Release|r155"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.6 Pre-Release|r156"));
     osd.closePanel();
 }
 
