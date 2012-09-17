@@ -12,6 +12,7 @@ using System.IO;
 using ArdupilotMega;
 using System.Xml;
 
+
 namespace OSD
 {
     public partial class OSD : Form
@@ -339,10 +340,13 @@ namespace OSD
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
-            TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
-            video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
+            CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+            this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+            this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+            this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
 
-        }
+            CMB_ComPort.Text = "COM5";
+        }          
 
         private string[] GetPortNames()
         {
@@ -1360,8 +1364,12 @@ namespace OSD
             TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
             pan.pal_ntsc = eeprom[pal_ntsc_ADDR];
-            video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
-            
+            CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+
+            this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+            this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+            this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+
             osdDraw1();
             osdDraw2();
 
@@ -1455,19 +1463,18 @@ namespace OSD
         private void CHK_pal_CheckedChanged(object sender, EventArgs e)
         {
             changeToPal(CHK_pal.Checked);
-
             osdDraw1();
             osdDraw2();
         }
 
         private void pALToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
-            nTSCToolStripMenuItem.Checked = !CHK_pal.Checked;
+            CHK_ntsc.Checked = !CHK_pal.Checked;
         }
 
         private void nTSCToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
-            CHK_pal.Checked = !nTSCToolStripMenuItem.Checked;
+            CHK_pal.Checked = !CHK_ntsc.Checked;
         }
 
         private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1622,7 +1629,11 @@ namespace OSD
 
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
-                        video_modecombo.SelectedIndex = Convert.ToByte(pan.pal_ntsc);
+                        CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+                        this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+                        this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+                        this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+
                     }
                 }
                 catch
@@ -1907,7 +1918,6 @@ namespace OSD
         private void OSD_FormClosed(object sender, FormClosedEventArgs e)
         {
             xmlconfig(true);
-
         }
 
         private void xmlconfig(bool write)
@@ -1955,7 +1965,7 @@ namespace OSD
                                         break;
                                     case "Pal":
                                         string temp2 = xmlreader.ReadString();
-                                        CHK_pal.Checked = (temp2 == "True");
+                                        //CHK_pal.Checked = (temp2 == "True");
                                         break;
                                     case "Config":
                                         break;
@@ -2189,9 +2199,15 @@ namespace OSD
             pan.switch_mode = Convert.ToByte(TOGGLE_BEH.Checked);
         }
 
-        private void video_modecombo_SelectedIndexChanged(object sender, EventArgs e)
+
+        private void CHK_pal_Click(object sender, EventArgs e)
         {
-            pan.pal_ntsc = Convert.ToByte(video_modecombo.SelectedIndex);
+            pan.pal_ntsc = 1;
+        }
+
+        private void CHK_ntsc_Click(object sender, EventArgs e)
+        {
+            pan.pal_ntsc = 0;
         }
 
     }
