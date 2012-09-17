@@ -206,7 +206,7 @@ void panWindSpeed(int first_col, int first_line){
 // Staus  : done
 
 void panOff(){
-    if (ch_toggle == 0){
+    if (ch_toggle == 4){
         if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
