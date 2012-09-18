@@ -137,13 +137,13 @@ void setup()
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset
-    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
-        osd.setPanel(6,9);
-        osd.openPanel();
-        osd.printf_P(PSTR("Missing/Old Config")); 
-        osd.closePanel();
+//    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
+//        osd.setPanel(6,9);
+//        osd.openPanel();
+//        osd.printf_P(PSTR("Missing/Old Config")); 
+//        osd.closePanel();
         //InitializeOSD();
-    }
+//    }
 
     // Get correct panel settings from EEPROM
     for(panel = 0; panel < npanels; panel++) readSettings();
