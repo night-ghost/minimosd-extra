@@ -175,10 +175,10 @@ void readSettings() {
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
     switch_mode = EEPROM.read(switch_mode_ADDR);
-    pal_ntsc = EEPROM.read(pal_ntsc_ADDR);
-    if (EEPROM.read(ch_toggle_ADDR) < 5 || EEPROM.read(ch_toggle_ADDR) > 8){
-     	EEPROM.write(ch_toggle_ADDR, 5);
-	}
+//    pal_ntsc = EEPROM.read(pal_ntsc_ADDR);
+//    if (EEPROM.read(ch_toggle_ADDR) < 4 || EEPROM.read(ch_toggle_ADDR) > 8){
+//     	EEPROM.write(ch_toggle_ADDR, 5);
+//	}
     ch_toggle = EEPROM.read(ch_toggle_ADDR);
     //  battp = EEPROM.read(battp_ADDR);
     if (EEPROM.read(panSetup_en_ADDR) != 1){

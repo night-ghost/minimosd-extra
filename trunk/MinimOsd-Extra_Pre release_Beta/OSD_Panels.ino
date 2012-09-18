@@ -475,7 +475,7 @@ void panWarn(int first_col, int first_line){
             break;
         case 5:
             //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x53\x53\x49\x20\x20";
+            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
             break;
         }
         osd.printf("%s",warning_string);
@@ -626,7 +626,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.6 Pre-Release|r157"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|2.0.7 Pre-Release|r161"));
     osd.closePanel();
 }
 
