@@ -1101,6 +1101,9 @@ namespace OSD
 
 
         /* *********************************************** */
+        // Version number, incrementing this will erase/upload factory settings.
+        // Only devs should increment this
+        const int VER = 75;
         // EEPROM Storage addresses
         const int OffsetBITpanel = 200;
         // First of 8 panels
@@ -1314,7 +1317,8 @@ namespace OSD
                     }
                 }
             }
-
+            //Verify EEPROM version
+            //if (eeprom[CHK1] + eeprom[CHK2] != VER)
 
             //Setup configuration panel
             pan.converts = eeprom[measure_ADDR];
