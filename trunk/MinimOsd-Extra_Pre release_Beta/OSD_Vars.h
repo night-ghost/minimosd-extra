@@ -12,6 +12,9 @@ static float	alt_error = 0; // Current altitude error in meters
 static float aspd_error = 0; // Current airspeed error in meters/second
 static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 
+static uint8_t base_mode=0;
+static bool motor_armed = 0;
+
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
 static int16_t      chan1_raw_middle = 0;
