@@ -143,8 +143,8 @@ byte panFMod_XY[2][npanels]; // = { 0,0 };
 byte panHorizon_XY[2][npanels]; // = {8,centercalc}
 
 // Third set of panels and their X,Y coordinate holders
-byte panWarn_XY[2];
-byte panOff_XY[2];
+byte panWarn_XY[2][npanels];
+//byte panOff_XY[2];
 byte panWindSpeed_XY[2][npanels];
 byte panClimb_XY[2][npanels];
 byte panTune_XY[2][npanels];

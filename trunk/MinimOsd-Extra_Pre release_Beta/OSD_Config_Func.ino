@@ -304,12 +304,12 @@ void readSettings() {
     panHorizon_XY[1][panel] = checkPAL(readEEPROM(panHorizon_y_ADDR + offset));
 
     setBit(panD_REG[panel], Warn_BIT, readEEPROM(panWarn_en_ADDR + offset));
-    panWarn_XY[0] = readEEPROM(panWarn_x_ADDR + offset);
-    panWarn_XY[1] = checkPAL(readEEPROM(panWarn_y_ADDR + offset));
+    panWarn_XY[0][panel] = readEEPROM(panWarn_x_ADDR + offset);
+    panWarn_XY[1][panel] = checkPAL(readEEPROM(panWarn_y_ADDR + offset));
 
-    setBit(panD_REG[panel], Off_BIT, readEEPROM(panOff_en_ADDR + offset));
-    panOff_XY[0] = readEEPROM(panOff_x_ADDR + offset);
-    panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR + offset));
+    //setBit(panD_REG[panel], Off_BIT, readEEPROM(panOff_en_ADDR + offset));
+    //panOff_XY[0] = readEEPROM(panOff_x_ADDR + offset);
+    //panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR + offset));
 
     setBit(panD_REG[panel], WindS_BIT, readEEPROM(panWindSpeed_en_ADDR + offset));
     panWindSpeed_XY[0][panel] = readEEPROM(panWindSpeed_x_ADDR + offset);
