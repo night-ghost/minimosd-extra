@@ -22,7 +22,7 @@ namespace OSD
         //ntsc = 13r 30 char
         Int16 panel_number = 0;
         const Int16 npanel = 2;
-        const Int16 toggle_offset = 4;
+        const Int16 toggle_offset = 3;
         Size basesize = new Size(30, 16);
         /// <summary>
         /// the un-scaled font render image

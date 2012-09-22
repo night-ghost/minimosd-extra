@@ -334,7 +334,7 @@
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(152, 24);
+            this.CHK_ntsc.Size = new System.Drawing.Size(114, 24);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -343,9 +343,9 @@
             // 
             this.CHK_pal.Checked = true;
             this.CHK_pal.CheckOnClick = true;
-            //this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(152, 24);
+            this.CHK_pal.Size = new System.Drawing.Size(114, 24);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -487,6 +487,7 @@
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
+            "Disabled",
             "Mode Switch",
             "Ch 5",
             "Ch 6",
