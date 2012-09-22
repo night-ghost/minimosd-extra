@@ -11,11 +11,11 @@ void startPanels(){
 void writePanels(){ 
 
     if(millis() < (lastMAVBeat + 2200)){
-        if(ISd(0,Off_BIT)) panOff(); // This must be first so you can always toggle
+        if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
-            if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0], panWarn_XY[1]); // this must be here so warnings are always checked
             if (panel != npanels)
             {
+                if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
                 //Testing bits from 8 bit register A 
                 if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
@@ -61,6 +61,8 @@ void writePanels(){
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
                 if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
+            } else { //panel == npanels
+                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
             }
         } else { // if (osd_on > 0)
             panSetup();
