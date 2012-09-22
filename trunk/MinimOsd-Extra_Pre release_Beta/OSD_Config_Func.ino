@@ -168,9 +168,7 @@ void writeSettings() {
         writeEEPROM(6,ch_toggle_ADDR);
     }
 }
-
 void readSettings() {
-
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
@@ -187,6 +185,9 @@ void readSettings() {
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
     rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
     rssiraw_on = EEPROM.read(OSD_RSSI_RAW_ADDR);
+}
+
+void readPanelSettings() {
 
     //****** First set of 8 Panels ******
     uint16_t offset = OffsetBITpanel * panel;
@@ -347,7 +348,8 @@ void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
             writeEEPROM(panel_y, (6 * panelu) - 6 + 4);
         }
         osd.clear();
-        for(panel = 0; panel < npanels; panel++) readSettings();
+        readSettings();
+        for(panel = 0; panel < npanels; panel++) readPanelSettings();
     } 
 }
 

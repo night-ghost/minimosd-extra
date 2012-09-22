@@ -11,7 +11,7 @@ void startPanels(){
 void writePanels(){ 
 
     if(millis() < (lastMAVBeat + 2200)){
-        panOff(); // This must be first so you can always toggle
+        if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
             if (panel != npanels)
             {
