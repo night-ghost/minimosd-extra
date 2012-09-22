@@ -9,6 +9,7 @@
 	#include "wiring.h"
 #endif
 #include "Spi.h"
+#include <EEPROM.h>
 
 volatile int x;
 volatile int font_count;
@@ -55,29 +56,29 @@ void OSD::init()
 
 void OSD::detectMode()
 {
-  digitalWrite(MAX7456_SELECT,LOW);
-  //read STAT and auto detect Mode PAL/NTSC
-  Spi.transfer(MAX7456_STAT_reg_read);//status register
-  byte osdstat_r = Spi.transfer(0xff);
+//    digitalWrite(MAX7456_SELECT,LOW);
+    //read STAT and auto detect Mode PAL/NTSC
+//    Spi.transfer(MAX7456_STAT_reg_read);//status register
+//    byte osdstat_r = Spi.transfer(0xff);
 
-  if ((B00000001 & osdstat_r) == 1){
-    setMode(1);  
-  }
-  else if((B00000010 & osdstat_r) == 1){
-    setMode(0);
-  }
-#ifdef MinimOSD
-  else if (digitalRead(3) == 1){
-    setMode(1);
-  }
-#endif
-if ((B00000010 & osdstat_r) < 1){
-  setMode(1);
-  digitalWrite(MAX7456_SELECT,LOW);
- } 
+//    if ((B00000001 & osdstat_r) == 1){
+//        setMode(1);  
+//    }
+//    else if((B00000010 & osdstat_r) == 1){
+        setMode(0);
+//    }
+//#ifdef MinimOSD
+//    else if (digitalRead(3) == 1){
+//        setMode(1);
+//    }
+//#endif
 
-  else setMode(0);
-  digitalWrite(MAX7456_SELECT,LOW);
+    if (EEPROM.read(912) == 1){
+        setMode(1);
+        digitalWrite(MAX7456_SELECT,LOW);
+    } 
+    else setMode(0);
+    digitalWrite(MAX7456_SELECT,LOW);
 }
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------
