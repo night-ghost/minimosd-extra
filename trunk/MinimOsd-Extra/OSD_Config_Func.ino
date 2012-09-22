@@ -168,9 +168,7 @@ void writeSettings() {
         writeEEPROM(6,ch_toggle_ADDR);
     }
 }
-
 void readSettings() {
-
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
@@ -187,6 +185,9 @@ void readSettings() {
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
     rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
     rssiraw_on = EEPROM.read(OSD_RSSI_RAW_ADDR);
+}
+
+void readPanelSettings() {
 
     //****** First set of 8 Panels ******
     uint16_t offset = OffsetBITpanel * panel;
@@ -304,12 +305,12 @@ void readSettings() {
     panHorizon_XY[1][panel] = checkPAL(readEEPROM(panHorizon_y_ADDR + offset));
 
     setBit(panD_REG[panel], Warn_BIT, readEEPROM(panWarn_en_ADDR + offset));
-    panWarn_XY[0] = readEEPROM(panWarn_x_ADDR + offset);
-    panWarn_XY[1] = checkPAL(readEEPROM(panWarn_y_ADDR + offset));
+    panWarn_XY[0][panel] = readEEPROM(panWarn_x_ADDR + offset);
+    panWarn_XY[1][panel] = checkPAL(readEEPROM(panWarn_y_ADDR + offset));
 
-    setBit(panD_REG[panel], Off_BIT, readEEPROM(panOff_en_ADDR + offset));
-    panOff_XY[0] = readEEPROM(panOff_x_ADDR + offset);
-    panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR + offset));
+    //setBit(panD_REG[panel], Off_BIT, readEEPROM(panOff_en_ADDR + offset));
+    //panOff_XY[0] = readEEPROM(panOff_x_ADDR + offset);
+    //panOff_XY[1] = checkPAL(readEEPROM(panOff_y_ADDR + offset));
 
     setBit(panD_REG[panel], WindS_BIT, readEEPROM(panWindSpeed_en_ADDR + offset));
     panWindSpeed_XY[0][panel] = readEEPROM(panWindSpeed_x_ADDR + offset);
@@ -347,7 +348,8 @@ void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
             writeEEPROM(panel_y, (6 * panelu) - 6 + 4);
         }
         osd.clear();
-        for(panel = 0; panel < npanels; panel++) readSettings();
+        readSettings();
+        for(panel = 0; panel < npanels; panel++) readPanelSettings();
     } 
 }
 
