@@ -137,17 +137,17 @@ void setup()
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset
-    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
-        osd.setPanel(6,9);
-        osd.openPanel();
-        osd.printf_P(PSTR("Missing/Old Config")); 
-        osd.closePanel();
-        InitializeOSD();
-    }
+//    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
+//        osd.setPanel(6,9);
+//        osd.openPanel();
+//        osd.printf_P(PSTR("Missing/Old Config")); 
+//        osd.closePanel();
+        //InitializeOSD();
+//    }
 
     // Get correct panel settings from EEPROM
-    readSettings();
-
+    for(panel = 0; panel < npanels; panel++) readSettings();
+    panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
     loadBar();
 
@@ -201,7 +201,7 @@ void OnMavlinkTimer()
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
-
+    
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
 }
 
