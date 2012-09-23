@@ -175,7 +175,10 @@
 #define ch_toggle_ADDR 906
 #define OSD_RSSI_RAW_ADDR 908
 #define switch_mode_ADDR 910
-#define pal_ntsc_ADDR 912
+#define PAL_NTSC_ADDR 912
+
+#define OSD_BATT_WARN_ADDR 914
+#define OSD_RSSI_WARN_ADDR 916
 
 #define CHK1 1000
 #define CHK2 1006
