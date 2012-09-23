@@ -339,6 +339,10 @@ namespace OSD
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+
+            BATT_WARNnumeric.Value = pan.batt_warn_level;
+            RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
             this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -991,7 +995,11 @@ namespace OSD
                 eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
                 eeprom[switch_mode_ADDR] = pan.switch_mode;
 
-                eeprom[pal_ntsc_ADDR] = pan.pal_ntsc;
+                eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
+                
+                eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
+                eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
+
             } 
 
 
@@ -1065,7 +1073,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(pal_ntsc_ADDR - measure_ADDR + 1), (short)measure_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_RSSI_WARN_ADDR - measure_ADDR + 1), (short)measure_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1218,8 +1226,10 @@ namespace OSD
         const int OSD_Toggle_ADDR = 906;
         const int OSD_RSSI_RAW_ADDR = 908;
         const int switch_mode_ADDR = 910;
-        const int pal_ntsc_ADDR = 912;
-        
+        const int PAL_NTSC_ADDR = 912;
+        const int OSD_BATT_WARN_ADDR = 914;
+        const int OSD_RSSI_WARN_ADDR = 916;  
+           
         const int CHK1 = 1000;
         const int CHK2 = 1006;
 
@@ -1365,8 +1375,15 @@ namespace OSD
             pan.switch_mode = eeprom[switch_mode_ADDR];
             TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
-            pan.pal_ntsc = eeprom[pal_ntsc_ADDR];
+            pan.pal_ntsc = eeprom[PAL_NTSC_ADDR];
             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+
+            pan.batt_warn_level = eeprom[OSD_BATT_WARN_ADDR];
+            BATT_WARNnumeric.Value = pan.batt_warn_level;
+
+            pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
+            RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+                   
 
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -1518,6 +1535,8 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_toggle);
                         sw.WriteLine("{0}\t{1}", "Chanel Rotation Switching", pan.switch_mode);
                         sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
+                        sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
+                        sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);                   
                         sw.Close();
                     }
                 }
@@ -1597,6 +1616,8 @@ namespace OSD
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
                             else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
                             else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
+                            else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
+                            else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);                   
                         }
 
                         //Modify units
@@ -1632,6 +1653,10 @@ namespace OSD
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+
+                        BATT_WARNnumeric.Value = pan.batt_warn_level;
+                        RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
                         this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
                         this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
                         this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -2212,5 +2237,14 @@ namespace OSD
             pan.pal_ntsc = 0;
         }
 
+        private void RSSI_WARNnumeric_ValueChanged(object sender, EventArgs e)
+        {
+            pan.rssi_warn_level = (byte)RSSI_WARNnumeric.Value;
+        }
+
+        private void BATT_WARNnumeric_ValueChanged(object sender, EventArgs e)
+        {
+            pan.batt_warn_level = (byte)BATT_WARNnumeric.Value;
+        }
     }
 }

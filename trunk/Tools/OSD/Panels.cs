@@ -112,6 +112,11 @@ namespace OSD
         public uint8_t ch_toggle = 8; //CH8
         public boolean switch_mode = 0;
         public boolean pal_ntsc = 1; //PAL 1 - NTSC 0
+        
+        public uint8_t rssi_warn_level = 5;
+        public uint8_t batt_warn_level = 10;
+
+
  	    /******* PANELS - DEFINITION *******/
 
  	    /* **************************************************************** */
