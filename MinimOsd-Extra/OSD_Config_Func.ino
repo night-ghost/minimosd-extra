@@ -185,6 +185,9 @@ void readSettings() {
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
     rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
     rssiraw_on = EEPROM.read(OSD_RSSI_RAW_ADDR);
+
+    batt_warn_level = EEPROM.read(OSD_BATT_WARN_ADDR);
+    rssi_warn_level = EEPROM.read(OSD_RSSI_WARN_ADDR);
 }
 
 void readPanelSettings() {

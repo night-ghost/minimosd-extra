@@ -10,6 +10,7 @@
 #endif
 #include "Spi.h"
 #include <EEPROM.h>
+#include "OSD_Config.h"
 
 volatile int x;
 volatile int font_count;
@@ -73,7 +74,7 @@ void OSD::detectMode()
 //    }
 //#endif
 
-    if (EEPROM.read(912) == 1){
+    if (EEPROM.read(PAL_NTSC_ADDR) == 1){
         setMode(1);
         digitalWrite(MAX7456_SELECT,LOW);
     } 
