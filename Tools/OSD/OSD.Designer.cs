@@ -79,6 +79,8 @@
             this.STALL_label = new System.Windows.Forms.Label();
             this.STALL_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBoxRSSI = new System.Windows.Forms.GroupBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.RSSI_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.RSSI_RAW = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -93,6 +95,8 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.BATT_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -110,6 +114,7 @@
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.STALL_numeric)).BeginInit();
             this.groupBoxRSSI.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).BeginInit();
             this.tabPage1.SuspendLayout();
@@ -118,6 +123,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // LIST_items
@@ -462,11 +468,11 @@
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(9, 192);
+            this.groupBox7.Location = new System.Drawing.Point(9, 232);
             this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox7.Size = new System.Drawing.Size(185, 124);
+            this.groupBox7.Size = new System.Drawing.Size(200, 124);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
             // 
@@ -514,11 +520,11 @@
             // 
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(425, 24);
+            this.groupBox6.Location = new System.Drawing.Point(452, 24);
             this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox6.Size = new System.Drawing.Size(185, 78);
+            this.groupBox6.Size = new System.Drawing.Size(203, 78);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             // 
@@ -550,7 +556,7 @@
             // 
             this.groupBox5.Controls.Add(this.OVERSPEED_label);
             this.groupBox5.Controls.Add(this.OVERSPEED_numeric);
-            this.groupBox5.Location = new System.Drawing.Point(217, 101);
+            this.groupBox5.Location = new System.Drawing.Point(239, 101);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(4);
@@ -584,13 +590,15 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label9);
+            this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(425, 101);
+            this.groupBox4.Location = new System.Drawing.Point(453, 101);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox4.Size = new System.Drawing.Size(185, 82);
+            this.groupBox4.Size = new System.Drawing.Size(203, 132);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             // 
@@ -628,7 +636,7 @@
             // 
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(217, 24);
+            this.groupBox3.Location = new System.Drawing.Point(239, 24);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
@@ -662,6 +670,8 @@
             // 
             // groupBoxRSSI
             // 
+            this.groupBoxRSSI.Controls.Add(this.label8);
+            this.groupBoxRSSI.Controls.Add(this.RSSI_WARNnumeric);
             this.groupBoxRSSI.Controls.Add(this.RSSI_RAW);
             this.groupBoxRSSI.Controls.Add(this.label5);
             this.groupBoxRSSI.Controls.Add(this.label6);
@@ -671,14 +681,33 @@
             this.groupBoxRSSI.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
             this.groupBoxRSSI.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBoxRSSI.Size = new System.Drawing.Size(185, 159);
+            this.groupBoxRSSI.Size = new System.Drawing.Size(200, 208);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(10, 123);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(160, 17);
+            this.label8.TabIndex = 11;
+            this.label8.Text = "RSSI Warning Level (%)";
+            // 
+            // RSSI_WARNnumeric
+            // 
+            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(12, 144);
+            this.RSSI_WARNnumeric.Margin = new System.Windows.Forms.Padding(4);
+            this.RSSI_WARNnumeric.Name = "RSSI_WARNnumeric";
+            this.RSSI_WARNnumeric.Size = new System.Drawing.Size(121, 22);
+            this.RSSI_WARNnumeric.TabIndex = 10;
+            this.RSSI_WARNnumeric.ValueChanged += new System.EventHandler(this.RSSI_WARNnumeric_ValueChanged);
             // 
             // RSSI_RAW
             // 
             this.RSSI_RAW.AutoSize = true;
-            this.RSSI_RAW.Location = new System.Drawing.Point(13, 130);
+            this.RSSI_RAW.Location = new System.Drawing.Point(13, 177);
             this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.RSSI_RAW.Name = "RSSI_RAW";
             this.RSSI_RAW.Size = new System.Drawing.Size(140, 21);
@@ -850,6 +879,25 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(8, 74);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(195, 17);
+            this.label9.TabIndex = 13;
+            this.label9.Text = "Bat. Remain. Warn. Level (%)";
+            // 
+            // BATT_WARNnumeric
+            // 
+            this.BATT_WARNnumeric.Location = new System.Drawing.Point(10, 95);
+            this.BATT_WARNnumeric.Margin = new System.Windows.Forms.Padding(4);
+            this.BATT_WARNnumeric.Name = "BATT_WARNnumeric";
+            this.BATT_WARNnumeric.Size = new System.Drawing.Size(121, 22);
+            this.BATT_WARNnumeric.TabIndex = 12;
+            this.BATT_WARNnumeric.ValueChanged += new System.EventHandler(this.BATT_WARNnumeric_ValueChanged);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -895,6 +943,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.STALL_numeric)).EndInit();
             this.groupBoxRSSI.ResumeLayout(false);
             this.groupBoxRSSI.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).EndInit();
             this.tabPage1.ResumeLayout(false);
@@ -904,6 +953,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -975,6 +1025,10 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox RSSI_RAW;
         private System.Windows.Forms.CheckBox TOGGLE_BEH;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown RSSI_WARNnumeric;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown BATT_WARNnumeric;
     }
 }
 
