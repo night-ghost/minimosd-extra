@@ -160,10 +160,9 @@
 #define panTune_en_ADDR 188
 #define panTune_x_ADDR 190
 #define panTune_y_ADDR 192
-#define panSetup_en_ADDR 194
-#define panEff_en_ADDR 196
-#define panEff_x_ADDR 198
-#define panEff_y_ADDR 202
+#define panEff_en_ADDR 194
+#define panEff_x_ADDR 196
+#define panEff_y_ADDR 198
 
 
 #define measure_ADDR 890
