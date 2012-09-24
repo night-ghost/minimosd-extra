@@ -1,19 +1,20 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static float	nav_roll = 0; // Current desired roll in degrees
-static float  nav_pitch = 0; // Current desired pitch in degrees
-static int16_t	nav_bearing = 0; // Current desired heading in degrees
+static float	    nav_roll = 0; // Current desired roll in degrees
+static float        nav_pitch = 0; // Current desired pitch in degrees
+static int16_t	    nav_bearing = 0; // Current desired heading in degrees
 static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
 static int8_t       wp_target_bearing_rotate_int = 0;
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
-static float	alt_error = 0; // Current altitude error in meters
-static float aspd_error = 0; // Current airspeed error in meters/second
-static float	xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+static float	    alt_error = 0; // Current altitude error in meters
+static float        aspd_error = 0; // Current airspeed error in meters/second
+static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+static float        eff = 0; //Efficiency
 
-static uint8_t base_mode=0;
-static bool motor_armed = 0;
+static uint8_t      base_mode=0;
+static bool         motor_armed = 0;
 
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
@@ -37,7 +38,9 @@ static uint8_t      high = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
-//static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
+static uint8_t      batt_warn_level = 0;
+
+//static uint8_t    osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 //static float      osd_vbat_B = 0;               // voltage in milivolt
 //static float      osd_curr_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
@@ -150,17 +153,19 @@ byte panClimb_XY[2][npanels];
 byte panTune_XY[2][npanels];
 //byte panSetup_XY[2];
 byte panRSSI_XY[2][npanels];
+byte panEff_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables
-static uint8_t  rssipersent = 0;
-static uint8_t  rssical = 0;
-static uint8_t  osd_rssi = 0; //raw value from mavlink
-static int16_t  rssi = -99; // scaled value 0-100%
-static bool rssiraw_on = false; // 0- display scale value | 1- display raw value
-//static uint8_t  radio_setup_flag = 0;
-static uint16_t  ch_raw = 0;
-static uint16_t  osd_chan5_raw = 1000;
-static uint16_t  osd_chan6_raw = 1000;
-static uint16_t  osd_chan7_raw = 1000;
-static uint16_t  osd_chan8_raw = 1000;
+static uint8_t      rssipersent = 0;
+static uint8_t      rssical = 0;
+static uint8_t      osd_rssi = 0; //raw value from mavlink
+static int16_t      rssi = -99; // scaled value 0-100%
+static bool         rssiraw_on = false; // 0- display scale value | 1- display raw value
+static uint8_t      rssi_warn_level = 0;
+
+static uint16_t     ch_raw = 0;
+static uint16_t     osd_chan5_raw = 1000;
+static uint16_t     osd_chan6_raw = 1000;
+static uint16_t     osd_chan7_raw = 1000;
+static uint16_t     osd_chan8_raw = 1000;

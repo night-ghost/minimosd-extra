@@ -159,6 +159,9 @@ void writeSettings() {
     writeEEPROM(on, panTune_en_ADDR + offset);
     writeEEPROM(10, panTune_x_ADDR + offset);
     writeEEPROM(4,  panTune_y_ADDR + offset);
+    writeEEPROM(on, panEff_en_ADDR + offset);
+    writeEEPROM(10, panEff_x_ADDR + offset);
+    writeEEPROM(4,  panEff_y_ADDR + offset);
 
     if(panel == 0) {
         writeEEPROM(on, panSetup_en_ADDR);
@@ -185,6 +188,9 @@ void readSettings() {
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
     rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
     rssiraw_on = EEPROM.read(OSD_RSSI_RAW_ADDR);
+
+    batt_warn_level = EEPROM.read(OSD_BATT_WARN_ADDR);
+    rssi_warn_level = EEPROM.read(OSD_RSSI_WARN_ADDR);
 }
 
 void readPanelSettings() {
@@ -330,6 +336,10 @@ void readPanelSettings() {
     setBit(panD_REG[panel], RSSI_BIT, readEEPROM(panRSSI_en_ADDR + offset));
     panRSSI_XY[0][panel] = readEEPROM(panRSSI_x_ADDR + offset);
     panRSSI_XY[1][panel] = checkPAL(readEEPROM(panRSSI_y_ADDR + offset));
+    
+    setBit(panD_REG[panel], Eff_BIT, readEEPROM(panEff_en_ADDR + offset));
+    panEff_XY[0][panel] = readEEPROM(panEff_x_ADDR + offset);
+    panEff_XY[1][panel] = checkPAL(readEEPROM(panEff_y_ADDR + offset));
 }
 
 int checkPAL(int line){

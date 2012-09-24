@@ -52,6 +52,7 @@
 #define Tune_BIT       4
 #define Setup_BIT      5
 #define RSSI_BIT       6
+#define Eff_BIT        7
 
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -159,10 +160,11 @@
 #define panTune_en_ADDR 188
 #define panTune_x_ADDR 190
 #define panTune_y_ADDR 192
-
 #define panSetup_en_ADDR 194
-//#define panSetup_x_ADDR 196
-//#define panSetup_y_ADDR 198
+#define panEff_en_ADDR 196
+#define panEff_x_ADDR 198
+#define panEff_y_ADDR 202
+
 
 #define measure_ADDR 890
 #define overspeed_ADDR 892
@@ -175,7 +177,10 @@
 #define ch_toggle_ADDR 906
 #define OSD_RSSI_RAW_ADDR 908
 #define switch_mode_ADDR 910
-#define pal_ntsc_ADDR 912
+#define PAL_NTSC_ADDR 912
+
+#define OSD_BATT_WARN_ADDR 914
+#define OSD_RSSI_WARN_ADDR 916
 
 #define CHK1 1000
 #define CHK2 1006
