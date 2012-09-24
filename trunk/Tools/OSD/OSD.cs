@@ -1215,9 +1215,9 @@ namespace OSD
         const int panTune_en_ADDR = 188;
         const int panTune_x_ADDR = 190;
         const int panTune_y_ADDR = 192;
-        const int panEff_en_ADDR = 196;
-        const int panEff_x_ADDR = 198;
-        const int panEff_y_ADDR = 202;
+        const int panEff_en_ADDR = 194;
+        const int panEff_x_ADDR = 196;
+        const int panEff_y_ADDR = 198;
         //
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;

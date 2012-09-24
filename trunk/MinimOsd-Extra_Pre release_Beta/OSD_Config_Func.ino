@@ -164,7 +164,7 @@ void writeSettings() {
     writeEEPROM(4,  panEff_y_ADDR + offset);
 
     if(panel == 0) {
-        writeEEPROM(on, panSetup_en_ADDR);
+//        writeEEPROM(on, panSetup_en_ADDR);
         writeEEPROM(30,overspeed_ADDR);
         writeEEPROM(0,stall_ADDR);
         writeEEPROM(100,battv_ADDR); //10Volts
@@ -182,9 +182,9 @@ void readSettings() {
 //	}
     ch_toggle = EEPROM.read(ch_toggle_ADDR);
     //  battp = EEPROM.read(battp_ADDR);
-    if (EEPROM.read(panSetup_en_ADDR) != 1){
-        EEPROM.write(panSetup_en_ADDR, 1);
-    }
+  //  if (EEPROM.read(panSetup_en_ADDR) != 1){
+  //      EEPROM.write(panSetup_en_ADDR, 1);
+  //  }
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
     rssipersent = EEPROM.read(OSD_RSSI_LOW_ADDR);
     rssiraw_on = EEPROM.read(OSD_RSSI_RAW_ADDR);
@@ -330,7 +330,7 @@ void readPanelSettings() {
     panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
     panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
 
-    setBit(panD_REG[panel], Setup_BIT, readEEPROM(panSetup_en_ADDR));
+    setBit(panD_REG[panel], Setup_BIT, 1);
     //panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
     //panSetup_XY[1] = checkPAL(readEEPROM(panSetup_y_ADDR));
     setBit(panD_REG[panel], RSSI_BIT, readEEPROM(panRSSI_en_ADDR + offset));
