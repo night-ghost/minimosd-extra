@@ -92,7 +92,7 @@ namespace OSD
         static float alt_error = 0; // Current altitude error in meters
         static float aspd_error = 0; // Current airspeed error in meters/second
         static float xtrack_error = 0; // Current crosstrack error on x-y plane in meters
-
+        static float eff = 10;
 
         //MAVLink session control
         static boolean mavbeat = 1;
@@ -118,6 +118,24 @@ namespace OSD
 
 
  	    /******* PANELS - DEFINITION *******/
+
+        /* **************************************************************** */
+        // Panel  : efficiency
+        // Needs  : X, Y locations
+        // Output : 
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panEff(int first_col, int first_line)
+        {
+        osd.setPanel(first_col, first_line);
+        osd.openPanel();
+        {
+        osd.printf("%c%3.0f%c", 0x17, eff, 0x82);
+        }
+        osd.closePanel();
+         return 0;
+        }
 
  	    /* **************************************************************** */
  	    // Panel  : panRSSI

@@ -67,7 +67,6 @@ C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\ResolveAssemblyReference.cache
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD.OSD.resources
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD.Properties.Resources.resources
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.read.1.tlog
-C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.read.4.tlog
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.write.1.tlog
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD_Config.TrustInfo.xml
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe.manifest
