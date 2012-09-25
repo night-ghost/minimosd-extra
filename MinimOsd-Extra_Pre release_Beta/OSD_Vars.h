@@ -75,6 +75,7 @@ static int8_t       osd_pitch = 0;                  // pitch from DCM
 static int8_t       osd_roll = 0;                   // roll from DCM
 static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
+static float        glide = 0;
 
 static float        osd_alt = 0;                    // altitude
 static float        osd_airspeed = -1;              // airspeed
