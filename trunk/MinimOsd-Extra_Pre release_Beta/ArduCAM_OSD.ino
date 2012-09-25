@@ -10,7 +10,7 @@ Coauthor(s):
 Jani Hirvinen   (All the EEPROM routines)
 Michael Oborne  (OSD Configutator)
 Mike Smith      (BetterStream and Fast Serial libraries)
-G·bor Zolt·n
+G√°bor Zolt√°n
 Pedro Santos
 Special Contribuitor:
 Andrew Tridgell by all the support on MAVLink
