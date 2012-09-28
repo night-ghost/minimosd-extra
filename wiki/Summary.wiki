@@ -1,4 +1,3 @@
-#sidebar Setup
 
 A project to add extra functions to MinimOsd code.
 
