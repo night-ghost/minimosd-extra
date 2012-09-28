@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Started to add functions to MinimOsd code.
+Started to add functions to MinimOSD code.
 
 
 
@@ -18,7 +18,7 @@ Added:
 
 - Airspeed
 
-- Home alt
+- Home altitude
 
 - Battery Percent
 
@@ -34,28 +34,28 @@ Added:
 
 - OSD on/off
 
-- Switchable secound screen
+- Switchable second screen
 
-- WP distance
+- Waypoint distance
 
-- WP heading
+- Waypoint heading
 
 - Efficiency, glide distance & thermic notifier. 3 in one panel (Will be in next release)
 
-- Warning messages for Lost GPS fix, Stall, Overspeed, battery volt, battery Percent, RSSI
+- Warning messages for Lost GPS fix, stall, overspeed, battery voltage, battery percent, RSSI
 
 
 
-This functions can be turned on and off, and placed on different screens now, by the Config. tool.
+This functions can be turned on and off, and placed on different screens now, using the Config. tool.
 
-Also RSSI, switching mode and channel and unit measurement, Stall speed warning, Overspeed warning, Battery warning volt, Battery percent warning, RSSI warning,  can be set in new Config Tool.
-
-
-
-We built in a new way of setting video standards. Now OSD does not guessing anymore :). You can set it fixed from CT. It is in "Video Mode" menu.
+Also RSSI, switching mode and channel and units of measurement, stall speed warning, overspeed warning, battery warning voltage, battery percent warning, RSSI warning, can be set in the new Config Tool.
 
 
-If you could send me a tlog file of an average flight.... Than i would be able to test it. :)
+
+We built in a new way of setting video standards. Now OSD does not guess anymore :). You can set it fixed from Config. Tool. It is in "Video Mode" menu.
+
+
+If you could send me a .tlog file of an average flight.... Than I would be able to test it. :)
 
 Or could anyone flight test it, and upload the OSD video about it? 
 
@@ -66,13 +66,7 @@ About the menu:
 I made a menu inside OSD. You can enter this menu only after boot, the same way as screen switching works.
 
 
-
-The MinimOSD-Extra project is here: Link
-
-
-
 The latest stable version is: 2.1
-
 
 
 Enjoy
