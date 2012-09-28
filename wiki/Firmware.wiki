@@ -19,13 +19,3 @@ http://gabek.dyndns.org:28/wiki/1.PNG
 
 Browse for the firmware file (.hex)
 MinimOSD will show the version of your firmware on boot (2.1)
-
-3./   Uploading character set file
-
-Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
-Than click on "Options" menu and choose "Update charset".
-
-http://gabek.dyndns.org:28/wiki/3.PNG
-
-It is located in CT directory. (.mcm)
-MinimOSD will show the version of your charset on boot (1.8)
