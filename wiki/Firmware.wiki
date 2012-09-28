@@ -1,6 +1,6 @@
 = Uploading firmware and character set =
 
-To upload you need a FTDI cable.
+To upload you need a FTDI cable like this: http://store.diydrones.com/FTDI_Cable_3_3V_p/ttl-232r-3v3.htm
 
 1./  preparing:
 
@@ -22,4 +22,3 @@ Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
 Than click on "Options" menu and choose update charset.
 It is located in CT directory. (.mcm)
 MinimOSD will show the version of your charset on boot (1.8)
-
