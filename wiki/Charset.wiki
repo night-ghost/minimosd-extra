@@ -4,6 +4,10 @@ To upload you need a FTDI cable like this: http://store.diydrones.com/FTDI_Cable
 
 1./   Preparing:
 
+After you connect it, open the latest Config Tool, and select the right port.
+
+http://gabek.dyndns.org:28/wiki/2.PNG
+
 Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
 
 
