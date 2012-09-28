@@ -5,4 +5,5 @@
 = Menu =
 
   * [Firmware Upload Firmware]
-    * [Configure Configure]
+  * [Configure Configureing]
+    * [Using Config Tool]
