@@ -1,5 +1,7 @@
 = Uploading character set file =
 
+To upload you need a FTDI cable like this: http://store.diydrones.com/FTDI_Cable_3_3V_p/ttl-232r-3v3.htm
+
 1./   Preparing:
 
 Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
