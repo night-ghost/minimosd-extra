@@ -3,6 +3,7 @@
 * [index Introdution]
 
 = Menu =
+
 * [ Start here]
   * [Firmware Upload Firmware]
-  
+  * [ Configure]
