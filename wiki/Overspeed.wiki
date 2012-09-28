@@ -2,7 +2,7 @@
 
 Overspeed warning is a configurable warning message.
 
-It can be set in CT.
+It can be set in CT and also from OSD menu.
 
 http://gabek.dyndns.org:28/wiki/7.PNG
 
