@@ -2,7 +2,7 @@
 
 * [index Introduction]
 
-= Menu =
+
 
   
   * [Configure Configuring]
