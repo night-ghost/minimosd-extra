@@ -1,0 +1,11 @@
+= Video Standards =
+
+Setting video standards is done trough CT.
+
+It can be set in "Video Mode" menu.
+
+http://gabek.dyndns.org:28/wiki/8.PNG
+
+It is very different from the original "guessing" method.
+It sets it fixed.
+
