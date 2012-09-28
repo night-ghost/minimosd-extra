@@ -107,7 +107,7 @@ void panEff(int first_col, int first_line){
 //    glide = (osd_home_alt - osd_alt) / osd_climb;
     glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth * 0.2 + glide * 0.8;
     
-    osd.printf("%c%4.0f%c", 0x18, glide, high);
+    osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
     } else {
       osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
       }
@@ -659,7 +659,7 @@ void panBatt_A(int first_col, int first_line){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.1|r267"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.1|r268"));
     osd.closePanel();
 }
 
