@@ -6,4 +6,4 @@
 
 * [ Start here]
   * [Firmware Upload Firmware]
-  * [ Configure]
+    * [ Configure]
