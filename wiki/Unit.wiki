@@ -1,0 +1,7 @@
+= Introduction =
+
+You can set MinimOSD-Extra to show units that you re familiar with.
+
+http://gabek.dyndns.org:28/wiki/7.PNG
+
+It can be set to use metric or imperial system.
