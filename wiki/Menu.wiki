@@ -9,6 +9,7 @@
     * [Config_Tool Using Config Tool]
       * [Firmware Uploading MinimOSD-Extra Firmware]
       * [Charset Uploading Character Set]
+      * [Standard Video Standards]
       * [Managing_Panels Managing Panels]
       * [Screen_Change Set screen change]
       * [Unit Unit mesurement]
