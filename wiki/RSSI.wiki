@@ -1,10 +1,10 @@
 1./
-First you need to enable this function in APM (APM_Config.h).
-Add "#define RECEIVER_RSSI_PIN 6"
-Note that 6 is the pin number where you have RSSI port connected. I have changed it defined as 6 as I use port 6. If you use a different port, replace 6 with your port number.
+First you need to enable this function in APM. Go to APM_Config.h and add: "#define RECEIVER_RSSI_PIN 6"
+
+Note that 6 is the pin number where you have RSSI port connected. I have changed it to 6 as I use port 6. If you use a different port, replace 6 with your port number.
 
 If you use APM2 or 2.5 than add:
-#define CONFIG_APM_HARDWARE APM_HARDWARE_APM2
+"#define CONFIG_APM_HARDWARE APM_HARDWARE_APM2"
 in APM_Config.h
 
 After this you can compile and upload.
@@ -15,7 +15,7 @@ You have to teach OSD to "read your receiver".
 
 http://gabek.dyndns.org:28/wiki/7.PNG
 
-Open CT check the "RSSI Enable Raw" check-box so when you power up your OSD with APM, you will see the raw values. After APM have booted up and you have your tx working (antenna pulled out), than it will show the raw value that you set in "RSSI Max Value" box. 
+Open Config. Tool check the "RSSI Enable Raw" check-box so when you power up your OSD with APM, you will see the raw values. After APM have booted up and you have your TX working (antenna pulled out), than it will show the raw value that you set in "RSSI Max Value" box. 
 Than turn your tx off, so it will show the raw value that you set in "RSSI Min Value" box.
-Than plug your OSD to FTDI again, and uncheck "RSSI Raw Value" checkbox, than save it to osd.
-After this OSD will show RSSI normaly.
+Than plug your OSD to FTDI again, and uncheck "RSSI Raw Value" check-box, than save it to OSD.
+After this OSD will show RSSI normally.
