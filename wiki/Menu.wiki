@@ -10,3 +10,4 @@
       * [Firmware Uploading MinimOSD-Extra Firmware]
       * [Charset Uploading Character Set]
       * [Managing_Panels Managing Panels]
+      * [Screen_Change Set screen change]
