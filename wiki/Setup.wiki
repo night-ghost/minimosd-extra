@@ -25,17 +25,3 @@ Than click on "Options" menu and choose update charset.
 It is located in CT directory. (.mcm)
 MinimOSD will show the version of your charset on boot (1.8)
 
-
-= Enabling and placing panels =
-
-1./
-
-Click to "Panel 1" than enable all the functions you need by checking or unchecking on the left. After you chouse everything you need place tham wherever you want on the screen.
-
-When you are ready click "Save current tab to" button, so new settings are written to your MinimOSD
-
-
--------------------------
-This page is not ready yet
-
-
