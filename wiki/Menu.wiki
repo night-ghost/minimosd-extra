@@ -4,6 +4,7 @@
 
 = Menu =
 
-  * [Firmware Uploading MinimOSD-Extra Firmware]
+  
   * [Configure Configureing]
     * [Config_Tool Using Config Tool]
+      * [Firmware Uploading MinimOSD-Extra Firmware]
