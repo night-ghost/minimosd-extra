@@ -7,8 +7,13 @@ To help you more, in an emergency situation warnings will bring you back to your
 Available warnings:
 
 - Lost GPS fix
+
 - Stall
+
 - Overspeed
+
 - Battery volt
+
 - Battery Percent
+
 - RSSI
