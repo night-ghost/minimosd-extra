@@ -6,4 +6,4 @@
 
   * [Firmware Uploading MinimOSD-Extra Firmware]
   * [Configure Configureing]
-    * [Config_tool Using Config Tool]
+    * [Config_Tool Using Config Tool]
