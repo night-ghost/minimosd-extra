@@ -1,0 +1,2 @@
+Config Tool Is the configutartor software, made for configuring MinimOSD.
+
