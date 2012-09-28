@@ -12,7 +12,7 @@
       * [Standard Video Standards]
       * [Managing_Panels Managing Panels]
       * [Screen_Change Set screen change]
-      * [Unit Unit measurement]
+      * [Unit Units of measurement]
       * [RSSI Tuning RSSI]
       * [Warnings Warnings]
         * [GPS GPS]
