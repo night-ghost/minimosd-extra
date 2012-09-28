@@ -1,6 +1,6 @@
 #sidebar Menu
 
-* [Articles HOWTO articles]
+* [Index Introdution]
     * [ArticlesXSS Web security]
     * [ArticlesDom DOM manipulation]
     * [ArticlesStyle CSS and style]
