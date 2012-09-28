@@ -1,18 +1,18 @@
 #sidebar Menu
 
-* [index Introdution]
+* [index Introduction]
 
 = Menu =
 
   
-  * [Configure Configureing]
+  * [Configure Configuring]
     * [Config_Tool Using Config Tool]
       * [Firmware Uploading MinimOSD-Extra Firmware]
       * [Charset Uploading Character Set]
       * [Standard Video Standards]
       * [Managing_Panels Managing Panels]
       * [Screen_Change Set screen change]
-      * [Unit Unit mesurement]
+      * [Unit Unit measurement]
       * [RSSI Tuning RSSI]
       * [Warnings Warnings]
         * [GPS GPS]
