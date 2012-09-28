@@ -55,15 +55,6 @@ Also RSSI, switching mode and channel and unit measurement, Stall speed warning,
 We built in a new way of setting video standards. Now OSD does not guessing anymore :). You can set it fixed from CT. It is in "Video Mode" menu.
 
 
-
-Here is how it looks: (This video is a bit outdated, sorry. I will make a new one soon.)
-
-
-
-
-
-
-
 If you could send me a tlog file of an average flight.... Than i would be able to test it. :)
 
 Or could anyone flight test it, and upload the OSD video about it? 
