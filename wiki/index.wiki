@@ -2,12 +2,6 @@
 
 = Introduction =
 
-Started to add functions to MinimOSD code.
-
-
-
-Here it is in action:
-
 
 <wiki:video url="http://www.youtube.com/watch?feature=player_embedded&v=9mSeuFvWqfg"/>
 
