@@ -4,7 +4,7 @@ You can choose from 3 different ways of switching.
 
 Also you if you don't need this function you can turn it off.
 
-http://gabek.dyndns.org:28/wiki/6.PNG
+http://gabek.dyndns.org:28/wiki/5.PNG
 
 1./ By mode switch:
 
@@ -38,7 +38,7 @@ There is another thing that modifies the behavior. That is warnings. If there is
 Switching by a momentary switch:
 For this you need a momentary switch (like trainer switch) assigned to the channel you set in CT "OSD Toggle Channel" dropdown menu. And check the "Rotation Switching" checkbox.
 
-http://gabek.dyndns.org:28/wiki/5.PNG
+http://gabek.dyndns.org:28/wiki/6.PNG
 
 You select any channel you want to use from 5 to 8, than check Rotation Switching checkbox.
 
