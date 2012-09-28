@@ -11,6 +11,7 @@
       * [Charset Uploading Character Set]
       * [Managing_Panels Managing Panels]
       * [Screen_Change Set screen change]
+      * [Unit Unit mesurement]
       * [RSSI Tuning RSSI]
       * [Warnings Warnings]
         * [GPS GPS]
