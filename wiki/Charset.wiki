@@ -17,5 +17,5 @@ Click on "Options" menu and choose "Update charset".
 
 http://gabek.dyndns.org:28/wiki/3.PNG
 
-The charset file is located in CT directory. (.mcm)
+The charset file is located in Config. Tool directory. (.mcm)
 MinimOSD will show the version of your charset on boot (1.8)
