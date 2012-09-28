@@ -19,4 +19,4 @@
         * [Battery Battery]
           * [Battery_volt Battery Volt]
           * [Battery_Percent Battery_Percent]
-        * [RSSI RSSI]
+        * [RSSI_warning RSSI]
