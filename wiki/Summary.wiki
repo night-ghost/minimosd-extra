@@ -1,3 +1,4 @@
+
 A project to add extra functions to MinimOsd code.
 
 This firmware defaults to PAL, but handles NTSC also, if an NTSC video is connected on boot. (It only defaults to PAL if no video connected.)
