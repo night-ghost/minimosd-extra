@@ -27,3 +27,4 @@
     * [Pan_pitch Pitch]
     * [Pan_roll Roll]
     * [Pan_battery_a Battery A]
+    * [Pan_visible_sats Visible Sats]
