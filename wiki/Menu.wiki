@@ -22,4 +22,4 @@
           * [Battery_volt Battery Volt]
           * [Battery_Percent Battery_Percent]
         * [RSSI_warning RSSI]
-   * [Panel Panel descriptions]
+  * [Panel Panel descriptions]
