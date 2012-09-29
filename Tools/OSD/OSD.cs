@@ -205,6 +205,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             nosdfunctions = a;
             //Fill List of items in tabe number 1
             LIST_items.Items.Clear();
@@ -280,7 +281,8 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             
             //Fill List of items in tabe number 2
             LIST_items2.Items.Clear();
@@ -345,8 +347,7 @@ namespace OSD
             BATT_WARNnumeric.Value = pan.batt_warn_level;
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
 
-            CALLSIGNcheckBox.Checked = Convert.ToBoolean(pan.callsign_en);
-            CALLSIGNmaskedText.Text= "A1B2C3";
+            CALLSIGNmaskedText.Text = pan.callsign_str;
 
             this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -1006,7 +1007,6 @@ namespace OSD
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
-                eeprom[OSD_CALL_SIGN_en_ADDR] = pan.callsign_en;
                 for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
                 {
                     int offset = 0;
@@ -1118,7 +1118,7 @@ namespace OSD
         // Only devs should increment this
         const int VER = 75;
         // EEPROM Storage addresses
-        const int OffsetBITpanel = 200;
+        const int OffsetBITpanel = 250;
         // First of 8 panels
         const int panCenter_en_ADDR = 0;
         const int panCenter_x_ADDR = 2;
@@ -1224,6 +1224,9 @@ namespace OSD
         const int panEff_en_ADDR = 194;
         const int panEff_x_ADDR = 196;
         const int panEff_y_ADDR = 198;
+        const int panCALLSIGN_en_ADDR = 200;
+        const int panCALLSIGN_x_ADDR = 202;
+        const int panCALLSIGN_y_ADDR = 204;
         //
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
@@ -1240,7 +1243,6 @@ namespace OSD
         const int OSD_BATT_WARN_ADDR = 914;
         const int OSD_RSSI_WARN_ADDR = 916;
 
-        const int OSD_CALL_SIGN_en_ADDR = 918;
         const int OSD_CALL_SIGN_ADDR = 920;
         const int OSD_CALL_SIGN_TOTAL = 6;  
            
@@ -1398,15 +1400,14 @@ namespace OSD
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
 
-            pan.callsign_en = eeprom[OSD_CALL_SIGN_en_ADDR];
             char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
             for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
                 str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
                 Console.WriteLine("Call Sign read ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
             }
-            
-            string str_final = new string(str_call);
-            CALLSIGNmaskedText.Text = str_final;               
+
+            pan.callsign_str = new string(str_call);
+            CALLSIGNmaskedText.Text = pan.callsign_str;               
 
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -1559,7 +1560,8 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "Chanel Rotation Switching", pan.switch_mode);
                         sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
                         sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
-                        sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);                   
+                        sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
+                        sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
                         sw.Close();
                     }
                 }
@@ -1640,7 +1642,8 @@ namespace OSD
                             else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
                             else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
-                            else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);                   
+                            else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
+                            else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
                         }
 
                         //Modify units
@@ -1679,6 +1682,8 @@ namespace OSD
 
                         BATT_WARNnumeric.Value = pan.batt_warn_level;
                         RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+                        CALLSIGNmaskedText.Text = pan.callsign_str;
 
                         this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
                         this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -2270,9 +2275,12 @@ namespace OSD
             pan.batt_warn_level = (byte)BATT_WARNnumeric.Value;
         }
 
-        private void CALLSIGNcheckBox_CheckedChanged(object sender, EventArgs e)
+
+        private void CALLSIGNmaskedText_Validated(object sender, EventArgs e)
         {
-            pan.callsign_en = Convert.ToByte(CALLSIGNcheckBox.Checked);
+            pan.callsign_str = CALLSIGNmaskedText.Text;
+            osdDraw1();
+            osdDraw2();
         }
 
     }
