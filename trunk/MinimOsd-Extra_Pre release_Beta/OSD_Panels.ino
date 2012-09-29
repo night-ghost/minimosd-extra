@@ -6,6 +6,15 @@ void startPanels(){
     do_converts(); // load the unit conversion preferences
 }
 
+//------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
+
+void panLogo(){
+    osd.setPanel(5, 5);
+    osd.openPanel();
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.2|r272"));
+    osd.closePanel();
+}
+
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
@@ -13,6 +22,7 @@ void writePanels(){
     if(millis() < (lastMAVBeat + 2200)){
         if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
         if (osd_set == 0) { // setup panel is called in the else at the end
+            if (call_sign_en) panCALLSIGN(24,15); //bottom right corner -fixed for now
             if (panel != npanels)
             {
                 if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
@@ -100,19 +110,19 @@ void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     if (osd_throttle > 2){
-      if (osd_groundspeed != 0) eff = float(osd_curr_A*1000) /(osd_groundspeed * converts);
-      osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
+        if (osd_groundspeed != 0) eff = float(osd_curr_A*1000) /(osd_groundspeed * converts);
+        osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
     }else{
-    if (osd_climb < 0.05) {
-//    glide = (osd_home_alt - osd_alt) / osd_climb;
-    glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth * 0.2 + glide * 0.8;
-    
-    osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
-    } else {
-      osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
-      }
+        if (osd_climb < 0.05) {
+            //    glide = (osd_home_alt - osd_alt) / osd_climb;
+            glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth * 0.2 + glide * 0.8;
+
+            osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
+        } else {
+            osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
+        }
     }
-     
+
     osd.closePanel();
 }
 
@@ -133,6 +143,21 @@ void panRSSI(int first_col, int first_line){
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
     if (rssi < -99) rssi = -99;
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
+    osd.closePanel();
+}
+
+/* **************************************************************** */
+// Panel  : panCALLSIGN
+// Needs  : X, Y locations
+// Output : Call sign identification
+// Size   : 1 x 6Hea  (rows x chars)
+// Staus  : done
+
+void panCALLSIGN(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
+    osd.printf("%s", char_call); 
     osd.closePanel();
 }
 
@@ -651,15 +676,6 @@ void panBatt_A(int first_col, int first_line){
     else osd.printf("%c%5.2f%c%c", 0xE2, (double)osd_vbat_A, 0x8E, osd_battery_pic_A);
     */
     osd.printf("%c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
-    osd.closePanel();
-}
-
-//------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
-
-void panLogo(){
-    osd.setPanel(5, 5);
-    osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.1|r268"));
     osd.closePanel();
 }
 

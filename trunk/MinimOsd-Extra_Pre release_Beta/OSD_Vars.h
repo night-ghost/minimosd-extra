@@ -89,6 +89,9 @@ static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
+//Call sign variables
+static bool         call_sign_en = false;
+static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
 static boolean      mavbeat = 0;
