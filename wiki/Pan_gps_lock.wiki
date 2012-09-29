@@ -10,4 +10,4 @@ Lock closed: Means GPS is locked (APM knows you exact location and hight)
 
 = This panel has a warning assigned =
 
-If no GPS fix than a warning is shown.
+If warnings are enabled, and there is no GPS fix than a warning message is shown.
