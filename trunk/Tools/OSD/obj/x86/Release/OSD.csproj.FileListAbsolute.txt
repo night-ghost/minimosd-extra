@@ -49,7 +49,6 @@ C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\OSD.OSD.resources
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\OSD.Properties.Resources.resources
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.read.1.tlog
-C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.read.4.tlog
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.write.1.tlog
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\OSD_Config.TrustInfo.xml
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe.manifest
