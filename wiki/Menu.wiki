@@ -24,3 +24,4 @@
         * [RSSI_warning RSSI]
   * [Panel Panel descriptions]
     * [Pan_center Center]
+    * [Pan_pitch Pitch]
