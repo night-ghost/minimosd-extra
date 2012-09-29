@@ -64,7 +64,6 @@
             this.tabPageConfig = new System.Windows.Forms.TabPage();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
-            this.CALLSIGNcheckBox = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
@@ -472,7 +471,6 @@
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
-            this.groupBox8.Controls.Add(this.CALLSIGNcheckBox);
             this.groupBox8.Controls.Add(this.label12);
             this.groupBox8.Location = new System.Drawing.Point(239, 232);
             this.groupBox8.Margin = new System.Windows.Forms.Padding(4);
@@ -492,18 +490,7 @@
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
             this.CALLSIGNmaskedText.Size = new System.Drawing.Size(121, 22);
             this.CALLSIGNmaskedText.TabIndex = 11;
-            // 
-            // CALLSIGNcheckBox
-            // 
-            this.CALLSIGNcheckBox.AutoSize = true;
-            this.CALLSIGNcheckBox.Location = new System.Drawing.Point(13, 82);
-            this.CALLSIGNcheckBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.CALLSIGNcheckBox.Name = "CALLSIGNcheckBox";
-            this.CALLSIGNcheckBox.Size = new System.Drawing.Size(133, 21);
-            this.CALLSIGNcheckBox.TabIndex = 10;
-            this.CALLSIGNcheckBox.Text = "Enable Call Sign";
-            this.CALLSIGNcheckBox.UseVisualStyleBackColor = true;
-            this.CALLSIGNcheckBox.CheckedChanged += new System.EventHandler(this.CALLSIGNcheckBox_CheckedChanged);
+            this.CALLSIGNmaskedText.Validated += new System.EventHandler(this.CALLSIGNmaskedText_Validated);
             // 
             // label12
             // 
@@ -1084,7 +1071,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown BATT_WARNnumeric;
         private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.CheckBox CALLSIGNcheckBox;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
     }

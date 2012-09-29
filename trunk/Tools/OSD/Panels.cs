@@ -116,7 +116,7 @@ namespace OSD
         public uint8_t rssi_warn_level = 5;
         public uint8_t batt_warn_level = 10;
 
-        public boolean callsign_en = 0;
+        public string callsign_str = "A1B2C3";
         public const byte letter_start = 41;
         //public uint8_t[] call_sign_parse = new uint8_t[6];
 
@@ -156,8 +156,24 @@ namespace OSD
  	        }
             osd.closePanel();
  	        return 0;
-
  	    }
+
+        /* **************************************************************** */
+        // Panel  : panCALLSIGN
+        // Needs  : X, Y locations
+        // Output : Call sign identification
+        // Size   : 1 x 6Hea  (rows x chars)
+        // Staus  : done
+
+        public int panCALLSIGN(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            osd.printf("%s", callsign_str);
+            osd.closePanel();
+            return 0;
+        }
+ 
         /******* PANELS - DEFINITION *******/
 
         /* **************************************************************** */

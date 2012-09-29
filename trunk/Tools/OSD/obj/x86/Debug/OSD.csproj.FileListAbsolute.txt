@@ -28,9 +28,6 @@ C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\bin\
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD.OSD.resources
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD.Properties.Resources.resources
-C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
-C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\GenerateResource-ResGen.read.4.tlog
-C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.TrustInfo.xml
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe.manifest
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
