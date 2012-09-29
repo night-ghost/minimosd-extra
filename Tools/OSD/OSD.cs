@@ -63,6 +63,7 @@ namespace OSD
         /// 328 eeprom memory
         /// </summary>
         byte[] eeprom = new byte[1024];
+        byte[] call_sign_parse = new byte[6];
         /// <summary>
         /// background image
         /// </summary>
@@ -343,6 +344,9 @@ namespace OSD
 
             BATT_WARNnumeric.Value = pan.batt_warn_level;
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+            CALLSIGNcheckBox.Checked = Convert.ToBoolean(pan.callsign_en);
+            CALLSIGNmaskedText.Text= "A1B2C3";
 
             this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -943,7 +947,8 @@ namespace OSD
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
             this.toolStripStatusLabel1.Text = "";
-            
+            string callsign_str = CALLSIGNmaskedText.Text;
+           
             TabPage current = PANEL_tabs.SelectedTab;
             if (current.Text == "Panel 1") 
             {
@@ -1001,20 +1006,20 @@ namespace OSD
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
+                eeprom[OSD_CALL_SIGN_en_ADDR] = pan.callsign_en;
+                for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+                {
+                    int offset = 0;
+                    if (!Char.IsNumber(callsign_str[i])){
+                        if(!char.IsUpper(callsign_str[i])) //test if not uppercase
+                            offset = 32; // 65 A position
+                    }
+
+                    call_sign_parse[i] = Convert.ToByte(callsign_str[i] - offset);
+                    eeprom[OSD_CALL_SIGN_ADDR + i] = call_sign_parse[i];
+                }
             } 
 
-
-            //for(int i=0;i<201;i++)
-            //{
-            //    Console.Write(i);
-            //    Console.Write(" , ");
-            //    Console.Write(eeprom[i]);
-            //    Console.Write(" vs ");
-            //    Console.Write(i + OffsetBITpanel);
-            //    Console.Write(" , ");
-            //    Console.WriteLine(eeprom[i + OffsetBITpanel]);
-
-            //}
             ArduinoSTK sp;
 
             try
@@ -1074,7 +1079,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)(OSD_RSSI_WARN_ADDR - measure_ADDR + 1), (short)measure_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - measure_ADDR + 1), (short)measure_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1232,7 +1237,11 @@ namespace OSD
         const int switch_mode_ADDR = 910;
         const int PAL_NTSC_ADDR = 912;
         const int OSD_BATT_WARN_ADDR = 914;
-        const int OSD_RSSI_WARN_ADDR = 916;  
+        const int OSD_RSSI_WARN_ADDR = 916;
+
+        const int OSD_CALL_SIGN_en_ADDR = 918;
+        const int OSD_CALL_SIGN_ADDR = 920;
+        const int OSD_CALL_SIGN_TOTAL = 6;  
            
         const int CHK1 = 1000;
         const int CHK2 = 1006;
@@ -1387,7 +1396,12 @@ namespace OSD
 
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
-                   
+
+            pan.callsign_en = eeprom[OSD_CALL_SIGN_en_ADDR];
+            char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
+            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
+            
+            CALLSIGNmaskedText.Text = Convert.ToString(str_call);               
 
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -2250,5 +2264,11 @@ namespace OSD
         {
             pan.batt_warn_level = (byte)BATT_WARNnumeric.Value;
         }
+
+        private void CALLSIGNcheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.callsign_en = Convert.ToByte(CALLSIGNcheckBox.Checked);
+        }
+
     }
 }
