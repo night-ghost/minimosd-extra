@@ -23,7 +23,7 @@ static int16_t      chan2_raw_middle = 0;
 static uint8_t      ch_toggle = 0;
 static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
-static boolean      pal_ntsc = 0;
+//static boolean      pal_ntsc = 0;
 
 static int8_t       setup_menu = 0;
 static float        converts = 0;
@@ -90,7 +90,6 @@ static float        osd_alt_prev = 0;             // previous altitude
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
 //Call sign variables
-static bool         call_sign_en = false;
 static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
@@ -151,13 +150,14 @@ byte panHorizon_XY[2][npanels]; // = {8,centercalc}
 
 // Third set of panels and their X,Y coordinate holders
 byte panWarn_XY[2][npanels];
-//byte panOff_XY[2];
 byte panWindSpeed_XY[2][npanels];
 byte panClimb_XY[2][npanels];
 byte panTune_XY[2][npanels];
-//byte panSetup_XY[2];
 byte panRSSI_XY[2][npanels];
 byte panEff_XY[2][npanels];
+
+byte panCALLSIGN_XY[2][npanels];
+
 
 //*************************************************************************************************************
 //rssi varables

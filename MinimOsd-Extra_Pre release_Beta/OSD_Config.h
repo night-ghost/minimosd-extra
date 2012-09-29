@@ -50,14 +50,14 @@
 #define WindS_BIT      2
 #define Climb_BIT      3
 #define Tune_BIT       4
-#define Setup_BIT      5
+#define CALLSIGN_BIT   5
 #define RSSI_BIT       6
 #define Eff_BIT        7
 
 /* *********************************************** */
 // EEPROM Storage addresses
 
-#define OffsetBITpanel       200
+#define OffsetBITpanel       250
 
 // First of 8 panels
 #define panCenter_en_ADDR 0
@@ -163,6 +163,9 @@
 #define panEff_en_ADDR 194
 #define panEff_x_ADDR 196
 #define panEff_y_ADDR 198
+#define panCALLSIGN_en_ADDR 200
+#define panCALLSIGN_x_ADDR 202
+#define panCALLSIGN_y_ADDR 204
 
 
 #define measure_ADDR 890
@@ -181,7 +184,6 @@
 #define OSD_BATT_WARN_ADDR 914
 #define OSD_RSSI_WARN_ADDR 916
 
-#define OSD_CALL_SIGN_en_ADDR 918
 #define OSD_CALL_SIGN_ADDR 920
 #define OSD_CALL_SIGN_TOTAL 6
 
