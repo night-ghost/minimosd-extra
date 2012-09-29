@@ -1017,6 +1017,7 @@ namespace OSD
 
                     call_sign_parse[i] = Convert.ToByte(callsign_str[i] - offset);
                     eeprom[OSD_CALL_SIGN_ADDR + i] = call_sign_parse[i];
+                    Console.WriteLine("Call Sign ",i," is ",eeprom[OSD_CALL_SIGN_ADDR + i]);
                 }
             } 
 
@@ -1399,9 +1400,13 @@ namespace OSD
 
             pan.callsign_en = eeprom[OSD_CALL_SIGN_en_ADDR];
             char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
-            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
+            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
+                str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
+                Console.WriteLine("Call Sign read ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
+            }
             
-            CALLSIGNmaskedText.Text = Convert.ToString(str_call);               
+            string str_final = new string(str_call);
+            CALLSIGNmaskedText.Text = str_final;               
 
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
