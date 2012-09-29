@@ -63,7 +63,6 @@ namespace OSD
         /// 328 eeprom memory
         /// </summary>
         byte[] eeprom = new byte[1024];
-        byte[] call_sign_parse = new byte[6];
         /// <summary>
         /// background image
         /// </summary>
@@ -948,7 +947,6 @@ namespace OSD
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
             this.toolStripStatusLabel1.Text = "";
-            string callsign_str = CALLSIGNmaskedText.Text;
            
             TabPage current = PANEL_tabs.SelectedTab;
             if (current.Text == "Panel 1") 
@@ -1007,16 +1005,20 @@ namespace OSD
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
+                if (pan.callsign_str.Length != OSD_CALL_SIGN_TOTAL)
+                {
+                    MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
                 {
                     int offset = 0;
-                    if (!Char.IsNumber(callsign_str[i])){
-                        if(!char.IsUpper(callsign_str[i])) //test if not uppercase
+                    if (!Char.IsNumber(pan.callsign_str[i])){
+                        if (!char.IsUpper(pan.callsign_str[i])) //test if not uppercase
                             offset = 32; // 65 A position
                     }
 
-                    call_sign_parse[i] = Convert.ToByte(callsign_str[i] - offset);
-                    eeprom[OSD_CALL_SIGN_ADDR + i] = call_sign_parse[i];
+                    eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i] - offset);
                     Console.WriteLine("Call Sign ",i," is ",eeprom[OSD_CALL_SIGN_ADDR + i]);
                 }
             } 
