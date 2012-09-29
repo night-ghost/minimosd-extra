@@ -189,6 +189,11 @@ void readSettings() {
 
     batt_warn_level = EEPROM.read(OSD_BATT_WARN_ADDR);
     rssi_warn_level = EEPROM.read(OSD_RSSI_WARN_ADDR);
+
+    call_sign_en = EEPROM.read(OSD_CALL_SIGN_en_ADDR);
+    for(int i=0;i < OSD_CALL_SIGN_TOTAL;i++) char_call[i] = EEPROM.read(OSD_CALL_SIGN_ADDR + i);
+
+    char_call[OSD_CALL_SIGN_TOTAL] ='\0'; //null terminate the string
 }
 
 void readPanelSettings() {
