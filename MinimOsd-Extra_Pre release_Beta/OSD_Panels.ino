@@ -972,7 +972,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
         arrow_set2 = 0xAF;
         break;
     } 
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
