@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.2|r272"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.2|r274"));
     osd.closePanel();
 }
 
@@ -110,13 +110,14 @@ void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     if (osd_throttle > 2){
-        if (osd_groundspeed != 0) eff = float(osd_curr_A*1000) /(osd_groundspeed * converts);
+        if (osd_groundspeed != 0) eff = float(osd_curr_A * 1000) / (osd_groundspeed * converts);
+        eff = eff * 0.2 + eff * 0.8;
         osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
     }else{
-        if (osd_climb < 0.05) {
-            //    glide = (osd_home_alt - osd_alt) / osd_climb;
-            glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth * 0.2 + glide * 0.8;
-
+        if (osd_climb < -0.05) {
+            //    glide = (osd_home_alt - osd_alt) / osd_climb;            
+            glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth;            
+            glide = glide * 0.2 + glide * 0.8;
             osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
         } else {
             osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
