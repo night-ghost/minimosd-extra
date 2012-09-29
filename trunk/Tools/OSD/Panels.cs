@@ -82,6 +82,7 @@ namespace OSD
         static uint16_t osd_throttle = 100;               // throtle
         static float osd_curr_A = 453;
         static float osd_windspeed = 10;
+        static float osd_windspeedz = 2;
         static float osd_climb = 2;
         static float nav_roll = 0;
         static float nav_pitch = 0;
@@ -227,7 +228,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-            osd.printf("%c%3.0f%c|%c%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5);
+                osd.printf("%c%3.0f%c|%c%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5, (double)(osd_windspeedz * 3.6), 0x81);
             }
             osd.closePanel();
             return 0;

@@ -203,7 +203,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 12, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             nosdfunctions = a;
             //Fill List of items in tabe number 1
