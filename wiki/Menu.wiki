@@ -57,3 +57,4 @@
     * [Pan_efficiency Efficiency]
     * [Pan_call_sign Call Sign]
   * [Operating Operating MinimOSD-Extra]
+    * [OSD_menu OSD Menu]
