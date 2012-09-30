@@ -1,0 +1,10 @@
+= Altitude =
+
+This panel indicates your hight above sea level in meters if you set metric system for unit measurement, and feats if imperial.
+
+== It works this way: ==
+
+When APM boots and gets GPS lock, it checks your hight above sea level than calibrates you barometric pressure sensor.
+After this it is using baro hight by default.
+
+But you can change this in APM parameters. You can use only GPS or a mix of bough also.
