@@ -1,0 +1,3 @@
+= WP Distance =
+
+Waypoint distance panel indicates your planes distance from the next waypoint in meters if you set metric system for unit measurement, and feets if imperial.
