@@ -1,6 +1,6 @@
 = RSSI =
 
-RSSI panel indicates your radio signal strength (Radio Signal Strength Iformation). It shows it in percent.
+RSSI panel indicates your radio signal strength (Received signal strength indication). It shows it in percent.
 
 == Requirements ==
 
