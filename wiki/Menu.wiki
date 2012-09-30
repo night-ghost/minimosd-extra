@@ -52,3 +52,4 @@
     * [Pan_wind_speed Wind Speed]
     * [Pan_warnings Warnings]
     * [Pan_time Time]
+    * [Pan_rssi RSSI]
