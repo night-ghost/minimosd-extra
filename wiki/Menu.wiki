@@ -55,3 +55,4 @@
     * [Pan_rssi RSSI]
     * [Pan_tune Tune]
     * [Pan_efficiency Efficiency]
+    * [Pan_call_sign Call Sign]
