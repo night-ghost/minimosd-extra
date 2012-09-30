@@ -11,6 +11,7 @@ using System.IO.Ports;
 using System.IO;
 using ArdupilotMega;
 using System.Xml;
+using System.Globalization;
 
 
 namespace OSD
@@ -1010,16 +1011,16 @@ namespace OSD
                     MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
-                {
-                    int offset = 0;
-                    if (!Char.IsNumber(pan.callsign_str[i])){
-                        if (!char.IsUpper(pan.callsign_str[i])) //test if not uppercase
-                            offset = 32; // 65 A position
-                    }
+                for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
+                    //int offset = 0;
+                    //if (!Char.IsNumber(pan.callsign_str[i])){
+                    //    if (char.IsUpper(pan.callsign_str[i])) //test if not uppercase
+                    //        offset = 32; // 65 A position
+                    //}
 
-                    eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i] - offset);
-                    Console.WriteLine("Call Sign ",i," is ",eeprom[OSD_CALL_SIGN_ADDR + i]);
+                    //eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i] + offset);
+                    eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
+                    Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
                 }
             } 
 
@@ -2281,6 +2282,10 @@ namespace OSD
         private void CALLSIGNmaskedText_Validated(object sender, EventArgs e)
         {
             pan.callsign_str = CALLSIGNmaskedText.Text;
+            //convert to lowercase on validate
+            pan.callsign_str = pan.callsign_str.ToLower(new CultureInfo("en-US", false));
+
+            CALLSIGNmaskedText.Text = pan.callsign_str;
             osdDraw1();
             osdDraw2();
         }
