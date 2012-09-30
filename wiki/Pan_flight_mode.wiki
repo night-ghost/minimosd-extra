@@ -1,0 +1,3 @@
+= Flight Mode =
+
+This panel indicates the actual flight mode APM is working in at the moment.
