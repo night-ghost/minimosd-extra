@@ -31,3 +31,4 @@
     * [Pan_battery_a Battery A]
     * [Pan_visible_sats Visible Sats]
     * [Pan_gps_lock GPS Lock]
+    * [Pan_gps_coord GPS Coord]
