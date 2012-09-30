@@ -1,0 +1,8 @@
+= Air Speed =
+
+This panel indicates your air speed that is your speed relative to the air around your plane, determined by airspeed sensor.
+
+
+== Requirement ==
+
+To be able to use this panel you need an airspeed sensor in addition to APM.
