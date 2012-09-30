@@ -2,4 +2,4 @@
 
 This panel is a variometer. 
 
-It indicates how fast your plane gains or loses hight in m/s.
+It indicates how fast your plane gains or loses hight in m/s if you set metric system for unit measurement, and f/s if imperial..
