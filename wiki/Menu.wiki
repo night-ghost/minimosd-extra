@@ -50,3 +50,4 @@
     * [Pan_flight_mode Flight Mode]
     * [Pan_horizon Horizon]
     * [Pan_wind_speed Wind Speed]
+    * [Pan_warnings Warnings]
