@@ -23,4 +23,4 @@ Available warnings:
 
 You can configure warning levels for Stall in CT and OSD menu, Overspeed in CT and OSD menu, Battery Volt in CT and OSD menu, RSSI in CT, and Battery Percent in CT.
 
-See * [Warnings Here]
+More about warnings: * [Warnings Here]
