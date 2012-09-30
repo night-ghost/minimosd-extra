@@ -37,3 +37,4 @@
     * [Pan_heart_beat Heart Beat]
     * [Pan_home_direction Home Direction]
     * [Pan_home_distance Home Distance]
+    * [Pan_wp_direction WP Direction]
