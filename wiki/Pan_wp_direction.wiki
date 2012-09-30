@@ -1,6 +1,6 @@
 = WP Direction =
 
-Waypoint direction indicates the direction to the next waypoint, relative to your plane. 
+Waypoint direction panel indicates the direction to the next waypoint, relative to your plane. 
 
 You need a magnetometer to make this panel work precise. 
 
