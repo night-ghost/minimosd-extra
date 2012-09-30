@@ -3,10 +3,10 @@
 This panel shows a symbol that has two states. 
 
 1./
-Lock opened: Means No GPS lock (APM does not know where it is)
+Lock opened: Means No GPS lock (APM does not have valid GPS coordinates)
 
 2./
-Lock closed: Means GPS is locked (APM knows you exact location and hight)
+Lock closed: Means GPS is locked (APM has valid GPS coordinates and altitude)
 
 = This panel has a warning assigned =
 
