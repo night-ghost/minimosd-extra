@@ -54,3 +54,4 @@
     * [Pan_time Time]
     * [Pan_rssi RSSI]
     * [Pan_tune Tune]
+    * [Pan_efficiency Efficiency]
