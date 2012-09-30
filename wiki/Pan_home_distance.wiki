@@ -1,3 +1,3 @@
 = Home Distance =
 
-This panel indicates your planes distance from home in meters if you set metric system for unit measurement, and feets if imperial.
+This panel indicates your plane distance from home in meters if you set metric system for units of measurement, and feet if imperial.
