@@ -113,12 +113,12 @@ namespace OSD
         public uint8_t ch_toggle = 8; //CH8
         public boolean switch_mode = 0;
         public boolean pal_ntsc = 1; //PAL 1 - NTSC 0
+        public uint8_t osd_brightness = 0; // low bright
         
         public uint8_t rssi_warn_level = 5;
         public uint8_t batt_warn_level = 10;
 
         public string callsign_str = "a1b2c3";
-        public const byte letter_start = 41;
         //public uint8_t[] call_sign_parse = new uint8_t[6];
 
         /******* PANELS - DEFINITION *******/
