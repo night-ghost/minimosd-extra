@@ -1,0 +1,5 @@
+= Time =
+
+Time panel shows the time from MinimOSD-Extra booted up. 
+
+Normaly this is all your systems boot time also (when only one on board battery is used and or all electronics are turned on together.), but you can reset MinimOSD-Extra by pressing reset button on it. Than this panel will start counting again from zero.
