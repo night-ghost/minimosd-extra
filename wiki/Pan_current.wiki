@@ -1,8 +1,8 @@
 = Current =
 
-This panel indicates the current draw your system is using at the moment.  
+This panel indicates the current system draw of your system, in the present moment.  
 
 
 == Requirement ==
 
-To be able to use this panel you need a current sensor in addition to APM.
+To be able to use this panel you need a current sensor connected to APM.
