@@ -46,3 +46,4 @@
     * [Pan_current Current]
     * [Pan_velocity Velocity]
     * [Pan_air_speed Air Speed]
+    * [Pan_throttle Throttle]
