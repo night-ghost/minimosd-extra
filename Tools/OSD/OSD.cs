@@ -349,6 +349,8 @@ namespace OSD
 
             CALLSIGNmaskedText.Text = pan.callsign_str;
 
+            BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+
             this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -1006,6 +1008,8 @@ namespace OSD
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
+                eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
+
                 if (pan.callsign_str.Length != OSD_CALL_SIGN_TOTAL)
                 {
                     MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1246,6 +1250,8 @@ namespace OSD
         const int OSD_BATT_WARN_ADDR = 914;
         const int OSD_RSSI_WARN_ADDR = 916;
 
+        const int OSD_BRIGHTNESS_ADDR = 918;
+
         const int OSD_CALL_SIGN_ADDR = 920;
         const int OSD_CALL_SIGN_TOTAL = 6;  
            
@@ -1402,6 +1408,9 @@ namespace OSD
 
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+            pan.osd_brightness = eeprom[OSD_BRIGHTNESS_ADDR];
+            BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
 
             char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
             for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
@@ -1564,6 +1573,7 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
                         sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
+                        sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
                         sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
                         sw.Close();
                     }
@@ -1646,6 +1656,7 @@ namespace OSD
                             else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
+                            else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
                         }
 
@@ -1685,6 +1696,8 @@ namespace OSD
 
                         BATT_WARNnumeric.Value = pan.batt_warn_level;
                         RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+                        BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
 
                         CALLSIGNmaskedText.Text = pan.callsign_str;
 
@@ -2288,6 +2301,11 @@ namespace OSD
             CALLSIGNmaskedText.Text = pan.callsign_str;
             osdDraw1();
             osdDraw2();
+        }
+
+        private void BRIGHTNESScomboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.osd_brightness = (byte)BRIGHTNESScomboBox.SelectedIndex ;
         }
 
     }

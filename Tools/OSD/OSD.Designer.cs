@@ -100,6 +100,9 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.BRIGHTNESScomboBox = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -128,6 +131,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.groupBox9.SuspendLayout();
             this.SuspendLayout();
             // 
             // LIST_items
@@ -452,6 +456,7 @@
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.groupBox9);
             this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
             this.tabPageConfig.Controls.Add(this.groupBox6);
@@ -472,11 +477,11 @@
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
             this.groupBox8.Controls.Add(this.label12);
-            this.groupBox8.Location = new System.Drawing.Point(239, 232);
+            this.groupBox8.Location = new System.Drawing.Point(239, 183);
             this.groupBox8.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox8.Size = new System.Drawing.Size(185, 124);
+            this.groupBox8.Size = new System.Drawing.Size(185, 80);
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
             // 
@@ -937,6 +942,44 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
+            this.groupBox9.Controls.Add(this.label13);
+            this.groupBox9.Location = new System.Drawing.Point(239, 278);
+            this.groupBox9.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox9.Size = new System.Drawing.Size(185, 78);
+            this.groupBox9.TabIndex = 10;
+            this.groupBox9.TabStop = false;
+            // 
+            // BRIGHTNESScomboBox
+            // 
+            this.BRIGHTNESScomboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.BRIGHTNESScomboBox.FormattingEnabled = true;
+            this.BRIGHTNESScomboBox.Items.AddRange(new object[] {
+            "Low",
+            "Medium",
+            "Medium High",
+            "High"});
+            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(12, 44);
+            this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
+            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(121, 24);
+            this.BRIGHTNESScomboBox.TabIndex = 3;
+            this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(9, 25);
+            this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(109, 17);
+            this.label13.TabIndex = 2;
+            this.label13.Text = "OSD Brightness";
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -995,6 +1038,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1073,6 +1118,9 @@
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
+        private System.Windows.Forms.GroupBox groupBox9;
+        private System.Windows.Forms.ComboBox BRIGHTNESScomboBox;
+        private System.Windows.Forms.Label label13;
     }
 }
 
