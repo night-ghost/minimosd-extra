@@ -1,0 +1,6 @@
+= Hedaing Rose =
+
+This panel is a Compass.
+
+It shows real north. (Not magnetic)
+
