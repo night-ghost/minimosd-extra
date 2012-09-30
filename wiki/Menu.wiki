@@ -39,3 +39,4 @@
     * [Pan_home_distance Home Distance]
     * [Pan_wp_direction WP Direction]
     * [Pan_wp_distance WP Distance]
+    * [Pan_altitude Altitude]
