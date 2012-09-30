@@ -35,3 +35,4 @@
     * [Pan_heading_rose Heading Rose]
     * [Pan_heading Heading]
     * [Pan_heart_beat Heart Beat]
+    * [Pan_home_direction Home Direction]
