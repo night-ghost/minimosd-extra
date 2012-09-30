@@ -1,5 +1,5 @@
 = Operating MinimOSD-Extra =
 
-It is basically the same as with original firmware, but it differs in many things.
+It is basically the same as with original firmware, but it differs in some things.
 
-Like video standard setting, built in menu, brightness, and of course all the new panels.
+Some examples are video standard setting, built in menu, brightness, and of course all the new panels.
