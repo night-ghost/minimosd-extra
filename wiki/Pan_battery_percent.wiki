@@ -3,7 +3,7 @@
 This panel indicates the charge level of your battery.
 It shows your charge level in percent.
 
-You should set your battery capacity in MP.
+You should set your battery capacity in Mission Planner.
 
 == Requirement ==
 
