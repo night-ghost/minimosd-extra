@@ -22,6 +22,7 @@
           * [Battery_volt Battery Volt]
           * [Battery_Percent Battery_Percent]
         * [RSSI_warning RSSI]
+        * [HAM HAM Call Sign]
   * [Panel Panel descriptions]
     * [Pan_center Center]
     * [Pan_pitch Pitch]
