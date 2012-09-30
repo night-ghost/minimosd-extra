@@ -42,3 +42,4 @@
     * [Pan_altitude Altitude]
     * [Pan_home_altitude Home Altitude]
     * [Pan_climb_rate Climb Rate]
+    * [Pan_battery_percent Battery Percent]
