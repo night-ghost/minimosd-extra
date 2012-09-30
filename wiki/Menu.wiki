@@ -51,3 +51,4 @@
     * [Pan_horizon Horizon]
     * [Pan_wind_speed Wind Speed]
     * [Pan_warnings Warnings]
+    * [Pan_time Time]
