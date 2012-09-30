@@ -1,6 +1,6 @@
 = Current =
 
-This panel indicates the current draw your system is using at the moment in.  
+This panel indicates the current draw your system is using at the moment.  
 
 
 == Requirement ==
