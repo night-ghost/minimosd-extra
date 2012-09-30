@@ -45,3 +45,4 @@
     * [Pan_battery_percent Battery Percent]
     * [Pan_current Current]
     * [Pan_velocity Velocity]
+    * [Pan_air_speed Air Speed]
