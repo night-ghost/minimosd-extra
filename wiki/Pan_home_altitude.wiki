@@ -1,0 +1,10 @@
+= Home Altitude =
+
+This panel indicates your hight above your home position in meters if you set metric system for unit measurement, and feats if imperial. 
+
+== It works this way: ==
+
+When APM boots and gets GPS lock, it checks your hight above sea level than calibrates you barometric pressure sensor. After this it is using baro hight by default. 
+From this moment, MinimOSD-Extra stores this hight, than substract it from your actual true hight sou you see your home alt.
+
+(You can change it in APM parameters to use only GPS to measure hight, or only baro hight (this is default) or a mix of bough.)
