@@ -48,3 +48,4 @@
     * [Pan_air_speed Air Speed]
     * [Pan_throttle Throttle]
     * [Pan_flight_mode Flight Mode]
+    * [Pan_horizon Horizon]
