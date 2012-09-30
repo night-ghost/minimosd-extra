@@ -9,21 +9,37 @@ You need to use a Mavlink 1.0 compatible firmware on APM.
 Connect to Mission Planner. Go to configuration. Locate EEPROM parameters and verify that you have the following parameters configured as here:
 
 SR0_EXT_STAT,2
+
 SR0_EXTRA1,15
+
 SR0_EXTRA2,10
+
 SR0_EXTRA3,3
+
 SR0_PARAMS,50
+
 SR0_POSITION,3
+
 SR0_RAW_CTRL,0
+
 SR0_RAW_SENS,25
+
 SR0_RC_CHAN,3
+
 SR3_EXT_STAT,2
+
 SR3_EXTRA1,15
+
 SR3_EXTRA2,5
+
 SR3_EXTRA3,3
+
 SR3_POSITION,0
+
 SR3_RAW_CTRL,0
+
 SR3_RAW_SENS,25
+
 SR3_RC_CHAN,0
 
 Change accordingly and save the parameters to APM. Than MinimOSD-Extra should work fine!
