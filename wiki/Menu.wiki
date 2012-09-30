@@ -34,3 +34,4 @@
     * [Pan_gps_coord GPS Coord]
     * [Pan_heading_rose Heading Rose]
     * [Pan_heading Heading]
+    * [Pan_heart_beat Heart Beat]
