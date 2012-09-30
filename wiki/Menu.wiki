@@ -4,7 +4,7 @@
 
 
 
-  * [APM parameters needed]
+  * [APM APM parameters needed]
   * [Configure Configuring]
     * [Config_Tool Using Config Tool]
       * [Firmware Uploading MinimOSD-Extra Firmware]
