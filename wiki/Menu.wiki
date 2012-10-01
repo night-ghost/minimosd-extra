@@ -59,3 +59,4 @@
   * [Operating Operating MinimOSD-Extra]
     * [OSD_menu OSD Menu]
     * [Switching_screens Switching Screens]
+    * [brightness Brightness]
