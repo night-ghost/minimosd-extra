@@ -24,7 +24,7 @@ Added:
 
 - Variometer
 
-- Wind speed and direction 
+- Wind horizontal speed and direction, and also vertical wind speed (Vertical wind speed will be in next release)
 
 - OSD on/off
 
@@ -34,9 +34,13 @@ Added:
 
 - Waypoint heading
 
+- Warning messages for Lost GPS fix, stall, overspeed, battery voltage, battery percent, RSSI
+
 - Efficiency, glide distance & thermic notifier. 3 in one panel (Will be in next release)
 
-- Warning messages for Lost GPS fix, stall, overspeed, battery voltage, battery percent, RSSI
+- OSD Brightness (Will be in next release)
+
+- HAM Call Sign (Will be in next release)
 
 
 
