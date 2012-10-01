@@ -128,13 +128,15 @@ void read_mavlink(){
                 {
                     chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
                     chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
-                    osd_chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
-                    osd_chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                    osd_chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                    osd_chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
+                    chan3_raw = mavlink_msg_rc_channels_raw_get_chan3_raw(&msg);
+                    chan4_raw = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
+                    chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
+                    chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
+                    chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
+                    chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
                     osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
-                break;
+                break;           
             case MAVLINK_MSG_ID_WIND:
                 {
                     osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north

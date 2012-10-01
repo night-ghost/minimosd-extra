@@ -6,7 +6,7 @@
 #define ISb(panel,whichBit) getBit(panB_REG[panel], whichBit)
 #define ISc(panel,whichBit) getBit(panC_REG[panel], whichBit)
 #define ISd(panel,whichBit) getBit(panD_REG[panel], whichBit)
-
+#define ISe(panel,whichBit) getBit(panE_REG[panel], whichBit)
 
 boolean getBit(byte Reg, byte whichBit) {
     boolean State;
@@ -162,6 +162,9 @@ void writeSettings() {
     writeEEPROM(on, panEff_en_ADDR + offset);
     writeEEPROM(10, panEff_x_ADDR + offset);
     writeEEPROM(4,  panEff_y_ADDR + offset);
+    writeEEPROM(on, panCh_en_ADDR + offset);
+    writeEEPROM(10, panCh_x_ADDR + offset);
+    writeEEPROM(4,  panCh_y_ADDR + offset);
 
     writeEEPROM(30,overspeed_ADDR);
     writeEEPROM(0,stall_ADDR);
@@ -335,6 +338,10 @@ void readPanelSettings() {
     setBit(panD_REG[panel], CALLSIGN_BIT, readEEPROM(panCALLSIGN_en_ADDR + offset));
     panCALLSIGN_XY[0][panel] = readEEPROM(panCALLSIGN_x_ADDR + offset);
     panCALLSIGN_XY[1][panel] = checkPAL(readEEPROM(panCALLSIGN_y_ADDR + offset));
+
+    setBit(panE_REG[panel], Ch_BIT, readEEPROM(panCh_en_ADDR + offset));
+    panCh_XY[0][panel] = readEEPROM(panCh_x_ADDR + offset);
+    panCh_XY[1][panel] = checkPAL(readEEPROM(panCh_y_ADDR + offset));
 
 }
 

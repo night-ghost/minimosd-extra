@@ -16,10 +16,18 @@ static float        eff = 0; //Efficiency
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
 
-static int16_t      chan1_raw = 0;
-static int16_t      chan2_raw = 0;
-static int16_t      chan1_raw_middle = 0;
-static int16_t      chan2_raw_middle = 0;
+static uint16_t     ch_raw = 0;
+static uint16_t     chan1_raw = 0;
+static uint16_t     chan2_raw = 0;
+static uint16_t     chan3_raw = 0;
+static uint16_t     chan4_raw = 0;
+static uint16_t     chan5_raw = 0;
+static uint16_t     chan6_raw = 0;
+static uint16_t     chan7_raw = 0;
+static uint16_t     chan8_raw = 0;
+static uint16_t     chan1_raw_middle = 0;
+static uint16_t     chan2_raw_middle = 0;
+
 static uint8_t      ch_toggle = 0;
 static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
@@ -108,6 +116,7 @@ byte panA_REG[npanels] = {0b00000000};
 byte panB_REG[npanels] = {0b00000000};
 byte panC_REG[npanels] = {0b00000000};
 byte panD_REG[npanels] = {0b00000000};
+byte panE_REG[npanels] = {0b00000000};
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
@@ -155,9 +164,8 @@ byte panClimb_XY[2][npanels];
 byte panTune_XY[2][npanels];
 byte panRSSI_XY[2][npanels];
 byte panEff_XY[2][npanels];
-
 byte panCALLSIGN_XY[2][npanels];
-
+byte panCh_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables
@@ -168,8 +176,3 @@ static int16_t      rssi = -99; // scaled value 0-100%
 static bool         rssiraw_on = false; // 0- display scale value | 1- display raw value
 static uint8_t      rssi_warn_level = 0;
 
-static uint16_t     ch_raw = 0;
-static uint16_t     osd_chan5_raw = 1000;
-static uint16_t     osd_chan6_raw = 1000;
-static uint16_t     osd_chan7_raw = 1000;
-static uint16_t     osd_chan8_raw = 1000;
