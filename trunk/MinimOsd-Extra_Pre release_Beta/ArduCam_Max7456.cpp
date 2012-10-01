@@ -97,7 +97,7 @@ void OSD::setBrightness()
         blevel = MAX7456_WHITE_level_80; //low brightness if bad value
     
     // set all rows to same charactor white level, 90%
-    for (x = 0x0; x < MAX7456_screen_rows; x++)
+    for (x = 0x0; x < 0x10; x++)
     {
         Spi.transfer(x + 0x10);
         Spi.transfer(blevel);

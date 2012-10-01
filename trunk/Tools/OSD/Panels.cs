@@ -121,7 +121,35 @@ namespace OSD
         public string callsign_str = "a1b2c3";
         //public uint8_t[] call_sign_parse = new uint8_t[6];
 
+        public uint8_t chan1_raw = 0;
+        public uint8_t chan2_raw = 0;
+        public uint8_t chan3_raw = 0;
+        public uint8_t chan4_raw = 0;
+        public uint8_t chan5_raw = 0;
+        public uint8_t chan6_raw = 0;
+        public uint8_t chan7_raw = 0;
+        public uint8_t chan8_raw = 0;
+
+
         /******* PANELS - DEFINITION *******/
+
+        /* **************************************************************** */
+        // Panel  : PanCh
+        // Needs  : X, Y locations
+        // Output : 
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panCh(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            {
+                osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
+            }
+            osd.closePanel();
+            return 0;
+        }
 
         /* **************************************************************** */
         // Panel  : efficiency

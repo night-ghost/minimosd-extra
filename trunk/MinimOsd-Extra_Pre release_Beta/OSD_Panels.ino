@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.3 r279"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.3 r419"));
     osd.closePanel();
 }
 
@@ -70,7 +70,9 @@ void writePanels(){
                 if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
                 if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
-                if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); 
+                if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
+                
+                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
             } else { //panel == npanels
                 if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
@@ -125,6 +127,21 @@ void panEff(int first_col, int first_line){
         }
     }
 
+    osd.closePanel();
+}
+
+/* **************************************************************** */
+// Panel  : panCh
+// Needs  : X, Y locations
+// Output : Scaled channel values from MAVLink
+// Size   
+// Staus  : done
+
+void panCh(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    
+    osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw); 
     osd.closePanel();
 }
 
@@ -301,10 +318,10 @@ void panOff(){
         }
     }
     else {
-        if(ch_toggle == 5) ch_raw = osd_chan5_raw;
-        else if(ch_toggle == 6) ch_raw = osd_chan6_raw;
-        else if(ch_toggle == 7) ch_raw = osd_chan7_raw;
-        else if(ch_toggle == 8) ch_raw = osd_chan8_raw;
+        if(ch_toggle == 5) ch_raw = chan5_raw;
+        else if(ch_toggle == 6) ch_raw = chan6_raw;
+        else if(ch_toggle == 7) ch_raw = chan7_raw;
+        else if(ch_toggle == 8) ch_raw = chan8_raw;
 
         if (switch_mode == 0){
             if (ch_raw > 1800) {
@@ -625,11 +642,11 @@ void panCenter(int first_col, int first_line){
 void panHorizon(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
-    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
-    osd.printf_P(PSTR("\xd8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xd9|"));
-    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
-    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9"));
+//    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
+//    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
+    osd.printf_P(PSTR("||\xd8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xd9|"));
+//    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
+//    osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9"));
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
 }
