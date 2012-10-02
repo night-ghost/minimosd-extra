@@ -72,3 +72,4 @@ C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe.manifest
 C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\OSD_Config.application
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\ResGen.read.1.tlog
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Release\ResGen.write.1.tlog
+C:\MinimOsd\trunk\Tools\OSD\obj\x86\Release\GenerateResource-ResGen.read.4.tlog
