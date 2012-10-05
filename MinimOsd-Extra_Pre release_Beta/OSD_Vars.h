@@ -31,6 +31,7 @@ static uint16_t     chan2_raw_middle = 0;
 static uint8_t      ch_toggle = 0;
 static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
+static boolean      takeofftime = 0;
 //static boolean      pal_ntsc = 0;
 
 static int8_t       setup_menu = 0;
@@ -58,6 +59,7 @@ static uint8_t      osd_mode = 0;                   // Navigation mode from RC A
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long text_timer = 0;
 static unsigned long warning_timer =0;
+static unsigned long FTime = 0;
 
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
