@@ -132,8 +132,8 @@ void read_mavlink(){
                     chan4_raw = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
                     chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
                     chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                    chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                    chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
+//                    chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
+//                    chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
                     osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
                 break;           
