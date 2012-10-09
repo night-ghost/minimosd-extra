@@ -2093,7 +2093,7 @@ namespace OSD
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
-                    System.Threading.Thread.Sleep(50);
+                    //System.Threading.Thread.Sleep(50);
 
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
