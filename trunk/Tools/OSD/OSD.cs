@@ -13,7 +13,6 @@ using ArdupilotMega;
 using System.Xml;
 using System.Globalization;
 
-
 namespace OSD
 {
     public partial class OSD : Form
@@ -78,7 +77,9 @@ namespace OSD
         Panels pan;
         int nosdfunctions=0;
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
 
         Graphics[] gr = new Graphics[npanel];
         //Graphics gr2;
@@ -92,7 +93,7 @@ namespace OSD
             InitializeComponent();
 
             // load default font
-            chars = mcm.readMCM("Gabor.mcm");
+            chars = mcm.readMCM("OSD_Charset.mcm");
             // load default bg picture
             try
             {
@@ -209,6 +210,9 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
 
             nosdfunctions = a;
+            //make backup in case EEPROM needs reset to deualt
+            panelItems_default = panelItems;
+
             //Fill List of items in tabe number 1
             LIST_items.Items.Clear();
 
@@ -242,7 +246,6 @@ namespace OSD
             }
 
             startup = false;
-
 
 
             a = 0;
@@ -291,6 +294,9 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+
+            //make backup in case EEPROM needs reset to deualt
+            panelItems2_default = panelItems2;
 
             //Fill List of items in tabe number 2
             LIST_items2.Items.Clear();
@@ -1120,6 +1126,130 @@ namespace OSD
         }
 
 
+        //Write data to MinimOSD EPPROM
+        private void BUT_ResetOSD_EEPROM()
+        {
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            this.toolStripStatusLabel1.Text = "";
+            //First Panel 
+            foreach (string str in this.LIST_items.Items)
+            {
+                foreach (var tuple in this.panelItems_default)
+                {
+                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                    {
+                        if (str == "Center") eeprom[tuple.Item5] = 0;
+                        else if (str == "Tune") eeprom[tuple.Item5] = 0;
+                        else if (str == "Channel Raw") eeprom[tuple.Item5] = 0;
+                        else eeprom[tuple.Item5] = 1;
+
+                        eeprom[tuple.Item6] = (byte)tuple.Item3; // x
+                        eeprom[tuple.Item7] = (byte)tuple.Item4; // y
+                    }
+                }
+            }
+            //Second Panel 
+            foreach (string str in this.LIST_items2.Items)
+            {
+                foreach (var tuple in this.panelItems2_default)
+                {
+                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+                    {
+                        if (str == "Center") eeprom[tuple.Item5] = 0;
+                        else if (str == "Tune") eeprom[tuple.Item5] = 0;
+                        else if (str == "Channel Raw") eeprom[tuple.Item5] = 0;
+                        else eeprom[tuple.Item5] = 1;
+
+                        eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
+                        eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
+                    }
+                }
+            }
+            //Setup configuration panel
+            eeprom[measure_ADDR] = pan.converts;
+            eeprom[overspeed_ADDR] = pan.overspeed;
+            eeprom[stall_ADDR] = pan.stall;
+            eeprom[battv_ADDR] = pan.battv;
+
+            eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
+            eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
+            eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
+
+            eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
+            eeprom[switch_mode_ADDR] = pan.switch_mode;
+
+            eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
+
+            eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
+            eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
+
+            eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
+
+            eeprom[CHK_VERSION] = VER;
+
+            if (pan.callsign_str.Length != OSD_CALL_SIGN_TOTAL)
+            {
+                MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+            {
+                eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
+                Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
+            }
+
+            ArduinoSTK sp;
+
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                sp.DtrEnable = false;
+                sp.RtsEnable = false; //added
+
+                sp.Open();
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            if (sp.connectAP())
+            {
+                try
+                {
+                    bool spupload_flag = false;
+                    for (int i = 0; i < 10; i++) { //try to upload two times if it fail
+                        spupload_flag = sp.upload(eeprom, 0,CHK_VERSION + 1, 0);
+                        if (!spupload_flag)
+                        {
+                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+                        }
+                        else break;
+                    }
+                    if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+                    else MessageBox.Show("Failed to upload new configuration data");
+                    }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed to talk to bootloader");
+            }
+
+            sp.Close();
+        }
+
+
+
         private void comboBox1_Click(object sender, EventArgs e)
         {
             CMB_ComPort.Items.Clear();
@@ -1131,7 +1261,7 @@ namespace OSD
         /* *********************************************** */
         // Version number, incrementing this will erase/upload factory settings.
         // Only devs should increment this
-        const int VER = 75;
+        const int VER = 76;
         // EEPROM Storage addresses
         const int OffsetBITpanel = 250;
         // First of 8 panels
@@ -1264,10 +1394,9 @@ namespace OSD
         const int OSD_BRIGHTNESS_ADDR = 918;
 
         const int OSD_CALL_SIGN_ADDR = 920;
-        const int OSD_CALL_SIGN_TOTAL = 6;  
-           
-        const int CHK1 = 1000;
-        const int CHK2 = 1006;
+        const int OSD_CALL_SIGN_TOTAL = 6;
+
+        const int CHK_VERSION = 1010;
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
@@ -1334,6 +1463,13 @@ namespace OSD
 
             sp.Close();
 
+            //Verify EEPROM version
+            if (eeprom[CHK_VERSION] != VER) { // no match
+                MessageBox.Show("The EEPROM mapping is outdated! An automatic update will start.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                BUT_ResetOSD_EEPROM(); //write defaults
+                MessageBox.Show("EEPROM mapping updated!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             if (!fail)
             {
 
@@ -1361,8 +1497,6 @@ namespace OSD
                     }
                 }
             }
-            //Verify EEPROM version
-            //if (eeprom[CHK1] + eeprom[CHK2] != VER)
 
             //Setup configuration panel
             pan.converts = eeprom[measure_ADDR];
@@ -1917,6 +2051,10 @@ namespace OSD
                     toolStripStatusLabel1.Text = "Failed";
                 }
             }
+            
+            //Check EEPROM version
+            this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
+
         }
 
         private void customBGPictureToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2093,7 +2231,7 @@ namespace OSD
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
-                    //System.Threading.Thread.Sleep(50);
+                    //System.Threading.Thread.Sleep(2);
 
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
@@ -2217,15 +2355,6 @@ namespace OSD
             }
         }
 
-        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
-            }
-            catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
-        }
-
 
         private void STALL_numeric_ValueChanged(object sender, EventArgs e)
         {
@@ -2317,6 +2446,22 @@ namespace OSD
         private void BRIGHTNESScomboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             pan.osd_brightness = (byte)BRIGHTNESScomboBox.SelectedIndex ;
+        }
+
+        private void gettingStartedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
+            }
+            catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //MessageBox.Show("Author: Michael Oborne \nCo-authors: Pedro Santos \n Zoltán Gábor", "About ArduCAM OSD Config", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            AboutBox1 about = new AboutBox1();
+            about.Show();
         }
 
     }
