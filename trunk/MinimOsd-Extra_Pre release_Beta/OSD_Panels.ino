@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r423"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r427"));
     osd.closePanel();
 }
 
@@ -114,14 +114,15 @@ void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     if (osd_throttle > 2){
-        if (osd_groundspeed != 0) eff = float(osd_curr_A * 1000) / (osd_groundspeed * converts);
-        eff = eff * 0.2 + eff * 0.8;
+        if (osd_groundspeed != 0) eff = float(osd_curr_A * 1000) / (osd_groundspeed * converts)* 0.2 + eff * 0.8;
+//        eff = eff * 0.2 + eff * 0.8;
         osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
     }else{
         if (osd_climb < -0.05) {
             //    glide = (osd_home_alt - osd_alt) / osd_climb;            
-            glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth;            
-            glide = glide * 0.2 + glide * 0.8;
+            //glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth;            
+            glide = (((osd_home_alt - osd_alt) / osd_climb) * osd_groundspeed) * converth*0.2 + glide*0.8;
+            //glide = glide * 0.2 + glide * 0.8;
             osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
         } else {
             osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
@@ -601,7 +602,7 @@ void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    if (takeofftime == 0 && (osd_alt - osd_home_alt) > 5) 
+    if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5) 
     {
     takeofftime = 1;
     FTime = (millis()/1000);
@@ -997,7 +998,9 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
         arrow_set2 = 0xAF;
         break;
     } 
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
+//    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
+  
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
