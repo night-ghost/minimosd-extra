@@ -65,6 +65,7 @@ void setHomeVars(OSD &osd)
       {
         if(++osd_alt_cnt >= 25){
           osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
+          haltset = 1;
         }
       }
     }
