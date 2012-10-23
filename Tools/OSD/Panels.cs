@@ -140,16 +140,16 @@ namespace OSD
         // Size   : 1 x 7Hea  (rows x chars)
         // Staus  : done
 
-        public int panCh(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            {
-                osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
-            }
-            osd.closePanel();
-            return 0;
-        }
+ //       public int panCh(int first_col, int first_line)
+ //       {
+ //           osd.setPanel(first_col, first_line);
+ //           osd.openPanel();
+ //           {
+ //               osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
+ //           }
+ //           osd.closePanel();
+ //           return 0;
+ //       }
 
         /* **************************************************************** */
         // Panel  : efficiency
