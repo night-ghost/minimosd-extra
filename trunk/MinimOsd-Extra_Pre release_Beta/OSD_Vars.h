@@ -19,8 +19,8 @@ static bool         motor_armed = 0;
 static uint16_t     ch_raw = 0;
 static uint16_t     chan1_raw = 0;
 static uint16_t     chan2_raw = 0;
-static uint16_t     chan3_raw = 0;
-static uint16_t     chan4_raw = 0;
+//static uint16_t     chan3_raw = 0;
+//static uint16_t     chan4_raw = 0;
 static uint16_t     chan5_raw = 0;
 static uint16_t     chan6_raw = 0;
 static uint16_t     chan7_raw = 0;
@@ -170,7 +170,7 @@ byte panTune_XY[2][npanels];
 byte panRSSI_XY[2][npanels];
 byte panEff_XY[2][npanels];
 byte panCALLSIGN_XY[2][npanels];
-byte panCh_XY[2][npanels];
+// byte panCh_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables

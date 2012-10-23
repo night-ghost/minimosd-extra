@@ -56,7 +56,7 @@
 
 // panE_REG Byte has:
 
-#define Ch_BIT         0
+//#define Ch_BIT         0
 
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -170,9 +170,9 @@
 #define panCALLSIGN_en_ADDR 200
 #define panCALLSIGN_x_ADDR 202
 #define panCALLSIGN_y_ADDR 204
-#define panCh_en_ADDR 206
-#define panCh_x_ADDR 208
-#define panCh_y_ADDR 210
+//#define panCh_en_ADDR 206
+//#define panCh_x_ADDR 208
+//#define panCh_y_ADDR 210
 
 
 #define measure_ADDR 890
