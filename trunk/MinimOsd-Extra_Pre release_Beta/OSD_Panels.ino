@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r427"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r428"));
     osd.closePanel();
 }
 
@@ -602,7 +602,7 @@ void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5) 
+    if (takeofftime == 0 && osd_throttle > 5) 
     {
     takeofftime = 1;
     FTime = (millis()/1000);
