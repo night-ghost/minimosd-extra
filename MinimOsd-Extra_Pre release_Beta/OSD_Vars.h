@@ -68,7 +68,9 @@ static uint8_t      warning = 0;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
+static unsigned long         descendt = 0;
 static float        osd_climb = 0;
+static float        descend = 0;
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
