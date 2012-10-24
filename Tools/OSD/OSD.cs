@@ -93,7 +93,7 @@ namespace OSD
             InitializeComponent();
 
             // load default font
-            chars = mcm.readMCM("OSD_Charset.mcm");
+            chars = mcm.readMCM("Gabor.mcm");
             // load default bg picture
             try
             {
@@ -208,6 +208,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
 //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 1, 11, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
 
             nosdfunctions = a;
             //make backup in case EEPROM needs reset to deualt
@@ -294,6 +295,7 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
 //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 1, 11, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
 
             //make backup in case EEPROM needs reset to deualt
             panelItems2_default = panelItems2;
@@ -1375,6 +1377,9 @@ namespace OSD
         const int panCh_en_ADDR = 206;
         const int panCh_x_ADDR = 208;
         const int panCh_y_ADDR = 210;
+        const int panTemp_en_ADDR = 212;
+        const int panTemp_x_ADDR = 214;
+        const int panTemp_y_ADDR = 216;
         //
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;

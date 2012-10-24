@@ -129,9 +129,27 @@ namespace OSD
         public uint8_t chan6_raw = 0;
         public uint8_t chan7_raw = 0;
         public uint8_t chan8_raw = 0;
-
+        static float temperature = 23.5f;
 
         /******* PANELS - DEFINITION *******/
+
+        /* **************************************************************** */
+        // Panel  : Temperature
+        // Needs  : X, Y locations
+        // Output : 
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panTemp(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            {
+                osd.printf("%c%5.1f%c", 0x1C, temperature, 0xC8);
+            }
+            osd.closePanel();
+            return 0;
+        }
 
         /* **************************************************************** */
         // Panel  : PanCh
