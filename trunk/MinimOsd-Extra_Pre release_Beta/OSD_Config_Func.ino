@@ -165,7 +165,10 @@ void writeSettings() {
  //   writeEEPROM(on, panCh_en_ADDR + offset);
  //   writeEEPROM(10, panCh_x_ADDR + offset);
  //   writeEEPROM(4,  panCh_y_ADDR + offset);
-
+    writeEEPROM(on, panTemp_en_ADDR + offset);
+    writeEEPROM(10, panTemp_x_ADDR + offset);
+    writeEEPROM(4,  panTemp_y_ADDR + offset);
+ 
     writeEEPROM(30,overspeed_ADDR);
     writeEEPROM(0,stall_ADDR);
     writeEEPROM(100,battv_ADDR); //10Volts
@@ -342,6 +345,10 @@ void readPanelSettings() {
 //   setBit(panE_REG[panel], Ch_BIT, readEEPROM(panCh_en_ADDR + offset));
 //    panCh_XY[0][panel] = readEEPROM(panCh_x_ADDR + offset);
 //    panCh_XY[1][panel] = checkPAL(readEEPROM(panCh_y_ADDR + offset));
+
+    setBit(panE_REG[panel], TEMP_BIT, readEEPROM(panTemp_en_ADDR + offset));
+    panTemp_XY[0][panel] = readEEPROM(panTemp_x_ADDR + offset);
+    panTemp_XY[1][panel] = checkPAL(readEEPROM(panTemp_y_ADDR + offset));
 
 }
 

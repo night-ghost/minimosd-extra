@@ -17,25 +17,25 @@ static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
 
 static uint16_t     ch_raw = 0;
-static uint16_t     chan1_raw = 0;
-static uint16_t     chan2_raw = 0;
+//static uint16_t     chan1_raw = 0;
+//static uint16_t     chan2_raw = 0;
 //static uint16_t     chan3_raw = 0;
 //static uint16_t     chan4_raw = 0;
 static uint16_t     chan5_raw = 0;
 static uint16_t     chan6_raw = 0;
 static uint16_t     chan7_raw = 0;
 static uint16_t     chan8_raw = 0;
-static uint16_t     chan1_raw_middle = 0;
-static uint16_t     chan2_raw_middle = 0;
+//static uint16_t     chan1_raw_middle = 0;
+//static uint16_t     chan2_raw_middle = 0;
 
 static uint8_t      ch_toggle = 0;
-static boolean      osd_set = 0;
+//static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
 static boolean      haltset = 0;
 //static boolean      pal_ntsc = 0;
 
-static int8_t       setup_menu = 0;
+//static int8_t       setup_menu = 0;
 static float        converts = 0;
 static float        converth = 0;
 static uint8_t      overspeed = 0;
@@ -45,6 +45,7 @@ static uint8_t      battv = 0;                //Battery warning voltage - units 
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
+static uint8_t      temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
@@ -69,6 +70,7 @@ static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
 static unsigned long         descendt = 0;
+static unsigned long         palt = 0;
 static float        osd_climb = 0;
 static float        descend = 0;
 
@@ -102,6 +104,8 @@ static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
+static uint16_t     temperature = 0;
+static float     convertt = 0;
 //Call sign variables
 static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
@@ -171,6 +175,7 @@ byte panRSSI_XY[2][npanels];
 byte panEff_XY[2][npanels];
 byte panCALLSIGN_XY[2][npanels];
 // byte panCh_XY[2][npanels];
+byte panTemp_XY[2][npanels];
 
 //*************************************************************************************************************
 //rssi varables

@@ -126,8 +126,8 @@ void read_mavlink(){
                 break;
             case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 {
-                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
-                    chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
+//                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
+//                    chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
 //                    chan3_raw = mavlink_msg_rc_channels_raw_get_chan3_raw(&msg);
 //                    chan4_raw = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
                     chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
@@ -142,6 +142,11 @@ void read_mavlink(){
                     osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
                     osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
                     osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+                }
+                break;
+            case MAVLINK_MSG_ID_SCALED_PRESSURE:
+                {
+                    temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
                 }
                 break;
             default:
