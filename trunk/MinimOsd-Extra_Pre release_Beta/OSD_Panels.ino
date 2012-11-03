@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r434"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r437"));
     osd.closePanel();
 }
 
@@ -198,7 +198,14 @@ void panCALLSIGN(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
+    if ((millis() - 60000) > CallSignBlink){
+      if (millis() - 61000 > CallSignBlink){
+        CallSignBlink = (millis() - 1000);
+          }
     osd.printf("%s", char_call); 
+    }else{
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+    }
     osd.closePanel();
 }
 
