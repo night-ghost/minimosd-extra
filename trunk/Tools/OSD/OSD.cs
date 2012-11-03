@@ -1026,22 +1026,14 @@ namespace OSD
 
                 eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
 
-                if (pan.callsign_str.Length != OSD_CALL_SIGN_TOTAL)
+                //for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+                for (int i = 0; i < pan.callsign_str.Length; i++)
                 {
-                    MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
-                    //int offset = 0;
-                    //if (!Char.IsNumber(pan.callsign_str[i])){
-                    //    if (char.IsUpper(pan.callsign_str[i])) //test if not uppercase
-                    //        offset = 32; // 65 A position
-                    //}
-
-                    //eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i] + offset);
                     eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
                     Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
                 }
+                if (pan.callsign_str.Length < OSD_CALL_SIGN_TOTAL)
+                    for (int i = pan.callsign_str.Length; i < OSD_CALL_SIGN_TOTAL; i++) eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('\0');
             } 
 
             ArduinoSTK sp;
@@ -1189,14 +1181,9 @@ namespace OSD
 
             eeprom[CHK_VERSION] = VER;
 
-            if (pan.callsign_str.Length != OSD_CALL_SIGN_TOTAL)
-            {
-                MessageBox.Show("Call Sign is incomplete. It should be 6 alphanumeric characters long!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
             for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
             {
-                eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
+                eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('a');
                 Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
             }
 
@@ -1399,7 +1386,7 @@ namespace OSD
         const int OSD_BRIGHTNESS_ADDR = 918;
 
         const int OSD_CALL_SIGN_ADDR = 920;
-        const int OSD_CALL_SIGN_TOTAL = 6;
+        const int OSD_CALL_SIGN_TOTAL = 8;
 
         const int CHK_VERSION = 1010;
 

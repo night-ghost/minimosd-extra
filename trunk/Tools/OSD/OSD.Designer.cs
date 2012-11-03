@@ -59,8 +59,8 @@
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gettingStartedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
@@ -431,19 +431,19 @@
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(53, 24);
             this.helpToolStripMenuItem.Text = "Help";
             // 
-            // aboutToolStripMenuItem
-            // 
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(177, 24);
-            this.aboutToolStripMenuItem.Text = "About ";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
             // gettingStartedToolStripMenuItem
             // 
             this.gettingStartedToolStripMenuItem.Name = "gettingStartedToolStripMenuItem";
             this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(177, 24);
             this.gettingStartedToolStripMenuItem.Text = "Getting started";
             this.gettingStartedToolStripMenuItem.Click += new System.EventHandler(this.gettingStartedToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(177, 24);
+            this.aboutToolStripMenuItem.Text = "About ";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // pictureBox1
             // 
@@ -547,7 +547,7 @@
             this.CALLSIGNmaskedText.AsciiOnly = true;
             this.CALLSIGNmaskedText.BeepOnError = true;
             this.CALLSIGNmaskedText.Location = new System.Drawing.Point(12, 46);
-            this.CALLSIGNmaskedText.Mask = "AAAAAA";
+            this.CALLSIGNmaskedText.Mask = "AAAAAAAA";
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
             this.CALLSIGNmaskedText.Size = new System.Drawing.Size(121, 22);
             this.CALLSIGNmaskedText.TabIndex = 11;
