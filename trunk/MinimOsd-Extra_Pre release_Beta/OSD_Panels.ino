@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r437"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r438"));
     osd.closePanel();
 }
 
@@ -136,12 +136,12 @@ void panEff(int first_col, int first_line){
     }else{
         if (osd_climb < -0.05) {
             
-          if (millis() - descendt > 0){
+          if (millis() > descendt){
             descendt = millis() + 5000;
             descend = palt - (osd_alt - osd_home_alt);
             palt = (osd_alt - osd_home_alt);
             
-            if  (descend != 0 && (osd_alt - osd_home_alt) != 0) glide = ((((osd_home_alt - osd_alt) / (descend / 5)) * osd_groundspeed) * converth)* 0.2 + glide * 0.8;
+            if  (descend != 0 && (osd_alt - osd_home_alt) != 0) glide = ((((osd_home_alt - osd_alt) / (descend / 5)) * osd_groundspeed) * converth)* 0.5 + glide * 0.5;
             }
             osd.printf("%c%4.0f%c", 0x18, (double)glide, high);
         } else if (osd_pitch <= 0){
