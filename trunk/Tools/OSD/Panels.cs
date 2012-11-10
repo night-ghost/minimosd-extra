@@ -181,7 +181,7 @@ namespace OSD
         osd.setPanel(first_col, first_line);
         osd.openPanel();
         {
-        osd.printf("%c%3.0f%c", 0x17, eff, 0x82);
+        osd.printf("%c%4.0f%c", 0x17, eff, 0x82);
         }
         osd.closePanel();
          return 0;
@@ -274,7 +274,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%3.0f%c|%c%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5, (double)(osd_windspeedz * 3.6), 0x81);
+                osd.printf("%c%3.0f%c|%c%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5);
             }
             osd.closePanel();
             return 0;
