@@ -15,7 +15,7 @@ static float        eff = 0; //Efficiency
 
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
-
+static bool          ma = 0;
 static uint16_t     ch_raw = 0;
 //static uint16_t     chan1_raw = 0;
 //static uint16_t     chan2_raw = 0;
@@ -73,7 +73,7 @@ static unsigned long         osd_switch_time = 0;
 static unsigned long         descendt = 0;
 static unsigned long         palt = 0;
 static float        osd_climb = 0;
-static float        descend = 0;
+//static float        descend = 0;
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
