@@ -139,7 +139,7 @@ void read_mavlink(){
                 break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-                    osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
+                    osd_winddirection = abs(mavlink_msg_wind_get_direction(&msg)); // 0..360 deg, 0=north
                     osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
                     osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }
