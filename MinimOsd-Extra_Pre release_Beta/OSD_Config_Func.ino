@@ -148,17 +148,17 @@ void writeSettings() {
     writeEEPROM(10, panWarn_x_ADDR + offset);
     writeEEPROM(4,  panWarn_y_ADDR + offset);
     writeEEPROM(on, panOff_en_ADDR + offset);
-    writeEEPROM(10, panOff_x_ADDR + offset);
-    writeEEPROM(4,  panOff_y_ADDR + offset);
+//    writeEEPROM(10, panOff_x_ADDR + offset);
+//    writeEEPROM(4,  panOff_y_ADDR + offset);
     writeEEPROM(on, panWindSpeed_en_ADDR + offset);
     writeEEPROM(10, panWindSpeed_x_ADDR + offset);
     writeEEPROM(4,  panWindSpeed_y_ADDR + offset);
     writeEEPROM(on, panClimb_en_ADDR + offset);
     writeEEPROM(10, panClimb_x_ADDR + offset);
     writeEEPROM(4,  panClimb_y_ADDR + offset);
-    writeEEPROM(on, panTune_en_ADDR + offset);
-    writeEEPROM(10, panTune_x_ADDR + offset);
-    writeEEPROM(4,  panTune_y_ADDR + offset);
+//    writeEEPROM(on, panTune_en_ADDR + offset);
+//    writeEEPROM(10, panTune_x_ADDR + offset);
+//    writeEEPROM(4,  panTune_y_ADDR + offset);
     writeEEPROM(on, panEff_en_ADDR + offset);
     writeEEPROM(10, panEff_x_ADDR + offset);
     writeEEPROM(4,  panEff_y_ADDR + offset);
@@ -168,6 +168,9 @@ void writeSettings() {
     writeEEPROM(on, panTemp_en_ADDR + offset);
     writeEEPROM(10, panTemp_x_ADDR + offset);
     writeEEPROM(4,  panTemp_y_ADDR + offset);
+//    writeEEPROM(on, panFata_en_ADDR + offset);
+//    writeEEPROM(10, panFdata_x_ADDR + offset);
+//    writeEEPROM(4,  panFdata_y_ADDR + offset);
  
     writeEEPROM(30,overspeed_ADDR);
     writeEEPROM(0,stall_ADDR);
@@ -329,9 +332,9 @@ void readPanelSettings() {
     panClimb_XY[0][panel] = readEEPROM(panClimb_x_ADDR + offset);
     panClimb_XY[1][panel] = checkPAL(readEEPROM(panClimb_y_ADDR + offset));
 
-    setBit(panD_REG[panel], Tune_BIT, readEEPROM(panTune_en_ADDR + offset));
-    panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
-    panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
+//    setBit(panD_REG[panel], Tune_BIT, readEEPROM(panTune_en_ADDR + offset));
+//    panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
+//    panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
 
     setBit(panD_REG[panel], RSSI_BIT, readEEPROM(panRSSI_en_ADDR + offset));
     panRSSI_XY[0][panel] = readEEPROM(panRSSI_x_ADDR + offset);

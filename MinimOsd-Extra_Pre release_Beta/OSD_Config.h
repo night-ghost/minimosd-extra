@@ -49,7 +49,7 @@
 #define Off_BIT        1
 #define WindS_BIT      2
 #define Climb_BIT      3
-#define Tune_BIT       4
+//#define Tune_BIT       4
 #define CALLSIGN_BIT   5
 #define RSSI_BIT       6
 #define Eff_BIT        7
@@ -154,17 +154,17 @@
 #define panWarn_x_ADDR 166
 #define panWarn_y_ADDR 168
 #define panOff_en_ADDR 170
-#define panOff_x_ADDR 172
-#define panOff_y_ADDR 174
+//#define panOff_x_ADDR 172
+//#define panOff_y_ADDR 174
 #define panWindSpeed_en_ADDR 176
 #define panWindSpeed_x_ADDR 178
 #define panWindSpeed_y_ADDR 180
 #define panClimb_en_ADDR 182
 #define panClimb_x_ADDR 184
 #define panClimb_y_ADDR 186
-#define panTune_en_ADDR 188
-#define panTune_x_ADDR 190
-#define panTune_y_ADDR 192
+//#define panTune_en_ADDR 188
+//#define panTune_x_ADDR 190
+//#define panTune_y_ADDR 192
 #define panEff_en_ADDR 194
 #define panEff_x_ADDR 196
 #define panEff_y_ADDR 198
@@ -177,7 +177,9 @@
 #define panTemp_en_ADDR 212
 #define panTemp_x_ADDR 214
 #define panTemp_y_ADDR 216
-
+//#define panFdata_en_ADDR 218
+//#define panFdata_x_ADDR 220
+//#define panFdata_y_ADDR 222
 
 #define measure_ADDR 890
 #define overspeed_ADDR 892

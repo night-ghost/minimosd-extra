@@ -207,6 +207,8 @@ void OnMavlinkTimer()
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
     
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
+    
+    setFdataVars();
 }
 
 
