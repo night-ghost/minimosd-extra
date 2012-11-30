@@ -11,16 +11,22 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r442"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r444"));
     osd.closePanel();
 }
+
 
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
 
-    if(millis() < (lastMAVBeat + 2200)){
-        if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
+  if(millis() < (lastMAVBeat + 2200)){
+   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_airspeed <= 4 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){
+// if ((osd_alt - osd_home_alt) <= 10){
+   
+      panFdata(); 
+        }else{      
+      if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
  //       if (osd_set == 0) { // setup panel is called in the else at the end
             if(panel != npanels)
             {
@@ -67,7 +73,7 @@ void writePanels(){
                 //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
                 if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+//                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
                 if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
                 if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
@@ -80,8 +86,9 @@ void writePanels(){
  //       } else { // if (osd_on > 0)
  //           panSetup();
  //       }
+        }
     } else { // if no mavlink update for 2 secs
-
+    
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
         osd.clear();
@@ -89,8 +96,9 @@ void writePanels(){
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
     panLogo();
-    }
-
+    
+  }
+  
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
     osd.setPanel(13,4);
@@ -98,10 +106,24 @@ void writePanels(){
     osd.printf("%i",freeMem()); 
     osd.closePanel();
 #endif
+  
 
 }
-
 /******* PANELS - DEFINITION *******/
+
+/* **************************************************************** */
+// Panel  : panFdata
+// Needs  : X, Y locations
+// Output : 
+// Size   : 
+// Staus  : done
+void panFdata(){
+     osd.setPanel(11, 4);
+     osd.clear();
+    osd.openPanel();                                            
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high);
+    osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : pantemp
@@ -424,14 +446,14 @@ void panOff(){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
     
-  void panTune(int first_col, int first_line){
-  osd.setPanel(first_col, first_line);
-  osd.openPanel();
+//  void panTune(int first_col, int first_line){
+//  osd.setPanel(first_col, first_line);
+//  osd.openPanel();
 
-  osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (wp_target_bearing), 0xB0, 0x41, 0x45, (alt_error * converth), high, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), spe);
+//  osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (wp_target_bearing), 0xB0, 0x41, 0x45, (alt_error * converth), high, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), spe);
 
-  osd.closePanel();
-}
+//  osd.closePanel();
+//}
 
 /* **************************************************************** */
 // Panel  : panCur_A
@@ -501,6 +523,7 @@ void panHomeAlt(int first_col, int first_line){
 void panVel(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+    
     osd.printf("%c%3.0f%c",0xE9,(double)(osd_groundspeed * converts),spe);
     osd.closePanel();
 }

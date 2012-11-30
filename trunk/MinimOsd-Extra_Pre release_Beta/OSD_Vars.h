@@ -1,6 +1,11 @@
 /*Panels variables*/
 //Will come from APM telem port
 
+static long         max_home_distance = 0;
+static float        max_osd_airspeed = -1;
+static float        max_osd_groundspeed = 0; 
+static float        max_osd_home_alt = 0;
+
 static float	    nav_roll = 0; // Current desired roll in degrees
 static float        nav_pitch = 0; // Current desired pitch in degrees
 static int16_t	    nav_bearing = 0; // Current desired heading in degrees
@@ -71,7 +76,7 @@ static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
 static unsigned long         descendt = 0;
-static unsigned long         palt = 0;
+static float         palt = 0;
 static float        osd_climb = 0;
 //static float        descend = 0;
 
@@ -171,7 +176,7 @@ byte panHorizon_XY[2][npanels]; // = {8,centercalc}
 byte panWarn_XY[2][npanels];
 byte panWindSpeed_XY[2][npanels];
 byte panClimb_XY[2][npanels];
-byte panTune_XY[2][npanels];
+//byte panTune_XY[2][npanels];
 byte panRSSI_XY[2][npanels];
 byte panEff_XY[2][npanels];
 byte panCALLSIGN_XY[2][npanels];

@@ -12,7 +12,8 @@ void uploadFont()
     osd.clear();
     osd.setPanel(6,9);
     osd.openPanel();
-    osd.printf_P(PSTR("Update CharSet")); 
+    osd.printf_P(PSTR("Update CharSet"));
+    delay(2000);
     osd.closePanel();
 
 
