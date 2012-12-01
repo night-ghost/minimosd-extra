@@ -109,13 +109,13 @@ void read_mavlink(){
                 break;
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 {
-                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
-                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
-                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
+//                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
+//                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
+//                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
                   wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
                   wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+//                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+//                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
                   xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
                 }
                 break;

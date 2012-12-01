@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r444"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r445"));
     osd.closePanel();
 }
 
@@ -53,7 +53,7 @@ void writePanels(){
                 }
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
-                if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
+ //               if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
                 if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
 
                 //Testing bits from 8 bit register C 
@@ -120,8 +120,8 @@ void writePanels(){
 void panFdata(){
      osd.setPanel(11, 4);
      osd.clear();
-    osd.openPanel();                                            
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high);
+    osd.openPanel();                          
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%3.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -914,16 +914,16 @@ void panMavBeat(int first_col, int first_line){
 // Size   : 1 x 2  (rows x chars)
 // Staus  : not ready
 
-void panWPDir(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
+//void panWPDir(int first_col, int first_line){
+//    osd.setPanel(first_col, first_line);
+//    osd.openPanel();
    
-    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
-    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
+//    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
+//    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize  
 
-    showArrow((uint8_t)wp_target_bearing_rotate_int,0);
-    osd.closePanel();
-}
+//    showArrow((uint8_t)wp_target_bearing_rotate_int,0);
+//    osd.closePanel();
+//}
 
 /* **************************************************************** */
 // Panel  : panWPDis
@@ -935,7 +935,16 @@ void panWPDir(int first_col, int first_line){
 void panWPDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-      osd.printf("%c%2i%c%4.0f%c",0x57,wp_number,0x0,(double)((float)(wp_dist) * converth),high);
+    
+    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
+    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
+    
+      if (xtrack_error > 999) xtrack_error = 999;
+      if (xtrack_error < -999) xtrack_error = -999;
+
+      osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
+      showArrow((uint8_t)wp_target_bearing_rotate_int,0);
+      osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
     osd.closePanel();
 }
 

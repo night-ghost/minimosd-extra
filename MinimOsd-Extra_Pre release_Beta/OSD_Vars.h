@@ -5,6 +5,7 @@ static long         max_home_distance = 0;
 static float        max_osd_airspeed = -1;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
+static float        max_osd_windspeed = 0;
 
 static float	    nav_roll = 0; // Current desired roll in degrees
 static float        nav_pitch = 0; // Current desired pitch in degrees
@@ -156,7 +157,7 @@ byte panHeading_XY[2][npanels]; // = { 16,12 };
 byte panMavBeat_XY[2][npanels]; // = { 2,10 };
 byte panHomeDir_XY[2][npanels]; // = { 0,0 };
 byte panHomeDis_XY[2][npanels]; // = { 0,0 };
-byte panWPDir_XY[2][npanels]; // = { 27,12 };
+//byte panWPDir_XY[2][npanels]; // = { 27,12 };
 byte panWPDis_XY[2][npanels]; // = { 23,11 };
 byte panTime_XY[2][npanels];
 
