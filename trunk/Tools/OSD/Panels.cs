@@ -722,16 +722,16 @@ namespace OSD
         // Size   : 1 x 2  (rows x chars)
         // Staus  : not ready
 
-        public int panWPDir(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            {
-                osd.printf("%c%c",  0xA4, 0xA5);
-            }
-            osd.closePanel();
-            return 0;
-        }
+//        public int panWPDir(int first_col, int first_line)
+//        {
+//            osd.setPanel(first_col, first_line);
+//            osd.openPanel();
+//            {
+//                osd.printf("%c%c",  0xA4, 0xA5);
+//            }
+//            osd.closePanel();
+//            return 0;
+//        }
 
         /* **************************************************************** */
         // Panel  : panWPDis
@@ -743,8 +743,8 @@ namespace OSD
         public int panWPDis(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            osd.printf("%c%2i%c%4.0f%c", 0x57, wp_number, 0x0, (double)((float)(wp_dist)), 0x6d); //Print in Km 
+            osd.openPanel();           
+            osd.printf("%c%c%c%2i%c%4.0f%c|%c%c%c%c%c%5.0f%c", 0x57, 0x70, 0x0, wp_number, 0x0, (double)((float)(wp_dist)), 0x6d, 0xa4, 0xa5, 0x20, 0x58, 0x45, (xtrack_error), 0x6D); //Print in Km 
             osd.closePanel();
             return 0;
         }

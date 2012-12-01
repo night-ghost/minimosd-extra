@@ -102,9 +102,9 @@ void writeSettings() {
     writeEEPROM(on, panHomeDis_en_ADDR + offset);
     writeEEPROM(2,  panHomeDis_x_ADDR + offset);
     writeEEPROM(1,  panHomeDis_y_ADDR + offset);
-    writeEEPROM(off,panWPDir_en_ADDR);
-    writeEEPROM(27,  panWPDir_x_ADDR);
-    writeEEPROM(12,  panWPDir_y_ADDR);
+ //   writeEEPROM(off,panWPDir_en_ADDR);
+ //   writeEEPROM(27,  panWPDir_x_ADDR);
+ //   writeEEPROM(12,  panWPDir_y_ADDR);
     writeEEPROM(off,panWPDis_en_ADDR);
     writeEEPROM(23,  panWPDis_x_ADDR);
     writeEEPROM(11,  panWPDis_y_ADDR);
@@ -266,9 +266,9 @@ void readPanelSettings() {
     panHomeDir_XY[0][panel] = readEEPROM(panHomeDir_x_ADDR + offset);
     panHomeDir_XY[1][panel] = checkPAL(readEEPROM(panHomeDir_y_ADDR + offset));
 
-    setBit(panB_REG[panel], WDir_BIT, readEEPROM(panWPDir_en_ADDR + offset));
-    panWPDir_XY[0][panel] = readEEPROM(panWPDir_x_ADDR + offset);
-    panWPDir_XY[1][panel] = checkPAL(readEEPROM(panWPDir_y_ADDR + offset));
+//    setBit(panB_REG[panel], WDir_BIT, readEEPROM(panWPDir_en_ADDR + offset));
+//    panWPDir_XY[0][panel] = readEEPROM(panWPDir_x_ADDR + offset);
+//    panWPDir_XY[1][panel] = checkPAL(readEEPROM(panWPDir_y_ADDR + offset));
 
     setBit(panB_REG[panel], WDis_BIT, readEEPROM(panWPDis_en_ADDR + offset));
     panWPDis_XY[0][panel] = readEEPROM(panWPDis_x_ADDR + offset);

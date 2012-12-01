@@ -30,7 +30,7 @@
 #define MavB_BIT       2
 #define HDir_BIT       3
 #define HDis_BIT       4
-#define WDir_BIT       5 //
+//#define WDir_BIT       5 //
 #define WDis_BIT       6 //
 #define Time_BIT       7 
 
@@ -106,9 +106,9 @@
 #define panHomeDis_en_ADDR 72
 #define panHomeDis_x_ADDR 74
 #define panHomeDis_y_ADDR 76
-#define panWPDir_en_ADDR 80 
-#define panWPDir_x_ADDR 82  
-#define panWPDir_y_ADDR 84  
+//#define panWPDir_en_ADDR 80 
+//#define panWPDir_x_ADDR 82  
+//#define panWPDir_y_ADDR 84  
 #define panWPDis_en_ADDR 86 
 #define panWPDis_x_ADDR 88  
 #define panWPDis_y_ADDR 90  
