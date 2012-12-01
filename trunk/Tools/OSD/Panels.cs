@@ -274,7 +274,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%3.0f%c|%c%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5);
+                osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5, (double)(osd_windspeed * 3.6), 0x81);
             }
             osd.closePanel();
             return 0;
