@@ -112,6 +112,7 @@ static float        osd_alt_prev = 0;             // previous altitude
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
+static uint16_t     tempconv = 0;
 static float     convertt = 0;
 //Call sign variables
 static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};

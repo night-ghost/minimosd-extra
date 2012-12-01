@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r445"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r447"));
     osd.closePanel();
 }
 
@@ -121,7 +121,7 @@ void panFdata(){
      osd.setPanel(11, 4);
      osd.clear();
     osd.openPanel();                          
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%3.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -135,8 +135,9 @@ void panFdata(){
 void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-//    osd.printf("%c%5.2f%c", 0xE4, (float(osd_curr_A) * .01), 0x8F);
-    osd.printf("%c%5.1f%c", 0x1C, (float(temperature)  / 10), 0xC8);
+    do_converts();
+    osd.printf("%c%5.1f%c", 0x1C, (float(tempconv) / 10), temps);
+//    osd.printf("%c%5.1f%c", 0x1C, (float(temperature) / 10), 0xC8);
     osd.closePanel();
 }
 
@@ -1078,7 +1079,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
         break;
     } 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
   
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
@@ -1168,12 +1169,15 @@ void do_converts()
         spe = 0x81;
         high = 0x8D;
         temps = 0xC8;
+        tempconv = temperature;
+        
     } else {
         converts = 2.23;
         converth = 3.28;
         spe = 0xfb;
         high = 0x66;
         temps = 0xC9;
+        tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
     }
 }
 
