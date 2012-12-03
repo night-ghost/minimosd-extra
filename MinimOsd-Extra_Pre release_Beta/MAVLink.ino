@@ -95,7 +95,7 @@ void read_mavlink(){
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                     osd_heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
-                    osd_throttle = mavlink_msg_vfr_hud_get_throttle(&msg);
+                    osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                     osd_alt = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
                 }
@@ -104,7 +104,7 @@ void read_mavlink(){
                 {
                     osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
                     osd_roll = ToDeg(mavlink_msg_attitude_get_roll(&msg));
-                    osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
+//                    osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
                 }
                 break;
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:

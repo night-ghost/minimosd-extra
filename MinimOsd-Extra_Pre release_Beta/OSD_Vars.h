@@ -9,6 +9,8 @@ static float        max_osd_windspeed = 0;
 static unsigned long runtime = 0;
 static unsigned long dt = 0;
 static float tdistance = 0;
+static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
+
 
 //static float	    nav_roll = 0; // Current desired roll in degrees
 //static float        nav_pitch = 0; // Current desired pitch in degrees
@@ -99,7 +101,7 @@ static uint8_t      osd_home_direction;             // Arrow direction pointing 
 
 static int8_t       osd_pitch = 0;                  // pitch from DCM
 static int8_t       osd_roll = 0;                   // roll from DCM
-static int8_t       osd_yaw = 0;                    // relative heading form DCM
+//static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
 static float        glide = 0;
 
@@ -114,7 +116,7 @@ static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
 static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
-static uint16_t     osd_throttle = 0;               // throtle
+static uint8_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
 static uint16_t     tempconv = 0;
 static uint16_t     distchar = 0;
