@@ -15,7 +15,7 @@
 
 // Panel 8bit REGISTER with BIT positions
 // panA_REG Byte has:
-#define Cen_BIT        0
+//#define Cen_BIT        0
 #define Pit_BIT        1
 #define Rol_BIT        2
 #define BatA_BIT       3
@@ -27,7 +27,7 @@
 // panB_REG Byte has:
 #define Rose_BIT       0
 #define Head_BIT       1
-#define MavB_BIT       2
+//#define MavB_BIT       2
 #define HDir_BIT       3
 #define HDis_BIT       4
 //#define WDir_BIT       5 //
@@ -58,6 +58,7 @@
 
 //#define Ch_BIT         0
 #define TEMP_BIT       1
+#define DIST_BIT       2
 
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -65,9 +66,9 @@
 #define OffsetBITpanel       250
 
 // First of 8 panels
-#define panCenter_en_ADDR 0
-#define panCenter_x_ADDR 2
-#define panCenter_y_ADDR 4
+//#define panCenter_en_ADDR 0
+//#define panCenter_x_ADDR 2
+//#define panCenter_y_ADDR 4
 #define panPitch_en_ADDR 6
 #define panPitch_x_ADDR 8
 #define panPitch_y_ADDR 10
@@ -97,9 +98,9 @@
 #define panHeading_en_ADDR 54
 #define panHeading_x_ADDR 56
 #define panHeading_y_ADDR 58
-#define panMavBeat_en_ADDR 60
-#define panMavBeat_x_ADDR 62
-#define panMavBeat_y_ADDR 64
+//#define panMavBeat_en_ADDR 60
+//#define panMavBeat_x_ADDR 62
+//#define panMavBeat_y_ADDR 64
 #define panHomeDir_en_ADDR 66
 #define panHomeDir_x_ADDR 68
 #define panHomeDir_y_ADDR 70
@@ -180,6 +181,9 @@
 //#define panFdata_en_ADDR 218
 //#define panFdata_x_ADDR 220
 //#define panFdata_y_ADDR 222
+#define panDistance_en_ADDR 224
+#define panDistance_x_ADDR 226
+#define panDistance_y_ADDR 228
 
 #define measure_ADDR 890
 #define overspeed_ADDR 892

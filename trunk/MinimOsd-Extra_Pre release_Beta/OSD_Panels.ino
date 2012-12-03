@@ -32,7 +32,7 @@ void writePanels(){
             {
                 if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
                 //Testing bits from 8 bit register A 
-                if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+ //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
                 if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
@@ -45,7 +45,7 @@ void writePanels(){
                 //Testing bits from 8 bit register B
                 if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
                 if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
-                if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
+ //               if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
 
                 if(osd_got_home == 1){
                     if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
@@ -110,6 +110,24 @@ void writePanels(){
 
 }
 /******* PANELS - DEFINITION *******/
+/* **************************************************************** */
+// Panel  : ODO
+// Needs  : X, Y locations
+// Output : 
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+void panDistance(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    do_converts();
+    if (tdistance > 1000.0) {
+    osd.printf("%c%3i%c", 0xFE, int(tdistance / 1000.0), 0xFD);
+    }else{
+    osd.printf("%c%3i%c", 0xFE, int(tdistance), 0x8D);
+    }
+    osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : panFdata
@@ -121,7 +139,7 @@ void panFdata(){
      osd.setPanel(11, 4);
      osd.clear();
     osd.openPanel();                          
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xFD, (double)((tdistance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -705,12 +723,12 @@ void panHomeDis(int first_col, int first_line){
 // Size   : 2 x 4  (rows x chars)
 // Staus  : done
 
-void panCenter(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
-    osd.closePanel();
-}
+//void panCenter(int first_col, int first_line){
+//    osd.setPanel(first_col, first_line);
+//    osd.openPanel();
+//    osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
+//    osd.closePanel();
+//}
 
 /* **************************************************************** */
 // Panel  : panHorizon
@@ -894,18 +912,18 @@ void panBoot(int first_col, int first_line){
 // Size   : 1 x 2  (rows x chars)
 // Staus  : done
 
-void panMavBeat(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    if(mavbeat == 1){
-        osd.printf_P(PSTR("\xEA\xEC"));
-        mavbeat = 0;
-    }
-    else{
-        osd.printf_P(PSTR("\xEA\xEB"));
-    }
-    osd.closePanel();
-}
+//void panMavBeat(int first_col, int first_line){
+//    osd.setPanel(first_col, first_line);
+//    osd.openPanel();
+//    if(mavbeat == 1){
+//        osd.printf_P(PSTR("\xEA\xEC"));
+//        mavbeat = 0;
+//    }
+//    else{
+//        osd.printf_P(PSTR("\xEA\xEB"));
+//    }
+//    osd.closePanel();
+//}
 
 
 /* **************************************************************** */
@@ -1170,6 +1188,7 @@ void do_converts()
         high = 0x8D;
         temps = 0xC8;
         tempconv = temperature;
+        distchar = 0xFD;
         
     } else {
         converts = 2.23;
@@ -1178,6 +1197,7 @@ void do_converts()
         high = 0x66;
         temps = 0xC9;
         tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
+        distchar = 0xFA;
     }
 }
 
