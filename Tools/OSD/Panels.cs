@@ -86,6 +86,7 @@ namespace OSD
         static float osd_climb = 2;
         static float nav_roll = 0;
         static float nav_pitch = 0;
+        static float tdistance = 1.27f;
         static uint16_t nav_bearing = 0; // Current desired heading in degrees
         static uint16_t wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
         static uint16_t wp_dist = 9000; // Distance to active MISSION in meters
@@ -132,6 +133,24 @@ namespace OSD
         static float temperature = 23.5f;
 
         /******* PANELS - DEFINITION *******/
+
+        /* **************************************************************** */
+        // Panel  : ODO
+        // Needs  : X, Y locations
+        // Output : 
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panDistance(int first_col, int first_line)
+            {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+            
+            osd.printf("%c%c%4.2f%c", 0xFE, 0x20, tdistance, 0xFD);
+            
+            osd.closePanel();
+            return 0;
+}
 
         /* **************************************************************** */
         // Panel  : Temperature
@@ -467,14 +486,14 @@ namespace OSD
         // Size   : 2 x 4  (rows x chars)
         // Staus  : done
 
-        public int panCenter(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
-            osd.closePanel();
-            return 0;
-        }
+//        public int panCenter(int first_col, int first_line)
+//        {
+//            osd.setPanel(first_col, first_line);
+//            osd.openPanel();
+//            osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
+//            osd.closePanel();
+//            return 0;
+//        }
 
         /* **************************************************************** */
         // Panel  : panHorizon
@@ -697,22 +716,22 @@ namespace OSD
         // Size   : 1 x 2  (rows x chars)
         // Staus  : done
 
-        public int panMavBeat(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            if (mavbeat == 1)
-            {
-                osd.printf_P(PSTR("\xEA\xEC"));
-                mavbeat = 0;
-            }
-            else
-            {
-                osd.printf_P(PSTR("\xEA\xEB"));
-            }
-            osd.closePanel();
-            return 0;
-        }
+//        public int panMavBeat(int first_col, int first_line)
+//        {
+//            osd.setPanel(first_col, first_line);
+//            osd.openPanel();
+//            if (mavbeat == 1)
+//            {
+//                osd.printf_P(PSTR("\xEA\xEC"));
+//                mavbeat = 0;
+//            }
+//            else
+//            {
+//                osd.printf_P(PSTR("\xEA\xEB"));
+//            }
+//          osd.closePanel();
+//            return 0;
+//        }
 
 
         /* **************************************************************** */

@@ -101,4 +101,13 @@ if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
 if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
 if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
+
+if ((millis() - dt) >= 1000){
+  runtime = millis() - dt;
+  dt = millis();
+  tdistance = tdistance + ((runtime / 1000) * osd_groundspeed);
+  }
+
+
+
 }
