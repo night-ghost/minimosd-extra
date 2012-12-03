@@ -9,9 +9,9 @@ void startPanels(){
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
 void panLogo(){
-    osd.setPanel(5, 5);
+    osd.setPanel(8, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r450"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release r451"));
     osd.closePanel();
 }
 
@@ -123,7 +123,7 @@ void panDistance(int first_col, int first_line){
     osd.openPanel();
     do_converts();
     if ((tdistance * converth) > 1000.0) {
-    osd.printf("%c%3.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
+    osd.printf("%c%4.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
     }else{
     osd.printf("%c%5.0f%c", 0xFE, (tdistance * converth), high);
     }
@@ -141,7 +141,7 @@ void panFdata(){
      osd.clear();
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
-    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFD, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFE, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -242,7 +242,7 @@ void panRSSI(int first_col, int first_line){
     //else if (rssi < rssipersent) rssi = rssipersent;
 
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
-    if (rssi < -99) rssi = -99;
+//    if (rssi < -99) rssi = -99;
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
     osd.closePanel();
 }
