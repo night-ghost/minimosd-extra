@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r447"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-release 2.1.5 r450"));
     osd.closePanel();
 }
 
@@ -21,7 +21,7 @@ void panLogo(){
 void writePanels(){ 
 
   if(millis() < (lastMAVBeat + 2200)){
-   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_airspeed <= 4 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){
+   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && osd_home_distance <= 100 && takeofftime == 1){
 // if ((osd_alt - osd_home_alt) <= 10){
    
       panFdata(); 
@@ -125,7 +125,7 @@ void panDistance(int first_col, int first_line){
     if ((tdistance * converth) > 1000.0) {
     osd.printf("%c%3.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
     }else{
-    osd.printf("%c%3i%c", 0xFE, int(tdistance * converth), high);
+    osd.printf("%c%5.0f%c", 0xFE, (tdistance * converth), high);
     }
     osd.closePanel();
 }
@@ -140,7 +140,8 @@ void panFdata(){
      osd.setPanel(11, 4);
      osd.clear();
     osd.openPanel();                          
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
+//    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFD, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -263,7 +264,8 @@ void panCALLSIGN(int first_col, int first_line){
           }
     osd.printf("%s", char_call); 
     }else{
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+//    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+    osd.printf("%s",strclear);
     }
     osd.closePanel();
 }
@@ -514,7 +516,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0f%c",0x16, (double)(osd_climb), 0x88);
+    osd.printf("%c%3.0f%c",0x16, (osd_climb), 0x88);
     osd.closePanel();
 }
 
@@ -741,11 +743,14 @@ void panHomeDis(int first_col, int first_line){
 void panHorizon(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+  
+     
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.printf_P(PSTR("\xd8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xd9|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
 }
