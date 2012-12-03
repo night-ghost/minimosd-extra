@@ -79,6 +79,7 @@ void writePanels(){
                 if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
                 if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
 //                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
+                if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
             } else { //panel == npanels
                 if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
@@ -121,10 +122,10 @@ void panDistance(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     do_converts();
-    if (tdistance > 1000.0) {
-    osd.printf("%c%3i%c", 0xFE, int(tdistance / 1000.0), 0xFD);
+    if ((tdistance * converth) > 1000.0) {
+    osd.printf("%c%3.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
     }else{
-    osd.printf("%c%3i%c", 0xFE, int(tdistance), 0x8D);
+    osd.printf("%c%3i%c", 0xFE, int(tdistance * converth), high);
     }
     osd.closePanel();
 }
@@ -139,7 +140,7 @@ void panFdata(){
      osd.setPanel(11, 4);
      osd.clear();
     osd.openPanel();                          
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (double)((max_home_distance) * converth), high, 0xFD, (double)((tdistance) * converth), high, 0xE8,(double)(max_osd_airspeed * converts), spe,0xE9,(double)(max_osd_groundspeed * converts),spe,0xE7, (double)(max_osd_home_alt * converth), high,0xFC,(double)(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
     osd.closePanel();
 }
 
@@ -1189,7 +1190,7 @@ void do_converts()
         temps = 0xC8;
         tempconv = temperature;
         distchar = 0xFD;
-        
+        distconv = 1000;
     } else {
         converts = 2.23;
         converth = 3.28;
@@ -1198,6 +1199,7 @@ void do_converts()
         temps = 0xC9;
         tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
         distchar = 0xFA;
+        distconv = 5280;
     }
 }
 

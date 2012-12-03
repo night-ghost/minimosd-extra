@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static long         max_home_distance = 0;
+static float         max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
@@ -49,7 +49,8 @@ static float        converts = 0;
 static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
-static uint8_t      battv = 0;                //Battery warning voltage - units Volt *10 
+static uint8_t      battv = 0; //Battery warning voltage - units Volt *10 
+static uint8_t      distconv = 0;
 //static int        battp = 0;
 
 static uint8_t      spe = 0;
@@ -116,6 +117,8 @@ static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
 static uint16_t     tempconv = 0;
+static uint16_t     distchar = 0;
+
 static float     convertt = 0;
 //Call sign variables
 static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
