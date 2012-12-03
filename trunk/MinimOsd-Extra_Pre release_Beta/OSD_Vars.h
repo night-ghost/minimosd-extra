@@ -52,7 +52,7 @@ static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
 static uint8_t      battv = 0; //Battery warning voltage - units Volt *10 
-static uint8_t      distconv = 0;
+static uint16_t      distconv = 0;
 //static int        battp = 0;
 
 static uint8_t      spe = 0;
