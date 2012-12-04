@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(8, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r453"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r454"));
     osd.closePanel();
 }
 
@@ -21,7 +21,8 @@ void panLogo(){
 void writePanels(){ 
 
   if(millis() < (lastMAVBeat + 2200)){
-   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && osd_home_distance <= 100 && takeofftime == 1){
+   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_airspeed <= 4 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+//   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && osd_home_distance <= 100 && takeofftime == 1){
 // if ((osd_alt - osd_home_alt) <= 10){
    
       panFdata(); 
