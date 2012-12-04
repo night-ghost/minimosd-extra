@@ -9,9 +9,9 @@ void startPanels(){
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
 void panLogo(){
-    osd.setPanel(8, 5);
+    osd.setPanel(7, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r454"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r455"));
     osd.closePanel();
 }
 
