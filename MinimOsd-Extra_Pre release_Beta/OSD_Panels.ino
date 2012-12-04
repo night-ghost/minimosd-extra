@@ -11,7 +11,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(8, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release r451"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release r452"));
     osd.closePanel();
 }
 
@@ -123,7 +123,7 @@ void panDistance(int first_col, int first_line){
     osd.openPanel();
     do_converts();
     if ((tdistance * converth) > 1000.0) {
-    osd.printf("%c%4.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
+    osd.printf("%c%5.2f%c", 0xFE, ((tdistance * converth) / distconv), distchar);
     }else{
     osd.printf("%c%5.0f%c", 0xFE, (tdistance * converth), high);
     }
