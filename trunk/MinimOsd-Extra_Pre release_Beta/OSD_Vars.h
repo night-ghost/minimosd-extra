@@ -9,6 +9,7 @@ static float        max_osd_windspeed = 0;
 static unsigned long runtime = 0;
 static unsigned long dt = 0;
 static float tdistance = 0;
+static float ddistance = 0;
 static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 
@@ -82,7 +83,7 @@ static uint8_t      warning = 0;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
-static unsigned long         descendt = 0;
+//static unsigned long         descendt = 0;
 static float         palt = 0;
 static float        osd_climb = 0;
 //static float        descend = 0;
