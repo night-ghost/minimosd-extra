@@ -861,24 +861,24 @@ namespace OSD
         private void checkedListBox2_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
-            if (((CheckedListBox)sender).SelectedItem != null)
-            {
-                if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
-                {
-                    int index = LIST_items2.Items.IndexOf("Center");
-                    LIST_items2.SetItemChecked(index, false);
-                }
-                else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
-                {
-                    int index = LIST_items2.Items.IndexOf("Horizon");
-                    LIST_items2.SetItemChecked(index, false);
-                }
+            //if (((CheckedListBox)sender).SelectedItem != null)
+            //{
+              //  if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
+                //{
+                  //  int index = LIST_items2.Items.IndexOf("Center");
+                    //LIST_items2.SetItemChecked(index, false);
+                //}
+                //else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
+               // {
+                 //   int index = LIST_items2.Items.IndexOf("Horizon");
+                  //  LIST_items2.SetItemChecked(index, false);
+                //}
             }
 
             // add a delay to this so it runs after the control value has been defined.
-            if (this.IsHandleCreated)
-                this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
-        }
+            //if (this.IsHandleCreated)
+              //  this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
+     //   }
 
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
