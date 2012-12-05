@@ -9,9 +9,9 @@ void startPanels(){
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
 void panLogo(){
-    osd.setPanel(7, 5);
+    osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r455"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r456"));
     osd.closePanel();
 }
 
@@ -21,7 +21,7 @@ void panLogo(){
 void writePanels(){ 
 
   if(millis() < (lastMAVBeat + 2200)){
-   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_airspeed <= 4 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
 //   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && osd_home_distance <= 100 && takeofftime == 1){
 // if ((osd_alt - osd_home_alt) <= 10){
    
@@ -696,12 +696,6 @@ void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_throttle > 5) 
-    {
-    takeofftime = 1;
-    FTime = (millis()/1000);
-    }
-
     start_Time = (millis()/1000) - FTime;
     osd.printf("%c%2i%c%02i", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
     osd.closePanel();
