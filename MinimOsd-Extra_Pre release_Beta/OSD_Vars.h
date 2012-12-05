@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static long         max_home_distance = 0;
+static float         max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
