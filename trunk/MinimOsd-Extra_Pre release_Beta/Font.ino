@@ -12,7 +12,7 @@ void uploadFont()
     osd.clear();
     osd.setPanel(6,9);
     osd.openPanel();
-    osd.printf_P(PSTR("Char Update"));
+    osd.printf_P(PSTR("Character Update"));
     delay(2000);
     osd.closePanel();
 
