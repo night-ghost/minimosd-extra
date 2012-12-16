@@ -1,7 +1,7 @@
 /******* STARTUP PANEL *******/
 
 void startPanels(){
-//    osd.clear();
+    osd.clear();
     //osd_clear = 3;
     panLogo(); // Display our logo  
     do_converts(); // load the unit conversion preferences
@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r457"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r458"));
     osd.closePanel();
 }
 
@@ -607,7 +607,7 @@ void panWarn(int first_col, int first_line){
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
                 case 4:
-                    if (osd_vbat_A < float(battv)/10.0 || 0 < osd_battery_remaining_A < batt_warn_level) warning_type = 4;
+                    if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;
                     break;
                 case 5:
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
