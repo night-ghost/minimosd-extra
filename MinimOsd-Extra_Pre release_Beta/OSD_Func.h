@@ -117,9 +117,4 @@ if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - o
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
 }
 
-  
-  
-
-
-
 }

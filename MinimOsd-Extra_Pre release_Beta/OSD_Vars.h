@@ -28,6 +28,7 @@ static float        eff = 0; //Efficiency
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
 static bool          ma = 0;
+static bool      osd_clear = 0;
 static uint16_t     ch_raw = 0;
 //static uint16_t     chan1_raw = 0;
 //static uint16_t     chan2_raw = 0;
@@ -100,8 +101,8 @@ static float        osd_home_alt = 0;
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 
-static int8_t       osd_pitch = 0;                  // pitch from DCM
-static int8_t       osd_roll = 0;                   // roll from DCM
+static int16_t       osd_pitch = 0;                  // pitch from DCM
+static int16_t       osd_roll = 0;                   // roll from DCM
 //static int8_t       osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
 static float        glide = 0;

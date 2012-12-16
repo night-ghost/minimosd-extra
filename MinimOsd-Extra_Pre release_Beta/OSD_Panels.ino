@@ -1,7 +1,8 @@
 /******* STARTUP PANEL *******/
 
 void startPanels(){
-    osd.clear();
+//    osd.clear();
+    //osd_clear = 3;
     panLogo(); // Display our logo  
     do_converts(); // load the unit conversion preferences
 }
@@ -11,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r456"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r457"));
     osd.closePanel();
 }
 
@@ -21,17 +22,22 @@ void panLogo(){
 void writePanels(){ 
 
   if(millis() < (lastMAVBeat + 2200)){
+if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
    if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
-//   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && osd_home_distance <= 100 && takeofftime == 1){
-// if ((osd_alt - osd_home_alt) <= 10){
-   
+       if (osd_clear == 0){
+         osd.clear(); 
+         osd_clear = 1;          
+       }
       panFdata(); 
-        }else{      
+        }else{ 
+          if (osd_clear == 1){
+         osd.clear(); 
+         osd_clear = 0;          
+       }
       if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
- //       if (osd_set == 0) { // setup panel is called in the else at the end
             if(panel != npanels)
             {
-                if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+                
                 //Testing bits from 8 bit register A 
  //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
@@ -82,7 +88,7 @@ void writePanels(){
 //                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
                 if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
             } else { //panel == npanels
-                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+//                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
             }
  //       } else { // if (osd_on > 0)
@@ -93,7 +99,7 @@ void writePanels(){
     
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
-        osd.clear();
+//        osd.clear();
         waitingMAVBeats = 1;
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
@@ -139,10 +145,9 @@ void panDistance(int first_col, int first_line){
 // Staus  : done
 void panFdata(){
      osd.setPanel(11, 4);
-     osd.clear();
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
-    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFE, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);
+    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFE, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);        
     osd.closePanel();
 }
 
@@ -245,7 +250,8 @@ void panRSSI(int first_col, int first_line){
 
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
 //    if (rssi < -99) rssi = -99;
-    osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
+    osd.printf("%c%3i%c", 0xE1, rssi, 0x25);
+//    osd.printf("%c%3i%c", 0xE1, osd_clear, 0x25); 
     osd.closePanel();
 }
 
@@ -601,7 +607,7 @@ void panWarn(int first_col, int first_line){
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
                 case 4:
-                    if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) warning_type = 4;
+                    if (osd_vbat_A < float(battv)/10.0 || 0 < osd_battery_remaining_A < batt_warn_level) warning_type = 4;
                     break;
                 case 5:
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
@@ -617,9 +623,9 @@ void panWarn(int first_col, int first_line){
             panel = 0; // turn OSD on if there is a warning                  
         }
         char* warning_string;
-        if (motor_armed == 0){
-            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
-        }else{
+//        if (motor_armed == 0){
+//            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
+//        }else{
             switch(warning_type){ 
             case 0:
                 //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
@@ -649,7 +655,7 @@ void panWarn(int first_col, int first_line){
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
                 //            break;
-            }
+//            }
         }
         osd.printf("%s",warning_string);
     }
