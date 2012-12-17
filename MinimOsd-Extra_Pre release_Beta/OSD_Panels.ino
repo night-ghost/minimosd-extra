@@ -1,7 +1,7 @@
 /******* STARTUP PANEL *******/
 
 void startPanels(){
-    osd.clear();
+//    osd.clear();
     //osd_clear = 3;
     panLogo(); // Display our logo  
     do_converts(); // load the unit conversion preferences
@@ -99,7 +99,7 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
     
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
-//        osd.clear();
+        osd.clear();
         waitingMAVBeats = 1;
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
