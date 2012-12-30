@@ -10,9 +10,9 @@ You also need to have the data stream rates configured correctly. To do so, conn
 
 SR0_EXT_STAT,2
 
-SR0_EXTRA1,15
+SR0_EXTRA1,5
 
-SR0_EXTRA2,10
+SR0_EXTRA2,5
 
 SR0_EXTRA3,3
 
@@ -22,7 +22,7 @@ SR0_POSITION,3
 
 SR0_RAW_CTRL,0
 
-SR0_RAW_SENS,25
+SR0_RAW_SENS,5
 
 SR0_RC_CHAN,3
 
@@ -38,7 +38,7 @@ SR3_POSITION,0
 
 SR3_RAW_CTRL,0
 
-SR3_RAW_SENS,25
+SR3_RAW_SENS,5
 
 SR3_RC_CHAN,0
 
