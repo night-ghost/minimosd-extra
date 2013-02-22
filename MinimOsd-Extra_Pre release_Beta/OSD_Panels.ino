@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r462"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r463c"));
     osd.closePanel();
 }
 
@@ -524,7 +524,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0f%c",0x16, (osd_climb), 0x88);
+    osd.printf("%c%3.0f%c",0x16, (osd_climb * converth), climbchar);
     osd.closePanel();
 }
 
@@ -966,8 +966,8 @@ void panWPDis(int first_col, int first_line){
     wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
     if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
     
-      if (xtrack_error > 999) xtrack_error = 999;
-      if (xtrack_error < -999) xtrack_error = -999;
+//      if (xtrack_error > 999) xtrack_error = 999;
+//      if (xtrack_error < -999) xtrack_error = -999;
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
@@ -1198,6 +1198,7 @@ void do_converts()
         tempconv = temperature;
         distchar = 0xFD;
         distconv = 1000;
+        climbchar = 0x88;
     } else {
         converts = 2.23;
         converth = 3.28;
@@ -1207,6 +1208,7 @@ void do_converts()
         tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
         distchar = 0xFA;
         distconv = 5280;
+        climbchar = 0xEB;
     }
 }
 

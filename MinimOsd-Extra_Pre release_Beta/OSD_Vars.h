@@ -6,7 +6,7 @@ static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
 static float        max_osd_windspeed = 0;
-static unsigned long runtime = 0;
+
 static unsigned long dt = 0;
 static float tdistance = 0;
 static float ddistance = 0;
@@ -122,6 +122,8 @@ static uint8_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
 static uint16_t     tempconv = 0;
 static uint16_t     distchar = 0;
+static uint16_t     climbchar = 0;
+
 
 static float     convertt = 0;
 //Call sign variables
