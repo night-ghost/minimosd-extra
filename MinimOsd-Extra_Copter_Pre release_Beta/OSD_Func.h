@@ -104,8 +104,8 @@ if (haltset == 1 && takeofftime == 0 && osd_throttle > 25)
     FTime = (millis()/1000);
     }
   
-  if ((millis() - dt) >= 1000 && osd_groundspeed > 1.0){
-  tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
+  if ((millis() - dt) >= 1000){
+    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
   dt = millis();
 
   }
