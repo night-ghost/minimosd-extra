@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release_C 2.1.5 r467"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release_C 2.1.5 r468"));
     osd.closePanel();
 }
 
@@ -379,7 +379,7 @@ void panWindSpeed(int first_col, int first_line){
 
 void panOff(){
     if (ch_toggle == 4){
-        if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
+        if ((osd_mode != 6) && (osd_mode != 7)){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
                 osd_switch_time = millis();
@@ -1001,7 +1001,6 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     //char c1 = 0xE0 ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
-    if (apm_mav_type == 2){ //ArduCopter MultiRotor or ArduCopter Heli
         if (osd_mode == 0) mode_str = "stab"; //Stabilize
         else if (osd_mode == 1) mode_str = "acro"; //Acrobatic
         else if (osd_mode == 2) mode_str = "alth"; //Alt Hold
@@ -1013,17 +1012,6 @@ void panFlightMode(int first_col, int first_line){
         else if (osd_mode == 8) mode_str = "posi"; //Position
         else if (osd_mode == 9) mode_str = "land"; //Land
         else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
-    } else if(apm_mav_type == 1){ //ArduPlane
-        if (osd_mode == 0) mode_str = "manu"; //Manual
-        else if (osd_mode == 1) mode_str = "circ"; //CIRCLE
-        else if (osd_mode == 2) mode_str = "stab"; //Stabilize
-        else if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
-        else if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
-        else if (osd_mode == 10) mode_str = "auto"; //AUTO
-        else if (osd_mode == 11) mode_str = "retl"; //Return to Launch
-        else if (osd_mode == 12) mode_str = "loit"; //Loiter
-        else if (osd_mode == 15) mode_str = "guid"; //GUIDED
-    }
     osd.printf("%c%s", 0xE0, mode_str);
     osd.closePanel();
 }
