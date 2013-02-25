@@ -97,25 +97,14 @@ void setHomeVars(OSD &osd)
 
 void setFdataVars(){
 
-if (apm_mav_type == 1)
-  {
 if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_throttle > 10)
     {
     takeofftime = 1;
     tdistance = 0;
     FTime = (millis()/1000);
     }
-  }
-else if (apm_mav_type == 2)
-  {
-if  (haltset == 1 && takeofftime == 0 && osd_throttle > 25)
-    {
-    takeofftime = 1;
-    tdistance = 0;
-    FTime = (millis()/1000);
-    }
-  }
-  if ((millis() - dt) >= 1000){
+  
+  if ((millis() - dt) >= 1000 && osd_groundspeed > 1.0){
   tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
   dt = millis();
 
@@ -127,5 +116,5 @@ if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed
 if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
 }
-
 }
+
