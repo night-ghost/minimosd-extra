@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r463c"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r471"));
     osd.closePanel();
 }
 
@@ -162,8 +162,8 @@ void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     do_converts();
-    osd.printf("%c%5.1f%c", 0x1C, (float(tempconv) / 10), temps);
-//    osd.printf("%c%5.1f%c", 0x1C, (float(temperature) / 10), 0xC8);
+    osd.printf("%c%4.2f%c", 0x1C, (float(tempconv) / 100), temps);
+//    osd.printf("%c%4.2f%c", 0x1C, (float(temperature) / 100), 0xC8);
     osd.closePanel();
 }
 
@@ -177,45 +177,24 @@ void panTemp(int first_col, int first_line){
 void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+    //Check thrttle just to prevent inicial false readings
     if (osd_throttle >= 1){
-      if (ma == 0) {
-              ma = 1;
-            }
-        if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
+        //If in loiter should estimated remaining flight time
+        if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
+          start_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (100 - osd_battery_remaining_A);
+          osd.printf("%c%2i%c%02i", 0x17,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+        }
+        //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
+        else{
+          eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
 //        eff = eff * 0.2 + eff * 0.8;
           if (eff > 0 && eff <= 9999) {
             osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
           }else{
           osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
           }
-          
-    }else{
-         
-        if ((osd_throttle < 1)){
-            if (ma == 1) {
-              palt = (osd_alt - osd_home_alt);
-//              descendt = millis();
-              ddistance = tdistance;
-              ma = 0;
-            }
-          }
-            if (osd_climb < -0.05){ 
-//            glide = (((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * ((millis() - descendt) / 1000)) * osd_groundspeed;
-            glide = ((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * (tdistance - ddistance);
-            if (glide > 9999) glide = 9999;
-             if (glide != 'inf' && glide > -0){
-            osd.printf("%c%4.0f%c", 0x18, glide, 0x8D);
-             }
-            }
-            else if (osd_climb > 0.0 && osd_pitch <= 0) {
-              osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));   
-            }else{
-              osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20")); 
-            }
-            
-        
+        }
     }
-
     osd.closePanel();
 }
 
@@ -379,7 +358,7 @@ void panWindSpeed(int first_col, int first_line){
 
 void panOff(){
     if (ch_toggle == 4){
-        if (((apm_mav_type == 1) && ((osd_mode != 11) && (osd_mode != 1))) || ((apm_mav_type == 2) && ((osd_mode != 6) && (osd_mode != 7)))){
+        if ((osd_mode != 6) && (osd_mode != 7)){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
                 osd_switch_time = millis();
@@ -1001,7 +980,6 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     //char c1 = 0xE0 ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
-    if (apm_mav_type == 2){ //ArduCopter MultiRotor or ArduCopter Heli
         if (osd_mode == 0) mode_str = "stab"; //Stabilize
         else if (osd_mode == 1) mode_str = "acro"; //Acrobatic
         else if (osd_mode == 2) mode_str = "alth"; //Alt Hold
@@ -1013,17 +991,6 @@ void panFlightMode(int first_col, int first_line){
         else if (osd_mode == 8) mode_str = "posi"; //Position
         else if (osd_mode == 9) mode_str = "land"; //Land
         else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
-    } else if(apm_mav_type == 1){ //ArduPlane
-        if (osd_mode == 0) mode_str = "manu"; //Manual
-        else if (osd_mode == 1) mode_str = "circ"; //CIRCLE
-        else if (osd_mode == 2) mode_str = "stab"; //Stabilize
-        else if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
-        else if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
-        else if (osd_mode == 10) mode_str = "auto"; //AUTO
-        else if (osd_mode == 11) mode_str = "retl"; //Return to Launch
-        else if (osd_mode == 12) mode_str = "loit"; //Loiter
-        else if (osd_mode == 15) mode_str = "guid"; //GUIDED
-    }
     osd.printf("%c%s", 0xE0, mode_str);
     osd.closePanel();
 }
