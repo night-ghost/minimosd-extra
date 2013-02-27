@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r471"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r479"));
     osd.closePanel();
 }
 
@@ -177,45 +177,24 @@ void panTemp(int first_col, int first_line){
 void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+    //Check thrttle just to prevent inicial false readings
     if (osd_throttle >= 1){
-      if (ma == 0) {
-              ma = 1;
-            }
-        if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
+        //If in loiter should estimated remaining flight time
+        if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
+          start_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (100 - osd_battery_remaining_A);
+          osd.printf("%c%2i%c%02i", 0x17,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+        }
+        //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
+        else{
+          eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
 //        eff = eff * 0.2 + eff * 0.8;
           if (eff > 0 && eff <= 9999) {
             osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
           }else{
           osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
           }
-          
-    }else{
-         
-        if ((osd_throttle < 1)){
-            if (ma == 1) {
-              palt = (osd_alt - osd_home_alt);
-//              descendt = millis();
-              ddistance = tdistance;
-              ma = 0;
-            }
-          }
-            if (osd_climb < -0.05){ 
-//            glide = (((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * ((millis() - descendt) / 1000)) * osd_groundspeed;
-            glide = ((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * (tdistance - ddistance);
-            if (glide > 9999) glide = 9999;
-             if (glide != 'inf' && glide > -0){
-            osd.printf("%c%4.0f%c", 0x18, glide, 0x8D);
-             }
-            }
-            else if (osd_climb > 0.0 && osd_pitch <= 0) {
-              osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));   
-            }else{
-              osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20")); 
-            }
-            
-        
+        }
     }
-
     osd.closePanel();
 }
 
@@ -755,6 +734,8 @@ void panHorizon(int first_col, int first_line){
 
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
+    //Show ground level on  HUD
+    showHudVerticalLandingAid(first_col + 6, first_line);
 }
 
 /* **************************************************************** */
@@ -1020,82 +1001,16 @@ void panFlightMode(int first_col, int first_line){
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
 void showArrow(uint8_t rotate_arrow,uint8_t method) {  
-    char arrow_set1 = 0x0;
-    char arrow_set2 = 0x0;   
-    switch(rotate_arrow) {
-    case 0: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 1: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 2: 
-        arrow_set1 = 0x92;
-        arrow_set2 = 0x93;
-        break;
-    case 3: 
-        arrow_set1 = 0x94;
-        arrow_set2 = 0x95;
-        break;
-    case 4: 
-        arrow_set1 = 0x96;
-        arrow_set2 = 0x97;
-        break;
-    case 5: 
-        arrow_set1 = 0x98;
-        arrow_set2 = 0x99;
-        break;
-    case 6: 
-        arrow_set1 = 0x9A;
-        arrow_set2 = 0x9B;
-        break;
-    case 7: 
-        arrow_set1 = 0x9C;
-        arrow_set2 = 0x9D;
-        break;
-    case 8: 
-        arrow_set1 = 0x9E;
-        arrow_set2 = 0x9F;
-        break;
-    case 9: 
-        arrow_set1 = 0xA0;
-        arrow_set2 = 0xA1;
-        break;
-    case 10: 
-        arrow_set1 = 0xA2;
-        arrow_set2 = 0xA3;
-        break;
-    case 11: 
-        arrow_set1 = 0xA4;
-        arrow_set2 = 0xA5;
-        break;
-    case 12: 
-        arrow_set1 = 0xA6;
-        arrow_set2 = 0xA7;
-        break;
-    case 13: 
-        arrow_set1 = 0xA8;
-        arrow_set2 = 0xA9;
-        break;
-    case 14: 
-        arrow_set1 = 0xAA;
-        arrow_set2 = 0xAB;
-        break;
-    case 15: 
-        arrow_set1 = 0xAC;
-        arrow_set2 = 0xAd;
-        break;
-    case 16: 
-        arrow_set1 = 0xAE;
-        arrow_set2 = 0xAF;
-        break;
-    } 
-//    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
+    int arrow_set1 = 0x90;
+    //We trust that we receive rotate_arrow [1, 16] so 
+    //it's no needed (rotate_arrow <= 16) in the if clause
+    if(rotate_arrow > 1){
+      arrow_set1 += rotate_arrow * 2 - 2;
+    }
+//    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(osd_windspeedz * converts),spe);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(max_osd_windspeed * converts),spe);
   
-    else osd.printf("%c%c", arrow_set1, arrow_set2);
+    else osd.printf("%c%c", (byte)arrow_set1, (byte)(arrow_set1 + 1));
 }
 
 // Calculate and shows Artificial Horizon
@@ -1125,54 +1040,51 @@ void showHorizon(int start_col, int start_row) {
             subval = hit - minval;
             subval = round((subval*9)/18);
             if(subval == 0) subval = 1;
-            printHit(start_col + col, start_row + row - 1, subval);
+            subval += 5; //horizon starts at 0X06 memmory position
+            osd.openSingle(start_col + col, start_row + row - 1);
+            osd.printf("%c", ((byte)subval));
         }
     }
 }
 
-void printHit(byte col, byte row, byte subval){
-    osd.openSingle(col, row);
-    char subval_char;
-        switch (subval){
-        case 1:
-            //osd.printf_P(PSTR("\x06"));
-            subval_char = 0x06;
-            break;
-        case 2:
-            //osd.printf_P(PSTR("\x07"));
-            subval_char = 0x07; 
-            break;
-        case 3:
-            //osd.printf_P(PSTR("\x08"));
-            subval_char = 0x08;
-            break;
-        case 4:
-            //osd.printf_P(PSTR("\x09"));
-            subval_char = 0x09;
-            break;
-        case 5:
-            //osd.printf_P(PSTR("\x0a"));
-            subval_char = 0x0a; 
-            break;
-        case 6:
-            //osd.printf_P(PSTR("\x0b"));
-            subval_char = 0x0b;
-            break;
-        case 7:
-            //osd.printf_P(PSTR("\x0c"));
-            subval_char = 0x0c;
-            break;
-        case 8:
-            //osd.printf_P(PSTR("\x0d"));
-            subval_char = 0x0d;
-            break;
-        case 9:
-            //osd.printf_P(PSTR("\x0e"));
-            subval_char = 0x0e;
-            break;
-        }
-        osd.printf("%c", subval_char);
+// Calculate and shows verical speed aid
+void showHudVerticalLandingAid(int start_col, int start_row) { 
+    //Show line on panel center because horizon line can be
+    //high or low depending on pitch attitude
+    int subval_char = 0x0E;
 
+    //shift alt interval from [-5, 5] to [0, 10] interval, so we
+    //can work with remainders.
+    //We are using a 0.2 altitude units as resolution (1 decimal place)
+    //so convert we convert it to times 10 to work 
+    //only with integers and save some bytes
+    int alt = ((osd_alt - osd_home_alt) * converth + 5) * 10;
+    
+    if((alt < 100) && (alt > 0)){
+        //We have 10 possible chars
+        //(alt * 5) -> 5 represents 1/5 which is our resolution. Every single
+        //line (char) change represents 0,2 altitude units
+        //% 10 -> Represents our 10 possible characters
+        //9 - -> Inverts our selected char because when we gain altitude
+        //the selected char has a lower position in memory
+        //+ 5 -> Is the memory displacement od the first altitude charecter 
+        //in memory (it starts at 0x05
+        subval_char = (99 - ((alt * 5) % 100)) / 10 + 5;
+        //Each row represents 2 altitude units
+        start_row += (alt / 20);
+    }
+    else if(alt >= 100){
+        //Copter is too high. Ground is way too low to show on panel, 
+        //so show down arrow at the bottom
+        subval_char = 0x05; 
+        start_row += 4;
+    }
+
+    //Enough calculations. Let's show the result
+    osd.openSingle(start_col, start_row);
+    osd.printf("%c", subval_char);
+    osd.openSingle(start_col + 1, start_row);
+    osd.printf("%c", subval_char);
 }
 
 void do_converts()
@@ -1199,5 +1111,3 @@ void do_converts()
         climbchar = 0xEB;
     }
 }
-
-
