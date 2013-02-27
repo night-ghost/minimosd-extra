@@ -999,82 +999,16 @@ void panFlightMode(int first_col, int first_line){
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
 void showArrow(uint8_t rotate_arrow,uint8_t method) {  
-    char arrow_set1 = 0x0;
-    char arrow_set2 = 0x0;   
-    switch(rotate_arrow) {
-    case 0: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 1: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 2: 
-        arrow_set1 = 0x92;
-        arrow_set2 = 0x93;
-        break;
-    case 3: 
-        arrow_set1 = 0x94;
-        arrow_set2 = 0x95;
-        break;
-    case 4: 
-        arrow_set1 = 0x96;
-        arrow_set2 = 0x97;
-        break;
-    case 5: 
-        arrow_set1 = 0x98;
-        arrow_set2 = 0x99;
-        break;
-    case 6: 
-        arrow_set1 = 0x9A;
-        arrow_set2 = 0x9B;
-        break;
-    case 7: 
-        arrow_set1 = 0x9C;
-        arrow_set2 = 0x9D;
-        break;
-    case 8: 
-        arrow_set1 = 0x9E;
-        arrow_set2 = 0x9F;
-        break;
-    case 9: 
-        arrow_set1 = 0xA0;
-        arrow_set2 = 0xA1;
-        break;
-    case 10: 
-        arrow_set1 = 0xA2;
-        arrow_set2 = 0xA3;
-        break;
-    case 11: 
-        arrow_set1 = 0xA4;
-        arrow_set2 = 0xA5;
-        break;
-    case 12: 
-        arrow_set1 = 0xA6;
-        arrow_set2 = 0xA7;
-        break;
-    case 13: 
-        arrow_set1 = 0xA8;
-        arrow_set2 = 0xA9;
-        break;
-    case 14: 
-        arrow_set1 = 0xAA;
-        arrow_set2 = 0xAB;
-        break;
-    case 15: 
-        arrow_set1 = 0xAC;
-        arrow_set2 = 0xAd;
-        break;
-    case 16: 
-        arrow_set1 = 0xAE;
-        arrow_set2 = 0xAF;
-        break;
-    } 
-//    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
+    int arrow_set1 = 0x90;
+    //We trust that we receive rotate_arrow [1, 16] so 
+    //it's no needed (rotate_arrow <= 16) in the if clause
+    if(rotate_arrow > 1){
+      arrow_set1 += rotate_arrow * 2 - 2;
+    }
+//    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(osd_windspeedz * converts),spe);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0xFC,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(max_osd_windspeed * converts),spe);
   
-    else osd.printf("%c%c", arrow_set1, arrow_set2);
+    else osd.printf("%c%c", (byte)arrow_set1, (byte)(arrow_set1 + 1));
 }
 
 // Calculate and shows Artificial Horizon
