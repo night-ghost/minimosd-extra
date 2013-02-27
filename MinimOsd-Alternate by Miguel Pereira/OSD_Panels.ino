@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r471"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r478"));
     osd.closePanel();
 }
 
@@ -1051,20 +1051,16 @@ void showHorizon(int start_col, int start_row) {
 void showHudVerticalLandingAid(int start_col, int start_row) { 
     //Show line on panel center because horizon line can be
     //high or low depending on pitch attitude
-    int subval_char = 0x09;
-
-    osd.openSingle(start_col, start_row + 2);
-    osd.printf("%c", (byte)subval_char);
-    osd.openSingle(start_col+1, start_row + 2);
-    osd.printf("%c", (byte)subval_char);
+    int subval_char = 0x0E;
 
     //shift alt interval from [-5, 5] to [0, 10] interval, so we
     //can work with remainders.
     //We are using a 0.2 altitude units as resolution (1 decimal place)
-    //so convert
+    //so convert we convert it to times 10 to work 
+    //only with integers and save some bytes
     int alt = ((osd_alt - osd_home_alt) * converth + 5) * 10;
-
-    if((alt < 10) && (alt > 0)){
+    
+    if((alt < 100) && (alt > 0)){
         //We have 10 possible chars
         //(alt * 5) -> 5 represents 1/5 which is our resolution. Every single
         //line (char) change represents 0,2 altitude units
@@ -1073,26 +1069,22 @@ void showHudVerticalLandingAid(int start_col, int start_row) {
         //the selected char has a lower position in memory
         //+ 5 -> Is the memory displacement od the first altitude charecter 
         //in memory (it starts at 0x05
-        subval_char = (9 - ((alt * 5) % 10) + 5);
+        subval_char = (99 - ((alt * 5) % 100)) / 10 + 5;
         //Each row represents 2 altitude units
-        start_row += (alt / 2);
-        //Enough calculations. Let's show the result
-        osd.openSingle(start_col, start_row);
-        osd.printf("%c", subval_char);
-        osd.openSingle(start_col + 1, start_row);
-        osd.printf("%c", subval_char);
+        start_row += (alt / 20);
     }
-    else if(alt >= 10){
+    else if(alt >= 100){
         //Copter is too high. Ground is way too low to show on panel, 
         //so show down arrow at the bottom
-        subval_char = 0xCF; 
+        subval_char = 0x05; 
         start_row += 4;
     }
-    else{
-        //Copter is too low. Ground is way too high to show on panel, 
-        //so show up arrow at the top
-        subval_char = 0xBF; 
-    }
+
+    //Enough calculations. Let's show the result
+    osd.openSingle(start_col, start_row);
+    osd.printf("%c", subval_char);
+    osd.openSingle(start_col + 1, start_row);
+    osd.printf("%c", subval_char);
 }
 
 void do_converts()
@@ -1119,5 +1111,3 @@ void do_converts()
         climbchar = 0xEB;
     }
 }
-
-
