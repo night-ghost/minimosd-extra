@@ -734,6 +734,8 @@ void panHorizon(int first_col, int first_line){
 
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
+    //Show ground level on  HUD
+    showHudVerticalLandingAid(first_col + 6, first_line);
 }
 
 /* **************************************************************** */
@@ -1042,6 +1044,54 @@ void showHorizon(int start_col, int start_row) {
             osd.openSingle(start_col + col, start_row + row - 1);
             osd.printf("%c", ((byte)subval));
         }
+    }
+}
+
+// Calculate and shows verical speed aid
+void showHudVerticalLandingAid(int start_col, int start_row) { 
+    //Show line on panel center because horizon line can be
+    //high or low depending on pitch attitude
+    int subval_char = 0x09;
+
+    osd.openSingle(start_col, start_row + 2);
+    osd.printf("%c", (byte)subval_char);
+    osd.openSingle(start_col+1, start_row + 2);
+    osd.printf("%c", (byte)subval_char);
+
+    //shift alt interval from [-5, 5] to [0, 10] interval, so we
+    //can work with remainders.
+    //We are using a 0.2 altitude units as resolution (1 decimal place)
+    //so convert
+    int alt = ((osd_alt - osd_home_alt) * converth + 5) * 10;
+
+    if((alt < 10) && (alt > 0)){
+        //We have 10 possible chars
+        //(alt * 5) -> 5 represents 1/5 which is our resolution. Every single
+        //line (char) change represents 0,2 altitude units
+        //% 10 -> Represents our 10 possible characters
+        //9 - -> Inverts our selected char because when we gain altitude
+        //the selected char has a lower position in memory
+        //+ 5 -> Is the memory displacement od the first altitude charecter 
+        //in memory (it starts at 0x05
+        subval_char = (9 - ((alt * 5) % 10) + 5);
+        //Each row represents 2 altitude units
+        start_row += (alt / 2);
+        //Enough calculations. Let's show the result
+        osd.openSingle(start_col, start_row);
+        osd.printf("%c", subval_char);
+        osd.openSingle(start_col + 1, start_row);
+        osd.printf("%c", subval_char);
+    }
+    else if(alt >= 10){
+        //Copter is too high. Ground is way too low to show on panel, 
+        //so show down arrow at the bottom
+        subval_char = 0xCF; 
+        start_row += 4;
+    }
+    else{
+        //Copter is too low. Ground is way too high to show on panel, 
+        //so show up arrow at the top
+        subval_char = 0xBF; 
     }
 }
 
