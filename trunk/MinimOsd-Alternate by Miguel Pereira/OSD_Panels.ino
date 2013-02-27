@@ -1038,54 +1038,11 @@ void showHorizon(int start_col, int start_row) {
             subval = hit - minval;
             subval = round((subval*9)/18);
             if(subval == 0) subval = 1;
-            printHit(start_col + col, start_row + row - 1, subval);
+            subval += 5; //horizon starts at 0X06 memmory position
+            osd.openSingle(start_col + col, start_row + row - 1);
+            osd.printf("%c", ((byte)subval));
         }
     }
-}
-
-void printHit(byte col, byte row, byte subval){
-    osd.openSingle(col, row);
-    char subval_char;
-        switch (subval){
-        case 1:
-            //osd.printf_P(PSTR("\x06"));
-            subval_char = 0x06;
-            break;
-        case 2:
-            //osd.printf_P(PSTR("\x07"));
-            subval_char = 0x07; 
-            break;
-        case 3:
-            //osd.printf_P(PSTR("\x08"));
-            subval_char = 0x08;
-            break;
-        case 4:
-            //osd.printf_P(PSTR("\x09"));
-            subval_char = 0x09;
-            break;
-        case 5:
-            //osd.printf_P(PSTR("\x0a"));
-            subval_char = 0x0a; 
-            break;
-        case 6:
-            //osd.printf_P(PSTR("\x0b"));
-            subval_char = 0x0b;
-            break;
-        case 7:
-            //osd.printf_P(PSTR("\x0c"));
-            subval_char = 0x0c;
-            break;
-        case 8:
-            //osd.printf_P(PSTR("\x0d"));
-            subval_char = 0x0d;
-            break;
-        case 9:
-            //osd.printf_P(PSTR("\x0e"));
-            subval_char = 0x0e;
-            break;
-        }
-        osd.printf("%c", subval_char);
-
 }
 
 void do_converts()
