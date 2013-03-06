@@ -48,13 +48,25 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
+  //If got 3D fix -> Set home
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
-    //osd_home_alt = osd_alt;
     osd_got_home = 1;
   }
-  else if(osd_got_home == 1){
+  //If has 3D fix and armed -> Reset home
+  else if(osd_got_home == 1 && motor_armed == 1){
+    osd_home_lat = osd_lat;
+    osd_home_lon = osd_lon;
+    osd_got_home = 2;
+  }
+  //If home already armed and motors disarmed
+  //restart set home sequence
+  else if(osd_got_home == 2 && motor_armed == 0){
+      osd_got_home = 0;
+      osd_alt_cnt = 0;
+  }
+  if(osd_got_home > 0){
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
     if(osd_alt_cnt < 25){
       if(fabs(osd_alt_prev - osd_alt) > 0.5){
