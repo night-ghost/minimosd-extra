@@ -651,7 +651,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%11.6f|%c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
+            osd.printf("%c%10.6f%c%c%10.6f", 0x83, (double)osd_lat, 0x20, 0x84, (double)osd_lon);
             osd.closePanel();
             return 0;
         }
@@ -685,7 +685,8 @@ namespace OSD
             osd.openPanel();
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-            osd.printf("%s|%c%s%c", "\x20\xc0\xc0\xc0\xc0\xc0\xc7\xc0\xc0\xc0\xc0\xc0\x20", 0xd0, Encoding.Default.GetString(buf_show), 0xd1);
+            osd.printf_P(PSTR("\xd0\xc0\xc1\xc0\xc2\xc0\xc1\xc0\xd1"));
+           
             osd.closePanel();
             return 0;
         }
