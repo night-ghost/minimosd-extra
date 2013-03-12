@@ -27,6 +27,7 @@ static float        eff = 0; //Efficiency
 
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
+static bool         last_armed = 0;
 static bool          ma = 0;
 static bool      osd_clear = 0;
 static uint16_t     ch_raw = 0;
@@ -133,7 +134,7 @@ static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 static boolean      mavbeat = 0;
 static float        lastMAVBeat = 0;
 static boolean      waitingMAVBeats = 1;
-static uint8_t      apm_mav_type;
+ //static uint8_t      apm_mav_type;
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
