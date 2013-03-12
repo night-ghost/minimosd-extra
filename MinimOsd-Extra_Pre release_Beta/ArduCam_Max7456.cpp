@@ -52,31 +52,31 @@ void OSD::init()
 
 void OSD::detectMode()
 {
-//    digitalWrite(MAX7456_SELECT,LOW);
+  //***If "Pal jumper" is set ON (closed): it will try to discover the mode
+  if (digitalRead(3) == 1){
+    digitalWrite(MAX7456_SELECT,LOW);
     //read STAT and auto detect Mode PAL/NTSC
-//    Spi.transfer(MAX7456_STAT_reg_read);//status register
-//    byte osdstat_r = Spi.transfer(0xff);
+    Spi.transfer(MAX7456_STAT_reg_read);//status register
+    byte osdstat_r = Spi.transfer(0xff);
 
-//    if ((B00000001 & osdstat_r) == 1){
-//        setMode(1);  
-//    }
-//    else if((B00000010 & osdstat_r) == 1){
-      //setMode(1);
-//    }
-//#ifdef MinimOSD
-//    else if (digitalRead(3) == 1){
-//        setMode(1);
-//    }
-//#endif
-
-    if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
-        setMode(0);
-        digitalWrite(MAX7456_SELECT,LOW);
-    } 
-    else { //PAL
-        setMode(1);
-        digitalWrite(MAX7456_SELECT,LOW);
+    if ((B00000001 & osdstat_r) == 1){
+        setMode(1);  
     }
+    else if((B00000010 & osdstat_r) == 1){
+      setMode(1);
+    }
+  }
+  //***If "Pal jumper" is set OFF (open): So, all remains dicted by the OSD tool configuration
+  else{
+      if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
+          setMode(0);
+          digitalWrite(MAX7456_SELECT,LOW);
+      } 
+      else { //PAL
+          setMode(1);
+          digitalWrite(MAX7456_SELECT,LOW);
+      }
+  }
 }
 
 //------------------ Set Brightness  ---------------------------------
