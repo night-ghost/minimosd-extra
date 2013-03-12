@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r478"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r479"));
     osd.closePanel();
 }
 
@@ -575,22 +575,20 @@ void panWarn(int first_col, int first_line){
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
-                switch(x) {
-                case 1:
+                if(x == 1){
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
-                    break;
-                case 2:
+                }
+                else if(x == 2){
                     if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
-                    break;
-                case 3:
+                }
+                else if(x == 3){
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
-                    break;
-                case 4:
+                }
+                else if(x == 4){
                     if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;
-                    break;
-                case 5:
+                }
+                else if(x == 5){
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
-                    break;    
                 }
                 if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
@@ -602,39 +600,37 @@ void panWarn(int first_col, int first_line){
             panel = 0; // turn OSD on if there is a warning                  
         }
         char* warning_string;
-//        if (motor_armed == 0){
-//            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
-//        }else{
-            switch(warning_type){ 
-            case 0:
-                //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+        //Show arm / disarm switch 
+        if (motor_armed ^ last_armed){
+            if(motor_armed){
+                warning_string = "\x20\x20\x41\x52\x4d\x45\x44\x20\x20";      
+            }
+            else{
+                warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
+            }
+            last_armed = motor_armed;
+        }else{
+            if(warning_type == 0){ 
                 warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-                break;   
-            case 1:  
-                //osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
+            }
+            else if(warning_type == 1){ 
                 warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
-                break;
-            case 2:
-                //osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
+            }
+            else if(warning_type == 2){ 
                 warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
-                break;
-            case 3:
-                //osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
+            }
+            else if(warning_type == 3){ 
                 warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
-                break;
-            case 4:
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+            }
+            else if(warning_type == 4){ 
                 warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
-                break;
-            case 5:
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+            }
+            else if(warning_type == 5){ 
                 warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-                break;
-                //        case 6:
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+            }
+            //else if(warning_type == 6){ 
                 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-                //            break;
-//            }
+            //}
         }
         osd.printf("%s",warning_string);
     }
