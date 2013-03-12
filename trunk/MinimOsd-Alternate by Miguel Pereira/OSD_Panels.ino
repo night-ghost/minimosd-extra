@@ -1009,34 +1009,26 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     else osd.printf("%c%c", (byte)arrow_set1, (byte)(arrow_set1 + 1));
 }
 
+#define HORIZON_ROWS 5
+#define HORIZON_COLUMNS 12
 // Calculate and shows Artificial Horizon
 void showHorizon(int start_col, int start_row) { 
 
-    int x, nose, row, minval, hit, subval = 0;
-    const int cols = 12;
-    const int rows = 5;
-    int col_hit[cols];
+    int x, nose, row, hit, subval = 0;
     float  pitch, roll;
 
-    (abs(osd_pitch) == 90)?pitch = 89.99 * (90/osd_pitch) * -0.017453293:pitch = osd_pitch * -0.017453293;
-    (abs(osd_roll) == 90)?roll = 89.99 * (90/osd_roll) * 0.017453293:roll = osd_roll * 0.017453293;
+    pitch = osd_pitch * -0.017453293; //Convert pitch to radians
+    roll = osd_roll * 0.017453293; //Convert roll to radians
 
-    nose = round(tan(pitch) * (rows*9));
-    for(int col=1;col <= cols;col++){
-        x = (col * 12) - (cols * 6) - 6;//center X point at middle of each col
-        col_hit[col-1] = (tan(roll) * x) + nose + (rows*9) - 1;//calculating hit point on Y plus offset to eliminate negative values
-        //col_hit[(col-1)] = nose + (rows * 9);
-    }
-
-    for(int col=0;col < cols; col++){
-        hit = col_hit[col];
-        if(hit > 0 && hit < (rows * 18)){
-            row = rows - ((hit-1)/18);
-            minval = rows*18 - row*18 + 1;
-            subval = hit - minval;
-            subval = round((subval*9)/18);
-            if(subval == 0) subval = 1;
-            subval += 5; //horizon starts at 0X06 memmory position
+    //Get nose pixel position
+    nose = round(tan(pitch) * (HORIZON_ROWS*9));
+    for(int col=0;col < HORIZON_COLUMNS; col++){
+        x = (col * 12) - (HORIZON_COLUMNS * 6) - 6;//center X point at middle of each col
+        hit = (tan(roll) * x) + nose + (HORIZON_ROWS*9) - 1;//calculating hit point on Y plus offset to eliminate negative values
+        //hit = (tan(roll) * x) + nose - 1;//[-inf, +inf[
+        if(hit > 0 && hit < (HORIZON_ROWS * 18)){
+            row = HORIZON_ROWS - ((hit-1)/18);
+            subval = hit % 18 + 6;//Horizon chars start at 0x06
             osd.openSingle(start_col + col, start_row + row - 1);
             osd.printf("%c", ((byte)subval));
         }
