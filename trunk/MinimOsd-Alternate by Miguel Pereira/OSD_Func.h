@@ -48,25 +48,20 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
-  //If got 3D fix -> Set home
+  //Check arm/disarm switching.
+  if (motor_armed ^ last_armed){
+    armed_switch = 1;
+    //If motors armed, reset home in Arducopter version
+    osd_got_home = !motor_armed;
+    last_armed = motor_armed;
+  }
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
+    //osd_home_alt = osd_alt;
     osd_got_home = 1;
   }
-  //If has 3D fix and armed -> Reset home
-  else if(osd_got_home == 1 && motor_armed == 1){
-    osd_home_lat = osd_lat;
-    osd_home_lon = osd_lon;
-    osd_got_home = 2;
-  }
-  //If home already armed and motors disarmed
-  //restart set home sequence
-  else if(osd_got_home == 2 && motor_armed == 0){
-      osd_got_home = 0;
-      osd_alt_cnt = 0;
-  }
-  if(osd_got_home > 0){
+  else if(osd_got_home == 1){
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
     if(osd_alt_cnt < 25){
       if(fabs(osd_alt_prev - osd_alt) > 0.5){
@@ -109,28 +104,20 @@ void setHomeVars(OSD &osd)
 
 void setFdataVars(){
 
-if (apm_mav_type == 1)
-  {
-if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_throttle > 10)
+if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
     {
     takeofftime = 1;
     tdistance = 0;
     FTime = (millis()/1000);
+    start_battery_reading = osd_battery_remaining_A;
+    last_battery_reading = osd_battery_remaining_A;
     }
-  }
-else if (apm_mav_type == 2)
-  {
-if  (haltset == 1 && takeofftime == 0 && osd_throttle > 25)
-    {
-    takeofftime = 1;
-    tdistance = 0;
-    FTime = (millis()/1000);
-    }
-  }
+    
   if ((millis() - dt) >= 1000){
-  tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
-  dt = millis();
-
+    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
+    //Current consumed integrator
+    osd_curr_consumed += (float)(millis() - dt) / 360000 * osd_curr_A;
+    dt = millis();
   }
 if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
@@ -139,5 +126,5 @@ if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed
 if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
 }
-
 }
+
