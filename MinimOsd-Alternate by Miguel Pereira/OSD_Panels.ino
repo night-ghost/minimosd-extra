@@ -78,7 +78,8 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
 
                 //Testing bits from 8 bit register D 
                 //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
-                if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
+                //For now we don't have windspeed in copter
+                //if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
 //                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
@@ -163,7 +164,6 @@ void panTemp(int first_col, int first_line){
     osd.openPanel();
     do_converts();
     osd.printf("%c%4.2f%c", 0x1C, (float(tempconv) / 100), temps);
-//    osd.printf("%c%4.2f%c", 0x1C, (float(temperature) / 100), 0xC8);
     osd.closePanel();
 }
 
@@ -177,23 +177,26 @@ void panTemp(int first_col, int first_line){
 void panEff(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //Check thrttle just to prevent inicial false readings
-    if (osd_throttle >= 1){
-        //If in loiter should estimated remaining flight time
-        if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
-          start_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (100 - osd_battery_remaining_A);
-          osd.printf("%c%2i%c%02i", 0x17,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
-        }
-        //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
-        else{
-          eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
-//        eff = eff * 0.2 + eff * 0.8;
-          if (eff > 0 && eff <= 9999) {
-            osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
-          }else{
-          osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
+    //Check takeoff just to prevent inicial false readings
+    if (takeofftime){
+        ////If in loiter should estimated remaining flight time
+        //if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
+          if(osd_battery_remaining_A != last_battery_reading){
+            start_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (start_battery_reading - osd_battery_remaining_A);
+            last_battery_reading = osd_battery_remaining_A;
           }
-        }
+          osd.printf("%c%2i%c%02i", 0x17,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+        //}
+        //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
+//        else{
+//          eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
+//        eff = eff * 0.2 + eff * 0.8;
+//          if (eff > 0 && eff <= 9999) {
+//            osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
+//          }else{
+//          osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
+//          }
+        //}
     }
     osd.closePanel();
 }
@@ -601,9 +604,9 @@ void panWarn(int first_col, int first_line){
         }
         char* warning_string;
         //Show arm / disarm switch 
-        if (motor_armed ^ last_armed){
+        if (armed_switch){
             if(motor_armed){
-                warning_string = "\x20\x20\x41\x52\x4d\x45\x44\x20\x20";      
+                warning_string = "\x20\x20\x20\x20\x41\x52\x4d\x45\x44\x20\x20\x20";      
             }
             else{
                 warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
@@ -662,7 +665,9 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
+//    osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
+    //TODO: Uncomment line above. Line under only to check integrated mAh reliability
+    osd.printf("%c%5.0f%c|%c%5.0i%c", 0x70, (1 - (float)osd_battery_remaining_A / 100) * batt_capacity * 100, 0x82, 0x69, osd_curr_consumed, 0x82);
     osd.closePanel();
 }
 
@@ -1009,26 +1014,28 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     else osd.printf("%c%c", (byte)arrow_set1, (byte)(arrow_set1 + 1));
 }
 
-#define HORIZON_ROWS 5
-#define HORIZON_COLUMNS 12
 // Calculate and shows Artificial Horizon
 void showHorizon(int start_col, int start_row) { 
-
-    int x, nose, row, hit, subval = 0;
+    int x, nose, row, minval, hit, subval = 0;
+    const int cols = 12;
+    const int rows = 5;
     float  pitch, roll;
 
-    pitch = osd_pitch * -0.017453293; //Convert pitch to radians
-    roll = osd_roll * 0.017453293; //Convert roll to radians
+    pitch = osd_pitch * -0.017453293;
+    roll = osd_roll * 0.017453293;
 
-    //Get nose pixel position
-    nose = round(tan(pitch) * (HORIZON_ROWS*9));
-    for(int col=0;col < HORIZON_COLUMNS; col++){
-        x = (col * 12) - (HORIZON_COLUMNS * 6) - 6;//center X point at middle of each col
-        hit = (tan(roll) * x) + nose + (HORIZON_ROWS*9) - 1;//calculating hit point on Y plus offset to eliminate negative values
-        //hit = (tan(roll) * x) + nose - 1;//[-inf, +inf[
-        if(hit > 0 && hit < (HORIZON_ROWS * 18)){
-            row = HORIZON_ROWS - ((hit-1)/18);
-            subval = hit % 18 + 6;//Horizon chars start at 0x06
+    //Calculate nose angle at center
+    nose = round(tan(pitch) * (rows*9));
+    for(int col=0;col < cols; col++){
+        x = (col * 12) - (cols * 6) + 6;//center X point at middle of each col
+        hit = (tan(roll) * x) + nose + (rows*9) - 1;//calculating hit point on Y plus offset to eliminate negative values
+        if(hit > 0 && hit < (rows * 18)){
+            row = rows - ((hit-1)/18);
+            minval = rows*18 - row*18 + 1;
+            subval = hit - minval;
+            subval = round((subval*9)/18);
+            if(subval == 0) subval = 1;
+            subval += 5; //horizon starts at 0X06 memmory position
             osd.openSingle(start_col + col, start_row + row - 1);
             osd.printf("%c", ((byte)subval));
         }

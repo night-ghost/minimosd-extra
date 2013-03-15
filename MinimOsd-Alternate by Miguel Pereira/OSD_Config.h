@@ -190,6 +190,7 @@
 #define stall_ADDR 894
 #define battv_ADDR 896
 //#define battp_ADDR 898
+#define OSD_BATT_CAP_ADDR 898
 #define OSD_RSSI_HIGH_ADDR 900
 #define OSD_RSSI_LOW_ADDR 902
 #define RADIO_ON_ADDR 904
