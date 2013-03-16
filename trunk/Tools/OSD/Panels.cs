@@ -651,7 +651,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%10.6f%c%c%10.6f", 0x83, (double)osd_lat, 0x20, 0x84, (double)osd_lon);
+            osd.printf("%c%10.6f%c|%c%10.6f", 0x83, (double)osd_lat, 0x20, 0x84, (double)osd_lon);
             osd.closePanel();
             return 0;
         }
