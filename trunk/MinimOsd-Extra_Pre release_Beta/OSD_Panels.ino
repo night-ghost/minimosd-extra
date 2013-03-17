@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.2"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.2 Test 2"));
     osd.closePanel();
 }
 
@@ -61,8 +61,9 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
  //               if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
-                if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
-
+                if(wp_number > 0){
+                  if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+                }
                 //Testing bits from 8 bit register C 
                 //if(osd_got_home == 1){
                 if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
