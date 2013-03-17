@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra Copter|Pre-Release 2.1.5 r490"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra Copter|Pre-Release 2.1.5 r491"));
     osd.closePanel();
 }
 
@@ -570,12 +570,23 @@ void panWarn(int first_col, int first_line){
             last_warning = warning_type; // save the warning type for cycling
             warning_type = 0; // blank the text
             warning = 1;
-            warning_timer = millis();            
+//            warning_timer = millis();            
         } else {
-            if ((millis() - 10000) > warning_timer ) warning = 0;
+//            if ((millis() - 10000) > warning_timer ) warning = 0;
 
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
+                //If armed/disarmed -> jump to that warning
+                if (armed_switch){
+                    if(motor_armed){
+                        warning_type = 6;
+                    }
+                    else{
+                        warning_type = 7;
+                    }
+                    last_armed = motor_armed;
+                    break;
+                }
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
                 if(x == 1){
@@ -604,37 +615,33 @@ void panWarn(int first_col, int first_line){
         }
         char* warning_string;
         //Show arm / disarm switch 
-        if (armed_switch){
-            if(motor_armed){
-                warning_string = "\x20\x20\x20\x20\x41\x52\x4d\x45\x44\x20\x20\x20";      
-            }
-            else{
-                warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
-            }
-            last_armed = motor_armed;
-        }else{
-            if(warning_type == 0){ 
-                warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-            }
-            else if(warning_type == 1){ 
-                warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
-            }
-            else if(warning_type == 2){ 
-                warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
-            }
-            else if(warning_type == 3){ 
-                warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
-            }
-            else if(warning_type == 4){ 
-                warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
-            }
-            else if(warning_type == 5){ 
-                warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-            }
-            //else if(warning_type == 6){ 
-                //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-            //}
+        if(warning_type == 0){ 
+            warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
         }
+        else if(warning_type == 1){ 
+            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+        }
+        else if(warning_type == 2){ 
+            warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+        }
+        else if(warning_type == 3){ 
+            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+        }
+        else if(warning_type == 4){ 
+            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+        }
+        else if(warning_type == 5){ 
+            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+        }
+        else if(warning_type == 6){ 
+            warning_string = "\x20\x20\x20\x20\x41\x52\x4d\x45\x44\x20\x20\x20";      
+        }
+        else if(warning_type == 7){ 
+            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
+        }
+        //else if(warning_type == 6){ 
+            //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
+        //}
         osd.printf("%s",warning_string);
     }
     osd.closePanel();
