@@ -2,21 +2,21 @@
 //------------------ Heading and Compass ----------------------------------------
 
 static char buf_show[12];
-const char buf_Rule[36] = {0xc2,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
-                           0xc4,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
-                           0xc3,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
-                           0xc5,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0};
+const char buf_Rule[36] = {0xc2,0xc0,0xc1,0xc0,0xc1,0xc0,
+                           0xc4,0xc0,0xc1,0xc0,0xc1,0xc0,
+                           0xc3,0xc0,0xc1,0xc0,0xc1,0xc0,
+                           0xc5,0xc0,0xc1,0xc0,0xc1,0xc0};
 void setHeadingPatern()
 {
   int start;
-  start = round((osd_heading * 36)/360);
-  start -= 5;
-  if(start < 0) start += 36;
+  start = round((osd_heading * 24)/360);
+  start -= 3;
+  if(start < 0) start += 24;
   for(int x=0; x <= 10; x++){
     buf_show[x] = buf_Rule[start];
-    if(++start > 35) start = 0;
+    if(++start > 23) start = 0;
   }
-  buf_show[11] = '\0';
+  buf_show[7] = '\0';
 }
 
 //------------------ Battery Remaining Picture ----------------------------------
@@ -48,6 +48,13 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
+  //Check arm/disarm switching.
+  armed_switch = motor_armed ^ last_armed;
+  if (armed_switch){
+    //If motors armed, reset home in Arducopter version
+    osd_got_home = !motor_armed;
+    last_armed = motor_armed;
+  }
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
@@ -97,17 +104,20 @@ void setHomeVars(OSD &osd)
 
 void setFdataVars(){
 
-if (haltset == 1 && takeofftime == 0 && osd_throttle > 25)
+if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
     {
     takeofftime = 1;
     tdistance = 0;
     FTime = (millis()/1000);
+    start_battery_reading = osd_battery_remaining_A;
+    last_battery_reading = osd_battery_remaining_A;
     }
-  
+    
   if ((millis() - dt) >= 1000){
     if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
-  dt = millis();
-
+    //Current consumed integrator
+    osd_curr_consumed += (float)(millis() - dt) / 360000 * osd_curr_A;
+    dt = millis();
   }
 if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
