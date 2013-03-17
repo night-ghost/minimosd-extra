@@ -53,7 +53,6 @@ void setHomeVars(OSD &osd)
   if (armed_switch){
     //If motors armed, reset home in Arducopter version
     osd_got_home = !motor_armed;
-    last_armed = motor_armed;
   }
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
