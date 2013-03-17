@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r479"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra|Pre-Release 2.1.5 r490"));
     osd.closePanel();
 }
 
@@ -148,7 +148,7 @@ void panFdata(){
      osd.setPanel(11, 4);
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, ((max_home_distance) * converth), high, 0xFD, ((tdistance) * converth), high, 0xE8,(max_osd_airspeed * converts), spe,0xE9,(max_osd_groundspeed * converts),spe,0xE7, (max_osd_home_alt * converth), high,0xFC,(max_osd_windspeed * converts),spe);
-    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFE, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe);        
+    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%10.6f|%c%10.6f", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x1f, (int)((max_home_distance) * converth), high, 0xFE, (int)((tdistance) * converth), high, 0xE8,(int)(max_osd_airspeed * converts), spe,0xE9,(int)(max_osd_groundspeed * converts),spe,0xE7, (int)(max_osd_home_alt * converth), high,0xFC,(int)(max_osd_windspeed * converts),spe, 0x83, (double)osd_lat, 0x84, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -182,10 +182,10 @@ void panEff(int first_col, int first_line){
         ////If in loiter should estimated remaining flight time
         //if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
           if(osd_battery_remaining_A != last_battery_reading){
-            start_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (start_battery_reading - osd_battery_remaining_A);
+            remaining_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (start_battery_reading - osd_battery_remaining_A);
             last_battery_reading = osd_battery_remaining_A;
           }
-          osd.printf("%c%2i%c%02i", 0x17,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+          osd.printf("%c%2i%c%02i", 0x17,((int)remaining_Time/60)%60,0x3A,(int)remaining_Time%60);
         //}
         //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
 //        else{
@@ -665,9 +665,11 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-//    osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
-    //TODO: Uncomment line above. Line under only to check integrated mAh reliability
-    osd.printf("%c%5.0f%c|%c%5.0i%c", 0x70, (1 - (float)osd_battery_remaining_A / 100) * batt_capacity * 100, 0x82, 0x69, osd_curr_consumed, 0x82);
+    //osd.printf("%c%5.0f%c|%c%5.0i%c", 0x70, (1 - (float)osd_battery_remaining_A / 100) * batt_capacity * 100, 0x82, 0x69, osd_curr_consumed, 0x82);
+    if((int)start_Time % 6 < 3)
+      osd.printf("%c%c%c%3.0i%c", 0xB9, 0x20, 0x20, osd_battery_remaining_A, 0x25);
+    else
+      osd.printf("%c%5.0i%c", 0xB9, osd_curr_consumed, 0x82);
     osd.closePanel();
 }
 
@@ -845,7 +847,7 @@ void panGPSats(int first_col, int first_line){
 void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%11.6f|%c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
+    osd.printf("%c%10.6f|%c%10.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -875,7 +877,8 @@ void panRose(int first_col, int first_line){
     osd.openPanel();
     //osd_heading  = osd_yaw;
     //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-    osd.printf("%s|%c%s%c", "\x20\xc0\xc0\xc0\xc0\xc0\xc7\xc0\xc0\xc0\xc0\xc0\x20", 0xd0, buf_show, 0xd1);
+    //osd.printf("%s|%c%s%c", "\x20\xc0\xc0\xc0\xc0\xc0\xc7\xc0\xc0\xc0\xc0\xc0\x20", 0xd0, buf_show, 0xd1);
+    osd.printf("%c%s%c", 0xd0, buf_show, 0xd1);
     osd.closePanel();
 }
 
