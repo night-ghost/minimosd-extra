@@ -68,7 +68,7 @@ static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       start_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
-static uint8_t      batt_capacity = 0;
+//static uint8_t      batt_capacity = 0;
 static uint16_t     osd_curr_consumed = 0;         // Battery Consumed mAh
 
 //static uint8_t    osd_battery_pic_A = 0xb4;       // picture to show battery remaining
@@ -77,6 +77,7 @@ static uint16_t     osd_curr_consumed = 0;         // Battery Consumed mAh
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
 static float        start_Time = -1.0;
+static float        remaining_Time = -1.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long text_timer = 0;
