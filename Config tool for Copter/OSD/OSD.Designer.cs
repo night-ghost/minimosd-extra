@@ -958,7 +958,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "OSD";
-            this.Text = "ArduCAM OSD Config";
+            this.Text = "ArduCAM OSD Config for Copter";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OSD_FormClosed);
             this.Load += new System.EventHandler(this.OSD_Load);
             this.Resize += new System.EventHandler(this.OSD_Resize);
