@@ -4,16 +4,18 @@ Copyright (c) 2011.  All rights reserved.
 An Open Source Arduino based OSD and Camera Control project.
 
 Program  : ArduCAM-OSD (Supports the variant: minimOSD)
-Version  : V1.9, 14 February 2012
+Version  : V2.1, 24 September 2012
 Author(s): Sandro Benigno
 Coauthor(s):
 Jani Hirvinen   (All the EEPROM routines)
 Michael Oborne  (OSD Configutator)
 Mike Smith      (BetterStream and Fast Serial libraries)
+Gábor Zoltán
+Pedro Santos
 Special Contribuitor:
 Andrew Tridgell by all the support on MAVLink
 Doug Weibel by his great orientation since the start of this project
-Contributors: James Goppert, Max Levine
+Contributors: James Goppert, Max Levine, Burt Green, Eddie Furey
 and all other members of DIY Drones Dev team
 Thanks to: Chris Anderson, Jordi Munoz
 
@@ -43,6 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #undef PSTR 
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
 
+#define isPAL 1
 
 /* **********************************************/
 /* ***************** INCLUDES *******************/
@@ -172,17 +175,17 @@ void loop()
 {
 
     if(enable_mav_request == 1){//Request rate control
-        osd.clear();
-        osd.setPanel(3,10);
-        osd.openPanel();
-        osd.printf_P(PSTR("Requesting DataStreams...")); 
-        osd.closePanel();
-        for(int n = 0; n < 3; n++){
-            request_mavlink_rates();//Three times to certify it will be readed
-            delay(50);
-        }
+        //osd.clear();
+        //osd.setPanel(3,10);
+        //osd.openPanel();
+        //osd.printf_P(PSTR("Requesting DataStreams...")); 
+        //osd.closePanel();
+        //for(int n = 0; n < 3; n++){
+        //    request_mavlink_rates();//Three times to certify it will be readed
+        //    delay(50);
+        //}
         enable_mav_request = 0;
-        delay(2000);
+        //delay(2000);
         osd.clear();
         waitingMAVBeats = 0;
         lastMAVBeat = millis();//Preventing error from delay sensing
@@ -204,6 +207,8 @@ void OnMavlinkTimer()
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
     
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
+    
+    setFdataVars();
 }
 
 

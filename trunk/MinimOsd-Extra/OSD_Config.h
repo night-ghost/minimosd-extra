@@ -4,7 +4,7 @@
 
 // Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
-#define VER 75
+#define VER 76
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
@@ -15,7 +15,7 @@
 
 // Panel 8bit REGISTER with BIT positions
 // panA_REG Byte has:
-#define Cen_BIT        0
+//#define Cen_BIT        0
 #define Pit_BIT        1
 #define Rol_BIT        2
 #define BatA_BIT       3
@@ -27,10 +27,10 @@
 // panB_REG Byte has:
 #define Rose_BIT       0
 #define Head_BIT       1
-#define MavB_BIT       2
+//#define MavB_BIT       2
 #define HDir_BIT       3
 #define HDis_BIT       4
-#define WDir_BIT       5 //
+//#define WDir_BIT       5 //
 #define WDis_BIT       6 //
 #define Time_BIT       7 
 
@@ -49,19 +49,26 @@
 #define Off_BIT        1
 #define WindS_BIT      2
 #define Climb_BIT      3
-#define Tune_BIT       4
-#define Setup_BIT      5
+//#define Tune_BIT       4
+#define CALLSIGN_BIT   5
 #define RSSI_BIT       6
+#define Eff_BIT        7
+
+// panE_REG Byte has:
+
+//#define Ch_BIT         0
+#define TEMP_BIT       1
+#define DIST_BIT       2
 
 /* *********************************************** */
 // EEPROM Storage addresses
 
-#define OffsetBITpanel       200
+#define OffsetBITpanel       250
 
 // First of 8 panels
-#define panCenter_en_ADDR 0
-#define panCenter_x_ADDR 2
-#define panCenter_y_ADDR 4
+//#define panCenter_en_ADDR 0
+//#define panCenter_x_ADDR 2
+//#define panCenter_y_ADDR 4
 #define panPitch_en_ADDR 6
 #define panPitch_x_ADDR 8
 #define panPitch_y_ADDR 10
@@ -91,18 +98,18 @@
 #define panHeading_en_ADDR 54
 #define panHeading_x_ADDR 56
 #define panHeading_y_ADDR 58
-#define panMavBeat_en_ADDR 60
-#define panMavBeat_x_ADDR 62
-#define panMavBeat_y_ADDR 64
+//#define panMavBeat_en_ADDR 60
+//#define panMavBeat_x_ADDR 62
+//#define panMavBeat_y_ADDR 64
 #define panHomeDir_en_ADDR 66
 #define panHomeDir_x_ADDR 68
 #define panHomeDir_y_ADDR 70
 #define panHomeDis_en_ADDR 72
 #define panHomeDis_x_ADDR 74
 #define panHomeDis_y_ADDR 76
-#define panWPDir_en_ADDR 80 
-#define panWPDir_x_ADDR 82  
-#define panWPDir_y_ADDR 84  
+//#define panWPDir_en_ADDR 80 
+//#define panWPDir_x_ADDR 82  
+//#define panWPDir_y_ADDR 84  
 #define panWPDis_en_ADDR 86 
 #define panWPDis_x_ADDR 88  
 #define panWPDis_y_ADDR 90  
@@ -148,21 +155,35 @@
 #define panWarn_x_ADDR 166
 #define panWarn_y_ADDR 168
 #define panOff_en_ADDR 170
-#define panOff_x_ADDR 172
-#define panOff_y_ADDR 174
+//#define panOff_x_ADDR 172
+//#define panOff_y_ADDR 174
 #define panWindSpeed_en_ADDR 176
 #define panWindSpeed_x_ADDR 178
 #define panWindSpeed_y_ADDR 180
 #define panClimb_en_ADDR 182
 #define panClimb_x_ADDR 184
 #define panClimb_y_ADDR 186
-#define panTune_en_ADDR 188
-#define panTune_x_ADDR 190
-#define panTune_y_ADDR 192
-
-#define panSetup_en_ADDR 194
-//#define panSetup_x_ADDR 196
-//#define panSetup_y_ADDR 198
+//#define panTune_en_ADDR 188
+//#define panTune_x_ADDR 190
+//#define panTune_y_ADDR 192
+#define panEff_en_ADDR 194
+#define panEff_x_ADDR 196
+#define panEff_y_ADDR 198
+#define panCALLSIGN_en_ADDR 200
+#define panCALLSIGN_x_ADDR 202
+#define panCALLSIGN_y_ADDR 204
+//#define panCh_en_ADDR 206
+//#define panCh_x_ADDR 208
+//#define panCh_y_ADDR 210
+#define panTemp_en_ADDR 212
+#define panTemp_x_ADDR 214
+#define panTemp_y_ADDR 216
+//#define panFdata_en_ADDR 218
+//#define panFdata_x_ADDR 220
+//#define panFdata_y_ADDR 222
+#define panDistance_en_ADDR 224
+#define panDistance_x_ADDR 226
+#define panDistance_y_ADDR 228
 
 #define measure_ADDR 890
 #define overspeed_ADDR 892
@@ -179,6 +200,11 @@
 
 #define OSD_BATT_WARN_ADDR 914
 #define OSD_RSSI_WARN_ADDR 916
+
+#define OSD_BRIGHTNESS_ADDR 918
+
+#define OSD_CALL_SIGN_ADDR 920
+#define OSD_CALL_SIGN_TOTAL 8
 
 #define CHK1 1000
 #define CHK2 1006

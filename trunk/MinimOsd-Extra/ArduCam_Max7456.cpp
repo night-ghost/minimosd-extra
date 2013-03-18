@@ -12,7 +12,7 @@
 #include <EEPROM.h>
 #include "OSD_Config.h"
 
-volatile int x;
+volatile int16_t x;
 volatile int font_count;
 volatile byte character_bitmap[0x40];
 
@@ -42,12 +42,7 @@ void OSD::init()
   Spi.transfer(MAX7456_OSDBL_reg); //black level write register
   Spi.transfer(osdbl_w);
 
-  // set all rows to same charactor white level, 90%
-  for (x = 0; x < MAX7456_screen_rows; x++)
-  {
-    Spi.transfer(x + 0x10);
-    Spi.transfer(MAX7456_WHITE_level_120);
-  }
+  setBrightness();
   // define sync (auto,int,ext) and
   // making sure the Max7456 is enabled
   control(1);
@@ -57,29 +52,52 @@ void OSD::init()
 
 void OSD::detectMode()
 {
-//    digitalWrite(MAX7456_SELECT,LOW);
-    //read STAT and auto detect Mode PAL/NTSC
-//    Spi.transfer(MAX7456_STAT_reg_read);//status register
-//    byte osdstat_r = Spi.transfer(0xff);
+  //read STAT and auto detect Mode PAL/NTSC
+  digitalWrite(MAX7456_SELECT,LOW);
+  Spi.transfer(MAX7456_STAT_reg_read);//status register
+  byte osdstat_r = Spi.transfer(0xff);
 
-//    if ((B00000001 & osdstat_r) == 1){
-//        setMode(1);  
-//    }
-//    else if((B00000010 & osdstat_r) == 1){
-        setMode(0);
-//    }
-//#ifdef MinimOSD
-//    else if (digitalRead(3) == 1){
-//        setMode(1);
-//    }
-//#endif
+  if ((B00000001 & osdstat_r) == 1){ //PAL
+      setMode(1);  
+  }
+  else if((B00000010 & osdstat_r) == 1){ //NTSC
+      setMode(0);
+  }
+  //If no signal was detected so it uses EEPROM config
+  else{
+      if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
+          setMode(0);
+      } 
+      else { //PAL
+          setMode(1);
+      }
+      digitalWrite(MAX7456_SELECT,LOW);
+  }
+}
 
-    if (EEPROM.read(PAL_NTSC_ADDR) == 1){
-        setMode(1);
-        digitalWrite(MAX7456_SELECT,LOW);
-    } 
-    else setMode(0);
-    digitalWrite(MAX7456_SELECT,LOW);
+//------------------ Set Brightness  ---------------------------------
+void OSD::setBrightness()
+{
+
+    uint8_t blevel = EEPROM.read(OSD_BRIGHTNESS_ADDR);
+
+    if(blevel == 0) //low brightness
+        blevel = MAX7456_WHITE_level_80;
+    else if(blevel == 1) 
+        blevel = MAX7456_WHITE_level_90;
+    else if(blevel == 2)
+        blevel = MAX7456_WHITE_level_100;
+    else if(blevel == 3) //high brightness
+        blevel = MAX7456_WHITE_level_120;
+    else 
+        blevel = MAX7456_WHITE_level_80; //low brightness if bad value
+    
+    // set all rows to same charactor white level, 90%
+    for (x = 0x0; x < 0x10; x++)
+    {
+        Spi.transfer(x + 0x10);
+        Spi.transfer(blevel);
+    }
 }
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------
