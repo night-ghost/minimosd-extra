@@ -64,7 +64,7 @@ static uint8_t      high = 0;
 static uint8_t      temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
-static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
+static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       start_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
