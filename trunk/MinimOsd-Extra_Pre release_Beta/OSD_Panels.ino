@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r499"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r500"));
     osd.closePanel();
 }
 
@@ -45,7 +45,7 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
                 //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
                 if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
-                if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
+//                if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
                 if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
                 if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
 
@@ -822,23 +822,23 @@ void panBatt_A(int first_col, int first_line){
 // Size   : 1 x 2  (rows x chars)
 // Staus  : done
 
-void panGPL(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    char* gps_str;
-    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20"; 
+//void panGPL(int first_col, int first_line){
+//    osd.setPanel(first_col, first_line);
+//    osd.openPanel();
+//    char* gps_str;
+//    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20"; 
         //osd.printf_P(PSTR("\x10\x20"));
-    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
+//    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
         //osd.printf_P(PSTR("\x11\x20"));
-    osd.printf("%s",gps_str);
+//    osd.printf("%s",gps_str);
 
     /*  if(osd_fix_type <= 1) {
     osd.printf_P(PSTR("\x10"));
     } else {
     osd.printf_P(PSTR("\x11"));
     }  */
-    osd.closePanel();
-}
+//    osd.closePanel();
+//}
 
 /* **************************************************************** */
 // Panel  : panGPSats
@@ -850,7 +850,12 @@ void panGPL(int first_col, int first_line){
 void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
+    
+    char* gps_str;
+    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x12";       
+    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x0f";
+    
+    osd.printf("%s%2i", gps_str, osd_satellites_visible);
     osd.closePanel();
 }
 

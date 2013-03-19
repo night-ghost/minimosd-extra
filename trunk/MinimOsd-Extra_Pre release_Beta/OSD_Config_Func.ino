@@ -81,9 +81,9 @@ void writeSettings() {
     writeEEPROM(on, panGPSats_en_ADDR + offset);
     writeEEPROM(1,  panGPSats_x_ADDR + offset);
     writeEEPROM(11, panGPSats_y_ADDR + offset);
-    writeEEPROM(on, panGPL_en_ADDR + offset);
-    writeEEPROM(5,  panGPL_x_ADDR + offset);
-    writeEEPROM(11, panGPL_y_ADDR + offset);
+//    writeEEPROM(on, panGPL_en_ADDR + offset);
+//    writeEEPROM(5,  panGPL_x_ADDR + offset);
+//    writeEEPROM(11, panGPL_y_ADDR + offset);
     writeEEPROM(on, panGPS_en_ADDR + offset);
     writeEEPROM(1,  panGPS_x_ADDR + offset);
     writeEEPROM(14, panGPS_y_ADDR + offset);
@@ -239,9 +239,9 @@ void readPanelSettings() {
     panGPSats_XY[0][panel] = readEEPROM(panGPSats_x_ADDR + offset);
     panGPSats_XY[1][panel] = checkPAL(readEEPROM(panGPSats_y_ADDR + offset));
 
-    setBit(panA_REG[panel], GPL_BIT, readEEPROM(panGPL_en_ADDR + offset));
-    panGPL_XY[0][panel] = readEEPROM(panGPL_x_ADDR + offset);
-    panGPL_XY[1][panel] = checkPAL(readEEPROM(panGPL_y_ADDR + offset));
+//    setBit(panA_REG[panel], GPL_BIT, readEEPROM(panGPL_en_ADDR + offset));
+//    panGPL_XY[0][panel] = readEEPROM(panGPL_x_ADDR + offset);
+//    panGPL_XY[1][panel] = checkPAL(readEEPROM(panGPL_y_ADDR + offset));
 
     setBit(panA_REG[panel], GPS_BIT, readEEPROM(panGPS_en_ADDR + offset));
     panGPS_XY[0][panel] = readEEPROM(panGPS_x_ADDR + offset);

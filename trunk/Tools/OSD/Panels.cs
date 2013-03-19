@@ -595,34 +595,34 @@ namespace OSD
         // Size   : 1 x 2  (rows x chars)
         // Staus  : done
 
-        public int panGPL(int first_col, int first_line)
-        {
-            osd.setPanel(first_col, first_line);
-            osd.openPanel();
-            switch (osd_fix_type)
-            {
-                case 0:
-                    osd.printf_P(PSTR("\x10\x20"));
-                    break;
-                case 1:
-                    osd.printf_P(PSTR("\x10\x20"));
-                    break;
-                case 2:
-                    osd.printf_P(PSTR("\x11\x20"));//If not APM, x01 would show 2D fix
-                    break;
-                case 3:
-                    osd.printf_P(PSTR("\x11\x20"));//If not APM, x02 would show 3D fix
-                    break;
-            }
+        //public int panGPL(int first_col, int first_line)
+        //{
+          //  osd.setPanel(first_col, first_line);
+            //osd.openPanel();
+            //switch (osd_fix_type)
+            //{
+             //   case 0:
+              //      osd.printf_P(PSTR("\x10\x20"));
+               //     break;
+               // case 1:
+               //     osd.printf_P(PSTR("\x10\x20"));
+                //    break;
+                //case 2:
+                  //  osd.printf_P(PSTR("\x11\x20"));//If not APM, x01 would show 2D fix
+                   // break;
+                //case 3:
+                  //  osd.printf_P(PSTR("\x11\x20"));//If not APM, x02 would show 3D fix
+                    //break;
+            //}
 
             /*  if(osd_fix_type <= 1) {
             osd.printf_P(PSTR("\x10"));
           } else {
             osd.printf_P(PSTR("\x11"));
           }  */
-            osd.closePanel();
-            return 0;
-        }
+            //osd.closePanel();
+            //return 0;
+        //}
 
         /* **************************************************************** */
         // Panel  : panGPSats
