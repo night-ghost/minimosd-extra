@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r502"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r503"));
     osd.closePanel();
 }
 
@@ -364,8 +364,14 @@ void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    osd_wind_arrow_rotate_int = round((osd_winddirection)/360.0 * 16.0) + -7; //Convert to int 1-16 
-    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
+    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
+    if(osd_wind_arrow_rotate_int < -7 ) {
+    osd_wind_arrow_rotate_int += 24;
+    }else if(osd_wind_arrow_rotate_int > 8 ) {
+    osd_wind_arrow_rotate_int -= 8;
+    }else{
+    osd_wind_arrow_rotate_int += 8;
+    }
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
 
     osd.closePanel();
@@ -1031,7 +1037,6 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     case 0: 
         arrow_set1 = 0x90;
         arrow_set2 = 0x91;
-        break;
     case 1: 
         arrow_set1 = 0x90;
         arrow_set2 = 0x91;
