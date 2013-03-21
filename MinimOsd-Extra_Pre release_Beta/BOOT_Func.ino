@@ -34,34 +34,34 @@ void loadBar() { //change name due we don't have CLI anymore
       osd.openPanel();
       switch(barStep) {
         case 0:
-         osd.printf_P(PSTR("\xf1\xf2\xf2\xf2\xf2\xf2\xf2"));
+         osd.printf_P(PSTR("\x8c\x8d\x8d\x8d\x8d\x8d\x8d"));
          break;
         case 1:
-         osd.printf_P(PSTR("\xef\xf2\xf2\xf2\xf2\xf2\xf2"));
+         osd.printf_P(PSTR("\x8a\x8d\x8d\x8d\x8d\x8d\x8d"));
          break;
         case 2:
-         osd.printf_P(PSTR("\xee\xf0\xf2\xf2\xf2\xf2\xf2"));
+         osd.printf_P(PSTR("\x89\x8b\x8d\x8d\x8d\x8d\x8d"));
          break;
         case 3:
-         osd.printf_P(PSTR("\xee\xee\xf0\xf2\xf2\xf2\xf2"));
+         osd.printf_P(PSTR("\x89\x89\x8b\x8d\x8d\x8d\x8d"));
          break;
         case 4:
-         osd.printf_P(PSTR("\xee\xee\xee\xf0\xf2\xf2\xf2"));
+         osd.printf_P(PSTR("\x89\x89\x89\x8b\x8d\x8d\x8d"));
          break;
         case 5:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xf0\xf2\xf2"));
+         osd.printf_P(PSTR("\x89\x89\x89\x89\x8b\x8d\x8d"));
          break;
         case 6:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xf0\xf2"));
+         osd.printf_P(PSTR("\x89\x89\x89\x89\x89\x8b\x8d"));
          break;
         case 7:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xf0"));
+         osd.printf_P(PSTR("\x89\x89\x89\x89\x89\x89\x8b"));
          break;
         case 8:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xee"));
+         osd.printf_P(PSTR("\x89\x89\x89\x89\x89\x89\x89"));
          break;
         case 9:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xee\xee"));
+         osd.printf_P(PSTR("\x89\x89\x89\x89\x89\x89\x89\x89"));
          break;
       }
       osd.closePanel();
