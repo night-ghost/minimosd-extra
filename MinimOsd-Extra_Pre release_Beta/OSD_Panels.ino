@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r503"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra|Pre-Release r504"));
     osd.closePanel();
 }
 
@@ -1037,6 +1037,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     case 0: 
         arrow_set1 = 0x90;
         arrow_set2 = 0x91;
+        break;
     case 1: 
         arrow_set1 = 0x90;
         arrow_set2 = 0x91;
