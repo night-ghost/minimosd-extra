@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD Extra Copter|Pre-Release 2.1.5 r491"));
+    osd.printf_P(PSTR("\xba\xbb\xbc\xbd\xbe|\xca\xcb\xcc\xcd\xce|MinimOSD-Extra Copter|Pre-Release r505"));
     osd.closePanel();
 }
 
@@ -45,7 +45,7 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
                 //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
                 if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
-                if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
+                //if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
                 if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
                 if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
 
@@ -347,7 +347,7 @@ void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
+    osd_wind_arrow_rotate_int = round((osd_winddirection)/360.0 * 16.0) + -7; //Convert to int 1-16 
     if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
 
@@ -674,7 +674,6 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //osd.printf("%c%5.0f%c|%c%5.0i%c", 0x70, (1 - (float)osd_battery_remaining_A / 100) * batt_capacity * 100, 0x82, 0x69, osd_curr_consumed, 0x82);
     if((int)start_Time % 6 < 3)
       osd.printf("%c%c%c%3.0i%c", 0xB9, 0x20, 0x20, osd_battery_remaining_A, 0x25);
     else
@@ -813,7 +812,7 @@ void panBatt_A(int first_col, int first_line){
 // Output : 1 static symbol with changing FIX symbol
 // Size   : 1 x 2  (rows x chars)
 // Staus  : done
-
+/*
 void panGPL(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
@@ -830,7 +829,7 @@ void panGPL(int first_col, int first_line){
     osd.printf_P(PSTR("\x11"));
     }  */
     osd.closePanel();
-}
+}*/
 
 /* **************************************************************** */
 // Panel  : panGPSats
@@ -842,7 +841,12 @@ void panGPL(int first_col, int first_line){
 void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i", 0x0f,osd_satellites_visible);
+    
+    char* gps_str;
+    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x12";       
+    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x0f";
+    
+    osd.printf("%s%2i", gps_str, osd_satellites_visible);
     osd.closePanel();
 }
 
@@ -960,8 +964,8 @@ void panWPDis(int first_col, int first_line){
     wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
     if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
     
-//      if (xtrack_error > 999) xtrack_error = 999;
-//      if (xtrack_error < -999) xtrack_error = -999;
+      if (xtrack_error > 999) xtrack_error = 999;
+      if (xtrack_error < -999) xtrack_error = -999;
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);

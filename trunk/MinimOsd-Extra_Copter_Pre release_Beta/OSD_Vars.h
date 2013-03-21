@@ -166,7 +166,7 @@ byte panRoll_XY[2][npanels]; // = { 23,7 };
 byte panBatt_A_XY[2][npanels]; // = { 23,1 };
 //byte panBatt_B_XY[2]; // = { 23,3 };
 byte panGPSats_XY[2][npanels]; // = { 2,12 };
-byte panGPL_XY[2][npanels]; // = { 2,11 };
+//byte panGPL_XY[2][npanels]; // = { 2,11 };
 byte panGPS_XY[2][npanels]; // = { 2,13 };
 byte panBatteryPercent_XY[2][npanels];
 
