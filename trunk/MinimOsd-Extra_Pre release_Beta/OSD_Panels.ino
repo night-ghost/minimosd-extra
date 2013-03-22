@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r513"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r514"));
     osd.closePanel();
 }
 
@@ -185,9 +185,9 @@ void panEff(int first_col, int first_line){
         if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
 //        eff = eff * 0.2 + eff * 0.8;
           if (eff > 0 && eff <= 9999) {
-            osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x01);
+            osd.printf("%c%4.0f%c", 0x16, (double)eff, 0x01);
           }else{
-          osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
+          osd.printf_P(PSTR("\x16\x20\x20\x20\x20\x20")); 
           }
           
     }else{
@@ -502,7 +502,7 @@ void panOff(){
 void panCur_A(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.2f%c", 0xbe, (float(osd_curr_A) * .01), 0x0e);
+    osd.printf("%c%5.2f%c", 0xbd, (float(osd_curr_A) * .01), 0x0e);
     osd.closePanel();
 }
 
@@ -531,7 +531,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0f%c",0x16, (osd_climb * converth), climbchar);
+    osd.printf("%c%3.0f%c",0x15, (osd_climb * converth), climbchar);
     osd.closePanel();
 }
 
@@ -694,7 +694,7 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0i%c", 0xba, osd_battery_remaining_A, 0x25);
+    osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25);
     osd.closePanel();
 }
 
@@ -756,7 +756,7 @@ void panHorizon(int first_col, int first_line){
      
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\xc7\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc6|"));
+    osd.printf_P(PSTR("\xc6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc5|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
 
@@ -804,10 +804,10 @@ void panBatt_A(int first_col, int first_line){
     osd.openPanel();
     /*************** This commented code is for the next ArduPlane Version
     if(osd_battery_remaining_A > 100){
-        osd.printf(" %c%5.2f%c", 0xbd, (double)osd_vbat_A, 0x0d);
-    else osd.printf("%c%5.2f%c%c", 0xbd, (double)osd_vbat_A, 0x0d, osd_battery_pic_A);
+        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_A, 0x0d);
+    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_A, 0x0d, osd_battery_pic_A);
     */
-    osd.printf("%c%5.2f%c", 0xbd, (double)osd_vbat_A, 0x0d);
+    osd.printf("%c%5.2f%c", 0xbc, (double)osd_vbat_A, 0x0d);
     osd.closePanel();
 }
 
@@ -1110,8 +1110,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
 }
 
 // Calculate and shows Artificial Horizon
-// For using this, you must load a special mcm file with the new staggered artificial horizon chars!
-// e.g. AH_BetterResolutionCharset002.mcm
+// Smooth horizon by Jörg Rothfuchs
 							// with different factors we can adapt do different cam optics
 #define AH_PITCH_FACTOR		0.010471976		// conversion factor for pitch
 #define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
@@ -1123,16 +1122,16 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
 #define AH_TOTAL_LINES		AH_ROWS * CHAR_ROWS	// helper define
 
 
-#define LINE_SET_STRAIGHT__	(0xc8 - 1)		// code of the first MAX7456 straight char -1
-#define LINE_SET_STRAIGHT_O	(0xD1 - 3)		// code of the first MAX7456 straight overflow char -3
-#define LINE_SET_P___STAG_1	(0xD2 - 1)		// code of the first MAX7456 positive staggered set 1 char -1
-#define LINE_SET_P___STAG_2	(0xDB - 1)		// code of the first MAX7456 positive staggered set 2 char -1
-#define LINE_SET_N___STAG_1	(0xE4 - 1)		// code of the first MAX7456 negative staggered set 1 char -1
-#define LINE_SET_N___STAG_2	(0xED - 1)		// code of the first MAX7456 negative staggered set 2 char -1
-#define LINE_SET_P_O_STAG_1	(0xF6 - 2)		// code of the first MAX7456 positive overflow staggered set 1 char -2
-#define LINE_SET_P_O_STAG_2	(0xFA - 1)		// code of the first MAX7456 positive overflow staggered set 2 char -1
-#define LINE_SET_N_O_STAG_1	(0xF8 - 2)		// code of the first MAX7456 negative overflow staggered set 1 char -2
-#define LINE_SET_N_O_STAG_2	(0xFD - 1)		// code of the first MAX7456 negative overflow staggered set 2 char -1
+#define LINE_SET_STRAIGHT__	(0xC7 - 1)		// code of the first MAX7456 straight char -1
+#define LINE_SET_STRAIGHT_O	(0xD0 - 3)		// code of the first MAX7456 straight overflow char -3
+#define LINE_SET_P___STAG_1	(0xD1 - 1)		// code of the first MAX7456 positive staggered set 1 char -1
+#define LINE_SET_P___STAG_2	(0xDA - 1)		// code of the first MAX7456 positive staggered set 2 char -1
+#define LINE_SET_N___STAG_1	(0xE3 - 1)		// code of the first MAX7456 negative staggered set 1 char -1
+#define LINE_SET_N___STAG_2	(0xEC - 1)		// code of the first MAX7456 negative staggered set 2 char -1
+#define LINE_SET_P_O_STAG_1	(0xF5 - 2)		// code of the first MAX7456 positive overflow staggered set 1 char -2
+#define LINE_SET_P_O_STAG_2	(0xF9 - 1)		// code of the first MAX7456 positive overflow staggered set 2 char -1
+#define LINE_SET_N_O_STAG_1	(0xF7 - 2)		// code of the first MAX7456 negative overflow staggered set 1 char -2
+#define LINE_SET_N_O_STAG_2	(0xFC - 1)		// code of the first MAX7456 negative overflow staggered set 2 char -1
 
 
 #define OVERFLOW_CHAR_OFFSET	6			// offset for the overflow subvals
@@ -1205,7 +1204,7 @@ void do_converts()
         converth = 1.0;
         spe = 0x10;
         high = 0x0c;
-        temps = 0xbb;
+        temps = 0xba;
         tempconv = temperature;
         distchar = 0x1b;
         distconv = 1000;
@@ -1215,7 +1214,7 @@ void do_converts()
         converth = 3.28;
         spe = 0x19;
         high = 0x66;
-        temps = 0xbc;
+        temps = 0xbb;
         tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
         distchar = 0x1c;
         distconv = 5280;
