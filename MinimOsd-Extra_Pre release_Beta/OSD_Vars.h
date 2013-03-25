@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static float         max_home_distance = 0;
+static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
@@ -13,22 +13,22 @@ static float ddistance = 0;
 static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 
-//static float	    nav_roll = 0; // Current desired roll in degrees
+//static float	      nav_roll = 0; // Current desired roll in degrees
 //static float        nav_pitch = 0; // Current desired pitch in degrees
-//static int16_t	    nav_bearing = 0; // Current desired heading in degrees
+//static int16_t      nav_bearing = 0; // Current desired heading in degrees
 static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
 static int8_t       wp_target_bearing_rotate_int = 0;
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
-//static float	    alt_error = 0; // Current altitude error in meters
+//static float	      alt_error = 0; // Current altitude error in meters
 //static float        aspd_error = 0; // Current airspeed error in meters/second
 static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 static float        eff = 0; //Efficiency
 
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
-static bool          ma = 0;
-static bool      osd_clear = 0;
+static bool         ma = 0;
+static bool         osd_clear = 0;
 static uint16_t     ch_raw = 0;
 //static uint16_t     chan1_raw = 0;
 //static uint16_t     chan2_raw = 0;
@@ -54,7 +54,7 @@ static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
 static uint8_t      battv = 0; //Battery warning voltage - units Volt *10 
-static uint16_t      distconv = 0;
+static uint16_t     distconv = 0;
 //static int        battp = 0;
 
 static uint8_t      spe = 0;
@@ -62,12 +62,13 @@ static uint8_t      high = 0;
 static uint8_t      temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
+static float      mah_used = 0;
 static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
 
 //static uint8_t    osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 //static float      osd_vbat_B = 0;               // voltage in milivolt
-//static float      osd_curr_B = 0;                 // Battery B current
+//static float    timer_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
 static float        start_Time = -1.0;
@@ -75,6 +76,7 @@ static uint8_t      osd_mode = 0;                   // Navigation mode from RC A
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long text_timer = 0;
 static unsigned long warning_timer =0;
+static unsigned long runt =0;
 static unsigned long FTime = 0;
 static unsigned long CallSignBlink = 0;
 
