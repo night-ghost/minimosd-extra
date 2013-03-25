@@ -110,8 +110,7 @@ if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_thro
 
 //  }
 
-  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
-  dt = millis();
+  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - runt) / 1000.0);
 
     
 if (takeofftime == 1){
