@@ -217,7 +217,6 @@ namespace OSD
 
             //Fill List of items in tabe number 1
             LIST_items.Items.Clear();
-
             startup = true;
             foreach (var thing in panelItems)
             {
@@ -227,7 +226,6 @@ namespace OSD
                     if (thing.Item1 == "Center")
                     {
                         LIST_items.Items.Add(thing.Item1, false);
-
                     }
 
                     else if (thing.Item1 == "Tune")
@@ -251,14 +249,12 @@ namespace OSD
                     else if (thing.Item1 == "Trip Distance")
                     {
                         LIST_items.Items.Add(thing.Item1, false);
-
                     }
 
 
                     else if (thing.Item1 == "Channel Raw")
                     {
                         LIST_items.Items.Add(thing.Item1, false);
-
                     }
                     else
                     {
@@ -266,7 +262,7 @@ namespace OSD
                     }
                 }
             }
-
+            LIST_items.Sorted = true;
             startup = false;
 
 
@@ -297,7 +293,7 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 4, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 3, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Climb Rate", pan.panClimb, 1, 7, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 24, 13, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 22, 13, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
 
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 1, 12, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
 
@@ -416,7 +412,7 @@ namespace OSD
                     }
                 }
             }
-
+            LIST_items2.Sorted = true;
             startup = false;
 
             osdDraw1();
@@ -847,7 +843,7 @@ namespace OSD
         {
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion;
+            this.Text = this.Text + " " + strVersion + " - Pre-Release";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -1112,6 +1108,7 @@ namespace OSD
                 eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
                 
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
+                eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
                 eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1265,6 +1262,7 @@ namespace OSD
             eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
 
             eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
+            eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
             eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
             eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1377,6 +1375,7 @@ namespace OSD
         const int panHeading_x_ADDR = 56;
         const int panHeading_y_ADDR = 58;
 //        const int panMavBeat_en_ADDR = 60;
+        const int OSD_BATT_SHOW_PERCENT = 60;
 //        const int panMavBeat_x_ADDR = 62;
 //        const int panMavBeat_y_ADDR = 64;
         const int panHomeDir_en_ADDR = 66;
@@ -1475,6 +1474,7 @@ namespace OSD
         const int switch_mode_ADDR = 910;
         const int PAL_NTSC_ADDR = 912;
         const int OSD_BATT_WARN_ADDR = 914;
+
         const int OSD_RSSI_WARN_ADDR = 916;
 
         const int OSD_BRIGHTNESS_ADDR = 918;
@@ -1636,6 +1636,9 @@ namespace OSD
 
             pan.batt_warn_level = eeprom[OSD_BATT_WARN_ADDR];
             BATT_WARNnumeric.Value = pan.batt_warn_level;
+
+            pan.osd_battery_show_percentage = eeprom[OSD_BATT_SHOW_PERCENT];
+            rbtBatteryPercent.Checked = Convert.ToBoolean(pan.osd_battery_show_percentage);
 
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -2548,6 +2551,11 @@ namespace OSD
             //MessageBox.Show("Author: Michael Oborne \nCo-authors: Pedro Santos \n Zoltán Gábor", "About ArduCAM OSD Config", MessageBoxButtons.OK, MessageBoxIcon.Information);
             AboutBox1 about = new AboutBox1();
             about.Show();
+        }
+
+        private void rbtBatteryPercent_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
         }
 
     }

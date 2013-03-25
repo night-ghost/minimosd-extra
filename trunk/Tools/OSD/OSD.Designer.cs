@@ -81,6 +81,8 @@
             this.OVERSPEED_label = new System.Windows.Forms.Label();
             this.OVERSPEED_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.rbtBatterymAh = new System.Windows.Forms.RadioButton();
+            this.rbtBatteryPercent = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
             this.BATT_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
@@ -105,6 +107,10 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -141,7 +147,7 @@
             this.LIST_items.FormattingEnabled = true;
             this.LIST_items.Location = new System.Drawing.Point(3, 3);
             this.LIST_items.Name = "LIST_items";
-            this.LIST_items.Size = new System.Drawing.Size(138, 259);
+            this.LIST_items.Size = new System.Drawing.Size(138, 274);
             this.LIST_items.TabIndex = 1;
             this.LIST_items.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
             this.LIST_items.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
@@ -453,7 +459,7 @@
             this.PANEL_tabs.Controls.Add(this.tabPage1);
             this.PANEL_tabs.Controls.Add(this.tabPage2);
             this.PANEL_tabs.Location = new System.Drawing.Point(0, 24);
-            this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
             this.PANEL_tabs.SelectedIndex = 0;
             this.PANEL_tabs.Size = new System.Drawing.Size(667, 394);
@@ -470,9 +476,9 @@
             this.tabPageConfig.Controls.Add(this.groupBox3);
             this.tabPageConfig.Controls.Add(this.groupBoxRSSI);
             this.tabPageConfig.Location = new System.Drawing.Point(4, 22);
-            this.tabPageConfig.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPageConfig.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageConfig.Name = "tabPageConfig";
-            this.tabPageConfig.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPageConfig.Padding = new System.Windows.Forms.Padding(2);
             this.tabPageConfig.Size = new System.Drawing.Size(659, 368);
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
@@ -498,7 +504,7 @@
             "Medium High",
             "High"});
             this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(9, 36);
-            this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
             this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(92, 21);
             this.BRIGHTNESScomboBox.TabIndex = 3;
@@ -529,7 +535,7 @@
             this.CALLSIGNmaskedText.AsciiOnly = true;
             this.CALLSIGNmaskedText.BeepOnError = true;
             this.CALLSIGNmaskedText.Location = new System.Drawing.Point(9, 37);
-            this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
             this.CALLSIGNmaskedText.Mask = "AAAAAAAA";
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
             this.CALLSIGNmaskedText.Size = new System.Drawing.Size(92, 20);
@@ -560,9 +566,9 @@
             // 
             this.TOGGLE_BEH.AutoSize = true;
             this.TOGGLE_BEH.Location = new System.Drawing.Point(10, 67);
-            this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2);
             this.TOGGLE_BEH.Name = "TOGGLE_BEH";
-            this.TOGGLE_BEH.Size = new System.Drawing.Size(86, 14);
+            this.TOGGLE_BEH.Size = new System.Drawing.Size(115, 17);
             this.TOGGLE_BEH.TabIndex = 10;
             this.TOGGLE_BEH.Text = "Rotation Switching";
             this.TOGGLE_BEH.UseVisualStyleBackColor = true;
@@ -580,7 +586,7 @@
             "Ch 7",
             "Ch 8"});
             this.ONOFF_combo.Location = new System.Drawing.Point(9, 36);
-            this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
             this.ONOFF_combo.Size = new System.Drawing.Size(92, 21);
             this.ONOFF_combo.TabIndex = 3;
@@ -613,7 +619,7 @@
             "Metric",
             "Imperial"});
             this.UNITS_combo.Location = new System.Drawing.Point(9, 36);
-            this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
             this.UNITS_combo.Size = new System.Drawing.Size(92, 21);
             this.UNITS_combo.TabIndex = 3;
@@ -662,15 +668,40 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.rbtBatterymAh);
+            this.groupBox4.Controls.Add(this.rbtBatteryPercent);
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
             this.groupBox4.Location = new System.Drawing.Point(340, 82);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(152, 107);
+            this.groupBox4.Size = new System.Drawing.Size(152, 150);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
+            // 
+            // rbtBatterymAh
+            // 
+            this.rbtBatterymAh.AutoSize = true;
+            this.rbtBatterymAh.Location = new System.Drawing.Point(8, 127);
+            this.rbtBatterymAh.Name = "rbtBatterymAh";
+            this.rbtBatterymAh.Size = new System.Drawing.Size(102, 17);
+            this.rbtBatterymAh.TabIndex = 15;
+            this.rbtBatterymAh.Text = "Show used mAh";
+            this.rbtBatterymAh.UseVisualStyleBackColor = true;
+            // 
+            // rbtBatteryPercent
+            // 
+            this.rbtBatteryPercent.AutoSize = true;
+            this.rbtBatteryPercent.Checked = true;
+            this.rbtBatteryPercent.Location = new System.Drawing.Point(8, 104);
+            this.rbtBatteryPercent.Name = "rbtBatteryPercent";
+            this.rbtBatteryPercent.Size = new System.Drawing.Size(111, 17);
+            this.rbtBatteryPercent.TabIndex = 14;
+            this.rbtBatteryPercent.TabStop = true;
+            this.rbtBatteryPercent.Text = "Show remaining %";
+            this.rbtBatteryPercent.UseVisualStyleBackColor = true;
+            this.rbtBatteryPercent.CheckedChanged += new System.EventHandler(this.rbtBatteryPercent_CheckedChanged);
             // 
             // label9
             // 
@@ -785,7 +816,7 @@
             // 
             this.RSSI_RAW.AutoSize = true;
             this.RSSI_RAW.Location = new System.Drawing.Point(10, 144);
-            this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2);
             this.RSSI_RAW.Name = "RSSI_RAW";
             this.RSSI_RAW.Size = new System.Drawing.Size(112, 17);
             this.RSSI_RAW.TabIndex = 9;
@@ -839,11 +870,13 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.radioButton2);
+            this.tabPage1.Controls.Add(this.radioButton1);
             this.tabPage1.Controls.Add(this.LIST_items);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.pictureBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Size = new System.Drawing.Size(659, 368);
             this.tabPage1.TabIndex = 0;
@@ -852,11 +885,13 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.radioButton3);
+            this.tabPage2.Controls.Add(this.radioButton4);
             this.tabPage2.Controls.Add(this.LIST_items2);
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.pictureBox2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Size = new System.Drawing.Size(659, 368);
             this.tabPage2.TabIndex = 0;
@@ -868,7 +903,7 @@
             this.LIST_items2.FormattingEnabled = true;
             this.LIST_items2.Location = new System.Drawing.Point(3, 3);
             this.LIST_items2.Name = "LIST_items2";
-            this.LIST_items2.Size = new System.Drawing.Size(138, 259);
+            this.LIST_items2.Size = new System.Drawing.Size(138, 274);
             this.LIST_items2.TabIndex = 2;
             this.LIST_items2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox2_ItemCheck);
             this.LIST_items2.SelectedIndexChanged += new System.EventHandler(this.checkedListBox2_SelectedIndexChanged);
@@ -944,6 +979,54 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
+            this.radioButton1.Location = new System.Drawing.Point(154, 14);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(112, 17);
+            this.radioButton1.TabIndex = 3;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "Sort Alphabetically";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.Visible = false;
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(154, 28);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(104, 17);
+            this.radioButton2.TabIndex = 4;
+            this.radioButton2.Text = "Sort By Category";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.Visible = false;
+            // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Location = new System.Drawing.Point(154, 28);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(104, 17);
+            this.radioButton3.TabIndex = 6;
+            this.radioButton3.Text = "Sort By Category";
+            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.Visible = false;
+            // 
+            // radioButton4
+            // 
+            this.radioButton4.AutoSize = true;
+            this.radioButton4.Checked = true;
+            this.radioButton4.Location = new System.Drawing.Point(154, 14);
+            this.radioButton4.Name = "radioButton4";
+            this.radioButton4.Size = new System.Drawing.Size(112, 17);
+            this.radioButton4.TabIndex = 5;
+            this.radioButton4.TabStop = true;
+            this.radioButton4.Text = "Sort Alphabetically";
+            this.radioButton4.UseVisualStyleBackColor = true;
+            this.radioButton4.Visible = false;
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -997,7 +1080,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).EndInit();
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).EndInit();
@@ -1086,6 +1171,12 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gettingStartedToolStripMenuItem;
+        private System.Windows.Forms.RadioButton rbtBatterymAh;
+        private System.Windows.Forms.RadioButton rbtBatteryPercent;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.RadioButton radioButton4;
     }
 }
 
