@@ -104,11 +104,16 @@ if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_thro
     FTime = (millis()/1000);
     }
   
-  if ((millis() - dt) >= 1000){
-    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
+//  if ((millis() - dt) >= 1000){
+//    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
+//  dt = millis();
+
+//  }
+
+  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
   dt = millis();
 
-  }
+    
 if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
 if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
