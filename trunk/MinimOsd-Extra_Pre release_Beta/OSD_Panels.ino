@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r519"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r521"));
     osd.closePanel();
 }
 
@@ -695,8 +695,11 @@ void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    osd.printf("%c%3.0i%c|%4.0f%c", 0x17, osd_battery_remaining_A, 0x25, mah_used, 0xbe);
-    
+    if (EEPROM.read(panMavBeat_en_ADDR) == 0){
+    osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25);
+    }else{
+    osd.printf("%c%4.0f%c",0x17, mah_used, 0xbe);
+    }
     osd.closePanel();
 }
 
