@@ -427,7 +427,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            if (Convert.ToBoolean(osd_battery_show_percentage))
+            if (osd_battery_show_percentage == 1)
             {
                 osd.printf("%c%c%c%3.0i%c", 0x17, 0x20, 0x20, osd_battery_remaining, 0x25);
             }
