@@ -75,3 +75,6 @@ C:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj
 C:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Release\OSD_Config.TrustInfo.xml
 C:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe.manifest
 C:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Release\OSD_Config.application
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.exe.config
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.pdb

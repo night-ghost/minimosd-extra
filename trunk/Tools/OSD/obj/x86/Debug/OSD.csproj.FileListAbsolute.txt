@@ -56,3 +56,19 @@ C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.TrustInfo.xml
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe.manifest
 C:\Users\Pedro Santos\Documents\Arduino\Minim_OSD_EXTRA_REP\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\vlcsnap-2012-01-28-07h46m04s95.png
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_SA_v5.mcm
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_Config.exe.config
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_Config.exe.manifest
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_Config.application
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_Config.exe
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Debug\OSD_Config.pdb
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD.AboutBox1.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD.OSD.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD.Properties.Resources.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD.csproj.GenerateResource.Cache
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.TrustInfo.xml
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe.manifest
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.pdb

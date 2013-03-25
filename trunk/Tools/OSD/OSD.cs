@@ -1108,7 +1108,7 @@ namespace OSD
                 eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
                 
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-                eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
+                eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = pan.osd_battery_show_percentage;
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
                 eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1149,7 +1149,7 @@ namespace OSD
                 {
                     bool spupload_flag = false;
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
-                    //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
+                    //conf_up = sp.upload(eeprom, OSD_BATT_SHOW_PERCENT_ADDR, (OSD_RSSI_LOW_ADDR - OSD_BATT_SHOW_PERCENT_ADDR), OSD_BATT_SHOW_PERCENT_ADDR);
                     if (current.Text == "Panel 1") {
                         for(int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
@@ -1182,7 +1182,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - measure_ADDR + 1), (short)measure_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)OSD_BATT_SHOW_PERCENT_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - OSD_BATT_SHOW_PERCENT_ADDR + 1), (short)OSD_BATT_SHOW_PERCENT_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1262,7 +1262,7 @@ namespace OSD
             eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
 
             eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-            eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
+            eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = pan.osd_battery_show_percentage;
             eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
             eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1375,7 +1375,6 @@ namespace OSD
         const int panHeading_x_ADDR = 56;
         const int panHeading_y_ADDR = 58;
 //        const int panMavBeat_en_ADDR = 60;
-        const int OSD_BATT_SHOW_PERCENT = 60;
 //        const int panMavBeat_x_ADDR = 62;
 //        const int panMavBeat_y_ADDR = 64;
         const int panHomeDir_en_ADDR = 66;
@@ -1461,6 +1460,7 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
+        const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
         const int stall_ADDR = 894;
@@ -1637,7 +1637,7 @@ namespace OSD
             pan.batt_warn_level = eeprom[OSD_BATT_WARN_ADDR];
             BATT_WARNnumeric.Value = pan.batt_warn_level;
 
-            pan.osd_battery_show_percentage = eeprom[OSD_BATT_SHOW_PERCENT];
+            pan.osd_battery_show_percentage = eeprom[OSD_BATT_SHOW_PERCENT_ADDR];
             rbtBatteryPercent.Checked = Convert.ToBoolean(pan.osd_battery_show_percentage);
 
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
