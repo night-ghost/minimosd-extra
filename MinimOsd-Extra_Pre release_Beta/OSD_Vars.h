@@ -7,7 +7,6 @@ static float        max_osd_groundspeed = 0;
 static float        max_osd_home_alt = 0;
 static float        max_osd_windspeed = 0;
 
-static unsigned long dt = 0;
 static float tdistance = 0;
 static float ddistance = 0;
 static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
