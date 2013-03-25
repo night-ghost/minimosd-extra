@@ -54,6 +54,7 @@ namespace OSD
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
         static uint16_t osd_battery_remaining = 10;      // 0 to 100 <=> 0 to 1000
+        public byte osd_battery_show_percentage = 1;      // use remaining % or used mAh
         static uint8_t osd_battery_pic = 0xb4;         // picture to show battery remaining
 
         static uint16_t osd_mode = 100;                   // Navigation mode from RC AC2 = CH5, APM = CH8
@@ -146,7 +147,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             
-            osd.printf("%c%c%4.2f%c", 0xFE, 0x20, tdistance, 0xFD);
+            osd.printf("%c%c%4.2f%c", 0x8F, 0x20, tdistance, 0x1B);
             
             osd.closePanel();
             return 0;
@@ -164,7 +165,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%5.1f%c", 0x1C, temperature, 0xC8);
+                osd.printf("%c%5.1f%c", 0x0A, temperature, 0x05);
             }
             osd.closePanel();
             return 0;
@@ -200,7 +201,7 @@ namespace OSD
         osd.setPanel(first_col, first_line);
         osd.openPanel();
         {
-        osd.printf("%c%4.0f%c", 0x17, eff, 0x82);
+        osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
         }
         osd.closePanel();
          return 0;
@@ -218,7 +219,7 @@ namespace OSD
  	        osd.setPanel(first_col, first_line);
  	        osd.openPanel();
  	        {
- 	            osd.printf("%c%3i%c", 0xE1, osd_rssi, 0x25);
+ 	            osd.printf("%c%3i%c", 0x09, osd_rssi, 0x25);
  	        }
             osd.closePanel();
  	        return 0;
@@ -274,7 +275,7 @@ namespace OSD
             osd.openPanel();
             
             {
-                osd.printf("%c%3.0f%c", 0x16, (double)(osd_climb), 0x88);
+                osd.printf("%c%3.0f%c", 0x15, (double)(osd_climb), 0x1A);
             }
             
             osd.closePanel();
@@ -293,7 +294,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0xFC, (double)(osd_windspeed * 3.6), 0x81, 0xA4, 0xA5, (double)(osd_windspeed * 3.6), 0x81);
+                osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0x1D, (double)(osd_windspeed * 3.6), 0x10, 0xA4, 0xA5, (double)(osd_windspeed * 3.6), 0x10);
             }
             osd.closePanel();
             return 0;
@@ -330,7 +331,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%5.2f%c%c", 0xE4, (osd_curr_A * .01), 0x8F);
+                osd.printf("%c%5.2f%c%c", 0xBD, (osd_curr_A * .01), 0x0E);
             }
             osd.closePanel();
             return 0;
@@ -348,7 +349,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0xE6, (double)(osd_alt), 0x8D);
+            osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt), 0x0C);
             osd.closePanel();
             return 0;
         }
@@ -378,7 +379,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0xE7, (double)(osd_alt - osd_home_alt), 0x8D);
+            osd.printf("%c%5.0f%c", 0x12, (double)(osd_alt - osd_home_alt), 0x0C);
             osd.closePanel();
             return 0;
         }
@@ -394,7 +395,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0xE9, (double)osd_groundspeed, 0x81);
+            osd.printf("%c%3.0f%c", 0x14, (double)osd_groundspeed, 0x10);
             osd.closePanel();
             return 0;
         }
@@ -410,7 +411,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0xE8, (double)(osd_airspeed), 0x81);
+            osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed), 0x10);
             osd.closePanel();
             return 0;
         }
@@ -426,7 +427,14 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0i%c", 0xB9, (osd_battery_remaining), 0x25);
+            if (Convert.ToBoolean(osd_battery_show_percentage))
+            {
+                osd.printf("%c%c%c%3.0i%c", 0x17, 0x20, 0x20, osd_battery_remaining, 0x25);
+            }
+            else
+            {
+                osd.printf("%c%5.0i%c", 0x17, osd_battery_remaining, 0x01);
+            }
             osd.closePanel();
             return 0;
         }
@@ -442,7 +450,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%2i%c%02i", 0xB3, (start_Time / 60) % 60, 0x3A, start_Time % 60);
+            osd.printf("%c%2i%c%02i", 0x08, (start_Time / 60) % 60, 0x3A, start_Time % 60);
             osd.closePanel();
             return 0;
         }
@@ -458,7 +466,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0i%c", 0x87, osd_throttle, 0x25);
+            osd.printf("%c%3.0i%c", 0x02, osd_throttle, 0x25);
             osd.closePanel();
             return 0;
         }
@@ -474,7 +482,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%5.0f%c", 0x1F, (double)osd_home_distance, 0x8D);
+            osd.printf("%c%5.0f%c", 0x0B, (double)osd_home_distance, 0x0C);
             osd.closePanel();
             return 0;
         }
@@ -504,12 +512,12 @@ namespace OSD
 
         public int panHorizon(int first_col, int first_line)
         {
-            showHorizon((first_col + 1), first_line);
+            //showHorizon((first_col + 1), first_line);
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-            osd.printf_P(PSTR("\xd8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xd9|"));
+            osd.printf_P(PSTR("\xc6\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xc5|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
             osd.closePanel();
@@ -527,7 +535,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%4i%c%c", osd_pitch, 0xb0, 0xb1);
+            osd.printf("%4i%c%c", osd_pitch, 0x05, 0x07);
             osd.closePanel();
             return 0;
         }
@@ -543,7 +551,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%4i%c%c", osd_roll, 0xb0, 0xb2);
+            osd.printf("%4i%c%c", osd_roll, 0x05, 0x06);
             osd.closePanel();
             return 0;
         }
@@ -560,7 +568,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.2f%c%c", 0xE2,(double)osd_vbat, 0x8E, osd_battery_pic);
-            osd.printf("%c%5.2f%c", 0xE2, (double)osd_vbat, 0x8E);
+            osd.printf("%c%5.2f%c", 0xBC, (double)osd_vbat, 0x0D);
             osd.closePanel();
             return 0;
         }
@@ -651,7 +659,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%10.6f%c|%c%10.6f", 0x83, (double)osd_lat, 0x20, 0x84, (double)osd_lon);
+            osd.printf("%c%10.6f%c|%c%10.6f", 0x03, (double)osd_lat, 0x20, 0x04, (double)osd_lon);
             osd.closePanel();
             return 0;
         }
@@ -667,7 +675,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%4.0f%c", (double)osd_heading, 0xb0);
+            osd.printf("%4.0f%c", (double)osd_heading, 0x05);
             osd.closePanel();
             return 0;
         }
@@ -685,7 +693,7 @@ namespace OSD
             osd.openPanel();
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-            osd.printf_P(PSTR("\xd0\xc0\xc1\xc0\xc2\xc0\xc1\xc0\xd1"));
+            osd.printf_P(PSTR("\x86\x80\x81\x80\x82\x80\x81\x80\x87"));
            
             osd.closePanel();
             return 0;
@@ -799,31 +807,31 @@ namespace OSD
             if (apm_mav_type == 2)//ArduCopter
             {
 
-                if (osd_mode == 100) osd.printf_P(PSTR("\xE0stab"));//Stabilize
-                if (osd_mode == 101) osd.printf_P(PSTR("\xE0acro"));//Acrobatic
-                if (osd_mode == 102) osd.printf_P(PSTR("\xE0alth"));//Alt Hold
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\xE0auto"));//Auto
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\xE0guid"));//Guided
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\xE0loit"));//Loiter
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\xE0retl"));//Return to Launch
-                if (osd_mode == 107) osd.printf_P(PSTR("\xE0circ")); // Circle
-                if (osd_mode == 108) osd.printf_P(PSTR("\xE0posi")); // Position
-                if (osd_mode == 109) osd.printf_P(PSTR("\xE0land")); // Land
-                if (osd_mode == 110) osd.printf_P(PSTR("\xE0oflo")); // OF_Loiter
+                if (osd_mode == 100) osd.printf_P(PSTR("\x7Fstab"));//Stabilize
+                if (osd_mode == 101) osd.printf_P(PSTR("\x7Facro"));//Acrobatic
+                if (osd_mode == 102) osd.printf_P(PSTR("\x7Falth"));//Alt Hold
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fauto"));//Auto
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fguid"));//Guided
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\x7Floit"));//Loiter
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7Fretl"));//Return to Launch
+                if (osd_mode == 107) osd.printf_P(PSTR("\x7Fcirc")); // Circle
+                if (osd_mode == 108) osd.printf_P(PSTR("\x7Fposi")); // Position
+                if (osd_mode == 109) osd.printf_P(PSTR("\x7Fland")); // Land
+                if (osd_mode == 110) osd.printf_P(PSTR("\x7Foflo")); // OF_Loiter
             }
             else if (apm_mav_type == 1) // arduplane
             {
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST1 && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\xE0\xE2"));//Stabilize
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_MANUAL && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\xE0\xE3"));//Manual
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\xE0\xE4"));//Loiter
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\xE0\xE5"));//Return to Launch
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 1) osd.printf_P(PSTR("\xE0\xE6"));//FLY_BY_WIRE_A
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 2) osd.printf_P(PSTR("\xE0\xE7"));//FLY_BY_WIRE_B
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED) osd.printf_P(PSTR("\xE0\xE7"));//GUIDED
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\xE0\xE7"));//AUTO
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\xE0\xE7"));//RTL
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\xE0\xE7"));//LOITER
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST3) osd.printf_P(PSTR("\xE0\xE7"));//CIRCLE
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST1 && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE2"));//Stabilize
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_MANUAL && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE3"));//Manual
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE4"));//Loiter
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE5"));//Return to Launch
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 1) osd.printf_P(PSTR("\x7F\xE6"));//FLY_BY_WIRE_A
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 2) osd.printf_P(PSTR("\x7F\xE7"));//FLY_BY_WIRE_B
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED) osd.printf_P(PSTR("\x7F\xE7"));//GUIDED
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7F\xE7"));//AUTO
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE7"));//RTL
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE7"));//LOITER
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST3) osd.printf_P(PSTR("\x7F\xE7"));//CIRCLE
             }
             //    if(osd_mode == 3 && osd_nav_mode == 4) osd.printf_P(PSTR("\xD0\xD2"));
             osd.closePanel();
