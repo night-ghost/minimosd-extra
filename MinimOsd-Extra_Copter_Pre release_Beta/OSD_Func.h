@@ -112,12 +112,10 @@ if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
     last_battery_reading = osd_battery_remaining_A;
     }
     
-  if ((millis() - dt) >= 1000){
-    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
-    //Current consumed integrator
-    osd_curr_consumed += (float)(millis() - dt) / 360000 * osd_curr_A;
+    tdistance += (millis() - dt) / 1000.0 * osd_groundspeed;
+    mah_used += (millis() - dt) / 3600000.0 * osd_curr_A * 10.0;
     dt = millis();
-  }
+
 if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
 if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
