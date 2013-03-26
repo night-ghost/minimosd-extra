@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OSD));
-            this.LIST_items = new System.Windows.Forms.CheckedListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -99,18 +98,19 @@
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.LIST_items = new System.Windows.Forms.TreeView();
+            this.rbtSortCategory = new System.Windows.Forms.RadioButton();
+            this.rbtSortAlphabetic = new System.Windows.Forms.RadioButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.LIST_items2 = new System.Windows.Forms.CheckedListBox();
+            this.rbtSortCategory2 = new System.Windows.Forms.RadioButton();
+            this.rbtSortAlphabetic2 = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
+            this.LIST_items2 = new System.Windows.Forms.TreeView();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -142,17 +142,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
-            // LIST_items
-            // 
-            this.LIST_items.FormattingEnabled = true;
-            this.LIST_items.Location = new System.Drawing.Point(3, 3);
-            this.LIST_items.Name = "LIST_items";
-            this.LIST_items.Size = new System.Drawing.Size(138, 274);
-            this.LIST_items.TabIndex = 1;
-            this.LIST_items.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
-            this.LIST_items.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
-            this.LIST_items.SelectedValueChanged += new System.EventHandler(this.checkedListBox1_SelectedValueChanged);
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.label2);
@@ -161,7 +150,7 @@
             this.groupBox1.Controls.Add(this.NUM_X);
             this.groupBox1.Location = new System.Drawing.Point(3, 285);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(138, 82);
+            this.groupBox1.Size = new System.Drawing.Size(169, 82);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             // 
@@ -212,7 +201,7 @@
             // BUT_WriteOSD
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_WriteOSD.Location = new System.Drawing.Point(526, 424);
+            this.BUT_WriteOSD.Location = new System.Drawing.Point(547, 424);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
             this.BUT_WriteOSD.Size = new System.Drawing.Size(131, 23);
             this.BUT_WriteOSD.TabIndex = 2;
@@ -224,7 +213,7 @@
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
-            this.CMB_ComPort.Location = new System.Drawing.Point(314, 424);
+            this.CMB_ComPort.Location = new System.Drawing.Point(335, 424);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(98, 21);
             this.CMB_ComPort.TabIndex = 4;
@@ -233,7 +222,7 @@
             // BUT_ReadOSD
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_ReadOSD.Location = new System.Drawing.Point(419, 424);
+            this.BUT_ReadOSD.Location = new System.Drawing.Point(440, 424);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(100, 23);
             this.BUT_ReadOSD.TabIndex = 6;
@@ -248,7 +237,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 451);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(667, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(688, 22);
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -271,7 +260,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(667, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(688, 24);
             this.menuStrip1.TabIndex = 10;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -441,10 +430,9 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Location = new System.Drawing.Point(154, 14);
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.pictureBox1.Location = new System.Drawing.Point(178, 17);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(497, 343);
             this.pictureBox1.TabIndex = 0;
@@ -462,7 +450,7 @@
             this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
             this.PANEL_tabs.SelectedIndex = 0;
-            this.PANEL_tabs.Size = new System.Drawing.Size(667, 394);
+            this.PANEL_tabs.Size = new System.Drawing.Size(687, 394);
             this.PANEL_tabs.TabIndex = 0;
             // 
             // tabPageConfig
@@ -479,7 +467,7 @@
             this.tabPageConfig.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageConfig.Name = "tabPageConfig";
             this.tabPageConfig.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPageConfig.Size = new System.Drawing.Size(659, 368);
+            this.tabPageConfig.Size = new System.Drawing.Size(679, 368);
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
@@ -870,44 +858,88 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.radioButton2);
-            this.tabPage1.Controls.Add(this.radioButton1);
             this.tabPage1.Controls.Add(this.LIST_items);
+            this.tabPage1.Controls.Add(this.rbtSortCategory);
+            this.tabPage1.Controls.Add(this.rbtSortAlphabetic);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.pictureBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(659, 368);
+            this.tabPage1.Size = new System.Drawing.Size(679, 368);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Panel 1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // LIST_items
+            // 
+            this.LIST_items.Location = new System.Drawing.Point(3, 40);
+            this.LIST_items.Name = "LIST_items";
+            this.LIST_items.Size = new System.Drawing.Size(169, 237);
+            this.LIST_items.TabIndex = 5;
+            this.LIST_items.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
+            this.LIST_items.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            // 
+            // rbtSortCategory
+            // 
+            this.rbtSortCategory.AutoSize = true;
+            this.rbtSortCategory.Location = new System.Drawing.Point(3, 17);
+            this.rbtSortCategory.Name = "rbtSortCategory";
+            this.rbtSortCategory.Size = new System.Drawing.Size(104, 17);
+            this.rbtSortCategory.TabIndex = 4;
+            this.rbtSortCategory.Text = "Sort By Category";
+            this.rbtSortCategory.UseVisualStyleBackColor = true;
+            // 
+            // rbtSortAlphabetic
+            // 
+            this.rbtSortAlphabetic.AutoSize = true;
+            this.rbtSortAlphabetic.Checked = true;
+            this.rbtSortAlphabetic.Location = new System.Drawing.Point(3, 3);
+            this.rbtSortAlphabetic.Name = "rbtSortAlphabetic";
+            this.rbtSortAlphabetic.Size = new System.Drawing.Size(112, 17);
+            this.rbtSortAlphabetic.TabIndex = 3;
+            this.rbtSortAlphabetic.TabStop = true;
+            this.rbtSortAlphabetic.Text = "Sort Alphabetically";
+            this.rbtSortAlphabetic.UseVisualStyleBackColor = true;
+            this.rbtSortAlphabetic.CheckedChanged += new System.EventHandler(this.rbtSortAlphabetic_CheckedChanged);
+            // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.radioButton3);
-            this.tabPage2.Controls.Add(this.radioButton4);
             this.tabPage2.Controls.Add(this.LIST_items2);
+            this.tabPage2.Controls.Add(this.rbtSortCategory2);
+            this.tabPage2.Controls.Add(this.rbtSortAlphabetic2);
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.pictureBox2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(659, 368);
+            this.tabPage2.Size = new System.Drawing.Size(679, 368);
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Panel 2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // LIST_items2
+            // rbtSortCategory2
             // 
-            this.LIST_items2.FormattingEnabled = true;
-            this.LIST_items2.Location = new System.Drawing.Point(3, 3);
-            this.LIST_items2.Name = "LIST_items2";
-            this.LIST_items2.Size = new System.Drawing.Size(138, 274);
-            this.LIST_items2.TabIndex = 2;
-            this.LIST_items2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox2_ItemCheck);
-            this.LIST_items2.SelectedIndexChanged += new System.EventHandler(this.checkedListBox2_SelectedIndexChanged);
-            this.LIST_items2.SelectedValueChanged += new System.EventHandler(this.checkedListBox2_SelectedValueChanged);
+            this.rbtSortCategory2.AutoSize = true;
+            this.rbtSortCategory2.Location = new System.Drawing.Point(3, 17);
+            this.rbtSortCategory2.Name = "rbtSortCategory2";
+            this.rbtSortCategory2.Size = new System.Drawing.Size(104, 17);
+            this.rbtSortCategory2.TabIndex = 6;
+            this.rbtSortCategory2.Text = "Sort By Category";
+            this.rbtSortCategory2.UseVisualStyleBackColor = true;
+            // 
+            // rbtSortAlphabetic2
+            // 
+            this.rbtSortAlphabetic2.AutoSize = true;
+            this.rbtSortAlphabetic2.Checked = true;
+            this.rbtSortAlphabetic2.Location = new System.Drawing.Point(3, 3);
+            this.rbtSortAlphabetic2.Name = "rbtSortAlphabetic2";
+            this.rbtSortAlphabetic2.Size = new System.Drawing.Size(112, 17);
+            this.rbtSortAlphabetic2.TabIndex = 5;
+            this.rbtSortAlphabetic2.TabStop = true;
+            this.rbtSortAlphabetic2.Text = "Sort Alphabetically";
+            this.rbtSortAlphabetic2.UseVisualStyleBackColor = true;
+            this.rbtSortAlphabetic2.CheckedChanged += new System.EventHandler(this.rbtSortAlphabetic2_CheckedChanged);
             // 
             // groupBox2
             // 
@@ -970,7 +1002,7 @@
             this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox2.Location = new System.Drawing.Point(154, 14);
+            this.pictureBox2.Location = new System.Drawing.Point(178, 17);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(497, 343);
             this.pictureBox2.TabIndex = 3;
@@ -979,59 +1011,20 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
-            // radioButton1
+            // LIST_items2
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(154, 14);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(112, 17);
-            this.radioButton1.TabIndex = 3;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Sort Alphabetically";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.Visible = false;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(154, 28);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(104, 17);
-            this.radioButton2.TabIndex = 4;
-            this.radioButton2.Text = "Sort By Category";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.Visible = false;
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(154, 28);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(104, 17);
-            this.radioButton3.TabIndex = 6;
-            this.radioButton3.Text = "Sort By Category";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.Visible = false;
-            // 
-            // radioButton4
-            // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Checked = true;
-            this.radioButton4.Location = new System.Drawing.Point(154, 14);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(112, 17);
-            this.radioButton4.TabIndex = 5;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Sort Alphabetically";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            this.radioButton4.Visible = false;
+            this.LIST_items2.Location = new System.Drawing.Point(3, 40);
+            this.LIST_items2.Name = "LIST_items2";
+            this.LIST_items2.Size = new System.Drawing.Size(169, 237);
+            this.LIST_items2.TabIndex = 7;
+            this.LIST_items2.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterCheck);
+            this.LIST_items2.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterSelect);
             // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(667, 473);
+            this.ClientSize = new System.Drawing.Size(688, 473);
             this.Controls.Add(this.PANEL_tabs);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
@@ -1096,7 +1089,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.CheckedListBox LIST_items;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.NumericUpDown NUM_Y;
         private System.Windows.Forms.NumericUpDown NUM_X;
@@ -1129,7 +1121,6 @@
         private System.Windows.Forms.TabControl PANEL_tabs;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.CheckedListBox LIST_items2;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label3;
@@ -1173,10 +1164,12 @@
         private System.Windows.Forms.ToolStripMenuItem gettingStartedToolStripMenuItem;
         private System.Windows.Forms.RadioButton rbtBatterymAh;
         private System.Windows.Forms.RadioButton rbtBatteryPercent;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.RadioButton rbtSortCategory;
+        private System.Windows.Forms.RadioButton rbtSortAlphabetic;
+        private System.Windows.Forms.RadioButton rbtSortCategory2;
+        private System.Windows.Forms.RadioButton rbtSortAlphabetic2;
+        private System.Windows.Forms.TreeView LIST_items;
+        private System.Windows.Forms.TreeView LIST_items2;
     }
 }
 

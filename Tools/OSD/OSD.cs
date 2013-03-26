@@ -216,7 +216,7 @@ namespace OSD
             panelItems_default = panelItems;
 
             //Fill List of items in tabe number 1
-            LIST_items.Items.Clear();
+            LIST_items.Nodes.Clear();
             startup = true;
             foreach (var thing in panelItems)
             {
@@ -225,49 +225,64 @@ namespace OSD
                     
                     if (thing.Item1 == "Center")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Tune")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "WP Distance")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Temperature")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
 
 
                     else if (thing.Item1 == "Trip Distance")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
 
 
                     else if (thing.Item1 == "Channel Raw")
                     {
-                        LIST_items.Items.Add(thing.Item1, false);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = false;
                     }
                     else
                     {
-                        LIST_items.Items.Add(thing.Item1, true);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        tn.Checked = true;
                     }
                 }
             }
-            LIST_items.Sorted = true;
+            LIST_items.CheckBoxes = true;
+            LIST_items.Sort();
             startup = false;
 
-
+            //startup = true;
+            //List<string> instruments = new List<string>();
+            //LIST_items.Nodes.Clear();
+            //foreach (var tuple in this.panelItems)
+            //{
+            //    if ((tuple != null))
+            //    {
+            //        TreeNode tn = LIST_items.Nodes.Add(tuple.Item1, tuple.Item1);
+            //        tn.Checked = (tuple.Item3 == 1);
+            //    }
+            //}
             a = 0;
-
+            startup = false;
             // first 8
             // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
 //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
@@ -319,7 +334,7 @@ namespace OSD
             panelItems2_default = panelItems2;
 
             //Fill List of items in tabe number 2
-            LIST_items2.Items.Clear();
+            LIST_items2.Nodes.Clear();
 
             startup = true;
             foreach (var thing in panelItems2)
@@ -329,90 +344,92 @@ namespace OSD
 
                     if (thing.Item1 == "Center")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Tune")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Pitch")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Roll")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Battery A")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Visible Sats")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "GPS Coord")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "GPS Lock")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Heading")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Altitude")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Climb Rate")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Current")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Horizon")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     
                     else if (thing.Item1 == "Efficiency")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else if (thing.Item1 == "Call Sign")
                     {
-                        LIST_items2.Items.Add(thing.Item1, false);
-
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
                     }
                     else
                     {
-                        LIST_items2.Items.Add(thing.Item1, true);
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = true;
                     }
                 }
             }
-            LIST_items2.Sorted = true;
+            LIST_items2.CheckBoxes = true;
+            LIST_items2.Sort();
             startup = false;
 
             osdDraw1();
@@ -566,7 +583,10 @@ namespace OSD
 
             if (usedPostion[ansW][ansH] != null && usedPostion[ansW][ansH] != "")
             {
-                LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
+                TreeNode[] tnArray = LIST_items.Nodes.Find(usedPostion[ansW][ansH], true);
+                LIST_items.Focus();
+                LIST_items.SelectedNode = tnArray[0];
+                //LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
                 return usedPostion[ansW][ansH];
             }
 
@@ -581,7 +601,10 @@ namespace OSD
 
             if (usedPostion[ansW][ansH] != null && usedPostion[ansW][ansH] != "")
             {
-                LIST_items2.SelectedIndex = LIST_items2.Items.IndexOf(usedPostion[ansW][ansH]);
+                TreeNode[] tnArray = LIST_items2.Nodes.Find(usedPostion[ansW][ansH], true);
+                LIST_items2.Focus();
+                LIST_items2.SelectedNode = tnArray[0];
+                //LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
                 return usedPostion[ansW][ansH];
             }
 
@@ -694,9 +717,15 @@ namespace OSD
 
             List<string> list = new List<string>();
 
-            foreach (string it in LIST_items.CheckedItems)
+            foreach (TreeNode tn in LIST_items.Nodes)
             {
-                list.Add(it);
+                foreach (TreeNode tn2 in tn.Nodes)
+                {
+                    if(tn2.Checked)
+                        list.Add(tn2.Text);
+                }
+                if (tn.Checked)
+                    list.Add(tn.Text);
             }
 
             list.Reverse();
@@ -785,9 +814,15 @@ namespace OSD
 
             List<string> list = new List<string>();
 
-            foreach (string it in LIST_items2.CheckedItems)
+            foreach (TreeNode tn in LIST_items2.Nodes)
             {
-                list.Add(it);
+                foreach (TreeNode tn2 in tn.Nodes)
+                {
+                    if (tn2.Checked)
+                        list.Add(tn2.Text);
+                }
+                if (tn.Checked)
+                    list.Add(tn.Text);
             }
 
             list.Reverse();
@@ -841,7 +876,6 @@ namespace OSD
 
         private void OSD_Load(object sender, EventArgs e)
         {
-
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Text = this.Text + " " + strVersion + " - Pre-Release";
 
@@ -970,7 +1004,8 @@ namespace OSD
             string item;
             try
             {
-                item = LIST_items.SelectedItem.ToString();
+                item = currentlyselected[0];
+                //item = LIST_items.SelectedItem.ToString();
             }
             catch { return; }
 
@@ -991,7 +1026,8 @@ namespace OSD
             string item;
             try
             {
-                item = LIST_items.SelectedItem.ToString();
+                item = currentlyselected[0];
+                //item = LIST_items.SelectedItem.ToString();
             }
             catch { return; }
 
@@ -1012,7 +1048,7 @@ namespace OSD
             string item;
             try
             {
-                item = LIST_items2.SelectedItem.ToString();
+                item = currentlyselected[0];
             }
             catch { return; }
 
@@ -1032,7 +1068,7 @@ namespace OSD
             string item;
             try
             {
-                item = LIST_items2.SelectedItem.ToString();
+                item = currentlyselected[0];
             }
             catch { return; }
 
@@ -1057,13 +1093,15 @@ namespace OSD
             if (current.Text == "Panel 1") 
             {
                 //First Panel 
-                foreach (string str in this.LIST_items.Items)
+                foreach (TreeNode tn in this.LIST_items.Nodes)
                 {
+                    string str = tn.Text;
                     foreach (var tuple in this.panelItems)
                     {
                         if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                         {
-                            eeprom[tuple.Item5] = (byte)(this.LIST_items.CheckedItems.Contains(str) ? 1 : 0);
+                            TreeNode[] trArray = LIST_items.Nodes.Find(str, true);
+                            eeprom[tuple.Item5] = (byte)(trArray[0].Checked ? 1 : 0);
                             eeprom[tuple.Item6] = (byte)tuple.Item3; // x
                             eeprom[tuple.Item7] = (byte)tuple.Item4; // y
 
@@ -1075,13 +1113,15 @@ namespace OSD
             else if (current.Text == "Panel 2") 
             {
                 //Second Panel 
-                foreach (string str in this.LIST_items2.Items)
+                foreach (TreeNode tn in this.LIST_items2.Nodes)
                 {
+                    string str = tn.Text;
                     foreach (var tuple in this.panelItems2)
                     {
                         if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                         {
-                            eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(this.LIST_items2.CheckedItems.Contains(str) ? 1 : 0);
+                            TreeNode[] trArray = LIST_items.Nodes.Find(str, true);
+                            eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(trArray[0].Checked ? 1 : 0);
                             eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
                             eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
 
@@ -1108,7 +1148,7 @@ namespace OSD
                 eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
                 
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-                eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = pan.osd_battery_show_percentage;
+                eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
                 eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1149,7 +1189,7 @@ namespace OSD
                 {
                     bool spupload_flag = false;
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
-                    //conf_up = sp.upload(eeprom, OSD_BATT_SHOW_PERCENT_ADDR, (OSD_RSSI_LOW_ADDR - OSD_BATT_SHOW_PERCENT_ADDR), OSD_BATT_SHOW_PERCENT_ADDR);
+                    //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
                     if (current.Text == "Panel 1") {
                         for(int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
@@ -1182,7 +1222,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)OSD_BATT_SHOW_PERCENT_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - OSD_BATT_SHOW_PERCENT_ADDR + 1), (short)OSD_BATT_SHOW_PERCENT_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)measure_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - measure_ADDR + 1), (short)measure_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1213,8 +1253,9 @@ namespace OSD
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
             //First Panel 
-            foreach (string str in this.LIST_items.Items)
+            foreach (TreeNode tn in this.LIST_items.Nodes)
             {
+                string str = tn.Text;
                 foreach (var tuple in this.panelItems_default)
                 {
                     if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
@@ -1230,7 +1271,7 @@ namespace OSD
                 }
             }
             //Second Panel 
-            foreach (string str in this.LIST_items2.Items)
+            foreach (string str in this.LIST_items2.Nodes)
             {
                 foreach (var tuple in this.panelItems2_default)
                 {
@@ -1262,7 +1303,7 @@ namespace OSD
             eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
 
             eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-            eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = pan.osd_battery_show_percentage;
+            eeprom[OSD_BATT_SHOW_PERCENT] = Convert.ToByte(pan.osd_battery_show_percentage);
             eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
 
             eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
@@ -1375,6 +1416,7 @@ namespace OSD
         const int panHeading_x_ADDR = 56;
         const int panHeading_y_ADDR = 58;
 //        const int panMavBeat_en_ADDR = 60;
+        const int OSD_BATT_SHOW_PERCENT = 60;
 //        const int panMavBeat_x_ADDR = 62;
 //        const int panMavBeat_y_ADDR = 64;
         const int panHomeDir_en_ADDR = 66;
@@ -1460,7 +1502,6 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
-        const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
         const int stall_ADDR = 894;
@@ -1564,8 +1605,13 @@ namespace OSD
                     if (panelItems[a] != null)
                     {
                         if (panelItems[a].Item5 >= 0)
-                            LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
+                        {
+                            TreeNode[] tnArray = LIST_items.Nodes.Find(panelItems[a].Item1, true);
+                            if (tnArray.Length > 0)
+                                tnArray[0].Checked = (eeprom[panelItems[a].Item5] == 1);
 
+                            //LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
+                        }
                         if (panelItems[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
                             panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, eeprom[panelItems[a].Item6], eeprom[panelItems[a].Item7], panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
                     }
@@ -1576,7 +1622,13 @@ namespace OSD
                     if (panelItems2[a] != null)
                     {
                         if (panelItems2[a].Item5 >= 0)
-                            LIST_items2.SetItemCheckState(a, eeprom[panelItems2[a].Item5 + OffsetBITpanel] == 0 ? CheckState.Unchecked : CheckState.Checked);
+                        {
+                            TreeNode[] tnArray = LIST_items2.Nodes.Find(panelItems2[a].Item1, true);
+                            if (tnArray.Length > 0)
+                                tnArray[0].Checked = (eeprom[panelItems2[a].Item5] == 1);
+
+                            //LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
+                        }
 
                         if (panelItems2[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
                             panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, eeprom[panelItems2[a].Item6 + OffsetBITpanel], eeprom[panelItems2[a].Item7 + OffsetBITpanel], panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
@@ -1637,7 +1689,7 @@ namespace OSD
             pan.batt_warn_level = eeprom[OSD_BATT_WARN_ADDR];
             BATT_WARNnumeric.Value = pan.batt_warn_level;
 
-            pan.osd_battery_show_percentage = eeprom[OSD_BATT_SHOW_PERCENT_ADDR];
+            pan.osd_battery_show_percentage = eeprom[OSD_BATT_SHOW_PERCENT];
             rbtBatteryPercent.Checked = Convert.ToBoolean(pan.osd_battery_show_percentage);
 
             pan.rssi_warn_level = eeprom[OSD_RSSI_WARN_ADDR];
@@ -1784,14 +1836,22 @@ namespace OSD
                         foreach (var item in panelItems)
                         {
                             if (item != null)
-                                sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, LIST_items.GetItemChecked(LIST_items.Items.IndexOf(item.Item1)).ToString());
+                            {
+                                TreeNode[] tnArray = LIST_items.Nodes.Find(item.Item1, true);
+                                if (tnArray.Length > 0)
+                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
+                            }
                         }
                         //Panel 2
                         sw.WriteLine("{0}", "Panel 2");
                         foreach (var item in panelItems2)
                         {
                             if (item != null)
-                                sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, LIST_items2.GetItemChecked(LIST_items2.Items.IndexOf(item.Item1)).ToString());
+                            {
+                                TreeNode[] tnArray = LIST_items2.Nodes.Find(item.Item1, true);
+                                if (tnArray.Length > 0)
+                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
+                            }
                         }
                         //Config 
                         sw.WriteLine("{0}", "Configuration");
@@ -1846,7 +1906,9 @@ namespace OSD
                                     {
                                         panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
 
-                                        LIST_items.SetItemChecked(a, strings[3] == "True");
+                                        TreeNode[] tnArray = LIST_items.Nodes.Find(panelItems[a].Item1, true);
+                                        if(tnArray.Length > 0)
+                                            tnArray[0].Checked = (strings[3] == "True");
                                     }
                                     catch { }
                                 }
@@ -1867,7 +1929,9 @@ namespace OSD
                                     {
                                         panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
 
-                                        LIST_items2.SetItemChecked(a, strings[3] == "True");
+                                        TreeNode[] tnArray = LIST_items2.Nodes.Find(panelItems2[a].Item1, true);
+                                        if (tnArray.Length > 0)
+                                            tnArray[0].Checked = (strings[3] == "True");
                                     }
                                     catch { }
                                 }
@@ -2558,5 +2622,244 @@ namespace OSD
             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
         }
 
+        //Controls if it's a populate process or user input
+        private Boolean AutomaticCheck = true;
+        private void rbtSortAlphabetic_CheckedChanged(object sender, EventArgs e)
+        {
+            AutomaticCheck = true;
+            LIST_items.Nodes.Clear();
+            if (rbtSortAlphabetic.Checked)
+            {
+                List<string> instruments = new List<string>();
+                foreach (var tuple in this.panelItems)
+                {
+                    if ((tuple != null))
+                    {
+                        LIST_items.Nodes.Add(tuple.Item1, tuple.Item1);
+                    }
+                }
+                LIST_items.Sort();
+            }
+            else
+            {
+                LIST_items.Nodes.Add("Attitude", "Attitude");
+                LIST_items.Nodes["Attitude"].Nodes.Add("Horizon", "Horizon");
+                LIST_items.Nodes["Attitude"].Nodes.Add("Pitch", "Pitch");
+                LIST_items.Nodes["Attitude"].Nodes.Add("Roll", "Roll");
+
+                LIST_items.Nodes.Add("General", "General");
+                LIST_items.Nodes["General"].Nodes.Add("Call Sign", "Call Sign");
+                LIST_items.Nodes["General"].Nodes.Add("RSSI", "RSSI");
+                LIST_items.Nodes["General"].Nodes.Add("Flight Mode", "Flight Mode");
+                LIST_items.Nodes["General"].Nodes.Add("Temperature", "Temperature");
+                LIST_items.Nodes["General"].Nodes.Add("Throttle", "Throttle");
+                LIST_items.Nodes["General"].Nodes.Add("Time", "Time");
+                LIST_items.Nodes["General"].Nodes.Add("Warnings", "Warnings");
+
+                LIST_items.Nodes.Add("Energy", "Energy");
+                LIST_items.Nodes["Energy"].Nodes.Add("Battery A", "Battery A");
+                LIST_items.Nodes["Energy"].Nodes.Add("Battery Percent", "Battery Percent");
+                LIST_items.Nodes["Energy"].Nodes.Add("Current", "Current");
+                LIST_items.Nodes["Energy"].Nodes.Add("Efficiency", "Efficiency");
+
+                LIST_items.Nodes.Add("Location", "Location");
+                LIST_items.Nodes["Location"].Nodes.Add("Altitude", "Altitude");
+                LIST_items.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
+                LIST_items.Nodes["Location"].Nodes.Add("Heading", "Heading");
+                LIST_items.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
+                LIST_items.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
+                LIST_items.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
+                LIST_items.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");
+                LIST_items.Nodes["Location"].Nodes.Add("Trip Distance", "Trip Distance");
+                LIST_items.Nodes["Location"].Nodes.Add("Visible Sats", "Visible Sats");
+                LIST_items.Nodes["Location"].Nodes.Add("WP Distance", "WP Distance");
+
+                LIST_items.Nodes.Add("Speed", "Speed");
+                LIST_items.Nodes["Speed"].Nodes.Add("Air Speed", "Air Speed");
+                LIST_items.Nodes["Speed"].Nodes.Add("Climb Rate", "Climb Rate");
+                LIST_items.Nodes["Speed"].Nodes.Add("Velocity", "Velocity");
+                LIST_items.Nodes["Speed"].Nodes.Add("Wind Speed", "Wind Speed");
+
+            }
+            LIST_items.CheckBoxes = true;
+
+            List<string> defaultUncheckedInstruments = new List<string>();
+            defaultUncheckedInstruments.Add("Center");
+            defaultUncheckedInstruments.Add("Tune");
+            defaultUncheckedInstruments.Add("WP Distance");
+            defaultUncheckedInstruments.Add("Temperature");
+            defaultUncheckedInstruments.Add("Trip Distance");
+            defaultUncheckedInstruments.Add("Channel Raw");
+
+            foreach (TreeNode tn in LIST_items.Nodes)
+            {
+                if(tn.Nodes.Count > 0)
+                {
+                    foreach (TreeNode tn2 in tn.Nodes)
+                    {
+                        if (defaultUncheckedInstruments.Contains(tn2.Text))
+                            tn2.Checked = false;
+                        else
+                            tn2.Checked = true;
+                    }
+                }
+                if (defaultUncheckedInstruments.Contains(tn.Text))
+                    tn.Checked = false;
+                else
+                    tn.Checked = true;
+            }
+
+            LIST_items.ExpandAll();
+            AutomaticCheck = false;
+        }
+
+        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if(!AutomaticCheck)
+                foreach (TreeNode node in e.Node.Nodes)
+                    node.Checked = e.Node.Checked;
+            if (this.IsHandleCreated)
+                this.BeginInvoke((MethodInvoker)delegate { osdDraw1(); });
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            //string item = ((CheckedListBox)sender).SelectedItem.ToString();
+
+            currentlyselected[0] = e.Node.Text;
+            osdDraw1();
+
+            foreach (var thing in panelItems)
+            {
+                if (thing != null && thing.Item1 == e.Node.Text)
+                {
+                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
+                    NUM_Y.Value = Constrain(thing.Item4, 0, 16 - 1);
+                }
+            }
+        }
+
+        private void rbtSortAlphabetic2_CheckedChanged(object sender, EventArgs e)
+        {
+            AutomaticCheck = true;
+            LIST_items2.Nodes.Clear();
+            if (rbtSortAlphabetic2.Checked)
+            {
+                List<string> instruments = new List<string>();
+                foreach (var tuple in this.panelItems)
+                {
+                    if ((tuple != null))
+                    {
+                        LIST_items2.Nodes.Add(tuple.Item1, tuple.Item1);
+                    }
+                }
+                LIST_items2.Sort();
+            }
+            else
+            {
+                LIST_items2.Nodes.Add("Attitude", "Attitude");
+                LIST_items2.Nodes["Attitude"].Nodes.Add("Horizon", "Horizon");
+                LIST_items2.Nodes["Attitude"].Nodes.Add("Pitch", "Pitch");
+                LIST_items2.Nodes["Attitude"].Nodes.Add("Roll", "Roll");
+
+                LIST_items2.Nodes.Add("General", "General");
+                LIST_items2.Nodes["General"].Nodes.Add("Call Sign", "Call Sign");
+                LIST_items2.Nodes["General"].Nodes.Add("RSSI", "RSSI");
+                LIST_items2.Nodes["General"].Nodes.Add("Flight Mode", "Flight Mode");
+                LIST_items2.Nodes["General"].Nodes.Add("Temperature", "Temperature");
+                LIST_items2.Nodes["General"].Nodes.Add("Throttle", "Throttle");
+                LIST_items2.Nodes["General"].Nodes.Add("Time", "Time");
+                LIST_items2.Nodes["General"].Nodes.Add("Warnings", "Warnings");
+
+                LIST_items2.Nodes.Add("Energy", "Energy");
+                LIST_items2.Nodes["Energy"].Nodes.Add("Battery A", "Battery A");
+                LIST_items2.Nodes["Energy"].Nodes.Add("Battery Percent", "Battery Percent");
+                LIST_items2.Nodes["Energy"].Nodes.Add("Current", "Current");
+                LIST_items2.Nodes["Energy"].Nodes.Add("Efficiency", "Efficiency");
+
+                LIST_items2.Nodes.Add("Location", "Location");
+                LIST_items2.Nodes["Location"].Nodes.Add("Altitude", "Altitude");
+                LIST_items2.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
+                LIST_items2.Nodes["Location"].Nodes.Add("Heading", "Heading");
+                LIST_items2.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
+                LIST_items2.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
+                LIST_items2.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
+                LIST_items2.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");
+                LIST_items2.Nodes["Location"].Nodes.Add("Trip Distance", "Trip Distance");
+                LIST_items2.Nodes["Location"].Nodes.Add("Visible Sats", "Visible Sats");
+                LIST_items2.Nodes["Location"].Nodes.Add("WP Distance", "WP Distance");
+
+                LIST_items2.Nodes.Add("Speed", "Speed");
+                LIST_items2.Nodes["Speed"].Nodes.Add("Air Speed", "Air Speed");
+                LIST_items2.Nodes["Speed"].Nodes.Add("Climb Rate", "Climb Rate");
+                LIST_items2.Nodes["Speed"].Nodes.Add("Velocity", "Velocity");
+                LIST_items2.Nodes["Speed"].Nodes.Add("Wind Speed", "Wind Speed");
+
+            }
+            LIST_items2.CheckBoxes = true;
+
+            List<string> defaultUncheckedInstruments = new List<string>();
+            defaultUncheckedInstruments.Add("Center");
+            defaultUncheckedInstruments.Add("Tune");
+            defaultUncheckedInstruments.Add("Pitch");
+            defaultUncheckedInstruments.Add("Roll");
+            defaultUncheckedInstruments.Add("Battery A");
+            defaultUncheckedInstruments.Add("Visible Sats");
+            defaultUncheckedInstruments.Add("GPS Coord");
+            defaultUncheckedInstruments.Add("GPS Lock");
+            defaultUncheckedInstruments.Add("Heading");
+            defaultUncheckedInstruments.Add("Altitude");
+            defaultUncheckedInstruments.Add("Climb Rate");
+            defaultUncheckedInstruments.Add("Call Sign");
+            defaultUncheckedInstruments.Add("Horizon");
+            defaultUncheckedInstruments.Add("Current");
+            
+            foreach (TreeNode tn in LIST_items2.Nodes)
+            {
+                if (tn.Nodes.Count > 0)
+                {
+                    foreach (TreeNode tn2 in tn.Nodes)
+                    {
+                        if (defaultUncheckedInstruments.Contains(tn2.Text))
+                            tn2.Checked = false;
+                        else
+                            tn2.Checked = true;
+                    }
+                }
+                if (defaultUncheckedInstruments.Contains(tn.Text))
+                    tn.Checked = false;
+                else
+                    tn.Checked = true;
+            }
+
+            LIST_items2.ExpandAll();
+            AutomaticCheck = false;
+        }
+
+        private void LIST_items2_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (!AutomaticCheck)
+                foreach (TreeNode node in e.Node.Nodes)
+                    node.Checked = e.Node.Checked;
+            if (this.IsHandleCreated)
+                this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
+        }
+
+        private void LIST_items2_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            //string item = ((CheckedListBox)sender).SelectedItem.ToString();
+
+            currentlyselected[0] = e.Node.Text;
+            osdDraw2();
+
+            foreach (var thing in panelItems2)
+            {
+                if (thing != null && thing.Item1 == e.Node.Text)
+                {
+                    NUM_X2.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
+                    NUM_Y2.Value = Constrain(thing.Item4, 0, 16 - 1);
+                }
+            }
+        }
     }
 }
