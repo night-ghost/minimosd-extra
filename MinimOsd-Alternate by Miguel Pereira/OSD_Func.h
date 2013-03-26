@@ -115,7 +115,7 @@ if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
   if ((millis() - dt) >= 1000){
     if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
     //Current consumed integrator
-    osd_curr_consumed += (float)(millis() - dt) / 360000 * osd_curr_A;
+    mah_used += (float)(millis() - dt) / 360000 * osd_curr_A;
     dt = millis();
   }
 if (takeofftime == 1){

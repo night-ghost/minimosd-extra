@@ -674,10 +674,11 @@ void panThr(int first_col, int first_line){
 void panBatteryPercent(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if((int)start_Time % 6 < 3)
-      osd.printf("%c%c%c%3.0i%c", 0x17, 0x20, 0x20, osd_battery_remaining_A, 0x25);
-    else
-      osd.printf("%c%5.0i%c", 0x17, osd_curr_consumed, 0x01);
+    if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR ) == 1){ 
+     osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25); 
+      }else{ 
+     osd.printf("%c%4.0f%c",0x17, mah_used, 0xbe); 
+     } 
     osd.closePanel();
 }
 
