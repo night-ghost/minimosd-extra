@@ -48,6 +48,7 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
+  osd_alt_to_home = (osd_alt - osd_home_alt);
   //Check arm/disarm switching.
   armed_switch = motor_armed ^ last_armed;
   if (armed_switch){
@@ -116,11 +117,12 @@ if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
     mah_used += (millis() - dt) / 3600000.0 * osd_curr_A * 10.0;
     dt = millis();
 
+
 if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
 if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
 if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
-if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
+if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
 }
 }

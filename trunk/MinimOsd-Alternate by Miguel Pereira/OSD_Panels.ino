@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r524"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r533"));
     osd.closePanel();
 }
 
@@ -747,7 +747,7 @@ void panHorizon(int first_col, int first_line){
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
     //Show ground level on  HUD
-    showHudVerticalLandingAid(first_col + 6, first_line);
+    showILS(first_col, first_line);
 }
 
 /* **************************************************************** */
@@ -1121,10 +1121,10 @@ void showHorizon(int start_col, int start_row) {
 }
 
 // Calculate and shows verical speed aid
-void showHudVerticalLandingAid(int start_col, int start_row) { 
+void showILS(int start_col, int start_row) { 
     //Show line on panel center because horizon line can be
     //high or low depending on pitch attitude
-    int subval_char = 0xD0;
+    int subval_char = 0xCF;
 
     //shift alt interval from [-5, 5] to [0, 10] interval, so we
     //can work with remainders.
@@ -1154,9 +1154,7 @@ void showHudVerticalLandingAid(int start_col, int start_row) {
     }
 
     //Enough calculations. Let's show the result
-    osd.openSingle(start_col, start_row);
-    osd.printf("%c", subval_char);
-    osd.openSingle(start_col + 1, start_row);
+    osd.openSingle(start_col + AH_COLS + 1, start_row);
     osd.printf("%c", subval_char);
 }
 
