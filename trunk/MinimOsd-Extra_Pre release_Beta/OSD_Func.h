@@ -48,6 +48,9 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
+  if(osd_throttle > 3 && takeoff_heading == -400)
+    takeoff_heading = osd_heading;
+  osd_alt_to_home = (osd_alt - osd_home_alt);
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
@@ -97,7 +100,7 @@ void setHomeVars(OSD &osd)
 
 void setFdataVars(){
 
-if (haltset == 1 && takeofftime == 0 && (osd_alt - osd_home_alt) > 5 && osd_throttle > 10)
+if (haltset == 1 && takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10)
     {
     takeofftime = 1;
     tdistance = 0;
@@ -119,7 +122,7 @@ if (takeofftime == 1){
 if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
 if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
 if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
-if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
+if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
 if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
 }
 }

@@ -23,7 +23,7 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
 if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+   if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
        if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;          
@@ -194,15 +194,15 @@ void panEff(int first_col, int first_line){
          
         if ((osd_throttle < 1)){
             if (ma == 1) {
-              palt = (osd_alt - osd_home_alt);
+              palt = osd_alt_to_home;
 //              descendt = millis();
               ddistance = tdistance;
               ma = 0;
             }
           }
             if (osd_climb < -0.05){ 
-//            glide = (((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * ((millis() - descendt) / 1000)) * osd_groundspeed;
-            glide = ((osd_alt - osd_home_alt) / (palt - (osd_alt - osd_home_alt))) * (tdistance - ddistance);
+//            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * ((millis() - descendt) / 1000)) * osd_groundspeed;
+            glide = (osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance);
             if (glide > 9999) glide = 9999;
              if (glide != 'inf' && glide > -0){
             osd.printf("%c%4.0f%c", 0x18, glide, 0x0c);
@@ -516,7 +516,7 @@ void panCur_A(int first_col, int first_line){
 void panAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x0c);
+    //osd.printf("%c%5.0f%c",0x85, (double)osd_alt_to_home, 0x0c);
     osd.printf("%c%5.0f%c",0x11, (double)(osd_alt * converth), high);
     osd.closePanel();
 }
@@ -545,8 +545,8 @@ void panClimb(int first_col, int first_line){
 void panHomeAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x0c);
-    osd.printf("%c%5.0f%c",0x12, (double)((osd_alt - osd_home_alt) * converth), high);
+    //osd.printf("%c%5.0f%c",0x85, (double)osd_alt_to_home, 0x0c);
+    osd.printf("%c%5.0f%c",0x12, (double)(osd_alt_to_home * converth), high);
     osd.closePanel();
 }
 
@@ -767,6 +767,8 @@ void panHorizon(int first_col, int first_line){
 
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
+    //Show ILS on  HUD
+    showILS(first_col, first_line);
 }
 
 /* **************************************************************** */
@@ -1035,79 +1037,17 @@ void panFlightMode(int first_col, int first_line){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
+
 void showArrow(uint8_t rotate_arrow,uint8_t method) {  
     char arrow_set1 = 0x0;
     char arrow_set2 = 0x0;   
-    switch(rotate_arrow) {
-    case 0: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 1: 
-        arrow_set1 = 0x90;
-        arrow_set2 = 0x91;
-        break;
-    case 2: 
-        arrow_set1 = 0x92;
-        arrow_set2 = 0x93;
-        break;
-    case 3: 
-        arrow_set1 = 0x94;
-        arrow_set2 = 0x95;
-        break;
-    case 4: 
-        arrow_set1 = 0x96;
-        arrow_set2 = 0x97;
-        break;
-    case 5: 
-        arrow_set1 = 0x98;
-        arrow_set2 = 0x99;
-        break;
-    case 6: 
-        arrow_set1 = 0x9A;
-        arrow_set2 = 0x9B;
-        break;
-    case 7: 
-        arrow_set1 = 0x9C;
-        arrow_set2 = 0x9D;
-        break;
-    case 8: 
-        arrow_set1 = 0x9E;
-        arrow_set2 = 0x9F;
-        break;
-    case 9: 
-        arrow_set1 = 0xA0;
-        arrow_set2 = 0xA1;
-        break;
-    case 10: 
-        arrow_set1 = 0xA2;
-        arrow_set2 = 0xA3;
-        break;
-    case 11: 
-        arrow_set1 = 0xA4;
-        arrow_set2 = 0xA5;
-        break;
-    case 12: 
-        arrow_set1 = 0xA6;
-        arrow_set2 = 0xA7;
-        break;
-    case 13: 
-        arrow_set1 = 0xA8;
-        arrow_set2 = 0xA9;
-        break;
-    case 14: 
-        arrow_set1 = 0xAA;
-        arrow_set2 = 0xAB;
-        break;
-    case 15: 
-        arrow_set1 = 0xAC;
-        arrow_set2 = 0xAd;
-        break;
-    case 16: 
-        arrow_set1 = 0xAE;
-        arrow_set2 = 0xAF;
-        break;
-    } 
+  
+    if(rotate_arrow == 0){
+      rotate_arrow = 1;
+    }
+    arrow_set1 = rotate_arrow + 0x8F;
+    arrow_set2 = arrow_set1 + 1;
+
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
     if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
   
@@ -1199,6 +1139,68 @@ void showHorizon(int start_col, int start_row) {
                 osd.printf("%c", line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
 	    }
         }
+    }
+}
+
+/*
+// Calculate and shows ILS
+void showILS(int start_col, int start_row) { 
+    //Vertical calculation
+    int desired_angle = 10;
+    double currentAngleDisplacement = desired_angle - atan(osd_alt_to_home / osd_home_distance) * 57.2957795;
+    //Calc current char position 
+    //int numberOfPixels = CHAR_ROWS * AH_ROWS;
+    int numberOfChars = 9;
+    int totalNumberOfLines = numberOfChars * AH_ROWS;
+    int linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
+    int charPosition = linePosition / CHAR_ROWS;
+    int selectedChar = numberOfChars - (linePosition % numberOfChars) + 0xC7;
+    if(charPosition >= 0 && charPosition <= CHAR_ROWS)
+    {
+      osd.openSingle(start_col + AH_COLS + 1, start_row + charPosition);
+      osd.printf("%c", selectedChar);
+    }
+    
+    currentAngleDisplacement = osd_home_direction - takeoff_heading;
+    //Horizontal calculation
+    numberOfChars = 6;
+    int totalNumberOfColumns = numberOfChars * AH_COLS;
+    linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfColumns / 2); //+-5 degrees
+    charPosition = linePosition / CHAR_COLS;
+    selectedChar = numberOfChars - (linePosition % numberOfChars) + 0x5E;
+    if(charPosition >= 0 && charPosition <= CHAR_COLS)
+    {
+      osd.openSingle(start_col + charPosition, start_row + AH_ROWS + 1);
+      osd.printf("%c", selectedChar);
+    }
+}*/
+
+// Calculate and shows ILS
+void showILS(int start_col, int start_row) { 
+    //Vertical calculation
+    int currentAngleDisplacement = 10 - atan(osd_alt_to_home / osd_home_distance) * 57.2957795;
+    //Calc current char position 
+    //int numberOfPixels = CHAR_ROWS * AH_ROWS;
+    int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+    int linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
+    int charPosition = linePosition / CHAR_ROWS;
+    int selectedChar = 9 - (linePosition % 9) + 0xC7;
+    if(charPosition >= 0 && charPosition <= CHAR_ROWS)
+    {
+      osd.openSingle(start_col + AH_COLS + 1, start_row + charPosition);
+      osd.printf("%c", selectedChar);
+    }
+    
+    currentAngleDisplacement = osd_home_direction - takeoff_heading;
+    //Horizontal calculation
+    totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
+    linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
+    charPosition = linePosition / CHAR_COLS;
+    selectedChar = (linePosition % 6) + 0xBF;
+    if(charPosition >= 0 && charPosition <= CHAR_COLS)
+    {
+      osd.openSingle(start_col + charPosition, start_row + AH_ROWS + 1);
+      osd.printf("%c", selectedChar);
     }
 }
 
