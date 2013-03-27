@@ -1416,7 +1416,6 @@ namespace OSD
         const int panHeading_x_ADDR = 56;
         const int panHeading_y_ADDR = 58;
 //        const int panMavBeat_en_ADDR = 60;
-        const int OSD_BATT_SHOW_PERCENT = 60;
 //        const int panMavBeat_x_ADDR = 62;
 //        const int panMavBeat_y_ADDR = 64;
         const int panHomeDir_en_ADDR = 66;
@@ -1502,6 +1501,7 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
+        const int OSD_BATT_SHOW_PERCENT = 888;
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
         const int stall_ADDR = 894;
