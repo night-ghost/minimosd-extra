@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r524"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r533"));
     osd.closePanel();
 }
 
@@ -23,7 +23,7 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
 if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-   if ((osd_alt - osd_home_alt) <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+   if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
        if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;          
@@ -523,7 +523,7 @@ void panHomeAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd.printf("%c%5.0f%c",0x12, (double)(osd_alt - osd_home_alt), 0x0C);
-    osd.printf("%c%5.0f%c",0x12, (double)((osd_alt - osd_home_alt) * converth), high);
+    osd.printf("%c%5.0f%c",0x12, (double)(osd_alt_to_home * converth), high);
     osd.closePanel();
 }
 
@@ -747,7 +747,7 @@ void panHorizon(int first_col, int first_line){
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
     //Show ground level on  HUD
-    showHudVerticalLandingAid(first_col + 6, first_line);
+    showILS(first_col, first_line);
 }
 
 /* **************************************************************** */
@@ -1121,17 +1121,17 @@ void showHorizon(int start_col, int start_row) {
 }
 
 // Calculate and shows verical speed aid
-void showHudVerticalLandingAid(int start_col, int start_row) { 
+void showILS(int start_col, int start_row) { 
     //Show line on panel center because horizon line can be
     //high or low depending on pitch attitude
-    int subval_char = 0xD0;
+    int subval_char = 0xCF;
 
     //shift alt interval from [-5, 5] to [0, 10] interval, so we
     //can work with remainders.
     //We are using a 0.2 altitude units as resolution (1 decimal place)
     //so convert we convert it to times 10 to work 
     //only with integers and save some bytes
-    int alt = ((osd_alt - osd_home_alt) * converth + 5) * 10;
+    int alt = (osd_alt_to_home * converth + 5) * 10;
     
     if((alt < 100) && (alt > 0)){
         //We have 10 possible chars
@@ -1154,9 +1154,7 @@ void showHudVerticalLandingAid(int start_col, int start_row) {
     }
 
     //Enough calculations. Let's show the result
-    osd.openSingle(start_col, start_row);
-    osd.printf("%c", subval_char);
-    osd.openSingle(start_col + 1, start_row);
+    osd.openSingle(start_col + AH_COLS + 1, start_row);
     osd.printf("%c", subval_char);
 }
 
