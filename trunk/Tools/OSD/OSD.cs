@@ -93,7 +93,7 @@ namespace OSD
             InitializeComponent();
 
             // load default font
-            chars = mcm.readMCM("Latest_Charset.mcm");
+            chars = mcm.readMCM("MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm");
             // load default bg picture
             try
             {
