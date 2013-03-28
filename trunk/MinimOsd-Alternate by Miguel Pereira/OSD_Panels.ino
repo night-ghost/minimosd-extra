@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r533"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r534"));
     osd.closePanel();
 }
 
@@ -677,7 +677,7 @@ void panBatteryPercent(int first_col, int first_line){
     if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR ) == 1){ 
      osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25); 
       }else{ 
-     osd.printf("%c%4.0f%c",0x17, mah_used, 0xbe); 
+     osd.printf("%c%5.0f%c",0x17, mah_used, 0x01); 
      } 
     osd.closePanel();
 }
@@ -1154,7 +1154,7 @@ void showILS(int start_col, int start_row) {
     }
 
     //Enough calculations. Let's show the result
-    osd.openSingle(start_col + AH_COLS + 1, start_row);
+    osd.openSingle(start_col + AH_COLS + 2, start_row);
     osd.printf("%c", subval_char);
 }
 
