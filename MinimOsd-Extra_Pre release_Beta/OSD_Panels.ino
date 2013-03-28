@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r534"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r535"));
     osd.closePanel();
 }
 
@@ -1045,7 +1045,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     if(rotate_arrow == 0){
       rotate_arrow = 1;
     }
-    arrow_set1 = rotate_arrow + 0x8F;
+    arrow_set1 = rotate_arrow * 2 + 0x8E;
     arrow_set2 = arrow_set1 + 1;
 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
