@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r531"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r534"));
     osd.closePanel();
 }
 
@@ -698,7 +698,7 @@ void panBatteryPercent(int first_col, int first_line){
     if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR) == 1){
     osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25);
     }else{
-    osd.printf("%c%4.0f%c",0x17, mah_used, 0xbe);
+    osd.printf("%c%5.0f%c",0x17, mah_used, 0x01);
     }
     osd.closePanel();
 }
@@ -1142,39 +1142,6 @@ void showHorizon(int start_col, int start_row) {
     }
 }
 
-/*
-// Calculate and shows ILS
-void showILS(int start_col, int start_row) { 
-    //Vertical calculation
-    int desired_angle = 10;
-    double currentAngleDisplacement = desired_angle - atan(osd_alt_to_home / osd_home_distance) * 57.2957795;
-    //Calc current char position 
-    //int numberOfPixels = CHAR_ROWS * AH_ROWS;
-    int numberOfChars = 9;
-    int totalNumberOfLines = numberOfChars * AH_ROWS;
-    int linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
-    int charPosition = linePosition / CHAR_ROWS;
-    int selectedChar = numberOfChars - (linePosition % numberOfChars) + 0xC7;
-    if(charPosition >= 0 && charPosition <= CHAR_ROWS)
-    {
-      osd.openSingle(start_col + AH_COLS + 1, start_row + charPosition);
-      osd.printf("%c", selectedChar);
-    }
-    
-    currentAngleDisplacement = osd_home_direction - takeoff_heading;
-    //Horizontal calculation
-    numberOfChars = 6;
-    int totalNumberOfColumns = numberOfChars * AH_COLS;
-    linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfColumns / 2); //+-5 degrees
-    charPosition = linePosition / CHAR_COLS;
-    selectedChar = numberOfChars - (linePosition % numberOfChars) + 0x5E;
-    if(charPosition >= 0 && charPosition <= CHAR_COLS)
-    {
-      osd.openSingle(start_col + charPosition, start_row + AH_ROWS + 1);
-      osd.printf("%c", selectedChar);
-    }
-}*/
-
 // Calculate and shows ILS
 void showILS(int start_col, int start_row) { 
     //Vertical calculation
@@ -1187,10 +1154,11 @@ void showILS(int start_col, int start_row) {
     int selectedChar = 9 - (linePosition % 9) + 0xC7;
     if(charPosition >= 0 && charPosition <= CHAR_ROWS)
     {
-      osd.openSingle(start_col + AH_COLS + 1, start_row + charPosition);
+      osd.openSingle(start_col + AH_COLS + 2, start_row + charPosition);
       osd.printf("%c", selectedChar);
     }
     
+    //Horizontal calculation
     currentAngleDisplacement = osd_home_direction - takeoff_heading;
     //Horizontal calculation
     totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
