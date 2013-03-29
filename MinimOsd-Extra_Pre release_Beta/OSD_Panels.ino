@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r535"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r536"));
     osd.closePanel();
 }
 
@@ -61,9 +61,9 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
  //               if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
-                if(wp_number > 0){
-                  if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
-                }
+               
+                if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+                
                 //Testing bits from 8 bit register C 
                 //if(osd_got_home == 1){
                 if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
@@ -531,7 +531,8 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0f%c",0x15, (osd_climb * converth), climbchar);
+    vs = (osd_climb * converth * 60) * 0.01 + vs *0.99;
+    osd.printf("%c%4.0f%c",0x15, vs, climbchar);
     osd.closePanel();
 }
 
@@ -544,8 +545,7 @@ void panClimb(int first_col, int first_line){
 
 void panHomeAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    //osd.printf("%c%5.0f%c",0x85, (double)osd_alt_to_home, 0x0c);
+    osd.openPanel();   
     osd.printf("%c%5.0f%c",0x12, (double)(osd_alt_to_home * converth), high);
     osd.closePanel();
 }
@@ -925,12 +925,12 @@ void panRose(int first_col, int first_line){
 // Size   : 1 x 21  (rows x chars)
 // Staus  : done
 
-void panBoot(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("Booting up:\x88\x8d\x8d\x8d\x8d\x8d\x8d\x8d\x8e")); 
-    osd.closePanel();
-}
+//void panBoot(int first_col, int first_line){
+//    osd.setPanel(first_col, first_line);
+//    osd.openPanel();
+//    osd.printf_P(PSTR("Booting up:\x88\x8d\x8d\x8d\x8d\x8d\x8d\x8d\x8e")); 
+//    osd.closePanel();
+//}
 
 /* **************************************************************** */
 // Panel  : panMavBeat
@@ -991,7 +991,9 @@ void panWPDis(int first_col, int first_line){
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
-      osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
+     
+        osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
+     
     osd.closePanel();
 }
 
