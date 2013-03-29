@@ -78,3 +78,16 @@ C:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj
 D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.exe.config
 D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe
 D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.pdb
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\vlcsnap-2012-01-28-07h46m04s95.png
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_SA_v5.mcm
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.exe.manifest
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.application
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.exe
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\bin\Release\OSD_Config.pdb
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD.AboutBox1.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD.OSD.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD.Properties.Resources.resources
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD.csproj.GenerateResource.Cache
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.TrustInfo.xml
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.exe.manifest
+D:\Users\headquartersMan\Documents\minimOSD by Miguel\trunk\Tools\OSD\obj\x86\Release\OSD_Config.application
