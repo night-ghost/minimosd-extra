@@ -1048,7 +1048,7 @@ namespace OSD
             string item;
             try
             {
-                item = currentlyselected[0];
+                item = currentlyselected[1];
             }
             catch { return; }
 
@@ -1068,7 +1068,7 @@ namespace OSD
             string item;
             try
             {
-                item = currentlyselected[0];
+                item = currentlyselected[1];
             }
             catch { return; }
 
@@ -2850,7 +2850,7 @@ namespace OSD
         {
             //string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
-            currentlyselected[0] = e.Node.Text;
+            currentlyselected[1] = e.Node.Text;
             osdDraw2();
 
             foreach (var thing in panelItems2)
