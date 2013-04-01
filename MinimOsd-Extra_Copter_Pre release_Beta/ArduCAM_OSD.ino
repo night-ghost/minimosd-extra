@@ -153,7 +153,9 @@ void setup()
     for(panel = 0; panel < npanels; panel++) readPanelSettings();
     panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
-    loadBar();
+    //loadBar();
+        delay(2000);
+    Serial.flush();
 
     // Startup MAVLink timers  
     mavlinkTimer.Set(&OnMavlinkTimer, 120);

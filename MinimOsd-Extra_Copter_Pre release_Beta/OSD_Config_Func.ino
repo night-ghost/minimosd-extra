@@ -38,8 +38,8 @@ void writeEEPROM(byte value, int address) {
 
 void InitializeOSD() {
 
-    loadBar();
-    delay(500);
+    //loadBar();
+    //delay(500);
 
     writeEEPROM(42, CHK1);
     writeEEPROM(VER-42,CHK2);

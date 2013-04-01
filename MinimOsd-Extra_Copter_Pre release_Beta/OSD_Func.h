@@ -50,11 +50,12 @@ void setHomeVars(OSD &osd)
   
   osd_alt_to_home = (osd_alt - osd_home_alt);
   //Check arm/disarm switching.
-  armed_switch = motor_armed ^ last_armed;
-  if (armed_switch){
+  if (motor_armed ^ last_armed){
+    showArmDisarmWarning = true;
     //If motors armed, reset home in Arducopter version
     osd_got_home = !motor_armed;
   }
+  last_armed = motor_armed;
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;

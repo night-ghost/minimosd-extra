@@ -6,6 +6,7 @@ static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
 static float        max_osd_windspeed = 0;
+static float        vs = 0;
 
 static unsigned long dt = 0;
 static float tdistance = 0;
@@ -28,7 +29,7 @@ static float        eff = 0; //Efficiency
 static uint8_t      base_mode=0;
 static bool         motor_armed = 0;
 static bool         last_armed = 0;
-static bool         armed_switch = 0;
+static bool         showArmDisarmWarning = 0;
 static bool          ma = 0;
 static bool      osd_clear = 0;
 static uint16_t     ch_raw = 0;
