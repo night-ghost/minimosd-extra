@@ -1120,7 +1120,7 @@ namespace OSD
                     {
                         if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                         {
-                            TreeNode[] trArray = LIST_items.Nodes.Find(str, true);
+                            TreeNode[] trArray = LIST_items2.Nodes.Find(str, true);
                             eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(trArray[0].Checked ? 1 : 0);
                             eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
                             eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
