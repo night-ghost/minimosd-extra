@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <Config>
-  <comport>COM3</comport>
+  <comport>COM5</comport>
   <Pal>True</Pal>
 </Config>
