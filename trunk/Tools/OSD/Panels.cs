@@ -136,6 +136,24 @@ namespace OSD
         /******* PANELS - DEFINITION *******/
 
         /* **************************************************************** */
+        // Panel  : COG
+        // Needs  : X, Y locations
+        // Output : 
+        // Size   : 1 x 7Hea  (rows x chars)
+        // Staus  : done
+
+        public int panCOG(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            osd.openPanel();
+
+            osd.printf("%c%c", 0x94, 0x95);
+
+            osd.closePanel();
+            return 0;
+        }
+
+        /* **************************************************************** */
         // Panel  : ODO
         // Needs  : X, Y locations
         // Output : 

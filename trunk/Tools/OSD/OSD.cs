@@ -172,7 +172,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 14, 14, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
             //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery B", pan.panBatt_B, 21, 3, panBatt_B_en_ADDR, panBatt_B_x_ADDR, panBatt_B_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Visible Sats", pan.panGPSats, 1, 11, panGPSats_en_ADDR, panGPSats_x_ADDR, panGPSats_y_ADDR);
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Lock", pan.panGPL, 5, 11, panGPL_en_ADDR, panGPL_x_ADDR, panGPL_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Ground course", pan.panCOG, 5, 11, panCOG_en_ADDR, panCOG_x_ADDR, panCOG_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Coord", pan.panGPS, 1, 14, panGPS_en_ADDR, panGPS_x_ADDR, panGPS_y_ADDR);
 
             //second 8
@@ -291,7 +291,7 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 1, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
             //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery B", pan.panBatt_B, 21, 3, panBatt_B_en_ADDR, panBatt_B_x_ADDR, panBatt_B_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Visible Sats", pan.panGPSats, 1, 9, panGPSats_en_ADDR, panGPSats_x_ADDR, panGPSats_y_ADDR);
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Lock", pan.panGPL, 1, 10, panGPL_en_ADDR, panGPL_x_ADDR, panGPL_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Ground course", pan.panCOG, 1, 10, panCOG_en_ADDR, panCOG_x_ADDR, panCOG_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Coord", pan.panGPS, 1, 14, panGPS_en_ADDR, panGPS_x_ADDR, panGPS_y_ADDR);
 
             //second 8
@@ -1401,9 +1401,9 @@ namespace OSD
         const int panGPSats_en_ADDR = 30;
         const int panGPSats_x_ADDR = 32;
         const int panGPSats_y_ADDR = 34;
-//        const int panGPL_en_ADDR = 36;
-//        const int panGPL_x_ADDR = 38;
-//        const int panGPL_y_ADDR = 40;
+        const int panCOG_en_ADDR = 36;
+        const int panCOG_x_ADDR = 38;
+        const int panCOG_y_ADDR = 40;
         const int panGPS_en_ADDR = 42;
         const int panGPS_x_ADDR = 44;
         const int panGPS_y_ADDR = 46;
@@ -2668,6 +2668,7 @@ namespace OSD
                 LIST_items.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
                 LIST_items.Nodes["Location"].Nodes.Add("Heading", "Heading");
                 LIST_items.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
+                LIST_items.Nodes["Location"].Nodes.Add("Ground course", "Ground course");
                 LIST_items.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
                 LIST_items.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
                 LIST_items.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");
@@ -2781,8 +2782,9 @@ namespace OSD
                 LIST_items2.Nodes.Add("Location", "Location");
                 LIST_items2.Nodes["Location"].Nodes.Add("Altitude", "Altitude");
                 LIST_items2.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
-                LIST_items2.Nodes["Location"].Nodes.Add("Heading", "Heading");
+                LIST_items2.Nodes["Location"].Nodes.Add("Heading", "Heading");                
                 LIST_items2.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
+                LIST_items2.Nodes["Location"].Nodes.Add("Ground course", "Ground course");
                 LIST_items2.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
                 LIST_items2.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
                 LIST_items2.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");

@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r545"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r548"));
     osd.closePanel();
 }
 
@@ -45,9 +45,9 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
                 //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
                 if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
-//                if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
                 if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
                 if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
+                if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
 
                 //Testing bits from 8 bit register B
                 if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
@@ -119,6 +119,28 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
 
 }
 /******* PANELS - DEFINITION *******/
+
+/* **************************************************************** */
+// Panel  : COG Course Over Ground
+// Needs  : X, Y locations
+// Output : 
+// Size   : 
+// Staus  : done
+
+void panCOG(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    
+    
+    osd_COG_arrow_rotate_int = round((osd_cog / 100 - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
+    if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
+    else if(osd_COG_arrow_rotate_int > 16 ) osd_COG_arrow_rotate_int =16;    
+    showArrow((uint8_t)osd_COG_arrow_rotate_int,0);
+    
+    osd.closePanel();
+}
+
+
 /* **************************************************************** */
 // Panel  : ODO
 // Needs  : X, Y locations
@@ -251,7 +273,7 @@ void panRSSI(int first_col, int first_line){
 
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
 //    if (rssi < -99) rssi = -99;
-    osd.printf("%c%3i%c", 0x09, rssi, 0x25);
+    osd.printf("%c%5i%c", 0x09, rssi, 0x25);
 //    osd.printf("%c%3i%c", 0x09, osd_clear, 0x25); 
     osd.closePanel();
 }
@@ -531,7 +553,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    vs = (osd_climb * converth * 60) * 0.01 + vs *0.99;
+    vs = (osd_climb * converth * 60) * 0.03 + vs *0.97;
     osd.printf("%c%4.0f%c",0x15, vs, climbchar);
     osd.closePanel();
 }
@@ -1055,7 +1077,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
     if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
-  
+        
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
