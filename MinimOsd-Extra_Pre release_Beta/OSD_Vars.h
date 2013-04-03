@@ -96,7 +96,7 @@ static float        osd_lon = 0;                    // longitude
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t      osd_cog;                        // Course over ground
-
+static uint16_t        off_course;
 static uint8_t      osd_got_home = 0;               // tels if got home position or not
 static float        osd_home_lat = 0;               // home latidude
 static float        osd_home_lon = 0;               // home longitude
