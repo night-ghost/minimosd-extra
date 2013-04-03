@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r550"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r551"));
     osd.closePanel();
 }
 
@@ -131,12 +131,22 @@ void panCOG(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    
-    osd_COG_arrow_rotate_int = round((osd_cog / 100 - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
+//    osd_COG_arrow_rotate_int = (((int)osd_cog / 100 - (int)osd_heading)/360 * 16 + 16) % 16 + 1; // [1, 16]
+//    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading) / 360 * 16 + 1;
+    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
     if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
-    else if(osd_COG_arrow_rotate_int > 16 ) osd_COG_arrow_rotate_int =16;    
-    showArrow((uint8_t)osd_COG_arrow_rotate_int,0);
+    if(osd_COG_arrow_rotate_int == 0 ) osd_COG_arrow_rotate_int = 16;    
+
+    if (((osd_cog / 100) - osd_heading) > 180){
+       off_course = (osd_cog / 100 - osd_heading) - 360;
+    }else if (((osd_cog / 100) - osd_heading) < -180){
+       off_course = (osd_cog / 100 - osd_heading) + 360;
+    }else{
+       off_course = (osd_cog / 100 - osd_heading);
+    }
     
+    showArrow((uint8_t)osd_COG_arrow_rotate_int,2);
+
     osd.closePanel();
 }
 
@@ -273,7 +283,7 @@ void panRSSI(int first_col, int first_line){
 
     if(!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
 //    if (rssi < -99) rssi = -99;
-    osd.printf("%c%5i%c", 0x09, rssi, 0x25);
+    osd.printf("%c%3i%c", 0x09, rssi, 0x25);
 //    osd.printf("%c%3i%c", 0x09, osd_clear, 0x25); 
     osd.closePanel();
 }
@@ -1057,7 +1067,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
     if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
-        
+    else if(method == 2) osd.printf("%c%c%4i%c", arrow_set1, arrow_set2, off_course, 0x05);   
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
