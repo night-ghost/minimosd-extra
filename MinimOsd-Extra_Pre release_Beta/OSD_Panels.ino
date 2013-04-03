@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r551"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r552"));
     osd.closePanel();
 }
 
@@ -135,8 +135,9 @@ void panCOG(int first_col, int first_line){
 //    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading) / 360 * 16 + 1;
     osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
     if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
-    if(osd_COG_arrow_rotate_int == 0 ) osd_COG_arrow_rotate_int = 16;    
-
+    if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
+    if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
+    
     if (((osd_cog / 100) - osd_heading) > 180){
        off_course = (osd_cog / 100 - osd_heading) - 360;
     }else if (((osd_cog / 100) - osd_heading) < -180){
