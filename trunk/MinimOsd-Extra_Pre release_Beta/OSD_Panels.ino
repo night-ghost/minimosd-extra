@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r549"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r550"));
     osd.closePanel();
 }
 
@@ -414,8 +414,7 @@ void panOff(){
                 osd_switch_time = millis();
 
                 if (osd_off_switch == osd_switch_last){
-                    switch(panel){
-                    case 0:
+                    if(panel == 0)
                         {
                             panel = 1;                                                        
 //                            if (millis() <= 60000){
@@ -423,20 +422,16 @@ void panOff(){
 //                            }else{
 //                                osd_set = 0;
 //                            }                            
-                            break;
                         }
-                    case 1:
+                    else if(panel == 1)
                         {
                             panel = npanels;
 //                            osd_set = 0;                            
-                            break;
                         }
-                    case npanels:
+                    else if(panel == npanels)
                         {
                             panel = 0;
-                            break;
                         }
-                    }
                     osd.clear();
                 }
             }
@@ -625,23 +620,16 @@ void panWarn(int first_col, int first_line){
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
-                switch(x) {
-                case 1:
+                if(x == 1)
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
-                    break;
-                case 2:
+                else if(x == 2)
                     if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
-                    break;
-                case 3:
+                else if(x == 3)
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
-                    break;
-                case 4:
+                else if(x == 4)
                     if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;
-                    break;
-                case 5:
+                else if(x == 5)
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
-                    break;    
-                }
                 if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
         }
@@ -655,37 +643,29 @@ void panWarn(int first_col, int first_line){
 //        if (motor_armed == 0){
 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
 //        }else{
-            switch(warning_type){ 
-            case 0:
+            if (warning_type == 0)
                 //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
                 warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-                break;   
-            case 1:  
+            else if (warning_type == 1)
                 //osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
                 warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
-                break;
-            case 2:
+            else if (warning_type == 2)
                 //osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
                 warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
-                break;
-            case 3:
+            else if (warning_type == 3)
                 //osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
                 warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
-                break;
-            case 4:
+            else if (warning_type == 4)
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
-                break;
-            case 5:
+            else if (warning_type == 5)
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-                break;
                 //        case 6:
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
                 //            break;
 //            }
-        }
         osd.printf("%s",warning_string);
     }
     osd.closePanel();
@@ -1172,12 +1152,12 @@ void showHorizon(int start_col, int start_row) {
 // Calculate and shows ILS
 void showILS(int start_col, int start_row) { 
     //Vertical calculation
-    int currentAngleDisplacement = 10 - atan(osd_alt_to_home / osd_home_distance) * 57.2957795;
+    int currentAngleDisplacement = atan(osd_alt_to_home / osd_home_distance) * 57.2957795 - 10;
     //Calc current char position 
     //int numberOfPixels = CHAR_ROWS * AH_ROWS;
     int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
-    int linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
-    int charPosition = linePosition / CHAR_ROWS;
+    int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+    int charPosition = linePosition / 9;
     int selectedChar = 9 - (linePosition % 9) + 0xC7;
     if(charPosition >= 0 && charPosition <= CHAR_ROWS)
     {
@@ -1189,8 +1169,8 @@ void showILS(int start_col, int start_row) {
     currentAngleDisplacement = osd_home_direction - takeoff_heading;
     //Horizontal calculation
     totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
-    linePosition = 5 / totalNumberOfLines * currentAngleDisplacement + (totalNumberOfLines / 2); //+-5 degrees
-    charPosition = linePosition / CHAR_COLS;
+    linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+    charPosition = linePosition / 6;
     selectedChar = (linePosition % 6) + 0xBF;
     if(charPosition >= 0 && charPosition <= CHAR_COLS)
     {
