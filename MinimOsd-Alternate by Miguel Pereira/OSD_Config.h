@@ -21,7 +21,7 @@
 #define BatA_BIT       3
 #define Bp_BIT         4
 #define GPSats_BIT     5
-//#define GPL_BIT        6
+#define COG_BIT        6
 #define GPS_BIT        7
 
 // panB_REG Byte has:

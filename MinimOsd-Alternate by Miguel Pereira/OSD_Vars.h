@@ -101,6 +101,8 @@ static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
+static uint16_t     osd_cog;                        // Course over ground
+static int16_t      off_course;
 
 static uint8_t      osd_got_home = 0;               // tels if got home position or not
 static float        osd_home_lat = 0;               // home latidude
@@ -122,6 +124,7 @@ static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
 static float        osd_winddirection = 0;
 static int8_t       osd_wind_arrow_rotate_int;
+static int8_t       osd_COG_arrow_rotate_int;
 
 static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
 static float        osd_alt_prev = 0;             // previous altitude
@@ -168,7 +171,7 @@ byte panRoll_XY[2][npanels]; // = { 23,7 };
 byte panBatt_A_XY[2][npanels]; // = { 23,1 };
 //byte panBatt_B_XY[2]; // = { 23,3 };
 byte panGPSats_XY[2][npanels]; // = { 2,12 };
-//byte panGPL_XY[2][npanels]; // = { 2,11 };
+byte panCOG_XY[2][npanels]; // = { 2,11 };
 byte panGPS_XY[2][npanels]; // = { 2,13 };
 byte panBatteryPercent_XY[2][npanels];
 

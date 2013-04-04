@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r544"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r554"));
     osd.closePanel();
 }
 
@@ -20,24 +20,21 @@ void panLogo(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
-
   if(millis() < (lastMAVBeat + 2200)){
-if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-   if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
-       if (osd_clear == 0){
+    if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+      if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;          
-       }
+      }
       panFdata(); 
-        }else{ 
-          if (osd_clear == 1){
-         osd.clear(); 
-         osd_clear = 0;          
-       }
+    }else{ 
+      if (osd_clear == 1){
+        osd.clear(); 
+        osd_clear = 0;          
+      }
       if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
-            if(panel != npanels)
-            {
-                
+      if(panel != npanels){
                 //Testing bits from 8 bit register A 
  //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
@@ -48,6 +45,7 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
                 //if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
                 if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
                 if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
+                if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
 
                 //Testing bits from 8 bit register B
                 if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
@@ -87,15 +85,12 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
                 if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
 //                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
                 if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
-            } else { //panel == npanels
+      } else { //panel == npanels
 //                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
-            }
- //       } else { // if (osd_on > 0)
- //           panSetup();
- //       }
-        }
-    } else { // if no mavlink update for 2 secs
+      }
+    }
+  } else { // if no mavlink update for 2 secs
     
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
@@ -104,7 +99,6 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
     panLogo();
-    
   }
   
     // OSD debug for development (Shown on top-middle panels) 
@@ -114,11 +108,39 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
     osd.printf("%i",freeMem()); 
     osd.closePanel();
 #endif
-  
-
 }
+
 /******* PANELS - DEFINITION *******/
 /* **************************************************************** */
+
+/* **************************************************************** */
+// Panel  : COG Course Over Ground
+// Needs  : X, Y locations
+// Output : 
+// Size   : 
+// Staus  : done
+
+void panCOG(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    
+    osd_COG_arrow_rotate_int = ((osd_cog / 100) - osd_heading) / 360.0 * 15.0 + 1; //Convert to int 1-16 
+    if(osd_COG_arrow_rotate_int < 1 ) osd_COG_arrow_rotate_int += 16;
+    //if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
+    //if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
+    
+    off_course = (osd_cog / 100 - osd_heading);
+    if (off_course > 180){
+       off_course += - 360;
+    }else if (off_course < -180){
+       off_course += + 360;
+    }
+    
+    showArrow((uint8_t)osd_COG_arrow_rotate_int,2);
+
+    osd.closePanel();
+}
+
 // Panel  : ODO
 // Needs  : X, Y locations
 // Output : 
@@ -128,7 +150,7 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
 void panDistance(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    do_converts();
+    //do_converts();
     if ((tdistance * converth) > 1000.0) {
     osd.printf("%c%5.2f%c", 0x8F, ((tdistance * converth) / distconv), distchar);
     }else{
@@ -161,7 +183,7 @@ void panFdata(){
 void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    do_converts();
+    //do_converts();
     osd.printf("%c%4.2f%c", 0x0A, (float(tempconv) / 100), temps);
     osd.closePanel();
 }
