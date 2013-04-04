@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r557"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r558"));
     osd.closePanel();
 }
 
@@ -1154,10 +1154,11 @@ void showILS(int start_col, int start_row) {
     //We are using a 0.2 altitude units as resolution (1 decimal place)
     //so convert we convert it to times 10 to work 
     //only with integers and save some bytes
-    int alt = (osd_alt_to_home * converth + 5) * 10;
+    //int alt = (osd_alt_to_home * converth + 5) * 10;
+    int alt = (osd_alt_to_home * converth + 5) * 4.4;
     
-    if((alt < 100) && (alt > 0)){
-        //We have 10 possible chars
+    if((alt < 44) && (alt > 0)){
+        //We have 9 possible chars
         //(alt * 5) -> 5 represents 1/5 which is our resolution. Every single
         //line (char) change represents 0,2 altitude units
         //% 10 -> Represents our 10 possible characters
@@ -1165,9 +1166,10 @@ void showILS(int start_col, int start_row) {
         //the selected char has a lower position in memory
         //+ 5 -> Is the memory displacement od the first altitude charecter 
         //in memory (it starts at 0x05
-        subval_char = (99 - ((alt * 5) % 100)) / 10 + 0xC7;
+        //subval_char = (99 - ((alt * 5) % 100)) / 9 + 0xC7;
+        subval_char = (8 - (alt  % 9)) + 0xC7;
         //Each row represents 2 altitude units
-        start_row += (alt / 20);
+        start_row += (alt / 9);
     }
     else if(alt >= 100){
         //Copter is too high. Ground is way too low to show on panel, 
