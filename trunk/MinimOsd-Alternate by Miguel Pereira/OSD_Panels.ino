@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r558"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r559"));
     osd.closePanel();
 }
 
@@ -591,9 +591,9 @@ void panWarn(int first_col, int first_line){
             last_warning = warning_type; // save the warning type for cycling
             warning_type = 0; // blank the text
             warning = 1;
-//            warning_timer = millis();            
+            warning_timer = millis();            
         } else {
-//            if ((millis() - 10000) > warning_timer ) warning = 0;
+            if ((millis() - 10000) > warning_timer ) warning = 0;
 
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
