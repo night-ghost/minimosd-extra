@@ -826,17 +826,17 @@ namespace OSD
             if (apm_mav_type == 2)//ArduCopter
             {
 
-                if (osd_mode == 100) osd.printf_P(PSTR("\x7Fstab"));//Stabilize
-                if (osd_mode == 101) osd.printf_P(PSTR("\x7Facro"));//Acrobatic
-                if (osd_mode == 102) osd.printf_P(PSTR("\x7Falth"));//Alt Hold
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fauto"));//Auto
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fguid"));//Guided
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\x7Floit"));//Loiter
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7Fretl"));//Return to Launch
-                if (osd_mode == 107) osd.printf_P(PSTR("\x7Fcirc")); // Circle
-                if (osd_mode == 108) osd.printf_P(PSTR("\x7Fposi")); // Position
-                if (osd_mode == 109) osd.printf_P(PSTR("\x7Fland")); // Land
-                if (osd_mode == 110) osd.printf_P(PSTR("\x7Foflo")); // OF_Loiter
+                if (osd_mode == 100) osd.printf_P(PSTR("\x7Fstab\x86"));//Stabilize
+                if (osd_mode == 101) osd.printf_P(PSTR("\x7Facro\x86"));//Acrobatic
+                if (osd_mode == 102) osd.printf_P(PSTR("\x7Falth\x86"));//Alt Hold
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fauto\x86"));//Auto
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fguid\x86"));//Guided
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\x7Floit\x86"));//Loiter
+                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7Fretl\x86"));//Return to Launch
+                if (osd_mode == 107) osd.printf_P(PSTR("\x7Fcirc\x86")); // Circle
+                if (osd_mode == 108) osd.printf_P(PSTR("\x7Fposi\x86")); // Position
+                if (osd_mode == 109) osd.printf_P(PSTR("\x7Fland\x86")); // Land
+                if (osd_mode == 110) osd.printf_P(PSTR("\x7Foflo\x86")); // OF_Loiter
             }
             else if (apm_mav_type == 1) // arduplane
             {
