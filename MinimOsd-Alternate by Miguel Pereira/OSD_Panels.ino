@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r559"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r560"));
     osd.closePanel();
 }
 
@@ -597,17 +597,6 @@ void panWarn(int first_col, int first_line){
 
             int x = last_warning; // start the warning checks where we left it last time
             while (warning_type == 0) { // cycle through the warning checks
-                //If armed/disarmed -> jump to that warning
-                if (showArmDisarmWarning){
-                    if(motor_armed){
-                        warning_type = 6;
-                    }
-                    else{
-                        warning_type = 7;
-                    }
-                    showArmDisarmWarning = false;
-                    break;
-                }
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
                 if(x == 1){
@@ -653,12 +642,6 @@ void panWarn(int first_col, int first_line){
         }
         else if(warning_type == 5){ 
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-        }
-        else if(warning_type == 6){ 
-            warning_string = "\x20\x20\x20\x20\x41\x52\x4d\x45\x44\x20\x20\x20";      
-        }
-        else if(warning_type == 7){ 
-            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
         }
         //else if(warning_type == 6){ 
             //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
@@ -1023,18 +1006,18 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     //char c1 = 0xE0 ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
-        if (osd_mode == 0) mode_str = "stab"; //Stabilize
-        else if (osd_mode == 1) mode_str = "acro"; //Acrobatic
-        else if (osd_mode == 2) mode_str = "alth"; //Alt Hold
-        else if (osd_mode == 3) mode_str = "auto"; //Auto
-        else if (osd_mode == 4) mode_str = "guid"; //Guided
-        else if (osd_mode == 5) mode_str = "loit"; //Loiter
-        else if (osd_mode == 6) mode_str = "retl"; //Return to Launch
-        else if (osd_mode == 7) mode_str = "circ"; //Circle
-        else if (osd_mode == 8) mode_str = "posi"; //Position
-        else if (osd_mode == 9) mode_str = "land"; //Land
-        else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
-    osd.printf("%c%s", 0x7F, mode_str);
+    if (osd_mode == 0) mode_str = "stab"; //Stabilize
+    else if (osd_mode == 1) mode_str = "acro"; //Acrobatic
+    else if (osd_mode == 2) mode_str = "alth"; //Alt Hold
+    else if (osd_mode == 3) mode_str = "auto"; //Auto
+    else if (osd_mode == 4) mode_str = "guid"; //Guided
+    else if (osd_mode == 5) mode_str = "loit"; //Loiter
+    else if (osd_mode == 6) mode_str = "retl"; //Return to Launch
+    else if (osd_mode == 7) mode_str = "circ"; //Circle
+    else if (osd_mode == 8) mode_str = "posi"; //Position
+    else if (osd_mode == 9) mode_str = "land"; //Land
+    else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
+    osd.printf("%c%s%c", 0x7F, mode_str, 0x20 + motor_armed);
     osd.closePanel();
 }
 
