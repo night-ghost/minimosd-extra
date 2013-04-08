@@ -893,8 +893,8 @@ void panRose(int first_col, int first_line){
     osd.openPanel();
     //osd_heading  = osd_yaw;
     //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-    //osd.printf("%s|%c%s%c", "\x20\x80\x80\x80\x80\x80\x81\x80\x80\x80\x80\x80\x20", 0x86, buf_show, 0x87);
-    osd.printf("%c%s%c", 0x86, buf_show, 0x87);
+    //osd.printf("%s|%c%s%c", "\x20\x80\x80\x80\x80\x80\x81\x80\x80\x80\x80\x80\x20", 0xc3, buf_show, 0x87);
+    osd.printf("%c%s%c", 0xc3, buf_show, 0x87);
     osd.closePanel();
 }
 
