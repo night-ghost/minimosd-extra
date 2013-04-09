@@ -188,7 +188,7 @@ namespace OSD
             // third 8
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 3, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Climb Rate", pan.panClimb, 1, 8, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 8, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
             
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 14, 14, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
@@ -307,7 +307,7 @@ namespace OSD
             // third 8
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 4, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 3, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Climb Rate", pan.panClimb, 1, 7, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 7, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 22, 13, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
 
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 1, 12, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
@@ -395,7 +395,7 @@ namespace OSD
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
-                    else if (thing.Item1 == "Climb Rate")
+                    else if (thing.Item1 == "Vertical Speed")
                     {
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
@@ -2741,7 +2741,7 @@ namespace OSD
                         LIST_items.Nodes["Location"].Nodes.Add(node);
 
                     if ((node.Text == "Air Speed") ||
-                        (node.Text == "Climb Rate") ||
+                        (node.Text == "Vertical Speed") ||
                         (node.Text == "Velocity") ||
                         (node.Text == "Wind Speed"))
                         LIST_items.Nodes["Speed"].Nodes.Add(node);
@@ -2852,7 +2852,7 @@ namespace OSD
                         LIST_items2.Nodes["Location"].Nodes.Add(node);
 
                     if ((node.Text == "Air Speed") ||
-                        (node.Text == "Climb Rate") ||
+                        (node.Text == "Vertical Speed") ||
                         (node.Text == "Velocity") ||
                         (node.Text == "Wind Speed"))
                         LIST_items2.Nodes["Speed"].Nodes.Add(node);
