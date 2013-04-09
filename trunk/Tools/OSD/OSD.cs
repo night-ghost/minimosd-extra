@@ -2663,6 +2663,9 @@ namespace OSD
         private void rbtBatteryPercent_CheckedChanged(object sender, EventArgs e)
         {
             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
+            //Refresh battery percent presentation
+            osdDraw1();
+            osdDraw2();
         }
 
         //Controls if it's a populate process or user input
