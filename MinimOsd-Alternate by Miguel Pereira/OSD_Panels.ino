@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r563"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r568"));
     osd.closePanel();
 }
 
@@ -513,7 +513,7 @@ void panAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd.printf("%c%5.0f%c",0x11, (double)(osd_alt - osd_home_alt), 0x0C);
-    osd.printf("%c%5.0f%c",0x11, (double)(osd_alt * converth), high);
+    osd.printf("%c%5.0f%c",0x11, (double)(osd_gps_alt * converth), high);
     osd.closePanel();
 }
 
@@ -646,6 +646,8 @@ void panWarn(int first_col, int first_line){
         //else if(warning_type == 6){ 
             //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
         //}
+        if (motor_armed == 0)
+            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
         osd.printf("%s",warning_string);
     }
     osd.closePanel();
