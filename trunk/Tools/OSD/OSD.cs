@@ -1672,7 +1672,7 @@ namespace OSD
                             //LIST_items2.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
                         }
 
-                        if (panelItems2[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
+                        if (panelItems2[a].Item7 >= 0 || panelItems2[a].Item6 >= 0)
                             panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, eeprom[panelItems2[a].Item6 + OffsetBITpanel], eeprom[panelItems2[a].Item7 + OffsetBITpanel], panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
                     }
                 }
