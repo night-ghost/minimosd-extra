@@ -110,3 +110,4 @@ E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj
 E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.TrustInfo.xml
 E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe.manifest
 E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\GenerateResource-ResGen.read.4.tlog

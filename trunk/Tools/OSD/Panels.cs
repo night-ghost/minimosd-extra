@@ -448,11 +448,11 @@ namespace OSD
             osd.openPanel();
             if (Convert.ToBoolean(osd_battery_show_percentage))
             {
-                osd.printf("%c%c%c%3.0i%c", 0x17, 0x20, 0x20, osd_battery_remaining, 0x25);
+                osd.printf("%c%c%3.0i%c", 0x17, 0x20, osd_battery_remaining, 0x25);
             }
             else
             {
-                osd.printf("%c%5.0i%c", 0x17, osd_battery_remaining, 0x01);
+                osd.printf("%c%4.0i%c", 0x17, osd_battery_remaining, 0x01);
             }
             osd.closePanel();
             return 0;
@@ -712,7 +712,7 @@ namespace OSD
             osd.openPanel();
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-            osd.printf_P(PSTR("\x86\x80\x81\x80\x82\x80\x81\x80\x87"));
+            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x87"));
            
             osd.closePanel();
             return 0;

@@ -1093,7 +1093,17 @@ namespace OSD
             if (current.Text == "Panel 1") 
             {
                 //First Panel 
-                foreach (TreeNode tn in this.LIST_items.Nodes)
+                List<TreeNode> AllNodes = new List<TreeNode>();
+                foreach (TreeNode tn in LIST_items.Nodes)
+                {
+                    foreach (TreeNode tn2 in tn.Nodes)
+                    {
+                        AllNodes.Add(tn2);
+                    }
+                    AllNodes.Add(tn);
+                }
+
+                foreach (TreeNode tn in AllNodes)
                 {
                     string str = tn.Text;
                     foreach (var tuple in this.panelItems)
@@ -1113,8 +1123,19 @@ namespace OSD
             else if (current.Text == "Panel 2") 
             {
                 //Second Panel 
-                foreach (TreeNode tn in this.LIST_items2.Nodes)
+                List<TreeNode> AllNodes = new List<TreeNode>();
+                foreach (TreeNode tn in LIST_items2.Nodes)
                 {
+                    foreach (TreeNode tn2 in tn.Nodes)
+                    {
+                        AllNodes.Add(tn2);
+                    }
+                    AllNodes.Add(tn);
+                }
+
+                foreach (TreeNode tn in AllNodes)
+                {
+
                     string str = tn.Text;
                     foreach (var tuple in this.panelItems2)
                     {
@@ -1253,7 +1274,17 @@ namespace OSD
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
             //First Panel 
-            foreach (TreeNode tn in this.LIST_items.Nodes)
+            List<TreeNode> AllNodes = new List<TreeNode>();
+            foreach (TreeNode tn in LIST_items.Nodes)
+            {
+                foreach (TreeNode tn2 in tn.Nodes)
+                {
+                    AllNodes.Add(tn2);
+                }
+                AllNodes.Add(tn);
+            }
+
+            foreach (TreeNode tn in AllNodes)
             {
                 string str = tn.Text;
                 foreach (var tuple in this.panelItems_default)
@@ -1271,8 +1302,19 @@ namespace OSD
                 }
             }
             //Second Panel 
-            foreach (string str in this.LIST_items2.Nodes)
+            AllNodes = new List<TreeNode>();
+            foreach (TreeNode tn in LIST_items2.Nodes)
             {
+                foreach (TreeNode tn2 in tn.Nodes)
+                {
+                    AllNodes.Add(tn2);
+                }
+                AllNodes.Add(tn);
+            }
+
+            foreach (TreeNode tn in AllNodes)
+            {
+                string str = tn.Text;
                 foreach (var tuple in this.panelItems2_default)
                 {
                     if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
@@ -1627,7 +1669,7 @@ namespace OSD
                             if (tnArray.Length > 0)
                                 tnArray[0].Checked = (eeprom[panelItems2[a].Item5] == 1);
 
-                            //LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
+                            //LIST_items2.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
                         }
 
                         if (panelItems2[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
@@ -2628,15 +2670,29 @@ namespace OSD
         private void rbtSortAlphabetic_CheckedChanged(object sender, EventArgs e)
         {
             AutomaticCheck = true;
+            List<TreeNode> allNodes = new List<TreeNode>();
+            foreach (TreeNode nd1 in LIST_items.Nodes)
+            {
+                foreach (TreeNode nd2 in nd1.Nodes)
+                {
+                    allNodes.Add(nd2);
+                }
+                allNodes.Add(nd1);
+            }
             LIST_items.Nodes.Clear();
+            LIST_items.CheckBoxes = true;
             if (rbtSortAlphabetic.Checked)
             {
                 List<string> instruments = new List<string>();
-                foreach (var tuple in this.panelItems)
+                foreach (TreeNode node in allNodes)
                 {
-                    if ((tuple != null))
+                    if ((node.Text != "Attitude") &&
+                        (node.Text != "General") &&
+                        (node.Text != "Energy") &&
+                        (node.Text != "Location") &&
+                        (node.Text != "Speed"))
                     {
-                        LIST_items.Nodes.Add(tuple.Item1, tuple.Item1);
+                        LIST_items.Nodes.Add(node);
                     }
                 }
                 LIST_items.Sort();
@@ -2644,71 +2700,52 @@ namespace OSD
             else
             {
                 LIST_items.Nodes.Add("Attitude", "Attitude");
-                LIST_items.Nodes["Attitude"].Nodes.Add("Horizon", "Horizon");
-                LIST_items.Nodes["Attitude"].Nodes.Add("Pitch", "Pitch");
-                LIST_items.Nodes["Attitude"].Nodes.Add("Roll", "Roll");
-
                 LIST_items.Nodes.Add("General", "General");
-                LIST_items.Nodes["General"].Nodes.Add("Call Sign", "Call Sign");
-                LIST_items.Nodes["General"].Nodes.Add("RSSI", "RSSI");
-                LIST_items.Nodes["General"].Nodes.Add("Flight Mode", "Flight Mode");
-                LIST_items.Nodes["General"].Nodes.Add("Temperature", "Temperature");
-                LIST_items.Nodes["General"].Nodes.Add("Throttle", "Throttle");
-                LIST_items.Nodes["General"].Nodes.Add("Time", "Time");
-                LIST_items.Nodes["General"].Nodes.Add("Warnings", "Warnings");
-
                 LIST_items.Nodes.Add("Energy", "Energy");
-                LIST_items.Nodes["Energy"].Nodes.Add("Battery A", "Battery A");
-                LIST_items.Nodes["Energy"].Nodes.Add("Battery Percent", "Battery Percent");
-                LIST_items.Nodes["Energy"].Nodes.Add("Current", "Current");
-                LIST_items.Nodes["Energy"].Nodes.Add("Efficiency", "Efficiency");
-
                 LIST_items.Nodes.Add("Location", "Location");
-                LIST_items.Nodes["Location"].Nodes.Add("Altitude", "Altitude");
-                LIST_items.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
-                LIST_items.Nodes["Location"].Nodes.Add("Heading", "Heading");
-                LIST_items.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
-                LIST_items.Nodes["Location"].Nodes.Add("Real heading", "Real heading");
-                LIST_items.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
-                LIST_items.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
-                LIST_items.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");
-                LIST_items.Nodes["Location"].Nodes.Add("Trip Distance", "Trip Distance");
-                LIST_items.Nodes["Location"].Nodes.Add("Visible Sats", "Visible Sats");
-                LIST_items.Nodes["Location"].Nodes.Add("WP Distance", "WP Distance");
-
                 LIST_items.Nodes.Add("Speed", "Speed");
-                LIST_items.Nodes["Speed"].Nodes.Add("Air Speed", "Air Speed");
-                LIST_items.Nodes["Speed"].Nodes.Add("Climb Rate", "Climb Rate");
-                LIST_items.Nodes["Speed"].Nodes.Add("Velocity", "Velocity");
-                LIST_items.Nodes["Speed"].Nodes.Add("Wind Speed", "Wind Speed");
 
-            }
-            LIST_items.CheckBoxes = true;
-
-            List<string> defaultUncheckedInstruments = new List<string>();
-            defaultUncheckedInstruments.Add("Center");
-            defaultUncheckedInstruments.Add("Tune");
-            defaultUncheckedInstruments.Add("WP Distance");
-            defaultUncheckedInstruments.Add("Temperature");
-            defaultUncheckedInstruments.Add("Trip Distance");
-            defaultUncheckedInstruments.Add("Channel Raw");
-
-            foreach (TreeNode tn in LIST_items.Nodes)
-            {
-                if(tn.Nodes.Count > 0)
+                foreach (TreeNode node in allNodes)
                 {
-                    foreach (TreeNode tn2 in tn.Nodes)
-                    {
-                        if (defaultUncheckedInstruments.Contains(tn2.Text))
-                            tn2.Checked = false;
-                        else
-                            tn2.Checked = true;
-                    }
+                    if ((node.Text == "Horizon") ||
+                        (node.Text == "Pitch") ||
+                        (node.Text == "Roll"))
+                        LIST_items.Nodes["Attitude"].Nodes.Add(node);
+
+                    if ((node.Text == "Call Sign") ||
+                        (node.Text == "RSSI") ||
+                        (node.Text == "Flight Mode") ||
+                        (node.Text == "Temperature") ||
+                        (node.Text == "Throttle") ||
+                        (node.Text == "Time") ||
+                        (node.Text == "Warnings"))
+                        LIST_items.Nodes["General"].Nodes.Add(node);
+
+                    if ((node.Text == "Battery A") ||
+                        (node.Text == "Battery Percent") ||
+                        (node.Text == "Current") ||
+                        (node.Text == "Efficiency"))
+                        LIST_items.Nodes["Energy"].Nodes.Add(node);
+
+                    if ((node.Text == "Altitude") ||
+                        (node.Text == "GPS Coord") ||
+                        (node.Text == "Heading") ||
+                        (node.Text == "Heading Rose") ||
+                        (node.Text == "Real heading") ||
+                        (node.Text == "Home Altitude") ||
+                        (node.Text == "Home Direction") ||
+                        (node.Text == "Home Distance") ||
+                        (node.Text == "Trip Distance") ||
+                        (node.Text == "Visible Sats") ||
+                        (node.Text == "WP Distance"))
+                        LIST_items.Nodes["Location"].Nodes.Add(node);
+
+                    if ((node.Text == "Air Speed") ||
+                        (node.Text == "Climb Rate") ||
+                        (node.Text == "Velocity") ||
+                        (node.Text == "Wind Speed"))
+                        LIST_items.Nodes["Speed"].Nodes.Add(node);
                 }
-                if (defaultUncheckedInstruments.Contains(tn.Text))
-                    tn.Checked = false;
-                else
-                    tn.Checked = true;
             }
 
             LIST_items.ExpandAll();
@@ -2744,15 +2781,29 @@ namespace OSD
         private void rbtSortAlphabetic2_CheckedChanged(object sender, EventArgs e)
         {
             AutomaticCheck = true;
+            List<TreeNode> allNodes = new List<TreeNode>();
+            foreach (TreeNode nd1 in LIST_items2.Nodes)
+            {
+                foreach (TreeNode nd2 in nd1.Nodes)
+                {
+                    allNodes.Add(nd2);
+                }
+                allNodes.Add(nd1);
+            }
             LIST_items2.Nodes.Clear();
+            LIST_items2.CheckBoxes = true;
             if (rbtSortAlphabetic2.Checked)
             {
                 List<string> instruments = new List<string>();
-                foreach (var tuple in this.panelItems)
+                foreach (TreeNode node in allNodes)
                 {
-                    if ((tuple != null))
+                    if ((node.Text != "Attitude") &&
+                        (node.Text != "General") &&
+                        (node.Text != "Energy") &&
+                        (node.Text != "Location") &&
+                        (node.Text != "Speed")) 
                     {
-                        LIST_items2.Nodes.Add(tuple.Item1, tuple.Item1);
+                        LIST_items2.Nodes.Add(node);
                     }
                 }
                 LIST_items2.Sort();
@@ -2760,79 +2811,52 @@ namespace OSD
             else
             {
                 LIST_items2.Nodes.Add("Attitude", "Attitude");
-                LIST_items2.Nodes["Attitude"].Nodes.Add("Horizon", "Horizon");
-                LIST_items2.Nodes["Attitude"].Nodes.Add("Pitch", "Pitch");
-                LIST_items2.Nodes["Attitude"].Nodes.Add("Roll", "Roll");
-
                 LIST_items2.Nodes.Add("General", "General");
-                LIST_items2.Nodes["General"].Nodes.Add("Call Sign", "Call Sign");
-                LIST_items2.Nodes["General"].Nodes.Add("RSSI", "RSSI");
-                LIST_items2.Nodes["General"].Nodes.Add("Flight Mode", "Flight Mode");
-                LIST_items2.Nodes["General"].Nodes.Add("Temperature", "Temperature");
-                LIST_items2.Nodes["General"].Nodes.Add("Throttle", "Throttle");
-                LIST_items2.Nodes["General"].Nodes.Add("Time", "Time");
-                LIST_items2.Nodes["General"].Nodes.Add("Warnings", "Warnings");
-
                 LIST_items2.Nodes.Add("Energy", "Energy");
-                LIST_items2.Nodes["Energy"].Nodes.Add("Battery A", "Battery A");
-                LIST_items2.Nodes["Energy"].Nodes.Add("Battery Percent", "Battery Percent");
-                LIST_items2.Nodes["Energy"].Nodes.Add("Current", "Current");
-                LIST_items2.Nodes["Energy"].Nodes.Add("Efficiency", "Efficiency");
-
                 LIST_items2.Nodes.Add("Location", "Location");
-                LIST_items2.Nodes["Location"].Nodes.Add("Altitude", "Altitude");
-                LIST_items2.Nodes["Location"].Nodes.Add("GPS Coord", "GPS Coord");
-                LIST_items2.Nodes["Location"].Nodes.Add("Heading", "Heading");                
-                LIST_items2.Nodes["Location"].Nodes.Add("Heading Rose", "Heading Rose");
-                LIST_items2.Nodes["Location"].Nodes.Add("Real heading", "Real heading");
-                LIST_items2.Nodes["Location"].Nodes.Add("Home Altitude", "Home Altitude");
-                LIST_items2.Nodes["Location"].Nodes.Add("Home Direction", "Home Direction");
-                LIST_items2.Nodes["Location"].Nodes.Add("Home Distance", "Home Distance");
-                LIST_items2.Nodes["Location"].Nodes.Add("Trip Distance", "Trip Distance");
-                LIST_items2.Nodes["Location"].Nodes.Add("Visible Sats", "Visible Sats");
-                LIST_items2.Nodes["Location"].Nodes.Add("WP Distance", "WP Distance");
-
                 LIST_items2.Nodes.Add("Speed", "Speed");
-                LIST_items2.Nodes["Speed"].Nodes.Add("Air Speed", "Air Speed");
-                LIST_items2.Nodes["Speed"].Nodes.Add("Climb Rate", "Climb Rate");
-                LIST_items2.Nodes["Speed"].Nodes.Add("Velocity", "Velocity");
-                LIST_items2.Nodes["Speed"].Nodes.Add("Wind Speed", "Wind Speed");
 
-            }
-            LIST_items2.CheckBoxes = true;
-
-            List<string> defaultUncheckedInstruments = new List<string>();
-            defaultUncheckedInstruments.Add("Center");
-            defaultUncheckedInstruments.Add("Tune");
-            defaultUncheckedInstruments.Add("Pitch");
-            defaultUncheckedInstruments.Add("Roll");
-            defaultUncheckedInstruments.Add("Battery A");
-            defaultUncheckedInstruments.Add("Visible Sats");
-            defaultUncheckedInstruments.Add("GPS Coord");
-            defaultUncheckedInstruments.Add("GPS Lock");
-            defaultUncheckedInstruments.Add("Heading");
-            defaultUncheckedInstruments.Add("Altitude");
-            defaultUncheckedInstruments.Add("Climb Rate");
-            defaultUncheckedInstruments.Add("Call Sign");
-            defaultUncheckedInstruments.Add("Horizon");
-            defaultUncheckedInstruments.Add("Current");
-            
-            foreach (TreeNode tn in LIST_items2.Nodes)
-            {
-                if (tn.Nodes.Count > 0)
+                foreach (TreeNode node in allNodes)
                 {
-                    foreach (TreeNode tn2 in tn.Nodes)
-                    {
-                        if (defaultUncheckedInstruments.Contains(tn2.Text))
-                            tn2.Checked = false;
-                        else
-                            tn2.Checked = true;
-                    }
+                    if ((node.Text == "Horizon") ||
+                        (node.Text == "Pitch") ||
+                        (node.Text == "Roll"))
+                        LIST_items2.Nodes["Attitude"].Nodes.Add(node);
+
+                    if ((node.Text == "Call Sign") ||
+                        (node.Text == "RSSI") ||
+                        (node.Text == "Flight Mode") ||
+                        (node.Text == "Temperature") ||
+                        (node.Text == "Throttle") ||
+                        (node.Text == "Time") ||
+                        (node.Text == "Warnings"))
+                        LIST_items2.Nodes["General"].Nodes.Add(node);
+
+                    if ((node.Text == "Battery A") ||
+                        (node.Text == "Battery Percent") ||
+                        (node.Text == "Current") ||
+                        (node.Text == "Efficiency"))
+                        LIST_items2.Nodes["Energy"].Nodes.Add(node);
+
+                    if ((node.Text == "Altitude") ||
+                        (node.Text == "GPS Coord") ||
+                        (node.Text == "Heading") ||
+                        (node.Text == "Heading Rose") ||
+                        (node.Text == "Real heading") ||
+                        (node.Text == "Home Altitude") ||
+                        (node.Text == "Home Direction") ||
+                        (node.Text == "Home Distance") ||
+                        (node.Text == "Trip Distance") ||
+                        (node.Text == "Visible Sats") ||
+                        (node.Text == "WP Distance"))
+                        LIST_items2.Nodes["Location"].Nodes.Add(node);
+
+                    if ((node.Text == "Air Speed") ||
+                        (node.Text == "Climb Rate") ||
+                        (node.Text == "Velocity") ||
+                        (node.Text == "Wind Speed"))
+                        LIST_items2.Nodes["Speed"].Nodes.Add(node);
                 }
-                if (defaultUncheckedInstruments.Contains(tn.Text))
-                    tn.Checked = false;
-                else
-                    tn.Checked = true;
             }
 
             LIST_items2.ExpandAll();
