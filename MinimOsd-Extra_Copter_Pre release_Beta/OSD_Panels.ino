@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r568"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r572"));
     osd.closePanel();
 }
 
@@ -183,7 +183,7 @@ void panFdata(){
 void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //do_converts();
+    do_converts();
     osd.printf("%c%4.2f%c", 0x0A, (float(tempconv) / 100), temps);
     osd.closePanel();
 }
