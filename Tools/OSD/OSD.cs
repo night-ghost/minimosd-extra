@@ -1667,7 +1667,7 @@ namespace OSD
                         {
                             TreeNode[] tnArray = LIST_items2.Nodes.Find(panelItems2[a].Item1, true);
                             if (tnArray.Length > 0)
-                                tnArray[0].Checked = (eeprom[panelItems2[a].Item5] == 1);
+                                tnArray[0].Checked = (eeprom[panelItems2[a].Item5 + OffsetBITpanel] == 1);
 
                             //LIST_items2.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
                         }
