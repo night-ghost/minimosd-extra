@@ -78,7 +78,7 @@ static uint16_t     mah_used = 0;         // Battery Consumed mAh
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
 static float        start_Time = -1.0;
 static float        remaining_Time = 0.0;
-static unsigned long start_time_summary = 4294967295;
+static unsigned long landed_at_time = 4294967295;   // Time landing was declared (4294967295 means airborn)
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long text_timer = 0;
@@ -99,6 +99,9 @@ static float        osd_climb = 0;
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
+//static float        not_moving_lat = 0;             // latidude with uav not moving
+//static float        not_moving_lon = 0;             // longitude with uav not moving
+static unsigned long not_moving_since = 0;          // get time since uav not moving
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground

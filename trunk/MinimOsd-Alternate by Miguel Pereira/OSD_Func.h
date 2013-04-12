@@ -112,6 +112,19 @@ void setFdataVars(){
     last_battery_reading = osd_battery_remaining_A;
   }
 
+  //Check if landed
+  if(osd_groundspeed <= 1 && osd_climb >= -1  && (osd_climb <= 1) && (takeofftime == 1)){
+    //10 seconds to declare a landing
+    if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (osd_throttle < 10)){
+      //Crashed or landed
+      landed_at_time = millis();
+    }
+  }
+  else{
+    not_moving_since = millis();
+    landed_at_time == 4294967295; //Airborn
+  }
+
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
   mah_used += (osd_curr_A * 10.0 * (millis() - dt) / 3600000.0);
   //tdistance += (millis() - dt) / 1000.0 * osd_groundspeed;
