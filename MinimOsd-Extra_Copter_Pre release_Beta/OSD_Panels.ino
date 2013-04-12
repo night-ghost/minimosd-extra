@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r574"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r575"));
     osd.closePanel();
 }
 
@@ -22,10 +22,18 @@ void panLogo(){
 void writePanels(){ 
   if(millis() < (lastMAVBeat + 2200)){
     if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+    //Check if landed
+    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1){ 
+      start_time_summary = millis();
+    }
+    else{
+      start_time_summary = 4294967295; //max unsigned long -> To track if "landing
+    }
+    //Only show flight summary 5 seconds after landing
+    if ((start_time_summary != 4294967295) && (((millis() - start_time_summary) / 500) % 2)){ 
       if (osd_clear == 0){
          osd.clear(); 
-         osd_clear = 1;          
+         osd_clear = 1;
       }
       panFdata(); 
     }else{ 
