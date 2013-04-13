@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r552"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r577"));
     osd.closePanel();
 }
 
@@ -397,14 +397,20 @@ void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
+//    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
+//    if(osd_wind_arrow_rotate_int < -7 ) {
+//    osd_wind_arrow_rotate_int += 24;
+//    }else if(osd_wind_arrow_rotate_int > 8 ) {
+//    osd_wind_arrow_rotate_int -= 8;
+//    }else{
+//    osd_wind_arrow_rotate_int += 8;
+//    }
+
     osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
-    if(osd_wind_arrow_rotate_int < -7 ) {
-    osd_wind_arrow_rotate_int += 24;
-    }else if(osd_wind_arrow_rotate_int > 8 ) {
-    osd_wind_arrow_rotate_int -= 8;
-    }else{
-    osd_wind_arrow_rotate_int += 8;
-    }
+    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
+    if(osd_wind_arrow_rotate_int == 0 ) osd_wind_arrow_rotate_int = 1; //normalize
+    if(osd_wind_arrow_rotate_int == 17 ) osd_wind_arrow_rotate_int = 1; //normalize
+    nor_osd_windspeed = osd_windspeed * 0.005 + nor_osd_windspeed * 0.995;
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
 
     osd.closePanel();
@@ -559,8 +565,8 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    vs = (osd_climb * converth * 60) * 0.03 + vs *0.97;
-    osd.printf("%c%4.0f%c",0x15, vs, climbchar);
+    vs = (osd_climb * converth * 60) * 0.05 + vs * 0.95;
+    osd.printf("%c%4.0f%c",0x15, int(vs / 10.0) * 10.0 , climbchar);
     osd.closePanel();
 }
 
@@ -1068,7 +1074,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     arrow_set2 = arrow_set1 + 1;
 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(max_osd_windspeed * converts),spe);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(nor_osd_windspeed * converts),spe);
     else if(method == 2) osd.printf("%c%c%4i%c", arrow_set1, arrow_set2, off_course, 0x05);   
     else osd.printf("%c%c", arrow_set1, arrow_set2);
 }
