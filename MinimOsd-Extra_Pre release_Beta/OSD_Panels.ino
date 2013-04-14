@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r578"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r579"));
     osd.closePanel();
 }
 
@@ -1029,16 +1029,18 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     //char c1 = 0x7f ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
-        if (osd_mode == 0) mode_str = "manu"; //Manual
-        else if (osd_mode == 1) mode_str = "circ"; //CIRCLE
+        if (osd_mode == 0) mode_str = "manu"; //Manual 
+        else if (osd_mode == 1) mode_str = "circ"; //CIRCLE 
         else if (osd_mode == 2) mode_str = "stab"; //Stabilize
+        else if (osd_mode == 3) mode_str = "trai"; //Training
         else if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
         else if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
         else if (osd_mode == 10) mode_str = "auto"; //AUTO
-        else if (osd_mode == 11) mode_str = "retl"; //Return to Launch
+        else if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
         else if (osd_mode == 12) mode_str = "loit"; //Loiter
         else if (osd_mode == 15) mode_str = "guid"; //GUIDED
     osd.printf("%c%s", 0x7f, mode_str);
+//      osd.printf("%c%i", 0x7f, osd_mode);
     osd.closePanel();
 }
 
