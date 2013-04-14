@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r577"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Pre-Release r578"));
     osd.closePanel();
 }
 
@@ -408,8 +408,8 @@ void panWindSpeed(int first_col, int first_line){
 
     osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16 
     if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
-    if(osd_wind_arrow_rotate_int == 0 ) osd_wind_arrow_rotate_int = 1; //normalize
-    if(osd_wind_arrow_rotate_int == 17 ) osd_wind_arrow_rotate_int = 1; //normalize
+    else if(osd_wind_arrow_rotate_int == 0 ) osd_wind_arrow_rotate_int = 1; //normalize
+    else if(osd_wind_arrow_rotate_int == 17 ) osd_wind_arrow_rotate_int = 1; //normalize
     nor_osd_windspeed = osd_windspeed * 0.005 + nor_osd_windspeed * 0.995;
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
 
@@ -637,16 +637,11 @@ void panWarn(int first_col, int first_line){
             while (warning_type == 0) { // cycle through the warning checks
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
-                if(x == 1)
-                    if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
-                else if(x == 2)
-                    if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
-                else if(x == 3)
-                    if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
-                else if(x == 4)
-                    if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;
-                else if(x == 5)
-                    if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
+                if(x == 1) {if ((osd_fix_type) < 2) warning_type = 1;} // No GPS Fix
+                else if(x == 2) {if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;}
+                else if(x == 3) {if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;}
+                else if(x == 4) {if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;}
+                else if(x == 5) {if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;}
                 if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
         }
@@ -660,24 +655,12 @@ void panWarn(int first_col, int first_line){
 //        if (motor_armed == 0){
 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
 //        }else{
-            if (warning_type == 0)
-                //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
-                warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-            else if (warning_type == 1)
-                //osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
-                warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
-            else if (warning_type == 2)
-                //osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
-                warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
-            else if (warning_type == 3)
-                //osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
-                warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
-            else if (warning_type == 4)
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-                warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
-            else if (warning_type == 5)
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-                warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+            if (warning_type == 0) warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+            else if (warning_type == 1) warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+            else if (warning_type == 2) warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+            else if (warning_type == 3) warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+            else if (warning_type == 4) warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+            else if (warning_type == 5) warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
                 //        case 6:
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
@@ -788,7 +771,7 @@ void panHorizon(int first_col, int first_line){
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
     //Show ILS on  HUD
-    showILS(first_col, first_line);
+//    showILS(first_col, first_line);
 }
 
 /* **************************************************************** */
@@ -1007,7 +990,7 @@ void panWPDis(int first_col, int first_line){
     if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
     
       if (xtrack_error > 999) xtrack_error = 999;
-      if (xtrack_error < -999) xtrack_error = -999;
+      else if (xtrack_error < -999) xtrack_error = -999;
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
