@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r579"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r583"));
     osd.closePanel();
 }
 
@@ -21,9 +21,10 @@ void panLogo(){
 
 void writePanels(){ 
 
-  if(millis() < (lastMAVBeat + 2200)){
-if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-   if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
+  if(millis() < (lastMAVBeat + 2200))
+    waitingMAVBeats = 1;
+  if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
        if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;          
@@ -96,17 +97,17 @@ if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // 
  //           panSetup();
  //       }
         }
-    } else { // if no mavlink update for 2 secs
-    
-        // this could be replaced with a No Mavlink warning so the last seen values still show
-
-        osd.clear();
-        waitingMAVBeats = 1;
+    //}
+//    else { // if no mavlink update for 2 secs
+//    
+//        // this could be replaced with a No Mavlink warning so the last seen values still show
+//
+//        osd.clear();
+//        waitingMAVBeats = 1;
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
-    panLogo();
-    
-  }
+//    panLogo();
+//  }
   
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
@@ -162,7 +163,7 @@ void panCOG(int first_col, int first_line){
 void panDistance(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    do_converts();
+    //do_converts();
     if ((tdistance * converth) > 1000.0) {
     osd.printf("%c%5.2f%c", 0x8f, ((tdistance * converth) / distconv), distchar);
     }else{
@@ -195,9 +196,7 @@ void panFdata(){
 void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    do_converts();
-    osd.printf("%c%5.1f%c", 0x0a, (float(tempconv) / 10), temps);
-//    osd.printf("%c%5.1f%c", 0x0a, (float(temperature) / 10), 0xbb);
+    osd.printf("%c%5.1f%c", 0x0a, (float(temperature * tempconv + tempconvAdd) / 10), temps);
     osd.closePanel();
 }
 
@@ -300,15 +299,23 @@ void panCALLSIGN(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
+    //During the first 1000 miliseconds of each minute show callsign
+    if(((millis() / 1000) % 60) <= 1000)
+      osd.printf("%s", char_call); 
+    else
+//    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+      osd.printf("%s",strclear);
+    
+/*    if(millis() % 60000
     if ((millis() - 60000) > CallSignBlink){
       if (millis() - 61000 > CallSignBlink){
         CallSignBlink = (millis() - 1000);
           }
-    osd.printf("%s", char_call); 
+      osd.printf("%s", char_call); 
     }else{
 //    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
-    osd.printf("%s",strclear);
-    }
+      osd.printf("%s",strclear);
+    }*/
     osd.closePanel();
 }
 
@@ -760,13 +767,12 @@ void panHorizon(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
   
-     
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\xc6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc5\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
+    osd.printf_P(PSTR("\xc6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc5|"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
+    //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
 
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
@@ -867,11 +873,11 @@ void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    char* gps_str;
-    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x1f";       
-    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x0f";
+    byte gps_str = 0x1f;
+    if(osd_fix_type >= 2)
+      gps_str = 0x0f;
     
-    osd.printf("%s%2i", gps_str, osd_satellites_visible);
+    osd.printf("%c%2i", gps_str, osd_satellites_visible);
     osd.closePanel();
 }
 
@@ -1029,16 +1035,16 @@ void panFlightMode(int first_col, int first_line){
     osd.openPanel();
     //char c1 = 0x7f ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
-        if (osd_mode == 0) mode_str = "manu"; //Manual 
-        else if (osd_mode == 1) mode_str = "circ"; //CIRCLE 
-        else if (osd_mode == 2) mode_str = "stab"; //Stabilize
-        else if (osd_mode == 3) mode_str = "trai"; //Training
-        else if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
-        else if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
-        else if (osd_mode == 10) mode_str = "auto"; //AUTO
-        else if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
-        else if (osd_mode == 12) mode_str = "loit"; //Loiter
-        else if (osd_mode == 15) mode_str = "guid"; //GUIDED
+    if (osd_mode == 0) mode_str = "manu"; //Manual 
+    if (osd_mode == 1) mode_str = "circ"; //CIRCLE 
+    if (osd_mode == 2) mode_str = "stab"; //Stabilize
+    if (osd_mode == 3) mode_str = "trai"; //Training
+    if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
+    if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
+    if (osd_mode == 10) mode_str = "auto"; //AUTO
+    if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
+    if (osd_mode == 12) mode_str = "loit"; //Loiter
+    if (osd_mode == 15) mode_str = "guid"; //GUIDED
     osd.printf("%c%s", 0x7f, mode_str);
 //      osd.printf("%c%i", 0x7f, osd_mode);
     osd.closePanel();
@@ -1050,18 +1056,16 @@ void panFlightMode(int first_col, int first_line){
 
 void showArrow(uint8_t rotate_arrow,uint8_t method) {  
     char arrow_set1 = 0x0;
-    char arrow_set2 = 0x0;   
   
     if(rotate_arrow == 0){
       rotate_arrow = 1;
     }
     arrow_set1 = rotate_arrow * 2 + 0x8E;
-    arrow_set2 = arrow_set1 + 1;
 
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(osd_windspeedz * converts),spe);
-    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set2,(double)(nor_osd_windspeed * converts),spe);
-    else if(method == 2) osd.printf("%c%c%4i%c", arrow_set1, arrow_set2, off_course, 0x05);   
-    else osd.printf("%c%c", arrow_set1, arrow_set2);
+    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set1 + 1,(double)(nor_osd_windspeed * converts),spe);
+    else if(method == 2) osd.printf("%c%c%4i%c", arrow_set1, arrow_set1 + 1, off_course, 0x05);   
+    else osd.printf("%c%c", arrow_set1, arrow_set1 + 1);
 }
 
 // Calculate and shows Artificial Horizon
@@ -1190,7 +1194,8 @@ void do_converts()
         spe = 0x10;
         high = 0x0c;
         temps = 0xba;
-        tempconv = temperature;
+        tempconv = 10;
+        tempconvAdd = 0;
         distchar = 0x1b;
         distconv = 1000;
         climbchar = 0x1a;
@@ -1200,7 +1205,8 @@ void do_converts()
         spe = 0x19;
         high = 0x66;
         temps = 0xbb;
-        tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
+        tempconv = 18;
+        tempconvAdd = 320;
         distchar = 0x1c;
         distconv = 5280;
         climbchar = 0x1e;
