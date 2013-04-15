@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r580"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r581"));
     osd.closePanel();
 }
 
@@ -1146,7 +1146,7 @@ void showILS(int start_col, int start_row) {
     //so convert we convert it to times 10 to work 
     //only with integers and save some bytes
     //int alt = (osd_alt_to_home * converth + 5) * 10;
-    int alt = (osd_alt_to_home * converth + 5) * 4.4;
+    int alt = (osd_alt_to_home * converth + 5) * 4.4; //44 possible position 5 rows times 9 chars
     
     if((alt < 44) && (alt > 0)){
         //We have 9 possible chars
@@ -1162,7 +1162,7 @@ void showILS(int start_col, int start_row) {
         //Each row represents 2 altitude units
         start_row += (alt / 9);
     }
-    else if(alt >= 100){
+    else if(alt >= 44){
         //Copter is too high. Ground is way too low to show on panel, 
         //so show down arrow at the bottom
         subval_char = 0xC8; 
