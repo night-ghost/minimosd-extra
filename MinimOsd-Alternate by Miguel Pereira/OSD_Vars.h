@@ -6,6 +6,7 @@ static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
 static float        max_osd_windspeed = 0;
+static float        nor_osd_windspeed = 0;
 static float        vs = 0;
 
 static unsigned long dt = 0;
