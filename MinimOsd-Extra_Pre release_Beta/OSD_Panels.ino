@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r584"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r585"));
     osd.closePanel();
 }
 
@@ -21,8 +21,7 @@ void panLogo(){
 
 void writePanels(){ 
 
-  if(millis() < (lastMAVBeat + 2200))
-    waitingMAVBeats = 1;
+  if(millis() < (lastMAVBeat + 2200)){
   if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
     if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100){ 
        if (osd_clear == 0){
@@ -98,16 +97,16 @@ void writePanels(){
  //       }
         }
     //}
-//    else { // if no mavlink update for 2 secs
-//    
-//        // this could be replaced with a No Mavlink warning so the last seen values still show
-//
-//        osd.clear();
-//        waitingMAVBeats = 1;
+   } else { // if no mavlink update for 2 secs
+    
+        // this could be replaced with a No Mavlink warning so the last seen values still show
+
+        osd.clear();
+        waitingMAVBeats = 1;
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
-//    panLogo();
-//  }
+    panLogo();
+  }
   
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
