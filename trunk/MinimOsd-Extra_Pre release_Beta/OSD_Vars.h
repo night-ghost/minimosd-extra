@@ -114,7 +114,7 @@ static float        osd_heading = 0;                // ground course heading fro
 static float        glide = 0;
 
 static float        osd_alt = 0;                    // altitude
-static float        osd_airspeed = -1;              // airspeed
+static float        osd_airspeed = 0;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
 static float        osd_winddirection = 0;
