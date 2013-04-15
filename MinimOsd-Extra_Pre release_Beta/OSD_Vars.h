@@ -79,7 +79,7 @@ static unsigned long text_timer = 0;
 static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
-static unsigned long CallSignBlink = 0;
+//static unsigned long CallSignBlink = 0;
 
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
@@ -127,7 +127,8 @@ static float        osd_alt_prev = 0;             // previous altitude
 static float        osd_groundspeed = 0;            // ground speed
 static uint8_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
-static uint16_t     tempconv = 0;
+static uint8_t      tempconv = 1;
+static uint16_t     tempconvAdd = 0;
 static uint16_t     distchar = 0;
 static uint16_t     climbchar = 0;
 
