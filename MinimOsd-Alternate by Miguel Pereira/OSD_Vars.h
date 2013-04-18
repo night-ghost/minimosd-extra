@@ -88,6 +88,7 @@ static unsigned long FTime = 0;
 static unsigned long CallSignBlink = 0;
 
 static uint8_t      warning_type = 0;
+static char*        warning_string;
 static uint8_t      last_warning = 0;
 static uint8_t      warning = 0;
 static uint8_t      osd_off_switch = 0;
