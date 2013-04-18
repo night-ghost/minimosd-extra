@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r582"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r586"));
     osd.closePanel();
 }
 
@@ -592,69 +592,68 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    if (millis() > text_timer){ // if the text has been shown for a while
-        if (warning_type != 0) {
-            last_warning = warning_type; // save the warning type for cycling
-            warning_type = 0; // blank the text
-            warning = 1;
-            warning_timer = millis();            
-        } else {
-            if ((millis() - 10000) > warning_timer ) warning = 0;
+    //If disarmed force showing disarmed message
+    if (motor_armed == 0){
+      warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
+      warning_type = 10;
+      text_timer = millis();
+    }
 
-            int x = last_warning; // start the warning checks where we left it last time
-            while (warning_type == 0) { // cycle through the warning checks
-                x++;
-                if (x > 5) x = 1; // change the 6 if you add more warning types
-                if(x == 1){
-                    if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
-                }
-                else if(x == 2){
-                    if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
-                }
-                else if(x == 3){
-                    if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
-                }
-                else if(x == 4){
-                    if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;
-                }
-                else if(x == 5){
-                    if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
-                }
-                if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
-            }
-        }
-
-        text_timer = millis() + 1000; // blink every 1 secs
-        if (warning == 1){ 
-            if (panel == 1) osd.clear();
-            panel = 0; // turn OSD on if there is a warning                  
-        }
-        char* warning_string;
-        //Show arm / disarm switch 
-        if(warning_type == 0){ 
-            warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-        }
-        else if(warning_type == 1){ 
+    //If there is no warning beeing shown, check for next one
+    if(warning_type == 0){
+      byte check_warning = last_warning ++; // start the warning checks where we left it last time
+      while (check_warning != last_warning){
+        if (check_warning > 5) check_warning = 1; // change the 5 if you add more warning types
+        //Check for no GPS fix
+        if(check_warning == 1){
+          if ((osd_fix_type) < 2){
+            warning_type = 1; // No GPS Fix
             warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+          }
         }
-        else if(warning_type == 2){ 
+        //Check for low airspeed
+        else if(check_warning == 2){
+          if (osd_airspeed * converts < stall && osd_airspeed > 1.12){
+            warning_type = 2;
             warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+          }
         }
-        else if(warning_type == 3){ 
+        //Check for over speed
+        else if(check_warning == 3){
+          if ((osd_airspeed * converts) > (float)overspeed){
+            warning_type = 3;
             warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+          }
         }
-        else if(warning_type == 4){ 
+        //Check for low battery
+        else if(check_warning == 4){
+          if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
+            warning_type = 4;
             warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+          }
         }
-        else if(warning_type == 5){ 
+        //Check for low RSSI
+        else if(check_warning == 5){
+          if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
+            warning_type = 5;
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+          }
         }
-        //else if(warning_type == 6){ 
-            //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-        //}
-        if (motor_armed == 0)
-            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-        osd.printf("%s",warning_string);
+        //Check next warning
+        check_warning ++;
+        if(warning_type != 0){
+          text_timer = millis();
+        }
+      }
+    }
+    else{
+      if (millis() - text_timer > 1000){
+        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+      }
+      else if (millis() - text_timer > 2000){
+        warning_type = 0;
+      }
+      osd.printf("%s",warning_string);
     }
     osd.closePanel();
 }
