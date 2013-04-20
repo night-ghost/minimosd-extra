@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r586"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r582"));
     osd.closePanel();
 }
 
@@ -23,8 +23,8 @@ void writePanels(){
   if(millis() < (lastMAVBeat + 2200)){
     if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
-    //Only show flight summary 5 seconds after landing
-    if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 5000) % 2) == 0)){ 
+    //Only show flight summary 5 seconds after landing and if throttle < 15
+    if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 5000) % 2) == 0) && (osd_throttle < 15)){ 
       if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;
@@ -533,7 +533,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    vs = (osd_climb * converth * 60) * 0.5 + vs * 0.5;
+    vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
     osd.printf("%c%4.0f%c",0x15, vs, climbchar);
     osd.closePanel();
 }
