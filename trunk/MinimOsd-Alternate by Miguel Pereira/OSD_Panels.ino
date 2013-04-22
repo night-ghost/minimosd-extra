@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r582"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r590"));
     osd.closePanel();
 }
 
@@ -186,8 +186,8 @@ void panFdata(){
 void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    do_converts();
-    osd.printf("%c%4.2f%c", 0x0A, (float(tempconv) / 100), temps);
+    //do_converts();
+    osd.printf("%c%5.1f%c", 0x0a, (float(temperature / 10 * tempconv + tempconvAdd) / 100), temps);
     osd.closePanel();
 }
 
@@ -272,7 +272,14 @@ void panCALLSIGN(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
-    if ((millis() - 60000) > CallSignBlink){
+    //During the first 1000 miliseconds of each minute show callsign
+    if(((millis() / 1000) % 60) <= 1000)
+      osd.printf("%s", char_call);
+    else
+//    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+      osd.printf("%s",strclear);
+    
+/*    if ((millis() - 60000) > CallSignBlink){
       if (millis() - 61000 > CallSignBlink){
         CallSignBlink = (millis() - 1000);
           }
@@ -280,7 +287,7 @@ void panCALLSIGN(int first_col, int first_line){
     }else{
 //    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
     osd.printf("%s",strclear);
-    }
+    }*/
     osd.closePanel();
 }
 
@@ -746,12 +753,7 @@ void panHorizon(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
   
-     
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
 
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
@@ -1181,7 +1183,8 @@ void do_converts()
         spe = 0x10;
         high = 0x0C;
         temps = 0xBA;
-        tempconv = temperature;
+        tempconv = 10;
+        tempconvAdd = 0;
         distchar = 0x1B;
         distconv = 1000;
         climbchar = 0x1A;
@@ -1191,7 +1194,8 @@ void do_converts()
         spe = 0x19;
         high = 0x66;
         temps = 0xBB;
-        tempconv = (1.8 *(float(temperature)  / 10) + 32) * 10;
+        tempconv = 18;
+        tempconvAdd = 3200;
         distchar = 0x1C;
         distconv = 5280;
         climbchar = 0x1E;
