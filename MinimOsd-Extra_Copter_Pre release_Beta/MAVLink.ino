@@ -53,7 +53,7 @@ void read_mavlink(){
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 {
-                    mavbeat = 1;
+                    //mavbeat = 1;
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                  //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
@@ -66,10 +66,10 @@ void read_mavlink(){
                     motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    lastMAVBeat = millis();
-                    if(waitingMAVBeats == 1){
-                        enable_mav_request = 1;
-                    }
+                    //lastMAVBeat = millis();
+                    //if(waitingMAVBeats == 1){
+                    //    enable_mav_request = 1;
+                    //}
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
