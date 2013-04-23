@@ -1,10 +1,8 @@
 /******* STARTUP PANEL *******/
 
 void startPanels(){
-//    osd.clear();
-    //osd_clear = 3;
-    panLogo(); // Display our logo  
-    do_converts(); // load the unit conversion preferences
+  panLogo(); // Display our logo  
+  do_converts(); // load the unit conversion preferences
 }
 
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
@@ -12,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r590"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r592"));
     osd.closePanel();
 }
 
@@ -20,79 +18,79 @@ void panLogo(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
-  if(millis() < (lastMAVBeat + 2200)){
-    if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+//  if(millis() < (lastMAVBeat + 2200))
+//    waitingMAVBeats = 1;
+  if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
-    //Only show flight summary 5 seconds after landing and if throttle < 15
-    if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 5000) % 2) == 0) && (osd_throttle < 15)){ 
-      if (osd_clear == 0){
-         osd.clear(); 
-         osd_clear = 1;
-      }
-      panFdata(); 
-    }else{ 
-      if (osd_clear == 1){
-        osd.clear(); 
-        osd_clear = 0;          
-      }
-      if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
-      if(panel != npanels){
-                //Testing bits from 8 bit register A 
- //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
-                if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
-                if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
-                if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
-                //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
-                if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
-                //if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
-                if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
-                if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
-                if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
-
-                //Testing bits from 8 bit register B
-                if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
-                if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
- //               if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
-
-                if(osd_got_home == 1){
-                    if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
-                    if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
-                }
-
-                if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
-                if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
-
-                //Testing bits from 8 bit register C 
-                //if(osd_got_home == 1){
-                if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
-                if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
-                if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
-                if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
-
-                //}
-                if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
-                if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
-                if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
-                if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
-
-                //Testing bits from 8 bit register D 
-                //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
-                //For now we don't have windspeed in copter
-                //if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
-                if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-//                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
-                if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
-                if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
-                if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
-                if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
-//                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
-                if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
-      } else { //panel == npanels
-//                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
-                if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
-      }
+  //Only show flight summary 5 seconds after landing and if throttle < 15
+  if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 5000) % 2) == 0) && (osd_throttle < 15)){ 
+    if (osd_clear == 0){
+       osd.clear(); 
+       osd_clear = 1;
     }
-  } else { // if no mavlink update for 2 secs
+    panFdata(); 
+  }else{ 
+    if (osd_clear == 1){
+      osd.clear(); 
+      osd_clear = 0;          
+    }
+    //Check for panel toggle
+    if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
+    if(panel != npanels){
+      //Testing bits from 8 bit register A 
+      //if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+      if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
+      if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
+      if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
+      //if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
+      if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
+      //if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
+      if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
+      if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
+      if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
+
+      //Testing bits from 8 bit register B
+      if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
+      if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
+      //if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
+      if(osd_got_home == 1){
+        if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
+        if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
+      }
+      if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+      if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+
+      //Testing bits from 8 bit register C 
+      //if(osd_got_home == 1){
+      if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
+      if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
+      if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
+      if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
+      //}
+      if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
+      if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
+      if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
+      if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
+
+      //Testing bits from 8 bit register D 
+      //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
+      //For now we don't have windspeed in copter
+      //if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
+      if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+      //if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+      if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
+      if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
+      //if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
+      if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
+      //if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
+      if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
+    }
+    //else { //panel == npanels
+      //if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+      //if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
+    //}
+  }
+/*  } else { // if no mavlink update for 2 secs
     
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
@@ -101,7 +99,8 @@ void writePanels(){
         // Display our logo and wait... 
     //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
     panLogo();
-  }
+  }*/
+  if(ISd(panel % npanels,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
   
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
@@ -394,37 +393,14 @@ void panWindSpeed(int first_col, int first_line){
 // Staus  : done
 
 void panOff(){
+  bool rotatePanel = 0;
     if (ch_toggle == 4){
         if ((osd_mode != 6) && (osd_mode != 7)){
             if (osd_off_switch != osd_mode){ 
                 osd_off_switch = osd_mode;
                 osd_switch_time = millis();
-
                 if (osd_off_switch == osd_switch_last){
-                    switch(panel){
-                    case 0:
-                        {
-                            panel = 1;                                                        
-//                            if (millis() <= 60000){
-//                                osd_set = 1;
-//                            }else{
-//                                osd_set = 0;
-//                            }                            
-                            break;
-                        }
-                    case 1:
-                        {
-                            panel = npanels;
-//                            osd_set = 0;                            
-                            break;
-                        }
-                    case npanels:
-                        {
-                            panel = 0;
-                            break;
-                        }
-                    }
-                    osd.clear();
+                  rotatePanel = 1;
                 }
             }
             if ((millis() - osd_switch_time) > 2000){
@@ -438,51 +414,41 @@ void panOff(){
         else if(ch_toggle == 7) ch_raw = chan7_raw;
         else if(ch_toggle == 8) ch_raw = chan8_raw;
 
+        //Switch mode by value
         if (switch_mode == 0){
-            if (ch_raw > 1800 && warning != 1) {
-//                if (millis() <= 60000){
-//                    osd_set = 1;
-//                }
-//                else if (osd_set != 1 && warning != 1){
-//              if (warning != 1){
-                osd.clear();
-//                }
-                panel = npanels; //off panel
-            }
-            else if (ch_raw < 1200 && panel != 0) { //first panel
- //               osd_set = 0;
+          //If there is a warning only change to first panel
+          if(warning == 1){
+            //First panel
+            if (ch_raw < 1200 && panel != 0) {
                 osd.clear();
                 panel = 0;
-            }    
-
- // else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1 && warning != 1) { //second panel
-    else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1 && warning != 1) { //second panel
- //               osd_set = 0;
+            } 
+          }
+          //Second panel
+          else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1) { //second panel
+              osd.clear();
+              panel = 1;
+          }
+          //Panel off
+          else if (ch_raw > 1800 && panel != npanels) {
                 osd.clear();
-                panel = 1;
-            }        
-        } else {
-
-            if (ch_raw > 1200)
- //               if (millis() <= 60000 && osd_set != 1){
- //                   if (osd_switch_time + 1000 < millis()){
- //                       osd_set = 1;
- //                       osd_switch_time = millis();
- //                   }
- //               } else {
-                    if (osd_switch_time + 1000 < millis()){
- //                       osd_set = 0;
-                        osd.clear();
-                        if (panel == npanels) {
-                            panel = 0;
-                        } else {
-                            panel++;
-                        }
-                        if (panel > 1) panel = npanels;
-                        osd_switch_time = millis();
-                    }
-  //              }
+                panel = npanels; //off panel
+          }
+        }
+        //Rotation switch
+        else{
+          if (ch_raw > 1200)
+            if (osd_switch_time + 1000 < millis()){
+              rotatePanel = 1;
+              osd_switch_time = millis();
+            }
         }    
+    }
+    if(rotatePanel == 1){
+      osd.clear();
+      panel++;
+      if (panel > npanels)
+        panel = 0;
     }
 }
 //* **************************************************************** */
