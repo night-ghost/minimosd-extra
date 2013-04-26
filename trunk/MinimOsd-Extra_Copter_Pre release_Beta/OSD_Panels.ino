@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r593"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r594"));
     osd.closePanel();
 }
 
@@ -394,55 +394,60 @@ void panWindSpeed(int first_col, int first_line){
 
 void panOff(){
   bool rotatePanel = 0;
+
+  //If there is a warning force switch to panel 0
+  if((foundWarning == 1) && (panel != 0)){
+    osd.clear();
+    panel = 0;
+  }
+  else{
+    //Flight mode switching
     if (ch_toggle == 4){
-        if ((osd_mode != 6) && (osd_mode != 7)){
-            if (osd_off_switch != osd_mode){ 
-                osd_off_switch = osd_mode;
-                osd_switch_time = millis();
-                if (osd_off_switch == osd_switch_last){
-                  rotatePanel = 1;
-                }
-            }
-            if ((millis() - osd_switch_time) > 2000){
-                osd_switch_last = osd_mode;
+      if ((osd_mode != 6) && (osd_mode != 7)){
+        if (osd_off_switch != osd_mode){ 
+          osd_off_switch = osd_mode;
+            osd_switch_time = millis();
+            if (osd_off_switch == osd_switch_last){
+              rotatePanel = 1;
             }
         }
+        if ((millis() - osd_switch_time) > 2000){
+          osd_switch_last = osd_mode;
+        }
+      }
     }
     else {
-        if(ch_toggle == 5) ch_raw = chan5_raw;
-        else if(ch_toggle == 6) ch_raw = chan6_raw;
-        else if(ch_toggle == 7) ch_raw = chan7_raw;
-        else if(ch_toggle == 8) ch_raw = chan8_raw;
+      if(ch_toggle == 5) ch_raw = chan5_raw;
+      else if(ch_toggle == 6) ch_raw = chan6_raw;
+      else if(ch_toggle == 7) ch_raw = chan7_raw;
+      else if(ch_toggle == 8) ch_raw = chan8_raw;
 
-        //Switch mode by value
-        if (switch_mode == 0){
-          //If there is a warning only change to first panel
-          if(warning == 1){
-            //First panel
-            if (ch_raw < 1200 && panel != 0) {
-                osd.clear();
-                panel = 0;
-            } 
-          }
-          //Second panel
-          else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1) { //second panel
-              osd.clear();
-              panel = 1;
-          }
-          //Panel off
-          else if (ch_raw > 1800 && panel != npanels) {
-                osd.clear();
-                panel = npanels; //off panel
-          }
+      //Switch mode by value
+      if (switch_mode == 0){
+        //First panel
+        if (ch_raw < 1200 && panel != 0) {
+          osd.clear();
+          panel = 0;
         }
-        //Rotation switch
-        else{
-          if (ch_raw > 1200)
-            if (osd_switch_time + 1000 < millis()){
-              rotatePanel = 1;
-              osd_switch_time = millis();
-            }
-        }    
+        //Second panel
+        else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1) { //second panel
+          osd.clear();
+          panel = 1;
+        }
+        //Panel off
+        else if (ch_raw > 1800 && panel != npanels) {
+          osd.clear();
+          panel = npanels; //off panel
+        }
+      }
+      //Rotation switch
+      else{
+        if (ch_raw > 1200)
+          if (osd_switch_time + 1000 < millis()){
+            rotatePanel = 1;
+            osd_switch_time = millis();
+        }
+      }    
     }
     if(rotatePanel == 1){
       osd.clear();
@@ -450,6 +455,7 @@ void panOff(){
       if (panel > npanels)
         panel = 0;
     }
+  }
 }
 //* **************************************************************** */
 // Panel  : panTune
@@ -614,6 +620,7 @@ void panWarn(int first_col, int first_line){
         }
         //Check next warning
         check_warning ++;
+        foundWarning = (warning_type > 0);
         if(warning_type != 0){
           text_timer = millis();
         }

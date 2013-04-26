@@ -90,7 +90,7 @@ static unsigned long FTime = 0;
 static uint8_t      warning_type = 0;
 static char*        warning_string;
 static uint8_t      last_warning = 0;
-static uint8_t      warning = 0;
+static bool         foundWarning = 0;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
