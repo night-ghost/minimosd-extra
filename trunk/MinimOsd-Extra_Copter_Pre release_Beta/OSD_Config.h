@@ -84,9 +84,9 @@
 #define panGPSats_en_ADDR 30
 #define panGPSats_x_ADDR 32
 #define panGPSats_y_ADDR 34
-//#define panGPL_en_ADDR 36
-//#define panGPL_x_ADDR 38
-//#define panGPL_y_ADDR 40
+#define panCOG_en_ADDR 36
+#define panCOG_x_ADDR 38
+#define panCOG_y_ADDR 40
 #define panGPS_en_ADDR 42
 #define panGPS_x_ADDR 44
 #define panGPS_y_ADDR 46

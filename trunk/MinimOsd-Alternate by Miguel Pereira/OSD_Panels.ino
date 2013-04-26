@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r594"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r595"));
     osd.closePanel();
 }
 
@@ -20,16 +20,17 @@ void panLogo(){
 void writePanels(){ 
 //  if(millis() < (lastMAVBeat + 2200))
 //    waitingMAVBeats = 1;
-  if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+  //if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
   //Only show flight summary 5 seconds after landing and if throttle < 15
-  if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 5000) % 2) == 0) && (osd_throttle < 15)){ 
+  if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 10000) % 2) == 0) && (osd_throttle < 15)){ 
     if (osd_clear == 0){
        osd.clear(); 
        osd_clear = 1;
     }
     panFdata(); 
   }else{ 
+    if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
     if (osd_clear == 1){
       osd.clear(); 
       osd_clear = 0;          
@@ -272,7 +273,7 @@ void panCALLSIGN(int first_col, int first_line){
     osd.openPanel();
     //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
     //During the first 1000 miliseconds of each minute show callsign
-    if(((millis() / 1000) % 60) <= 1000)
+    if(((millis() / 1000) % 60) < 2)
       osd.printf("%s", char_call);
     else
 //    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
@@ -576,62 +577,65 @@ void panWarn(int first_col, int first_line){
       warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
       warning_type = 10;
       text_timer = millis();
+      foundWarning = 0;
     }
 
     //If there is no warning beeing shown, check for next one
     if(warning_type == 0){
-      byte check_warning = last_warning ++; // start the warning checks where we left it last time
-      while (check_warning != last_warning){
-        if (check_warning > 5) check_warning = 1; // change the 5 if you add more warning types
+      //byte check_warning = last_warning ++; // start the warning checks where we left it last time
+      last_warning ++; // start the warning checks where we left it last time
+      //while (check_warning != last_warning){
+        //if (check_warning > 5) check_warning = 1; // change the 5 if you add more warning types
+        if (last_warning > 5) last_warning = 1; // change the 5 if you add more warning types
         //Check for no GPS fix
-        if(check_warning == 1){
+        if(last_warning == 1){
           if ((osd_fix_type) < 2){
             warning_type = 1; // No GPS Fix
             warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
           }
         }
         //Check for low airspeed
-        else if(check_warning == 2){
+        else if(last_warning == 2){
           if (osd_airspeed * converts < stall && osd_airspeed > 1.12){
             warning_type = 2;
             warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
           }
         }
         //Check for over speed
-        else if(check_warning == 3){
+        else if(last_warning == 3){
           if ((osd_airspeed * converts) > (float)overspeed){
             warning_type = 3;
             warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
           }
         }
         //Check for low battery
-        else if(check_warning == 4){
+        else if(last_warning == 4){
           if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
             warning_type = 4;
             warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
           }
         }
         //Check for low RSSI
-        else if(check_warning == 5){
+        else if(last_warning == 5){
           if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
             warning_type = 5;
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
           }
         }
         //Check next warning
-        check_warning ++;
+        //check_warning ++;
         foundWarning = (warning_type > 0);
         if(warning_type != 0){
           text_timer = millis();
         }
-      }
+      //}
     }
     else{
-      if (millis() - text_timer > 1000){
-        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-      }
-      else if (millis() - text_timer > 2000){
+      if (millis() - text_timer > 2000){
         warning_type = 0;
+      }
+      else if (millis() - text_timer > 1000){
+        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
       }
       osd.printf("%s",warning_string);
     }
@@ -1016,7 +1020,8 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     //arrow_set2 = arrow_set1 + 1;
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1D,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(osd_windspeedz * converts),spe);
     if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set1 + 1,(double)(nor_osd_windspeed * converts),spe);
-    else osd.printf("%c%c", (byte)arrow_set1, (byte)(arrow_set1 + 1));
+    else if(method == 2) osd.printf("%c%c%4i%c", arrow_set1, arrow_set1 + 1, off_course, 0x05);   
+    else osd.printf("%c%c", arrow_set1, arrow_set1 + 1);
 }
 
 // Calculate and shows Artificial Horizon
