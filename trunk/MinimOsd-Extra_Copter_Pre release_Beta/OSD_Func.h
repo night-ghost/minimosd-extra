@@ -113,27 +113,15 @@ void setFdataVars(){
     last_battery_reading = osd_battery_remaining_A;
   }
 
-  //Check if is moving
-  if((osd_groundspeed > 1) || (osd_climb < -0.5) || (osd_climb > 0.5)){
+  //Check if is moving (osd_groundspeed > 1Km/h or osd_climb within ]-10, 10[ m/m
+  if((osd_groundspeed > 0.28) || (osd_climb < -0.17) || (osd_climb > 0.17)){
     not_moving_since = millis();
-    landed_at_time == 4294967295; //Airborn
+    landed_at_time = 4294967295; //Airborn
   }
   //If it is stoped for more than 10 seconds, declare a landing
   else if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (takeofftime == 1)){
     landed_at_time = millis();
   }
-  
-/*  if(osd_groundspeed <= 1 && osd_climb >= -1  && (osd_climb <= 1)){
-    //10 seconds to declare a landing
-    if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (takeofftime == 1)){
-      //Crashed or landed
-      landed_at_time = millis();
-    }
-  }
-  else{
-    not_moving_since = millis();
-    landed_at_time == 4294967295; //Airborn
-  }*/
 
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
   mah_used += (osd_curr_A * 10.0 * (millis() - dt) / 3600000.0);

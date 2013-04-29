@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r595"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r596"));
     osd.closePanel();
 }
 
@@ -22,18 +22,18 @@ void writePanels(){
 //    waitingMAVBeats = 1;
   //if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
-  //Only show flight summary 5 seconds after landing and if throttle < 15
+  //Only show flight summary 10 seconds after landing and if throttle < 15
   if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 10000) % 2) == 0) && (osd_throttle < 15)){ 
     if (osd_clear == 0){
-       osd.clear(); 
+       osd.clear();
        osd_clear = 1;
     }
     panFdata(); 
   }else{ 
     if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
     if (osd_clear == 1){
-      osd.clear(); 
-      osd_clear = 0;          
+      osd.clear();
+      osd_clear = 0;
     }
     //Check for panel toggle
     if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
