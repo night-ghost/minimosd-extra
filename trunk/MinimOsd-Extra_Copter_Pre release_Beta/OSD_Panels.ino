@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r596"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r598"));
     osd.closePanel();
 }
 
@@ -23,7 +23,7 @@ void writePanels(){
   //if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
   //Only show flight summary 10 seconds after landing and if throttle < 15
-  if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 10000) % 2) == 0) && (osd_throttle < 15)){ 
+  if ((landed_at_time != 4294967295) && ((((millis() - landed_at_time) / 10000) % 2) == 0)){ 
     if (osd_clear == 0){
        osd.clear();
        osd_clear = 1;
@@ -126,7 +126,7 @@ void panCOG(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    osd_COG_arrow_rotate_int = ((osd_cog / 100) - osd_heading) / 360.0 * 15.0 + 1; //Convert to int 1-16 
+    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading) / 360.0 * 15.0 + 1); //Convert to int 1-16 
     if(osd_COG_arrow_rotate_int < 1 ) osd_COG_arrow_rotate_int += 16;
     //if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
     //if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
@@ -1014,9 +1014,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
     int arrow_set1 = 0x90;
     //We trust that we receive rotate_arrow [1, 16] so 
     //it's no needed (rotate_arrow <= 16) in the if clause
-    if(rotate_arrow > 1){
-      arrow_set1 += rotate_arrow * 2 - 2;
-    }
+    arrow_set1 += rotate_arrow * 2 - 2;
     //arrow_set2 = arrow_set1 + 1;
 //    if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1D,(double)(osd_windspeed * converts),spe, (byte)arrow_set1, (byte)(arrow_set1 + 1),(double)(osd_windspeedz * converts),spe);
     if(method == 1) osd.printf("%c%3.0f%c|%c%c%2.0f%c",0x1d,(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set1 + 1,(double)(nor_osd_windspeed * converts),spe);

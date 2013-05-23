@@ -114,7 +114,8 @@ void setFdataVars(){
   }
 
   //Check if is moving (osd_groundspeed > 1Km/h or osd_climb within ]-10, 10[ m/m
-  if((osd_groundspeed > 0.28) || (osd_climb < -0.17) || (osd_climb > 0.17)){
+  //if((osd_groundspeed > 0.28) || (osd_climb < -0.17) || (osd_climb > 0.17)){
+  if(osd_throttle > 15){
     not_moving_since = millis();
     landed_at_time = 4294967295; //Airborn
   }
