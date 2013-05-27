@@ -96,11 +96,9 @@ void setHomeVars(OSD &osd)
     if(bearing < 0) bearing += 360;//normalization
     bearing = bearing - osd_heading;//relative home direction
     if(bearing < 0) bearing += 360; //normalization
-    osd_home_direction = round((float)(bearing/360.0f) * 16.0f) + 1;//array of arrows =)
-    if(osd_home_direction > 16) osd_home_direction = 0;
-
+    osd_home_direction = ((int)round((float)(bearing/360.0f) * 16.0f) % 16) + 1;//array of arrows =)
+    //if(osd_home_direction > 16) osd_home_direction = 1;
   }
-
 }
 
 void setFdataVars(){
@@ -131,6 +129,7 @@ void setFdataVars(){
   dt = millis();
 
   if (takeofftime == 1){
+    start_Time = (millis()/1000) - FTime;
     if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
