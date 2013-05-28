@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r600"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r601"));
     osd.closePanel();
 }
 
@@ -31,12 +31,12 @@ void writePanels(){
     panFdata(); 
   }else{ 
     if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+    //Check for panel toggle
+    if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
     if (osd_clear == 1){
       osd.clear();
       osd_clear = 0;
     }
-    //Check for panel toggle
-    if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
     if(panel != npanels){
       //Testing bits from 8 bit register A 
       //if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
@@ -398,7 +398,8 @@ void panOff(){
   //If there is a warning force switch to panel 0
   if(foundWarning == 1){
     if(panel != 0){
-      osd.clear();
+      //osd.clear();
+      osd_clear = 1;
     }
     panel = 0;
   }
@@ -428,17 +429,20 @@ void panOff(){
       if (switch_mode == 0){
         //First panel
         if (ch_raw < 1200 && panel != 0) {
-          osd.clear();
+          osd_clear = 1;
+          //osd.clear();
           panel = 0;
         }
         //Second panel
         else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1) { //second panel
-          osd.clear();
+          osd_clear = 1;
+          //osd.clear();
           panel = 1;
         }
         //Panel off
         else if (ch_raw > 1800 && panel != npanels) {
-          osd.clear();
+          osd_clear = 1;
+          //osd.clear();
           panel = npanels; //off panel
         }
       }
@@ -452,7 +456,8 @@ void panOff(){
       }    
     }
     if(rotatePanel == 1){
-      osd.clear();
+      osd_clear = 1;
+      //osd.clear();
       panel++;
       if (panel > npanels)
         panel = 0;
