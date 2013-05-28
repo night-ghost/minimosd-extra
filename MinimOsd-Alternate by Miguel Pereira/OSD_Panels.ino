@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r599"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r600"));
     osd.closePanel();
 }
 
@@ -396,8 +396,10 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if((foundWarning == 1) && (panel != 0)){
-    osd.clear();
+  if(foundWarning == 1){
+    if(panel != 0){
+      osd.clear();
+    }
     panel = 0;
   }
   else{
