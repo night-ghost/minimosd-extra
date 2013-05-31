@@ -25,6 +25,24 @@ SR3_RAW_SENS, 2 ( 2hz for raw imu sensor data )
 
 SR3_RC_CHAN, 5 ( 5hz for radio input or radio output data )
 
+
+If you fly copter than you also need to set SR0 also:
+
+SR0_EXT_STAT, 2 
+
+SR0_EXTRA1, 5 
+
+SR0_EXTRA2, 2 
+
+SR0_EXTRA3, 3
+
+SR0_POSITION, 2  
+
+SR0_RAW_SENS, 2  
+
+SR0_RC_CHAN, 5 
+
+
 Change accordingly and save the parameters to APM. 
 
 If you follow this steps, MinimOSD-Extra should work fine!
