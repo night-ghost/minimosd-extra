@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r602"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r605"));
     osd.closePanel();
 }
 
@@ -126,19 +126,16 @@ void panCOG(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading); //[-360, 360]
-    if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 360; //Normalize [0, 360]
-    off_course = osd_COG_arrow_rotate_int;
-    //off_course = (osd_cog / 100 - osd_heading);
+    off_course = (osd_cog / 100 - osd_heading) ; //[-360, 360]
+    osd_COG_arrow_rotate_int = ((int)round((float)(off_course/360.0) * 16.0) + 16) % 16 + 1; //[1, 16]
+    //if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16; //Normalize [0, 16]
+    //osd_COG_arrow_rotate_int = osd_COG_arrow_rotate_int % 16 + 1; //[1, 16]
     if (off_course > 180){
        off_course += - 360;
     }else if (off_course < -180){
        off_course += + 360;
     }
-    osd_COG_arrow_rotate_int = (int)round((float)(osd_COG_arrow_rotate_int/360.0) * 16.0) % 16 + 1; //[1, 16]
-    
     showArrow((uint8_t)osd_COG_arrow_rotate_int,2);
-
     osd.closePanel();
 }
 
@@ -375,13 +372,14 @@ void panWindSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16
-    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
-    else if(osd_wind_arrow_rotate_int == 0 ) osd_wind_arrow_rotate_int = 1; //normalize
-    else if(osd_wind_arrow_rotate_int == 17 ) osd_wind_arrow_rotate_int = 1; //normalize
-    nor_osd_windspeed = osd_windspeed * 0.005 + nor_osd_windspeed * 0.995;    
+    //osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 1; //Convert to int 1-16
+    //if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
+    //else if(osd_wind_arrow_rotate_int == 0 ) osd_wind_arrow_rotate_int = 1; //normalize
+    //else if(osd_wind_arrow_rotate_int == 17 ) osd_wind_arrow_rotate_int = 1; //normalize
+    
+    osd_wind_arrow_rotate_int = ((int)round((osd_winddirection - osd_heading)/360.0 * 16.0) + 16) % 16 + 1; //[1, 16]
+    nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990;     
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
-
     osd.closePanel();
 }
 
@@ -956,19 +954,21 @@ void panWPDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
-    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
+    //wp_target_bearing_rotate_int = (int)round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0); //[-16, 16]
+    //if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize [0, 16]
+    //wp_target_bearing_rotate_int = wp_target_bearing_rotate_int % 16 + 1; //Convert to [1, 16] 
+    wp_target_bearing_rotate_int = ((int)round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 16) % 16 + 1; //[1, 16]
     
-      if (xtrack_error > 999) xtrack_error = 999;
-      else if (xtrack_error < -999) xtrack_error = -999;
+    if (xtrack_error > 999) xtrack_error = 999;
+    else if (xtrack_error < -999) xtrack_error = -999;
 
-      osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
-      showArrow((uint8_t)wp_target_bearing_rotate_int,0);
-      if (osd_mode == 10){
-          osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
-      }else{
-          osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
-      }
+    osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
+    showArrow((uint8_t)wp_target_bearing_rotate_int,0);
+    if (osd_mode == 10){
+        osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
+    }else{
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+    }
     osd.closePanel();
 }
 
