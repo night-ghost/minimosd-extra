@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r604"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r607"));
     osd.closePanel();
 }
 
@@ -61,9 +61,9 @@ void writePanels(){
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
  //               if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
-               
+                if(wp_number > 0){
                 if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
-                
+                }
                 //Testing bits from 8 bit register C 
                 //if(osd_got_home == 1){
                 if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
@@ -413,7 +413,7 @@ void panWindSpeed(int first_col, int first_line){
 //    }
 //    nor_osd_windspeed = osd_windspeed * 0.005 + nor_osd_windspeed * 0.995;
 
-    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 9; //Convert to int 1-16
+    osd_wind_arrow_rotate_int = abs(round((osd_winddirection - osd_heading)/360.0 * 16.0)) + 9; //Convert to int 1-16
     if(osd_wind_arrow_rotate_int > 16 ) osd_wind_arrow_rotate_int -= 16; //normalize
     nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990;    
 
