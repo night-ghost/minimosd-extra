@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r605"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r609"));
     osd.closePanel();
 }
 
@@ -59,7 +59,10 @@ void writePanels(){
         if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
       }
       if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
-      if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+      //Only show wp panel if there is one
+      if(wp_number > 0){
+        if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+      }
 
       //Testing bits from 8 bit register C 
       //if(osd_got_home == 1){
@@ -394,7 +397,7 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if(foundWarning == 1){
+  if(warning_type != 0){
     if(panel != 0){
       //osd.clear();
       osd_clear = 1;
@@ -579,69 +582,66 @@ void panWarn(int first_col, int first_line){
     //If disarmed force showing disarmed message
     if (motor_armed == 0){
       warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-      warning_type = 10;
       text_timer = millis();
-      foundWarning = 0;
+      warning_type = 0;
     }
 
-    //If there is no warning beeing shown, check for next one
-    if(warning_type == 0){
-      //byte check_warning = last_warning ++; // start the warning checks where we left it last time
-      last_warning ++; // start the warning checks where we left it last time
-      //while (check_warning != last_warning){
-        //if (check_warning > 5) check_warning = 1; // change the 5 if you add more warning types
-        if (last_warning > 5) last_warning = 1; // change the 5 if you add more warning types
+    //2 seconds to show a warning
+    if (millis() - text_timer < 2000){
+      //2nd second blanked message
+      if (millis() - text_timer > 1000){
+        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+      }
+      osd.printf("%s",warning_string);
+    }
+    //Check for next warning
+    else{
+      byte last_warning = warning_type; //we have to store the last warning so we can stop the cycle
+      byte check_warning = warning_type;
+      warning_type = 0;
+      do{
+        check_warning++;
+        if (check_warning > 5) check_warning = 0; // change the 5 if you add more warning types
         //Check for no GPS fix
-        if(last_warning == 1){
+        if(check_warning == 1){
           if ((osd_fix_type) < 2){
             warning_type = 1; // No GPS Fix
             warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
           }
         }
         //Check for low airspeed
-        else if(last_warning == 2){
+        else if(check_warning == 2){
           if (osd_airspeed * converts < stall && osd_airspeed > 1.12){
             warning_type = 2;
             warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
           }
         }
         //Check for over speed
-        else if(last_warning == 3){
+        else if(check_warning == 3){
           if ((osd_airspeed * converts) > (float)overspeed){
             warning_type = 3;
             warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
           }
         }
         //Check for low battery
-        else if(last_warning == 4){
+        else if(check_warning == 4){
           if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
             warning_type = 4;
             warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
           }
         }
         //Check for low RSSI
-        else if(last_warning == 5){
+        else if(check_warning == 5){
           if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
             warning_type = 5;
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
           }
         }
-        //Check next warning
-        //check_warning ++;
-        foundWarning = (warning_type > 0);
+        //If found a warning start timer to show it
         if(warning_type != 0){
           text_timer = millis();
         }
-      //}
-    }
-    else{
-      if (millis() - text_timer > 2000){
-        warning_type = 0;
-      }
-      else if (millis() - text_timer > 1000){
-        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-      }
-      osd.printf("%s",warning_string);
+      }while ((warning_type == 0) && (check_warning != last_warning));
     }
     osd.closePanel();
 }
