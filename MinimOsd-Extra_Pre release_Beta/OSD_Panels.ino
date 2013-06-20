@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r612"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r613"));
     osd.closePanel();
 }
 
@@ -299,22 +299,22 @@ void panCALLSIGN(int first_col, int first_line){
     osd.openPanel();
     //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
     //During the first 1000 miliseconds of each minute show callsign
-    if(((millis() / 1000) % 60) <= 1000)
-      osd.printf("%s", char_call); 
-    else
+//    if(millis() <= 1000){
+//      osd.printf("%s", char_call); 
+//    }else{
 //    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
-      osd.printf("%s",strclear);
+//      osd.printf("%s",strclear);
     
-/*    if(millis() % 60000
+//    if(millis() % 60000
     if ((millis() - 60000) > CallSignBlink){
       if (millis() - 61000 > CallSignBlink){
-        CallSignBlink = (millis() - 1000);
+        CallSignBlink = millis();
           }
       osd.printf("%s", char_call); 
     }else{
 //    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
       osd.printf("%s",strclear);
-    }*/
+    }
     osd.closePanel();
 }
 
@@ -997,7 +997,7 @@ void panWPDis(int first_col, int first_line){
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
       
-      if (osd_mode == 10){     
+      if (osd_mode == 10 || osd_mode == 15){     
         osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
       }else{
         osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
