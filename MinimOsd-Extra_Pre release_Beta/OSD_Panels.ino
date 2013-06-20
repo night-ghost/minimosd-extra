@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r608"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r610"));
     osd.closePanel();
 }
 
@@ -413,8 +413,9 @@ void panWindSpeed(int first_col, int first_line){
 //    }
 //    nor_osd_windspeed = osd_windspeed * 0.005 + nor_osd_windspeed * 0.995;
 
-    osd_wind_arrow_rotate_int = abs(round((osd_winddirection - osd_heading)/360.0 * 16.0)) + 9; //Convert to int 1-16
+    osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 9; //Convert to int 1-16
     if(osd_wind_arrow_rotate_int > 16 ) osd_wind_arrow_rotate_int -= 16; //normalize
+    if(osd_wind_arrow_rotate_int < 0 ) osd_wind_arrow_rotate_int += 16; //normalize
     nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990;    
 
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
