@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r613"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra|Beta r615"));
     osd.closePanel();
 }
 
@@ -23,7 +23,7 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
   if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100 && (millis() - runt) > 5000){ 
+    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100 && (millis() - landed) > 10000){ 
        if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;          
@@ -33,6 +33,7 @@ void writePanels(){
           if (osd_clear == 1){
          osd.clear(); 
          osd_clear = 0;          
+         landed = millis(); 
        }
       if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
             if(panel != npanels)
