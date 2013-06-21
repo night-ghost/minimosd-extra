@@ -80,6 +80,7 @@ static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
 static unsigned long CallSignBlink = 0;
+static unsigned long landed = 0;
 
 static uint8_t      warning_type = 0;
 static uint8_t      last_warning = 0;
