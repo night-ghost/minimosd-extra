@@ -88,6 +88,7 @@ void read_mavlink(){
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
+                    osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
@@ -139,9 +140,11 @@ void read_mavlink(){
                 break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-                    osd_winddirection = abs(mavlink_msg_wind_get_direction(&msg)); // 0..360 deg, 0=north
-                    osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
-//                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+                  if (osd_climb < 1){
+                  osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
+                  osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
+//                  osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+                  }
                 }
                 break;
             case MAVLINK_MSG_ID_SCALED_PRESSURE:
