@@ -17,7 +17,7 @@ namespace OSD
             this.labelProductName.Text = "ArduCAM OSD Config"; //AssemblyProduct;
             this.labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
             this.labelCopyright.Text = "Author: Michael Oborne";//AssemblyCopyright;
-            this.labelCompanyName.Text = "Co-authors: Pedro Santos and Gábor Zoltán";//AssemblyCompany;
+            this.labelCompanyName.Text = "Co-authors: Pedro Santos, Gábor Zoltán and Miguel Pereira";//AssemblyCompany;
         }
 
         #region Assembly Attribute Accessors
