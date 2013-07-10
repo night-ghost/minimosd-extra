@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r609"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r621"));
     osd.closePanel();
 }
 
@@ -611,9 +611,9 @@ void panWarn(int first_col, int first_line){
         }
         //Check for low airspeed
         else if(check_warning == 2){
-          if (osd_airspeed * converts < stall && osd_airspeed > 1.12){
+          if (abs(vs) > stall * 10){
             warning_type = 2;
-            warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+            warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21";
           }
         }
         //Check for over speed

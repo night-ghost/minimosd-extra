@@ -1,4 +1,5 @@
-﻿namespace OSD
+﻿using System;
+namespace OSD
 {
     partial class OSD
     {
@@ -63,6 +64,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.lblModelType = new System.Windows.Forms.Label();
+            this.cbxModelType = new System.Windows.Forms.ComboBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.BRIGHTNESScomboBox = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -102,6 +105,7 @@
             this.rbtSortCategory = new System.Windows.Forms.RadioButton();
             this.rbtSortAlphabetic = new System.Windows.Forms.RadioButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.LIST_items2 = new System.Windows.Forms.TreeView();
             this.rbtSortCategory2 = new System.Windows.Forms.RadioButton();
             this.rbtSortAlphabetic2 = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -110,7 +114,6 @@
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.LIST_items2 = new System.Windows.Forms.TreeView();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -455,6 +458,8 @@
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.lblModelType);
+            this.tabPageConfig.Controls.Add(this.cbxModelType);
             this.tabPageConfig.Controls.Add(this.groupBox9);
             this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
@@ -472,13 +477,36 @@
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
             // 
+            // lblModelType
+            // 
+            this.lblModelType.AutoSize = true;
+            this.lblModelType.Location = new System.Drawing.Point(5, 10);
+            this.lblModelType.Name = "lblModelType";
+            this.lblModelType.Size = new System.Drawing.Size(62, 13);
+            this.lblModelType.TabIndex = 13;
+            this.lblModelType.Text = "Model type:";
+            // 
+            // cbxModelType
+            // 
+            this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxModelType.FormattingEnabled = true;
+            this.cbxModelType.Items.AddRange(new object[] {
+            "Plane",
+            "Copter"});
+            this.cbxModelType.Location = new System.Drawing.Point(72, 7);
+            this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxModelType.Name = "cbxModelType";
+            this.cbxModelType.Size = new System.Drawing.Size(126, 21);
+            this.cbxModelType.TabIndex = 12;
+            this.cbxModelType.SelectedIndexChanged += new System.EventHandler(this.cbxModelType_SelectedIndexChanged);
+            // 
             // groupBox9
             // 
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(179, 226);
+            this.groupBox9.Location = new System.Drawing.Point(179, 236);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(139, 63);
+            this.groupBox9.Size = new System.Drawing.Size(150, 63);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
             // 
@@ -511,9 +539,9 @@
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
             this.groupBox8.Controls.Add(this.label12);
-            this.groupBox8.Location = new System.Drawing.Point(179, 149);
+            this.groupBox8.Location = new System.Drawing.Point(179, 159);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(139, 65);
+            this.groupBox8.Size = new System.Drawing.Size(150, 65);
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
             // 
@@ -544,7 +572,7 @@
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(7, 188);
+            this.groupBox7.Location = new System.Drawing.Point(7, 198);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(150, 101);
             this.groupBox7.TabIndex = 8;
@@ -593,7 +621,7 @@
             // 
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(339, 20);
+            this.groupBox6.Location = new System.Drawing.Point(356, 30);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(152, 63);
             this.groupBox6.TabIndex = 7;
@@ -626,9 +654,9 @@
             // 
             this.groupBox5.Controls.Add(this.OVERSPEED_label);
             this.groupBox5.Controls.Add(this.OVERSPEED_numeric);
-            this.groupBox5.Location = new System.Drawing.Point(179, 83);
+            this.groupBox5.Location = new System.Drawing.Point(179, 93);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(139, 67);
+            this.groupBox5.Size = new System.Drawing.Size(150, 67);
             this.groupBox5.TabIndex = 6;
             this.groupBox5.TabStop = false;
             // 
@@ -662,7 +690,7 @@
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(340, 82);
+            this.groupBox4.Location = new System.Drawing.Point(357, 92);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(152, 150);
             this.groupBox4.TabIndex = 5;
@@ -740,16 +768,16 @@
             // 
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(179, 20);
+            this.groupBox3.Location = new System.Drawing.Point(179, 30);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(139, 63);
+            this.groupBox3.Size = new System.Drawing.Size(150, 63);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             // 
             // STALL_label
             // 
             this.STALL_label.AutoSize = true;
-            this.STALL_label.Location = new System.Drawing.Point(7, 20);
+            this.STALL_label.Location = new System.Drawing.Point(6, 21);
             this.STALL_label.Name = "STALL_label";
             this.STALL_label.Size = new System.Drawing.Size(95, 13);
             this.STALL_label.TabIndex = 2;
@@ -777,7 +805,7 @@
             this.groupBoxRSSI.Controls.Add(this.label6);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
-            this.groupBoxRSSI.Location = new System.Drawing.Point(7, 20);
+            this.groupBoxRSSI.Location = new System.Drawing.Point(7, 30);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
             this.groupBoxRSSI.Size = new System.Drawing.Size(150, 169);
             this.groupBoxRSSI.TabIndex = 3;
@@ -918,6 +946,15 @@
             this.tabPage2.Text = "Panel 2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // LIST_items2
+            // 
+            this.LIST_items2.Location = new System.Drawing.Point(3, 40);
+            this.LIST_items2.Name = "LIST_items2";
+            this.LIST_items2.Size = new System.Drawing.Size(169, 237);
+            this.LIST_items2.TabIndex = 7;
+            this.LIST_items2.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterCheck);
+            this.LIST_items2.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterSelect);
+            // 
             // rbtSortCategory2
             // 
             this.rbtSortCategory2.AutoSize = true;
@@ -1011,15 +1048,6 @@
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
-            // LIST_items2
-            // 
-            this.LIST_items2.Location = new System.Drawing.Point(3, 40);
-            this.LIST_items2.Name = "LIST_items2";
-            this.LIST_items2.Size = new System.Drawing.Size(169, 237);
-            this.LIST_items2.TabIndex = 7;
-            this.LIST_items2.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterCheck);
-            this.LIST_items2.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.LIST_items2_AfterSelect);
-            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1049,6 +1077,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
+            this.tabPageConfig.PerformLayout();
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
@@ -1170,6 +1199,8 @@
         private System.Windows.Forms.RadioButton rbtSortAlphabetic2;
         private System.Windows.Forms.TreeView LIST_items;
         private System.Windows.Forms.TreeView LIST_items2;
+        private System.Windows.Forms.Label lblModelType;
+        private System.Windows.Forms.ComboBox cbxModelType;
     }
 }
 

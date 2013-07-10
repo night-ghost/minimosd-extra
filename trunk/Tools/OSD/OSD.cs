@@ -443,16 +443,18 @@ namespace OSD
 
             OVERSPEED_numeric.Value = pan.overspeed;
 
+            cbxModelType.SelectedIndex = 0;
+
             if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (km/h)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Stall Speed (mph)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
 
@@ -1684,19 +1686,19 @@ namespace OSD
             if (pan.converts == 0)
             {
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (km/h)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (pan.converts == 1)
             {
                 UNITS_combo.SelectedIndex = 1; //imperial
-                STALL_label.Text = "Stall Speed (mph)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             } else //garbage value in EEPROM - default to metric
             {
                 pan.converts = 0; //correct value
                 UNITS_combo.SelectedIndex = 0; //metric
-                STALL_label.Text = "Stall Speed (km/h)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
 
@@ -2005,20 +2007,20 @@ namespace OSD
                         if (pan.converts == 0)
                         {
                             UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = "Stall Speed (km/h)";
+                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                             OVERSPEED_label.Text = "Overspeed (km/h)";
                         }
                         else if (pan.converts == 1)
                         {
                             UNITS_combo.SelectedIndex = 1; //imperial
-                            STALL_label.Text = "Stall Speed (mph)";
+                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                             OVERSPEED_label.Text = "Overspeed (mph)";
                         }
                         else //red garbage value in EEPROM - default to metric
                         {
                             pan.converts = 0; //correct value
                             UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = "Stall Speed (km/h)";
+                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                             OVERSPEED_label.Text = "Overspeed (km/h)";
                         }
 
@@ -2576,12 +2578,12 @@ namespace OSD
         {
             if(UNITS_combo.SelectedIndex == 0) {
                 pan.converts = 0; //metric
-                STALL_label.Text = "Stall Speed (km/h)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (UNITS_combo.SelectedIndex == 1){
                 pan.converts = 1; //imperial
-                STALL_label.Text = "Stall Speed (mph)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
         }
@@ -2889,6 +2891,22 @@ namespace OSD
                     NUM_X2.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
                     NUM_Y2.Value = Constrain(thing.Item4, 0, 16 - 1);
                 }
+            }
+        }
+
+        private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (UNITS_combo.SelectedIndex == 0)
+            {
+                pan.converts = 0; //metric
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                OVERSPEED_label.Text = "Overspeed (km/h)";
+            }
+            else if (UNITS_combo.SelectedIndex == 1)
+            {
+                pan.converts = 1; //imperial
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                OVERSPEED_label.Text = "Overspeed (mph)";
             }
         }
     }
