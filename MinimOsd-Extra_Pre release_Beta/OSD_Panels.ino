@@ -23,17 +23,24 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
   if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100 && (millis() - landed) > 10000){ 
+    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100) {
+      landing = 1;
+          }else{
+          landed = millis();
+          }
+    if (landing == 1 && (millis() - 7000) > landed){ 
        if (osd_clear == 0){
          osd.clear(); 
-         osd_clear = 1;          
+         osd_clear = 1;
+         panFdata();
        }
-      panFdata(); 
+//        if ((millis() - 10000) > landing) panFdata();     
         }else{ 
-          if (osd_clear == 1){
+//         landed = millis();
+         
+         if (osd_clear == 1){
          osd.clear(); 
-         osd_clear = 0;          
-         landed = millis(); 
+         osd_clear = 0;                    
        }
       if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
             if(panel != npanels)

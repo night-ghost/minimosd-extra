@@ -140,6 +140,7 @@ static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
 static boolean      mavbeat = 0;
+static boolean      landing = 0;
 static float        lastMAVBeat = 0;
 static boolean      waitingMAVBeats = 1;
 //static uint8_t      apm_mav_type;
