@@ -718,7 +718,7 @@ void panBatteryPercent(int first_col, int first_line){
     if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR) == 1){
     osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25);
     }else{
-    osd.printf("%c%4.0f%c",0x17, mah_used, 0x01);
+    osd.printf("%c%5.0f%c",0x17, mah_used, 0x01);
     }
     osd.closePanel();
 }
