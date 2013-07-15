@@ -10,11 +10,11 @@ void uploadFont()
     int font_count = 0;
 
     osd.clear();
-    osd.setPanel(6,9);
-    osd.openPanel();
-    osd.printf_P(PSTR("Character Update"));
-    delay(2000);
-    osd.closePanel();
+//    osd.setPanel(6,9);
+//    osd.openPanel();
+//    osd.printf_P(PSTR("Character Update"));
+//    delay(2000);
+//    osd.closePanel();
 
 
     Serial.printf_P(PSTR("Ready for Font\n"));

@@ -53,7 +53,7 @@ void read_mavlink(){
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 {
-                    mavbeat = 1;
+                    //mavbeat = 1;
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                  //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
@@ -66,10 +66,10 @@ void read_mavlink(){
                     motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    lastMAVBeat = millis();
-                    if(waitingMAVBeats == 1){
-                        enable_mav_request = 1;
-                    }
+                    //lastMAVBeat = millis();
+                    //if(waitingMAVBeats == 1){
+                    //    enable_mav_request = 1;
+                    //}
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -85,10 +85,12 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 {
+                    osd_gps_alt = mavlink_msg_gps_raw_int_get_alt(&msg) / 1000.0f;
                     osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
+                    osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
