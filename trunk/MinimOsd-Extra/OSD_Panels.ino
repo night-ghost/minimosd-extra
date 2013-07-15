@@ -1043,12 +1043,16 @@ void panFlightMode(int first_col, int first_line){
     if (osd_mode == 1) mode_str = "circ"; //CIRCLE 
     if (osd_mode == 2) mode_str = "stab"; //Stabilize
     if (osd_mode == 3) mode_str = "trai"; //Training
+    if (osd_mode == 4) mode_str = "acro"; //ACRO
     if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
     if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
+    if (osd_mode == 7) mode_str = "cruise"; //Cruise
     if (osd_mode == 10) mode_str = "auto"; //AUTO
     if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
     if (osd_mode == 12) mode_str = "loit"; //Loiter
     if (osd_mode == 15) mode_str = "guid"; //GUIDED
+    
+    
     osd.printf("%c%s", 0x7f, mode_str);
 //      osd.printf("%c%i", 0x7f, osd_mode);
     osd.closePanel();
