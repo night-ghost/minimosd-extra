@@ -153,7 +153,9 @@ void setup()
     for(panel = 0; panel < npanels; panel++) readPanelSettings();
     panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
-    loadBar();
+    //loadBar();
+        delay(2000);
+    Serial.flush();
 
     // Startup MAVLink timers  
     mavlinkTimer.Set(&OnMavlinkTimer, 120);
@@ -173,8 +175,7 @@ void setup()
 // As simple as possible.
 void loop() 
 {
-
-    if(enable_mav_request == 1){//Request rate control
+  /*  if(enable_mav_request == 1){//Request rate control
         //osd.clear();
         //osd.setPanel(3,10);
         //osd.openPanel();
@@ -189,7 +190,7 @@ void loop()
         osd.clear();
         waitingMAVBeats = 0;
         lastMAVBeat = millis();//Preventing error from delay sensing
-    }
+    }*/
 
     read_mavlink();
     mavlinkTimer.Run();
@@ -201,7 +202,7 @@ void OnMavlinkTimer()
 {
     setHeadingPatern();  // generate the heading patern
 
-    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
+    //osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home

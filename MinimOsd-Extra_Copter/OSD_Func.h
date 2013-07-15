@@ -2,10 +2,10 @@
 //------------------ Heading and Compass ----------------------------------------
 
 static char buf_show[12];
-const char buf_Rule[36] = {0xc2,0xc0,0xc1,0xc0,0xc1,0xc0,
-                           0xc4,0xc0,0xc1,0xc0,0xc1,0xc0,
-                           0xc3,0xc0,0xc1,0xc0,0xc1,0xc0,
-                           0xc5,0xc0,0xc1,0xc0,0xc1,0xc0};
+const char buf_Rule[36] = {0x82,0x80,0x81,0x80,0x81,0x80,
+                           0x84,0x80,0x81,0x80,0x81,0x80,
+                           0x83,0x80,0x81,0x80,0x81,0x80,
+                           0x85,0x80,0x81,0x80,0x81,0x80};
 void setHeadingPatern()
 {
   int start;
@@ -48,15 +48,17 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
+  osd_alt_to_home = (osd_alt - osd_home_alt);
   //Check arm/disarm switching.
-  armed_switch = motor_armed ^ last_armed;
-  if (armed_switch){
+  if (motor_armed ^ last_armed){
     //If motors armed, reset home in Arducopter version
     osd_got_home = !motor_armed;
   }
+  last_armed = motor_armed;
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
+    osd_alt_cnt = 0;
     //osd_home_alt = osd_alt;
     osd_got_home = 1;
   }
@@ -94,36 +96,45 @@ void setHomeVars(OSD &osd)
     if(bearing < 0) bearing += 360;//normalization
     bearing = bearing - osd_heading;//relative home direction
     if(bearing < 0) bearing += 360; //normalization
-    osd_home_direction = round((float)(bearing/360.0f) * 16.0f) + 1;//array of arrows =)
-    if(osd_home_direction > 16) osd_home_direction = 0;
-
+    osd_home_direction = ((int)round((float)(bearing/360.0f) * 16.0f) % 16) + 1;//array of arrows =)
+    //if(osd_home_direction > 16) osd_home_direction = 1;
   }
-
 }
 
 void setFdataVars(){
-
-if (haltset == 1 && takeofftime == 0 && osd_throttle > 15)
-    {
+  //
+  if (haltset == 1 && takeofftime == 0 && osd_throttle > 15){
     takeofftime = 1;
     tdistance = 0;
     FTime = (millis()/1000);
     start_battery_reading = osd_battery_remaining_A;
     last_battery_reading = osd_battery_remaining_A;
-    }
-    
-  if ((millis() - dt) >= 1000){
-    if (osd_groundspeed > 1.0) tdistance = tdistance + (((millis() - dt) / 1000) * osd_groundspeed); 
-    //Current consumed integrator
-    osd_curr_consumed += (float)(millis() - dt) / 360000 * osd_curr_A;
-    dt = millis();
   }
-if (takeofftime == 1){
-if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
-if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
-if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
-if ((osd_alt - osd_home_alt) > max_osd_home_alt) max_osd_home_alt = (osd_alt - osd_home_alt);
-if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
-}
+
+  //Check if is moving (osd_groundspeed > 1Km/h or osd_climb within ]-10, 10[ m/m
+  //if((osd_groundspeed > 0.28) || (osd_climb < -0.17) || (osd_climb > 0.17)){
+  if(osd_throttle > 15){
+    not_moving_since = millis();
+    landed_at_time = 4294967295; //Airborn
+  }
+  //If it is stoped for more than 10 seconds, declare a landing
+  else if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (takeofftime == 1)){
+    landed_at_time = millis();
+  }
+
+  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
+  mah_used += (osd_curr_A * 10.0 * (millis() - dt) / 3600000.0);
+  //tdistance += (millis() - dt) / 1000.0 * osd_groundspeed;
+  //mah_used += (millis() - dt) / 3600000.0 * osd_curr_A * 10.0;
+  dt = millis();
+
+  if (takeofftime == 1){
+    start_Time = (millis()/1000) - FTime;
+    if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
+    if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
+    if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
+    if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
+    if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
+  }
 }
 
