@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r628"));
     osd.closePanel();
 }
 
@@ -22,7 +22,7 @@ void panLogo(){
 void writePanels(){ 
 
   if(millis() < (lastMAVBeat + 2200)){
-  if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+  
     if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100) {
       landing = 1;
           }else{
@@ -35,7 +35,7 @@ void writePanels(){
          panFdata();
        }
 //        if ((millis() - 10000) > landing) panFdata();     
-        }else{ 
+        }else{
 //         landed = millis();
          
          if (osd_clear == 1){
@@ -48,6 +48,7 @@ void writePanels(){
                 
                 //Testing bits from 8 bit register A 
  //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+                if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
                 if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
@@ -186,7 +187,7 @@ void panDistance(int first_col, int first_line){
 // Size   : 
 // Staus  : done
 void panFdata(){
-     osd.setPanel(11, 5);
+     osd.setPanel(11, 3);
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x1b, ((tdistance) * converth), high, 0x13,(max_osd_airspeed * converts), spe,0x14,(max_osd_groundspeed * converts),spe,0x12, (max_osd_home_alt * converth), high,0x1d,(max_osd_windspeed * converts),spe);
     osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5.0f%c|%c%10.6f|%c%10.6f", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0b, (int)((max_home_distance) * converth), high, 0x8f, (int)((tdistance) * converth), high, 0x13,(int)(max_osd_airspeed * converts), spe,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high,0x1d,(int)(max_osd_windspeed * converts),spe, 0x17, mah_used, 0x01, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
@@ -584,8 +585,9 @@ void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
-    osd.printf("%c%4.0f%c",0x15, int(vs / 10.0) * 10.0, climbchar);
+    osd.printf("%c%4.0f%c%c",0x15, int(vs / 10.0) * 10.0, climbchar, 0x20);
     osd.closePanel();
+    
 }
 
 /* **************************************************************** */
@@ -1046,7 +1048,7 @@ void panFlightMode(int first_col, int first_line){
     if (osd_mode == 4) mode_str = "acro"; //ACRO
     if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
     if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
-    if (osd_mode == 7) mode_str = "cruise"; //Cruise
+    if (osd_mode == 7) mode_str = "crui"; //Cruise
     if (osd_mode == 10) mode_str = "auto"; //AUTO
     if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
     if (osd_mode == 12) mode_str = "loit"; //Loiter
