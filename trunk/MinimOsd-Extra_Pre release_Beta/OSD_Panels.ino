@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r638"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r639"));
     osd.closePanel();
 }
 
@@ -245,13 +245,13 @@ void panEff(int first_col, int first_line){
           }
             if (osd_climb < -0.05){ 
 //            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * ((millis() - descendt) / 1000)) * osd_groundspeed;
-            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * 0.1 + glide *0.9;
+            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * converth;
             if (glide > 9999) glide = 9999;
              if (glide != 'inf' && glide > -0){
-            osd.printf("%c%4.0f%c", 0x18, glide, 0x0c);
+            osd.printf("%c%4.0f%c", 0x18, glide, high);
              }
             }
-            else if (osd_climb > 0.0 && osd_pitch < 0) {
+            else if (osd_climb >= -0.05 && osd_pitch < 0) {
               osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));   
             }else{
               osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20")); 
