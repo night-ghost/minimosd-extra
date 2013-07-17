@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r628"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r629"));
     osd.closePanel();
 }
 
@@ -644,7 +644,7 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    if (millis() > text_timer){ // if the text has been shown for a while
+    if (millis() > one_sec_timer){ // if the text has been shown for a while
         if (warning_type != 0) {
             last_warning = warning_type; // save the warning type for cycling
             warning_type = 0; // blank the text
@@ -658,7 +658,7 @@ void panWarn(int first_col, int first_line){
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
                 if(x == 1) {if ((osd_fix_type) < 2) warning_type = 1;} // No GPS Fix
-                else if(x == 2) {if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;}
+                else if(x == 2) {if (osd_airspeed * converts < stall && takeofftime == 1) warning_type = 2;}
                 else if(x == 3) {if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;}
                 else if(x == 4) {if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;}
                 else if(x == 5) {if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;}
@@ -666,7 +666,7 @@ void panWarn(int first_col, int first_line){
             }
         }
 
-        text_timer = millis() + 1000; // blink every 1 secs
+//        text_timer = millis() + 1000; // blink every 1 secs   (one_sec_timer  now)
         if (warning == 1){ 
             if (panel == 1) osd.clear();
             panel = 0; // turn OSD on if there is a warning                  
@@ -897,7 +897,8 @@ void panGPSats(int first_col, int first_line){
 void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+    if (blinker == 0) osd.printf("%c%10.6f", 0x03, (double)osd_lat);
+    else osd.printf("%c%10.6f", 0x04, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -1167,6 +1168,7 @@ void showHorizon(int start_col, int start_row) {
 }
 
 // Calculate and shows ILS
+/*
 void showILS(int start_col, int start_row) { 
     //Vertical calculation
     int currentAngleDisplacement = atan(osd_alt_to_home / osd_home_distance) * 57.2957795 - 10;
@@ -1195,7 +1197,7 @@ void showILS(int start_col, int start_row) {
       osd.printf("%c", selectedChar);
     }
 }
-
+*/
 void do_converts()
 {
     if (EEPROM.read(measure_ADDR) == 0) {
