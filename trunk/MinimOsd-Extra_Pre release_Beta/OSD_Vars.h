@@ -76,15 +76,15 @@ static uint8_t      batt_warn_level = 0;
 static float        start_Time = -1.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-static unsigned long text_timer = 0;
+//static unsigned long text_timer = 0;
 static unsigned long one_sec_timer = 0;
-static unsigned long warning_timer =0;
+//static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
 static unsigned long CallSignBlink = 0;
 static unsigned long landed = 0;
 
-static uint8_t      warning_type = 0;
+//static uint8_t      warning_type = 0;
 static char*        warning_string;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
@@ -148,7 +148,7 @@ static boolean      waitingMAVBeats = 1;
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
-static boolean      blinker = 0;
+//static boolean      blinker = 0;
 static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 2;

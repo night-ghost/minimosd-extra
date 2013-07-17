@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r636"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r637"));
     osd.closePanel();
 }
 
@@ -103,6 +103,8 @@ void writePanels(){
 //                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
             }
+            timers();
+//                timers();
  //       } else { // if (osd_on > 0)
  //           panSetup();
  //       }
@@ -224,12 +226,12 @@ void panEff(int first_col, int first_line){
       if (ma == 0) {
               ma = 1;
             }
-        if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
+        if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10.0) / (osd_groundspeed * converts))* 0.1 + eff * 0.9;
 //        eff = eff * 0.2 + eff * 0.8;
           if (eff > 0 && eff <= 9999) {
-            osd.printf("%c%4.0f%c", 0x16, (double)eff, 0x01);
+            osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
           }else{
-          osd.printf_P(PSTR("\x16\x20\x20\x20\x20\x20")); 
+          osd.printf_P(PSTR("\x16\x20\x20\x20\x20\x20"));
           }
           
     }else{
@@ -244,13 +246,13 @@ void panEff(int first_col, int first_line){
           }
             if (osd_climb < -0.05){ 
 //            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * ((millis() - descendt) / 1000)) * osd_groundspeed;
-            glide = (osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance);
+            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance));
             if (glide > 9999) glide = 9999;
              if (glide != 'inf' && glide > -0){
             osd.printf("%c%4.0f%c", 0x18, glide, 0x0c);
              }
             }
-            else if (osd_climb > 0.0 && osd_pitch <= 0) {
+            else if (osd_climb > 0.0 && osd_pitch < 0) {
               osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));   
             }else{
               osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20")); 
@@ -448,7 +450,7 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if(warning_type != 0){
+  if(warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
     if(panel != 0){
       //osd.clear();
       osd_clear = 1;
@@ -631,51 +633,47 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-if (one_sec_timer_switch == 1);{ 
- do{
+if (one_sec_timer_switch == 1){
+  if (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
+  warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+  }else{
+  do{
     if (check_warning == 1){
       if ((osd_fix_type) < 2){
-            warning_type = 1; 
             warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS Fix
           }
     }
     else if (check_warning == 2){
-      if (abs(vs) > stall * 10){
-            warning_type = 2;
-            warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; // Stall
+      if (osd_airspeed > stall * 10){
+            warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"; // Stall
             }
           }
     else if (check_warning == 3){
       if ((osd_airspeed * converts) > (float)overspeed){
-            warning_type = 3;
-            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"; //overspeed
             }
            }
     else if (check_warning == 4){
       if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
-            warning_type = 4;
-            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; // Battery low
             }
           }
     else if (check_warning == 5){
       if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
-            warning_type = 5;
-            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; // RSSI low
             }          
           }
 
-    if (check_warning != warning_type) warning_type = 0;
           check_warning++;
-                
- }while (warning_type > 0 || check_warning > 5);
- if (warning_type == 0) warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+  
+ }while (warning_string == "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20" && check_warning <= 5);
+  }
  
  osd.printf("%s",warning_string);
- 
- if (check_warning > 5) check_warning = 1;
- 
+ if (check_warning >= 5) check_warning = 1;
  
  
+//one_sec_timer = millis() + 1000; 
 }
     osd.closePanel();
 }
@@ -886,8 +884,9 @@ void panGPSats(int first_col, int first_line){
 void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if (blinker == 0) osd.printf("%c%10.6f", 0x03, (double)osd_lat);
-    else osd.printf("%c%10.6f", 0x04, (double)osd_lon);
+    osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+//    if (blinker == 0) osd.printf("%c%10.6f", 0x03, (double)osd_lat);
+//    else osd.printf("%c%10.6f", 0x04, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -1219,11 +1218,10 @@ void timers()
 if (one_sec_timer_switch == 1){ 
   one_sec_timer = millis() + 1000;
   one_sec_timer_switch = 0;
-  if (blinker == 0){
-
-  blinker = 1;
-  }else{
-  blinker = 0;  
-  }
+//  if (blinker == 0){
+//  blinker = 1;
+//  }else{
+//  blinker = 0;  
+//  }
   }
 }
