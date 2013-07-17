@@ -75,6 +75,7 @@ static uint8_t      batt_warn_level = 0;
 static float        start_Time = -1.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
+static unsigned long text_timer = 0;
 static unsigned long one_sec_timer = 0;
 static unsigned long warning_timer =0;
 static unsigned long runt =0;
@@ -83,8 +84,7 @@ static unsigned long CallSignBlink = 0;
 static unsigned long landed = 0;
 
 static uint8_t      warning_type = 0;
-static uint8_t      last_warning = 0;
-static uint8_t      warning = 0;
+static char*        warning_string;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;

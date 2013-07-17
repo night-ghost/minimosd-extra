@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r630"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r631"));
     osd.closePanel();
 }
 
@@ -443,91 +443,76 @@ void panWindSpeed(int first_col, int first_line){
 // Staus  : done
 
 void panOff(){
-    if (ch_toggle == 4){
-        if ((osd_mode != 11) && (osd_mode != 1)){
-            if (osd_off_switch != osd_mode){ 
-                osd_off_switch = osd_mode;
-                osd_switch_time = millis();
+  bool rotatePanel = 0;
 
-                if (osd_off_switch == osd_switch_last){
-                    if(panel == 0)
-                        {
-                            panel = 1;                                                        
-//                            if (millis() <= 60000){
-//                                osd_set = 1;
-//                            }else{
-//                                osd_set = 0;
-//                            }                            
-                        }
-                    else if(panel == 1)
-                        {
-                            panel = npanels;
-//                            osd_set = 0;                            
-                        }
-                    else if(panel == npanels)
-                        {
-                            panel = 0;
-                        }
-                    osd.clear();
-                }
-            }
-            if ((millis() - osd_switch_time) > 2000){
-                osd_switch_last = osd_mode;
+  //If there is a warning force switch to panel 0
+  if(warning_type != 0){
+    if(panel != 0){
+      //osd.clear();
+      osd_clear = 1;
+    }
+    panel = 0;
+  }
+  else{
+    //Flight mode switching
+    if (ch_toggle == 4){
+      if ((osd_mode != 6) && (osd_mode != 7)){
+        if (osd_off_switch != osd_mode){ 
+          osd_off_switch = osd_mode;
+            osd_switch_time = millis();
+            if (osd_off_switch == osd_switch_last){
+              rotatePanel = 1;
             }
         }
+        if ((millis() - osd_switch_time) > 2000){
+          osd_switch_last = osd_mode;
+        }
+      }
     }
     else {
-        if(ch_toggle == 5) ch_raw = chan5_raw;
-        else if(ch_toggle == 6) ch_raw = chan6_raw;
-        else if(ch_toggle == 7) ch_raw = chan7_raw;
-        else if(ch_toggle == 8) ch_raw = chan8_raw;
+      if(ch_toggle == 5) ch_raw = chan5_raw;
+      else if(ch_toggle == 6) ch_raw = chan6_raw;
+      else if(ch_toggle == 7) ch_raw = chan7_raw;
+      else if(ch_toggle == 8) ch_raw = chan8_raw;
 
-        if (switch_mode == 0){
-            if (ch_raw > 1800 && warning != 1) {
-//                if (millis() <= 60000){
-//                    osd_set = 1;
-//                }
-//                else if (osd_set != 1 && warning != 1){
-//              if (warning != 1){
-                osd.clear();
-//                }
-                panel = npanels; //off panel
-            }
-            else if (ch_raw < 1200 && panel != 0) { //first panel
- //               osd_set = 0;
-                osd.clear();
-                panel = 0;
-            }    
-
- // else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1 && warning != 1) { //second panel
-    else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1 && warning != 1) { //second panel
- //               osd_set = 0;
-                osd.clear();
-                panel = 1;
-            }        
-        } else {
-
-            if (ch_raw > 1200)
- //               if (millis() <= 60000 && osd_set != 1){
- //                   if (osd_switch_time + 1000 < millis()){
- //                       osd_set = 1;
- //                       osd_switch_time = millis();
- //                   }
- //               } else {
-                    if (osd_switch_time + 1000 < millis()){
- //                       osd_set = 0;
-                        osd.clear();
-                        if (panel == npanels) {
-                            panel = 0;
-                        } else {
-                            panel++;
-                        }
-                        if (panel > 1) panel = npanels;
-                        osd_switch_time = millis();
-                    }
-  //              }
-        }    
+      //Switch mode by value
+      if (switch_mode == 0){
+        //First panel
+        if (ch_raw < 1200 && panel != 0) {
+          osd_clear = 1;
+          //osd.clear();
+          panel = 0;
+        }
+        //Second panel
+        else if (ch_raw >= 1200 && ch_raw <= 1800 && panel != 1) { //second panel
+          osd_clear = 1;
+          //osd.clear();
+          panel = 1;
+        }
+        //Panel off
+        else if (ch_raw > 1800 && panel != npanels) {
+          osd_clear = 1;
+          //osd.clear();
+          panel = npanels; //off panel
+        }
+      }
+      //Rotation switch
+      else{
+        if (ch_raw > 1200)
+          if (osd_switch_time + 1000 < millis()){
+            rotatePanel = 1;
+            osd_switch_time = millis();
+        }
+      }    
     }
+    if(rotatePanel == 1){
+      osd_clear = 1;
+      //osd.clear();
+      panel++;
+      if (panel > npanels)
+        panel = 0;
+    }
+  }
 }
 //* **************************************************************** */
 // Panel  : panTune
@@ -643,50 +628,63 @@ void panAirSpeed(int first_col, int first_line){
 void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-
-    if (millis() > one_sec_timer){ // if the text has been shown for a while
-        if (warning_type != 0) {
-            last_warning = warning_type; // save the warning type for cycling
-            warning_type = 0; // blank the text
-            warning = 1;
-            warning_timer = millis();            
-        } else {
-            if ((millis() - 10000) > warning_timer ) warning = 0;
-
-            int x = last_warning; // start the warning checks where we left it last time
-            while (warning_type == 0) { // cycle through the warning checks
-                x++;
-                if (x > 5) x = 1; // change the 6 if you add more warning types
-                if(x == 1) {if ((osd_fix_type) < 2) warning_type = 1;} // No GPS Fix
-                else if(x == 2) {if (osd_airspeed * converts < stall && takeofftime == 1) warning_type = 2;}
-                else if(x == 3) {if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;}
-                else if(x == 4) {if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning_type = 4;}
-                else if(x == 5) {if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;}
-                if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
-            }
+ 
+    //2 seconds to show a warning
+    if (millis() - text_timer < 2000){
+      //2nd second blanked message
+      if (millis() - text_timer > 1000){
+        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+      }
+      osd.printf("%s",warning_string);
+    }
+    //Check for next warning
+    else{
+      byte last_warning = warning_type; //we have to store the last warning so we can stop the cycle
+      byte check_warning = warning_type;
+      warning_type = 0;
+      do{
+        check_warning++;
+        if (check_warning > 5) check_warning = 0; // change the 5 if you add more warning types
+        //Check for no GPS fix
+        if(check_warning == 1){
+          if ((osd_fix_type) < 2){
+            warning_type = 1; // No GPS Fix
+            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+          }
         }
-
-//        text_timer = millis() + 1000; // blink every 1 secs   (one_sec_timer  now)
-        if (warning == 1){ 
-            if (panel == 1) osd.clear();
-            panel = 0; // turn OSD on if there is a warning                  
+        //Check for low airspeed
+        else if(check_warning == 2){
+          if (abs(vs) > stall * 10){
+            warning_type = 2;
+            warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21";
+          }
         }
-        char* warning_string;
-//        if (motor_armed == 0){
-//            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";      
-//        }else{
-            if (warning_type == 0) warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-            else if (warning_type == 1) warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
-            else if (warning_type == 2) warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
-            else if (warning_type == 3) warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
-            else if (warning_type == 4) warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
-            else if (warning_type == 5) warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-                //        case 6:
-                //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-                //            warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-                //            break;
-//            }
-        osd.printf("%s",warning_string);
+        //Check for over speed
+        else if(check_warning == 3){
+          if ((osd_airspeed * converts) > (float)overspeed){
+            warning_type = 3;
+            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+          }
+        }
+        //Check for low battery
+        else if(check_warning == 4){
+          if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
+            warning_type = 4;
+            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+          }
+        }
+        //Check for low RSSI
+        else if(check_warning == 5){
+          if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
+            warning_type = 5;
+            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+          }
+        }
+        //If found a warning start timer to show it
+        if(warning_type != 0){
+          text_timer = millis();
+        }
+      }while ((warning_type == 0) && (check_warning != last_warning));
     }
     osd.closePanel();
 }
