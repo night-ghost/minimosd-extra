@@ -43,7 +43,7 @@ static uint16_t     chan8_raw = 0;
 //static uint16_t     chan2_raw_middle = 0;
 
 static uint8_t      ch_toggle = 0;
-static uint8_t      check_warning = 0;
+static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
