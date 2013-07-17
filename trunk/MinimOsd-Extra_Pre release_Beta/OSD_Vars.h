@@ -27,7 +27,7 @@ static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in m
 static float        eff = 0; //Efficiency
 
 static uint8_t      base_mode=0;
-static bool         motor_armed = 0;
+//static bool         motor_armed = 0;
 static bool         ma = 0;
 static bool         osd_clear = 0;
 static uint16_t     ch_raw = 0;
@@ -75,7 +75,7 @@ static uint8_t      batt_warn_level = 0;
 static float        start_Time = -1.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-static unsigned long text_timer = 0;
+static unsigned long one_sec_timer = 0;
 static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
@@ -106,7 +106,7 @@ static float        osd_home_alt = 0;
 static float        osd_alt_to_home = 0; 
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
-static int          takeoff_heading = -400;         // Calculated takeoff heading
+//static int          takeoff_heading = -400;         // Calculated takeoff heading
 
 static int16_t       osd_pitch = 0;                  // pitch from DCM
 static int16_t       osd_roll = 0;                   // roll from DCM
@@ -147,6 +147,7 @@ static boolean      waitingMAVBeats = 1;
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
+static boolean      blinker = 0;
 
 static const uint8_t npanels = 2;
 static uint8_t panel = 0; 
