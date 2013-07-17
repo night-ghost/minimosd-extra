@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r632"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r633"));
     osd.closePanel();
 }
 
@@ -20,6 +20,8 @@ void panLogo(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
+  
+  if (millis() > one_sec_timer) one_sec_timer_switch = 1;  
 
   if(millis() < (lastMAVBeat + 2200)){
   
@@ -1225,8 +1227,9 @@ void do_converts()
 
 void timers()
 {
-if (millis() > one_sec_timer){ 
+if (millis() > one_sec_timer && one_sec_timer_switch == 1){ 
   one_sec_timer = millis() + 1000;
+  one_sec_timer_switch = 0;
   if (blinker == 0){
 
   blinker = 1;
