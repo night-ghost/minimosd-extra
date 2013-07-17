@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r635"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r636"));
     osd.closePanel();
 }
 
@@ -663,6 +663,8 @@ if (one_sec_timer_switch == 1);{
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
             }          
           }
+
+    if (check_warning != warning_type) warning_type = 0;
           check_warning++;
                 
  }while (warning_type > 0 || check_warning > 5);
