@@ -122,15 +122,5 @@ void setFdataVars(){
     if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
-  
-  if (millis() > one_sec_timer){ 
-  one_sec_timer = millis() + 1000;
-  if (blinker == 0){
-
-  blinker = 1;
-  }else{
-  blinker = 0;  
-  }
-  }
 }
 
