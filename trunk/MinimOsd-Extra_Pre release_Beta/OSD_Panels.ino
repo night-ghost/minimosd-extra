@@ -449,7 +449,7 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if(warning_found){
+  if(canswitch == 0){
     if(panel != 0){
       //osd.clear();
       osd_clear = 1;
@@ -662,13 +662,13 @@ if (one_sec_timer_switch == 1){
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; // RSSI low
             }          
           }
-//          warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");
-          if (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
-            warning_found = 1;
-          }else if (ch_raw < 1200){
-            warning_found = 0;
-          }  
-
+          warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");          
+          if (warning_found == 1){
+          canswitch = 0;  
+          }else if (ch_raw < 1200) {
+          canswitch = 1;
+          }
+          
           check_warning++;
   
  }while (!warning_string && check_warning <= 5);
