@@ -90,6 +90,7 @@ static boolean      warning_found = 0;
 static boolean      canswitch = 1;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
+static uint8_t      rotation = 0;
 static unsigned long         osd_switch_time = 0;
 //static unsigned long         descendt = 0;
 static float         palt = 0;

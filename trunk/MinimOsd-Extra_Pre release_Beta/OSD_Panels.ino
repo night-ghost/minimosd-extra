@@ -631,59 +631,70 @@ void panAirSpeed(int first_col, int first_line){
 void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+                
+  if (one_sec_timer_switch == 1){
+                int warning[]={0,0,0,0,0,0};
 
-if (one_sec_timer_switch == 1){
-  if (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
-  warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-  }else{
-  do{
-    if (check_warning == 1){
-      if ((osd_fix_type) < 2){
-            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS Fix
-          }
-    }
-    else if (check_warning == 2){
-      if (osd_airspeed * converts < stall && takeofftime == 1){
-            warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"; // Stall
-            }
-          }
-    else if (check_warning == 3){
-      if ((osd_airspeed * converts) > (float)overspeed){
-            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"; //overspeed
-            }
-           }
-    else if (check_warning == 4){
-      if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
-            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; // Battery low
-            }
-          }
-    else if (check_warning == 5){
-      if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
-            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; // RSSI low
-            }          
-          }
-          warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");          
-          if (warning_found == 1 && EEPROM.read(AUTO_SCREEN_SWITC_ADD) == 1){
+                if ((osd_fix_type) < 2) warning[1] = 1; warning[0] = 1;
+                if (osd_airspeed * converts < stall && takeofftime == 1) warning[2] = 1; warning[0] = 1;
+                if ((osd_airspeed * converts) > (float)overspeed) warning[3] = 1; warning[0] = 1;
+                if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning[4] = 1; warning[0] = 1;
+                if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning[5] = 1; warning[0] = 1;
+
+
+                  int h;
+                  h = warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5];
+  
+
+            if (rotation == 0) if (warning[0] == 0 || h == 2) {
+                warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+              }else{
+                  rotation = 1; 
+              } 
+              
+            if (rotation == 1) if (warning[1] == 1) {
+                warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+              }else{
+                  rotation = 2; 
+              }
+              
+            if (rotation == 2) if (warning[2] == 1) {
+                warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+              }else{
+                  rotation = 3; 
+              }
+              
+            if (rotation == 3) if (warning[3] == 1) {
+                warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+              }else{
+                  rotation = 4; 
+              }
+              
+            if (rotation == 4) if (warning[4] == 1) {
+                warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+              }else{
+                  rotation = 5; 
+              }
+              
+            if (rotation == 5) if (warning[5] == 1) {
+                warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+              }else{
+                  rotation = 0; 
+              }   
+            
+            rotation++;
+
+          if (warning[0] == 1 && EEPROM.read(AUTO_SCREEN_SWITC_ADD) == 1){
           canswitch = 0;  
           }else if (ch_raw < 1200) {
           canswitch = 1;
           }
-          
-          check_warning++;
-  
- }while (!warning_string && check_warning <= 5);
-  }
- 
+ if (rotation > 5) rotation = 0;
+            
  osd.printf("%s",warning_string);
- if (check_warning >= 5) check_warning = 1;
- 
- 
-//one_sec_timer = millis() + 1000; 
-}
-    osd.closePanel();
-}
 
-  
+  }
+}  
 /* **************************************************************** */
 // Panel  : panThr
 // Needs  : X, Y locations
