@@ -1165,6 +1165,7 @@ namespace OSD
                 eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
                 eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
 
+                eeprom[AUTO_SCREEN_SWITCH_ADD] = pan.auto_screen_switch;
                 eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
                 eeprom[switch_mode_ADDR] = pan.switch_mode;
 
@@ -1341,6 +1342,7 @@ namespace OSD
             eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
             eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
 
+            eeprom[AUTO_SCREEN_SWITCH_ADD] = pan.auto_screen_switch;
             eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
             eeprom[switch_mode_ADDR] = pan.switch_mode;
 
@@ -1545,6 +1547,7 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
+        const int AUTO_SCREEN_SWITCH_ADD = 886;
         const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
         const int measure_ADDR = 890;
         const int overspeed_ADDR = 892;
@@ -1723,6 +1726,9 @@ namespace OSD
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
+
+            pan.auto_screen_switch = eeprom[AUTO_SCREEN_SWITCH_ADD];
+            TOGGLE_BEH.Checked = Convert.ToBoolean(pan.auto_screen_switch);
 
             pan.switch_mode = eeprom[switch_mode_ADDR];
             TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
@@ -1908,6 +1914,7 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "RSSI Low", pan.rssipersent);
                         sw.WriteLine("{0}\t{1}", "RSSI Enable Raw", pan.rssiraw_on);
                         sw.WriteLine("{0}\t{1}", "Toggle Channel", pan.ch_toggle);
+                        sw.WriteLine("{0}\t{1}", "Auto Screen Switch", pan.auto_screen_switch);
                         sw.WriteLine("{0}\t{1}", "Chanel Rotation Switching", pan.switch_mode);
                         sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
                         sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
@@ -1995,6 +2002,7 @@ namespace OSD
                             else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
+                            else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
                             else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
                             else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
@@ -2033,6 +2041,7 @@ namespace OSD
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
+                        cbxPanelAutoSwitch.Checked = Convert.ToBoolean(pan.auto_screen_switch);
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
@@ -2601,6 +2610,11 @@ namespace OSD
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             pan.rssiraw_on = Convert.ToByte(RSSI_RAW.Checked);
+        }
+
+        private void cbxPanelAutoSwitch_BEHChanged(object sender, EventArgs e)
+        {
+            pan.auto_screen_switch = Convert.ToByte(cbxPanelAutoSwitch.Checked);
         }
 
         private void TOGGLE_BEHChanged(object sender, EventArgs e)
