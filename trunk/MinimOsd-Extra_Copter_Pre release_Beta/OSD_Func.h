@@ -138,3 +138,7 @@ void setFdataVars(){
   }
 }
 
+void checkModellType(){
+if (EEPROM.read(MODELL_TYPE_ADD) != 1) EEPROM.write(MODELL_TYPE_ADD, 1);
+}
+
