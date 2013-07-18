@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r641"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r643"));
     osd.closePanel();
 }
 
@@ -663,7 +663,7 @@ if (one_sec_timer_switch == 1){
             }          
           }
           warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");          
-          if (warning_found == 1){
+          if (warning_found == 1 && EEPROM.read(AUTO_SCREEN_SWITC_ADD) == 1){
           canswitch = 0;  
           }else if (ch_raw < 1200) {
           canswitch = 1;
