@@ -445,7 +445,7 @@ namespace OSD
 
             if(cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
-            cbxModelType.SelectedIndex = pan.model_type;
+            cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
             if (pan.converts == 0)
             {
@@ -1166,8 +1166,6 @@ namespace OSD
             else if (current.Text == "Config") 
             {
                 //Setup configuration panel
-                eeprom[MODEL_TYPE_ADD] = pan.model_type;
-
                 eeprom[measure_ADDR] = pan.converts;
                 eeprom[overspeed_ADDR] = pan.overspeed;
                 eeprom[stall_ADDR] = pan.stall;
@@ -1345,7 +1343,6 @@ namespace OSD
                 }
             }
             //Setup configuration panel
-            eeprom[MODEL_TYPE_ADD] = pan.model_type;
             eeprom[measure_ADDR] = pan.converts;
             eeprom[overspeed_ADDR] = pan.overspeed;
             eeprom[stall_ADDR] = pan.stall;
@@ -1699,6 +1696,7 @@ namespace OSD
 
             //Setup configuration panel
             pan.model_type = eeprom[MODEL_TYPE_ADD];
+            MessageBox.Show("Model type read from eeprom: " + eeprom[MODEL_TYPE_ADD]);
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
             pan.converts = eeprom[measure_ADDR];
             //Modify units
@@ -1922,7 +1920,6 @@ namespace OSD
                         }
                         //Config 
                         sw.WriteLine("{0}", "Configuration");
-                        sw.WriteLine("{0}\t{1}", "Model Type", pan.model_type);
                         sw.WriteLine("{0}\t{1}", "Units", pan.converts);
                         sw.WriteLine("{0}\t{1}", "Overspeed", pan.overspeed);
                         sw.WriteLine("{0}\t{1}", "Stall", pan.stall);
@@ -2026,10 +2023,7 @@ namespace OSD
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
-                            else if (strings[0] == "Model Type") pan.model_type = byte.Parse(strings[1]);
                         }
-
-                        cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
                         //Modify units
                         if (pan.converts == 0)
@@ -2929,7 +2923,6 @@ namespace OSD
 
         private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pan.model_type = Convert.ToByte(cbxModelType.SelectedValue);
             if (UNITS_combo.SelectedIndex == 0)
             {
                 pan.converts = 0; //metric
