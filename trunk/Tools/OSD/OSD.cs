@@ -443,7 +443,9 @@ namespace OSD
 
             OVERSPEED_numeric.Value = pan.overspeed;
 
-            cbxModelType.SelectedIndex = 0;
+            if(cbxModelType.Items.Count == 0)
+                cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
+            cbxModelType.SelectedIndex = pan.model_type;
 
             if (pan.converts == 0)
             {
@@ -876,8 +878,16 @@ namespace OSD
             return (int)value;
         }
 
+        enum ModelType
+        { 
+            Plane = 0,
+            Copter = 1
+        }
+
         private void OSD_Load(object sender, EventArgs e)
         {
+            if (cbxModelType.Items.Count == 0)
+                cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Text = this.Text + " " + strVersion + " - Pre-Release";
 
@@ -1156,6 +1166,8 @@ namespace OSD
             else if (current.Text == "Config") 
             {
                 //Setup configuration panel
+                eeprom[MODEL_TYPE_ADD] = pan.model_type;
+
                 eeprom[measure_ADDR] = pan.converts;
                 eeprom[overspeed_ADDR] = pan.overspeed;
                 eeprom[stall_ADDR] = pan.stall;
@@ -1333,6 +1345,7 @@ namespace OSD
                 }
             }
             //Setup configuration panel
+            eeprom[MODEL_TYPE_ADD] = pan.model_type;
             eeprom[measure_ADDR] = pan.converts;
             eeprom[overspeed_ADDR] = pan.overspeed;
             eeprom[stall_ADDR] = pan.stall;
@@ -1547,6 +1560,7 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
+        const int MODEL_TYPE_ADD = 884;
         const int AUTO_SCREEN_SWITCH_ADD = 886;
         const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
         const int measure_ADDR = 890;
@@ -1684,6 +1698,8 @@ namespace OSD
             }
 
             //Setup configuration panel
+            pan.model_type = eeprom[MODEL_TYPE_ADD];
+            cbxModelType.SelectedItem = (ModelType)pan.model_type;
             pan.converts = eeprom[measure_ADDR];
             //Modify units
             if (pan.converts == 0)
@@ -1906,6 +1922,7 @@ namespace OSD
                         }
                         //Config 
                         sw.WriteLine("{0}", "Configuration");
+                        sw.WriteLine("{0}\t{1}", "Model Type", pan.model_type);
                         sw.WriteLine("{0}\t{1}", "Units", pan.converts);
                         sw.WriteLine("{0}\t{1}", "Overspeed", pan.overspeed);
                         sw.WriteLine("{0}\t{1}", "Stall", pan.stall);
@@ -1969,7 +1986,7 @@ namespace OSD
                         //Panel 2
                         stringh = sr.ReadLine(); //
                         //while (!sr.EndOfStream)
-                        for (int i = 0; i < nosdfunctions; i++)
+                        for (int i = 0; i < nosdfunctions - 1; i++)
                         {
                             string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                             for (int a = 0; a < panelItems.Length; a++)
@@ -2009,7 +2026,10 @@ namespace OSD
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
+                            else if (strings[0] == "Model Type") pan.model_type = byte.Parse(strings[1]);
                         }
+
+                        cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
                         //Modify units
                         if (pan.converts == 0)
@@ -2562,7 +2582,6 @@ namespace OSD
             }
         }
 
-
         private void STALL_numeric_ValueChanged(object sender, EventArgs e)
         {
             pan.stall = (byte)STALL_numeric.Value;
@@ -2910,6 +2929,7 @@ namespace OSD
 
         private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            pan.model_type = Convert.ToByte(cbxModelType.SelectedValue);
             if (UNITS_combo.SelectedIndex == 0)
             {
                 pan.converts = 0; //metric
