@@ -73,6 +73,7 @@ namespace OSD
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.cbxPanelAutoSwitch = new System.Windows.Forms.CheckBox();
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -114,7 +115,6 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.cbxPanelAutoSwitch = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -491,9 +491,6 @@ namespace OSD
             // 
             this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxModelType.FormattingEnabled = true;
-            this.cbxModelType.Items.AddRange(new object[] {
-            "Plane",
-            "Copter"});
             this.cbxModelType.Location = new System.Drawing.Point(72, 7);
             this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
             this.cbxModelType.Name = "cbxModelType";
@@ -579,6 +576,19 @@ namespace OSD
             this.groupBox7.Size = new System.Drawing.Size(150, 123);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
+            // 
+            // cbxPanelAutoSwitch
+            // 
+            this.cbxPanelAutoSwitch.Checked = true;
+            this.cbxPanelAutoSwitch.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxPanelAutoSwitch.Location = new System.Drawing.Point(8, 13);
+            this.cbxPanelAutoSwitch.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxPanelAutoSwitch.Name = "cbxPanelAutoSwitch";
+            this.cbxPanelAutoSwitch.Size = new System.Drawing.Size(137, 34);
+            this.cbxPanelAutoSwitch.TabIndex = 11;
+            this.cbxPanelAutoSwitch.Text = "Warnings Auto Panel Switch";
+            this.cbxPanelAutoSwitch.UseVisualStyleBackColor = true;
+            this.cbxPanelAutoSwitch.CheckedChanged += new System.EventHandler(this.cbxPanelAutoSwitch_BEHChanged);
             // 
             // TOGGLE_BEH
             // 
@@ -1049,19 +1059,6 @@ namespace OSD
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
-            // 
-            // cbxPanelAutoSwitch
-            // 
-            this.cbxPanelAutoSwitch.Checked = true;
-            this.cbxPanelAutoSwitch.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxPanelAutoSwitch.Location = new System.Drawing.Point(8, 13);
-            this.cbxPanelAutoSwitch.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxPanelAutoSwitch.Name = "cbxPanelAutoSwitch";
-            this.cbxPanelAutoSwitch.Size = new System.Drawing.Size(137, 34);
-            this.cbxPanelAutoSwitch.TabIndex = 11;
-            this.cbxPanelAutoSwitch.Text = "Warnings Auto Panel Switch";
-            this.cbxPanelAutoSwitch.UseVisualStyleBackColor = true;
-            this.cbxPanelAutoSwitch.CheckedChanged += new System.EventHandler(this.cbxPanelAutoSwitch_BEHChanged);
             // 
             // OSD
             // 

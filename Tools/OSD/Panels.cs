@@ -46,6 +46,8 @@ namespace OSD
         //Will come from APM telem port
 
         //Config vars
+        public uint8_t model_type = 0; //0 - Plane; 1 - Copter
+
         public uint8_t overspeed = 40;
         public uint8_t stall = 5;
         public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
