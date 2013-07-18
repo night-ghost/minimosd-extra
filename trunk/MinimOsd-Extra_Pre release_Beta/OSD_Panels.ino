@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r639"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r640"));
     osd.closePanel();
 }
 
@@ -21,7 +21,7 @@ void panLogo(){
 
 void writePanels(){ 
   
-  if (millis() > one_sec_timer) one_sec_timer_switch = 1;  
+  //if (millis() > one_sec_timer) one_sec_timer_switch = 1;  
 
   if(millis() < (lastMAVBeat + 2200)){
   
@@ -449,7 +449,7 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if(warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
+  if(warning_found){
     if(panel != 0){
       //osd.clear();
       osd_clear = 1;
@@ -662,10 +662,10 @@ if (one_sec_timer_switch == 1){
             warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; // RSSI low
             }          
           }
-
+          warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");
           check_warning++;
   
- }while (warning_string == "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20" && check_warning <= 5);
+ }while (!warning_string && check_warning <= 5);
   }
  
  osd.printf("%s",warning_string);
@@ -1214,13 +1214,18 @@ void do_converts()
 
 void timers()
 {
-if (one_sec_timer_switch == 1){ 
-  one_sec_timer = millis() + 1000;
-  one_sec_timer_switch = 0;
+  if (one_sec_timer_switch == 1){ 
+    one_sec_timer = millis() + 1000;
+    one_sec_timer_switch = 0;
+  }
+  if (millis() > one_sec_timer) one_sec_timer_switch = 1;  
+//if (one_sec_timer_switch == 1){ 
+//  one_sec_timer = millis() + 1000;
+//  one_sec_timer_switch = 0;
 //  if (blinker == 0){
 //  blinker = 1;
 //  }else{
 //  blinker = 0;  
 //  }
-  }
+//  }
 }
