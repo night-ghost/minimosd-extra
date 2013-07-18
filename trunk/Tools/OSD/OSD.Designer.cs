@@ -114,6 +114,7 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.cbxPanelAutoSwitch = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -569,19 +570,20 @@ namespace OSD
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.cbxPanelAutoSwitch);
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
             this.groupBox7.Location = new System.Drawing.Point(7, 198);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(150, 101);
+            this.groupBox7.Size = new System.Drawing.Size(150, 123);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
             // 
             // TOGGLE_BEH
             // 
             this.TOGGLE_BEH.AutoSize = true;
-            this.TOGGLE_BEH.Location = new System.Drawing.Point(10, 67);
+            this.TOGGLE_BEH.Location = new System.Drawing.Point(8, 96);
             this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2);
             this.TOGGLE_BEH.Name = "TOGGLE_BEH";
             this.TOGGLE_BEH.Size = new System.Drawing.Size(115, 17);
@@ -601,7 +603,7 @@ namespace OSD
             "Ch 6",
             "Ch 7",
             "Ch 8"});
-            this.ONOFF_combo.Location = new System.Drawing.Point(9, 36);
+            this.ONOFF_combo.Location = new System.Drawing.Point(7, 65);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
             this.ONOFF_combo.Size = new System.Drawing.Size(92, 21);
@@ -611,7 +613,7 @@ namespace OSD
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(7, 20);
+            this.label11.Location = new System.Drawing.Point(5, 49);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(108, 13);
             this.label11.TabIndex = 2;
@@ -1048,6 +1050,19 @@ namespace OSD
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // cbxPanelAutoSwitch
+            // 
+            this.cbxPanelAutoSwitch.Checked = true;
+            this.cbxPanelAutoSwitch.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxPanelAutoSwitch.Location = new System.Drawing.Point(8, 13);
+            this.cbxPanelAutoSwitch.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxPanelAutoSwitch.Name = "cbxPanelAutoSwitch";
+            this.cbxPanelAutoSwitch.Size = new System.Drawing.Size(137, 34);
+            this.cbxPanelAutoSwitch.TabIndex = 11;
+            this.cbxPanelAutoSwitch.Text = "Warnings Auto Panel Switch";
+            this.cbxPanelAutoSwitch.UseVisualStyleBackColor = true;
+            this.cbxPanelAutoSwitch.CheckedChanged += new System.EventHandler(this.cbxPanelAutoSwitch_BEHChanged);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1201,6 +1216,7 @@ namespace OSD
         private System.Windows.Forms.TreeView LIST_items2;
         private System.Windows.Forms.Label lblModelType;
         private System.Windows.Forms.ComboBox cbxModelType;
+        private System.Windows.Forms.CheckBox cbxPanelAutoSwitch;
     }
 }
 
