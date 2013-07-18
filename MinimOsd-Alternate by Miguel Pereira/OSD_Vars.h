@@ -45,6 +45,7 @@ static uint16_t     chan8_raw = 0;
 //static uint16_t     chan2_raw_middle = 0;
 
 static uint8_t      ch_toggle = 0;
+static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
@@ -89,6 +90,8 @@ static unsigned long FTime = 0;
 
 static uint8_t      warning_type = 0;
 static char*        warning_string;
+static boolean      warning_found = 0;
+static boolean      canswitch = 1;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
@@ -154,6 +157,7 @@ static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 //static boolean      enable_mav_request = 0;
+static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 2;
 static uint8_t panel = 0; 

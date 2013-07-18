@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra Copter|Pre-Release r621"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Copter r645"));
     osd.closePanel();
 }
 
@@ -397,7 +397,7 @@ void panOff(){
   bool rotatePanel = 0;
 
   //If there is a warning force switch to panel 0
-  if(warning_type != 0){
+  if(canswitch == 0){
     if(panel != 0){
       //osd.clear();
       osd_clear = 1;
@@ -579,70 +579,54 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    //If disarmed force showing disarmed message
-    if (motor_armed == 0){
-      warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
-      text_timer = millis();
-      warning_type = 0;
+if (one_sec_timer_switch == 1){
+  if (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"){
+  warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+  }else{
+  do{
+    if (check_warning == 1){
+      if ((osd_fix_type) < 2){
+            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS Fix
+          }
     }
-
-    //2 seconds to show a warning
-    if (millis() - text_timer < 2000){
-      //2nd second blanked message
-      if (millis() - text_timer > 1000){
-        warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
-      }
-      osd.printf("%s",warning_string);
-    }
-    //Check for next warning
-    else{
-      byte last_warning = warning_type; //we have to store the last warning so we can stop the cycle
-      byte check_warning = warning_type;
-      warning_type = 0;
-      do{
-        check_warning++;
-        if (check_warning > 5) check_warning = 0; // change the 5 if you add more warning types
-        //Check for no GPS fix
-        if(check_warning == 1){
-          if ((osd_fix_type) < 2){
-            warning_type = 1; // No GPS Fix
-            warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+    else if (check_warning == 2){
+      if (abs(vs) > stall * 10){
+            warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed
+            }
           }
-        }
-        //Check for low airspeed
-        else if(check_warning == 2){
-          if (abs(vs) > stall * 10){
-            warning_type = 2;
-            warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21";
+    else if (check_warning == 3){
+      if ((osd_airspeed * converts) > (float)overspeed){
+            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"; //overspeed
+            }
+           }
+    else if (check_warning == 4){
+      if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
+            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; // Battery low
+            }
           }
-        }
-        //Check for over speed
-        else if(check_warning == 3){
-          if ((osd_airspeed * converts) > (float)overspeed){
-            warning_type = 3;
-            warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+    else if (check_warning == 5){
+      if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
+            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; // RSSI low
+            }          
           }
-        }
-        //Check for low battery
-        else if(check_warning == 4){
-          if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)){
-            warning_type = 4;
-            warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+          warning_found = (warning_string != "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20");          
+          if (warning_found == 1 && EEPROM.read(AUTO_SCREEN_SWITC_ADD) == 1){
+          canswitch = 0;  
+          }else if (ch_raw < 1200) {
+          canswitch = 1;
           }
-        }
-        //Check for low RSSI
-        else if(check_warning == 5){
-          if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on){
-            warning_type = 5;
-            warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-          }
-        }
-        //If found a warning start timer to show it
-        if(warning_type != 0){
-          text_timer = millis();
-        }
-      }while ((warning_type == 0) && (check_warning != last_warning));
-    }
+          
+          check_warning++;
+  
+ }while (!warning_string && check_warning <= 5);
+  }
+ 
+ osd.printf("%s",warning_string);
+ if (check_warning >= 5) check_warning = 1;
+ 
+ 
+//one_sec_timer = millis() + 1000; 
+}
     osd.closePanel();
 }
 
