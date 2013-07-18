@@ -87,6 +87,7 @@ static unsigned long landed = 0;
 //static uint8_t      warning_type = 0;
 static char*        warning_string;
 static boolean      warning_found = 0;
+static boolean      canswitch = 0;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static unsigned long         osd_switch_time = 0;
