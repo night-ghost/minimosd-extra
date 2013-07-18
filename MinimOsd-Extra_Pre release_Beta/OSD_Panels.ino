@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r646"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r647"));
     osd.closePanel();
 }
 
@@ -643,7 +643,7 @@ if (one_sec_timer_switch == 1){
           }
     }
     else if (check_warning == 2){
-      if (osd_airspeed * converts < stall){
+      if (osd_airspeed * converts < stall && takeofftime == 1){
             warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"; // Stall
             }
           }

@@ -122,5 +122,9 @@ void setFdataVars(){
     if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
+
 }
 
+void checkModellType(){
+if (EEPROM.read(MODELL_TYPE_ADD) != 0) EEPROM.write(MODELL_TYPE_ADD, 0);
+}

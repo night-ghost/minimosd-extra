@@ -185,6 +185,7 @@
 #define panDistance_x_ADDR 226
 #define panDistance_y_ADDR 228
 
+#define MODELL_TYPE_ADD 884 
 #define AUTO_SCREEN_SWITC_ADD 886
 #define OSD_BATT_SHOW_PERCENT_ADDR 888
 #define measure_ADDR 890

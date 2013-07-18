@@ -210,6 +210,8 @@ void OnMavlinkTimer()
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
     
     setFdataVars();
+    
+    checkModellType();
 }
 
 

@@ -210,8 +210,9 @@ void OnMavlinkTimer()
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
     
     setFdataVars();
+    
+    checkModellType();
 }
-
 
 void unplugSlaves(){
     //Unplug list of SPI
