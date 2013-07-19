@@ -322,7 +322,7 @@ namespace OSD
 
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Wind Speed", pan.panWindSpeed, 1, 14, panWindSpeed_en_ADDR, panWindSpeed_x_ADDR, panWindSpeed_y_ADDR);
 
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
 //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
@@ -423,6 +423,11 @@ namespace OSD
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
+                    else if (thing.Item1 == "Warnings")
+                    {
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
+                    }
                     else
                     {
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
@@ -448,6 +453,10 @@ namespace OSD
             if(cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
+
+            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
             if (pan.converts == 0)
             {
@@ -890,6 +899,9 @@ namespace OSD
         {
             if (cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
+            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Text = this.Text + " " + strVersion + " - Pre-Release";
 
@@ -1755,7 +1767,7 @@ namespace OSD
             else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
 
             pan.auto_screen_switch = eeprom[AUTO_SCREEN_SWITCH_ADD];
-            TOGGLE_BEH.Checked = Convert.ToBoolean(pan.auto_screen_switch);
+            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
             pan.switch_mode = eeprom[switch_mode_ADDR];
             TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
@@ -2074,7 +2086,7 @@ namespace OSD
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
-                        cbxPanelAutoSwitch.Checked = Convert.ToBoolean(pan.auto_screen_switch);
+                        cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
@@ -2644,11 +2656,6 @@ namespace OSD
             pan.rssiraw_on = Convert.ToByte(RSSI_RAW.Checked);
         }
 
-        private void cbxPanelAutoSwitch_BEHChanged(object sender, EventArgs e)
-        {
-            pan.auto_screen_switch = Convert.ToByte(cbxPanelAutoSwitch.Checked);
-        }
-
         private void TOGGLE_BEHChanged(object sender, EventArgs e)
         {
             pan.switch_mode = Convert.ToByte(TOGGLE_BEH.Checked);
@@ -2954,6 +2961,19 @@ namespace OSD
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
+        }
+
+        enum PanelsAutoSwitch
+        { 
+            Disabled = 0,
+            Panel1 = 1,
+            Panel2 = 2,
+            PanelOff = 3
+        }
+
+        private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.auto_screen_switch = (byte)(PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem;
         }
     }
 }
