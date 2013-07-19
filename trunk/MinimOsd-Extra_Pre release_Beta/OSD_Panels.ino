@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r651"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r653"));
     osd.closePanel();
 }
 
@@ -634,7 +634,7 @@ void panWarn(int first_col, int first_line){
                 
   if (one_sec_timer_switch == 1){
 
-    int warning[]={0,0,0,0,0,0}; // Make and clear the array
+    boolean warning[]={0,0,0,0,0,0}; // Make and clear the array
 
 
                 // check all warnings at once
@@ -645,12 +645,12 @@ void panWarn(int first_col, int first_line){
                 if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning[5] = 1; warning[0] = 1;
 
                   //check if only one warning is on
-                  int h;
-                  h = warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5];
+   //               int h;
+   //               h = warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5];
   
 
             // Prepare for printf in rotation
-            if (rotation == 0) if (warning[0] == 0 || h == 2) {
+            if (rotation == 0) if (warning[0] == 0 || (warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5]) == 2) {
                 warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
               }else{
                   rotation = 1; 
