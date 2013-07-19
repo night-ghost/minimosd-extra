@@ -26,6 +26,7 @@ static uint8_t      wp_number = 0; // Current waypoint number
 static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 static float        eff = 0; //Efficiency
 
+
 static uint8_t      base_mode=0;
 //static bool         motor_armed = 0;
 static bool         ma = 0;
