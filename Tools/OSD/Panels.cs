@@ -53,6 +53,53 @@ namespace OSD
         public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
         public uint8_t converts = 0;                //1- Imperial; 0- Metric
 
+        private byte temperatureChar = 0x1B;
+        private byte bigDistanceChar = 0x1B;
+        private byte smallDistanceChar = 0x1B;
+        private byte climbChar = 0x1A;
+        private byte velocityChar = 0x10;
+        private byte altitudeChar = 0x10;
+
+        private float convertspeed = 3.6f;
+        private float converth = 1.0f;
+        private float tempconv = 10;
+        private float tempconvAdd = 0;
+        private float distconv = 1000;
+
+        public void do_converts()
+        {
+            switch (converts)
+            { 
+                case 0:
+                    convertspeed = 3.6f;
+                    converth = 1.0f;
+                    tempconv = 10;
+                    tempconvAdd = 0;
+                    distconv = 1000;
+
+                    temperatureChar = 0xBA;
+                    bigDistanceChar = 0x1B;
+                    climbChar = 0x1A;
+                    velocityChar = 0x10;
+                    altitudeChar = 0x6D;
+                    smallDistanceChar = 0x6D;
+                    break;
+                case 1:
+                    convertspeed = 2.23f;
+                    converth = 3.28f;
+                    tempconv = 18;
+                    tempconvAdd = 3200;
+                    distconv = 5280;
+                    temperatureChar = 0xBB;
+                    bigDistanceChar = 0x1C;
+                    climbChar = 0x1E;
+                    velocityChar = 0x19;
+                    altitudeChar = 0x66;
+                    smallDistanceChar = 0x66;
+                    break;
+            }
+        }
+
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
         static uint16_t osd_battery_remaining = 10;      // 0 to 100 <=> 0 to 1000
@@ -80,8 +127,8 @@ namespace OSD
         //static uint8_t osd_yaw = 0;                    // relative heading form DCM
         static float osd_heading = 0;                // ground course heading from GPS
         static float osd_alt = 200;                    // altitude
-        static float osd_groundspeed = 90;            // ground speed
-        static float osd_airspeed = 101;            // air speed
+        static float osd_groundspeed = 9;            // ground speed
+        static float osd_airspeed = 10;            // air speed
         static uint16_t osd_throttle = 100;               // throtle
         static float osd_curr_A = 453;
         static float osd_windspeed = 10;
@@ -165,15 +212,15 @@ namespace OSD
         // Staus  : done
 
         public int panDistance(int first_col, int first_line)
-            {
+        {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            
-            osd.printf("%c%c%4.2f%c", 0x8F, 0x20, tdistance, 0x1B);
+
+            osd.printf("%c%c%4.2f%c", 0x8F, 0x20, tdistance * converth, bigDistanceChar);
             
             osd.closePanel();
             return 0;
-}
+        }
 
         /* **************************************************************** */
         // Panel  : Temperature
@@ -187,7 +234,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%5.1f%c", 0x0A, temperature, 0x05);
+                osd.printf("%c%5.1f%c", 0x0A, temperature * tempconv + tempconvAdd, temperatureChar);
             }
             osd.closePanel();
             return 0;
@@ -297,9 +344,8 @@ namespace OSD
             osd.openPanel();
             
             {
-                osd.printf("%c%3.0f%c", 0x15, (double)(osd_climb), 0x1A);
+                osd.printf("%c%3.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
             }
-            
             osd.closePanel();
             return 0;
         }
@@ -316,7 +362,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0x1D, (double)(osd_windspeed * 3.6), 0x10, 0xA4, 0xA5, (double)(osd_windspeed * 3.6), 0x10);
+                osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0x1D, (double)(osd_windspeed * convertspeed), velocityChar, 0xA4, 0xA5, (double)(osd_windspeed * convertspeed), velocityChar);
             }
             osd.closePanel();
             return 0;
@@ -371,7 +417,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt), 0x0C);
+            osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
             osd.closePanel();
             return 0;
         }
@@ -401,7 +447,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0x12, (double)(osd_alt - osd_home_alt), 0x0C);
+            osd.printf("%c%5.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
             osd.closePanel();
             return 0;
         }
@@ -417,7 +463,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0x14, (double)osd_groundspeed, 0x10);
+            osd.printf("%c%3.0f%c", 0x14, (double)(osd_groundspeed * convertspeed), velocityChar);
             osd.closePanel();
             return 0;
         }
@@ -433,7 +479,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed), 0x10);
+            osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed * convertspeed), velocityChar);
             osd.closePanel();
             return 0;
         }
@@ -504,7 +550,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%5.0f%c", 0x0B, (double)osd_home_distance, 0x0C);
+            osd.printf("%c%5.0f%c", 0x0B, (double)(osd_home_distance * converth), bigDistanceChar);
             osd.closePanel();
             return 0;
         }
@@ -793,8 +839,8 @@ namespace OSD
         public int panWPDis(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();           
-            osd.printf("%c%c%c%2i%c%4.0f%c|%c%c%c%c%c%5.0f%c", 0x57, 0x70, 0x0, wp_number, 0x0, (double)((float)(wp_dist)), 0x6d, 0xa4, 0xa5, 0x20, 0x58, 0x45, (xtrack_error), 0x6D); //Print in Km 
+            osd.openPanel();
+            osd.printf("%c%c%c%2i%c%4.0f%c|%c%c%c%c%c%5.0f%c", 0x57, 0x70, 0x0, wp_number, 0x0, (double)((float)(wp_dist * converth)), smallDistanceChar, 0xa4, 0xa5, 0x20, 0x58, 0x45, (xtrack_error), smallDistanceChar); //Print in Km 
             osd.closePanel();
             return 0;
         }
