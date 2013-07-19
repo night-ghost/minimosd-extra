@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r655"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r661"));
     osd.closePanel();
 }
 
@@ -450,7 +450,7 @@ void panOff(){
 
   //If there is a warning force switch to panel 0
   if(canswitch == 0){
-    if(panel != 0){
+    if(panel != panel_auto_switch){
       //osd.clear();
       osd_clear = 1;
     }
@@ -682,9 +682,7 @@ void panWarn(int first_col, int first_line){
               
             if (rotation == 5) if (warning[5] == 1) {
                 warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
-              }else{
-                  rotation = 0; 
-              }   
+              }
             
             rotation++;
           
