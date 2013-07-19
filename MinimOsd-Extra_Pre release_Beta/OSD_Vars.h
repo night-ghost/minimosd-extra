@@ -28,6 +28,7 @@ static float        eff = 0; //Efficiency
 
 
 static uint8_t      base_mode=0;
+static uint8_t      panel_auto_switch=0;
 //static bool         motor_armed = 0;
 static bool         ma = 0;
 static bool         osd_clear = 0;

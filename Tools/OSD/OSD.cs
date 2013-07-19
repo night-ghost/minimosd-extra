@@ -2965,10 +2965,10 @@ namespace OSD
 
         enum PanelsAutoSwitch
         { 
-            Disabled = 0,
-            Panel1 = 1,
-            Panel2 = 2,
-            PanelOff = 3
+            Disabled = 3,
+            Panel1 = 0,
+            Panel2 = 1,
+            PanelOff = 2
         }
 
         private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged(object sender, EventArgs e)

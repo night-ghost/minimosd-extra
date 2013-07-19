@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r653"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r655"));
     osd.closePanel();
 }
 
@@ -100,7 +100,8 @@ void writePanels(){
 //                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
                 if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
             } else { //panel == npanels
-//                if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+                //if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+                //if(panel_auto_switch == 3) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); //if warnings auto jump to panel off show warning on panel 0 coordinates
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
             }
             timers();
@@ -454,7 +455,7 @@ void panOff(){
       //osd.clear();
       osd_clear = 1;
     }
-    panel = 0;
+    panel = panel_auto_switch; 
   }
   else{
     //Flight mode switching
@@ -689,7 +690,7 @@ void panWarn(int first_col, int first_line){
             rotation++;
           
           // Auto switch decesion
-          if (warning[0] == 1 && EEPROM.read(AUTO_SCREEN_SWITC_ADD) == 1){
+          if (warning[0] == 1 && panel_auto_switch < 3){
           canswitch = 0;  
           }else if (ch_raw < 1200) {
           canswitch = 1;
