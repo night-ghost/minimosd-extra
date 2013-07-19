@@ -100,8 +100,7 @@ void writePanels(){
 //                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
                 if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
             } else { //panel == npanels
-                //if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
-                //if(panel_auto_switch == 3) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); //if warnings auto jump to panel off show warning on panel 0 coordinates
+                if(ISd(0,Warn_BIT) || ISd(1,Warn_BIT)) panWarn(9, 4); // this must be here so warnings are always checked
                 if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
             }
             timers();
