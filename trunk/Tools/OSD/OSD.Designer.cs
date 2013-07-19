@@ -116,6 +116,7 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.lblFWModelType = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -460,6 +461,7 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.lblFWModelType);
             this.tabPageConfig.Controls.Add(this.lblModelType);
             this.tabPageConfig.Controls.Add(this.cbxModelType);
             this.tabPageConfig.Controls.Add(this.groupBox9);
@@ -1068,6 +1070,15 @@ namespace OSD
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // lblFWModelType
+            // 
+            this.lblFWModelType.Location = new System.Drawing.Point(259, 10);
+            this.lblFWModelType.Name = "lblFWModelType";
+            this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
+            this.lblFWModelType.TabIndex = 14;
+            this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
+            this.lblFWModelType.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1223,6 +1234,7 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbxModelType;
         private System.Windows.Forms.ComboBox cbxWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblWarningsAutoPanelSwitch;
+        private System.Windows.Forms.Label lblFWModelType;
     }
 }
 
