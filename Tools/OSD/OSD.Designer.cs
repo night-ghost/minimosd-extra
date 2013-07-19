@@ -64,6 +64,7 @@ namespace OSD
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.lblFWModelType = new System.Windows.Forms.Label();
             this.lblModelType = new System.Windows.Forms.Label();
             this.cbxModelType = new System.Windows.Forms.ComboBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
@@ -116,7 +117,6 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.lblFWModelType = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -480,6 +480,15 @@ namespace OSD
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
+            // 
+            // lblFWModelType
+            // 
+            this.lblFWModelType.Location = new System.Drawing.Point(259, 10);
+            this.lblFWModelType.Name = "lblFWModelType";
+            this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
+            this.lblFWModelType.TabIndex = 14;
+            this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
+            this.lblFWModelType.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblModelType
             // 
@@ -1069,15 +1078,6 @@ namespace OSD
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
-            // 
-            // lblFWModelType
-            // 
-            this.lblFWModelType.Location = new System.Drawing.Point(259, 10);
-            this.lblFWModelType.Name = "lblFWModelType";
-            this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
-            this.lblFWModelType.TabIndex = 14;
-            this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
-            this.lblFWModelType.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // OSD
             // 

@@ -2979,6 +2979,41 @@ namespace OSD
         private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged(object sender, EventArgs e)
         {
             pan.auto_screen_switch = (byte)(PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem;
+
+            //Get panel warnings check status
+            Boolean isPanel1WarningChecked = false;
+            Boolean isPanel2WarningChecked = false;
+            //Panel 1
+            foreach (var item in panelItems)
+            {
+                if (item != null && item.Item1 == "Warnings")
+                {
+                    TreeNode[] tnArray = LIST_items.Nodes.Find(item.Item1, true);
+                    isPanel1WarningChecked = tnArray[0].Checked;
+                }
+            }
+            //Panel 2
+            foreach (var item in panelItems2)
+            {
+                if (item != null && item.Item1 == "Warnings")
+                {
+                    TreeNode[] tnArray = LIST_items2.Nodes.Find(item.Item1, true);
+                    isPanel2WarningChecked = tnArray[0].Checked;
+                }
+            }
+
+
+            switch ((PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem)
+            {
+                case PanelsAutoSwitch.Panel1:
+                    if (!isPanel1WarningChecked)
+                        MessageBox.Show("You have selected to auto switch to panel 1. " + Environment.NewLine + "However you didn't configured warnings on panel 1.", "Panel Auto Switch Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    break;
+                case PanelsAutoSwitch.Panel2:
+                    if (!isPanel2WarningChecked)
+                        MessageBox.Show("You have selected to auto switch to panel 2. " + Environment.NewLine + "However you didn't configured warnings on panel 2.", "Panel Auto Switch Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    break;
+            }
         }
     }
 }
