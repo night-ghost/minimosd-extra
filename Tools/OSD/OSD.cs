@@ -1283,7 +1283,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)OSD_BATT_SHOW_PERCENT_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - OSD_BATT_SHOW_PERCENT_ADDR + 1), (short)OSD_BATT_SHOW_PERCENT_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)AUTO_SCREEN_SWITCH_ADD, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - AUTO_SCREEN_SWITCH_ADD + 1), (short)AUTO_SCREEN_SWITCH_ADD);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1724,6 +1724,7 @@ namespace OSD
             //Setup configuration panel
             pan.model_type = eeprom[MODEL_TYPE_ADD];
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
+            lblFWModelType.Text = "Model Type found in OSD: " + cbxModelType.SelectedText;
             pan.converts = eeprom[measure_ADDR];
             //Modify units
             if (pan.converts == 0)
