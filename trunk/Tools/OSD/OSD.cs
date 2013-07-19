@@ -715,6 +715,7 @@ namespace OSD
             }
             catch { }
 
+            //Drawing the grid
             if (checkBox1.Checked)
             {
                 for (int b = 1; b < 16; b++)
@@ -2639,6 +2640,9 @@ namespace OSD
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
+            pan.do_converts();
+            osdDraw1();
+            osdDraw2();
         }
 
         private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
