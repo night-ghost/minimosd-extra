@@ -71,6 +71,8 @@ static int8_t       start_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
 //static uint8_t      batt_capacity = 0;
+static uint8_t      rotation = 0;
+static uint8_t      panel_auto_switch=0;
 static float     mah_used = 0;         // Battery Consumed mAh
 
 //static uint8_t    osd_battery_pic_A = 0xb4;       // picture to show battery remaining
