@@ -186,6 +186,7 @@ void readSettings() {
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
     switch_mode = EEPROM.read(switch_mode_ADDR);
+    panel_auto_switch = EEPROM.read(AUTO_SCREEN_SWITC_ADD);
 //    if (EEPROM.read(ch_toggle_ADDR) < 4 || EEPROM.read(ch_toggle_ADDR) > 8){
 //     	EEPROM.write(ch_toggle_ADDR, 5);
 //	}

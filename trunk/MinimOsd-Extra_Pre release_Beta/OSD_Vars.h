@@ -13,7 +13,6 @@ static float tdistance = 0;
 static float ddistance = 0;
 static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
 
-
 //static float	      nav_roll = 0; // Current desired roll in degrees
 //static float        nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t      nav_bearing = 0; // Current desired heading in degrees
