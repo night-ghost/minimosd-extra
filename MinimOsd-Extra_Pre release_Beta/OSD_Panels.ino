@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r663"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r664"));
     osd.closePanel();
 }
 
@@ -905,7 +905,7 @@ void panGPSats(int first_col, int first_line){
     if(osd_fix_type >= 2)
       gps_str = 0x0f;
     
-    osd.printf("%c%2i", gps_str, osd_satellites_visible);
+    osd.printf("%c%2i|%2i", gps_str, osd_satellites_visible, (eph / 100));
     osd.closePanel();
 }
 
@@ -1072,7 +1072,7 @@ void panFlightMode(int first_col, int first_line){
     if (osd_mode == 4) mode_str = "acro"; //ACRO
     if (osd_mode == 5) mode_str = "fbwa"; //FLY_BY_WIRE_A
     if (osd_mode == 6) mode_str = "fbwb"; //FLY_BY_WIRE_B
-    if (osd_mode == 7) mode_str = "crui"; //Cruise
+    if (osd_mode == 7) mode_str = "cruz"; //Cruise
     if (osd_mode == 10) mode_str = "auto"; //AUTO
     if (osd_mode == 11) mode_str = "retl"; //Return to Launch 
     if (osd_mode == 12) mode_str = "loit"; //Loiter

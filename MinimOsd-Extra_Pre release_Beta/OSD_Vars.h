@@ -24,7 +24,7 @@ static uint8_t      wp_number = 0; // Current waypoint number
 //static float        aspd_error = 0; // Current airspeed error in meters/second
 static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 static float        eff = 0; //Efficiency
-
+static uint16_t     eph = 0;
 
 static uint8_t      base_mode=0;
 static uint8_t      panel_auto_switch=0;
