@@ -51,7 +51,7 @@ void setHomeVars(OSD &osd)
 //  if(osd_throttle > 3 && takeoff_heading == -400)
 //    takeoff_heading = osd_heading;
   osd_alt_to_home = (osd_alt - osd_home_alt);
-  if(osd_got_home == 0 && osd_fix_type > 1){
+  if(osd_got_home == 0 && osd_fix_type == 3){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
     //osd_home_alt = osd_alt;
