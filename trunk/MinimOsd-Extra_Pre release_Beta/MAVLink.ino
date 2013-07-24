@@ -89,6 +89,7 @@ void read_mavlink(){
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
                     osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
+                    eph = mavlink_msg_gps_raw_int_get_eph(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
