@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r666"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r667"));
     osd.closePanel();
 }
 
@@ -658,10 +658,11 @@ void panWarn(int first_col, int first_line){
                   warning[5] = 1; 
                   warning[0] = 1;
                   }
-
-                  //check if only one warning is on
-   //               int h;
-   //               h = warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5];
+//                if (eph > 150){  
+//                  warning[6] = 1;
+//                  warning[0] = 1;
+//                  }
+                  
   
 
             // Prepare for printf in rotation
@@ -697,8 +698,12 @@ void panWarn(int first_col, int first_line){
               
             if (rotation == 5) if (warning[5] == 1) {
                 warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+//                  rotation = 6;
               }
             
+//            if (rotation == 6) if (warning[6] == 1) {
+//                warning_string = "\x20\x20\x4c\x6f\x77\x20\x48\x44\x4f\x50\x20\x20";            
+//              }
             rotation++;
           
           // Auto switch decesion
@@ -901,10 +906,16 @@ void panGPSats(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    byte gps_str = 0x1f;
-    if(osd_fix_type == 3) gps_str = 0x0f;
+    byte gps_str = 0x2a;
+    if (osd_fix_type == 2) gps_str = 0x1f;
+    if (osd_fix_type == 3) gps_str = 0x0f;
     
-    osd.printf("%c%2i|%c%1.1f", gps_str, osd_satellites_visible, 0x68, (float(eph) / 100));
+    
+    if (eph >999){
+    osd.printf("%c%2i%c%1.0f", gps_str, osd_satellites_visible, 0x20, (float(eph) / 100));
+    }else{
+    osd.printf("%c%2i%c%1.1f", gps_str, osd_satellites_visible, 0x20, (float(eph) / 100));  
+    }
     osd.closePanel();
 }
 
@@ -1030,7 +1041,7 @@ void panWPDis(int first_col, int first_line){
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
       
-      if (osd_mode == 10 || osd_mode == 15){     
+      if (osd_mode == 10 || osd_mode == 15 || osd_mode == 7){     
         osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
       }else{
         osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
