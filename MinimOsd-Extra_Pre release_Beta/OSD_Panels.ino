@@ -25,12 +25,9 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
   
-    if (osd_alt_to_home <= 10 && osd_groundspeed <= 1 && osd_throttle <= 1 && takeofftime == 1 && osd_home_distance <= 100) {
-      landing = 1;
-          }else{
+    if (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || takeofftime == 0 || osd_home_distance > 100)
           landed = millis();
-          }
-    if (landing == 1 && (millis() - 7000) > landed){ 
+    if ((millis() - 7000) > landed){ 
        if (osd_clear == 0){
          osd.clear(); 
          osd_clear = 1;
@@ -143,11 +140,22 @@ void panCOG(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
+    
+    off_course = (osd_cog / 100 - osd_heading) ; //[-360, 360]
+    osd_COG_arrow_rotate_int = ((int)round((float)(off_course/360.0) * 16.0) + 16) % 16 + 1; //[1, 16]
+    //if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16; //Normalize [0, 16]
+    //osd_COG_arrow_rotate_int = osd_COG_arrow_rotate_int % 16 + 1; //[1, 16]
+    if (off_course > 180){
+       off_course += - 360;
+    }else if (off_course < -180){
+       off_course += + 360;
+    }
+    
 //    osd_COG_arrow_rotate_int = (((int)osd_cog / 100 - (int)osd_heading)/360 * 16 + 16) % 16 + 1; // [1, 16]
 //    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading) / 360 * 16 + 1;
-    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
-    if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
-    if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
+/*    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
+    if(osd_COG_arrow_rotate_int <= 0 ) osd_COG_arrow_rotate_int += 16;
+    //if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
     if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
     
     if (((osd_cog / 100) - osd_heading) > 180){
@@ -156,7 +164,7 @@ void panCOG(int first_col, int first_line){
        off_course = (osd_cog / 100 - osd_heading) + 360;
     }else{
        off_course = (osd_cog / 100 - osd_heading);
-    }
+    }*/
     
     showArrow((uint8_t)osd_COG_arrow_rotate_int,2);
 
@@ -309,25 +317,12 @@ void panRSSI(int first_col, int first_line){
 void panCALLSIGN(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //osd.printf("%c%c%c%c%c%c", char_call[0], char_call[1], char_call[2], char_call[3], char_call[4], char_call[5]); 
-    //During the first 1000 miliseconds of each minute show callsign
-//    if(millis() <= 1000){
-//      osd.printf("%s", char_call); 
-//    }else{
-//    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
-//      osd.printf("%s",strclear);
-    
-//    if(millis() % 60000
-    if ((millis() - 60000) > CallSignBlink){
-      if (millis() - 61000 > CallSignBlink){
-        CallSignBlink = millis();
-          }
-      osd.printf("%s", char_call); 
-    }else{
-//    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+    if(((millis() / 1000) % 60) < 2)
+      osd.printf("%s", char_call);
+    else
       osd.printf("%s",strclear);
-    }
     osd.closePanel();
+
 }
 
 /* **************************************************************** */

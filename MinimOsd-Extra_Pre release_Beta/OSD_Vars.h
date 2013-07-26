@@ -82,8 +82,8 @@ static unsigned long one_sec_timer = 0;
 //static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
-static unsigned long CallSignBlink = 0;
-static unsigned long landed = 0;
+//static unsigned long CallSignBlink = 0;
+static unsigned long landed = 4294967295;
 
 //static uint8_t      warning_type = 0;
 static char*        warning_string;
@@ -145,7 +145,7 @@ static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
 static boolean      mavbeat = 0;
-static boolean      landing = 0;
+//static boolean      landing = 0;
 static float        lastMAVBeat = 0;
 static boolean      waitingMAVBeats = 1;
 //static uint8_t      apm_mav_type;
