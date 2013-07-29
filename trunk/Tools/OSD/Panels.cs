@@ -47,6 +47,7 @@ namespace OSD
 
         //Config vars
         public uint8_t model_type = 0; //0 - Plane; 1 - Copter
+        public uint8_t signs_on = 1; 
 
         public uint8_t overspeed = 40;
         public uint8_t stall = 5;

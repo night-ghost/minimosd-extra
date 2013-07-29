@@ -454,6 +454,8 @@ namespace OSD
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
+            cbxShowSigns.Checked = (pan.signs_on != 0);
+
             if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
             cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
@@ -1193,6 +1195,7 @@ namespace OSD
                             return;
                     }
                 }
+                eeprom[SIGNS_ON] = pan.signs_on;
                 eeprom[measure_ADDR] = pan.converts;
                 eeprom[overspeed_ADDR] = pan.overspeed;
                 eeprom[stall_ADDR] = pan.stall;
@@ -1283,7 +1286,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)AUTO_SCREEN_SWITCH_ADD, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - AUTO_SCREEN_SWITCH_ADD + 1), (short)AUTO_SCREEN_SWITCH_ADD);
+                            spupload_flag = sp.upload(eeprom, (short)SIGNS_ON, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGNS_ON + 1), (short)SIGNS_ON);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1370,6 +1373,7 @@ namespace OSD
                 }
             }
             //Setup configuration panel
+            eeprom[SIGNS_ON] = pan.signs_on;
             eeprom[measure_ADDR] = pan.converts;
             eeprom[overspeed_ADDR] = pan.overspeed;
             eeprom[stall_ADDR] = pan.stall;
@@ -1584,6 +1588,7 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
+        const int SIGNS_ON = 882;
         const int MODEL_TYPE_ADD = 884;
         const int AUTO_SCREEN_SWITCH_ADD = 886;
         const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
@@ -1723,6 +1728,7 @@ namespace OSD
 
             //Setup configuration panel
             pan.model_type = eeprom[MODEL_TYPE_ADD];
+            pan.signs_on = eeprom[SIGNS_ON];
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
             lblFWModelType.Text = "Model Type found in OSD: " + cbxModelType.SelectedText;
             pan.converts = eeprom[measure_ADDR];
