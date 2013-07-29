@@ -137,7 +137,7 @@ static uint8_t      tempconv = 1;
 static uint16_t     tempconvAdd = 0;
 static byte     distchar = 0;
 static byte     climbchar = 0;
-static byte     signDist = 0x20;
+//static byte     signDist = 0x20;
 static byte     signTemp = 0x20;
 static byte     signEff = 0x20;
 static byte     signRssi = 0x20;
@@ -148,11 +148,13 @@ static byte     signHomeAlt = 0x20;
 static byte     signVel = 0x20;
 static byte     signASpeed = 0x20;
 static byte     signThrot = 0x20;
-static byte     signBat = 0x20;
+//static byte     signBat = 0x20;
 static byte     signTime = 0x20;
-static byte     signHomeDist = 0x20;
+//static byte     signHomeDist = 0x20;
 static byte     signBatA = 0x20;
 static byte     signMode = 0x20;
+static byte     signLat = 0x20;
+static byte     signLon = 0x20;
 
 
 static float     convertt = 0;
