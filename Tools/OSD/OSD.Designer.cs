@@ -117,6 +117,7 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.cbxShowSigns = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -650,11 +651,12 @@ namespace OSD
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.cbxShowSigns);
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Location = new System.Drawing.Point(356, 30);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(152, 63);
+            this.groupBox6.Size = new System.Drawing.Size(152, 96);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             // 
@@ -665,7 +667,7 @@ namespace OSD
             this.UNITS_combo.Items.AddRange(new object[] {
             "Metric",
             "Imperial"});
-            this.UNITS_combo.Location = new System.Drawing.Point(9, 36);
+            this.UNITS_combo.Location = new System.Drawing.Point(9, 60);
             this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
             this.UNITS_combo.Size = new System.Drawing.Size(92, 21);
@@ -675,7 +677,7 @@ namespace OSD
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 20);
+            this.label10.Location = new System.Drawing.Point(7, 44);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(31, 13);
             this.label10.TabIndex = 2;
@@ -721,7 +723,7 @@ namespace OSD
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(357, 92);
+            this.groupBox4.Location = new System.Drawing.Point(356, 132);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(152, 150);
             this.groupBox4.TabIndex = 5;
@@ -1079,6 +1081,17 @@ namespace OSD
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // cbxShowSigns
+            // 
+            this.cbxShowSigns.AutoSize = true;
+            this.cbxShowSigns.Location = new System.Drawing.Point(10, 20);
+            this.cbxShowSigns.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxShowSigns.Name = "cbxShowSigns";
+            this.cbxShowSigns.Size = new System.Drawing.Size(137, 17);
+            this.cbxShowSigns.TabIndex = 10;
+            this.cbxShowSigns.Text = "Show sign before value";
+            this.cbxShowSigns.UseVisualStyleBackColor = true;
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1235,6 +1248,7 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbxWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblFWModelType;
+        private System.Windows.Forms.CheckBox cbxShowSigns;
     }
 }
 
