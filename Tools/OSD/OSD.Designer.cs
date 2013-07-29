@@ -80,6 +80,7 @@ namespace OSD
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.cbxShowSigns = new System.Windows.Forms.CheckBox();
             this.UNITS_combo = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -117,7 +118,6 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.cbxShowSigns = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -660,6 +660,18 @@ namespace OSD
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             // 
+            // cbxShowSigns
+            // 
+            this.cbxShowSigns.AutoSize = true;
+            this.cbxShowSigns.Location = new System.Drawing.Point(10, 20);
+            this.cbxShowSigns.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxShowSigns.Name = "cbxShowSigns";
+            this.cbxShowSigns.Size = new System.Drawing.Size(137, 17);
+            this.cbxShowSigns.TabIndex = 10;
+            this.cbxShowSigns.Text = "Show sign before value";
+            this.cbxShowSigns.UseVisualStyleBackColor = true;
+            this.cbxShowSigns.CheckedChanged += new System.EventHandler(this.cbxShowSigns_CheckedChanged);
+            // 
             // UNITS_combo
             // 
             this.UNITS_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1080,17 +1092,6 @@ namespace OSD
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
-            // 
-            // cbxShowSigns
-            // 
-            this.cbxShowSigns.AutoSize = true;
-            this.cbxShowSigns.Location = new System.Drawing.Point(10, 20);
-            this.cbxShowSigns.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxShowSigns.Name = "cbxShowSigns";
-            this.cbxShowSigns.Size = new System.Drawing.Size(137, 17);
-            this.cbxShowSigns.TabIndex = 10;
-            this.cbxShowSigns.Text = "Show sign before value";
-            this.cbxShowSigns.UseVisualStyleBackColor = true;
             // 
             // OSD
             // 
