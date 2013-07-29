@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r667"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r672"));
     osd.closePanel();
 }
 
@@ -903,10 +903,10 @@ void panGPSats(int first_col, int first_line){
     if (osd_fix_type == 2) gps_str = 0x1f;
     if (osd_fix_type == 3) gps_str = 0x0f;
     
-    if ((eph >= 2) && blinker)
+    if ((eph >= 200) && blinker)
        gps_str = 0x20;
     
-    osd.printf("%c%2i%c%1.0f", gps_str, osd_satellites_visible, 0x20, (float(eph) / 100));
+    osd.printf("%c%2i", gps_str, osd_satellites_visible);
     osd.closePanel();
 }
 
