@@ -135,8 +135,24 @@ static uint8_t     osd_throttle = 0;               // throtle
 static uint16_t     temperature = 0;
 static uint8_t      tempconv = 1;
 static uint16_t     tempconvAdd = 0;
-static uint16_t     distchar = 0;
-static uint16_t     climbchar = 0;
+static byte     distchar = 0;
+static byte     climbchar = 0;
+static byte     signDist = 0x20;
+static byte     signTemp = 0x20;
+static byte     signEff = 0x20;
+static byte     signRssi = 0x20;
+static byte     signCurr = 0x20;
+static byte     signAlt = 0x20;
+static byte     signClimb = 0x20;
+static byte     signHomeAlt = 0x20;
+static byte     signVel = 0x20;
+static byte     signASpeed = 0x20;
+static byte     signThrot = 0x20;
+static byte     signBat = 0x20;
+static byte     signTime = 0x20;
+static byte     signHomeDist = 0x20;
+static byte     signBatA = 0x20;
+static byte     signMode = 0x20;
 
 
 static float     convertt = 0;
@@ -152,7 +168,7 @@ static boolean      waitingMAVBeats = 1;
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 static boolean      enable_mav_request = 0;
-//static boolean      blinker = 0;
+static boolean      blinker = 0;
 static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 2;
