@@ -25,8 +25,8 @@ void writePanels(){
 
   if(millis() < (lastMAVBeat + 2200)){
   
-    if (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || takeofftime == 0 || osd_home_distance > 100)
-          landed = millis();
+    if (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100){
+          if (takeofftime == 1) landed = millis();}
     if ((millis() - 7000) > landed){ 
        if (osd_clear == 0){
          osd.clear(); 
@@ -130,32 +130,23 @@ void writePanels(){
 /******* PANELS - DEFINITION *******/
 
 /* **************************************************************** */
-// Panel  : COG Course Over Ground
+
+ // Panel  : COG Course Over Ground
 // Needs  : X, Y locations
 // Output : 
 // Size   : 
 // Staus  : done
 
+
 void panCOG(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    
-    off_course = (osd_cog / 100 - osd_heading) ; //[-360, 360]
-    osd_COG_arrow_rotate_int = ((int)round((float)(off_course/360.0) * 16.0) + 16) % 16 + 1; //[1, 16]
-    //if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16; //Normalize [0, 16]
-    //osd_COG_arrow_rotate_int = osd_COG_arrow_rotate_int % 16 + 1; //[1, 16]
-    if (off_course > 180){
-       off_course += - 360;
-    }else if (off_course < -180){
-       off_course += + 360;
-    }
-    
 //    osd_COG_arrow_rotate_int = (((int)osd_cog / 100 - (int)osd_heading)/360 * 16 + 16) % 16 + 1; // [1, 16]
 //    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading) / 360 * 16 + 1;
-/*    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
-    if(osd_COG_arrow_rotate_int <= 0 ) osd_COG_arrow_rotate_int += 16;
-    //if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
+    osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
+    if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
+    if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
     if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
     
     if (((osd_cog / 100) - osd_heading) > 180){
@@ -164,9 +155,10 @@ void panCOG(int first_col, int first_line){
        off_course = (osd_cog / 100 - osd_heading) + 360;
     }else{
        off_course = (osd_cog / 100 - osd_heading);
-    }*/
+    }
     
     showArrow((uint8_t)osd_COG_arrow_rotate_int,2);
+
 
     osd.closePanel();
 }
@@ -184,9 +176,9 @@ void panDistance(int first_col, int first_line){
     osd.openPanel();
     //do_converts();
     if ((tdistance * converth) > 9999.0) {
-      osd.printf("%c%5.2f%c", signDist, ((tdistance * converth) / distconv), distchar);
+      osd.printf("%c%5.2f%c", 0x8f, ((tdistance * converth) / distconv), distchar);
     }else{
-      osd.printf("%c%5.0f%c", signDist, (tdistance * converth), high);
+      osd.printf("%c%5.0f%c", 0x8f, (tdistance * converth), high);
     }
     osd.closePanel();
 }
@@ -738,9 +730,9 @@ void panBatteryPercent(int first_col, int first_line){
     osd.openPanel();
     
     if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR) == 1){
-        osd.printf("%c%3.0i%c", signBat, osd_battery_remaining_A, 0x25);
+        osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining_A, 0x25);
     }else{
-        osd.printf("%c%5.0f%c",signBat , mah_used, 0x01);
+        osd.printf("%c%5.0f%c", 0x17, mah_used, 0x01);
     }
     osd.closePanel();
 }
@@ -771,7 +763,7 @@ void panTime(int first_col, int first_line){
 void panHomeDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.0f%c", signHomeDist, (double)((osd_home_distance) * converth), high);
+    osd.printf("%c%5.0f%c", 0x0b, (double)((osd_home_distance) * converth), high);
     osd.closePanel();
 }
 
@@ -920,7 +912,7 @@ void panGPSats(int first_col, int first_line){
 void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%10.6f|%10.6f", (double)osd_lat, (double)osd_lon);
+    osd.printf("%c%10.6f|%c%10.6f", signLat, (double)osd_lat, signLon, (double)osd_lon);
 //    if (blinker == 0) osd.printf("%c%10.6f", 0x03, (double)osd_lat);
 //    else osd.printf("%c%10.6f", 0x04, (double)osd_lon);
     osd.closePanel();
@@ -1225,7 +1217,7 @@ void showILS(int start_col, int start_row) {
 void do_converts()
 {
   if(EEPROM.read(SIGNS_ON_ADDR) != 0) {
-      signDist = 0x8f;
+//      signDist = 0x8f;
       signTemp = 0x0a;
       signEff = 0x16;
       signRssi = 0x09;
@@ -1236,11 +1228,13 @@ void do_converts()
       signVel = 0x14;
       signASpeed = 0x13;
       signThrot = 0x02;
-      signBat = 0x17;
+//      signBat = 0x17;
       signTime = 0x08;
-      signHomeDist = 0x0b;
+//      signHomeDist = 0x0b;
       signBatA = 0xbc;
       signMode = 0x7f;
+      signLat = 0x03;
+      signLon = 0x04;
     }
     if (EEPROM.read(measure_ADDR) == 0) {
         converts = 3.6;
