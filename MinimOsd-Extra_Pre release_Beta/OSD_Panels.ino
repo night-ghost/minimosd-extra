@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r675"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r676"));
     osd.closePanel();
 }
 
@@ -1233,7 +1233,7 @@ void showILS(int start_col, int start_row) {
 */
 void do_converts()
 {
-  if(EEPROM.read(SIGN_MSL_ON_ADDR) == 0) EEPROM.write(876, 1);;
+//  if(EEPROM.read(SIGN_MSL_ON_ADDR) == 0) EEPROM.write(876, 1);
 //  if(EEPROM.read(SIGNS_ON_ADDR) != 0) iconGS = 1;
 //  if(EEPROM.read(SIGNS_ON_ADDR) != 0) iconHA = 1;
 //  if(EEPROM.read(SIGNS_ON_ADDR) != 0) iconMSL = 1;
