@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Copter r663"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Copter r677"));
     osd.closePanel();
 }
 
@@ -589,21 +589,36 @@ void panWarn(int first_col, int first_line){
 
 
                 // check all warnings at once
-                if ((osd_fix_type) < 2) warning[1] = 1; warning[0] = 1;
-                if (osd_airspeed * converts < stall && takeofftime == 1) warning[2] = 1; warning[0] = 1;
-                if ((osd_airspeed * converts) > (float)overspeed) warning[3] = 1; warning[0] = 1;
-                if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) warning[4] = 1; warning[0] = 1;
-                if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning[5] = 1; warning[0] = 1;
-
-
-                  //check if only one warning is on
-   //               int h;
-   //               h = warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5];
+                if ((osd_fix_type) < 2) {
+                  warning[1] = 1; 
+                  warning[0] = 1;
+                  }
+                if (osd_airspeed * converts < stall && takeofftime == 1) {
+                  warning[2] = 1; 
+                  warning[0] = 1;
+                  }
+                if ((osd_airspeed * converts) > (float)overspeed) {
+                  warning[3] = 1; 
+                  warning[0] = 1;
+                  }
+                if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0)) {
+                  warning[4] = 1; 
+                  warning[0] = 1;
+                  }
+                if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) {
+                  warning[5] = 1; 
+                  warning[0] = 1;
+                  }
+//                if (eph > 150){  
+//                  warning[6] = 1;
+//                  warning[0] = 1;
+//                  }
+                  
   
 
 
             // Prepare for printf in rotation
-            if (rotation == 0) if (warning[0] == 0 || (warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5]) == 2) {
+            if (rotation == 0) if (warning[0] == 0 || warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5] == 2) {
                 warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
               }else{
                   rotation = 1; 
@@ -635,8 +650,12 @@ void panWarn(int first_col, int first_line){
               
             if (rotation == 5) if (warning[5] == 1) {
                 warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+//                  rotation = 6;
               }
             
+//            if (rotation == 6) if (warning[6] == 1) {
+//                warning_string = "\x20\x20\x4c\x6f\x77\x20\x48\x44\x4f\x50\x20\x20";            
+//              }
             rotation++;
           
           // Auto switch decesion
@@ -648,12 +667,10 @@ void panWarn(int first_col, int first_line){
  if (rotation > 5) rotation = 0;
             
  osd.printf("%s",warning_string);
-
-
+ 
   }
 osd.closePanel();
 }  
-  
 /* **************************************************************** */
 // Panel  : panThr
 // Needs  : X, Y locations
