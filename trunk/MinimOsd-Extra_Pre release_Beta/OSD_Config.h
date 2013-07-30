@@ -185,7 +185,10 @@
 #define panDistance_x_ADDR 226
 #define panDistance_y_ADDR 228
 
-#define SIGNS_ON_ADDR 882 
+#define SIGN_MSL_ON_ADDR 876
+#define SIGN_HA_ON_ADDR 878
+#define SIGN_GS_ON_ADDR 880
+#define SIGN_AS_ON_ADDR 882 
 #define MODELL_TYPE_ADD 884 
 #define AUTO_SCREEN_SWITC_ADD 886
 #define OSD_BATT_SHOW_PERCENT_ADDR 888
