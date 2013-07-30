@@ -64,6 +64,12 @@ namespace OSD
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.cbxMslAltitudeSign = new System.Windows.Forms.CheckBox();
+            this.cbxHomeAltitudeSign = new System.Windows.Forms.CheckBox();
+            this.cbxGroundSpeedSign = new System.Windows.Forms.CheckBox();
+            this.cbxAirSpeedSign = new System.Windows.Forms.CheckBox();
             this.lblFWModelType = new System.Windows.Forms.Label();
             this.lblModelType = new System.Windows.Forms.Label();
             this.cbxModelType = new System.Windows.Forms.ComboBox();
@@ -80,7 +86,6 @@ namespace OSD
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.cbxShowSigns = new System.Windows.Forms.CheckBox();
             this.UNITS_combo = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -126,6 +131,7 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.PANEL_tabs.SuspendLayout();
             this.tabPageConfig.SuspendLayout();
+            this.groupBox10.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.groupBox7.SuspendLayout();
@@ -462,6 +468,7 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.groupBox10);
             this.tabPageConfig.Controls.Add(this.lblFWModelType);
             this.tabPageConfig.Controls.Add(this.lblModelType);
             this.tabPageConfig.Controls.Add(this.cbxModelType);
@@ -481,6 +488,76 @@ namespace OSD
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.label14);
+            this.groupBox10.Controls.Add(this.cbxMslAltitudeSign);
+            this.groupBox10.Controls.Add(this.cbxHomeAltitudeSign);
+            this.groupBox10.Controls.Add(this.cbxGroundSpeedSign);
+            this.groupBox10.Controls.Add(this.cbxAirSpeedSign);
+            this.groupBox10.Location = new System.Drawing.Point(356, 249);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(152, 114);
+            this.groupBox10.TabIndex = 8;
+            this.groupBox10.TabStop = false;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 15);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(121, 13);
+            this.label14.TabIndex = 14;
+            this.label14.Text = "Show sign before value:";
+            // 
+            // cbxMslAltitudeSign
+            // 
+            this.cbxMslAltitudeSign.AutoSize = true;
+            this.cbxMslAltitudeSign.Location = new System.Drawing.Point(5, 92);
+            this.cbxMslAltitudeSign.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxMslAltitudeSign.Name = "cbxMslAltitudeSign";
+            this.cbxMslAltitudeSign.Size = new System.Drawing.Size(86, 17);
+            this.cbxMslAltitudeSign.TabIndex = 13;
+            this.cbxMslAltitudeSign.Text = "MSL Altitude";
+            this.cbxMslAltitudeSign.UseVisualStyleBackColor = true;
+            this.cbxMslAltitudeSign.CheckedChanged += new System.EventHandler(this.cbxMslAltitudeSign_CheckedChanged);
+            // 
+            // cbxHomeAltitudeSign
+            // 
+            this.cbxHomeAltitudeSign.AutoSize = true;
+            this.cbxHomeAltitudeSign.Location = new System.Drawing.Point(5, 72);
+            this.cbxHomeAltitudeSign.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxHomeAltitudeSign.Name = "cbxHomeAltitudeSign";
+            this.cbxHomeAltitudeSign.Size = new System.Drawing.Size(92, 17);
+            this.cbxHomeAltitudeSign.TabIndex = 12;
+            this.cbxHomeAltitudeSign.Text = "Home Altitude";
+            this.cbxHomeAltitudeSign.UseVisualStyleBackColor = true;
+            this.cbxHomeAltitudeSign.CheckedChanged += new System.EventHandler(this.cbxHomeAltitudeSign_CheckedChanged);
+            // 
+            // cbxGroundSpeedSign
+            // 
+            this.cbxGroundSpeedSign.AutoSize = true;
+            this.cbxGroundSpeedSign.Location = new System.Drawing.Point(5, 51);
+            this.cbxGroundSpeedSign.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxGroundSpeedSign.Name = "cbxGroundSpeedSign";
+            this.cbxGroundSpeedSign.Size = new System.Drawing.Size(95, 17);
+            this.cbxGroundSpeedSign.TabIndex = 11;
+            this.cbxGroundSpeedSign.Text = "Ground Speed";
+            this.cbxGroundSpeedSign.UseVisualStyleBackColor = true;
+            this.cbxGroundSpeedSign.CheckedChanged += new System.EventHandler(this.cbxGroundSpeedSign_CheckedChanged);
+            // 
+            // cbxAirSpeedSign
+            // 
+            this.cbxAirSpeedSign.AutoSize = true;
+            this.cbxAirSpeedSign.Location = new System.Drawing.Point(5, 30);
+            this.cbxAirSpeedSign.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxAirSpeedSign.Name = "cbxAirSpeedSign";
+            this.cbxAirSpeedSign.Size = new System.Drawing.Size(72, 17);
+            this.cbxAirSpeedSign.TabIndex = 10;
+            this.cbxAirSpeedSign.Text = "Air Speed";
+            this.cbxAirSpeedSign.UseVisualStyleBackColor = true;
+            this.cbxAirSpeedSign.CheckedChanged += new System.EventHandler(this.cbxAirSpeedSign_CheckedChanged);
             // 
             // lblFWModelType
             // 
@@ -651,26 +728,13 @@ namespace OSD
             // 
             // groupBox6
             // 
-            this.groupBox6.Controls.Add(this.cbxShowSigns);
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Location = new System.Drawing.Point(356, 30);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(152, 96);
+            this.groupBox6.Size = new System.Drawing.Size(152, 63);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
-            // 
-            // cbxShowSigns
-            // 
-            this.cbxShowSigns.AutoSize = true;
-            this.cbxShowSigns.Location = new System.Drawing.Point(10, 20);
-            this.cbxShowSigns.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxShowSigns.Name = "cbxShowSigns";
-            this.cbxShowSigns.Size = new System.Drawing.Size(137, 17);
-            this.cbxShowSigns.TabIndex = 10;
-            this.cbxShowSigns.Text = "Show sign before value";
-            this.cbxShowSigns.UseVisualStyleBackColor = true;
-            this.cbxShowSigns.CheckedChanged += new System.EventHandler(this.cbxShowSigns_CheckedChanged);
             // 
             // UNITS_combo
             // 
@@ -679,7 +743,7 @@ namespace OSD
             this.UNITS_combo.Items.AddRange(new object[] {
             "Metric",
             "Imperial"});
-            this.UNITS_combo.Location = new System.Drawing.Point(9, 60);
+            this.UNITS_combo.Location = new System.Drawing.Point(9, 36);
             this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
             this.UNITS_combo.Size = new System.Drawing.Size(92, 21);
@@ -689,7 +753,7 @@ namespace OSD
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 44);
+            this.label10.Location = new System.Drawing.Point(7, 20);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(31, 13);
             this.label10.TabIndex = 2;
@@ -735,7 +799,7 @@ namespace OSD
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(356, 132);
+            this.groupBox4.Location = new System.Drawing.Point(356, 99);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(152, 150);
             this.groupBox4.TabIndex = 5;
@@ -1123,6 +1187,8 @@ namespace OSD
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
             this.tabPageConfig.PerformLayout();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
@@ -1249,7 +1315,12 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbxWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblFWModelType;
-        private System.Windows.Forms.CheckBox cbxShowSigns;
+        private System.Windows.Forms.CheckBox cbxAirSpeedSign;
+        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.CheckBox cbxMslAltitudeSign;
+        private System.Windows.Forms.CheckBox cbxHomeAltitudeSign;
+        private System.Windows.Forms.CheckBox cbxGroundSpeedSign;
     }
 }
 
