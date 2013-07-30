@@ -454,7 +454,10 @@ namespace OSD
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
-            cbxShowSigns.Checked = (pan.signs_on != 0);
+            cbxAirSpeedSign.Checked = (pan.sign_air_speed != 0);
+            cbxGroundSpeedSign.Checked = (pan.sign_ground_speed != 0);
+            cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude != 0);
+            cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude != 0);
 
             if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
@@ -1195,7 +1198,10 @@ namespace OSD
                             return;
                     }
                 }
-                eeprom[SIGNS_ON_ADDR] = pan.signs_on;
+                eeprom[SIGN_AS_ON_ADDR] = pan.sign_air_speed;
+                eeprom[SIGN_GS_ON_ADDR] = pan.sign_ground_speed;
+                eeprom[SIGN_HA_ON_ADDR] = pan.sign_home_altitude;
+                eeprom[SIGN_MSL_ON_ADDR] = pan.sign_msl_altitude;
                 eeprom[measure_ADDR] = pan.converts;
                 eeprom[overspeed_ADDR] = pan.overspeed;
                 eeprom[stall_ADDR] = pan.stall;
@@ -1286,7 +1292,7 @@ namespace OSD
                     {
                         for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
-                            spupload_flag = sp.upload(eeprom, (short)SIGNS_ON_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGNS_ON_ADDR + 1), (short)SIGNS_ON_ADDR);
+                            spupload_flag = sp.upload(eeprom, (short)SIGN_MSL_ON_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGN_MSL_ON_ADDR + 1), (short)SIGN_MSL_ON_ADDR);
                             if (!spupload_flag)
                             {
                                 if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1373,7 +1379,10 @@ namespace OSD
                 }
             }
             //Setup configuration panel
-            eeprom[SIGNS_ON_ADDR] = pan.signs_on;
+            eeprom[SIGN_AS_ON_ADDR] = pan.sign_air_speed;
+            eeprom[SIGN_GS_ON_ADDR] = pan.sign_ground_speed;
+            eeprom[SIGN_HA_ON_ADDR] = pan.sign_home_altitude;
+            eeprom[SIGN_MSL_ON_ADDR] = pan.sign_msl_altitude;
             eeprom[measure_ADDR] = pan.converts;
             eeprom[overspeed_ADDR] = pan.overspeed;
             eeprom[stall_ADDR] = pan.stall;
@@ -1588,7 +1597,10 @@ namespace OSD
         const int panDistance_y_ADDR = 228;
 
         //
-        const int SIGNS_ON_ADDR = 882;
+        const int SIGN_MSL_ON_ADDR = 876;
+        const int SIGN_HA_ON_ADDR = 878;
+        const int SIGN_GS_ON_ADDR = 880;
+        const int SIGN_AS_ON_ADDR = 882;
         const int MODEL_TYPE_ADD = 884;
         const int AUTO_SCREEN_SWITCH_ADD = 886;
         const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
@@ -1728,7 +1740,10 @@ namespace OSD
 
             //Setup configuration panel
             pan.model_type = eeprom[MODEL_TYPE_ADD];
-            pan.signs_on = eeprom[SIGNS_ON_ADDR];
+            pan.sign_air_speed = eeprom[SIGN_AS_ON_ADDR];
+            pan.sign_ground_speed = eeprom[SIGN_GS_ON_ADDR];
+            pan.sign_home_altitude = eeprom[SIGN_HA_ON_ADDR];
+            pan.sign_msl_altitude = eeprom[SIGN_MSL_ON_ADDR];
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
             lblFWModelType.Text = "Model Type found in OSD: " + cbxModelType.SelectedText;
             pan.converts = eeprom[measure_ADDR];
@@ -1973,6 +1988,10 @@ namespace OSD
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
                         sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
                         sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
+                        sw.WriteLine("{0}\t{1}", "Sign Air Speed", pan.sign_air_speed);
+                        sw.WriteLine("{0}\t{1}", "Sign Ground  Speed", pan.sign_ground_speed);
+                        sw.WriteLine("{0}\t{1}", "Sign Home Altitude", pan.sign_home_altitude);
+                        sw.WriteLine("{0}\t{1}", "Sign MSL Altitude", pan.sign_msl_altitude);
                         sw.Close();
                     }
                 }
@@ -2062,6 +2081,10 @@ namespace OSD
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
                             else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)byte.Parse(strings[1]); //we're not overwriting "eeprom" model type
+                            else if (strings[0] == "Sign Air Speed") pan.sign_air_speed = byte.Parse(strings[1]);
+                            else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
+                            else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
+                            else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
                         }
 
                         //Modify units
@@ -3022,9 +3045,36 @@ namespace OSD
             }
         }
 
-        private void cbxShowSigns_CheckedChanged(object sender, EventArgs e)
+        private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
-            pan.signs_on = Convert.ToByte(cbxShowSigns.Checked);
+            if(cbxAirSpeedSign.Checked)
+                pan.sign_air_speed = 0x13;
+            else
+                pan.sign_air_speed = 0x00;
+        }
+
+        private void cbxGroundSpeedSign_CheckedChanged(object sender, EventArgs e)
+        {
+            if(cbxGroundSpeedSign.Checked)
+                pan.sign_ground_speed = 0x14;
+            else
+                pan.sign_ground_speed = 0x00;
+        }
+
+        private void cbxHomeAltitudeSign_CheckedChanged(object sender, EventArgs e)
+        {
+            if(cbxHomeAltitudeSign.Checked)
+                pan.sign_home_altitude = 0x12;
+            else
+                pan.sign_home_altitude = 0x00;
+        }
+
+        private void cbxMslAltitudeSign_CheckedChanged(object sender, EventArgs e)
+        {
+            if(cbxMslAltitudeSign.Checked)
+                pan.sign_msl_altitude = 0x11;
+            else
+                pan.sign_msl_altitude = 0x00;
         }
     }
 }
