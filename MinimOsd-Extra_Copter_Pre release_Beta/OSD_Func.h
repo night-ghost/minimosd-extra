@@ -111,22 +111,18 @@ void setFdataVars(){
     last_battery_reading = osd_battery_remaining_A;
   }
 
-  //Check if is moving (osd_groundspeed > 1Km/h or osd_climb within ]-10, 10[ m/m
-  //if((osd_groundspeed > 0.28) || (osd_climb < -0.17) || (osd_climb > 0.17)){
   if(osd_throttle > 15){
     not_moving_since = millis();
-    landed_at_time = 4294967295; //Airborn
+    landed = 4294967295; //Airborn
   }
   //If it is stoped for more than 10 seconds, declare a landing
-  else if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (takeofftime == 1)){
-    landed_at_time = millis();
+  else if(((millis() - not_moving_since) > 10000) && (landed == 4294967295) && (takeofftime == 1)){
+    landed = millis();
   }
 
-  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);
-  mah_used += (osd_curr_A * 10.0 * (millis() - dt) / 3600000.0);
-  //tdistance += (millis() - dt) / 1000.0 * osd_groundspeed;
-  //mah_used += (millis() - dt) / 3600000.0 * osd_curr_A * 10.0;
-  dt = millis();
+  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - runt) / 1000.0);
+  mah_used += (osd_curr_A * 10.0 * (millis() - runt) / 3600000.0);
+  runt = millis();
 
   if (takeofftime == 1){
     start_Time = (millis()/1000) - FTime;
@@ -136,6 +132,7 @@ void setFdataVars(){
     if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
+  
 }
 
 void checkModellType(){
