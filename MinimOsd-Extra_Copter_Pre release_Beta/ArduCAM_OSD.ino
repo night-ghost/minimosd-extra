@@ -212,6 +212,8 @@ void OnMavlinkTimer()
     setFdataVars();
     
     checkModellType();
+
+    timers();
 }
 
 void unplugSlaves(){
