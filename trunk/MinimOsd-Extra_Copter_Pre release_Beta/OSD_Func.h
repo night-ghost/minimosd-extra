@@ -102,7 +102,9 @@ void setHomeVars(OSD &osd)
 }
 
 void setFdataVars(){
-  //
+  //Moved from panel because warnings also need this var and panClimb could be off
+  vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
+
   if (haltset == 1 && takeofftime == 0 && osd_throttle > 15){
     takeofftime = 1;
     tdistance = 0;

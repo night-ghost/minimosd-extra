@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Copter r681"));
+    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Copter r682"));
     osd.closePanel();
 }
 
@@ -505,7 +505,6 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
     osd.printf("%c%4.0f%c%c", 0x15, int(vs / 10.0) * 10.0, climbchar, 0x20);
     osd.closePanel();
 }
@@ -573,7 +572,7 @@ void panWarn(int first_col, int first_line){
                   warning[1] = 1; 
                   warning[0] = 1;
                   }
-                if (osd_airspeed * converts < stall && takeofftime == 1) {
+                if (abs(vs) > stall * 10) {
                   warning[2] = 1; 
                   warning[0] = 1;
                   }
@@ -595,32 +594,32 @@ void panWarn(int first_col, int first_line){
 //                  }
             // Prepare for printf in rotation
             if (rotation == 0) if (warning[0] == 0 || warning[0] + warning[1] + warning[2] + warning[3] + warning[4] + warning[5] == 2) {
-                warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+                warning_string = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"; //Blank line
               }else{
                   rotation = 1; 
               } 
             if (rotation == 1) if (warning[1] == 1) {
-                warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
+                warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; //No GPS fix!
               }else{
                   rotation = 2; 
               }
             if (rotation == 2) if (warning[2] == 1) {
-                warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
+                warning_string = "\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
               }else{
                   rotation = 3; 
               }
             if (rotation == 3) if (warning[3] == 1) {
-                warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
+                warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"; //Over Speed!
               }else{
                   rotation = 4; 
               }
             if (rotation == 4) if (warning[4] == 1) {
-                warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
+                warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
               }else{
                   rotation = 5; 
               }
             if (rotation == 5) if (warning[5] == 1) {
-                warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20";
+                warning_string = "\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"; //Low Rssi
 //                  rotation = 6;
               }
             
@@ -635,9 +634,15 @@ void panWarn(int first_col, int first_line){
           }else if (ch_raw < 1200) {
           canswitch = 1;
           }
- if (rotation > 5) rotation = 0;
-            
- osd.printf("%s",warning_string);
+  if (rotation > 5) rotation = 0;
+  /*if (motor_armed == 0)
+  {
+    //If disarmed force showing disarmed message 
+    warning_string = "\x20\x20\x44\x49\x53\x41\x52\x4d\x45\x44\x20\x20";
+    //Enable panel switching while disarmed
+    canswitch = 1;
+  }*/
+  osd.printf("%s",warning_string);
  
   }
 osd.closePanel();
