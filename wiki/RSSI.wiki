@@ -1,11 +1,7 @@
 1./
-First you need to enable this function in APM. Go to APM_Config.h and add: "#define RECEIVER_RSSI_PIN 6"
+First you need to enable this function in APM. Go to MP than look for it in advanced parameters.
 
-Note that 6 is the analog pin number where you have RSSI port connected. I have changed it to 6 as I use analog port 6. If you use a different port, replace 6 with your analog port number.
-
-If you use APM2 or 2.5 than add:
-"#define CONFIG_APM_HARDWARE APM_HARDWARE_APM2"
-in APM_Config.h
+I have changed it to 6 as I use analog port 6. If you use a different port, replace 6 with your analog port number.
 
 After this you can compile and upload.
 
