@@ -45,10 +45,10 @@ void InitializeOSD() {
     writeEEPROM(VER-42,CHK2);
     for(panel = 0; panel < npanels; panel++) writeSettings();
 
-    osd.setPanel(4,9);
-    osd.openPanel();
-    osd.printf_P(PSTR("OSD Initialized, reboot")); 
-    osd.closePanel();
+//    osd.setPanel(4,9);
+//    osd.openPanel();
+//    osd.printf_P(PSTR("OSD Initialized, reboot")); 
+//    osd.closePanel();
 
     // run for ever so user resets 
     for(;;) {}

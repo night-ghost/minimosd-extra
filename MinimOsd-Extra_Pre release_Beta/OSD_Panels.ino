@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\xb0\xb1\xb2\xb3\xb4|\xb5\xb6\xb7\xb8\xb9|MinimOSD-Extra 2.4|Plane r683"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r686"));
     osd.closePanel();
 }
 
@@ -193,7 +193,7 @@ void panFdata(){
      osd.setPanel(11, 3);
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x1b, ((tdistance) * converth), high, 0x13,(max_osd_airspeed * converts), spe,0x14,(max_osd_groundspeed * converts),spe,0x12, (max_osd_home_alt * converth), high,0x1d,(max_osd_windspeed * converts),spe);
-    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5f%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5.0f%c|%c%10.6f|%c%10.6f", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0b, (int)((max_home_distance) * converth), high, 0x8f, (tdistance * converth), high, 0x13,(int)(max_osd_airspeed * converts), spe,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high,0x1d,(int)(max_osd_windspeed * converts),spe, 0x17, mah_used, 0x01, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5.0f%c|%c%10.6f|%c%10.6f", 0x08,((int)(start_Time/60)),0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x8f, (tdistance * converth), high, 0x13,(int)(max_osd_airspeed * converts), spe,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high,0x1d,(int)(max_osd_windspeed * converts),spe, 0x17, mah_used, 0x01, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -310,10 +310,10 @@ void panRSSI(int first_col, int first_line){
 void panCALLSIGN(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(((millis() / 1000) % 60) < 2)
+//    if(((millis() / 1000) % 60) < 2)
       osd.printf("%s", char_call);
-    else
-      osd.printf("%s",strclear);
+//    else
+//      osd.printf("%s",strclear);
     osd.closePanel();
 
 }
@@ -764,7 +764,14 @@ void panTime(int first_col, int first_line){
     
     start_Time = (millis()/1000) - FTime;
 //    osd.printf("%c%2i%c%02i", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
-    osd.printf("%2i%c%02i",((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+//    osd.printf("%2i%c%02i",((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+
+
+//    if((int)start_Time < 36000) oszt=60;
+    osd.printf("%3i%c%02i", ((int)start_Time/60), 0x3A, (int)start_Time%60);
+//    }else{
+//    osd.printf("%2i%c%02i", ((int)start_Time/3600)%60, 0x3A, ((int)start_Time/60)%60);
+//    }
     osd.closePanel();
 }
 
@@ -778,7 +785,15 @@ void panTime(int first_col, int first_line){
 void panHomeDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.0f%c", 0x0b, (double)((osd_home_distance) * converth), high);
+//    osd.printf("%c%5.0f%c", 0x0b, (double)((osd_home_distance) * converth), high);
+
+
+    if ((osd_home_distance * converth) > 9999.0) {
+      osd.printf("%c%5.2f%c", 0x0b, ((osd_home_distance * converth) / distconv), distchar);
+    }else{
+      osd.printf("%c%5.0f%c", 0x0b, (osd_home_distance * converth), high);
+    }
+
     osd.closePanel();
 }
 
