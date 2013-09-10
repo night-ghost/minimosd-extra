@@ -160,7 +160,7 @@ Serial.flush();
     mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
     // House cleaning, clear display and enable timers
-    osd.clear();
+//    osd.clear();
     mavlinkTimer.Enable();
 
 } // END of setup();
