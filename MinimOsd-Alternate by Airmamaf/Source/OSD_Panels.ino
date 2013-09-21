@@ -663,7 +663,7 @@ void panFlightMode(int first_col, int first_line){
   }*/
 #endif
   //DMD Hdop
-  osd.printf("|%5i", osd_eph);
+  //osd.printf("|%5i", osd_eph);
   osd.closePanel();
 }
 
