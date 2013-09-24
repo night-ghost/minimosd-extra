@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r686"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r692"));
     osd.closePanel();
 }
 
@@ -145,9 +145,9 @@ void panCOG(int first_col, int first_line){
 //    osd_COG_arrow_rotate_int = (((int)osd_cog / 100 - (int)osd_heading)/360 * 16 + 16) % 16 + 1; // [1, 16]
 //    osd_COG_arrow_rotate_int = (osd_cog / 100 - osd_heading) / 360 * 16 + 1;
     osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
-    if(osd_COG_arrow_rotate_int < 0 ) osd_COG_arrow_rotate_int += 16;
-    if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
-    if(osd_COG_arrow_rotate_int == 17) osd_COG_arrow_rotate_int = 1;
+    if(osd_COG_arrow_rotate_int < 1 ) osd_COG_arrow_rotate_int += 16;
+//    if(osd_COG_arrow_rotate_int == 0) osd_COG_arrow_rotate_int = 16;    
+    else if(osd_COG_arrow_rotate_int > 16) osd_COG_arrow_rotate_int -= 16;
     
     if (((osd_cog / 100) - osd_heading) > 180){
        off_course = (osd_cog / 100 - osd_heading) - 360;
@@ -193,7 +193,7 @@ void panFdata(){
      osd.setPanel(11, 3);
     osd.openPanel();                          
 //    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c|%c%5.0f%c", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x1b, ((tdistance) * converth), high, 0x13,(max_osd_airspeed * converts), spe,0x14,(max_osd_groundspeed * converts),spe,0x12, (max_osd_home_alt * converth), high,0x1d,(max_osd_windspeed * converts),spe);
-    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5.0f%c|%c%10.6f|%c%10.6f", 0x08,((int)(start_Time/60)),0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x8f, (tdistance * converth), high, 0x13,(int)(max_osd_airspeed * converts), spe,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high,0x1d,(int)(max_osd_windspeed * converts),spe, 0x17, mah_used, 0x01, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+    osd.printf("%c%3i%c%02i|%c%5.0f%c|%c%5.0f%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%5.0f%c|%c%11.6f|%c%11.6f", 0x08,((int)(start_Time/60)),0x3A,(int)start_Time%60, 0x0b, ((max_home_distance) * converth), high, 0x8f, (tdistance * converth), high, 0x13,(int)(max_osd_airspeed * converts), spe,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high,0x1d,(int)(max_osd_windspeed * converts),spe, 0x17, mah_used, 0x01, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
     osd.closePanel();
 }
 
@@ -314,6 +314,7 @@ void panCALLSIGN(int first_col, int first_line){
       osd.printf("%s", char_call);
 //    else
 //      osd.printf("%s",strclear);
+//osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
     osd.closePanel();
 
 }
@@ -419,7 +420,7 @@ void panWindSpeed(int first_col, int first_line){
     osd_wind_arrow_rotate_int = round((osd_winddirection - osd_heading)/360.0 * 16.0) + 9; //Convert to int 1-16
     }
     if(osd_wind_arrow_rotate_int > 16 ) osd_wind_arrow_rotate_int -= 16; //normalize
-    if(osd_wind_arrow_rotate_int < 1 ) osd_wind_arrow_rotate_int += 16; //normalize
+    else if(osd_wind_arrow_rotate_int < 1 ) osd_wind_arrow_rotate_int += 16; //normalize
     nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990;    
     
     showArrow((uint8_t)osd_wind_arrow_rotate_int,1); //print data to OSD
@@ -924,7 +925,7 @@ void panGPSats(int first_col, int first_line){
     
     byte gps_str = 0x2a;
     if (osd_fix_type == 2) gps_str = 0x1f;
-    if (osd_fix_type == 3) gps_str = 0x0f;
+    else if (osd_fix_type == 3) gps_str = 0x0f;
     
     if ((eph >= 200) && blinker)
        gps_str = 0x20;
@@ -944,7 +945,7 @@ void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 //    osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
-    osd.printf("%10.6f|%10.6f", (double)osd_lat, (double)osd_lon);
+    osd.printf("%11.6f|%11.6f", (double)osd_lat, (double)osd_lon);
 //    if (blinker == 0) osd.printf("%c%10.6f", 0x03, (double)osd_lat);
 //    else osd.printf("%c%10.6f", 0x04, (double)osd_lon);
     osd.closePanel();
@@ -1048,7 +1049,8 @@ void panWPDis(int first_col, int first_line){
     osd.openPanel();
     
     wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
-    if(wp_target_bearing_rotate_int < 0 ) wp_target_bearing_rotate_int += 16; //normalize
+    if(wp_target_bearing_rotate_int < 1 ) wp_target_bearing_rotate_int += 16; //normalize
+//    else if(wp_target_bearing_rotate_int == 0 ) wp_target_bearing_rotate_int = 16; //normalize
     else if(wp_target_bearing_rotate_int > 16 ) wp_target_bearing_rotate_int -= 16; //normalize
       if (xtrack_error > 999) xtrack_error = 999;
       else if (xtrack_error < -999) xtrack_error = -999;
