@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r692"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r693"));
     osd.closePanel();
 }
 
@@ -86,7 +86,6 @@ void writePanels(){
                 if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
 
                 //Testing bits from 8 bit register D 
-                //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
                 if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
 //                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
@@ -437,6 +436,11 @@ void panWindSpeed(int first_col, int first_line){
 void panOff(){
   bool rotatePanel = 0;
 
+  if(ch_toggle == 5) ch_raw = chan5_raw;
+  else if(ch_toggle == 6) ch_raw = chan6_raw;
+  else if(ch_toggle == 7) ch_raw = chan7_raw;
+  else if(ch_toggle == 8) ch_raw = chan8_raw;
+
   //If there is a warning force switch to panel 0
   if(canswitch == 0){
     if(panel != panel_auto_switch){
@@ -462,11 +466,7 @@ void panOff(){
       }
     }
     else {
-      if(ch_toggle == 5) ch_raw = chan5_raw;
-      else if(ch_toggle == 6) ch_raw = chan6_raw;
-      else if(ch_toggle == 7) ch_raw = chan7_raw;
-      else if(ch_toggle == 8) ch_raw = chan8_raw;
-
+      
       //Switch mode by value
       if (switch_mode == 0){
         //First panel
