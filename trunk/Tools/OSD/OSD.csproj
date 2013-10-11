@@ -139,8 +139,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Source\Copter\OSD_Panels.ino" />
-    <None Include="Source\Plane\OSD_Panels.ino" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="osd.ico" />

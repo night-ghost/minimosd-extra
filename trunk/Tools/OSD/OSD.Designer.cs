@@ -124,6 +124,7 @@ namespace OSD
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
+            this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -371,7 +372,8 @@ namespace OSD
             this.updateFirmwareToolStripMenuItem,
             this.customBGPictureToolStripMenuItem,
             this.sendTLogToolStripMenuItem,
-            this.updateFontToolStripMenuItem});
+            this.updateFontToolStripMenuItem,
+            this.setSketchesPathToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
@@ -384,14 +386,14 @@ namespace OSD
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(186, 22);
+            this.checkBox1.Size = new System.Drawing.Size(224, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -399,14 +401,14 @@ namespace OSD
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.sendTLogToolStripMenuItem.Text = "Send TLog...";
             this.sendTLogToolStripMenuItem.ToolTipText = "Send a Mavlink transmission log to the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
@@ -414,7 +416,7 @@ namespace OSD
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
@@ -1169,6 +1171,14 @@ namespace OSD
             this.btnGeneratePanelsFile.Visible = false;
             this.btnGeneratePanelsFile.Click += new System.EventHandler(this.btnGeneratePanelsFile_Click);
             // 
+            // setSketchesPathToolStripMenuItem
+            // 
+            this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
+            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.setSketchesPathToolStripMenuItem.Text = "Set Arduino Sketches Path...";
+            this.setSketchesPathToolStripMenuItem.Visible = false;
+            this.setSketchesPathToolStripMenuItem.Click += new System.EventHandler(this.setSketchesPathToolStripMenuItem_Click);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1336,6 +1346,7 @@ namespace OSD
         private System.Windows.Forms.CheckBox cbxHomeAltitudeSign;
         private System.Windows.Forms.CheckBox cbxGroundSpeedSign;
         private System.Windows.Forms.Button btnGeneratePanelsFile;
+        private System.Windows.Forms.ToolStripMenuItem setSketchesPathToolStripMenuItem;
     }
 }
 

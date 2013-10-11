@@ -3092,17 +3092,22 @@ namespace OSD
 
         private void btnGeneratePanelsFile_Click(object sender, EventArgs e)
         {
-            string path = Directory.GetCurrentDirectory();
-            path += @"/Source/" + ((ModelType)cbxModelType.SelectedValue).ToString();
-            if (!Directory.Exists(path))
+            if (String.IsNullOrEmpty(sketchPath))
             {
-                MessageBox.Show("Source code folder not found!");
+                MessageBox.Show("Sketch path not selected." + Environment.NewLine + "Please select Arducam_OSD path going to Options -> Set Arduino Sketches Path...");
                 return;
             }
-            string file = path + @"/" + "OSD_Panels.ino";
-            if (!File.Exists(file))
+            if (!Directory.Exists(sketchPath))
             {
-                MessageBox.Show("Source code file (OSD_Panels.ino) not found!");
+                MessageBox.Show("Sketch path (" + sketchPath + ") not found!");
+                return;
+            }
+            string panelsFile = sketchPath + @"/" + "OSD_Panels.ino";
+            string baseFileName = "OSD_Panels.ino." + ((ModelType)cbxModelType.SelectedValue).ToString() + ".base";
+            string baseFile = sketchPath + @"/" + baseFileName;
+            if (!File.Exists(baseFile))
+            {
+                MessageBox.Show("Source code file (" + baseFileName + ") not found!");
                 return;
             }
 
@@ -3118,16 +3123,17 @@ namespace OSD
 
             //Get source code
             string content = string.Empty;
-            using (StreamReader reader = new StreamReader(file))
+            using (StreamReader reader = new StreamReader(baseFile))
             {
                 content = reader.ReadToEnd();
                 reader.Close();
             }
 
             //
-            string panelName = "panel";
+            string panelName = String.Empty;
             foreach (TreeNode tn in AllNodes)
             {
+                panelName = String.Empty;
                 //Get both tree nodes
                 string str = tn.Text;
                 TreeNode[] trArray1 = LIST_items.Nodes.Find(str, true);
@@ -3142,17 +3148,17 @@ namespace OSD
                     //Get panel name
                     panelName = tuple.Item2.Method.Name;
                 }
-                if (!trArray1[0].Checked && !trArray1[0].Checked)
+                if (!trArray1[0].Checked && !trArray2[0].Checked && !String.IsNullOrEmpty(panelName))
                     content = commentPanelCallInSourceCode(panelName, content);
             }
 
             //Write new panels file
-            using (StreamWriter writer = new StreamWriter(file + ".temp"))
+            using (StreamWriter writer = new StreamWriter(panelsFile))
             {
                 writer.Write(content);
                 writer.Close();
             }
-            MessageBox.Show("File " + file + ".temp" + " generated successfully.");
+            MessageBox.Show("File " + panelsFile + " generated successfully." + Environment.NewLine + "For now, for the next step you should compile the sketch via Arduino IDE.");
         }
 
         private string commentPanelCallInSourceCode(string panelName, string code)
@@ -3178,7 +3184,22 @@ namespace OSD
         {
             if (!btnGeneratePanelsFile.Visible && e.X >= btnGeneratePanelsFile.Location.X && e.X <= (btnGeneratePanelsFile.Location.X + btnGeneratePanelsFile.Size.Width)
                                               && e.Y >= btnGeneratePanelsFile.Location.Y && e.Y <= (btnGeneratePanelsFile.Location.Y + btnGeneratePanelsFile.Size.Height))
+            {
                 btnGeneratePanelsFile.Visible = true;
+                setSketchesPathToolStripMenuItem.Visible = true;
+            }
+        }
+
+        string sketchPath = String.Empty;
+
+        private void setSketchesPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = sketchPath;
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                sketchPath = fbd.SelectedPath;
+            }
         }
     }
 }
