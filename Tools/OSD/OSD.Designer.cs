@@ -123,6 +123,7 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -214,7 +215,7 @@ namespace OSD
             // BUT_WriteOSD
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_WriteOSD.Location = new System.Drawing.Point(547, 424);
+            this.BUT_WriteOSD.Location = new System.Drawing.Point(545, 423);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
             this.BUT_WriteOSD.Size = new System.Drawing.Size(131, 23);
             this.BUT_WriteOSD.TabIndex = 2;
@@ -226,7 +227,7 @@ namespace OSD
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
-            this.CMB_ComPort.Location = new System.Drawing.Point(335, 424);
+            this.CMB_ComPort.Location = new System.Drawing.Point(333, 423);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(98, 21);
             this.CMB_ComPort.TabIndex = 4;
@@ -235,7 +236,7 @@ namespace OSD
             // BUT_ReadOSD
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_ReadOSD.Location = new System.Drawing.Point(440, 424);
+            this.BUT_ReadOSD.Location = new System.Drawing.Point(438, 423);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(100, 23);
             this.BUT_ReadOSD.TabIndex = 6;
@@ -1157,11 +1158,23 @@ namespace OSD
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // btnGeneratePanelsFile
+            // 
+            this.btnGeneratePanelsFile.Location = new System.Drawing.Point(0, 423);
+            this.btnGeneratePanelsFile.Name = "btnGeneratePanelsFile";
+            this.btnGeneratePanelsFile.Size = new System.Drawing.Size(125, 23);
+            this.btnGeneratePanelsFile.TabIndex = 15;
+            this.btnGeneratePanelsFile.Text = "Generate Panels File";
+            this.btnGeneratePanelsFile.UseVisualStyleBackColor = true;
+            this.btnGeneratePanelsFile.Visible = false;
+            this.btnGeneratePanelsFile.Click += new System.EventHandler(this.btnGeneratePanelsFile_Click);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 473);
+            this.Controls.Add(this.btnGeneratePanelsFile);
             this.Controls.Add(this.PANEL_tabs);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
@@ -1174,6 +1187,7 @@ namespace OSD
             this.Text = "MinimOSD-Extra Config Tool";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OSD_FormClosed);
             this.Load += new System.EventHandler(this.OSD_Load);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OSD_MouseUp);
             this.Resize += new System.EventHandler(this.OSD_Resize);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -1321,6 +1335,7 @@ namespace OSD
         private System.Windows.Forms.CheckBox cbxMslAltitudeSign;
         private System.Windows.Forms.CheckBox cbxHomeAltitudeSign;
         private System.Windows.Forms.CheckBox cbxGroundSpeedSign;
+        private System.Windows.Forms.Button btnGeneratePanelsFile;
     }
 }
 
