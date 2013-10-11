@@ -3158,9 +3158,18 @@ namespace OSD
         private string commentPanelCallInSourceCode(string panelName, string code)
         {
             int pos = code.IndexOf(panelName);
-            if (pos >= 0)
+            if(pos < 0)
+                return code;
+            //Get the if statement that calls the method
+            int commentIndex = pos;
+            for (commentIndex = pos; commentIndex > 0; commentIndex--)
             {
-                code = code.Substring(0, pos) + @"//" + code.Substring(pos);
+                if (code.Substring(commentIndex, 3) == "if(")
+                    break;
+            }
+            if (commentIndex >= 0)
+            {
+                code = code.Substring(0, commentIndex) + @"//" + code.Substring(commentIndex);
             }
             return code;
         }
