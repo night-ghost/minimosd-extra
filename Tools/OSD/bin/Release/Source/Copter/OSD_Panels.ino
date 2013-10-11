@@ -41,55 +41,55 @@ void writePanels(){
     }
     if(panel != npanels){
       //Testing bits from 8 bit register A 
-      //panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
-      panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
-      panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
-      panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
+      //if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+      if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
+      if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
+      if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
       //if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
-      panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
+      if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
       //if(ISa(panel,GPL_BIT)) panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]); //2x1
-      panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
-      panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
-      panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
+      if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
+      if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
+      if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
 
       //Testing bits from 8 bit register B
-      panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
-      panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
+      if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
+      if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
       //if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
       if(osd_got_home == 1){
-        panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
-        panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
+        if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
+        if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
       }
-      panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+      if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
       //Only show wp panel if there is one
       if(wp_number > 0){
-        panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+        if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
       }
 
       //Testing bits from 8 bit register C 
       //if(osd_got_home == 1){
-      panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
-      panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
-      panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
-      panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
+      if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
+      if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
+      if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
+      if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
       //}
-      panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
-      panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
-      panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
-      panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
+      if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
+      if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
+      if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
+      if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
 
       //Testing bits from 8 bit register D 
       //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
       //For now we don't have windspeed in copter
       //if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
-      panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+      if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
       //if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
-      panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
-      panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
+      if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
+      if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
       //if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
-      panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
+      if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
       //if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
-      panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
+      if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
     }
     //else { //panel == npanels
       //if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
