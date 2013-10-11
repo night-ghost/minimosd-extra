@@ -12,6 +12,7 @@ using System.IO;
 using ArdupilotMega;
 using System.Xml;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace OSD
 {
@@ -75,7 +76,7 @@ namespace OSD
         SerialPort comPort = new SerialPort();
 
         Panels pan;
-        int nosdfunctions=0;
+        int nosdfunctions = 0;
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
         Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
@@ -102,7 +103,8 @@ namespace OSD
                 bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
             }
             catch { }
-            for(int i = 0; i < npanel;i++) {
+            for (int i = 0; i < npanel; i++)
+            {
                 screen[i] = new Bitmap(30 * 12, 16 * 18);
                 gr[i] = Graphics.FromImage(screen[i]);
                 mousedown[i] = false;
@@ -122,7 +124,8 @@ namespace OSD
             if (pal)
             {
                 basesize = new Size(30, 16);
-                for(int i = 0; i < npanel;i++){
+                for (int i = 0; i < npanel; i++)
+                {
                     screen[i] = new Bitmap(30 * 12, 16 * 18);
                 }
                 image = new Bitmap(30 * 12, 16 * 18);
@@ -147,7 +150,7 @@ namespace OSD
                 NUM_Y2.Maximum = 15;
             }
 
-            
+
         }
         //Set item boxes
         void setupFunctions()
@@ -168,7 +171,7 @@ namespace OSD
 
             // first 8
             // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
+            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Pitch", pan.panPitch, 7, 1, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Roll", pan.panRoll, 13, 1, panRoll_en_ADDR, panRoll_x_ADDR, panRoll_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 14, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
@@ -180,10 +183,10 @@ namespace OSD
             //second 8
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading Rose", pan.panRose, 21, 15, panRose_en_ADDR, panRose_x_ADDR, panRose_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading", pan.panHeading, 24, 13, panHeading_en_ADDR, panHeading_x_ADDR, panHeading_y_ADDR);
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
+            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 1, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
@@ -192,24 +195,24 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 8, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
-            
+
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 14, 14, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
-            
+
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Velocity", pan.panVel, 1, 2, panVel_en_ADDR, panVel_x_ADDR, panVel_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_en_ADDR, panAirSpeed_x_ADDR, panAirSpeed_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Throttle", pan.panThr, 1, 3, panThr_en_ADDR, panThr_x_ADDR, panThr_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Flight Mode", pan.panFlightMode, 1, 13, panFMod_en_ADDR, panFMod_x_ADDR, panFMod_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Horizon", pan.panHorizon, 8, 6, panHorizon_en_ADDR, panHorizon_x_ADDR, panHorizon_y_ADDR);
-            
+
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_en_ADDR, panWindSpeed_x_ADDR, panWindSpeed_y_ADDR);
-            
+
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 23, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 7, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 11, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
-//            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 1, 11, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Trip Distance", pan.panDistance, 22, 2, panDistance_en_ADDR, panDistance_x_ADDR, panDistance_y_ADDR);
 
@@ -224,46 +227,46 @@ namespace OSD
             {
                 if (thing != null)
                 {
-                    
+
                     if (thing.Item1 == "Center")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Tune")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
                     else if (thing.Item1 == "WP Distance")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
 
                     else if (thing.Item1 == "Temperature")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
 
 
                     else if (thing.Item1 == "Trip Distance")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
 
 
                     else if (thing.Item1 == "Channel Raw")
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
                     else
                     {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1,thing.Item1);
+                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = true;
                     }
                 }
@@ -287,7 +290,7 @@ namespace OSD
             startup = false;
             // first 8
             // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
+            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Pitch", pan.panPitch, 22, 10, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Roll", pan.panRoll, 11, 1, panRoll_en_ADDR, panRoll_x_ADDR, panRoll_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 1, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
@@ -299,10 +302,10 @@ namespace OSD
             //second 8
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading Rose", pan.panRose, 21, 15, panRose_en_ADDR, panRose_x_ADDR, panRose_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading", pan.panHeading, 24, 13, panHeading_en_ADDR, panHeading_x_ADDR, panHeading_y_ADDR);
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
+            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 1, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 9, 14, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
             // rssi
 
@@ -325,10 +328,10 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
-//            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 22, 14, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Trip Distance", pan.panDistance, 22, 2, panDistance_en_ADDR, panDistance_x_ADDR, panDistance_y_ADDR);
 
@@ -412,7 +415,7 @@ namespace OSD
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
                         tn.Checked = false;
                     }
-                    
+
                     else if (thing.Item1 == "Efficiency")
                     {
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
@@ -450,7 +453,7 @@ namespace OSD
 
             OVERSPEED_numeric.Value = pan.overspeed;
 
-            if(cbxModelType.Items.Count == 0)
+            if (cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
@@ -495,7 +498,7 @@ namespace OSD
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
 
             CMB_ComPort.Text = "COM5";
-        }          
+        }
 
         private string[] GetPortNames()
         {
@@ -593,7 +596,7 @@ namespace OSD
             }
 
         }
-            
+
 
         string getMouseOverItem(int x, int y)
         {
@@ -654,7 +657,7 @@ namespace OSD
             xpos = Constrain(ansW, 0, 30 - 1);
             ypos = Constrain(ansH, 0, 16 - 1);
         }
-        
+
         void getCharLoc2(int x, int y, out int xpos, out int ypos)
         {
 
@@ -742,7 +745,7 @@ namespace OSD
             {
                 foreach (TreeNode tn2 in tn.Nodes)
                 {
-                    if(tn2.Checked)
+                    if (tn2.Checked)
                         list.Add(tn2.Text);
                 }
                 if (tn.Checked)
@@ -896,7 +899,7 @@ namespace OSD
         }
 
         enum ModelType
-        { 
+        {
             Plane = 0,
             Copter = 1
         }
@@ -935,8 +938,8 @@ namespace OSD
             {
                 if (thing != null && thing.Item1 == item)
                 {
-                        NUM_X.Value = Constrain(thing.Item3,0,basesize.Width -1);
-                        NUM_Y.Value = Constrain(thing.Item4,0,16 -1);
+                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
+                    NUM_Y.Value = Constrain(thing.Item4, 0, 16 - 1);
                 }
             }
         }
@@ -989,23 +992,23 @@ namespace OSD
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
-//            if (((CheckedListBox)sender).SelectedItem != null)
-//            {
-//                if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
-//                {
-//                    int index = LIST_items.Items.IndexOf("Center");
-//                    LIST_items.SetItemChecked(index, false);
-//                }
-//                else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
-//                {
-//                    int index = LIST_items.Items.IndexOf("Horizon");
-//                    LIST_items.SetItemChecked(index, false);
-//                }
-//            }
+            //            if (((CheckedListBox)sender).SelectedItem != null)
+            //            {
+            //                if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
+            //                {
+            //                    int index = LIST_items.Items.IndexOf("Center");
+            //                    LIST_items.SetItemChecked(index, false);
+            //                }
+            //                else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
+            //                {
+            //                    int index = LIST_items.Items.IndexOf("Horizon");
+            //                    LIST_items.SetItemChecked(index, false);
+            //                }
+            //            }
 
             // add a delay to this so it runs after the control value has been defined.
-                if (this.IsHandleCreated)
-                    this.BeginInvoke((MethodInvoker)delegate { osdDraw1(); });
+            if (this.IsHandleCreated)
+                this.BeginInvoke((MethodInvoker)delegate { osdDraw1(); });
         }
 
         private void checkedListBox2_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -1013,22 +1016,22 @@ namespace OSD
             // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
             //if (((CheckedListBox)sender).SelectedItem != null)
             //{
-              //  if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
-                //{
-                  //  int index = LIST_items2.Items.IndexOf("Center");
-                    //LIST_items2.SetItemChecked(index, false);
-                //}
-                //else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
-               // {
-                 //   int index = LIST_items2.Items.IndexOf("Horizon");
-                  //  LIST_items2.SetItemChecked(index, false);
-                //}
-            }
+            //  if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
+            //{
+            //  int index = LIST_items2.Items.IndexOf("Center");
+            //LIST_items2.SetItemChecked(index, false);
+            //}
+            //else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
+            // {
+            //   int index = LIST_items2.Items.IndexOf("Horizon");
+            //  LIST_items2.SetItemChecked(index, false);
+            //}
+        }
 
-            // add a delay to this so it runs after the control value has been defined.
-            //if (this.IsHandleCreated)
-              //  this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
-     //   }
+        // add a delay to this so it runs after the control value has been defined.
+        //if (this.IsHandleCreated)
+        //  this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
+        //   }
 
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
@@ -1118,11 +1121,11 @@ namespace OSD
         //Write data to MinimOSD EPPROM
         private void BUT_WriteOSD_Click(object sender, EventArgs e)
         {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
-           
+
             TabPage current = PANEL_tabs.SelectedTab;
-            if (current.Text == "Panel 1") 
+            if (current.Text == "Panel 1")
             {
                 //First Panel 
                 List<TreeNode> AllNodes = new List<TreeNode>();
@@ -1152,7 +1155,7 @@ namespace OSD
                     }
                 }
             }
-            else if (current.Text == "Panel 2") 
+            else if (current.Text == "Panel 2")
             {
                 //Second Panel 
                 List<TreeNode> AllNodes = new List<TreeNode>();
@@ -1183,7 +1186,7 @@ namespace OSD
                     }
                 }
             }
-            else if (current.Text == "Config") 
+            else if (current.Text == "Config")
             {
                 //Setup configuration panel
                 //It only checks if configuration screen model type matches fw model type if model type already have been read from eeprom
@@ -1216,7 +1219,7 @@ namespace OSD
                 eeprom[switch_mode_ADDR] = pan.switch_mode;
 
                 eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
-                
+
                 eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
                 eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = Convert.ToByte(pan.osd_battery_show_percentage);
                 eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
@@ -1231,7 +1234,7 @@ namespace OSD
                 }
                 if (pan.callsign_str.Length < OSD_CALL_SIGN_TOTAL)
                     for (int i = pan.callsign_str.Length; i < OSD_CALL_SIGN_TOTAL; i++) eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('\0');
-            } 
+            }
 
             ArduinoSTK sp;
 
@@ -1260,14 +1263,16 @@ namespace OSD
                     bool spupload_flag = false;
                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
-                    if (current.Text == "Panel 1") {
-                        for(int i = 0; i < 10; i++)
+                    if (current.Text == "Panel 1")
+                    {
+                        for (int i = 0; i < 10; i++)
                         { //try to upload two times if it fail
                             spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
-                            if (!spupload_flag) {
-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter "+ i + ")");
+                            if (!spupload_flag)
+                            {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
                                 else Console.WriteLine("keepalive fail (iter " + i + ")");
-                            } 
+                            }
                             else break;
                         }
                         if (spupload_flag) MessageBox.Show("Done writing Panel 1 data!");
@@ -1302,9 +1307,10 @@ namespace OSD
                         }
                         if (spupload_flag) MessageBox.Show("Done writing configuration data!");
                         else MessageBox.Show("Failed to upload new configuration data");
-                    } 
-                }                 
-                catch (Exception ex) {
+                    }
+                }
+                catch (Exception ex)
+                {
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -1437,8 +1443,9 @@ namespace OSD
                 try
                 {
                     bool spupload_flag = false;
-                    for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-                        spupload_flag = sp.upload(eeprom, 0,CHK_VERSION + 1, 0);
+                    for (int i = 0; i < 10; i++)
+                    { //try to upload two times if it fail
+                        spupload_flag = sp.upload(eeprom, 0, CHK_VERSION + 1, 0);
                         if (!spupload_flag)
                         {
                             if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -1448,7 +1455,7 @@ namespace OSD
                     }
                     if (spupload_flag) MessageBox.Show("Done writing configuration data!");
                     else MessageBox.Show("Failed to upload new configuration data");
-                    }
+                }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
@@ -1479,9 +1486,9 @@ namespace OSD
         // EEPROM Storage addresses
         const int OffsetBITpanel = 250;
         // First of 8 panels
-//        const int panCenter_en_ADDR = 0;
-//        const int panCenter_x_ADDR = 2;
-//        const int panCenter_y_ADDR = 4;
+        //        const int panCenter_en_ADDR = 0;
+        //        const int panCenter_x_ADDR = 2;
+        //        const int panCenter_y_ADDR = 4;
         const int panPitch_en_ADDR = 6;
         const int panPitch_x_ADDR = 8;
         const int panPitch_y_ADDR = 10;
@@ -1511,18 +1518,18 @@ namespace OSD
         const int panHeading_en_ADDR = 54;
         const int panHeading_x_ADDR = 56;
         const int panHeading_y_ADDR = 58;
-//        const int panMavBeat_en_ADDR = 60;
-//        const int panMavBeat_x_ADDR = 62;
-//        const int panMavBeat_y_ADDR = 64;
+        //        const int panMavBeat_en_ADDR = 60;
+        //        const int panMavBeat_x_ADDR = 62;
+        //        const int panMavBeat_y_ADDR = 64;
         const int panHomeDir_en_ADDR = 66;
         const int panHomeDir_x_ADDR = 68;
         const int panHomeDir_y_ADDR = 70;
         const int panHomeDis_en_ADDR = 72;
         const int panHomeDis_x_ADDR = 74;
         const int panHomeDis_y_ADDR = 76;
-//        const int panWPDir_en_ADDR = 80;
-//        const int panWPDir_x_ADDR = 82;
-//        const int panWPDir_y_ADDR = 84;
+        //        const int panWPDir_en_ADDR = 80;
+        //        const int panWPDir_x_ADDR = 82;
+        //        const int panWPDir_y_ADDR = 84;
         const int panWPDis_en_ADDR = 86;
         const int panWPDis_x_ADDR = 88;
         const int panWPDis_y_ADDR = 90;
@@ -1577,9 +1584,9 @@ namespace OSD
         const int panClimb_en_ADDR = 182;
         const int panClimb_x_ADDR = 184;
         const int panClimb_y_ADDR = 186;
-//        const int panTune_en_ADDR = 188;
-//        const int panTune_x_ADDR = 190;
-//        const int panTune_y_ADDR = 192;
+        //        const int panTune_en_ADDR = 188;
+        //        const int panTune_x_ADDR = 190;
+        //        const int panTune_y_ADDR = 192;
         const int panEff_en_ADDR = 194;
         const int panEff_x_ADDR = 196;
         const int panEff_y_ADDR = 198;
@@ -1645,8 +1652,8 @@ namespace OSD
 
         private void BUT_ReadOSD_Click(object sender, EventArgs e)
         {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
-            this.toolStripStatusLabel1.Text = ""; 
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            this.toolStripStatusLabel1.Text = "";
 
             bool fail = false;
             ArduinoSTK sp;
@@ -1663,7 +1670,7 @@ namespace OSD
 
                 sp.Open();
             }
-            catch {  MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);        return; }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
 
             if (sp.connectAP())
             {
@@ -1680,7 +1687,8 @@ namespace OSD
                         else break;
                     }
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -1693,7 +1701,8 @@ namespace OSD
             sp.Close();
 
             //Verify EEPROM version
-            if (eeprom[CHK_VERSION] != VER) { // no match
+            if (eeprom[CHK_VERSION] != VER)
+            { // no match
                 MessageBox.Show("The EEPROM mapping is outdated! An automatic update will start.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 BUT_ResetOSD_EEPROM(); //write defaults
                 MessageBox.Show("EEPROM mapping updated!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1759,7 +1768,8 @@ namespace OSD
                 UNITS_combo.SelectedIndex = 1; //imperial
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
-            } else //garbage value in EEPROM - default to metric
+            }
+            else //garbage value in EEPROM - default to metric
             {
                 pan.converts = 0; //correct value
                 UNITS_combo.SelectedIndex = 0; //metric
@@ -1812,13 +1822,14 @@ namespace OSD
             BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
 
             char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
-            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++){
+            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+            {
                 str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
                 Console.WriteLine("Call Sign read ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
             }
 
             pan.callsign_str = new string(str_call);
-            CALLSIGNmaskedText.Text = pan.callsign_str;               
+            CALLSIGNmaskedText.Text = pan.callsign_str;
 
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -2017,10 +2028,10 @@ namespace OSD
                         //Panel 1
                         string stringh = sr.ReadLine(); //
                         //while (!sr.EndOfStream)
-                        for( int i = 0; i < nosdfunctions; i++)
+                        for (int i = 0; i < nosdfunctions; i++)
                         {
-                            string[] strings = sr.ReadLine().Split(new char[] {'\t'},StringSplitOptions.RemoveEmptyEntries);
-                            for (int a = 0; a < panelItems.Length ; a++)
+                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int a = 0; a < panelItems.Length; a++)
                             {
                                 if (panelItems[a] != null && panelItems[a].Item1 == strings[0])
                                 {
@@ -2030,7 +2041,7 @@ namespace OSD
                                         panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
 
                                         TreeNode[] tnArray = LIST_items.Nodes.Find(panelItems[a].Item1, true);
-                                        if(tnArray.Length > 0)
+                                        if (tnArray.Length > 0)
                                             tnArray[0].Checked = (strings[3] == "True");
                                     }
                                     catch { }
@@ -2161,7 +2172,7 @@ namespace OSD
 
             mousedown[0] = false;
         }
-        
+
         private void pictureBox2_MouseUp(object sender, MouseEventArgs e)
         {
             getMouseOverItem2(e.X, e.Y);
@@ -2227,12 +2238,12 @@ namespace OSD
             mousedown[1] = true;
         }
 
-                
+
 
         private void updateFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;      
-            this.toolStripStatusLabel1.Text = ""; 
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            this.toolStripStatusLabel1.Text = "";
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "*.hex|*.hex";
@@ -2334,7 +2345,7 @@ namespace OSD
                     toolStripStatusLabel1.Text = "Failed";
                 }
             }
-            
+
             //Check EEPROM version
             this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
 
@@ -2386,8 +2397,8 @@ namespace OSD
 
                 BinaryReader br = new BinaryReader(ofd.OpenFile());
 
-                this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;        
-                this.toolStripStatusLabel1.Text = "Sending TLOG data..."; 
+                this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+                this.toolStripStatusLabel1.Text = "Sending TLOG data...";
 
                 while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
                 {
@@ -2410,7 +2421,7 @@ namespace OSD
                 try
                 {
                     toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-                    toolStripStatusLabel1.Text = "";   
+                    toolStripStatusLabel1.Text = "";
 
                     comPort.Close();
                 }
@@ -2490,19 +2501,19 @@ namespace OSD
 
         private void updateFontToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;        
-            toolStripStatusLabel1.Text = "";        
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            toolStripStatusLabel1.Text = "";
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "mcm|*.mcm";
 
             ofd.ShowDialog();
-            
+
             if (ofd.FileName != "")
             {
                 if (comPort.IsOpen)
                     comPort.Close();
-                
+
                 try
                 {
 
@@ -2660,12 +2671,14 @@ namespace OSD
 
         private void UNITS_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(UNITS_combo.SelectedIndex == 0) {
+            if (UNITS_combo.SelectedIndex == 0)
+            {
                 pan.converts = 0; //metric
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
-            else if (UNITS_combo.SelectedIndex == 1){
+            else if (UNITS_combo.SelectedIndex == 1)
+            {
                 pan.converts = 1; //imperial
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
@@ -2677,7 +2690,7 @@ namespace OSD
 
         private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
         {
-            pan.battv = (byte) (MINVOLT_numeric.Value * 10);
+            pan.battv = (byte)(MINVOLT_numeric.Value * 10);
         }
 
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
@@ -2730,7 +2743,7 @@ namespace OSD
 
         private void BRIGHTNESScomboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pan.osd_brightness = (byte)BRIGHTNESScomboBox.SelectedIndex ;
+            pan.osd_brightness = (byte)BRIGHTNESScomboBox.SelectedIndex;
         }
 
         private void gettingStartedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2846,7 +2859,7 @@ namespace OSD
 
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if(!AutomaticCheck)
+            if (!AutomaticCheck)
                 foreach (TreeNode node in e.Node.Nodes)
                     node.Checked = e.Node.Checked;
             if (this.IsHandleCreated)
@@ -2893,7 +2906,7 @@ namespace OSD
                         (node.Text != "General") &&
                         (node.Text != "Energy") &&
                         (node.Text != "Location") &&
-                        (node.Text != "Speed")) 
+                        (node.Text != "Speed"))
                     {
                         LIST_items2.Nodes.Add(node);
                     }
@@ -2998,7 +3011,7 @@ namespace OSD
         }
 
         enum PanelsAutoSwitch
-        { 
+        {
             Disabled = 3,
             Panel1 = 0,
             Panel2 = 1,
@@ -3047,7 +3060,7 @@ namespace OSD
 
         private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbxAirSpeedSign.Checked)
+            if (cbxAirSpeedSign.Checked)
                 pan.sign_air_speed = 0x13;
             else
                 pan.sign_air_speed = 0x00;
@@ -3055,7 +3068,7 @@ namespace OSD
 
         private void cbxGroundSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbxGroundSpeedSign.Checked)
+            if (cbxGroundSpeedSign.Checked)
                 pan.sign_ground_speed = 0x14;
             else
                 pan.sign_ground_speed = 0x00;
@@ -3063,7 +3076,7 @@ namespace OSD
 
         private void cbxHomeAltitudeSign_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbxHomeAltitudeSign.Checked)
+            if (cbxHomeAltitudeSign.Checked)
                 pan.sign_home_altitude = 0x12;
             else
                 pan.sign_home_altitude = 0x00;
@@ -3071,10 +3084,92 @@ namespace OSD
 
         private void cbxMslAltitudeSign_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbxMslAltitudeSign.Checked)
+            if (cbxMslAltitudeSign.Checked)
                 pan.sign_msl_altitude = 0x11;
             else
                 pan.sign_msl_altitude = 0x00;
+        }
+
+        private void btnGeneratePanelsFile_Click(object sender, EventArgs e)
+        {
+            string path = Directory.GetCurrentDirectory();
+            path += @"/Source/" + ((ModelType)cbxModelType.SelectedValue).ToString();
+            if (!Directory.Exists(path))
+            {
+                MessageBox.Show("Source code folder not found!");
+                return;
+            }
+            string file = path + @"/" + "OSD_Panels.ino";
+            if (!File.Exists(file))
+            {
+                MessageBox.Show("Source code file (OSD_Panels.ino) not found!");
+                return;
+            }
+
+            List<TreeNode> AllNodes = new List<TreeNode>();
+            foreach (TreeNode tn in LIST_items.Nodes)
+            {
+                foreach (TreeNode tn2 in tn.Nodes)
+                {
+                    AllNodes.Add(tn2);
+                }
+                AllNodes.Add(tn);
+            }
+
+            //Get source code
+            string content = string.Empty;
+            using (StreamReader reader = new StreamReader(file))
+            {
+                content = reader.ReadToEnd();
+                reader.Close();
+            }
+
+            //
+            string panelName = "panel";
+            foreach (TreeNode tn in AllNodes)
+            {
+                //Get both tree nodes
+                string str = tn.Text;
+                TreeNode[] trArray1 = LIST_items.Nodes.Find(str, true);
+                TreeNode[] trArray2 = LIST_items2.Nodes.Find(str, true);
+                //Get related tuple on panel1 so we can extract method name
+                foreach (var tuple in this.panelItems)
+                {
+                    if ((tuple == null) || ((tuple.Item1 != str)) || tuple.Item5 == -1)
+                    {
+                        continue;
+                    }
+                    //Get panel name
+                    panelName = tuple.Item2.Method.Name;
+                }
+                if (!trArray1[0].Checked && !trArray1[0].Checked)
+                    content = commentPanelCallInSourceCode(panelName, content);
+            }
+
+            //Write new panels file
+            using (StreamWriter writer = new StreamWriter(file + ".temp"))
+            {
+                writer.Write(content);
+                writer.Close();
+            }
+            MessageBox.Show("File " + file + ".temp" + " generated successfully.");
+        }
+
+        private string commentPanelCallInSourceCode(string panelName, string code)
+        {
+            int pos = code.IndexOf(panelName);
+            if (pos >= 0)
+            {
+                code = code.Substring(0, pos) + @"//" + code.Substring(pos);
+            }
+            return code;
+        }
+
+        private void OSD_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (!btnGeneratePanelsFile.Visible && e.X >= btnGeneratePanelsFile.Location.X && e.X <= (btnGeneratePanelsFile.Location.X + btnGeneratePanelsFile.Size.Width)
+                                              && e.Y >= btnGeneratePanelsFile.Location.Y && e.Y <= (btnGeneratePanelsFile.Location.Y + btnGeneratePanelsFile.Size.Height))
+                btnGeneratePanelsFile.Visible = true;
         }
     }
 }

@@ -63,14 +63,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="OSD_Config.exe" size="194048">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="OSD_Config.exe" size="196096">
       <assemblyIdentity name="OSD_Config" version="2.3.0.8" publicKeyToken="02E7DCADB6D14847" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>RCFCWviv8nvxyPKu6cnq3gVAwlU=</dsig:DigestValue>
+        <dsig:DigestValue>x0KHCmtLLh0sinZDfDh7KOhOhSg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
