@@ -449,7 +449,8 @@ namespace OSD
             STALL_numeric.Value = pan.stall;
             RSSI_numeric_min.Value = pan.rssipersent;
             RSSI_numeric_max.Value = pan.rssical;
-            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
+            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+            cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
 
             OVERSPEED_numeric.Value = pan.overspeed;
 
@@ -1793,7 +1794,8 @@ namespace OSD
             RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.rssiraw_on = eeprom[OSD_RSSI_RAW_ADDR];
-            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
+            RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+            cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
@@ -2122,9 +2124,34 @@ namespace OSD
                         OVERSPEED_numeric.Value = pan.overspeed;
                         STALL_numeric.Value = pan.stall;
                         MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
-                        RSSI_numeric_max.Value = pan.rssical;
-                        RSSI_numeric_min.Value = pan.rssipersent;
-                        RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on);
+
+                        //RSSI_numeric_max.Value = pan.rssical;
+                        //RSSI_numeric_min.Value = pan.rssipersent;
+                        RSSI_numeric_min.Minimum = 0;
+                        RSSI_numeric_min.Maximum = 2000;
+                        RSSI_numeric_max.Minimum = 0;
+                        RSSI_numeric_max.Maximum = 2000;
+                        RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+                        if ((int)(pan.rssiraw_on / 2) == 0)
+                        {
+                            RSSI_numeric_min.Value = pan.rssipersent;
+                            RSSI_numeric_max.Value = pan.rssical;
+                            RSSI_numeric_min.Minimum = 0;
+                            RSSI_numeric_min.Maximum = 255;
+                            RSSI_numeric_max.Minimum = 0;
+                            RSSI_numeric_max.Maximum = 255;
+                        }
+                        else
+                        {
+                            RSSI_numeric_min.Value = pan.rssipersent * 10;
+                            RSSI_numeric_max.Value = pan.rssical * 10;
+                            RSSI_numeric_min.Minimum = 1000;
+                            RSSI_numeric_min.Maximum = 2000;
+                            RSSI_numeric_max.Minimum = 1000;
+                            RSSI_numeric_max.Maximum = 2000;
+                        }
+                        cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
@@ -2434,6 +2461,10 @@ namespace OSD
             xmlconfig(true);
         }
 
+        private String arduinoIDEPath = "Arduino-1.0.2";
+        private String planeSketchPath = "ArduCAM_OSD_Plane";
+        private String copterSketchPath = "ArduCAM_OSD_Copter";
+
         private void xmlconfig(bool write)
         {
             if (write || !File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.xml"))
@@ -2450,6 +2481,12 @@ namespace OSD
                     xmlwriter.WriteElementString("comport", CMB_ComPort.Text);
 
                     xmlwriter.WriteElementString("Pal", CHK_pal.Checked.ToString());
+
+                    xmlwriter.WriteElementString("ArduinoIDEPath", arduinoIDEPath);
+
+                    xmlwriter.WriteElementString("PlaneSketchPath", planeSketchPath);
+
+                    xmlwriter.WriteElementString("CopterSketchPath", copterSketchPath);
 
                     xmlwriter.WriteEndElement();
 
@@ -2481,7 +2518,14 @@ namespace OSD
                                         string temp2 = xmlreader.ReadString();
                                         //CHK_pal.Checked = (temp2 == "True");
                                         break;
-                                    case "Config":
+                                    case "ArduinoIDEPath":
+                                        arduinoIDEPath = xmlreader.ReadString();
+                                        break;
+                                    case "PlaneSketchPath":
+                                        planeSketchPath = xmlreader.ReadString();
+                                        break;
+                                    case "CopterSketchPath":
+                                        copterSketchPath = xmlreader.ReadString();
                                         break;
                                     case "xml":
                                         break;
@@ -2656,12 +2700,26 @@ namespace OSD
 
         private void RSSI_numeric_min_ValueChanged(object sender, EventArgs e)
         {
-            pan.rssipersent = (byte)RSSI_numeric_min.Value;
+            if (cbxRSSIChannel.SelectedIndex == 0)
+            {
+                pan.rssipersent = (byte)RSSI_numeric_min.Value;
+            }
+            else
+            {
+                pan.rssipersent = (byte)(RSSI_numeric_min.Value / 10);
+            }
         }
 
         private void RSSI_numeric_max_ValueChanged(object sender, EventArgs e)
         {
-            pan.rssical = (byte)RSSI_numeric_max.Value;
+            if (cbxRSSIChannel.SelectedIndex == 0)
+            {
+                pan.rssical = (byte)RSSI_numeric_max.Value;
+            }
+            else
+            {
+                pan.rssical = (byte)(RSSI_numeric_max.Value / 10);
+            }
         }
 
         private void OVERSPEED_numeric_ValueChanged(object sender, EventArgs e)
@@ -2700,7 +2758,8 @@ namespace OSD
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            pan.rssiraw_on = Convert.ToByte(RSSI_RAW.Checked);
+            int rssiChannel = pan.rssiraw_on / 2;
+            pan.rssiraw_on = Convert.ToByte(rssiChannel * 2 + Convert.ToInt32(RSSI_RAW.Checked));
         }
 
         private void TOGGLE_BEHChanged(object sender, EventArgs e)
@@ -3200,6 +3259,58 @@ namespace OSD
             {
                 sketchPath = fbd.SelectedPath;
             }
+        }
+
+        private void cbxRSSIChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetRSSIValues(); 
+        }
+
+        private void SetRSSIValues()
+        {
+            int OldMax = (int)RSSI_numeric_min.Maximum;
+            RSSI_numeric_min.Minimum = 0;
+            RSSI_numeric_min.Maximum = 2000;
+            RSSI_numeric_max.Minimum = 0;
+            RSSI_numeric_max.Maximum = 2000;
+            if (cbxRSSIChannel.SelectedIndex == 0)
+            {
+                lblRSSIMin.Text = "RSSI Min Value";
+                lblRSSIMax.Text = "RSSI Max Value";
+                if (OldMax == 2000)
+                {
+                    //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
+                    //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
+                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
+                    RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
+                    //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
+                    //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
+                }
+                RSSI_numeric_min.Minimum = 0;
+                RSSI_numeric_min.Maximum = 255;
+                RSSI_numeric_max.Minimum = 0;
+                RSSI_numeric_max.Maximum = 255;
+            }
+            else
+            {
+                lblRSSIMin.Text = "RSSI Min Value (pwm)";
+                lblRSSIMax.Text = "RSSI Max Value (pwm)";
+                if (OldMax == 255)
+                {
+                    //RSSI_numeric_min.Value = pan.rssipersent * 100 / 255 + 100;
+                    //RSSI_numeric_max.Value = pan.rssical * 100 / 255 + 100;
+                    RSSI_numeric_min.Value = (pan.rssipersent * 100 / 255 + 100) * 10;
+                    RSSI_numeric_max.Value = (pan.rssical * 100 / 255 + 100) * 10;
+                    //pan.rssipersent = (byte)(pan.rssipersent * 100 / 255 + 100);
+                    //pan.rssical = (byte)(pan.rssical * 100 / 255 + 100);
+                }
+                RSSI_numeric_min.Maximum = 2000;
+                RSSI_numeric_min.Minimum = 1000;
+                RSSI_numeric_max.Maximum = 2000;
+                RSSI_numeric_max.Minimum = 1000;
+            }
+            int rawOn = pan.rssiraw_on % 2;
+            pan.rssiraw_on = Convert.ToByte(cbxRSSIChannel.SelectedIndex * 2 + rawOn);
         }
     }
 }
