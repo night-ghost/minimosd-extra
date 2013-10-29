@@ -58,6 +58,7 @@ namespace OSD
             this.customBGPictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gettingStartedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -105,8 +106,8 @@ namespace OSD
             this.label8 = new System.Windows.Forms.Label();
             this.RSSI_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.RSSI_RAW = new System.Windows.Forms.CheckBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblRSSIMax = new System.Windows.Forms.Label();
+            this.lblRSSIMin = new System.Windows.Forms.Label();
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -124,7 +125,8 @@ namespace OSD
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
-            this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbxRSSIChannel = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -216,7 +218,7 @@ namespace OSD
             // BUT_WriteOSD
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_WriteOSD.Location = new System.Drawing.Point(545, 423);
+            this.BUT_WriteOSD.Location = new System.Drawing.Point(545, 440);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
             this.BUT_WriteOSD.Size = new System.Drawing.Size(131, 23);
             this.BUT_WriteOSD.TabIndex = 2;
@@ -228,7 +230,7 @@ namespace OSD
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
-            this.CMB_ComPort.Location = new System.Drawing.Point(333, 423);
+            this.CMB_ComPort.Location = new System.Drawing.Point(333, 440);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(98, 21);
             this.CMB_ComPort.TabIndex = 4;
@@ -237,7 +239,7 @@ namespace OSD
             // BUT_ReadOSD
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_ReadOSD.Location = new System.Drawing.Point(438, 423);
+            this.BUT_ReadOSD.Location = new System.Drawing.Point(438, 440);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(100, 23);
             this.BUT_ReadOSD.TabIndex = 6;
@@ -250,7 +252,7 @@ namespace OSD
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar1,
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 451);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 468);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(688, 22);
             this.statusStrip1.TabIndex = 8;
@@ -421,6 +423,14 @@ namespace OSD
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
             // 
+            // setSketchesPathToolStripMenuItem
+            // 
+            this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
+            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.setSketchesPathToolStripMenuItem.Text = "Set Arduino Sketches Path...";
+            this.setSketchesPathToolStripMenuItem.Visible = false;
+            this.setSketchesPathToolStripMenuItem.Click += new System.EventHandler(this.setSketchesPathToolStripMenuItem_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -466,7 +476,7 @@ namespace OSD
             this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
             this.PANEL_tabs.SelectedIndex = 0;
-            this.PANEL_tabs.Size = new System.Drawing.Size(687, 394);
+            this.PANEL_tabs.Size = new System.Drawing.Size(687, 411);
             this.PANEL_tabs.TabIndex = 0;
             // 
             // tabPageConfig
@@ -487,7 +497,7 @@ namespace OSD
             this.tabPageConfig.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageConfig.Name = "tabPageConfig";
             this.tabPageConfig.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPageConfig.Size = new System.Drawing.Size(679, 368);
+            this.tabPageConfig.Size = new System.Drawing.Size(679, 385);
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
@@ -665,9 +675,9 @@ namespace OSD
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(7, 198);
+            this.groupBox7.Location = new System.Drawing.Point(7, 230);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(150, 142);
+            this.groupBox7.Size = new System.Drawing.Size(150, 144);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
             // 
@@ -675,7 +685,7 @@ namespace OSD
             // 
             this.cbxWarningsAutoPanelSwitch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxWarningsAutoPanelSwitch.FormattingEnabled = true;
-            this.cbxWarningsAutoPanelSwitch.Location = new System.Drawing.Point(9, 46);
+            this.cbxWarningsAutoPanelSwitch.Location = new System.Drawing.Point(7, 47);
             this.cbxWarningsAutoPanelSwitch.Margin = new System.Windows.Forms.Padding(2);
             this.cbxWarningsAutoPanelSwitch.Name = "cbxWarningsAutoPanelSwitch";
             this.cbxWarningsAutoPanelSwitch.Size = new System.Drawing.Size(120, 21);
@@ -684,16 +694,16 @@ namespace OSD
             // 
             // lblWarningsAutoPanelSwitch
             // 
-            this.lblWarningsAutoPanelSwitch.Location = new System.Drawing.Point(7, 13);
+            this.lblWarningsAutoPanelSwitch.Location = new System.Drawing.Point(5, 16);
             this.lblWarningsAutoPanelSwitch.Name = "lblWarningsAutoPanelSwitch";
-            this.lblWarningsAutoPanelSwitch.Size = new System.Drawing.Size(108, 31);
+            this.lblWarningsAutoPanelSwitch.Size = new System.Drawing.Size(139, 29);
             this.lblWarningsAutoPanelSwitch.TabIndex = 12;
             this.lblWarningsAutoPanelSwitch.Text = "Warnings Auto Panel Switch:";
             // 
             // TOGGLE_BEH
             // 
             this.TOGGLE_BEH.AutoSize = true;
-            this.TOGGLE_BEH.Location = new System.Drawing.Point(9, 121);
+            this.TOGGLE_BEH.Location = new System.Drawing.Point(7, 122);
             this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2);
             this.TOGGLE_BEH.Name = "TOGGLE_BEH";
             this.TOGGLE_BEH.Size = new System.Drawing.Size(115, 17);
@@ -713,7 +723,7 @@ namespace OSD
             "Ch 6",
             "Ch 7",
             "Ch 8"});
-            this.ONOFF_combo.Location = new System.Drawing.Point(8, 90);
+            this.ONOFF_combo.Location = new System.Drawing.Point(6, 91);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
             this.ONOFF_combo.Size = new System.Drawing.Size(92, 21);
@@ -723,7 +733,7 @@ namespace OSD
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 74);
+            this.label11.Location = new System.Drawing.Point(4, 75);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(108, 13);
             this.label11.TabIndex = 2;
@@ -910,23 +920,25 @@ namespace OSD
             // 
             // groupBoxRSSI
             // 
+            this.groupBoxRSSI.Controls.Add(this.cbxRSSIChannel);
+            this.groupBoxRSSI.Controls.Add(this.label15);
             this.groupBoxRSSI.Controls.Add(this.label8);
             this.groupBoxRSSI.Controls.Add(this.RSSI_WARNnumeric);
             this.groupBoxRSSI.Controls.Add(this.RSSI_RAW);
-            this.groupBoxRSSI.Controls.Add(this.label5);
-            this.groupBoxRSSI.Controls.Add(this.label6);
+            this.groupBoxRSSI.Controls.Add(this.lblRSSIMax);
+            this.groupBoxRSSI.Controls.Add(this.lblRSSIMin);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
             this.groupBoxRSSI.Location = new System.Drawing.Point(7, 30);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
-            this.groupBoxRSSI.Size = new System.Drawing.Size(150, 169);
+            this.groupBoxRSSI.Size = new System.Drawing.Size(150, 194);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(8, 100);
+            this.label8.Location = new System.Drawing.Point(6, 129);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(121, 13);
             this.label8.TabIndex = 11;
@@ -934,7 +946,7 @@ namespace OSD
             // 
             // RSSI_WARNnumeric
             // 
-            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(9, 117);
+            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(9, 145);
             this.RSSI_WARNnumeric.Name = "RSSI_WARNnumeric";
             this.RSSI_WARNnumeric.Size = new System.Drawing.Size(91, 20);
             this.RSSI_WARNnumeric.TabIndex = 10;
@@ -943,7 +955,7 @@ namespace OSD
             // RSSI_RAW
             // 
             this.RSSI_RAW.AutoSize = true;
-            this.RSSI_RAW.Location = new System.Drawing.Point(10, 144);
+            this.RSSI_RAW.Location = new System.Drawing.Point(9, 170);
             this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2);
             this.RSSI_RAW.Name = "RSSI_RAW";
             this.RSSI_RAW.Size = new System.Drawing.Size(112, 17);
@@ -952,27 +964,27 @@ namespace OSD
             this.RSSI_RAW.UseVisualStyleBackColor = true;
             this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
-            // label5
+            // lblRSSIMax
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 59);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(85, 13);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "RSSI Max Value";
+            this.lblRSSIMax.AutoSize = true;
+            this.lblRSSIMax.Location = new System.Drawing.Point(6, 90);
+            this.lblRSSIMax.Name = "lblRSSIMax";
+            this.lblRSSIMax.Size = new System.Drawing.Size(85, 13);
+            this.lblRSSIMax.TabIndex = 3;
+            this.lblRSSIMax.Text = "RSSI Max Value";
             // 
-            // label6
+            // lblRSSIMin
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 20);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(82, 13);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "RSSI Min Value";
+            this.lblRSSIMin.AutoSize = true;
+            this.lblRSSIMin.Location = new System.Drawing.Point(6, 51);
+            this.lblRSSIMin.Name = "lblRSSIMin";
+            this.lblRSSIMin.Size = new System.Drawing.Size(82, 13);
+            this.lblRSSIMin.TabIndex = 2;
+            this.lblRSSIMin.Text = "RSSI Min Value";
             // 
             // RSSI_numeric_max
             // 
-            this.RSSI_numeric_max.Location = new System.Drawing.Point(9, 76);
+            this.RSSI_numeric_max.Location = new System.Drawing.Point(9, 106);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
             255,
             0,
@@ -981,11 +993,16 @@ namespace OSD
             this.RSSI_numeric_max.Name = "RSSI_numeric_max";
             this.RSSI_numeric_max.Size = new System.Drawing.Size(91, 20);
             this.RSSI_numeric_max.TabIndex = 1;
+            this.RSSI_numeric_max.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
             this.RSSI_numeric_max.ValueChanged += new System.EventHandler(this.RSSI_numeric_max_ValueChanged);
             // 
             // RSSI_numeric_min
             // 
-            this.RSSI_numeric_min.Location = new System.Drawing.Point(9, 37);
+            this.RSSI_numeric_min.Location = new System.Drawing.Point(9, 67);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
             255,
             0,
@@ -1162,7 +1179,7 @@ namespace OSD
             // 
             // btnGeneratePanelsFile
             // 
-            this.btnGeneratePanelsFile.Location = new System.Drawing.Point(0, 423);
+            this.btnGeneratePanelsFile.Location = new System.Drawing.Point(4, 440);
             this.btnGeneratePanelsFile.Name = "btnGeneratePanelsFile";
             this.btnGeneratePanelsFile.Size = new System.Drawing.Size(125, 23);
             this.btnGeneratePanelsFile.TabIndex = 15;
@@ -1171,19 +1188,37 @@ namespace OSD
             this.btnGeneratePanelsFile.Visible = false;
             this.btnGeneratePanelsFile.Click += new System.EventHandler(this.btnGeneratePanelsFile_Click);
             // 
-            // setSketchesPathToolStripMenuItem
+            // cbxRSSIChannel
             // 
-            this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
-            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.setSketchesPathToolStripMenuItem.Text = "Set Arduino Sketches Path...";
-            this.setSketchesPathToolStripMenuItem.Visible = false;
-            this.setSketchesPathToolStripMenuItem.Click += new System.EventHandler(this.setSketchesPathToolStripMenuItem_Click);
+            this.cbxRSSIChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRSSIChannel.FormattingEnabled = true;
+            this.cbxRSSIChannel.Items.AddRange(new object[] {
+            "Mavlink RSSI",
+            "Channel 5",
+            "Channel 6",
+            "Channel 7",
+            "Channel 8"});
+            this.cbxRSSIChannel.Location = new System.Drawing.Point(9, 27);
+            this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxRSSIChannel.Name = "cbxRSSIChannel";
+            this.cbxRSSIChannel.Size = new System.Drawing.Size(135, 21);
+            this.cbxRSSIChannel.TabIndex = 13;
+            this.cbxRSSIChannel.SelectedIndexChanged += new System.EventHandler(this.cbxRSSIChannel_SelectedIndexChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(6, 12);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(76, 13);
+            this.label15.TabIndex = 12;
+            this.label15.Text = "RSSI channel:";
             // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 473);
+            this.ClientSize = new System.Drawing.Size(688, 490);
             this.Controls.Add(this.btnGeneratePanelsFile);
             this.Controls.Add(this.PANEL_tabs);
             this.Controls.Add(this.statusStrip1);
@@ -1293,8 +1328,8 @@ namespace OSD
         private System.Windows.Forms.NumericUpDown NUM_X2;
         private System.Windows.Forms.TabPage tabPageConfig;
         private System.Windows.Forms.GroupBox groupBoxRSSI;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblRSSIMax;
+        private System.Windows.Forms.Label lblRSSIMin;
         private System.Windows.Forms.NumericUpDown RSSI_numeric_max;
         private System.Windows.Forms.NumericUpDown RSSI_numeric_min;
         private System.Windows.Forms.GroupBox groupBox4;
@@ -1347,6 +1382,8 @@ namespace OSD
         private System.Windows.Forms.CheckBox cbxGroundSpeedSign;
         private System.Windows.Forms.Button btnGeneratePanelsFile;
         private System.Windows.Forms.ToolStripMenuItem setSketchesPathToolStripMenuItem;
+        private System.Windows.Forms.ComboBox cbxRSSIChannel;
+        private System.Windows.Forms.Label label15;
     }
 }
 
