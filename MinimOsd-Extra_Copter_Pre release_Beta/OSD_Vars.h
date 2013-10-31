@@ -248,6 +248,6 @@ static uint8_t      rssipersent = 0;
 static uint8_t      rssical = 0;
 static uint8_t      osd_rssi = 0; //raw value from mavlink
 static int16_t      rssi = -99; // scaled value 0-100%
-static bool         rssiraw_on = false; // 0- display scale value | 1- display raw value
+static uint8_t      rssiraw_on = 0;
 static uint8_t      rssi_warn_level = 0;
 

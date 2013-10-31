@@ -68,6 +68,15 @@ extern "C" {
                         );                                              \
                         __c;                                            \
                 })
+/*
+#define GETBYTE(flag, mask, pnt)        ({      \
+       unsigned char __c;                       \
+       __c = ((flag) & (mask))                  \
+             ? pgm_read_byte(pnt) : *pnt;       \
+       pnt++;                                   \
+       __c;                                     \
+})
+*/
 
 #define FL_ZFILL	0x01
 #define FL_PLUS		0x02
@@ -88,27 +97,6 @@ extern "C" {
 #define FL_FLTEXP	FL_PREC
 #define	FL_FLTFIX	FL_LONG
 
-#ifdef DESKTOP_BUILD
-void
-BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
-{
-        char *str = NULL;
-        int i;
-        char *fmt2 = strdup(fmt);
-        for (i=0; fmt2[i]; i++) {
-                // cope with %S
-                if (fmt2[i] == '%' && fmt2[i+1] == 'S') {
-                        fmt2[i+1] = 's';
-                }
-        }
-        vasprintf(&str, fmt2, ap);
-        for (i=0; str[i]; i++) {
-                write(str[i]);
-        }
-        free(str);
-        free(fmt2);
-}
-#else
 void
 BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
 {
@@ -258,7 +246,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                 p = PSTR("inf");
                                 if (vtype & FTOA_NAN)
                                         p = PSTR("nan");
-                                while ( (ndigs = pgm_read_byte((const prog_char *)p)) != 0) {
+                                while ( (ndigs = pgm_read_byte(p)) != 0) {
                                         if (flags & FL_FLTUPP)
                                                 ndigs += 'I' - 'i';
                                         write(ndigs);
@@ -386,7 +374,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                 goto str_lpad;
 
                         case 'S':
-                        // pgmstring: // not yet used
+                        pgmstring:
                                 pnt = va_arg (ap, char *);
                                 size = strnlen_P (pnt, (flags & FL_PREC) ? prec : ~0);
                                 flags |= FL_PGMSTRING;
@@ -531,4 +519,3 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                 }
         } /* for (;;) */
 }
-#endif // DESKTOP_BUILD

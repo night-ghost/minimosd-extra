@@ -1,10 +1,10 @@
-// -*-  tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: t -*-
+// -*- Mode: C++; c-basic-offset: 8; indent-tabs-mode: nil -*-
 //
 // Interrupt-driven serial transmit/receive library.
 //
 //      Copyright (c) 2010 Michael Smith. All rights reserved.
 //
-// Receive and baudrate calculations derived from the Arduino
+// Receive and baudrate calculations derived from the Arduino 
 // HardwareSerial driver:
 //
 //      Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
@@ -31,12 +31,7 @@
 
 //#include "../AP_Common/AP_Common.h"
 #include "FastSerial.h"
-
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
+#include "WProgram.h"
 
 #if   defined(UDR3)
 # define FS_MAX_PORTS   4
@@ -48,106 +43,128 @@
 # define FS_MAX_PORTS   1
 #endif
 
-FastSerial::Buffer __FastSerial__rxBuffer[FS_MAX_PORTS];
-FastSerial::Buffer __FastSerial__txBuffer[FS_MAX_PORTS];
-uint8_t FastSerial::_serialInitialized = 0;
+FastSerial::Buffer	__FastSerial__rxBuffer[FS_MAX_PORTS];
+FastSerial::Buffer	__FastSerial__txBuffer[FS_MAX_PORTS];
+
+// Default buffer sizes
+#define RX_BUFFER_SIZE  128
+#define TX_BUFFER_SIZE  64
+#define BUFFER_MAX      512
 
 // Constructor /////////////////////////////////////////////////////////////////
 
-FastSerial::FastSerial(const uint8_t portNumber, volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
-					   volatile uint8_t *ucsra, volatile uint8_t *ucsrb, const uint8_t u2x,
-					   const uint8_t portEnableBits, const uint8_t portTxBits) :
-					   _ubrrh(ubrrh),
-					   _ubrrl(ubrrl),
-					   _ucsra(ucsra),
-					   _ucsrb(ucsrb),
-					   _u2x(u2x),
-					   _portEnableBits(portEnableBits),
-					   _portTxBits(portTxBits),
-					   _rxBuffer(&__FastSerial__rxBuffer[portNumber]),
-					   _txBuffer(&__FastSerial__txBuffer[portNumber])
+FastSerial::FastSerial(const uint8_t portNumber,
+                       volatile uint8_t *ubrrh,
+                       volatile uint8_t *ubrrl,
+                       volatile uint8_t *ucsra,
+                       volatile uint8_t *ucsrb,
+                       const uint8_t u2x,
+                       const uint8_t portEnableBits,
+                       const uint8_t portTxBits)
 {
-	setInitialized(portNumber);
-	begin(57600);
+        _ubrrh = ubrrh;
+        _ubrrl = ubrrl;
+        _ucsra = ucsra;
+        _ucsrb = ucsrb;
+        _u2x   = u2x;
+        _portEnableBits = portEnableBits;
+        _portTxBits     = portTxBits;
+
+        // init buffers
+        _rxBuffer = &__FastSerial__rxBuffer[portNumber];
+        _txBuffer->head = _txBuffer->tail = 0;
+        _txBuffer = &__FastSerial__txBuffer[portNumber];
+        _rxBuffer->head = _rxBuffer->tail = 0;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 void FastSerial::begin(long baud)
 {
-	begin(baud, 0, 0);
+        unsigned int    rxb, txb;
+
+        // If we are re-configuring an already-open port, preserve the
+        // existing buffer sizes.
+        if (_open) {
+                rxb = _rxBuffer->mask + 1;
+                txb = _txBuffer->mask + 1;
+        } else {
+                rxb = RX_BUFFER_SIZE;
+                txb = TX_BUFFER_SIZE;
+        }
+
+        begin(baud, RX_BUFFER_SIZE, TX_BUFFER_SIZE);
 }
 
 void FastSerial::begin(long baud, unsigned int rxSpace, unsigned int txSpace)
 {
-	uint16_t ubrr;
-	bool use_u2x = true;
+        uint16_t        ubrr;
+        bool            use_u2x = false;
+        int             ureg, u2;
+        long            breg, b2, dreg, d2;
+       
+        // if we are currently open, close and restart
+        if (_open)
+                end();
 
-	// if we are currently open...
-	if (_open) {
-		// If the caller wants to preserve the buffer sizing, work out what
-		// it currently is...
-		if (0 == rxSpace)
-			rxSpace = _rxBuffer->mask + 1;
-		if (0 == txSpace)
-			txSpace = _txBuffer->mask + 1;
+        // allocate buffers
+        if (!_allocBuffer(_rxBuffer, rxSpace ? : RX_BUFFER_SIZE) ||
+            !_allocBuffer(_txBuffer, txSpace ? : TX_BUFFER_SIZE)) {
+                end();
+                return;                 // couldn't allocate buffers - fatal
+        }
+        _open = true;
 
-		// close the port in its current configuration, clears _open
-		end();
-	}
+        // U2X mode is needed for bitrates higher than (F_CPU / 16)
+        if (baud > F_CPU / 16) {
+                use_u2x = true;
+                ubrr = F_CPU / (8 * baud) - 1;
+        } else {
+                // Determine whether u2x mode would give a closer
+                // approximation of the desired speed.
+    
+                // ubrr for non-2x mode, corresponding baudrate and delta
+                ureg = F_CPU / 16 / baud - 1;
+                breg = F_CPU / 16 / (ureg + 1);
+                dreg = abs(baud - breg);
+                
+                // ubrr for 2x mode, corresponding bitrate and delta
+                u2   = F_CPU / 8 / baud - 1;
+                b2   = F_CPU / 8 / (u2 + 1); 
+                d2   = abs(baud - b2);
 
-	// allocate buffers
-	if (!_allocBuffer(_rxBuffer, rxSpace ? : _default_rx_buffer_size) || !_allocBuffer(_txBuffer, txSpace ?	: _default_tx_buffer_size)) {
-		end();
-		return; // couldn't allocate buffers - fatal
-	}
-
-	// reset buffer pointers
-	_txBuffer->head = _txBuffer->tail = 0;
-	_rxBuffer->head = _rxBuffer->tail = 0;
-
-	// mark the port as open
-	_open = true;
-
-	// If the user has supplied a new baud rate, compute the new UBRR value.
-	if (baud > 0) {
-#if F_CPU == 16000000UL
-		// hardcoded exception for compatibility with the bootloader shipped
-		// with the Duemilanove and previous boards and the firmware on the 8U2
-		// on the Uno and Mega 2560.
-		if (baud == 57600)
-			use_u2x = false;
-#endif
-
-		if (use_u2x) {
-			*_ucsra = 1 << _u2x;
-			ubrr = (F_CPU / 4 / baud - 1) / 2;
-		} else {
-			*_ucsra = 0;
-			ubrr = (F_CPU / 8 / baud - 1) / 2;
-		}
-
-		*_ubrrh = ubrr >> 8;
-		*_ubrrl = ubrr;
-	}
-
-	*_ucsrb |= _portEnableBits;
+                // Pick the setting that gives the smallest rate
+                // error, preferring non-u2x mode if the delta is
+                // identical.
+                if (dreg <= d2) {
+                        ubrr = ureg;
+                } else {
+                        ubrr = u2;
+                        use_u2x = true;
+                }                
+        }
+  
+        *_ucsra = use_u2x ? _BV(_u2x) : 0;
+        *_ubrrh = ubrr >> 8;
+        *_ubrrl = ubrr;
+        *_ucsrb |= _portEnableBits;
 }
 
 void FastSerial::end()
 {
-	*_ucsrb &= ~(_portEnableBits | _portTxBits);
+        *_ucsrb &= ~(_portEnableBits | _portTxBits);
 
-	_freeBuffer(_rxBuffer);
-	_freeBuffer(_txBuffer);
-	_open = false;
+        _freeBuffer(_rxBuffer);
+        _freeBuffer(_txBuffer);
+        _open = false;
 }
 
-int FastSerial::available(void)
+int
+FastSerial::available(void)
 {
-	if (!_open)
-		return (-1);
-	return ((_rxBuffer->head - _rxBuffer->tail) & _rxBuffer->mask);
+        if (!_open)
+                return(-1);
+        return((_rxBuffer->head - _rxBuffer->tail) & _rxBuffer->mask);
 }
 
 int FastSerial::txspace(void)
@@ -157,148 +174,108 @@ int FastSerial::txspace(void)
 	return ((_txBuffer->mask+1) - ((_txBuffer->head - _txBuffer->tail) & _txBuffer->mask));
 }
 
-int FastSerial::read(void)
+int
+FastSerial::read(void)
 {
-	uint8_t c;
+        uint8_t         c;
 
-	// if the head and tail are equal, the buffer is empty
-	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
-		return (-1);
+        // if the head and tail are equal, the buffer is empty
+        if (!_open || (_rxBuffer->head == _rxBuffer->tail))
+                return(-1);
 
-	// pull character from tail
-	c = _rxBuffer->bytes[_rxBuffer->tail];
-	_rxBuffer->tail = (_rxBuffer->tail + 1) & _rxBuffer->mask;
+        // pull character from tail
+        c = _rxBuffer->bytes[_rxBuffer->tail];
+        _rxBuffer->tail = (_rxBuffer->tail + 1) & _rxBuffer->mask;
 
-	return (c);
+        return(c);
 }
 
-int FastSerial::peek(void)
+int
+FastSerial::peek(void)
 {
 
-	// if the head and tail are equal, the buffer is empty
-	if (!_open || (_rxBuffer->head == _rxBuffer->tail))
-		return (-1);
+        // if the head and tail are equal, the buffer is empty
+        if (!_open || (_rxBuffer->head == _rxBuffer->tail))
+                return(-1);
 
-	// pull character from tail
-	return (_rxBuffer->bytes[_rxBuffer->tail]);
+        // pull character from tail
+        return(_rxBuffer->bytes[_rxBuffer->tail]);
 }
 
-void FastSerial::flush(void)
+
+void
+FastSerial::flush(void)
 {
-	// don't reverse this or there may be problems if the RX interrupt
-	// occurs after reading the value of _rxBuffer->head but before writing
-	// the value to _rxBuffer->tail; the previous value of head
-	// may be written to tail, making it appear as if the buffer
-	// don't reverse this or there may be problems if the RX interrupt
-	// occurs after reading the value of head but before writing
-	// the value to tail; the previous value of rx_buffer_head
-	// may be written to tail, making it appear as if the buffer
-	// were full, not empty.
-	_rxBuffer->head = _rxBuffer->tail;
+        // don't reverse this or there may be problems if the RX interrupt
+        // occurs after reading the value of _rxBuffer->head but before writing
+        // the value to _rxBuffer->tail; the previous value of head
+        // may be written to tail, making it appear as if the buffer
+        // don't reverse this or there may be problems if the RX interrupt
+        // occurs after reading the value of head but before writing
+        // the value to tail; the previous value of rx_buffer_head
+        // may be written to tail, making it appear as if the buffer
+        // were full, not empty.
+        _rxBuffer->head = _rxBuffer->tail;
 
-	// don't reverse this or there may be problems if the TX interrupt
-	// occurs after reading the value of _txBuffer->tail but before writing
-	// the value to _txBuffer->head.
-	_txBuffer->tail = _txBuffer->head;
+        // don't reverse this or there may be problems if the TX interrupt
+        // occurs after reading the value of _txBuffer->tail but before writing
+        // the value to _txBuffer->head.
+        _txBuffer->tail = _rxBuffer->head;
 }
 
-#if defined(ARDUINO) && ARDUINO >= 100
-size_t FastSerial::write(uint8_t c)
+size_t
+FastSerial::write(uint8_t c)
 {
-	uint16_t i;
+        int16_t         i;
 
-	if (!_open) // drop bytes if not open
-		return 0;
+        if (!_open)                     // drop bytes if not open
+                return c;
 
-	// wait for room in the tx buffer
-	i = (_txBuffer->head + 1) & _txBuffer->mask;
+        // wait for room in the tx buffer
+        i = (_txBuffer->head + 1) & _txBuffer->mask;
+        while (i == _txBuffer->tail)
+                ;
 
-	// if the port is set into non-blocking mode, then drop the byte
-	// if there isn't enough room for it in the transmit buffer
-	if (_nonblocking_writes && i == _txBuffer->tail) {
-		return 0;
-	}
+        // add byte to the buffer
+        _txBuffer->bytes[_txBuffer->head] = c;
+        _txBuffer->head = i;
 
-	while (i == _txBuffer->tail)
-		;
-
-	// add byte to the buffer
-	_txBuffer->bytes[_txBuffer->head] = c;
-	_txBuffer->head = i;
-
-	// enable the data-ready interrupt, as it may be off if the buffer is empty
-	*_ucsrb |= _portTxBits;
-
-	// return number of bytes written (always 1)
-	return 1;
+        // enable the data-ready interrupt, as it may be off if the buffer is empty
+        *_ucsrb |= _portTxBits;
 }
-#else
-void FastSerial::write(uint8_t c)
-{
-	uint16_t i;
-
-	if (!_open) // drop bytes if not open
-		return;
-
-	// wait for room in the tx buffer
-	i = (_txBuffer->head + 1) & _txBuffer->mask;
-	while (i == _txBuffer->tail)
-		;
-
-	// add byte to the buffer
-	_txBuffer->bytes[_txBuffer->head] = c;
-	_txBuffer->head = i;
-
-	// enable the data-ready interrupt, as it may be off if the buffer is empty
-	*_ucsrb |= _portTxBits;
-}
-#endif
 
 // Buffer management ///////////////////////////////////////////////////////////
 
-bool FastSerial::_allocBuffer(Buffer *buffer, unsigned int size)
+bool
+FastSerial::_allocBuffer(Buffer *buffer, unsigned int size)
 {
-	uint16_t	mask;
-	uint8_t		shift;
+        uint8_t shift;
 
-	// init buffer state
-	buffer->head = buffer->tail = 0;
+        // init buffer state
+        buffer->head = buffer->tail = 0;
 
-	// Compute the power of 2 greater or equal to the requested buffer size
-	// and then a mask to simplify wrapping operations.  Using __builtin_clz
-	// would seem to make sense, but it uses a 256(!) byte table.
-	// Note that we ignore requests for more than BUFFER_MAX space.
-	for (shift = 1; (1U << shift) < min(_max_buffer_size, size); shift++)
-		;
-	mask = (1 << shift) - 1;
+        // Compute the power of 2 greater or equal to the requested buffer size
+        // and then a mask to simplify wrapping operations.  Using __builtin_clz
+        // would seem to make sense, but it uses a 256(!) byte table.
+        // Note that we ignore requests for more than BUFFER_MAX space.
+        for (shift = 1; (1U << shift) < min(BUFFER_MAX, size); shift++)
+                ;
+        buffer->mask = (1 << shift) - 1;
 
-	// If the descriptor already has a buffer allocated we need to take
-	// care of it.
-	if (buffer->bytes) {
+        // allocate memory for the buffer - if this fails, we fail
+        buffer->bytes = (uint8_t *)malloc(buffer->mask + 1);
 
-		// If the allocated buffer is already the correct size then
-		// we have nothing to do
-		if (buffer->mask == mask)
-			return true;
-
-		// Dispose of the old buffer.
-		free(buffer->bytes);
-	}
-	buffer->mask = mask;
-
-	// allocate memory for the buffer - if this fails, we fail.
-	buffer->bytes = (uint8_t *) malloc(buffer->mask + 1);
-
-	return (buffer->bytes != NULL);
+        return(buffer->bytes != NULL);
 }
 
-void FastSerial::_freeBuffer(Buffer *buffer)
+void
+FastSerial::_freeBuffer(Buffer *buffer)
 {
-	buffer->head = buffer->tail = 0;
-	buffer->mask = 0;
-	if (NULL != buffer->bytes) {
-		free(buffer->bytes);
-		buffer->bytes = NULL;
-	}
+        buffer->head = buffer->tail = 0;
+        buffer->mask = 0;
+        if (NULL != buffer->bytes) {
+                free(buffer->bytes);
+                buffer->bytes = NULL;
+        }
 }
 
