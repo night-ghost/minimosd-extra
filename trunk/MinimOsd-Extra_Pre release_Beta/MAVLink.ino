@@ -141,11 +141,11 @@ void read_mavlink(){
                 break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-                  if (osd_climb < 1.66 && osd_climb > -1.66){
+//                  if (osd_climb < 1.66 && osd_climb > -1.66){
                   osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
                   osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
 //                  osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
-                  }
+//                  }
                 }
                 break;
             case MAVLINK_MSG_ID_SCALED_PRESSURE:
