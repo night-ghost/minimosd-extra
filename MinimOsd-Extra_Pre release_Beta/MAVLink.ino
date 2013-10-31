@@ -1,6 +1,6 @@
-#include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
-#include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
-
+//#include "../mavlink/include/mavlink_types.h"
+#include "../mavlink/include/mavlink.h"
+         
 // true when we have received at least 1 MAVLink packet
 static bool mavlink_active;
 static uint8_t crlf_count = 0;
@@ -11,6 +11,7 @@ static int parse_error = 0;
 void request_mavlink_rates()
 {
     const int  maxStreams = 6;
+    mavlink_message_t msg;
     const uint8_t MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
@@ -19,9 +20,10 @@ void request_mavlink_rates()
         MAV_DATA_STREAM_EXTRA2};
     const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
     for (int i=0; i < maxStreams; i++) {
-        mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
-            apm_mav_system, apm_mav_component,
-            MAVStreams[i], MAVRates[i], 1);
+    mavlink_msg_request_data_stream_pack(127, 0, &msg, 7, 1, MAVStreams[i], MAVRates[i], 1);
+    uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+    Serial.write(buf, len);
     }
 }
 
