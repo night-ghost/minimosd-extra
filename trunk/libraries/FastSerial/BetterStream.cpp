@@ -12,22 +12,22 @@
 // Enhancements to the Arduino Stream class.
 //
 
-#include <limits.h>
+#include "limits.h"
 #include "BetterStream.h"
 
 // Stream extensions////////////////////////////////////////////////////////////
 
 void
-BetterStream::print_P(const prog_char_t *s)
+BetterStream::print_P(const prog_char *s)
 {
         char    c;
 
-        while ('\0' != (c = pgm_read_byte((const prog_char *)s++)))
+        while ('\0' != (c = pgm_read_byte(s++)))
                 write(c);
 }
 
 void
-BetterStream::println_P(const prog_char_t *s)
+BetterStream::println_P(const char *s)
 {
         print_P(s);
         println();
@@ -44,7 +44,7 @@ BetterStream::printf(const char *fmt, ...)
 }
 
 void
-BetterStream::_printf_P(const prog_char *fmt, ...)
+BetterStream::printf_P(const char *fmt, ...)
 {
         va_list ap;
 

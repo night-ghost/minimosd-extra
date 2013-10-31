@@ -17,9 +17,8 @@
 #undef PROGMEM 
 #define PROGMEM __attribute__(( section(".progmem.data") )) 
 
-# undef PSTR
-# define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); \
-                (prog_char_t *)&__c[0];}))
+#undef PSTR 
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
 
 //
 // Create a FastSerial driver that looks just like the stock Arduino
@@ -39,7 +38,7 @@ void setup(void)
         //
         // Set the speed for our replacement serial port.
         //
-	Serial.begin(115200);
+	Serial.begin(38400);
 
         //
         // Test printing things

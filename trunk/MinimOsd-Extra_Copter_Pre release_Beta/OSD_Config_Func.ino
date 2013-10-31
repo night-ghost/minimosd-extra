@@ -47,7 +47,7 @@ void InitializeOSD() {
 
     osd.setPanel(4,9);
     osd.openPanel();
-    osd.printf_P(PSTR("OSD Initialized, reboot")); 
+    osd.printf_P("OSD Initialized, reboot"); 
     osd.closePanel();
 
     // run for ever so user resets 
