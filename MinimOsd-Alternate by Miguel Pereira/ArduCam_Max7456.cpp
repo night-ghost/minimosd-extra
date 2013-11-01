@@ -56,22 +56,23 @@ void OSD::detectMode()
   digitalWrite(MAX7456_SELECT,LOW);
   Spi.transfer(MAX7456_STAT_reg_read);//status register
   byte osdstat_r = Spi.transfer(0xff);
+
   if ((B00000001 & osdstat_r) == 1){ //PAL
-    setMode(1);
+      setMode(1);  
   }
   else if((B00000010 & osdstat_r) == 1){ //NTSC
-  setMode(0);
+      setMode(0);
   }
   //If no signal was detected so it uses EEPROM config
   else{
-    if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
-      setMode(0);
-    }
-    else { //PAL
-      setMode(1);
-    }
-    digitalWrite(MAX7456_SELECT,LOW);
-  } 
+      if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
+          setMode(0);
+      } 
+      else { //PAL
+          setMode(1);
+      }
+      digitalWrite(MAX7456_SELECT,LOW);
+  }
 }
 
 //------------------ Set Brightness  ---------------------------------
