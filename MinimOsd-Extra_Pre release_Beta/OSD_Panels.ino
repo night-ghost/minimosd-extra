@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r709"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r710"));
     osd.closePanel();
 }
 
@@ -1282,7 +1282,7 @@ void do_converts()
         spe = 0x10;
         high = 0x0c;
         temps = 0xba;
-        tempconv = 1;
+        tempconv = 10;
         tempconvAdd = 0;
         distchar = 0x1b;
         distconv = 1000;
@@ -1293,7 +1293,7 @@ void do_converts()
         spe = 0x19;
         high = 0x66;
         temps = 0xbb;
-        tempconv = 1.8;
+        tempconv = 18;
         tempconvAdd = 32000;
         distchar = 0x1c;
         distconv = 5280;
