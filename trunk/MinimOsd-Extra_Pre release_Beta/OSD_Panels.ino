@@ -12,7 +12,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P("MinimOSD-Extra 2.4|Plane r704");
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r709"));
     osd.closePanel();
 }
 
@@ -207,7 +207,7 @@ void panTemp(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 //    osd.printf("%c%5.1f%c", 0x0a, (float(temperature * tempconv + tempconvAdd) / 100), temps);
-    osd.printf("%5.1f%c", (float(temperature * tempconv + tempconvAdd) / 100), temps);
+    osd.printf("%5.1f%c", (float(temperature * tempconv + tempconvAdd) / 1000), temps);
     osd.closePanel();
 }
 
@@ -230,7 +230,7 @@ void panEff(int first_col, int first_line){
           if (eff > 0 && eff <= 9999) {
             osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
           }else{
-          osd.printf_P("\x16\x20\x20\x20\x20\x20");
+          osd.printf_P(PSTR("\x16\x20\x20\x20\x20\x20"));
           }
           
     }else{
@@ -252,9 +252,9 @@ void panEff(int first_col, int first_line){
              }
             }
             else if (osd_climb >= -0.05 && osd_pitch < 0) {
-              osd.printf_P("\x18\x20\x20\x90\x91\x20");   
+              osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));   
             }else{
-              osd.printf_P("\x18\x20\x20\x20\x20\x20"); 
+              osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20")); 
             }
             
         
@@ -552,7 +552,7 @@ void panAlt(int first_col, int first_line){
     osd.openPanel();
 //    osd.printf("%c%5.0f%c",0x11, (double)(osd_alt * converth), high);
 //    if (iconMSL == 1) 
-    if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf_P("\x11");
+    if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf_P(PSTR("\x11"));
     osd.printf("%5.0f%c", (double)(osd_alt * converth), high);
     osd.closePanel();
 }
@@ -584,7 +584,7 @@ void panHomeAlt(int first_col, int first_line){
     osd.openPanel();   
 //    osd.printf("%c%5.0f%c",0x12, (double)(osd_alt_to_home * converth), high);
 //    if (iconHA == 1) 
-    if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf_P("\x12");
+    if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf_P(PSTR("\x12"));
     osd.printf("%5.0f%c", (double)(osd_alt_to_home * converth), high);
     osd.closePanel();
 }
@@ -601,7 +601,7 @@ void panVel(int first_col, int first_line){
     osd.openPanel();
 //    osd.printf("%c%3.0f%c",0x14,(double)(osd_groundspeed * converts),spe);
 //    if (iconGS == 1) 
-    if(EEPROM.read(SIGN_GS_ON_ADDR) != 0) osd.printf_P("\x14");
+    if(EEPROM.read(SIGN_GS_ON_ADDR) != 0) osd.printf_P(PSTR("\x14"));
     osd.printf("%3.0f%c",(double)(osd_groundspeed * converts),spe);
     osd.closePanel();
 }
@@ -618,7 +618,7 @@ void panAirSpeed(int first_col, int first_line){
     osd.openPanel();
 //    osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed * converts), spe);
 //    if (iconAS == 1) 
-    if(EEPROM.read(SIGN_AS_ON_ADDR) != 0) osd.printf_P("\x13");
+    if(EEPROM.read(SIGN_AS_ON_ADDR) != 0) osd.printf_P(PSTR("\x13"));        
     osd.printf("%3.0f%c", (double)(osd_airspeed * converts), spe); 
     osd.closePanel();
 }
@@ -825,7 +825,7 @@ void panHomeDis(int first_col, int first_line){
 void panHorizon(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf_P("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\xc6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc5|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|");
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\xc6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc5|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
     osd.closePanel();
     showHorizon((first_col + 1), first_line);
     //Show ILS on  HUD
@@ -1064,7 +1064,7 @@ void panWPDis(int first_col, int first_line){
       if (osd_mode == 10 || osd_mode == 15 || osd_mode == 7){     
         osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
       }else{
-        osd.printf_P("\x20\x20\x20\x20\x20\x20\x20\x20");
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
           }
     osd.closePanel();
 }
@@ -1282,7 +1282,7 @@ void do_converts()
         spe = 0x10;
         high = 0x0c;
         temps = 0xba;
-        tempconv = 10;
+        tempconv = 1;
         tempconvAdd = 0;
         distchar = 0x1b;
         distconv = 1000;
@@ -1293,8 +1293,8 @@ void do_converts()
         spe = 0x19;
         high = 0x66;
         temps = 0xbb;
-        tempconv = 18;
-        tempconvAdd = 3200;
+        tempconv = 1.8;
+        tempconvAdd = 32000;
         distchar = 0x1c;
         distconv = 5280;
         climbchar = 0x1e;
