@@ -69,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #endif
 #include <EEPROM.h>
 #include <SimpleTimer.h>
-#include <mavlink.h>
+#include <GCS_MAVLink.h>
 
 #ifdef membug
 #include <MemoryFree.h>
@@ -110,7 +110,7 @@ void setup()
 
     Serial.begin(TELEMETRY_SPEED);
     // setup mavlink port
-
+    mavlink_comm_0_port = &Serial;
 
 #ifdef membug
     Serial.println(freeMem());
