@@ -1788,13 +1788,36 @@ namespace OSD
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
             pan.rssical = eeprom[OSD_RSSI_HIGH_ADDR];
-            RSSI_numeric_max.Value = pan.rssical;
+            //RSSI_numeric_max.Value = pan.rssical;
 
             pan.rssipersent = eeprom[OSD_RSSI_LOW_ADDR];
-            RSSI_numeric_min.Value = pan.rssipersent;
+            //RSSI_numeric_min.Value = pan.rssipersent;
 
             pan.rssiraw_on = eeprom[OSD_RSSI_RAW_ADDR];
+
+            RSSI_numeric_min.Minimum = 0;
+            RSSI_numeric_min.Maximum = 2000;
+            RSSI_numeric_max.Minimum = 0;
+            RSSI_numeric_max.Maximum = 2000;
             RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+            if ((int)(pan.rssiraw_on / 2) == 0)
+            {
+                RSSI_numeric_min.Value = pan.rssipersent;
+                RSSI_numeric_max.Value = pan.rssical;
+                RSSI_numeric_min.Minimum = 0;
+                RSSI_numeric_min.Maximum = 255;
+                RSSI_numeric_max.Minimum = 0;
+                RSSI_numeric_max.Maximum = 255;
+            }
+            else
+            {
+                RSSI_numeric_min.Value = pan.rssipersent * 10;
+                RSSI_numeric_max.Value = pan.rssical * 10;
+                RSSI_numeric_min.Minimum = 1000;
+                RSSI_numeric_min.Maximum = 2000;
+                RSSI_numeric_max.Minimum = 1000;
+                RSSI_numeric_max.Maximum = 2000;
+            }
             cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
