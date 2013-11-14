@@ -1795,10 +1795,13 @@ namespace OSD
 
             pan.rssiraw_on = eeprom[OSD_RSSI_RAW_ADDR];
 
+            updatingRSSI = true;
             RSSI_numeric_min.Minimum = 0;
             RSSI_numeric_min.Maximum = 2000;
             RSSI_numeric_max.Minimum = 0;
             RSSI_numeric_max.Maximum = 2000;
+            RSSI_numeric_min.Value = 0;
+            RSSI_numeric_max.Value = 0;
             RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
             if ((int)(pan.rssiraw_on / 2) == 0)
             {
@@ -1819,6 +1822,7 @@ namespace OSD
                 RSSI_numeric_max.Maximum = 2000;
             }
             cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+            updatingRSSI = false;
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
             if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
@@ -2038,6 +2042,8 @@ namespace OSD
             }
         }
 
+        private Boolean updatingRSSI = false;
+
         private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
@@ -2150,10 +2156,14 @@ namespace OSD
 
                         //RSSI_numeric_max.Value = pan.rssical;
                         //RSSI_numeric_min.Value = pan.rssipersent;
+
+                        updatingRSSI = true;
                         RSSI_numeric_min.Minimum = 0;
                         RSSI_numeric_min.Maximum = 2000;
                         RSSI_numeric_max.Minimum = 0;
                         RSSI_numeric_max.Maximum = 2000;
+                        RSSI_numeric_min.Value = 0;
+                        RSSI_numeric_max.Value = 0;
                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
                         if ((int)(pan.rssiraw_on / 2) == 0)
                         {
@@ -2199,6 +2209,10 @@ namespace OSD
                 catch
                 {
                     MessageBox.Show("Error Reading file");
+                }
+                finally
+                {
+                    updatingRSSI = false;
                 }
             }
 
@@ -2723,6 +2737,8 @@ namespace OSD
 
         private void RSSI_numeric_min_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingRSSI)
+                return;
             if (cbxRSSIChannel.SelectedIndex == 0)
             {
                 pan.rssipersent = (byte)RSSI_numeric_min.Value;
@@ -2735,6 +2751,8 @@ namespace OSD
 
         private void RSSI_numeric_max_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingRSSI)
+                return;
             if (cbxRSSIChannel.SelectedIndex == 0)
             {
                 pan.rssical = (byte)RSSI_numeric_max.Value;
