@@ -49,7 +49,7 @@ void setHomeVars(OSD &osd)
   long bearing;
   
   //if(osd_got_home == 0 && osd_fix_type > 1){
-  if(osd_got_home == 0 && osd_fix_type == 3){  //DMD : 3D GPS fix is 3 when OK
+  if(osd_got_home == 0 && osd_fix_type == 3 && osd_eph < 330){  //DMD : 3D GPS fix is 3 when OK, and GPS position is accurate
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
     osd_home_alt = osd_alt;

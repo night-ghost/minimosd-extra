@@ -25,13 +25,14 @@ void loadBar() { //change name due we don't have CLI anymore
 //  Serial.flush(); 
   
   // Our main loop to wait input from user.  
-  for(waitTimer = 0; waitTimer <= BOOTTIME; waitTimer++) {
+  /*for(waitTimer = 0; waitTimer <= BOOTTIME; waitTimer++) {
 
     // How often we update our progress bar is depending on modulo
     if(waitTimer % (BOOTTIME / 8) == 0) {
       barStep++;
       
       // Update bar it self
+      /*
       osd.setPanel(barX + 12, barY);
       osd.openPanel();
       switch(barStep) {
@@ -67,10 +68,11 @@ void loadBar() { //change name due we don't have CLI anymore
          break;
       }
       osd.closePanel();
-    }
+      */
+    //}
     
-    delay(1);       // Minor delay to make sure that we stay here long enough
-  }
+    //delay(1);       // Minor delay to make sure that we stay here long enough
+  //}
 }
 
 

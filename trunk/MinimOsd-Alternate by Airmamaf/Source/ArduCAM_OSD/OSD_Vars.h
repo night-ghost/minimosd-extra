@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 #include <DMD_SommeAverage.h>
-#include "RunningAverage.h"
+#include "RSSIFilter.h"
 
 
 #define MASK_OSD_GET_RSSI_CONF        (1<<0) 
@@ -68,8 +68,8 @@ Les valeurs de TUNE_PARAM_ID et RSSI_CONFIG_ID sont recuperees dans le fichier d
 
 
 #define RSSIPIN 12              // Miso Pin
-RunningAverage rssi_percent(16);
-long last_rssi_measure_time=0;
+RSSIFilter rssiFilter(160000, 135, -2, 3.5);
+//long last_rssi_measure_time=0;
 static const char* RSSI_PARAM_NAME = "RSSI_PIN"; 
 static boolean rssi_signal_from_apm = true;
 
@@ -99,7 +99,7 @@ static uint8_t  osd_battery_pic_A = 0xb9; //DMD old : 0xb4;       // picture to 
 //static float    osd_vbat_B = 0;               // voltage in milivolt
 //static float    osd_curr_B = 0;                 // Battery B current
 static float climb_rate = 100;                 // DMD The cm/s we are moving up or down based on filtered data - Positive = UP
-static DMD_SommeAverage climb_average;
+//static DMD_SommeAverage climb_average;
 
 
 
