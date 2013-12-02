@@ -12,9 +12,9 @@ void startPanels(){
 void writePanels(){
     uint32_t  localtime = millis();
 
-    if(ISa(Climb_BIT)) {
+    /*if(ISa(Climb_BIT)) {
         climb_average.addValue(osd_alt);
-    }
+    }*/
 
   if(localtime < (lastMAVBeat + 2000)){
     //DMD Flight time
@@ -72,12 +72,12 @@ void writePanels(){
         
         
     //  if(ISa(BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1]); //7x1
-    	if(ISa(Climb_BIT)) {
+    	/*if(ISa(Climb_BIT)) {
     	    if(localtime - local_climb_time > 1000 ) {
                 panClimb(panClimb_XY[0], panClimb_XY[1], localtime - local_climb_time); //7x1 //DMD
                 local_climb_time = localtime;
             }
-        }
+        }*/
         
         if(ISa(GPSats_BIT)) panGPSats(panGPSats_XY[0], panGPSats_XY[1]); //5x1
         if(ISa(GPL_BIT)) panGPL(panGPL_XY[0], panGPL_XY[1]); //2x1
@@ -188,12 +188,52 @@ void panRSSI(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   if( !rssi_signal_from_apm ) {
-    osd_rssi = constrain(rssi_percent.getIntAverage(),0,100);
+    osd_rssi = rssiFilter.getPercentCurvedSignal();
   }
   osd.printf("%c%3i%c",0xE1,osd_rssi,0x25);
   osd.closePanel();
+  
+  //Display RSSI signal bar
+  
+  osd.setPanel(first_col -1, first_line + 1);
+  osd.openPanel();
+  int rssi = osd_rssi + 4; //For math computing, just divide by 20, if 
+  rssi = min(rssi, 104); //From 100->96 is full, 95 to 91, 
+  
+  osd.printf("%c",0xED); //Left corner
+  for(int i=0; i<5; i++) {
+    osd.printf("%c", getSignalImage(rssi, (i*4)));
+  }
+  osd.printf("%c",0xF3); //Right corner   
+        
+
+ /*       
+ osd.printf("%c%c%c%c%c%c%c",0xED,
+        getSignalImage(rssi, 0), 
+        getSignalImage(rssi, 4),
+        getSignalImage(rssi, 8),
+        getSignalImage(rssi, 12),
+        getSignalImage(rssi, 16),0xF3);
+  */      
+        
+  osd.closePanel();
 }
 //Fin RSSI
+
+//Compute image from RSSI signal value
+char getSignalImage(int rssi, int scope) {
+  int base = rssi / 5 - scope;
+  
+  //Result should be between 0 and 4
+  base = max(base, 0);
+  base = min(base, 4);
+  
+  //Full bar image is 0xEE
+  //Empty bar image is 0xF2 
+  //Image should be 0xEE (Full), 0xEF (full minus 3 pos), 0xF0 (full minus 6 pos), 0xF1 (full minus 9 pos) and 0xF2 (Empty)
+  char image = 0xEE + abs(base - 4);
+  return image;
+}
 
 //DMD
 /* **************************************************************** */
@@ -203,6 +243,7 @@ void panRSSI(int first_col, int first_line){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
+/*
 void panClimb(int first_col, int first_line, uint32_t elapsed_time)
 {
     osd.setPanel(first_col, first_line);
@@ -216,8 +257,8 @@ void panClimb(int first_col, int first_line, uint32_t elapsed_time)
     } else {
       osd.printf("%c%3.0f%c%c", 0x85, (double)climb_rate, 0x81, 0xBF);
     } */
-    osd.closePanel();
-}
+    //osd.closePanel();
+//}
 
 //DMD
 /* **************************************************************** */
@@ -283,7 +324,7 @@ void panCurrentBatA(int first_col, int first_line)
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   
-  osd.printf("%3i%c%c", (int)osd_battery_remaining_A , 0x25, osd_battery_pic_A);
+  osd.printf("%c%3i%c", osd_battery_pic_A, (int)osd_battery_remaining_A , 0x25);
   //osd.printf("%4i%c%c", (int)osd_curr_A , 0x82, osd_battery_pic_A);
   //osd.printf("%4i%c%c", (int)(osd_curr_A * 0.02778f) , 0x82, osd_battery_pic_A);
   //osd.printf("%4i%c%c", (int)(osd_curr_A * 0.01 * 0.02778) , 0x82, osd_battery_pic_A);
@@ -486,6 +527,8 @@ void panGPSats(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
   osd.printf("%c%2i", 0x0f,osd_satellites_visible);
+    //DMD Hdop
+  osd.printf("|%c%5i", 0x12, osd_eph);
   osd.closePanel();
 }
 
@@ -544,7 +587,8 @@ void panRose(int first_col, int first_line){
 void panBoot(int first_col, int first_line){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
-  osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
+  osd.printf_P(PSTR("Booting up...")); 
+  //osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
   osd.closePanel();
 
 }
@@ -662,8 +706,7 @@ void panFlightMode(int first_col, int first_line){
     if(osd_mode == 1) osd.printf_P(PSTR("\xE0""circ%c"),motorstatus);//CIRCLE
   }*/
 #endif
-  //DMD Hdop
-  //osd.printf("|%5i", osd_eph);
+
   osd.closePanel();
 }
 

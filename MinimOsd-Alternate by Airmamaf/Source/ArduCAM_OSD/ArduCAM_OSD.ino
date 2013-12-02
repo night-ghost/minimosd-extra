@@ -67,6 +67,7 @@
 	#include "wiring.h"
 #endif
 #include <EEPROM.h>
+#include <SimpleTimer.h>
 #include <GCS_MAVLink.h>
 
 #ifdef membug
@@ -78,8 +79,8 @@
 #include "ArduCam_Max7456.h"
 #include "OSD_Vars.h"
 #include "OSD_Func.h"
-#include "DMD_SommeAverage.h" 
-#include "RunningAverage.h" //DMD pour le RSSI
+//#include "DMD_SommeAverage.h" 
+#include <RSSIFilter.h> //DMD pour le RSSI
 
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
@@ -166,7 +167,7 @@ void setup()
   //Set up RSSI PIN from MinimOSD
   if( panB_REG & (1 << RSSI_BIT) ) {
     pinMode(RSSIPIN, INPUT);
-    rssi_percent.clear();
+    rssiFilter.clear();
     osd_state_screen = MASK_OSD_GET_RSSI_CONF;
   } else {
     osd_state_screen = MASK_OSD_NORMAL_MODE;
@@ -209,12 +210,7 @@ void loop()
   
   //DMD rssi via PIN 12 si config. affichage RSSI et si RSSI ne vient pas de l'APM
   if( !rssi_signal_from_apm && (panB_REG & (1 << RSSI_BIT))) {
-    unsigned long currtime=millis();
-   
-    if(currtime - last_rssi_measure_time > 50){
-        rssi_percent.addValue((pulseIn(RSSIPIN, HIGH,500)-1)*2);
-        last_rssi_measure_time=currtime;
-    }
+        rssiFilter.computeSignal(pulseIn(RSSIPIN, HIGH, 200));
   }
   
   mavlinkTimer.Run();
