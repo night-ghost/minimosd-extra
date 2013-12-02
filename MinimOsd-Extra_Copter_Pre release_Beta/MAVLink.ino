@@ -48,6 +48,7 @@ void read_mavlink(){
 
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
+            lastMAVBeat = millis();
             mavlink_active = 1;
             //handle msg
             switch(msg.msgid) {
@@ -66,10 +67,10 @@ void read_mavlink(){
                     motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    lastMAVBeat = millis();
+                    /*lastMAVBeat = millis();
                     if(waitingMAVBeats == 1){
                         enable_mav_request = 1;
-                    }
+                    }*/
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
