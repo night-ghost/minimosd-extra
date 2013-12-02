@@ -175,7 +175,7 @@ Serial.flush();
 void loop() 
 {
 
-    if(enable_mav_request == 1){//Request rate control
+    /*if(enable_mav_request == 1){//Request rate control
         //osd.clear();
         //osd.setPanel(3,10);
         //osd.openPanel();
@@ -190,7 +190,7 @@ void loop()
         osd.clear();
         waitingMAVBeats = 0;
         lastMAVBeat = millis();//Preventing error from delay sensing
-    }
+    }*/
 
     read_mavlink();
     mavlinkTimer.Run();
