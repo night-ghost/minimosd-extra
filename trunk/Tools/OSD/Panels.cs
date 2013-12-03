@@ -117,7 +117,7 @@ namespace OSD
         static float osd_lon = 117.883419f;                    // longitude
         static uint8_t osd_satellites_visible = 7;     // number of satelites
         static uint8_t osd_fix_type = 3;               // GPS lock 0-1=no fix, 2=2D, 3=3D
-        static int start_Time = 2; 
+        static int start_Time = 3785; 
 
         //static uint8_t osd_got_home = 0;               // tels if got home position or not
         //static float osd_home_lat = 0;               // home latidude
@@ -238,7 +238,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             {
-                osd.printf("%c%5.1f%c", 0x0A, temperature * tempconv + tempconvAdd, temperatureChar);
+                osd.printf("%5.1f%c", temperature * tempconv + tempconvAdd, temperatureChar);
             }
             osd.closePanel();
             return 0;
@@ -501,7 +501,7 @@ namespace OSD
             osd.openPanel();
             if (Convert.ToBoolean(osd_battery_show_percentage))
             {
-                osd.printf("%c%c%3.0i%c", 0x17, 0x20, osd_battery_remaining, 0x25);
+                osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining, 0x25);
             }
             else
             {
@@ -522,7 +522,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%2i%c%02i", 0x08, (start_Time / 60) % 60, 0x3A, start_Time % 60);
+            osd.printf("%3i%c%02i", ((int)start_Time / 60), 0x3A, (int)start_Time % 60);
             osd.closePanel();
             return 0;
         }
@@ -715,7 +715,8 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%2i", 0x0f, osd_satellites_visible);
+            //osd.printf("%c%2i", 0x0f, osd_satellites_visible);
+            osd.printf("%c%2i", 0x2a, osd_satellites_visible);
             osd.closePanel();
             return 0;
         }
@@ -876,34 +877,35 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            if (apm_mav_type == 2)//ArduCopter
+            if (this.osd.modelType == OSD.ModelType.Copter)//ArduCopter
             {
-
-                if (osd_mode == 100) osd.printf_P(PSTR("\x7Fstab\x86"));//Stabilize
-                if (osd_mode == 101) osd.printf_P(PSTR("\x7Facro\x86"));//Acrobatic
-                if (osd_mode == 102) osd.printf_P(PSTR("\x7Falth\x86"));//Alt Hold
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fauto\x86"));//Auto
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fguid\x86"));//Guided
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\x7Floit\x86"));//Loiter
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7Fretl\x86"));//Return to Launch
-                if (osd_mode == 107) osd.printf_P(PSTR("\x7Fcirc\x86")); // Circle
-                if (osd_mode == 108) osd.printf_P(PSTR("\x7Fposi\x86")); // Position
-                if (osd_mode == 109) osd.printf_P(PSTR("\x7Fland\x86")); // Land
-                if (osd_mode == 110) osd.printf_P(PSTR("\x7Foflo\x86")); // OF_Loiter
+                osd.printf_P(PSTR("\x7Fstab\x86"));//Stabilize
+                //if (osd_mode == 100) osd.printf_P(PSTR("\x7Fstab\x86"));//Stabilize
+                //if (osd_mode == 101) osd.printf_P(PSTR("\x7Facro\x86"));//Acrobatic
+                //if (osd_mode == 102) osd.printf_P(PSTR("\x7Falth\x86"));//Alt Hold
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fauto\x86"));//Auto
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7Fguid\x86"));//Guided
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_HOLD) osd.printf_P(PSTR("\x7Floit\x86"));//Loiter
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7Fretl\x86"));//Return to Launch
+                //if (osd_mode == 107) osd.printf_P(PSTR("\x7Fcirc\x86")); // Circle
+                //if (osd_mode == 108) osd.printf_P(PSTR("\x7Fposi\x86")); // Position
+                //if (osd_mode == 109) osd.printf_P(PSTR("\x7Fland\x86")); // Land
+                //if (osd_mode == 110) osd.printf_P(PSTR("\x7Foflo\x86")); // OF_Loiter
             }
-            else if (apm_mav_type == 1) // arduplane
+            else if (this.osd.modelType == OSD.ModelType.Plane) // arduplane
             {
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST1 && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE2"));//Stabilize
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_MANUAL && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE3"));//Manual
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE4"));//Loiter
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE5"));//Return to Launch
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 1) osd.printf_P(PSTR("\x7F\xE6"));//FLY_BY_WIRE_A
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 2) osd.printf_P(PSTR("\x7F\xE7"));//FLY_BY_WIRE_B
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED) osd.printf_P(PSTR("\x7F\xE7"));//GUIDED
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7F\xE7"));//AUTO
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE7"));//RTL
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE7"));//LOITER
-                if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST3) osd.printf_P(PSTR("\x7F\xE7"));//CIRCLE
+                osd.printf_P(PSTR("manu"));//Stabilize
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST1 && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE2"));//Stabilize
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_MANUAL && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_VECTOR) osd.printf_P(PSTR("\x7F\xE3"));//Manual
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE4"));//Loiter
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE5"));//Return to Launch
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 1) osd.printf_P(PSTR("\x7F\xE6"));//FLY_BY_WIRE_A
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST2 && osd_nav_mode == 2) osd.printf_P(PSTR("\x7F\xE7"));//FLY_BY_WIRE_B
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_GUIDED) osd.printf_P(PSTR("\x7F\xE7"));//GUIDED
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_WAYPOINT) osd.printf_P(PSTR("\x7F\xE7"));//AUTO
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_RETURNING) osd.printf_P(PSTR("\x7F\xE7"));//RTL
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_AUTO && osd_nav_mode == (byte)ArdupilotMega.MAVLink.MAV_NAV.MAV_NAV_LOITER) osd.printf_P(PSTR("\x7F\xE7"));//LOITER
+                //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST3) osd.printf_P(PSTR("\x7F\xE7"));//CIRCLE
             }
             //    if(osd_mode == 3 && osd_nav_mode == 4) osd.printf_P(PSTR("\xD0\xD2"));
             osd.closePanel();
