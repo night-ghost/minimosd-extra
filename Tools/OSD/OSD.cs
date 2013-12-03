@@ -899,7 +899,7 @@ namespace OSD
             return (int)value;
         }
 
-        enum ModelType
+        public enum ModelType
         {
             Plane = 0,
             Copter = 1
@@ -913,7 +913,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r725";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2311,8 +2311,8 @@ namespace OSD
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "*.hex|*.hex";
-
-            ofd.ShowDialog();
+            if(ofd.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
+                return;
 
             if (ofd.FileName != "")
             {
@@ -2415,6 +2415,7 @@ namespace OSD
 
         }
 
+        private Boolean customImage = false;
         private void customBGPictureToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -2430,7 +2431,7 @@ namespace OSD
 
                 }
                 catch { MessageBox.Show("Bad Image"); }
-
+                customImage = true;
                 osdDraw1();
                 osdDraw2();
             }
@@ -3094,8 +3095,10 @@ namespace OSD
             }
         }
 
+        public ModelType modelType = ModelType.Plane; 
         private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            modelType = (ModelType)cbxModelType.SelectedItem;
             if (UNITS_combo.SelectedIndex == 0)
             {
                 pan.converts = 0; //metric
@@ -3108,6 +3111,20 @@ namespace OSD
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
+
+            //if (modelType == ModelType.Plane)
+            //{
+            //    if(!customImage)
+            //        bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
+            //}
+            //else if (modelType == ModelType.Copter)
+            //{
+            //    if (!customImage)
+            //        bgpicture = Image.FromFile("quad.png");
+            //}
+
+            osdDraw1();
+            osdDraw2();
         }
 
         enum PanelsAutoSwitch
