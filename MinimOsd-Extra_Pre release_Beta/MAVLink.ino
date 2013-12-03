@@ -48,8 +48,8 @@ void read_mavlink(){
 
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
+            lastMAVBeat = millis();
             mavlink_active = 1;
-            lastMAVBeat = millis(); //Moved to here. As long as we have data we consider valid to show on OSD (no more waiting on heartbeat
             //handle msg
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:

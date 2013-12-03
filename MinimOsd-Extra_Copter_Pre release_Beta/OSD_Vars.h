@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static float         max_home_distance = 0;
+static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
@@ -26,6 +26,7 @@ static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in m
 static float        eff = 0; //Efficiency
 static uint16_t     eph = 0;
 
+static uint8_t      currentBasePanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
 static uint8_t      base_mode=0;
 static uint8_t      panel_auto_switch=0;
 static bool         motor_armed = 0;

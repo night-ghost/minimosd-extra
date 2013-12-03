@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r717"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r719"));
     osd.closePanel();
 }
 
@@ -18,26 +18,41 @@ void panLogo(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
-//  if(millis() < (lastMAVBeat + 2200))
-//    waitingMAVBeats = 1;
-  //if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+//if(millis() < (lastMAVBeat + 2200))
+//  waitingMAVBeats = 1;
+//if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
 
-  if(millis() < (lastMAVBeat + 2200)){
-    
+  //Base panel selection
+  //No mavlink data available panel
+  if(millis() > (lastMAVBeat + 2200)){
+    if (currentBasePanel != 2){
+      osd.clear();
+      currentBasePanel = 2;
+    }   
+    //panLogo();
+    //waitingMAVBeats = 1;
+    //Display our logo and wait... 
+    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
+  }
+  //Flight summary panel
   //Only show flight summary 10 seconds after landing and if throttle < 15
-  if ((landed != 4294967295) && ((((millis() - landed) / 10000) % 2) == 0)){ 
-    if (osd_clear == 0){
-       osd.clear();
-       osd_clear = 1;
+  else if ((landed != 4294967295) && ((((millis() - landed) / 10000) % 2) == 0)){ 
+    if (currentBasePanel != 1){
+      osd.clear();
+      currentBasePanel = 1;
     }
     panFdata(); 
-  }else{ 
+  }
+  //Normal osd panel
+  else{
     if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
     //Check for panel toggle
     if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
-    if (osd_clear == 1){
+    //If there is a panel switch or a change in base panel then clear osd
+    if ((osd_clear == 1) || (currentBasePanel != 0)){
       osd.clear();
       osd_clear = 0;
+      currentBasePanel = 0;
     }
     if(panel != npanels){
       //Testing bits from 8 bit register A 
@@ -67,12 +82,10 @@ void writePanels(){
       }
 
       //Testing bits from 8 bit register C 
-      //if(osd_got_home == 1){
       if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
       if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
       if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
       if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
-      //}
       if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
       if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
       if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
@@ -91,22 +104,9 @@ void writePanels(){
       //if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
       if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
     }
-    //else { //panel == npanels
-      //if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
-      //if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
-    //}
-  }
-  } else { // if no mavlink update for 2 secs
-    
-        // this could be replaced with a No Mavlink warning so the last seen values still show
-
-        osd.clear();
-        waitingMAVBeats = 1;
-        // Display our logo and wait... 
-    //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
-    panLogo();
   }
   if(ISd(panel % npanels,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
+  timers();
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
     osd.setPanel(13,4);
@@ -794,13 +794,13 @@ void panBatt_A(int first_col, int first_line){
 
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
-//void panWaitMAVBeats(int first_col, int first_line){
-//    panLogo();
-//    osd.setPanel(first_col, first_line);
-//    osd.openPanel();
-//    osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
-//    osd.closePanel();
-//}
+void panWaitMAVBeats(int first_col, int first_line){
+  //panLogo();
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  osd.printf_P(PSTR("No mav data!"));
+  osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : panGPL

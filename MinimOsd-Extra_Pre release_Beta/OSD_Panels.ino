@@ -1,8 +1,6 @@
 /******* STARTUP PANEL *******/
 
 void startPanels(){
-//    osd.clear();
-    //osd_clear = 3;
     panLogo(); // Display our logo  
     do_converts(); // load the unit conversion preferences
 }
@@ -12,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r716"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r719"));
     osd.closePanel();
 }
 
@@ -20,102 +18,95 @@ void panLogo(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
-  
-  //if (millis() > one_sec_timer) one_sec_timer_switch = 1;  
-
-  if(millis() < (lastMAVBeat + 2200)){
-  
-    if (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100){
-          if (takeofftime == 1) landed = millis();}
-    if ((millis() - 7000) > landed){ 
-       if (osd_clear == 0){
-         osd.clear(); 
-         osd_clear = 1;
-         panFdata();
-       }
-//        if ((millis() - 10000) > landing) panFdata();     
-        }else{
-//         landed = millis();
-         
-         if (osd_clear == 1){
-         osd.clear(); 
-         osd_clear = 0;                    
-       }
-      if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
-            if(panel != npanels)
-            {
-                
-                //Testing bits from 8 bit register A 
- //               if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
-                if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
-                if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
-                if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
-                if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
-                //  if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
-                if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
-                if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
-                if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
-                if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
-
-                //Testing bits from 8 bit register B
-                if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
-                if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
- //               if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
-
-                if(osd_got_home == 1){
-                    if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
-                    if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
-                }
-
-                if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
- //               if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
-                if(wp_number > 0){
-                if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
-                }
-                //Testing bits from 8 bit register C 
-                //if(osd_got_home == 1){
-                if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
-                if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
-                if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
-                if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
-
-                //}
-                if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
-                if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
-                if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
-                if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
-
-                //Testing bits from 8 bit register D 
-                if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
-                if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-//                if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
-                if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
-                if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
-                if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
-                if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
-//                if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
-                if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
-            } else { //panel == npanels
-                if(ISd(0,Warn_BIT) || ISd(1,Warn_BIT)) panWarn(9, 4); // this must be here so warnings are always checked
-                if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
-            }
-            timers();
- //       } else { // if (osd_on > 0)
- //           panSetup();
- //       }
-        }
-    //}
-   } else { // if no mavlink update for 2 secs
-    
-        // this could be replaced with a No Mavlink warning so the last seen values still show
-
-        osd.clear();
-        waitingMAVBeats = 1;
-        // Display our logo and wait... 
-    //    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
-    panLogo();
+  if ((takeofftime == 1) && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100)){
+    landed = millis();
   }
-  
+
+  //Base panel selection
+  //No mavlink data available panel
+  if(millis() > (lastMAVBeat + 2200)){
+    if (currentBasePanel != 2){
+      osd.clear();
+      currentBasePanel = 2;
+    }   
+    //panLogo();
+    //waitingMAVBeats = 1;
+    //Display our logo and wait... 
+    panWaitMAVBeats(5,10); //Waiting for MAVBeats...
+  }
+  //Flight summary panel
+  //Only show flight summary 7 seconds after landing
+  else if ((millis() - 7000) > landed){ 
+    if (currentBasePanel != 1){
+      osd.clear();
+      currentBasePanel = 1;
+    }
+    panFdata(); 
+  }
+  //Normal osd panel
+  else{
+    if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
+    //Check for panel toggle
+    if(ch_toggle > 3) panOff(); // This must be first so you can always toggle
+    if ((osd_clear == 1) || (currentBasePanel != 0)){
+      osd.clear();
+      osd_clear = 0;
+      currentBasePanel = 0;
+    }
+    if(panel != npanels)
+    {
+      //Testing bits from 8 bit register A 
+      //if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+      //if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
+      if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
+      if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
+      if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
+      //if(ISa(panel,BatB_BIT)) panBatt_B(panBatt_B_XY[0], panBatt_B_XY[1][panel]); //7x1
+      if(ISa(panel,GPSats_BIT)) panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]); //5x1
+      if(ISa(panel,GPS_BIT)) panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]); //12x3
+      if(ISa(panel,Bp_BIT)) panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]); //
+      if(ISa(panel,COG_BIT)) panCOG(panCOG_XY[0][panel], panCOG_XY[1][panel]); //
+
+      //Testing bits from 8 bit register B
+      if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
+      if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
+      //if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
+
+      if(osd_got_home == 1){
+        if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
+        if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
+      }
+      
+      if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+      //if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
+      if(wp_number > 0){
+        if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+      }
+      //Testing bits from 8 bit register C 
+      if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
+      if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
+      if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
+      if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
+
+      if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
+      if(ISc(panel,FMod_BIT)) panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);  //
+      if(ISc(panel,Hor_BIT)) panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]); //14x5
+      if(ISc(panel,CurA_BIT)) panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
+
+      //Testing bits from 8 bit register D 
+      if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
+      if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+      //if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+      if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
+      if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
+      if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
+      if(ISe(panel,TEMP_BIT)) panTemp(panTemp_XY[0][panel], panTemp_XY[1][panel]);
+      //if(ISe(panel,Ch_BIT)) panCh(panCh_XY[0][panel], panCh_XY[1][panel]);
+      if(ISe(panel,DIST_BIT)) panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
+    }
+  }
+  if(ISd(0,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]); //call sign even in off panel
+  timers();
     // OSD debug for development (Shown on top-middle panels) 
 #ifdef membug
     osd.setPanel(13,4);
@@ -882,13 +873,13 @@ void panBatt_A(int first_col, int first_line){
 
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
-//void panWaitMAVBeats(int first_col, int first_line){
-//    panLogo();
-//    osd.setPanel(first_col, first_line);
-//    osd.openPanel();
-//    osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
-//    osd.closePanel();
-//}
+void panWaitMAVBeats(int first_col, int first_line){
+  //panLogo();
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  osd.printf_P(PSTR("No mav data!"));
+  osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : panGPL
