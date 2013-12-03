@@ -11,7 +11,7 @@ static float        vs = 0;
 
 static float tdistance = 0;
 static float ddistance = 0;
-//static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
+static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 //static uint8_t oszt = 1;
  
