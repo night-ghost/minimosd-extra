@@ -68,7 +68,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 #include <EEPROM.h>
-#include <SimpleTimer.h>
+//#include <SimpleTimer.h>
 #include <GCS_MAVLink.h>
 
 #ifdef membug
@@ -95,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 FastSerialPort0(Serial);
 OSD osd; //OSD object 
 
-SimpleTimer  mavlinkTimer;
+//SimpleTimer  mavlinkTimer;
 
 
 /* **********************************************/
@@ -157,11 +157,11 @@ void setup()
 delay(2000);
 Serial.flush(); 
     // Startup MAVLink timers  
-    mavlinkTimer.Set(&OnMavlinkTimer, 120);
+    //mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
     // House cleaning, clear display and enable timers
 //    osd.clear();
-    mavlinkTimer.Enable();
+    //mavlinkTimer.Enable();
 
 } // END of setup();
 
@@ -191,9 +191,14 @@ void loop()
         waitingMAVBeats = 0;
         lastMAVBeat = millis();//Preventing error from delay sensing
     }*/
-
+    
+    //Run "timer" every 120 miliseconds
+    if(millis() > mavLinkTimer + 120){
+      mavLinkTimer = millis();
+      OnMavlinkTimer();
+    }
     read_mavlink();
-    mavlinkTimer.Run();
+    //mavlinkTimer.Run();
 }
 
 /* *********************************************** */
