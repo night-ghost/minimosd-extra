@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r723"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r726"));
     osd.closePanel();
 }
 
@@ -495,7 +495,8 @@ void panCur_A(int first_col, int first_line){
 void panAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf_P("\x11");
+    //if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf_P("\x11");
+    if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf("%c", 0x11);
     osd.printf("%5.0f%c", (double)(osd_gps_alt * converth), high);
     osd.closePanel();
 }
@@ -524,7 +525,8 @@ void panClimb(int first_col, int first_line){
 void panHomeAlt(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf_P("\x12");
+    //if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf_P('\x12');
+    if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf("%c", 0x12);
     osd.printf("%5.0f%c", (double)(osd_alt_to_home * converth), high);
     osd.closePanel();
 }
@@ -539,7 +541,8 @@ void panHomeAlt(int first_col, int first_line){
 void panVel(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(EEPROM.read(SIGN_GS_ON_ADDR) != 0) osd.printf_P("\x14");
+    //if(EEPROM.read(SIGN_GS_ON_ADDR) != 0) osd.printf_P("\x14");
+    if(EEPROM.read(SIGN_GS_ON_ADDR) != 0) osd.printf("%c", 0x14);
     osd.printf("%3.0f%c",(double)(osd_groundspeed * converts),spe);
     osd.closePanel();
 }
@@ -554,7 +557,8 @@ void panVel(int first_col, int first_line){
 void panAirSpeed(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(EEPROM.read(SIGN_AS_ON_ADDR) != 0) osd.printf_P("\x13");
+    //if(EEPROM.read(SIGN_AS_ON_ADDR) != 0) osd.printf_P("\x13");
+    if(EEPROM.read(SIGN_AS_ON_ADDR) != 0) osd.printf("%c", 0x13);
     osd.printf("%3.0f%c", (double)(osd_airspeed * converts), spe); 
     osd.closePanel();
 }
