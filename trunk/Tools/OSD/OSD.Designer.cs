@@ -58,6 +58,7 @@ namespace OSD
             this.customBGPictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gettingStartedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -127,7 +128,11 @@ namespace OSD
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
-            this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblPresentedCharset = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lblLatestCharsetUploaded = new System.Windows.Forms.Label();
+            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -158,6 +163,8 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.groupBox11.SuspendLayout();
+            this.groupBox12.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -219,11 +226,11 @@ namespace OSD
             // BUT_WriteOSD
             // 
             this.BUT_WriteOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_WriteOSD.Location = new System.Drawing.Point(545, 440);
+            this.BUT_WriteOSD.Location = new System.Drawing.Point(540, 508);
             this.BUT_WriteOSD.Name = "BUT_WriteOSD";
-            this.BUT_WriteOSD.Size = new System.Drawing.Size(131, 23);
+            this.BUT_WriteOSD.Size = new System.Drawing.Size(148, 23);
             this.BUT_WriteOSD.TabIndex = 2;
-            this.BUT_WriteOSD.Text = "Save current tab to OSD";
+            this.BUT_WriteOSD.Text = "Save Current Tab to OSD";
             this.BUT_WriteOSD.UseVisualStyleBackColor = true;
             this.BUT_WriteOSD.Click += new System.EventHandler(this.BUT_WriteOSD_Click);
             // 
@@ -231,7 +238,7 @@ namespace OSD
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CMB_ComPort.FormattingEnabled = true;
-            this.CMB_ComPort.Location = new System.Drawing.Point(333, 440);
+            this.CMB_ComPort.Location = new System.Drawing.Point(330, 510);
             this.CMB_ComPort.Name = "CMB_ComPort";
             this.CMB_ComPort.Size = new System.Drawing.Size(98, 21);
             this.CMB_ComPort.TabIndex = 4;
@@ -240,7 +247,7 @@ namespace OSD
             // BUT_ReadOSD
             // 
             this.BUT_ReadOSD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_ReadOSD.Location = new System.Drawing.Point(438, 440);
+            this.BUT_ReadOSD.Location = new System.Drawing.Point(434, 508);
             this.BUT_ReadOSD.Name = "BUT_ReadOSD";
             this.BUT_ReadOSD.Size = new System.Drawing.Size(100, 23);
             this.BUT_ReadOSD.TabIndex = 6;
@@ -253,7 +260,7 @@ namespace OSD
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar1,
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 468);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 536);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(688, 22);
             this.statusStrip1.TabIndex = 8;
@@ -425,6 +432,13 @@ namespace OSD
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
             // 
+            // presentCustomCharsetToolStripMenuItem
+            // 
+            this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.presentCustomCharsetToolStripMenuItem.Text = "Present Custom Charset...";
+            this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
+            // 
             // setSketchesPathToolStripMenuItem
             // 
             this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
@@ -462,7 +476,7 @@ namespace OSD
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.pictureBox1.Location = new System.Drawing.Point(178, 17);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(497, 343);
+            this.pictureBox1.Size = new System.Drawing.Size(497, 339);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
@@ -474,19 +488,16 @@ namespace OSD
             this.PANEL_tabs.Controls.Add(this.tabPageConfig);
             this.PANEL_tabs.Controls.Add(this.tabPage1);
             this.PANEL_tabs.Controls.Add(this.tabPage2);
-            this.PANEL_tabs.Location = new System.Drawing.Point(0, 24);
+            this.PANEL_tabs.Location = new System.Drawing.Point(1, 96);
             this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
             this.PANEL_tabs.SelectedIndex = 0;
-            this.PANEL_tabs.Size = new System.Drawing.Size(687, 411);
+            this.PANEL_tabs.Size = new System.Drawing.Size(687, 407);
             this.PANEL_tabs.TabIndex = 0;
             // 
             // tabPageConfig
             // 
             this.tabPageConfig.Controls.Add(this.groupBox10);
-            this.tabPageConfig.Controls.Add(this.lblFWModelType);
-            this.tabPageConfig.Controls.Add(this.lblModelType);
-            this.tabPageConfig.Controls.Add(this.cbxModelType);
             this.tabPageConfig.Controls.Add(this.groupBox9);
             this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
@@ -499,7 +510,7 @@ namespace OSD
             this.tabPageConfig.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageConfig.Name = "tabPageConfig";
             this.tabPageConfig.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPageConfig.Size = new System.Drawing.Size(679, 385);
+            this.tabPageConfig.Size = new System.Drawing.Size(679, 381);
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
@@ -511,7 +522,7 @@ namespace OSD
             this.groupBox10.Controls.Add(this.cbxHomeAltitudeSign);
             this.groupBox10.Controls.Add(this.cbxGroundSpeedSign);
             this.groupBox10.Controls.Add(this.cbxAirSpeedSign);
-            this.groupBox10.Location = new System.Drawing.Point(356, 249);
+            this.groupBox10.Location = new System.Drawing.Point(357, 224);
             this.groupBox10.Name = "groupBox10";
             this.groupBox10.Size = new System.Drawing.Size(152, 114);
             this.groupBox10.TabIndex = 8;
@@ -576,27 +587,26 @@ namespace OSD
             // 
             // lblFWModelType
             // 
-            this.lblFWModelType.Location = new System.Drawing.Point(259, 10);
+            this.lblFWModelType.Location = new System.Drawing.Point(6, 16);
             this.lblFWModelType.Name = "lblFWModelType";
             this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
             this.lblFWModelType.TabIndex = 14;
             this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
-            this.lblFWModelType.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblModelType
             // 
             this.lblModelType.AutoSize = true;
-            this.lblModelType.Location = new System.Drawing.Point(5, 10);
+            this.lblModelType.Location = new System.Drawing.Point(6, 16);
             this.lblModelType.Name = "lblModelType";
-            this.lblModelType.Size = new System.Drawing.Size(62, 13);
+            this.lblModelType.Size = new System.Drawing.Size(112, 13);
             this.lblModelType.TabIndex = 13;
-            this.lblModelType.Text = "Model type:";
+            this.lblModelType.Text = "Presented model type:";
             // 
             // cbxModelType
             // 
             this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxModelType.FormattingEnabled = true;
-            this.cbxModelType.Location = new System.Drawing.Point(72, 7);
+            this.cbxModelType.Location = new System.Drawing.Point(123, 13);
             this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
             this.cbxModelType.Name = "cbxModelType";
             this.cbxModelType.Size = new System.Drawing.Size(126, 21);
@@ -607,7 +617,7 @@ namespace OSD
             // 
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(179, 236);
+            this.groupBox9.Location = new System.Drawing.Point(180, 211);
             this.groupBox9.Name = "groupBox9";
             this.groupBox9.Size = new System.Drawing.Size(150, 63);
             this.groupBox9.TabIndex = 10;
@@ -642,7 +652,7 @@ namespace OSD
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
             this.groupBox8.Controls.Add(this.label12);
-            this.groupBox8.Location = new System.Drawing.Point(179, 159);
+            this.groupBox8.Location = new System.Drawing.Point(180, 134);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(150, 65);
             this.groupBox8.TabIndex = 9;
@@ -677,7 +687,7 @@ namespace OSD
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(7, 230);
+            this.groupBox7.Location = new System.Drawing.Point(8, 205);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(150, 144);
             this.groupBox7.TabIndex = 8;
@@ -745,7 +755,7 @@ namespace OSD
             // 
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(356, 30);
+            this.groupBox6.Location = new System.Drawing.Point(357, 5);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(152, 63);
             this.groupBox6.TabIndex = 7;
@@ -778,7 +788,7 @@ namespace OSD
             // 
             this.groupBox5.Controls.Add(this.OVERSPEED_label);
             this.groupBox5.Controls.Add(this.OVERSPEED_numeric);
-            this.groupBox5.Location = new System.Drawing.Point(179, 93);
+            this.groupBox5.Location = new System.Drawing.Point(180, 68);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(150, 67);
             this.groupBox5.TabIndex = 6;
@@ -814,7 +824,7 @@ namespace OSD
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(356, 99);
+            this.groupBox4.Location = new System.Drawing.Point(357, 74);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(152, 150);
             this.groupBox4.TabIndex = 5;
@@ -892,7 +902,7 @@ namespace OSD
             // 
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(179, 30);
+            this.groupBox3.Location = new System.Drawing.Point(180, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(150, 63);
             this.groupBox3.TabIndex = 4;
@@ -931,7 +941,7 @@ namespace OSD
             this.groupBoxRSSI.Controls.Add(this.lblRSSIMin);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
-            this.groupBoxRSSI.Location = new System.Drawing.Point(7, 30);
+            this.groupBoxRSSI.Location = new System.Drawing.Point(8, 5);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
             this.groupBoxRSSI.Size = new System.Drawing.Size(150, 194);
             this.groupBoxRSSI.TabIndex = 3;
@@ -1051,7 +1061,7 @@ namespace OSD
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(679, 385);
+            this.tabPage1.Size = new System.Drawing.Size(679, 381);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Panel 1";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -1098,7 +1108,7 @@ namespace OSD
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(679, 385);
+            this.tabPage2.Size = new System.Drawing.Size(679, 381);
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Panel 2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1143,7 +1153,7 @@ namespace OSD
             this.groupBox2.Controls.Add(this.NUM_X2);
             this.groupBox2.Location = new System.Drawing.Point(3, 285);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(138, 82);
+            this.groupBox2.Size = new System.Drawing.Size(169, 82);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             // 
@@ -1198,7 +1208,7 @@ namespace OSD
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox2.Location = new System.Drawing.Point(178, 17);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(497, 343);
+            this.pictureBox2.Size = new System.Drawing.Size(497, 339);
             this.pictureBox2.TabIndex = 3;
             this.pictureBox2.TabStop = false;
             this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseDown);
@@ -1207,7 +1217,8 @@ namespace OSD
             // 
             // btnGeneratePanelsFile
             // 
-            this.btnGeneratePanelsFile.Location = new System.Drawing.Point(4, 440);
+            this.btnGeneratePanelsFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnGeneratePanelsFile.Location = new System.Drawing.Point(1, 508);
             this.btnGeneratePanelsFile.Name = "btnGeneratePanelsFile";
             this.btnGeneratePanelsFile.Size = new System.Drawing.Size(125, 23);
             this.btnGeneratePanelsFile.TabIndex = 15;
@@ -1216,18 +1227,65 @@ namespace OSD
             this.btnGeneratePanelsFile.Visible = false;
             this.btnGeneratePanelsFile.Click += new System.EventHandler(this.btnGeneratePanelsFile_Click);
             // 
-            // presentCustomCharsetToolStripMenuItem
+            // lblPresentedCharset
             // 
-            this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.presentCustomCharsetToolStripMenuItem.Text = "Present Custom Charset...";
-            this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
+            this.lblPresentedCharset.AutoSize = true;
+            this.lblPresentedCharset.Location = new System.Drawing.Point(7, 40);
+            this.lblPresentedCharset.Name = "lblPresentedCharset";
+            this.lblPresentedCharset.Size = new System.Drawing.Size(97, 13);
+            this.lblPresentedCharset.TabIndex = 6;
+            this.lblPresentedCharset.Text = "Presented Charset:";
+            this.lblPresentedCharset.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(266, 513);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(58, 13);
+            this.label5.TabIndex = 16;
+            this.label5.Text = "Serial Port:";
+            // 
+            // lblLatestCharsetUploaded
+            // 
+            this.lblLatestCharsetUploaded.Location = new System.Drawing.Point(6, 40);
+            this.lblLatestCharsetUploaded.Name = "lblLatestCharsetUploaded";
+            this.lblLatestCharsetUploaded.Size = new System.Drawing.Size(249, 13);
+            this.lblLatestCharsetUploaded.TabIndex = 17;
+            this.lblLatestCharsetUploaded.Text = "Latest charset uploaded to OSD: Unknown";
+            // 
+            // groupBox11
+            // 
+            this.groupBox11.Controls.Add(this.lblModelType);
+            this.groupBox11.Controls.Add(this.cbxModelType);
+            this.groupBox11.Controls.Add(this.lblPresentedCharset);
+            this.groupBox11.Location = new System.Drawing.Point(1, 26);
+            this.groupBox11.Name = "groupBox11";
+            this.groupBox11.Size = new System.Drawing.Size(334, 65);
+            this.groupBox11.TabIndex = 18;
+            this.groupBox11.TabStop = false;
+            this.groupBox11.Text = "CT Tool Status:";
+            // 
+            // groupBox12
+            // 
+            this.groupBox12.Controls.Add(this.lblFWModelType);
+            this.groupBox12.Controls.Add(this.lblLatestCharsetUploaded);
+            this.groupBox12.Location = new System.Drawing.Point(341, 26);
+            this.groupBox12.Name = "groupBox12";
+            this.groupBox12.Size = new System.Drawing.Size(347, 65);
+            this.groupBox12.TabIndex = 19;
+            this.groupBox12.TabStop = false;
+            this.groupBox12.Text = "OSD Status:";
             // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 490);
+            this.ClientSize = new System.Drawing.Size(688, 558);
+            this.Controls.Add(this.groupBox12);
+            this.Controls.Add(this.groupBox11);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.btnGeneratePanelsFile);
             this.Controls.Add(this.PANEL_tabs);
             this.Controls.Add(this.statusStrip1);
@@ -1254,7 +1312,6 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
-            this.tabPageConfig.PerformLayout();
             this.groupBox10.ResumeLayout(false);
             this.groupBox10.PerformLayout();
             this.groupBox9.ResumeLayout(false);
@@ -1289,6 +1346,9 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.groupBox11.ResumeLayout(false);
+            this.groupBox11.PerformLayout();
+            this.groupBox12.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1394,6 +1454,11 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbxRSSIChannel;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ToolStripMenuItem presentCustomCharsetToolStripMenuItem;
+        private System.Windows.Forms.Label lblPresentedCharset;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblLatestCharsetUploaded;
+        private System.Windows.Forms.GroupBox groupBox11;
+        private System.Windows.Forms.GroupBox groupBox12;
     }
 }
 

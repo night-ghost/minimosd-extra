@@ -97,6 +97,7 @@ namespace OSD
 
             // load default font
             chars = mcm.readMCM("MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm");
+            lblPresentedCharset.Text = "Presented Charset: " + "MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm";
             // load default bg picture
             try
             {
@@ -913,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r727";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r728";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2736,6 +2737,7 @@ namespace OSD
 
                     toolStripProgressBar1.Value = 100;
                     toolStripStatusLabel1.Text = "CharSet Done";
+                    lblLatestCharsetUploaded.Text = "Latest charset uploaded to OSD: " + ofd.SafeFileName;
                 }
             }
         }
@@ -3335,7 +3337,7 @@ namespace OSD
 
         private void SetRSSIValues()
         {
-            updatingRSSI = true;
+            //updatingRSSI = true;
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
             RSSI_numeric_min.Maximum = 2000;
@@ -3349,8 +3351,8 @@ namespace OSD
                 {
                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
                     //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
-                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 900;
-                    RSSI_numeric_max.Value = (pan.rssical * 10 - 900) * 255 / 900;
+                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 1100;
+                    RSSI_numeric_max.Value = (pan.rssical * 10 - 900) * 255 / 1100;
                     //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
                     //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
                 }
@@ -3379,7 +3381,7 @@ namespace OSD
             }
             int rawOn = pan.rssiraw_on % 2;
             pan.rssiraw_on = Convert.ToByte(cbxRSSIChannel.SelectedIndex * 2 + rawOn);
-            updatingRSSI = false;
+            //updatingRSSI = false;
         }
 
         private void presentCustomCharsetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3390,6 +3392,7 @@ namespace OSD
                 return;
 
             chars = mcm.readMCM(ofd.FileName);
+            lblPresentedCharset.Text = "Presented Charset: " + ofd.SafeFileName;
             osdDraw1();
             osdDraw2();
         }
