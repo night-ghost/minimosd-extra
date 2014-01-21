@@ -103,6 +103,8 @@ namespace OSD
             this.STALL_label = new System.Windows.Forms.Label();
             this.STALL_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBoxRSSI = new System.Windows.Forms.GroupBox();
+            this.cbxRSSIChannel = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.RSSI_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.RSSI_RAW = new System.Windows.Forms.CheckBox();
@@ -125,8 +127,7 @@ namespace OSD
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
-            this.cbxRSSIChannel = new System.Windows.Forms.ComboBox();
-            this.label15 = new System.Windows.Forms.Label();
+            this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -375,6 +376,7 @@ namespace OSD
             this.customBGPictureToolStripMenuItem,
             this.sendTLogToolStripMenuItem,
             this.updateFontToolStripMenuItem,
+            this.presentCustomCharsetToolStripMenuItem,
             this.setSketchesPathToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
@@ -935,6 +937,32 @@ namespace OSD
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
             // 
+            // cbxRSSIChannel
+            // 
+            this.cbxRSSIChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRSSIChannel.FormattingEnabled = true;
+            this.cbxRSSIChannel.Items.AddRange(new object[] {
+            "Mavlink RSSI",
+            "Channel 5",
+            "Channel 6",
+            "Channel 7",
+            "Channel 8"});
+            this.cbxRSSIChannel.Location = new System.Drawing.Point(9, 27);
+            this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxRSSIChannel.Name = "cbxRSSIChannel";
+            this.cbxRSSIChannel.Size = new System.Drawing.Size(135, 21);
+            this.cbxRSSIChannel.TabIndex = 13;
+            this.cbxRSSIChannel.SelectedIndexChanged += new System.EventHandler(this.cbxRSSIChannel_SelectedIndexChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(6, 12);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(76, 13);
+            this.label15.TabIndex = 12;
+            this.label15.Text = "RSSI channel:";
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -1023,7 +1051,7 @@ namespace OSD
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(679, 368);
+            this.tabPage1.Size = new System.Drawing.Size(679, 385);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Panel 1";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -1070,7 +1098,7 @@ namespace OSD
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(679, 368);
+            this.tabPage2.Size = new System.Drawing.Size(679, 385);
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Panel 2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1188,31 +1216,12 @@ namespace OSD
             this.btnGeneratePanelsFile.Visible = false;
             this.btnGeneratePanelsFile.Click += new System.EventHandler(this.btnGeneratePanelsFile_Click);
             // 
-            // cbxRSSIChannel
+            // presentCustomCharsetToolStripMenuItem
             // 
-            this.cbxRSSIChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRSSIChannel.FormattingEnabled = true;
-            this.cbxRSSIChannel.Items.AddRange(new object[] {
-            "Mavlink RSSI",
-            "Channel 5",
-            "Channel 6",
-            "Channel 7",
-            "Channel 8"});
-            this.cbxRSSIChannel.Location = new System.Drawing.Point(9, 27);
-            this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxRSSIChannel.Name = "cbxRSSIChannel";
-            this.cbxRSSIChannel.Size = new System.Drawing.Size(135, 21);
-            this.cbxRSSIChannel.TabIndex = 13;
-            this.cbxRSSIChannel.SelectedIndexChanged += new System.EventHandler(this.cbxRSSIChannel_SelectedIndexChanged);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(6, 12);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(76, 13);
-            this.label15.TabIndex = 12;
-            this.label15.Text = "RSSI channel:";
+            this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.presentCustomCharsetToolStripMenuItem.Text = "Present Custom Charset...";
+            this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // OSD
             // 
@@ -1384,6 +1393,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem setSketchesPathToolStripMenuItem;
         private System.Windows.Forms.ComboBox cbxRSSIChannel;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.ToolStripMenuItem presentCustomCharsetToolStripMenuItem;
     }
 }
 

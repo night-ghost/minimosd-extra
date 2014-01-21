@@ -913,7 +913,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r725";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r727";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -1754,6 +1754,10 @@ namespace OSD
             pan.sign_ground_speed = eeprom[SIGN_GS_ON_ADDR];
             pan.sign_home_altitude = eeprom[SIGN_HA_ON_ADDR];
             pan.sign_msl_altitude = eeprom[SIGN_MSL_ON_ADDR];
+            cbxAirSpeedSign.Checked = (pan.sign_air_speed != 0);
+            cbxGroundSpeedSign.Checked = (pan.sign_ground_speed != 0);
+            cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude != 0);
+            cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude != 0);
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
             lblFWModelType.Text = "Model Type found in OSD: " + cbxModelType.SelectedText;
             pan.converts = eeprom[measure_ADDR];
@@ -1816,9 +1820,9 @@ namespace OSD
             {
                 RSSI_numeric_min.Value = pan.rssipersent * 10;
                 RSSI_numeric_max.Value = pan.rssical * 10;
-                RSSI_numeric_min.Minimum = 1000;
+                RSSI_numeric_min.Minimum = 900;
                 RSSI_numeric_min.Maximum = 2000;
-                RSSI_numeric_max.Minimum = 1000;
+                RSSI_numeric_max.Minimum = 900;
                 RSSI_numeric_max.Maximum = 2000;
             }
             cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
@@ -2178,9 +2182,9 @@ namespace OSD
                         {
                             RSSI_numeric_min.Value = pan.rssipersent * 10;
                             RSSI_numeric_max.Value = pan.rssical * 10;
-                            RSSI_numeric_min.Minimum = 1000;
+                            RSSI_numeric_min.Minimum = 900;
                             RSSI_numeric_min.Maximum = 2000;
-                            RSSI_numeric_max.Minimum = 1000;
+                            RSSI_numeric_max.Minimum = 900;
                             RSSI_numeric_max.Maximum = 2000;
                         }
                         cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
@@ -2199,6 +2203,11 @@ namespace OSD
                         BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
 
                         CALLSIGNmaskedText.Text = pan.callsign_str;
+
+                        cbxAirSpeedSign.Checked = (pan.sign_air_speed != 0);
+                        cbxGroundSpeedSign.Checked = (pan.sign_ground_speed != 0);
+                        cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude != 0);
+                        cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude != 0);
 
                         this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
                         this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -3326,6 +3335,7 @@ namespace OSD
 
         private void SetRSSIValues()
         {
+            updatingRSSI = true;
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
             RSSI_numeric_min.Maximum = 2000;
@@ -3339,8 +3349,8 @@ namespace OSD
                 {
                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
                     //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
-                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
-                    RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
+                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 900;
+                    RSSI_numeric_max.Value = (pan.rssical * 10 - 900) * 255 / 900;
                     //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
                     //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
                 }
@@ -3357,18 +3367,31 @@ namespace OSD
                 {
                     //RSSI_numeric_min.Value = pan.rssipersent * 100 / 255 + 100;
                     //RSSI_numeric_max.Value = pan.rssical * 100 / 255 + 100;
-                    RSSI_numeric_min.Value = (pan.rssipersent * 100 / 255 + 100) * 10;
-                    RSSI_numeric_max.Value = (pan.rssical * 100 / 255 + 100) * 10;
+                    RSSI_numeric_min.Value = (pan.rssipersent * 1100 / 255) + 900;
+                    RSSI_numeric_max.Value = (pan.rssical * 1100 / 255) + 900;
                     //pan.rssipersent = (byte)(pan.rssipersent * 100 / 255 + 100);
                     //pan.rssical = (byte)(pan.rssical * 100 / 255 + 100);
                 }
                 RSSI_numeric_min.Maximum = 2000;
-                RSSI_numeric_min.Minimum = 1000;
+                RSSI_numeric_min.Minimum = 900;
                 RSSI_numeric_max.Maximum = 2000;
-                RSSI_numeric_max.Minimum = 1000;
+                RSSI_numeric_max.Minimum = 900;
             }
             int rawOn = pan.rssiraw_on % 2;
             pan.rssiraw_on = Convert.ToByte(cbxRSSIChannel.SelectedIndex * 2 + rawOn);
+            updatingRSSI = false;
+        }
+
+        private void presentCustomCharsetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "mcm|*.mcm";
+            if(ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            chars = mcm.readMCM(ofd.FileName);
+            osdDraw1();
+            osdDraw2();
         }
     }
 }
