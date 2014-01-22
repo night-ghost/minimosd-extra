@@ -105,15 +105,20 @@ void setFdataVars(){
   //Moved from panel because warnings also need this var and panClimb could be off
   vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
 
-  if (haltset == 1 && takeofftime == 0 && osd_throttle > 15){
-    takeofftime = 1;
+  //Set startup GPS dependent variables
+  if (haltset == 1 && osd_throttle > 15){
+    haltset = 2;
     tdistance = 0;
-    FTime = (millis()/1000);
-    start_battery_reading = osd_battery_remaining_A;
-    last_battery_reading = osd_battery_remaining_A;
   }
 
+  //Copter specific "in flight" detection
   if(osd_throttle > 15){
+    if (takeofftime == 0){
+      takeofftime = 1;
+      start_battery_reading = osd_battery_remaining_A;
+      last_battery_reading = osd_battery_remaining_A;
+    }
+    start_Time = (millis()/1000) - FTime;
     not_moving_since = millis();
     landed = 4294967295; //Airborn
   }
@@ -121,20 +126,20 @@ void setFdataVars(){
   else if(((millis() - not_moving_since) > 10000) && (landed == 4294967295) && (takeofftime == 1)){
     landed = millis();
   }
+  FTime = (millis()/1000);
 
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - runt) / 1000.0);
   mah_used += (osd_curr_A * 10.0 * (millis() - runt) / 3600000.0);
   runt = millis();
 
+  //Set max data
   if (takeofftime == 1){
-    start_Time = (millis()/1000) - FTime;
     if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
     if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
-  
 }
 
 void checkModellType(){
