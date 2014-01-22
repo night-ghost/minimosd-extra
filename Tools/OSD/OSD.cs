@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r728";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r730";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2737,7 +2737,7 @@ namespace OSD
 
                     toolStripProgressBar1.Value = 100;
                     toolStripStatusLabel1.Text = "CharSet Done";
-                    lblLatestCharsetUploaded.Text = "Latest charset uploaded to OSD: " + ofd.SafeFileName;
+                    lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
                 }
             }
         }

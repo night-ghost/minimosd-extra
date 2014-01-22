@@ -72,9 +72,6 @@ namespace OSD
             this.cbxHomeAltitudeSign = new System.Windows.Forms.CheckBox();
             this.cbxGroundSpeedSign = new System.Windows.Forms.CheckBox();
             this.cbxAirSpeedSign = new System.Windows.Forms.CheckBox();
-            this.lblFWModelType = new System.Windows.Forms.Label();
-            this.lblModelType = new System.Windows.Forms.Label();
-            this.cbxModelType = new System.Windows.Forms.ComboBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.BRIGHTNESScomboBox = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -127,6 +124,9 @@ namespace OSD
             this.NUM_Y2 = new System.Windows.Forms.NumericUpDown();
             this.NUM_X2 = new System.Windows.Forms.NumericUpDown();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.lblFWModelType = new System.Windows.Forms.Label();
+            this.lblModelType = new System.Windows.Forms.Label();
+            this.cbxModelType = new System.Windows.Forms.ComboBox();
             this.btnGeneratePanelsFile = new System.Windows.Forms.Button();
             this.lblPresentedCharset = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -524,7 +524,7 @@ namespace OSD
             this.groupBox10.Controls.Add(this.cbxAirSpeedSign);
             this.groupBox10.Location = new System.Drawing.Point(357, 224);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(152, 114);
+            this.groupBox10.Size = new System.Drawing.Size(160, 114);
             this.groupBox10.TabIndex = 8;
             this.groupBox10.TabStop = false;
             // 
@@ -584,34 +584,6 @@ namespace OSD
             this.cbxAirSpeedSign.Text = "Air Speed";
             this.cbxAirSpeedSign.UseVisualStyleBackColor = true;
             this.cbxAirSpeedSign.CheckedChanged += new System.EventHandler(this.cbxAirSpeedSign_CheckedChanged);
-            // 
-            // lblFWModelType
-            // 
-            this.lblFWModelType.Location = new System.Drawing.Point(6, 16);
-            this.lblFWModelType.Name = "lblFWModelType";
-            this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
-            this.lblFWModelType.TabIndex = 14;
-            this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
-            // 
-            // lblModelType
-            // 
-            this.lblModelType.AutoSize = true;
-            this.lblModelType.Location = new System.Drawing.Point(6, 16);
-            this.lblModelType.Name = "lblModelType";
-            this.lblModelType.Size = new System.Drawing.Size(112, 13);
-            this.lblModelType.TabIndex = 13;
-            this.lblModelType.Text = "Presented model type:";
-            // 
-            // cbxModelType
-            // 
-            this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxModelType.FormattingEnabled = true;
-            this.cbxModelType.Location = new System.Drawing.Point(123, 13);
-            this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxModelType.Name = "cbxModelType";
-            this.cbxModelType.Size = new System.Drawing.Size(126, 21);
-            this.cbxModelType.TabIndex = 12;
-            this.cbxModelType.SelectedIndexChanged += new System.EventHandler(this.cbxModelType_SelectedIndexChanged);
             // 
             // groupBox9
             // 
@@ -757,7 +729,7 @@ namespace OSD
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Location = new System.Drawing.Point(357, 5);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(152, 63);
+            this.groupBox6.Size = new System.Drawing.Size(160, 63);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             // 
@@ -826,7 +798,7 @@ namespace OSD
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
             this.groupBox4.Location = new System.Drawing.Point(357, 74);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(152, 150);
+            this.groupBox4.Size = new System.Drawing.Size(160, 150);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             // 
@@ -1215,6 +1187,34 @@ namespace OSD
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
             this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseUp);
             // 
+            // lblFWModelType
+            // 
+            this.lblFWModelType.Location = new System.Drawing.Point(6, 16);
+            this.lblFWModelType.Name = "lblFWModelType";
+            this.lblFWModelType.Size = new System.Drawing.Size(249, 13);
+            this.lblFWModelType.TabIndex = 14;
+            this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
+            // 
+            // lblModelType
+            // 
+            this.lblModelType.AutoSize = true;
+            this.lblModelType.Location = new System.Drawing.Point(6, 16);
+            this.lblModelType.Name = "lblModelType";
+            this.lblModelType.Size = new System.Drawing.Size(112, 13);
+            this.lblModelType.TabIndex = 13;
+            this.lblModelType.Text = "Presented model type:";
+            // 
+            // cbxModelType
+            // 
+            this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxModelType.FormattingEnabled = true;
+            this.cbxModelType.Location = new System.Drawing.Point(123, 13);
+            this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxModelType.Name = "cbxModelType";
+            this.cbxModelType.Size = new System.Drawing.Size(126, 21);
+            this.cbxModelType.TabIndex = 12;
+            this.cbxModelType.SelectedIndexChanged += new System.EventHandler(this.cbxModelType_SelectedIndexChanged);
+            // 
             // btnGeneratePanelsFile
             // 
             this.btnGeneratePanelsFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -1253,7 +1253,7 @@ namespace OSD
             this.lblLatestCharsetUploaded.Name = "lblLatestCharsetUploaded";
             this.lblLatestCharsetUploaded.Size = new System.Drawing.Size(249, 13);
             this.lblLatestCharsetUploaded.TabIndex = 17;
-            this.lblLatestCharsetUploaded.Text = "Latest charset uploaded to OSD: Unknown";
+            this.lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown";
             // 
             // groupBox11
             // 
