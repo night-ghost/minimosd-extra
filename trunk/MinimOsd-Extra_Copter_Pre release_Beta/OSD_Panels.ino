@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r726"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r729"));
     osd.closePanel();
 }
 
@@ -207,7 +207,7 @@ void panEff(int first_col, int first_line){
         ////If in loiter should estimated remaining flight time
         //if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
           if(osd_battery_remaining_A != last_battery_reading){
-            remaining_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (start_battery_reading - osd_battery_remaining_A);
+            remaining_Time = osd_battery_remaining_A * start_Time / (start_battery_reading - osd_battery_remaining_A);
             last_battery_reading = osd_battery_remaining_A;
           }
           osd.printf("%c%2i%c%02i", 0x17,((int)remaining_Time/60)%60,0x3A,(int)remaining_Time%60);
@@ -698,7 +698,6 @@ void panBatteryPercent(int first_col, int first_line){
 void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    start_Time = (millis()/1000) - FTime;
     osd.printf("%2i%c%02i",((int)start_Time/60)%60,0x3A,(int)start_Time%60);
     osd.closePanel();
 }
