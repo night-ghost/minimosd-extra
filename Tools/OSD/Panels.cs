@@ -47,6 +47,13 @@ namespace OSD
 
         //Config vars
         public uint8_t model_type = 0; //0 - Plane; 1 - Copter
+        public uint8_t fw_version1 = 0;
+        public uint8_t fw_version2 = 0;
+        public uint8_t fw_version3 = 0;
+        public uint8_t cs_version1 = 0;
+        public uint8_t cs_version2 = 0;
+        public uint8_t cs_version3 = 0;
+        
         public uint8_t sign_air_speed = 0;
         public uint8_t sign_ground_speed = 0;
         public uint8_t sign_home_altitude = 0;
