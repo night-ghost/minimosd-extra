@@ -1611,6 +1611,7 @@ namespace OSD
         const int SIGN_GS_ON_ADDR = 880;
         const int SIGN_AS_ON_ADDR = 882;
         const int MODEL_TYPE_ADD = 884;
+
         const int AUTO_SCREEN_SWITCH_ADD = 886;
         const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
         const int measure_ADDR = 890;
@@ -1633,6 +1634,13 @@ namespace OSD
 
         const int OSD_CALL_SIGN_ADDR = 920;
         const int OSD_CALL_SIGN_TOTAL = 8;
+
+        const int FW_VERSION1_ADDR = 930;
+        const int FW_VERSION2_ADDR = 932;
+        const int FW_VERSION3_ADDR = 934;
+        const int CS_VERSION1_ADDR = 936;
+        const int CS_VERSION2_ADDR = 938;
+        const int CS_VERSION3_ADDR = 940;
 
         const int CHK_VERSION = 1010;
 
@@ -1751,6 +1759,30 @@ namespace OSD
 
             //Setup configuration panel
             pan.model_type = eeprom[MODEL_TYPE_ADD];
+            pan.fw_version1 = eeprom[FW_VERSION1_ADDR];
+            pan.fw_version2 = eeprom[FW_VERSION2_ADDR];
+            pan.fw_version3 = eeprom[FW_VERSION3_ADDR];
+            pan.cs_version1 = eeprom[CS_VERSION1_ADDR];
+            pan.cs_version2 = eeprom[CS_VERSION2_ADDR];
+            pan.cs_version3 = eeprom[CS_VERSION3_ADDR];
+            if((pan.fw_version1 == 0x00) && (pan.fw_version2 == 0x00) && (pan.fw_version3 == 0x00))
+            {
+                lblFWModelType.Text = "Model Type found in OSD: Unknown" + (ModelType)pan.model_type + " version.";
+            }
+            else
+            {
+                lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version1 + "." + pan.fw_version2 + "." + pan.fw_version3;
+            }
+
+            if ((pan.cs_version1 == 0x00) && (pan.cs_version2 == 0x00) && (pan.cs_version3 == 0x00))
+            {
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Uknown charset version. ";
+            }
+            else
+            {
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + (pan.cs_version1 - '0').ToString() + "." + (pan.cs_version2 - '0').ToString() + "." + (pan.cs_version3 - '0').ToString();
+            }
+
             pan.sign_air_speed = eeprom[SIGN_AS_ON_ADDR];
             pan.sign_ground_speed = eeprom[SIGN_GS_ON_ADDR];
             pan.sign_home_altitude = eeprom[SIGN_HA_ON_ADDR];
@@ -1760,7 +1792,6 @@ namespace OSD
             cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude != 0);
             cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude != 0);
             cbxModelType.SelectedItem = (ModelType)pan.model_type;
-            lblFWModelType.Text = "Model Type found in OSD: " + cbxModelType.SelectedText;
             pan.converts = eeprom[measure_ADDR];
             //Modify units
             if (pan.converts == 0)
@@ -2648,12 +2679,26 @@ namespace OSD
                         }
                     }
 
+                    if (!comPort.ReadLine().Contains("Ready for Version"))
+                    {
+                        MessageBox.Show("Error entering CharSet version - invalid data");
+                        comPort.Close();
+                        return;
+                    }
+                    comPort.Write("_");
+                    comPort.Write("2");
+                    comPort.Write("4");
+                    comPort.Write("1");
+                    //char[] version = { '2', '4', '1' };
+                    //comPort.Write(version, 0, version.Length);
+
                     if (!comPort.ReadLine().Contains("Ready for Font"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
                         return;
                     }
+
                 }
                 catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
 
@@ -2664,7 +2709,7 @@ namespace OSD
                     StreamReader sr2 = new StreamReader(br.BaseStream);
 
                     string device = sr2.ReadLine();
-
+                    
                     if (device != "MAX7456")
                     {
                         MessageBox.Show("Invalid MCM");
@@ -2675,7 +2720,7 @@ namespace OSD
                     br.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     long length = br.BaseStream.Length;
-
+                    int conta = 0;
                     while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
                     {
                         try
@@ -2690,11 +2735,14 @@ namespace OSD
                                 read = (int)(br.BaseStream.Length - br.BaseStream.Position);
                             }
                             length -= read;
-
                             byte[] buffer = br.ReadBytes(read);
-
+                            //foreach (char ch in buffer)
+                            //{
+                            //    if ((ch == 0x30) || (ch == 0x31))
+                            //        conta++;
+                            //}
                             comPort.Write(buffer, 0, buffer.Length);
-
+                            //conta += buffer.Length;
                             int timeout = 0;
 
                             while (comPort.BytesToRead == 0 && read == 768)
@@ -2710,15 +2758,24 @@ namespace OSD
                                 }
                             }
 
-                            Console.WriteLine(comPort.ReadExisting());
+                            //Console.WriteLine(comPort.ReadExisting());
+                            if(comPort.BytesToRead != 0)
+                                lblFWModelType.Text = comPort.ReadExisting();
+                            if (length < 1000)
+                            {
+                                lblFWModelType.Text = lblFWModelType.Text;
+                            }
 
                         }
-                        catch { break; }
+                        catch { 
+                            break; 
+                        }
 
                         Application.DoEvents();
                     }
-
-                    comPort.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                    int dasda = comPort.BytesToWrite;
+                    conta = conta;
+                    comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
@@ -2739,6 +2796,27 @@ namespace OSD
                     toolStripStatusLabel1.Text = "CharSet Done";
                     lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
                 }
+
+
+                //comPort.DiscardOutBuffer();
+                //comPort.WriteLine("");
+                //comPort.Write("3");
+                //int timeout2 = 0;
+                //while (comPort.BytesToRead == 0)
+                //{
+                //    System.Threading.Thread.Sleep(500);
+                //    timeout2++;
+
+                //    if (timeout2 > 10)
+                //    {
+                //        MessageBox.Show("Falta confirmação");
+                //        comPort.Close();
+                //        return;
+                //    }
+                //}
+                //lblFWModelType.Text = comPort.ReadExisting();
+
+
             }
         }
 

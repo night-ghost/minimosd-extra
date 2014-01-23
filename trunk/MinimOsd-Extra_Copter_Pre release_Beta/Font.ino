@@ -17,10 +17,28 @@ void uploadFont()
 //    osd.closePanel();
 
 
+    Serial.printf_P(PSTR("Ready for Version\n"));
+
+    uint8_t incomingByte;
+    do
+    {
+      incomingByte = Serial.read();
+    }while(incomingByte != '_');
+    
+    while (Serial.available() < 3){
+    }
+    
+    uint8_t cs_version1 = Serial.read();
+    uint8_t cs_version2 = Serial.read();
+    uint8_t cs_version3 = Serial.read();
+    EEPROM.write(CS_VERSION1_ADDR, cs_version1);
+    EEPROM.write(CS_VERSION2_ADDR, cs_version2);
+    EEPROM.write(CS_VERSION3_ADDR, cs_version3);
+
     Serial.printf_P(PSTR("Ready for Font\n"));
 
     while(font_count < 256) { 
-        int8_t incomingByte = Serial.read();
+        incomingByte = Serial.read();
         switch(incomingByte) // parse and decode mcm file
         {
         case 0x0d: // carridge return, end of line
@@ -86,6 +104,13 @@ void uploadFont()
             font_count++;
             Serial.printf_P(PSTR("Char Done\n"));
         }
+        
+      //  if(font_count == 255)
+        //{
+//          EEPROM.write(CS_VERSION1_ADDR, cs_version1);
+  //        EEPROM.write(CS_VERSION2_ADDR, cs_version2);
+    //      EEPROM.write(CS_VERSION3_ADDR, cs_version3);
+       // }
     }
 
     //  character_bitmap[]
