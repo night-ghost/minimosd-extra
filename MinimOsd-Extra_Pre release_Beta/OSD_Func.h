@@ -59,19 +59,19 @@ void setHomeVars(OSD &osd)
   }
   else if(osd_got_home == 1){
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
-    if(osd_alt_cnt < 25){
-      if(fabs(osd_alt_prev - osd_alt) > 0.5){
-        osd_alt_cnt = 0;
-        osd_alt_prev = osd_alt;
-      }
-      else
-      {
-        if(++osd_alt_cnt >= 25){
-          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
-          haltset = 1;
-        }
-      }
-    }
+//    if(osd_alt_cnt < 25){
+//      if(fabs(osd_alt_prev - osd_alt) > 0.5){
+//        osd_alt_cnt = 0;
+//        osd_alt_prev = osd_alt;
+//      }
+//      else
+//      {
+//        if(++osd_alt_cnt >= 25){
+//          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
+//          haltset = 1;
+//        }
+//      }
+//    }
     // shrinking factor for longitude going to poles direction
     float rads = fabs(osd_home_lat) * 0.0174532925;
     double scaleLongDown = cos(rads);
@@ -100,7 +100,7 @@ void setHomeVars(OSD &osd)
 
 void setFdataVars(){
 
-  if (haltset == 1 && takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
+  if (takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
     takeofftime = 1;
     tdistance = 0;
     FTime = (millis()/1000);
