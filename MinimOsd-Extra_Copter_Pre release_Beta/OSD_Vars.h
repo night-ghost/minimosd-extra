@@ -50,7 +50,7 @@ static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
-static boolean      haltset = 0;
+//static boolean      haltset = 0;
 //static boolean      pal_ntsc = 0;
 
 //static int8_t       setup_menu = 0;
@@ -134,8 +134,8 @@ static float        osd_winddirection = 0;
 static int8_t       osd_wind_arrow_rotate_int;
 static int8_t       osd_COG_arrow_rotate_int;
 
-static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
-static float        osd_alt_prev = 0;             // previous altitude
+//static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
+//static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint8_t     osd_throttle = 0;               // throtle

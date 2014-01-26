@@ -58,25 +58,25 @@ void setHomeVars(OSD &osd)
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
-    osd_alt_cnt = 0;
+    //osd_alt_cnt = 0;
     //osd_home_alt = osd_alt;
     osd_got_home = 1;
   }
   else if(osd_got_home == 1){
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
-    if(osd_alt_cnt < 25){
-      if(fabs(osd_alt_prev - osd_alt) > 0.5){
-        osd_alt_cnt = 0;
-        osd_alt_prev = osd_alt;
-      }
-      else
-      {
-        if(++osd_alt_cnt >= 25){
-          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
-          haltset = 1;
-        }
-      }
-    }
+//    if(osd_alt_cnt < 25){
+//      if(fabs(osd_alt_prev - osd_alt) > 0.5){
+//        osd_alt_cnt = 0;
+//        osd_alt_prev = osd_alt;
+//      }
+//      else
+//      {
+//        if(++osd_alt_cnt >= 25){
+//          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
+//          haltset = 1;
+//        }
+//      }
+//    }
     // shrinking factor for longitude going to poles direction
     float rads = fabs(osd_home_lat) * 0.0174532925;
     double scaleLongDown = cos(rads);
@@ -106,15 +106,16 @@ void setFdataVars(){
   vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
 
   //Set startup GPS dependent variables
-  if (haltset == 1 && osd_throttle > 15){
-    haltset = 2;
-    tdistance = 0;
-  }
+//  if (haltset == 1 && osd_throttle > 15){
+//    haltset = 2;
+//    tdistance = 0;
+//  }
 
   //Copter specific "in flight" detection
   if(osd_throttle > 15){
     if (takeofftime == 0){
       takeofftime = 1;
+      tdistance = 0;
       start_battery_reading = osd_battery_remaining_A;
       last_battery_reading = osd_battery_remaining_A;
     }

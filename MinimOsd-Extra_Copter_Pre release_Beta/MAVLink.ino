@@ -154,6 +154,11 @@ void read_mavlink(){
                     temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
                 }
                 break;
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
+                { 
+                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
+                }
+                break; 
             default:
                 //Do nothing
                 break;
