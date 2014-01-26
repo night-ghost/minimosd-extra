@@ -1765,18 +1765,18 @@ namespace OSD
             pan.cs_version1 = eeprom[CS_VERSION1_ADDR];
             pan.cs_version2 = eeprom[CS_VERSION2_ADDR];
             pan.cs_version3 = eeprom[CS_VERSION3_ADDR];
-            if((pan.fw_version1 == 0x00) && (pan.fw_version2 == 0x00) && (pan.fw_version3 == 0x00))
+            if((pan.fw_version1 == '0') && (pan.fw_version2 == '0') && (pan.fw_version3 == '0'))
             {
-                lblFWModelType.Text = "Model Type found in OSD: Unknown" + (ModelType)pan.model_type + " version.";
+                lblFWModelType.Text = "Model Type found in OSD: Unknown or custom";
             }
             else
             {
                 lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version1 + "." + pan.fw_version2 + "." + pan.fw_version3;
             }
 
-            if ((pan.cs_version1 == 0x00) && (pan.cs_version2 == 0x00) && (pan.cs_version3 == 0x00))
+            if ((pan.cs_version1 == '0') && (pan.cs_version2 == '0') && (pan.cs_version3 == '0'))
             {
-                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Uknown charset version. ";
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
             }
             else
             {
@@ -2622,6 +2622,42 @@ namespace OSD
             }
         }
 
+        private Boolean IsValidCharsetFile(OpenFileDialog ofd)
+        {
+            string errorMessage = "";
+            using (var stream = ofd.OpenFile())
+            {
+                StreamReader sr = new StreamReader(stream);
+                //Check header
+                long lineNumber = 1;
+                if(sr.ReadLine() != "MAX7456")
+                    errorMessage += "Invalid file header." + Environment.NewLine;
+
+                lineNumber++;
+                while(!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    if (line.Length != 8)
+                    {
+                        errorMessage += "Invalid line length in line:" + lineNumber + Environment.NewLine;
+                        break;
+                    }
+                    foreach(char c in line)
+                        if (c != '0' && c != '1')
+                        {
+                            errorMessage += "Invalid char in line:" + lineNumber + Environment.NewLine;
+                            break;
+                        }
+                    lineNumber++;
+                }
+                if(string.IsNullOrEmpty(errorMessage) && lineNumber != 16386)
+                    errorMessage += "Invalid number of lines: " + lineNumber + Environment.NewLine;
+            }
+            if(!string.IsNullOrEmpty(errorMessage))
+                MessageBox.Show("Invalid Charset File:" + errorMessage, "Invalid Charset File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            return string.IsNullOrEmpty(errorMessage);
+        }
+
         private void updateFontToolStripMenuItem_Click(object sender, EventArgs e)
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
@@ -2631,6 +2667,30 @@ namespace OSD
             ofd.Filter = "mcm|*.mcm";
 
             ofd.ShowDialog();
+
+            if (!IsValidCharsetFile(ofd))
+                return;
+
+            //Get file version
+            string fileVersion = "000";
+            string tempFileName = ofd.SafeFileName.ToUpper();
+            if(tempFileName.StartsWith("MINIMOSD_"))
+            {
+                tempFileName = tempFileName.Remove(0, 9);
+                if(tempFileName.EndsWith(".MCM"))
+                {
+                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                    string[] versionArray = tempFileName.Split('.');
+                    Int16 version1, version2, version3;
+                    if(versionArray.Length > 2)
+                    {
+                        if(Int16.TryParse(versionArray[0], out version1) && 
+                           Int16.TryParse(versionArray[1], out version2) && 
+                           Int16.TryParse(versionArray[2], out version3))
+                            fileVersion = version1.ToString().Substring(0,1).Trim() + version2.ToString().Substring(0,1).Trim() + version3.ToString().Substring(0,1).Trim();
+                    }
+                }
+            }
 
             if (ofd.FileName != "")
             {
@@ -2678,7 +2738,7 @@ namespace OSD
                             return;
                         }
                     }
-
+/*
                     if (!comPort.ReadLine().Contains("Ready for Version"))
                     {
                         MessageBox.Show("Error entering CharSet version - invalid data");
@@ -2692,7 +2752,7 @@ namespace OSD
                     //char[] version = { '2', '4', '1' };
                     //comPort.Write(version, 0, version.Length);
 
-                    if (!comPort.ReadLine().Contains("Ready for Font"))
+*/                    if (!comPort.ReadLine().Contains("Ready for Font"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
@@ -2720,7 +2780,6 @@ namespace OSD
                     br.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     long length = br.BaseStream.Length;
-                    int conta = 0;
                     while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
                     {
                         try
@@ -2736,13 +2795,7 @@ namespace OSD
                             }
                             length -= read;
                             byte[] buffer = br.ReadBytes(read);
-                            //foreach (char ch in buffer)
-                            //{
-                            //    if ((ch == 0x30) || (ch == 0x31))
-                            //        conta++;
-                            //}
                             comPort.Write(buffer, 0, buffer.Length);
-                            //conta += buffer.Length;
                             int timeout = 0;
 
                             while (comPort.BytesToRead == 0 && read == 768)
@@ -2758,9 +2811,7 @@ namespace OSD
                                 }
                             }
 
-                            //Console.WriteLine(comPort.ReadExisting());
-                            if(comPort.BytesToRead != 0)
-                                lblFWModelType.Text = comPort.ReadExisting();
+                            comPort.ReadExisting();
                             if (length < 1000)
                             {
                                 lblFWModelType.Text = lblFWModelType.Text;
@@ -2773,8 +2824,48 @@ namespace OSD
 
                         Application.DoEvents();
                     }
-                    int dasda = comPort.BytesToWrite;
-                    conta = conta;
+                    comPort.WriteLine("\r\n");
+                    //Wait for last char acknowledge
+                    int t = 0;
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        t++;
+
+                        if (t > 10)
+                        {
+                            MessageBox.Show("No end");
+                            comPort.Close();
+                            return;
+                        }
+                    }
+                    //Console.WriteLine(comPort.ReadExisting());
+                    if (comPort.BytesToRead != 0)
+                        comPort.ReadLine();
+
+                    //Send font version
+                    //char[] charVersion = {'2','4','1'};
+                    comPort.WriteLine(fileVersion);
+
+
+                    //Wait for last char acknowledge
+                    t = 0;
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        t++;
+
+                        if (t > 10)
+                        {
+                            MessageBox.Show("No end2");
+                            comPort.Close();
+                            return;
+                        }
+                    }
+                    //Console.WriteLine(comPort.ReadExisting());
+                    if (comPort.BytesToRead != 0)
+                        comPort.ReadExisting();
+
                     comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
                     comPort.DtrEnable = false;
