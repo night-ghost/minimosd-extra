@@ -126,7 +126,7 @@ void setFdataVars(){
 }
 
 void checkModellType(){
-if (EEPROM.read(MODELL_TYPE_ADD) != 1) EEPROM.write(MODELL_TYPE_ADD, 1);
+if (EEPROM.read(MODELL_TYPE_ADD) != 0) EEPROM.write(MODELL_TYPE_ADD, 0);
 if (EEPROM.read(FW_VERSION1_ADDR) != 2) EEPROM.write(FW_VERSION1_ADDR, 2);
 if (EEPROM.read(FW_VERSION2_ADDR) != 4) EEPROM.write(FW_VERSION2_ADDR, 4);
 if (EEPROM.read(FW_VERSION3_ADDR) != 1) EEPROM.write(FW_VERSION3_ADDR, 1);
