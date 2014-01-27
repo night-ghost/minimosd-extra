@@ -925,9 +925,6 @@ namespace OSD
             this.cbxRSSIChannel.FormattingEnabled = true;
             this.cbxRSSIChannel.Items.AddRange(new object[] {
             "Mavlink RSSI",
-            "Channel 5",
-            "Channel 6",
-            "Channel 7",
             "Channel 8"});
             this.cbxRSSIChannel.Location = new System.Drawing.Point(9, 27);
             this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);

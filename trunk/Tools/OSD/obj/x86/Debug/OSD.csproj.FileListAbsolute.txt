@@ -146,4 +146,3 @@ D:\Documentos Miguel\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe
 D:\Documentos Miguel\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.application
 D:\Documentos Miguel\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.exe
 D:\Documentos Miguel\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\OSD_Config.pdb
-E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\obj\x86\Debug\GenerateResource-ResGen.read.4.tlog
