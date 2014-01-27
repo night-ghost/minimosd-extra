@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r730";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r740";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2980,8 +2980,16 @@ namespace OSD
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            int rssiChannel = pan.rssiraw_on / 2;
-            pan.rssiraw_on = Convert.ToByte(rssiChannel * 2 + Convert.ToInt32(RSSI_RAW.Checked));
+            switch (cbxRSSIChannel.SelectedIndex)
+            {
+                case 0:
+                    pan.rssiraw_on = 0;
+                    break;
+                case 1:
+                    pan.rssiraw_on = 8;
+                    break;
+            }
+            pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
         }
 
         private void TOGGLE_BEHChanged(object sender, EventArgs e)
@@ -3564,9 +3572,17 @@ namespace OSD
                 RSSI_numeric_max.Maximum = 2000;
                 RSSI_numeric_max.Minimum = 900;
             }
-            int rawOn = pan.rssiraw_on % 2;
-            pan.rssiraw_on = Convert.ToByte(cbxRSSIChannel.SelectedIndex * 2 + rawOn);
-            //updatingRSSI = false;
+            
+            switch (cbxRSSIChannel.SelectedIndex)
+            {
+                case 0:
+                    pan.rssiraw_on = 0;
+                    break;
+                case 1:
+                    pan.rssiraw_on = 8;
+                    break;
+            }
+            pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
         }
 
         private void presentCustomCharsetToolStripMenuItem_Click(object sender, EventArgs e)
