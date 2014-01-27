@@ -65,7 +65,7 @@ static uint16_t     distconv = 0;
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
-static int8_t      temps = 0;
+static int16_t      temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static float        mah_used = 0;
