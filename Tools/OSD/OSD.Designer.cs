@@ -299,7 +299,7 @@ namespace OSD
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveToFileToolStripMenuItem
@@ -307,7 +307,7 @@ namespace OSD
             this.saveToFileToolStripMenuItem.Image = global::OSD.Properties.Resources.saveHS;
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
             this.saveToFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.saveToFileToolStripMenuItem.Text = "Save OSD file...";
             this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
@@ -316,32 +316,32 @@ namespace OSD
             this.loadFromFileToolStripMenuItem.Image = global::OSD.Properties.Resources.openHS;
             this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
             this.loadFromFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.loadFromFileToolStripMenuItem.Text = "Open OSD File...";
             this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromFileToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(203, 6);
             // 
             // loadDefaultsToolStripMenuItem
             // 
             this.loadDefaultsToolStripMenuItem.Name = "loadDefaultsToolStripMenuItem";
-            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.loadDefaultsToolStripMenuItem.Text = "Load Defaults";
             this.loadDefaultsToolStripMenuItem.Click += new System.EventHandler(this.loadDefaultsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -351,14 +351,14 @@ namespace OSD
             this.CHK_ntsc,
             this.CHK_pal});
             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
-            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
             this.videoModeToolStripMenuItem.Text = "Video Mode";
             // 
             // CHK_ntsc
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(104, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -369,7 +369,7 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(104, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -388,7 +388,7 @@ namespace OSD
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // checkBox1
@@ -397,14 +397,14 @@ namespace OSD
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(221, 22);
+            this.checkBox1.Size = new System.Drawing.Size(224, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -412,14 +412,14 @@ namespace OSD
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.sendTLogToolStripMenuItem.Text = "Send TLog...";
             this.sendTLogToolStripMenuItem.ToolTipText = "Send a Mavlink transmission log to the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
@@ -427,7 +427,7 @@ namespace OSD
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
@@ -435,14 +435,14 @@ namespace OSD
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.presentCustomCharsetToolStripMenuItem.Text = "Present Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // setSketchesPathToolStripMenuItem
             // 
             this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
-            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.setSketchesPathToolStripMenuItem.Text = "Set Arduino Sketches Path...";
             this.setSketchesPathToolStripMenuItem.Visible = false;
             this.setSketchesPathToolStripMenuItem.Click += new System.EventHandler(this.setSketchesPathToolStripMenuItem_Click);
@@ -453,20 +453,20 @@ namespace OSD
             this.gettingStartedToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // gettingStartedToolStripMenuItem
             // 
             this.gettingStartedToolStripMenuItem.Name = "gettingStartedToolStripMenuItem";
-            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.gettingStartedToolStripMenuItem.Text = "Getting started";
             this.gettingStartedToolStripMenuItem.Click += new System.EventHandler(this.gettingStartedToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.aboutToolStripMenuItem.Text = "About ";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 

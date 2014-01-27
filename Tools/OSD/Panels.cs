@@ -428,7 +428,11 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
+            if (this.osd.mslAltSign)//ArduCopter
+                osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
+            else
+                osd.printf("%5.0f%c", (double)(osd_alt * converth), altitudeChar);
+
             osd.closePanel();
             return 0;
         }
@@ -458,7 +462,10 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             osd.openPanel();
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
-            osd.printf("%c%5.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
+            if (this.osd.homeAltSign)//ArduCopter
+                osd.printf("%c%5.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
+            else
+                osd.printf("%5.0f%c", (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
             osd.closePanel();
             return 0;
         }
@@ -474,7 +481,10 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0x14, (double)(osd_groundspeed * convertspeed), velocityChar);
+            if (this.osd.groundSpeedSign)//ArduCopter
+                osd.printf("%c%3.0f%c", 0x14, (double)(osd_groundspeed * convertspeed), velocityChar);
+            else
+                osd.printf("%3.0f%c", (double)(osd_groundspeed * convertspeed), velocityChar);
             osd.closePanel();
             return 0;
         }
@@ -490,7 +500,10 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             osd.openPanel();
-            osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed * convertspeed), velocityChar);
+            if (this.osd.airSpeedSign)//ArduCopter
+                osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed * convertspeed), velocityChar);
+            else
+                osd.printf("%3.0f%c", (double)(osd_airspeed * convertspeed), velocityChar);
             osd.closePanel();
             return 0;
         }

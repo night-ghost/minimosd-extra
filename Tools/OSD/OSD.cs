@@ -3355,36 +3355,52 @@ namespace OSD
             }
         }
 
+        public Boolean airSpeedSign = false;
         private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxAirSpeedSign.Checked)
                 pan.sign_air_speed = 0x13;
             else
                 pan.sign_air_speed = 0x00;
+            airSpeedSign = cbxAirSpeedSign.Checked;
+            osdDraw1();
+            osdDraw2();
         }
 
+        public Boolean groundSpeedSign = false;
         private void cbxGroundSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxGroundSpeedSign.Checked)
                 pan.sign_ground_speed = 0x14;
             else
                 pan.sign_ground_speed = 0x00;
+            groundSpeedSign = cbxGroundSpeedSign.Checked;
+            osdDraw1();
+            osdDraw2();
         }
 
+        public Boolean homeAltSign = false;
         private void cbxHomeAltitudeSign_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxHomeAltitudeSign.Checked)
                 pan.sign_home_altitude = 0x12;
             else
                 pan.sign_home_altitude = 0x00;
+            homeAltSign = cbxHomeAltitudeSign.Checked;
+            osdDraw1();
+            osdDraw2();
         }
 
+        public Boolean mslAltSign = false;
         private void cbxMslAltitudeSign_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxMslAltitudeSign.Checked)
                 pan.sign_msl_altitude = 0x11;
             else
                 pan.sign_msl_altitude = 0x00;
+            mslAltSign = cbxMslAltitudeSign.Checked;
+            osdDraw1();
+            osdDraw2();
         }
 
         private void btnGeneratePanelsFile_Click(object sender, EventArgs e)
