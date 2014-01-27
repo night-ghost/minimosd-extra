@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r735"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r736"));
     osd.closePanel();
 }
 
