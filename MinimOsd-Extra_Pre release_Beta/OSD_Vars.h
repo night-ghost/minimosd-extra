@@ -51,7 +51,7 @@ static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
-static boolean      haltset = 0;
+//static boolean      haltset = 0;
 //static boolean      pal_ntsc = 0;
 
 //static int8_t       setup_menu = 0;
@@ -65,7 +65,7 @@ static uint16_t     distconv = 0;
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
-static uint8_t      temps = 0;
+static int8_t      temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static float        mah_used = 0;
