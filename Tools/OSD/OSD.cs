@@ -3786,6 +3786,7 @@ namespace OSD
                             { 
                                 if(bitPosition == 4)
                                 {
+                                    halfByte = (byte)(halfByte + (byte)0x30); //Displace to start in ascii char '0'
                                     halfBytes.Add(halfByte);
                                     bitPosition = 0;
                                     halfByte = 0x00;
