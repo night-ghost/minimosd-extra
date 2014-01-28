@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r741";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r744";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2778,7 +2778,9 @@ namespace OSD
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "mcm|*.mcm";
 
-            ofd.ShowDialog();
+            DialogResult dialogResp = ofd.ShowDialog();
+            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
+                return;
 
             if (!IsValidCharsetFile(ofd))
                 return;
@@ -3663,7 +3665,9 @@ namespace OSD
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "mcm|*.mcm";
 
-            ofd.ShowDialog();
+            DialogResult dialogResp = ofd.ShowDialog();
+            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
+                return;
 
             if (!IsValidCharsetFile(ofd))
                 return;
