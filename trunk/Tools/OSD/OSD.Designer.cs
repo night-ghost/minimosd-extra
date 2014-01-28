@@ -133,6 +133,7 @@ namespace OSD
             this.lblLatestCharsetUploaded = new System.Windows.Forms.Label();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -383,6 +384,7 @@ namespace OSD
             this.customBGPictureToolStripMenuItem,
             this.sendTLogToolStripMenuItem,
             this.updateFontToolStripMenuItem,
+            this.updateCharsetDevToolStripMenuItem,
             this.presentCustomCharsetToolStripMenuItem,
             this.setSketchesPathToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
@@ -1275,6 +1277,14 @@ namespace OSD
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "OSD Status:";
             // 
+            // updateCharsetDevToolStripMenuItem
+            // 
+            this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
+            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
+            this.updateCharsetDevToolStripMenuItem.Visible = false;
+            this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1456,6 +1466,7 @@ namespace OSD
         private System.Windows.Forms.Label lblLatestCharsetUploaded;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.GroupBox groupBox12;
+        private System.Windows.Forms.ToolStripMenuItem updateCharsetDevToolStripMenuItem;
     }
 }
 
