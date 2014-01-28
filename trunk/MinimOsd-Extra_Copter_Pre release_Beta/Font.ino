@@ -17,7 +17,7 @@ void uploadFont()
 //    osd.closePanel();
 
 
-    Serial.printf_P(PSTR("Ready for Font\n"));
+    Serial.printf_P("Ready for Font\n");
 
     while(font_count < 256) { 
         int8_t incomingByte = Serial.read();
@@ -84,24 +84,12 @@ void uploadFont()
             osd.write_NVM(font_count, character_bitmap);    
             byte_count = 0;
             font_count++;
-            Serial.printf("Char Done\n", font_count);
+            Serial.printf_P("Char Done\n");
         }
     }
 
-    byte_count = 0;
-    while(byte_count < 6){
-//      if(Serial.available() > 0)
-//      {
-        character_bitmap[0] = Serial.read();
-        if(character_bitmap[0] >= '0' && character_bitmap[0] <= '9'){
-          EEPROM.write(CS_VERSION1_ADDR + byte_count, character_bitmap[0]);
-          byte_count += 2;
-        }
-//      }
-    }
-
-    Serial.printf_P(PSTR("UF2\n"));
     //  character_bitmap[]
 }
+
 
 
