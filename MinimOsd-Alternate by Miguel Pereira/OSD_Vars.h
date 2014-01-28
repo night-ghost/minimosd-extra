@@ -1,7 +1,7 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-static float         max_home_distance = 0;
+static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
@@ -26,6 +26,7 @@ static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in m
 static float        eff = 0; //Efficiency
 static uint16_t     eph = 0;
 
+static uint8_t      currentBasePanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
 static uint8_t      base_mode=0;
 static uint8_t      panel_auto_switch=0;
 static bool         motor_armed = 0;
@@ -49,7 +50,7 @@ static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      takeofftime = 0;
-static boolean      haltset = 0;
+//static boolean      haltset = 0;
 //static boolean      pal_ntsc = 0;
 
 //static int8_t       setup_menu = 0;
@@ -63,7 +64,7 @@ static uint16_t      distconv = 0;
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
-static uint8_t      temps = 0;
+static int16_t       temps = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static float        mah_used = 0;
@@ -83,6 +84,7 @@ static uint8_t      osd_mode = 0;                   // Navigation mode from RC A
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 //static unsigned long text_timer = 0;
 static unsigned long one_sec_timer = 0;
+static unsigned long mavLinkTimer = 0;
 //static unsigned long warning_timer =0;
 static unsigned long runt =0;
 static unsigned long FTime = 0;
@@ -132,8 +134,8 @@ static float        osd_winddirection = 0;
 static int8_t       osd_wind_arrow_rotate_int;
 static int8_t       osd_COG_arrow_rotate_int;
 
-static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
-static float        osd_alt_prev = 0;             // previous altitude
+//static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
+//static float        osd_alt_prev = 0;             // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint8_t     osd_throttle = 0;               // throtle

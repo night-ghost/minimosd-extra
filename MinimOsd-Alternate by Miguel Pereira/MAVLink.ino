@@ -1,7 +1,6 @@
-//#include "..\mavlink\include\mavlink_types.h"
-//#include "..\mavlink\include\common\mavlink.h"
-//#include "..\mavlink\include\common\common.h"
-#include "../mavlink/include/mavlink.h"
+#include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
+#include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
+
 // true when we have received at least 1 MAVLink packet
 static bool mavlink_active;
 static uint8_t crlf_count = 0;
@@ -11,22 +10,19 @@ static int parse_error = 0;
 
 void request_mavlink_rates()
 {
-  const int  maxStreams = 6;
-  mavlink_message_t msg;
-  const uint8_t MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
-    MAV_DATA_STREAM_EXTENDED_STATUS,
-    MAV_DATA_STREAM_RC_CHANNELS,
-    MAV_DATA_STREAM_POSITION,
-    MAV_DATA_STREAM_EXTRA1, 
-    MAV_DATA_STREAM_EXTRA2};
-  const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
-
-  for (int i=0; i < maxStreams; i++) {
-    mavlink_msg_request_data_stream_pack(127, 0, &msg, 7, 1, MAVStreams[i], MAVRates[i], 1);
-    uint8_t buf[MAVLINK_MAX_PACKET_LEN];
-    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-    Serial.write(buf, len);
-  }
+    const int  maxStreams = 6;
+    const uint8_t MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
+        MAV_DATA_STREAM_EXTENDED_STATUS,
+        MAV_DATA_STREAM_RC_CHANNELS,
+        MAV_DATA_STREAM_POSITION,
+        MAV_DATA_STREAM_EXTRA1, 
+        MAV_DATA_STREAM_EXTRA2};
+    const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
+    for (int i=0; i < maxStreams; i++) {
+        mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
+            apm_mav_system, apm_mav_component,
+            MAVStreams[i], MAVRates[i], 1);
+    }
 }
 
 void read_mavlink(){
@@ -52,6 +48,7 @@ void read_mavlink(){
 
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
+            lastMAVBeat = millis();
             mavlink_active = 1;
             //handle msg
             switch(msg.msgid) {
@@ -70,10 +67,10 @@ void read_mavlink(){
                     motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    lastMAVBeat = millis();
+                    /*lastMAVBeat = millis();
                     if(waitingMAVBeats == 1){
                         enable_mav_request = 1;
-                    }
+                    }*/
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -157,6 +154,11 @@ void read_mavlink(){
                     temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
                 }
                 break;
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
+                { 
+                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
+                }
+                break; 
             default:
                 //Do nothing
                 break;

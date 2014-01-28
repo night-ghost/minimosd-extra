@@ -3564,6 +3564,7 @@ namespace OSD
             {
                 btnGeneratePanelsFile.Visible = true;
                 setSketchesPathToolStripMenuItem.Visible = true;
+                updateCharsetDevToolStripMenuItem.Visible = true;
             }
         }
 
@@ -3652,6 +3653,233 @@ namespace OSD
             lblPresentedCharset.Text = "Presented Charset: " + ofd.SafeFileName;
             osdDraw1();
             osdDraw2();
+        }
+
+        private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            toolStripStatusLabel1.Text = "";
+
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "mcm|*.mcm";
+
+            ofd.ShowDialog();
+
+            if (!IsValidCharsetFile(ofd))
+                return;
+
+            //Get file version
+            string fileVersion = "000";
+            string tempFileName = ofd.SafeFileName.ToUpper();
+            if (tempFileName.StartsWith("MINIMOSD_"))
+            {
+                tempFileName = tempFileName.Remove(0, 9);
+                if (tempFileName.EndsWith(".MCM"))
+                {
+                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                    string[] versionArray = tempFileName.Split('.');
+                    Int16 version1, version2, version3;
+                    if (versionArray.Length > 2)
+                    {
+                        if (Int16.TryParse(versionArray[0], out version1) &&
+                           Int16.TryParse(versionArray[1], out version2) &&
+                           Int16.TryParse(versionArray[2], out version3))
+                            fileVersion = version1.ToString().Substring(0, 1).Trim() + version2.ToString().Substring(0, 1).Trim() + version3.ToString().Substring(0, 1).Trim();
+                    }
+                }
+            }
+
+            if (ofd.FileName != "")
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                try
+                {
+
+                    comPort.PortName = CMB_ComPort.Text;
+                    comPort.BaudRate = 57600;
+
+                    comPort.Open();
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    //System.Threading.Thread.Sleep(2);
+
+                    comPort.DtrEnable = true;
+                    comPort.RtsEnable = true;
+
+                    System.Threading.Thread.Sleep(7000);
+
+                    comPort.ReadExisting();
+
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+
+                    int timeout = 0;
+
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(500);
+                        Console.WriteLine("Waiting...");
+                        timeout++;
+
+                        if (timeout > 6)
+                        {
+                            MessageBox.Show("Error entering font mode - No Data");
+                            comPort.Close();
+                            return;
+                        }
+                    }
+                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    {
+                        MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                        comPort.Close();
+                        return;
+                    }
+
+                }
+                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+                using (var stream = ofd.OpenFile())
+                {
+
+                    BinaryReader br = new BinaryReader(stream);
+                    StreamReader sr2 = new StreamReader(br.BaseStream);
+
+                    string device = sr2.ReadLine();
+
+                    if (device != "MAX7456")
+                    {
+                        MessageBox.Show("Invalid MCM");
+                        comPort.Close();
+                        return;
+                    }
+
+                    br.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                    long length = br.BaseStream.Length;
+                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+                    {
+                        try
+                        {
+                            toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+                            toolStripStatusLabel1.Text = "CharSet Uploading";
+
+
+                            int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
+                            if ((br.BaseStream.Position + read) > br.BaseStream.Length)
+                            {
+                                read = (int)(br.BaseStream.Length - br.BaseStream.Position);
+                            }
+                            length -= read;
+                            byte[] tempBuffer = br.ReadBytes(read);
+                            List<byte> halfBytes = new List<byte>();
+                            byte halfByte = 0x00;
+                            int i = 0;
+                            int bitPosition = 0;
+                            while(i < read)
+                            { 
+                                if(bitPosition == 4)
+                                {
+                                    halfBytes.Add(halfByte);
+                                    bitPosition = 0;
+                                    halfByte = 0x00;
+                                }
+                                else if(tempBuffer[i] == 0x31)
+                                {
+                                    halfByte = (byte)(halfByte + (byte)Math.Pow(2, bitPosition));
+                                    bitPosition++;
+                                }
+                                else if (tempBuffer[i] == 0x30)
+                                {
+                                    bitPosition++;
+                                }
+                                else //send cr and lf
+                                {
+                                    halfBytes.Add(halfByte);
+                                }
+                                i++;
+                            }
+                            comPort.Write(halfBytes.ToArray(), 0, halfBytes.Count);
+                            //byte[] buffer = br.ReadBytes(read);
+                            //comPort.Write(buffer, 0, buffer.Length);
+                            int timeout = 0;
+
+                            while (comPort.BytesToRead == 0 && read == 768)
+                            {
+                                System.Threading.Thread.Sleep(10);
+                                timeout++;
+
+                                if (timeout > 10)
+                                {
+                                    MessageBox.Show("CharSet upload failed - no response");
+                                    comPort.Close();
+                                    return;
+                                }
+                            }
+
+                            comPort.ReadExisting();
+                            if (length < 1000)
+                            {
+                                lblFWModelType.Text = lblFWModelType.Text;
+                            }
+
+                        }
+                        catch
+                        {
+                            break;
+                        }
+
+                        Application.DoEvents();
+                    }
+                    comPort.WriteLine("\r\n");
+                    //Wait for last char acknowledge
+                    int t = 0;
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        t++;
+
+                        if (t > 10)
+                        {
+                            MessageBox.Show("No end");
+                            comPort.Close();
+                            return;
+                        }
+                    }
+                    //Console.WriteLine(comPort.ReadExisting());
+                    if (comPort.BytesToRead != 0)
+                        comPort.ReadLine();
+
+                    comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    System.Threading.Thread.Sleep(50);
+
+                    comPort.DtrEnable = true;
+                    comPort.RtsEnable = true;
+
+                    System.Threading.Thread.Sleep(50);
+
+                    comPort.Close();
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    toolStripProgressBar1.Value = 100;
+                    toolStripStatusLabel1.Text = "CharSet Done";
+                }
+
+                WriteCharsetVersion(fileVersion);
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+            }
         }
     }
 }

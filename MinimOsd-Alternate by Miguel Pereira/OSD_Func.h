@@ -58,25 +58,25 @@ void setHomeVars(OSD &osd)
   if(osd_got_home == 0 && osd_fix_type > 1){
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
-    osd_alt_cnt = 0;
+    //osd_alt_cnt = 0;
     //osd_home_alt = osd_alt;
     osd_got_home = 1;
   }
   else if(osd_got_home == 1){
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
-    if(osd_alt_cnt < 25){
-      if(fabs(osd_alt_prev - osd_alt) > 0.5){
-        osd_alt_cnt = 0;
-        osd_alt_prev = osd_alt;
-      }
-      else
-      {
-        if(++osd_alt_cnt >= 25){
-          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
-          haltset = 1;
-        }
-      }
-    }
+//    if(osd_alt_cnt < 25){
+//      if(fabs(osd_alt_prev - osd_alt) > 0.5){
+//        osd_alt_cnt = 0;
+//        osd_alt_prev = osd_alt;
+//      }
+//      else
+//      {
+//        if(++osd_alt_cnt >= 25){
+//          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
+//          haltset = 1;
+//        }
+//      }
+//    }
     // shrinking factor for longitude going to poles direction
     float rads = fabs(osd_home_lat) * 0.0174532925;
     double scaleLongDown = cos(rads);
@@ -105,15 +105,21 @@ void setFdataVars(){
   //Moved from panel because warnings also need this var and panClimb could be off
   vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
 
-  if (haltset == 1 && takeofftime == 0 && osd_throttle > 15){
-    takeofftime = 1;
-    tdistance = 0;
-    FTime = (millis()/1000);
-    start_battery_reading = osd_battery_remaining_A;
-    last_battery_reading = osd_battery_remaining_A;
-  }
+  //Set startup GPS dependent variables
+//  if (haltset == 1 && osd_throttle > 15){
+//    haltset = 2;
+//    tdistance = 0;
+//  }
 
+  //Copter specific "in flight" detection
   if(osd_throttle > 15){
+    if (takeofftime == 0){
+      takeofftime = 1;
+      tdistance = 0;
+      start_battery_reading = osd_battery_remaining_A;
+      last_battery_reading = osd_battery_remaining_A;
+    }
+    start_Time = (millis()/1000) - FTime;
     not_moving_since = millis();
     landed = 4294967295; //Airborn
   }
@@ -121,23 +127,26 @@ void setFdataVars(){
   else if(((millis() - not_moving_since) > 10000) && (landed == 4294967295) && (takeofftime == 1)){
     landed = millis();
   }
+  FTime = (millis()/1000);
 
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - runt) / 1000.0);
   mah_used += (osd_curr_A * 10.0 * (millis() - runt) / 3600000.0);
   runt = millis();
 
+  //Set max data
   if (takeofftime == 1){
-    start_Time = (millis()/1000) - FTime;
     if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
     if (osd_alt_to_home > max_osd_home_alt) max_osd_home_alt = osd_alt_to_home;
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
-  
 }
 
 void checkModellType(){
 if (EEPROM.read(MODELL_TYPE_ADD) != 1) EEPROM.write(MODELL_TYPE_ADD, 1);
+if (EEPROM.read(FW_VERSION1_ADDR) != 2) EEPROM.write(FW_VERSION1_ADDR, 2);
+if (EEPROM.read(FW_VERSION2_ADDR) != 4) EEPROM.write(FW_VERSION2_ADDR, 4);
+if (EEPROM.read(FW_VERSION3_ADDR) != 1) EEPROM.write(FW_VERSION3_ADDR, 1);
 }
 
