@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r740";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r741";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -1660,6 +1660,118 @@ namespace OSD
             catch { }
         }
 
+        private void ReadCharsetVersion()
+        {
+            byte[] tempEeprom = new byte[1024];
+
+            bool fail = false;
+            ArduinoSTK sp;
+
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DtrEnable = true;
+
+                sp.Open();
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            if (sp.connectAP())
+            {
+                try
+                {
+                    for (int i = 0; i < 5; i++)
+                    { //try to download two times if it fail
+                        tempEeprom = sp.download(1024);
+                        if (!sp.down_flag)
+                        {
+                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+                        }
+                        else break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed to talk to bootloader");
+                fail = true;
+            }
+
+            sp.Close();
+
+            if (!fail)
+            {
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + tempEeprom[CS_VERSION1_ADDR].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 1].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 2].ToString(); 
+            }
+        }
+
+        private void WriteCharsetVersion(string version)
+        {
+            byte[] tempEeprom = new byte[3];
+            tempEeprom[0] = (byte)version[0];
+            tempEeprom[1] = (byte)version[1];
+            tempEeprom[2] = (byte)version[2];
+            //Set Com port
+            ArduinoSTK sp;
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                sp.DtrEnable = false;
+                sp.RtsEnable = false; //added
+
+                sp.Open();
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            if (sp.connectAP())
+            {
+                try
+                {
+                    bool spupload_flag = false;
+                        for (int i = 0; i < 10; i++)
+                        { //try to upload two times if it fail
+                            spupload_flag = sp.upload(tempEeprom, (short)CS_VERSION1_ADDR, (short)tempEeprom.Length, (short)SIGN_MSL_ON_ADDR);
+                            if (!spupload_flag)
+                            {
+                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+                            }
+                            else break;
+                        }
+                        if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+                        else MessageBox.Show("Failed to upload new configuration data");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed to talk to bootloader");
+            }
+
+            sp.Close();
+        }
+
         private void BUT_ReadOSD_Click(object sender, EventArgs e)
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
@@ -1763,8 +1875,8 @@ namespace OSD
             pan.fw_version2 = eeprom[FW_VERSION2_ADDR];
             pan.fw_version3 = eeprom[FW_VERSION3_ADDR];
             pan.cs_version1 = eeprom[CS_VERSION1_ADDR];
-            pan.cs_version2 = eeprom[CS_VERSION2_ADDR];
-            pan.cs_version3 = eeprom[CS_VERSION3_ADDR];
+            pan.cs_version2 = eeprom[CS_VERSION1_ADDR + 1];
+            pan.cs_version3 = eeprom[CS_VERSION1_ADDR + 2];
             if((pan.fw_version1 == '0') && (pan.fw_version2 == '0') && (pan.fw_version3 == '0'))
             {
                 lblFWModelType.Text = "Model Type found in OSD: Unknown or custom";
@@ -2738,21 +2850,7 @@ namespace OSD
                             return;
                         }
                     }
-/*
-                    if (!comPort.ReadLine().Contains("Ready for Version"))
-                    {
-                        MessageBox.Show("Error entering CharSet version - invalid data");
-                        comPort.Close();
-                        return;
-                    }
-                    comPort.Write("_");
-                    comPort.Write("2");
-                    comPort.Write("4");
-                    comPort.Write("1");
-                    //char[] version = { '2', '4', '1' };
-                    //comPort.Write(version, 0, version.Length);
-
-*/                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    if (!comPort.ReadLine().Contains("Ready for Font"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
@@ -2843,29 +2941,6 @@ namespace OSD
                     if (comPort.BytesToRead != 0)
                         comPort.ReadLine();
 
-                    //Send font version
-                    //char[] charVersion = {'2','4','1'};
-                    comPort.WriteLine(fileVersion);
-
-
-                    //Wait for last char acknowledge
-                    t = 0;
-                    while (comPort.BytesToRead == 0)
-                    {
-                        System.Threading.Thread.Sleep(10);
-                        t++;
-
-                        if (t > 10)
-                        {
-                            MessageBox.Show("No end2");
-                            comPort.Close();
-                            return;
-                        }
-                    }
-                    //Console.WriteLine(comPort.ReadExisting());
-                    if (comPort.BytesToRead != 0)
-                        comPort.ReadExisting();
-
                     comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
                     comPort.DtrEnable = false;
@@ -2885,29 +2960,10 @@ namespace OSD
 
                     toolStripProgressBar1.Value = 100;
                     toolStripStatusLabel1.Text = "CharSet Done";
-                    lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
                 }
 
-
-                //comPort.DiscardOutBuffer();
-                //comPort.WriteLine("");
-                //comPort.Write("3");
-                //int timeout2 = 0;
-                //while (comPort.BytesToRead == 0)
-                //{
-                //    System.Threading.Thread.Sleep(500);
-                //    timeout2++;
-
-                //    if (timeout2 > 10)
-                //    {
-                //        MessageBox.Show("Falta confirmação");
-                //        comPort.Close();
-                //        return;
-                //    }
-                //}
-                //lblFWModelType.Text = comPort.ReadExisting();
-
-
+                WriteCharsetVersion(fileVersion);
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
             }
         }
 
