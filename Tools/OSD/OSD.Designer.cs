@@ -58,6 +58,7 @@ namespace OSD
             this.customBGPictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -133,7 +134,6 @@ namespace OSD
             this.lblLatestCharsetUploaded = new System.Windows.Forms.Label();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
-            this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -359,7 +359,7 @@ namespace OSD
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(152, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -370,7 +370,7 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(152, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -434,11 +434,19 @@ namespace OSD
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
             // 
+            // updateCharsetDevToolStripMenuItem
+            // 
+            this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
+            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
+            this.updateCharsetDevToolStripMenuItem.Visible = false;
+            this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
+            // 
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
             this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.presentCustomCharsetToolStripMenuItem.Text = "Present Custom Charset...";
+            this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // setSketchesPathToolStripMenuItem
@@ -1276,14 +1284,6 @@ namespace OSD
             this.groupBox12.TabIndex = 19;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "OSD Status:";
-            // 
-            // updateCharsetDevToolStripMenuItem
-            // 
-            this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
-            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
-            this.updateCharsetDevToolStripMenuItem.Visible = false;
-            this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
             // 
             // OSD
             // 
