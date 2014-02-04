@@ -17,7 +17,7 @@ void uploadFont()
 //    osd.closePanel();
 
 
-    Serial.printf_P("Ready for Font\n");
+    Serial.printf_P(PSTR("Ready for Font\n"));
 
     byte ascii_byte;
     while(font_count < 256) { 
@@ -49,7 +49,7 @@ void uploadFont()
             osd.write_NVM(font_count, character_bitmap);    
             byte_count = 0;
             font_count++;
-            Serial.printf_P("Char Done\n");
+            Serial.printf_P(PSTR("Char Done\n"));
         }
     }
 }
