@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r746";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r747";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -3800,7 +3800,7 @@ namespace OSD
                             { 
                                 if(tempBuffer[i] == 0x31)
                                 {
-                                    halfByte = (byte)(halfByte + (byte)Math.Pow(2, bitPosition));
+                                    halfByte = (byte)(halfByte + (byte)Math.Pow(2, 3 - bitPosition));
                                     bitPosition++;
                                 }
                                 else if (tempBuffer[i] == 0x30)
