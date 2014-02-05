@@ -19,7 +19,7 @@ void uploadFont()
 
     //byte ascii_byte;
     while(font_count < 256) { 
-        int8_t incomingByte = Serial.read();
+        byte incomingByte = Serial.read();
         boolean half_byte_count = 0;
         //New line means 'one char sent'
         if(incomingByte == 0x0d){
@@ -30,16 +30,16 @@ void uploadFont()
         }
         else if((incomingByte >= 0x30) && (incomingByte <= 0x3F)){
           if(half_byte_count = 0){
-            character_bitmap[byte_count] = character_bitmap[byte_count] + (incomingByte - '0');
+            character_bitmap[byte_count] = character_bitmap[byte_count] + ((incomingByte - 0x30) << 4);
             half_byte_count = 1;
           }
           else
           {
-             character_bitmap[byte_count] = character_bitmap[byte_count] + ((incomingByte - '0') * 16);
-             //character_bitmap[byte_count] = ascii_byte;
-             byte_count++;
-             half_byte_count = 0;
-             //ascii_byte = 0;
+            character_bitmap[byte_count] = character_bitmap[byte_count] + (incomingByte - 0x30);
+            //character_bitmap[byte_count] = ascii_byte;
+            byte_count++;
+            half_byte_count = 0;
+            //ascii_byte = 0;
            }
         }
     }
