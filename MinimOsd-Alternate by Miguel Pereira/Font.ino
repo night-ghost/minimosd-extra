@@ -1,49 +1,51 @@
 
 void uploadFont()
 {
-    uint8_t byte_count = 0;
-    //byte ascii_binary[0x08];
+    uint16_t byte_count = 0;
+    byte bit_count;
 
     // move these local to prevent ram usage
     uint8_t character_bitmap[0x40];
     int font_count = 0;
 
     osd.clear();
-//    osd.setPanel(6,9);
-//    osd.openPanel();
-//    osd.printf_P(PSTR("Character Update"));
-//    delay(2000);
-//    osd.closePanel();
 
-    Serial.printf_P(PSTR("Ready for Font\n"));
+    Serial.printf_P(PSTR("RFF\n"));
 
-    //byte ascii_byte;
     while(font_count < 256) { 
-        byte incomingByte = Serial.read();
-        boolean half_byte_count = 0;
-        //New line means 'one char sent'
-        if(incomingByte == 0x0d){
-            osd.write_NVM(font_count, character_bitmap);    
-            //byte_count = 0;
-            font_count++;
-            Serial.printf_P(PSTR("Char Done\n"));
+        int8_t incomingByte = Serial.read();
+        switch(incomingByte) // parse and decode mcm file
+        {
+        case 0x0d: // carridge return, end of line
+            //Serial.println("cr");
+            if (bit_count == 8)
+            {
+                byte_count++;
+                character_bitmap[byte_count] = 0;
+            }
+            bit_count = 0;
+            break;
+        case 0x30: // ascii '0'
+        case 0x31: // ascii '1' 
+            character_bitmap[byte_count] << 1;
+            if(incomingByte == 0x31)
+              character_bitmap[byte_count] += 1;
+            bit_count++;
+            break;
+        default:
+            break;
         }
-        else if((incomingByte >= 0x30) && (incomingByte <= 0x3F)){
-          if(half_byte_count = 0){
-            character_bitmap[byte_count] = character_bitmap[byte_count] + ((incomingByte - 0x30) << 4);
-            half_byte_count = 1;
-          }
-          else
-          {
-            character_bitmap[byte_count] = character_bitmap[byte_count] + (incomingByte - 0x30);
-            //character_bitmap[byte_count] = ascii_byte;
-            byte_count++;
-            half_byte_count = 0;
-            //ascii_byte = 0;
-           }
+
+        // we have one completed character
+        // write the character to NVM 
+        if(byte_count == 64)
+        {
+            osd.write_NVM(font_count, character_bitmap);    
+            byte_count = 0;
+            font_count++;
+            Serial.printf_P(PSTR("CD\n"));
         }
     }
 }
-
 
 
