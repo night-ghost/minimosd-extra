@@ -27,7 +27,7 @@ void uploadFont()
             break;
         case 0x30: // ascii '0'
         case 0x31: // ascii '1' 
-            character_bitmap[byte_count] << 1;
+            character_bitmap[byte_count] = character_bitmap[byte_count] << 1;
             if(incomingByte == 0x31)
               character_bitmap[byte_count] += 1;
             bit_count++;
