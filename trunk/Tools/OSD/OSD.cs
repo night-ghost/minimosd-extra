@@ -914,7 +914,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r747";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r749";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -3739,7 +3739,7 @@ namespace OSD
                             return;
                         }
                     }
-                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    if (!comPort.ReadLine().Contains("RFF"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
@@ -3767,9 +3767,6 @@ namespace OSD
                     br.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     long length = br.BaseStream.Length;
-                    long halfByteCount = 0;
-                    //Ignore first line
-                    br.BaseStream.Position = 9;
                     while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
                     {
                         try
@@ -3778,73 +3775,24 @@ namespace OSD
                             toolStripStatusLabel1.Text = "CharSet Uploading";
 
 
-                            //int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
-                            int read = 640;// 163847 / 256 + 1; // 163,847 font file
+                            int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
                             if ((br.BaseStream.Position + read) > br.BaseStream.Length)
                             {
                                 read = (int)(br.BaseStream.Length - br.BaseStream.Position);
                             }
                             length -= read;
-                            byte[] tempBuffer = br.ReadBytes(read);
-                            List<byte> halfBytes = new List<byte>();
-                            byte halfByte = 0x00;
-                            int i = 0;
-                            int bitPosition = 0;
-                            ////Ignore first line
-                            //int countEnters = 0;
-                            //while (tempBuffer[i] != 0x0d)
-                            //    i++;
-                            //while ((tempBuffer[i] == 0x0d) || (tempBuffer[i] == 0x0a))
-                            //    i++;
-                            while (i < read)
-                            { 
-                                if(tempBuffer[i] == 0x31)
-                                {
-                                    halfByte = (byte)(halfByte + (byte)Math.Pow(2, 3 - bitPosition));
-                                    bitPosition++;
-                                }
-                                else if (tempBuffer[i] == 0x30)
-                                {
-                                    bitPosition++;
-                                }
-                                //else //send cr and lf
-                                //{
-                                //    halfBytes.Add(tempBuffer[i]);
-                                //    bitPosition = 0;
-                                //}
-
-                                //if (tempBuffer[i] == 0x0d)
-                                //    countEnters++;
-                                if(bitPosition == 4)
-                                {
-                                    halfByte = (byte)(halfByte + (byte)0x30); //Displace to start in ascii char '0'
-                                    halfBytes.Add(halfByte);
-                                    bitPosition = 0;
-                                    halfByte = 0x00;
-                                    halfByteCount++;
-                                    // \r\n means one entire char sent
-                                    if ((halfByteCount % 128) == 0)
-                                    {
-                                        halfBytes.Add(0x0d);
-                                        halfBytes.Add(0x0a);
-                                    }
-                                }
-                                i++;
-                            }
-                            
-                            comPort.Write(halfBytes.ToArray(), 0, halfBytes.Count);
-                            //byte[] buffer = br.ReadBytes(read);
-                            //comPort.Write(buffer, 0, buffer.Length);
+                            byte[] buffer = br.ReadBytes(read);
+                            comPort.Write(buffer, 0, buffer.Length);
                             int timeout = 0;
 
-                            while (comPort.BytesToRead == 0 && read == 640)
+                            while (comPort.BytesToRead == 0 && read == 768)
                             {
                                 System.Threading.Thread.Sleep(10);
                                 timeout++;
 
                                 if (timeout > 10)
                                 {
-                                    MessageBox.Show("CharSet upload failed - no response " + i + " HalfBytesCount: " + halfBytes.Count);
+                                    MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
                                     return;
                                 }
@@ -3857,17 +3805,13 @@ namespace OSD
                             }
 
                         }
-                        catch(Exception ex)
+                        catch
                         {
-                            MessageBox.Show("Position: " + br.BaseStream.Position + " Half byte count: " + halfByteCount);
                             break;
                         }
 
                         Application.DoEvents();
                     }
-
-                    
-                    /*
                     comPort.WriteLine("\r\n");
                     //Wait for last char acknowledge
                     int t = 0;
@@ -3886,7 +3830,7 @@ namespace OSD
                     //Console.WriteLine(comPort.ReadExisting());
                     if (comPort.BytesToRead != 0)
                         comPort.ReadLine();
-                    */
+
                     comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
                     comPort.DtrEnable = false;
