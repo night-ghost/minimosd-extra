@@ -25,7 +25,6 @@
           * [Battery_Percent Battery_Percent]
         * [RSSI_warning RSSI]      
   * [Panel Panel descriptions]
-    * [Pan_center Center]
     * [Pan_pitch Pitch]
     * [Pan_roll Roll]
     * [Pan_battery_a Battery A]
