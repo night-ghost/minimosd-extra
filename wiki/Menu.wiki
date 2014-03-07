@@ -54,7 +54,6 @@
     * [Pan_call_sign Call Sign]
     * [Pan_td Trip distance]
   * [Operating Operating MinimOSD-Extra]
-    * [OSD_menu OSD Menu]
     * [Switching_screens Switching Screens]
     * [video_standards Video Standards]
     * [brightness Brightness]
