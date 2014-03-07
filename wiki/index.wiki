@@ -3,9 +3,6 @@
 = Introduction =
 
 
-<wiki:video url="http://www.youtube.com/watch?feature=player_embedded&v=9mSeuFvWqfg"/>
-
-
 Added:
 
 - Changeable unit measurement (US, metric)
@@ -14,34 +11,39 @@ Added:
 
 - Home altitude
 
-- Battery Percent
+- Battery Percent, or mah used
 
 - Current Draw
 
-- Time From Startup
-
-- OSD Menu
+- Time From Startup and flight time in one panel
 
 - Variometer
 
-- Wind horizontal speed and direction, and also vertical wind speed (Vertical wind speed will be in next release)
+- Wind horizontal speed and direction, and average speed
 
 - OSD on/off
 
 - Switchable second screen
 
-- Waypoint distance
-
-- Waypoint heading
+- Waypoint distance, Waypoint number, direction and Crosstrack error in one panel
 
 - Warning messages for Lost GPS fix, stall, overspeed, battery voltage, battery percent, RSSI
 
-- Efficiency, glide distance & thermic notifier. 3 in one panel (Will be in next release)
+- Efficiency, glide distance & thermic notifier. 3 in one panel
 
-- OSD Brightness (Will be in next release)
+- OSD Brightness
 
-- HAM Call Sign (Will be in next release)
+- HAM Call Sign
 
+- Smoother horizon
+
+- Real heading
+
+- RSSI
+
+- Temperature
+
+- Trip distance
 
 
 This functions can be turned on and off, and placed on different screens now, using the Config. tool.
@@ -49,22 +51,8 @@ This functions can be turned on and off, and placed on different screens now, us
 Also RSSI, switching mode and channel and units of measurement, stall speed warning, overspeed warning, battery warning voltage, battery percent warning, RSSI warning, can be set in the new Config Tool.
 
 
+We built in a new way of setting video standards. Now OSD does not just guess anymore. You can set the standard to default to if no video is detected. If video is detected, than it will change it automatically. It is in "Video Mode" menu. 
 
-We built in a new way of setting video standards. Now OSD does not guess anymore :). You can set it fixed from Config. Tool. It is in "Video Mode" menu.
-
-
-If you could send me a .tlog file of an average flight.... Than I would be able to test it. :)
-
-Or could anyone flight test it, and upload the OSD video about it? 
-
-
-
-About the menu:
-
-I made a menu inside OSD. You can enter this menu only after boot, the same way as screen switching works.
-
-
-The latest stable version is: 2.1
 
 
 Enjoy
