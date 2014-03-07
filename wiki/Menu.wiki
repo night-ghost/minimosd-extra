@@ -50,7 +50,6 @@
     * [Pan_warnings Warnings]
     * [Pan_time Time]
     * [Pan_rssi RSSI]
-    * [Pan_tune Tune]
     * [Pan_efficiency Efficiency]
     * [Pan_call_sign Call Sign]
   * [Operating Operating MinimOSD-Extra]
