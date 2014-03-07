@@ -1,7 +1,7 @@
 = Battery Percent =
 
 This panel indicates the charge level of your battery.
-It shows your charge level in percent.
+It is capable to show your charge level in percent, or it can tell you mah used since poweron.
 
 You should set your battery capacity in Mission Planner.
 
