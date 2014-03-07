@@ -32,7 +32,7 @@
     * [Pan_gps_coord GPS Coord]
     * [Pan_heading_rose Heading Rose]
     * [Pan_heading Heading]
-    * [Pan_heart_beat Heart Beat]
+    * [Pan_cog]
     * [Pan_home_direction Home Direction]
     * [Pan_home_distance Home Distance]
     * [Pan_wp_direction WP Direction]
