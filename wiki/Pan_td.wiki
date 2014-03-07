@@ -1,11 +1,4 @@
 = Trip distance =
 
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+This panel tells you total distance your plane have traveled.
+It is basically an odometer.
