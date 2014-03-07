@@ -1,1 +1,1 @@
-Configurreing MinimOSD-Extra is done trough Config Tool. However some functions you can configure it trough a built in OSD menu.
+Configurreing MinimOSD-Extra is done trough Config Tool. 
