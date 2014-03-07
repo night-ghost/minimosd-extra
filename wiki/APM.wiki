@@ -8,22 +8,22 @@ You need to use a Mavlink 1.0 compatible firmware on APM.
 2./
 You also need to have the data stream rates configured correctly. To do so, connect to Mission Planner. Go to configuration. Locate EEPROM parameters and verify that you have the following parameters configured as here;
 
-SERIAL3_BAUD, 57 (telemetry output at 57600) 
+SERIAL1_BAUD, 57 (telemetry output at 57600) 
 
-SR3_EXT_STAT, 2 ( 2hz for waypoints, GPS raw, fence data, current 
+SR1_EXT_STAT, 2 ( 2hz for waypoints, GPS raw, fence data, current 
 waypoint, etc) 
 
-SR3_EXTRA1, 5 ( 5hz for attitude and simulation state) 
+SR1_EXTRA1, 5 ( 5hz for attitude and simulation state) 
 
-SR3_EXTRA2, 2 ( 2hz for VFR_Hud data ) 
+SR1_EXTRA2, 2 ( 2hz for VFR_Hud data ) 
 
-SR3_EXTRA3, 3 ( 3hz for AHRS, Hardware Status, Wind ) 
+SR1_EXTRA3, 3 ( 3hz for AHRS, Hardware Status, Wind ) 
 
-SR3_POSITION, 2 ( 2hz for location data ) 
+SR1_POSITION, 2 ( 2hz for location data ) 
 
-SR3_RAW_SENS, 2 ( 2hz for raw imu sensor data ) 
+SR1_RAW_SENS, 2 ( 2hz for raw imu sensor data ) 
 
-SR3_RC_CHAN, 5 ( 5hz for radio input or radio output data )
+SR1_RC_CHAN, 5 ( 5hz for radio input or radio output data )
 
 
 If you fly copter than you also need to set SR0 also:
