@@ -1,4 +1,4 @@
-
+/*
 void uploadFont()
 {
     uint16_t byte_count = 0;
@@ -92,4 +92,4 @@ void uploadFont()
 }
 
 
-
+*/

@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r741"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r777"));
     osd.closePanel();
 }
 
@@ -96,7 +96,7 @@ void writePanels(){
       //Testing bits from 8 bit register D 
       if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
       if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-      //if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+      if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
       if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
       if(ISd(panel,Eff_BIT)) panEff(panEff_XY[0][panel], panEff_XY[1][panel]);
       if(ISd(panel,CALLSIGN_BIT)) panCALLSIGN(panCALLSIGN_XY[0][panel], panCALLSIGN_XY[1][panel]);
@@ -508,14 +508,14 @@ void panOff(){
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
     
-//  void panTune(int first_col, int first_line){
-//  osd.setPanel(first_col, first_line);
-//  osd.openPanel();
+  void panTune(int first_col, int first_line){
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
 
-//  osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0x05, 0x4E, 0x50, (nav_pitch), 0x05, 0x4E, 0x48, (nav_bearing), 0x05, 0x54, 0x42, (wp_target_bearing), 0x05, 0x41, 0x45, (alt_error * converth), high, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), spe);
+  osd.printf("%c%2.0f%c|%c%2.0f%c", 0xb0, (alt_error * converth), high, 0xb1, ((aspd_error / 100.0) * converts), spe);
 
-//  osd.closePanel();
-//}
+  osd.closePanel();
+}
 
 /* **************************************************************** */
 // Panel  : panCur_A
