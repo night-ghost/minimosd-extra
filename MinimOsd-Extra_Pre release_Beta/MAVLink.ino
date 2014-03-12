@@ -41,9 +41,9 @@ void read_mavlink(){
             } else {
                 crlf_count = 0;
             }
-            if (crlf_count == 3) {
-                uploadFont();
-            }
+//            if (crlf_count == 3) {
+//                uploadFont();
+//            }
         }
 
         //trying to grab msg  
@@ -117,8 +117,8 @@ void read_mavlink(){
 //                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
                   wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
                   wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-//                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-//                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
                   xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
                 }
                 break;
