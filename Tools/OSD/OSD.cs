@@ -13,6 +13,7 @@ using ArdupilotMega;
 using System.Xml;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace OSD
 {
@@ -210,7 +211,7 @@ namespace OSD
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 23, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 7, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 11, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
@@ -329,7 +330,7 @@ namespace OSD
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
             panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
             //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
@@ -417,6 +418,11 @@ namespace OSD
                         tn.Checked = false;
                     }
 
+                    else if (thing.Item1 == "Tune")
+                    {
+                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
+                        tn.Checked = false;
+                    }
                     else if (thing.Item1 == "Efficiency")
                     {
                         TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
@@ -903,7 +909,8 @@ namespace OSD
         public enum ModelType
         {
             Plane = 0,
-            Copter = 1
+            Copter = 1,
+            Unknown = 9
         }
 
         private void OSD_Load(object sender, EventArgs e)
@@ -1586,9 +1593,9 @@ namespace OSD
         const int panClimb_en_ADDR = 182;
         const int panClimb_x_ADDR = 184;
         const int panClimb_y_ADDR = 186;
-        //        const int panTune_en_ADDR = 188;
-        //        const int panTune_x_ADDR = 190;
-        //        const int panTune_y_ADDR = 192;
+        const int panTune_en_ADDR = 188;
+        const int panTune_x_ADDR = 190;
+        const int panTune_y_ADDR = 192;
         const int panEff_en_ADDR = 194;
         const int panEff_x_ADDR = 196;
         const int panEff_y_ADDR = 198;
@@ -2600,15 +2607,15 @@ namespace OSD
 
             if (ofd.FileName != "")
             {
-                if (comPort.IsOpen)
-                    comPort.Close();
+                //if (comPort.IsOpen)
+                //    comPort.Close();
 
                 try
                 {
 
-                    comPort.PortName = CMB_ComPort.Text;
-                    comPort.BaudRate = 57600;
-                    comPort.Open();
+                    //comPort.PortName = CMB_ComPort.Text;
+                    //comPort.BaudRate = 57600;
+                    //comPort.Open();
 
                 }
                 catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
@@ -2622,13 +2629,73 @@ namespace OSD
                 {
                     try
                     {
-                        byte[] bytes = br.ReadBytes(20);
+                        string message = "";
+                        byte[] bytes = br.ReadBytes(200000);
+                        int frameIndex = 0;
+                        for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
+                        {
+                            if (frameIndex >= 20)
+                            {
+                                string a = "";
+                            }
 
-                        comPort.Write(bytes, 0, bytes.Length);
+                            if (frameIndex < 20)
+                            {
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                int length = (int)bytes[byteIndex];
+                                message += "Payload length: " + length.ToString();
+                                byteIndex++;
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "System ID: " + ((int)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                                message += "Message: ";
+                                for (int x = 0; x < length; x++)
+                                {
+                                    while (bytes[byteIndex] == '\0')
+                                        byteIndex++;
+                                    message += ((char)bytes[byteIndex]).ToString();
+                                    byteIndex++;
+                                }
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+                                message += Environment.NewLine;
+                                byteIndex++;
+                            }
+
+                            if (bytes[byteIndex] == 0xFE)
+                            {
+                                frameIndex++;
+                            }
+
+                        }
+
+                        string str = System.Text.Encoding.UTF8.GetString(bytes);
+                        str = str.Replace((char)0, '\0');
+                        str = str.Replace("\0", "");
+                        //comPort.Write(bytes, 0, bytes.Length);
 
                         System.Threading.Thread.Sleep(5);
 
-                        Console.Write(comPort.ReadExisting());
+                        //Console.Write(comPort.ReadExisting());
 
                     }
                     catch { break; }
@@ -2641,7 +2708,7 @@ namespace OSD
                     toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
                     toolStripStatusLabel1.Text = "";
 
-                    comPort.Close();
+                    //comPort.Close();
                 }
                 catch { }
             }
@@ -3176,7 +3243,8 @@ namespace OSD
                     if ((node.Text == "Battery A") ||
                         (node.Text == "Battery Percent") ||
                         (node.Text == "Current") ||
-                        (node.Text == "Efficiency"))
+                        (node.Text == "Efficiency") ||
+                        (node.Text == "Tune"))
                         LIST_items.Nodes["Energy"].Nodes.Add(node);
 
                     if ((node.Text == "Altitude") ||
@@ -3287,7 +3355,8 @@ namespace OSD
                     if ((node.Text == "Battery A") ||
                         (node.Text == "Battery Percent") ||
                         (node.Text == "Current") ||
-                        (node.Text == "Efficiency"))
+                        (node.Text == "Efficiency") ||
+                        (node.Text == "Tune"))
                         LIST_items2.Nodes["Energy"].Nodes.Add(node);
 
                     if ((node.Text == "Altitude") ||
@@ -3855,6 +3924,410 @@ namespace OSD
                 WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
             }
+        }
+
+        private void updateCharsetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            #region Get and validate font file
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "mcm|*.mcm";
+
+            DialogResult dialogResp = ofd.ShowDialog();
+            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
+                return;
+
+            if (!IsValidCharsetFile(ofd))
+                return;
+            #endregion
+
+            //Get current fw version (plane, copter...)
+            ModelType model = GetModelType();
+            //Upload font fw
+            UploadFirmeware("charuploader");
+            //Upload font
+            UploadFont(ofd);
+            //Upload fw
+        }
+
+        private bool UploadFirmeware(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+
+            byte[] FLASH;
+            bool spuploadflash_flag = false;
+            try
+            {
+                toolStripStatusLabel1.Text = "Reading Hex File";
+
+                statusStrip1.Refresh();
+
+                FLASH = readIntelHEXv2(new StreamReader(fileName));
+            }
+            catch { MessageBox.Show("Bad Hex File"); return false; }
+
+            //bool fail = false;
+            ArduinoSTK sp;
+
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                sp.DtrEnable = false;
+                sp.RtsEnable = false; //added
+
+                sp.Open();
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return false; }
+
+            toolStripStatusLabel1.Text = "Connecting to Board";
+
+            if (sp.connectAP())
+            {
+                sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);
+                try
+                {
+                    for (int i = 0; i < 3; i++) //try to upload 3 times
+                    { //try to upload n times if it fail
+                        spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+                        if (!spuploadflash_flag)
+                        {
+                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+                            //toolStripStatusLabel1.Text = "Lost sync. Reconnecting...";
+                        }
+                        else break;
+                    }
+
+                    //if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
+                    //{
+                    //    if (sp.IsOpen)
+                    //        sp.Close();
+
+                    //    MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",                                    
+                    //        "Error",                            
+                    //        MessageBoxButtons.OK,        
+                    //        MessageBoxIcon.Warning); 
+                    //}
+                }
+                catch (Exception ex)
+                {
+                    //fail = true;
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+            }
+            else
+            {
+                MessageBox.Show("Failed to talk to bootloader");
+            }
+
+            sp.Close();
+
+            if (spuploadflash_flag)
+            {
+
+                toolStripStatusLabel1.Text = "Done";
+
+                MessageBox.Show("Done!");
+            }
+            else
+            {
+                MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
+                            "Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                toolStripStatusLabel1.Text = "Failed";
+            }
+            return true;
+        }
+
+        private ModelType GetModelType()
+        {
+            byte[] tempEeprom = null;
+            bool fail = false;
+            ArduinoSTK sp;
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DtrEnable = true;
+
+                sp.Open();
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return ModelType.Unknown; }
+
+            if (sp.connectAP())
+            {
+                try
+                {
+                    for (int i = 0; i < 5; i++)
+                    { //try to download two times if it fail
+                        tempEeprom = sp.download(1024);
+                        if (!sp.down_flag)
+                        {
+                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+                        }
+                        else break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed to talk to bootloader");
+                fail = true;
+            }
+
+            sp.Close();
+
+            //Setup configuration panel
+            return (ModelType)tempEeprom[MODEL_TYPE_ADD];
+        }
+
+        private bool UploadFont(OpenFileDialog ofd)
+        {
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            toolStripStatusLabel1.Text = "";
+
+
+            if (!IsValidCharsetFile(ofd))
+                return false;
+
+            //Get file version
+            string fileVersion = "000";
+            string tempFileName = ofd.SafeFileName.ToUpper();
+            if (tempFileName.StartsWith("MINIMOSD_"))
+            {
+                tempFileName = tempFileName.Remove(0, 9);
+                if (tempFileName.EndsWith(".MCM"))
+                {
+                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                    string[] versionArray = tempFileName.Split('.');
+                    Int16 version1, version2, version3;
+                    if (versionArray.Length > 2)
+                    {
+                        if (Int16.TryParse(versionArray[0], out version1) &&
+                           Int16.TryParse(versionArray[1], out version2) &&
+                           Int16.TryParse(versionArray[2], out version3))
+                            fileVersion = version1.ToString().Substring(0, 1).Trim() + version2.ToString().Substring(0, 1).Trim() + version3.ToString().Substring(0, 1).Trim();
+                    }
+                }
+            }
+
+            if (ofd.FileName != "")
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                try
+                {
+
+                    comPort.PortName = CMB_ComPort.Text;
+                    comPort.BaudRate = 57600;
+
+                    comPort.Open();
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    //System.Threading.Thread.Sleep(2);
+
+                    comPort.DtrEnable = true;
+                    comPort.RtsEnable = true;
+
+                    System.Threading.Thread.Sleep(7000);
+
+                    comPort.ReadExisting();
+
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+                    comPort.WriteLine("");
+
+                    int timeout = 0;
+
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(500);
+                        Console.WriteLine("Waiting...");
+                        timeout++;
+
+                        if (timeout > 6)
+                        {
+                            MessageBox.Show("Error entering font mode - No Data");
+                            comPort.Close();
+                            return false;
+                        }
+                    }
+                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    {
+                        MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                        comPort.Close();
+                        return false;
+                    }
+
+                }
+                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return false; }
+
+                using (var stream = ofd.OpenFile())
+                {
+
+                    BinaryReader br = new BinaryReader(stream);
+                    StreamReader sr2 = new StreamReader(br.BaseStream);
+
+                    string device = sr2.ReadLine();
+
+                    if (device != "MAX7456")
+                    {
+                        MessageBox.Show("Invalid MCM");
+                        comPort.Close();
+                        return false;
+                    }
+
+                    br.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                    long length = br.BaseStream.Length;
+                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+                    {
+                        try
+                        {
+                            toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+                            toolStripStatusLabel1.Text = "CharSet Uploading";
+
+
+                            int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
+                            if ((br.BaseStream.Position + read) > br.BaseStream.Length)
+                            {
+                                read = (int)(br.BaseStream.Length - br.BaseStream.Position);
+                            }
+                            length -= read;
+                            byte[] buffer = br.ReadBytes(read);
+                            comPort.Write(buffer, 0, buffer.Length);
+                            int timeout = 0;
+
+                            while (comPort.BytesToRead == 0 && read == 768)
+                            {
+                                System.Threading.Thread.Sleep(10);
+                                timeout++;
+
+                                if (timeout > 10)
+                                {
+                                    MessageBox.Show("CharSet upload failed - no response");
+                                    comPort.Close();
+                                    return false;
+                                }
+                            }
+
+                            comPort.ReadExisting();
+                            if (length < 1000)
+                            {
+                                lblFWModelType.Text = lblFWModelType.Text;
+                            }
+
+                        }
+                        catch
+                        {
+                            break;
+                        }
+
+                        Application.DoEvents();
+                    }
+                    comPort.WriteLine("\r\n");
+                    //Wait for last char acknowledge
+                    int t = 0;
+                    while (comPort.BytesToRead == 0)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        t++;
+
+                        if (t > 10)
+                        {
+                            MessageBox.Show("No end");
+                            comPort.Close();
+                            return false;
+                        }
+                    }
+                    //Console.WriteLine(comPort.ReadExisting());
+                    if (comPort.BytesToRead != 0)
+                        comPort.ReadLine();
+
+                    comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    System.Threading.Thread.Sleep(50);
+
+                    comPort.DtrEnable = true;
+                    comPort.RtsEnable = true;
+
+                    System.Threading.Thread.Sleep(50);
+
+                    comPort.Close();
+
+                    comPort.DtrEnable = false;
+                    comPort.RtsEnable = false;
+
+                    toolStripProgressBar1.Value = 100;
+                    toolStripStatusLabel1.Text = "CharSet Done";
+                }
+
+                WriteCharsetVersion(fileVersion);
+                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+            }
+            return true;
+        }
+
+
+        private bool GetLatestFW(ModelType modelType)
+        {
+            try
+            {
+                FileStream latestPlaneFile = new FileStream("C:\\test\\MinimOSD_" + modelType.ToString() + ".hex", FileMode.Create);
+
+                FtpWebRequest request = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://xx.x.xx.xxx/MinimOSD_" + modelType.ToString() + ".hex"));
+                request.Credentials = new NetworkCredential("username", "pass");
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.UseBinary = true;
+
+                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+                Stream ftpStream = response.GetResponseStream();
+                long cl = response.ContentLength;
+                int bufferSize = 2048;
+                int readCount;
+                byte[] buffer = new byte[bufferSize];
+                readCount = ftpStream.Read(buffer, 0, bufferSize);
+                while (readCount > 0)
+                {
+                    latestPlaneFile.Write(buffer, 0, readCount);
+                    readCount = ftpStream.Read(buffer, 0, bufferSize);
+                }
+                ftpStream.Close();
+                latestPlaneFile.Close();
+                response.Close();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
