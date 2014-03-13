@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r777"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r780"));
     osd.closePanel();
 }
 
@@ -512,7 +512,7 @@ void panOff(){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
 
-  osd.printf("%c%2.0f%c|%c%2.0f%c", 0xb0, (alt_error * converth), high, 0xb1, ((aspd_error / 100.0) * converts), spe);
+  osd.printf("%c%3.0f%c%c|%c%3.0f%c%c", 0xb0, (alt_error * converth), high, 0x20, 0xb1, ((aspd_error / 100.0) * converts), spe, 0x20);
 
   osd.closePanel();
 }
