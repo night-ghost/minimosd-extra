@@ -3636,6 +3636,8 @@ namespace OSD
                 btnGeneratePanelsFile.Visible = true;
                 setSketchesPathToolStripMenuItem.Visible = true;
                 updateCharsetDevToolStripMenuItem.Visible = true;
+                updateCharsetcustomFwToolStripMenuItem.Visible = true;
+                getFwFromOSDToolStripMenuItem.Visible = true;
             }
         }
 
@@ -3926,30 +3928,7 @@ namespace OSD
             }
         }
 
-        private void updateCharsetToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            #region Get and validate font file
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "mcm|*.mcm";
-
-            DialogResult dialogResp = ofd.ShowDialog();
-            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
-                return;
-
-            if (!IsValidCharsetFile(ofd))
-                return;
-            #endregion
-
-            //Get current fw version (plane, copter...)
-            ModelType model = GetModelType();
-            //Upload font fw
-            UploadFirmeware("charuploader");
-            //Upload font
-            UploadFont(ofd);
-            //Upload fw
-        }
-
-        private bool UploadFirmeware(string fileName)
+        private bool UploadFirmware(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;
@@ -4051,6 +4030,7 @@ namespace OSD
 
         private ModelType GetModelType()
         {
+            ModelType modelType = ModelType.Unknown;
             byte[] tempEeprom = null;
             bool fail = false;
             ArduinoSTK sp;
@@ -4082,6 +4062,7 @@ namespace OSD
                         }
                         else break;
                     }
+                    modelType = (ModelType)tempEeprom[MODEL_TYPE_ADD];
                 }
                 catch (Exception ex)
                 {
@@ -4091,13 +4072,12 @@ namespace OSD
             else
             {
                 MessageBox.Show("Failed to talk to bootloader");
-                fail = true;
             }
 
             sp.Close();
-
+                
             //Setup configuration panel
-            return (ModelType)tempEeprom[MODEL_TYPE_ADD];
+            return modelType;
         }
 
         private bool UploadFont(OpenFileDialog ofd)
@@ -4176,7 +4156,7 @@ namespace OSD
                             return false;
                         }
                     }
-                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    if (!comPort.ReadLine().Contains("RFF"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
@@ -4295,15 +4275,20 @@ namespace OSD
             return true;
         }
 
-
         private bool GetLatestFW(ModelType modelType)
         {
             try
             {
-                FileStream latestPlaneFile = new FileStream("C:\\test\\MinimOSD_" + modelType.ToString() + ".hex", FileMode.Create);
+                string localFwDir = AppDomain.CurrentDomain.BaseDirectory + "\\FW";
+                string fileName = "MinimOSD_Extra_" + modelType.ToString() + ".hex";
 
-                FtpWebRequest request = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://xx.x.xx.xxx/MinimOSD_" + modelType.ToString() + ".hex"));
-                request.Credentials = new NetworkCredential("username", "pass");
+                if (!Directory.Exists(localFwDir))
+                    Directory.CreateDirectory(localFwDir);
+                FileStream latestPlaneFile = new FileStream(localFwDir + "\\MinimOSD_" + modelType.ToString() + ".hex", FileMode.Create);
+                //FileStream latestPlaneFile = new FileStream("C:\\test\\MinimOSD_" + modelType.ToString() + "_Test.hex", FileMode.Create);
+
+                FtpWebRequest request = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://gabek.dyndns.org:23/Latest/" + fileName));
+                request.Credentials = new NetworkCredential("ct", "secret01201");
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 request.UseBinary = true;
 
@@ -4328,6 +4313,138 @@ namespace OSD
                 return false;
             }
             return true;
+        }
+
+        private void updateCharsetcustomFwToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            #region Get and validate font file
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "mcm|*.mcm";
+
+            DialogResult dialogResp = ofd.ShowDialog();
+            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
+                return;
+
+            if (!IsValidCharsetFile(ofd))
+                return;
+            #endregion
+
+            //Get current fw version (plane, copter...)
+            ModelType modelType = GetModelType();
+            modelType = ModelType.Copter;
+            string modelFileName = "MinimOSD_" + modelType.ToString() + ".hex";
+            if (modelType == ModelType.Unknown)
+            {
+                if(MessageBox.Show("Unknown current fw." + Environment.NewLine +
+                                   "If you proceed you'll need to upload  the fw manually after charset upload." + Environment.NewLine + 
+                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+                    return;
+            }
+
+            //Get latest fw from ftp
+            if (!GetLatestFW(modelType))
+            {
+                if(MessageBox.Show("Unable to get latest fw from internet." + Environment.NewLine +
+                                   "If you proceed you'll need to upload the fw manually after charset upload." + Environment.NewLine + 
+                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+                return;
+            }
+
+            //Upload font fw
+            if(!UploadFirmware("charuploader.hex"))
+                return;
+
+            //Upload font
+            if(!UploadFont(ofd))
+                return;
+
+            //Upload fw
+            if(modelType != ModelType.Unknown)
+                UploadFirmware(modelFileName);
+        }
+
+
+
+        private void GetFwFromOSD()
+        {
+            ArduinoSTK sp;
+            byte[] FLASH = new byte[32 * 1024];
+            //byte[] FLASH = new byte[30382];
+
+            try
+            {
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                sp = new ArduinoSTK();
+                sp.PortName = CMB_ComPort.Text;
+                sp.BaudRate = 57600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                sp.DtrEnable = false;
+                sp.RtsEnable = false; //added
+
+                sp.Open();
+
+            }
+            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            if (sp.connectAP())
+            {
+                try
+                {
+                    int start = 0;
+                    short length = 0x100;
+
+                    while (start < FLASH.Length)
+                    {
+                        sp.setaddress(start);
+                        sp.downloadflash(length).CopyTo(FLASH, start);
+                        start += length;
+                    }
+
+                    StreamWriter sw = new StreamWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "FW" + Path.DirectorySeparatorChar + @"flash.bin", false);
+                    BinaryWriter bw = new BinaryWriter(sw.BaseStream);
+                    bw.Write(FLASH, 0, FLASH.Length);
+                    bw.Close();
+
+                    sw = new StreamWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "FW" + Path.DirectorySeparatorChar + @"flash.hex", false);
+                    for (int i = 0; i < FLASH.Length; i += 16)
+                    {
+                        string add = string.Format("{0:X4}", i);
+                        if (i % (0x1000 << 4) == 0)
+                        {
+                            if (i != 0)
+                                sw.WriteLine(":02000002{0:X4}{1:X2}", ((i >> 4) & 0xf000), 0x100 - (2 + 2 + (((i >> 4) & 0xf000) >> 8) & 0xff));
+                        }
+                        if (add.Length == 5)
+                        {
+                            add = add.Substring(1);
+                        }
+                        sw.Write(":{0:X2}{1}00", 16, add);
+                        byte ck = (byte)(16 + (i & 0xff) + ((i >> 8) & 0xff));
+                        for (int a = 0; a < 16; a++)
+                        {
+                            ck += FLASH[i + a];
+                            sw.Write("{0:X2}", FLASH[i + a]);
+                        }
+                        sw.WriteLine("{0:X2}", (byte)(0x100 - ck));
+                    }
+
+                    sw.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            sp.Close();
+        }
+
+        private void getFwFromOSDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetFwFromOSD();
         }
     }
 }
