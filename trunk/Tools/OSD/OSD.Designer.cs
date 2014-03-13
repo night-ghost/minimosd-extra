@@ -134,6 +134,8 @@ namespace OSD
             this.lblLatestCharsetUploaded = new System.Windows.Forms.Label();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.updateCharsetcustomFwToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getFwFromOSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Y)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).BeginInit();
@@ -359,7 +361,7 @@ namespace OSD
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(152, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -370,7 +372,7 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(152, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -385,8 +387,10 @@ namespace OSD
             this.sendTLogToolStripMenuItem,
             this.updateFontToolStripMenuItem,
             this.updateCharsetDevToolStripMenuItem,
+            this.updateCharsetcustomFwToolStripMenuItem,
             this.presentCustomCharsetToolStripMenuItem,
-            this.setSketchesPathToolStripMenuItem});
+            this.setSketchesPathToolStripMenuItem,
+            this.getFwFromOSDToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
@@ -399,14 +403,14 @@ namespace OSD
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(224, 22);
+            this.checkBox1.Size = new System.Drawing.Size(233, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -414,14 +418,14 @@ namespace OSD
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.sendTLogToolStripMenuItem.Text = "Send TLog...";
             this.sendTLogToolStripMenuItem.ToolTipText = "Send a Mavlink transmission log to the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
@@ -429,7 +433,7 @@ namespace OSD
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
@@ -437,7 +441,7 @@ namespace OSD
             // updateCharsetDevToolStripMenuItem
             // 
             this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
-            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
             this.updateCharsetDevToolStripMenuItem.Visible = false;
             this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
@@ -445,14 +449,14 @@ namespace OSD
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // setSketchesPathToolStripMenuItem
             // 
             this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
-            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.setSketchesPathToolStripMenuItem.Text = "Set Arduino Sketches Path...";
             this.setSketchesPathToolStripMenuItem.Visible = false;
             this.setSketchesPathToolStripMenuItem.Click += new System.EventHandler(this.setSketchesPathToolStripMenuItem_Click);
@@ -1285,6 +1289,22 @@ namespace OSD
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "OSD Status:";
             // 
+            // updateCharsetcustomFwToolStripMenuItem
+            // 
+            this.updateCharsetcustomFwToolStripMenuItem.Name = "updateCharsetcustomFwToolStripMenuItem";
+            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateCharsetcustomFwToolStripMenuItem.Text = "Update Charset (custom fw)...";
+            this.updateCharsetcustomFwToolStripMenuItem.Visible = false;
+            this.updateCharsetcustomFwToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetcustomFwToolStripMenuItem_Click);
+            // 
+            // getFwFromOSDToolStripMenuItem
+            // 
+            this.getFwFromOSDToolStripMenuItem.Name = "getFwFromOSDToolStripMenuItem";
+            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.getFwFromOSDToolStripMenuItem.Text = "GetFwFromOSD...";
+            this.getFwFromOSDToolStripMenuItem.Visible = false;
+            this.getFwFromOSDToolStripMenuItem.Click += new System.EventHandler(this.getFwFromOSDToolStripMenuItem_Click);
+            // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1467,6 +1487,8 @@ namespace OSD
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.GroupBox groupBox12;
         private System.Windows.Forms.ToolStripMenuItem updateCharsetDevToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateCharsetcustomFwToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getFwFromOSDToolStripMenuItem;
     }
 }
 
