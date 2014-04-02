@@ -30,7 +30,7 @@ static uint8_t      currentBasePanel=255; //0 - Normal OSD; 1 - Flight summary; 
 static uint8_t      base_mode=0;
 static uint8_t      panel_auto_switch=0;
 static bool         motor_armed = 0;
-static bool         last_armed = 0;
+static bool         last_armed_status = 0;
 static bool         ma = 0;
 static bool         osd_clear = 0;
 static uint16_t     ch_raw = 0;
@@ -49,7 +49,6 @@ static uint8_t      ch_toggle = 0;
 static uint8_t      check_warning = 1;
 //static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
-static boolean      takeofftime = 0;
 //static boolean      haltset = 0;
 //static boolean      pal_ntsc = 0;
 
@@ -69,7 +68,7 @@ static float        osd_vbat_A = 0;                 // Battery A voltage in mili
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static float        mah_used = 0;
 static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
-static int8_t       start_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
+static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
 
@@ -78,18 +77,18 @@ static uint8_t      batt_warn_level = 0;
 //static float      osd_curr_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
-static float        start_Time = -1.0;
-static float        remaining_Time = 0.0;
+static uint16_t     remaining_estimated_flight_time_seconds = 0.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 //static unsigned long text_timer = 0;
 static unsigned long one_sec_timer = 0;
 static unsigned long mavLinkTimer = 0;
 //static unsigned long warning_timer =0;
-static unsigned long runt =0;
-static unsigned long FTime = 0;
+//static unsigned long current_flight_start_Time = 0.0;
+static unsigned long total_flight_time_milis = 0.0;
+static uint16_t      total_flight_time_seconds = 0.0;
+static unsigned long runt = 0;
 //static unsigned long CallSignBlink = 0;
-static unsigned long landed = 4294967295;
 
 //static uint8_t      warning_type = 0;
 static char*        warning_string;
@@ -106,7 +105,6 @@ static float        osd_climb = 0;
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
-static unsigned long not_moving_since = 0;          // get time since uav not moving
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground
@@ -114,8 +112,8 @@ static uint16_t     off_course;
 static uint8_t      osd_got_home = 0;               // tels if got home position or not
 static float        osd_home_lat = 0;               // home latidude
 static float        osd_home_lon = 0;               // home longitude
-static float        osd_home_alt = 0; 
-static float        osd_alt_to_home = 0; 
+//static float        osd_home_alt = 0; 
+//static float        osd_alt_to_home = 0; 
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 
@@ -125,8 +123,9 @@ static int16_t       osd_roll = 0;                   // roll from DCM
 static float        osd_heading = 0;                // ground course heading from GPS
 static float        glide = 0;
 
-static float        osd_alt = 0;                    // altitude
-static int32_t      osd_gps_alt = 0;                    // altitude
+static float        osd_alt_abs = 0;                    // altitude
+static float        osd_alt_rel = 0;                    // altitude
+static int32_t      osd_alt_gps = 0;                    // altitude
 static float        osd_airspeed = 0;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
