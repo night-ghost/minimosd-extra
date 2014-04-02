@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r750"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r784"));
     osd.closePanel();
 }
 
@@ -36,7 +36,7 @@ void writePanels(){
   }
   //Flight summary panel
   //Only show flight summary 10 seconds after landing and if throttle < 15
-  else if ((landed != 4294967295) && ((((millis() - landed) / 10000) % 2) == 0)){ 
+  else if (!motor_armed && (((millis() / 10000) % 2) == 0)){ 
     if (currentBasePanel != 1){
       osd.clear();
       currentBasePanel = 1;
@@ -170,11 +170,12 @@ void panDistance(int first_col, int first_line){
 // Output : 
 // Size   : 
 // Staus  : done
-void panFdata(){
-     osd.setPanel(11, 4);
-    osd.openPanel();
-    osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%10.6f|%c%10.6f", 0x08,((int)start_Time/60)%60,0x3A,(int)start_Time%60, 0x0B, (int)((max_home_distance) * converth), high, 0x8F, (int)((tdistance) * converth), high,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
-    osd.closePanel();
+void panFdata()
+{
+  osd.setPanel(11, 4);
+  osd.openPanel();
+  osd.printf("%c%3i%c%02i|%c%5i%c|%c%5i%c|%c%5i%c|%c%5i%c|%c%10.6f|%c%10.6f", 0x08,((int)total_flight_time_seconds/60)%60,0x3A,(int)total_flight_time_seconds%60, 0x0B, (int)((max_home_distance) * converth), high, 0x8F, (int)((tdistance) * converth), high,0x14,(int)(max_osd_groundspeed * converts),spe,0x12, (int)(max_osd_home_alt * converth), high, 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+  osd.closePanel();
 }
 
 /* **************************************************************** */
@@ -198,32 +199,21 @@ void panTemp(int first_col, int first_line){
 // Output : 
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
-
-void panEff(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    //Check takeoff just to prevent inicial false readings
-    if (takeofftime){
-        ////If in loiter should estimated remaining flight time
-        //if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
-          if(osd_battery_remaining_A != last_battery_reading){
-            remaining_Time = osd_battery_remaining_A * start_Time / (start_battery_reading - osd_battery_remaining_A);
-            last_battery_reading = osd_battery_remaining_A;
-          }
-          osd.printf("%c%2i%c%02i", 0x17,((int)remaining_Time/60)%60,0x3A,(int)remaining_Time%60);
-        //}
-        //If in movement show mAh needed to fly a Km or a mile (depending on selected unit
-//        else{
-//          eff = (float(osd_curr_A * 10) / (osd_groundspeed * converts))* 0.5 + eff * 0.5;
-//        eff = eff * 0.2 + eff * 0.8;
-//          if (eff > 0 && eff <= 9999) {
-//            osd.printf("%c%4.0f%c", 0x17, (double)eff, 0x82);
-//          }else{
-//          osd.printf_P(PSTR("\x17\x20\x20\x20\x20\x20")); 
-//          }
-        //}
+void panEff(int first_col, int first_line)
+{
+  osd.setPanel(first_col, first_line);
+  osd.openPanel();
+  //Check takeoff just to prevent inicial false readings
+  if (motor_armed)
+  {
+    if(osd_battery_remaining_A != last_battery_reading)
+    {
+      remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / (max_battery_reading - osd_battery_remaining_A)) / 1000;
+      last_battery_reading = osd_battery_remaining_A;
     }
-    osd.closePanel();
+    osd.printf("%c%2i%c%02i", 0x17,((int)remaining_estimated_flight_time_seconds/60)%60,0x3A,(int)remaining_estimated_flight_time_seconds%60);
+  }
+  osd.closePanel();
 }
 
 /* **************************************************************** */
@@ -497,7 +487,7 @@ void panAlt(int first_col, int first_line){
     osd.openPanel();
     //if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf_P("\x11");
     if(EEPROM.read(SIGN_MSL_ON_ADDR) != 0) osd.printf("%c", 0x11);
-    osd.printf("%5.0f%c", (double)(osd_gps_alt * converth), high);
+    osd.printf("%5.0f%c", (double)(osd_alt_gps * converth), high);
     osd.closePanel();
 }
 
@@ -527,7 +517,7 @@ void panHomeAlt(int first_col, int first_line){
     osd.openPanel();
     //if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf_P('\x12');
     if(EEPROM.read(SIGN_HA_ON_ADDR) != 0) osd.printf("%c", 0x12);
-    osd.printf("%5.0f%c", (double)(osd_alt_to_home * converth), high);
+    osd.printf("%5.0f%c", (double)(osd_alt_rel * converth), high);
     osd.closePanel();
 }
 
@@ -698,7 +688,7 @@ void panBatteryPercent(int first_col, int first_line){
 void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%2i%c%02i",((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+    osd.printf("%2i%c%02i",((int)total_flight_time_seconds/60)%60,0x3A,(int)total_flight_time_seconds%60);
     osd.closePanel();
 }
 
@@ -1138,7 +1128,7 @@ void showILS(int start_col, int start_row) {
     //so convert we convert it to times 10 to work 
     //only with integers and save some bytes
     //int alt = (osd_alt_to_home * converth + 5) * 10;
-    int alt = (osd_alt_to_home * converth + 5) * 4.4; //44 possible position 5 rows times 9 chars
+    int alt = (osd_alt_rel * converth + 5) * 4.4; //44 possible position 5 rows times 9 chars
     
     if((alt < 44) && (alt > 0)){
         //We have 9 possible chars
