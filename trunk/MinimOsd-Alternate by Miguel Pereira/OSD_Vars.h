@@ -125,7 +125,7 @@ static float        glide = 0;
 
 static float        osd_alt_abs = 0;                    // altitude
 static float        osd_alt_rel = 0;                    // altitude
-static int32_t      osd_alt_gps = 0;                    // altitude
+static float        osd_alt_gps = 0;                    // altitude
 static float        osd_airspeed = 0;              // airspeed
 static float        osd_windspeed = 0;
 static float        osd_windspeedz = 0;
