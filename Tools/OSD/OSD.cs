@@ -921,7 +921,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r749";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r786";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -4445,6 +4445,18 @@ namespace OSD
         private void getFwFromOSDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GetFwFromOSD();
+        }
+
+        private void CALLSIGNmaskedText_Validating(object sender, CancelEventArgs e)
+        {
+            string validString = "";
+            foreach (char c in CALLSIGNmaskedText.Text)
+            {
+
+                if ((c == '-') || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) || ((c >= '0') && (c <= '9')))
+                    validString += c;
+            }
+            CALLSIGNmaskedText.Text = validString;
         }
     }
 }
