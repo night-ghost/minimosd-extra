@@ -921,7 +921,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r786";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r787";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -2919,7 +2919,8 @@ namespace OSD
                             return;
                         }
                     }
-                    if (!comPort.ReadLine().Contains("Ready for Font"))
+                    string readFont = comPort.ReadLine();
+                    if (!readFont.Contains("Ready for Font") && !readFont.Contains("RFF"))
                     {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
