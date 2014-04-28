@@ -921,7 +921,7 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r787";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r788";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -1976,7 +1976,10 @@ namespace OSD
                 RSSI_numeric_max.Minimum = 900;
                 RSSI_numeric_max.Maximum = 2000;
             }
-            cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+            if(pan.rssiraw_on <= 1)
+                cbxRSSIChannel.SelectedIndex = 0;
+            else
+                cbxRSSIChannel.SelectedIndex = 1;
             updatingRSSI = false;
 
             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
