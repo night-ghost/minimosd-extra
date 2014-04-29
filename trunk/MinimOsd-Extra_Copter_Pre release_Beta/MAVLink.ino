@@ -86,7 +86,7 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 {
-                    osd_gps_alt = mavlink_msg_gps_raw_int_get_alt(&msg) / 1000.0f;
+                    osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg) / 1000.0f;
                     osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
@@ -101,7 +101,7 @@ void read_mavlink(){
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                     osd_heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
                     osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
-                    osd_alt = mavlink_msg_vfr_hud_get_alt(&msg);
+                    osd_alt_rel = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
                 }
                 break;
@@ -156,7 +156,10 @@ void read_mavlink(){
                 break;
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
                 { 
-                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
+                    //osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
+                    //Commented because it seems that we only get relative alt when we have GPS lock.
+                    //That shouldn't be because we may rely only on baro. So using vfr hud alt (testing)
+                    //osd_alt_rel = (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001);
                 }
                 break; 
             default:
