@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r785"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r789"));
     osd.closePanel();
 }
 
@@ -36,7 +36,7 @@ void writePanels(){
   }
   //Flight summary panel
   //Only show flight summary 10 seconds after landing and if throttle < 15
-  else if (!motor_armed && (((millis() / 10000) % 2) == 0)){ 
+  else if (!motor_armed && (((millis() / 10000) % 2) == 0) && (tdistance > 50)){ 
     if (currentBasePanel != 1){
       osd.clear();
       currentBasePanel = 1;
