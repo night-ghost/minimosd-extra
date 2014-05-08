@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r789"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r791"));
     osd.closePanel();
 }
 
@@ -1004,11 +1004,14 @@ void panFlightMode(int first_col, int first_line){
     else if (osd_mode == 5) mode_str = "loit"; //Loiter
     else if (osd_mode == 6) mode_str = "retl"; //Return to Launch
     else if (osd_mode == 7) mode_str = "circ"; //Circle
-    else if (osd_mode == 8) mode_str = "posi"; //Position
+    //else if (osd_mode == 8) mode_str = "posi"; //Position
     else if (osd_mode == 9) mode_str = "land"; //Land
     else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
     else if (osd_mode == 11) mode_str = "drif"; //OF_Loiter
     else if (osd_mode == 13) mode_str = "sprt"; //OF_Loiter
+    else if (osd_mode == 14) mode_str = "flip"; //OF_Loiter
+    else if (osd_mode == 15) mode_str = "tune"; //OF_Loiter
+    else if (osd_mode == 16) mode_str = "hybr"; //OF_Loiter
     osd.printf("%c%s%c", 0x7F, mode_str, motor_armed * 0x86);
     osd.closePanel();
 }
