@@ -104,6 +104,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Tuple.cs" />
+    <Compile Include="Updater.cs" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
       <SubType>Designer</SubType>

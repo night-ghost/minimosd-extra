@@ -1,0 +1,5 @@
+e:\documents and settings\vitorr\my documents\visual studio 2010\Projects\CTToolUpdater\CTToolUpdater\bin\Debug\CTToolUpdater.exe
+e:\documents and settings\vitorr\my documents\visual studio 2010\Projects\CTToolUpdater\CTToolUpdater\bin\Debug\CTToolUpdater.pdb
+e:\documents and settings\vitorr\my documents\visual studio 2010\Projects\CTToolUpdater\CTToolUpdater\obj\x86\Debug\ResolveAssemblyReference.cache
+e:\documents and settings\vitorr\my documents\visual studio 2010\Projects\CTToolUpdater\CTToolUpdater\obj\x86\Debug\CTToolUpdater.exe
+e:\documents and settings\vitorr\my documents\visual studio 2010\Projects\CTToolUpdater\CTToolUpdater\obj\x86\Debug\CTToolUpdater.pdb

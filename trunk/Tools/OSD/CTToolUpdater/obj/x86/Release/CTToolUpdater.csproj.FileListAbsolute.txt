@@ -1,0 +1,5 @@
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater\bin\Release\CTToolUpdater.exe
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater\bin\Release\CTToolUpdater.pdb
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater\obj\x86\Release\ResolveAssemblyReference.cache
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater\obj\x86\Release\CTToolUpdater.exe
+E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater\obj\x86\Release\CTToolUpdater.pdb
