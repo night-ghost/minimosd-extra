@@ -14,6 +14,7 @@ using System.Xml;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Diagnostics;
 
 namespace OSD
 {
@@ -913,6 +914,8 @@ namespace OSD
             Unknown = 9
         }
 
+        string currentVersion = "";
+
         private void OSD_Load(object sender, EventArgs e)
         {
             if (cbxModelType.Items.Count == 0)
@@ -922,6 +925,13 @@ namespace OSD
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Text = this.Text + " " + strVersion + " - Pre-Release r788";
+            currentVersion = strVersion + "r788";
+
+            //if (Updater.NewVersionExists(currentVersion))
+            //{
+            //    Process.Start(@"E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\Updater.exe");
+            //}
+
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -4461,6 +4471,12 @@ namespace OSD
                     validString += c;
             }
             CALLSIGNmaskedText.Text = validString;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Process.Start(@"E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater.exe");
+            this.Close();
         }
     }
 }
