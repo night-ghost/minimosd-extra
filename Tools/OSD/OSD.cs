@@ -924,14 +924,8 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r788";
-            currentVersion = strVersion + "r788";
-
-            //if (Updater.NewVersionExists(currentVersion))
-            //{
-            //    Process.Start(@"E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\Updater.exe");
-            //}
-
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r793";
+            currentVersion = strVersion + "r793";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -939,6 +933,8 @@ namespace OSD
                 CMB_ComPort.SelectedIndex = 0;
 
             xmlconfig(false);
+
+            CheckForUpdates();
 
             osdDraw1();
             osdDraw2();
@@ -2735,6 +2731,8 @@ namespace OSD
         private String arduinoIDEPath = "Arduino-1.0.2";
         private String planeSketchPath = "ArduCAM_OSD_Plane";
         private String copterSketchPath = "ArduCAM_OSD_Copter";
+        private bool autoUpdate = false;
+        private bool checkForUpdates = true;
 
         private void xmlconfig(bool write)
         {
@@ -2758,6 +2756,10 @@ namespace OSD
                     xmlwriter.WriteElementString("PlaneSketchPath", planeSketchPath);
 
                     xmlwriter.WriteElementString("CopterSketchPath", copterSketchPath);
+
+                    xmlwriter.WriteElementString("AutoUpdate", autoUpdate.ToString());
+
+                    xmlwriter.WriteElementString("CheckForUpdates", checkForUpdates.ToString());
 
                     xmlwriter.WriteEndElement();
 
@@ -2797,6 +2799,14 @@ namespace OSD
                                         break;
                                     case "CopterSketchPath":
                                         copterSketchPath = xmlreader.ReadString();
+                                        break;
+                                    case "AutoUpdate":
+                                        autoUpdate = (xmlreader.ReadString().ToUpper() == "TRUE");
+                                        cbxShowUpdateDialog.Checked = !autoUpdate;
+                                        break;
+                                    case "CheckForUpdates":
+                                        checkForUpdates = (xmlreader.ReadString().ToUpper() == "TRUE");
+                                        cbxAutoUpdate.Checked = checkForUpdates;
                                         break;
                                     case "xml":
                                         break;
@@ -4477,6 +4487,59 @@ namespace OSD
         {
             Process.Start(@"E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater.exe");
             this.Close();
+        }
+
+        private void CheckForUpdates()
+        {
+            if (checkForUpdates)
+            {
+                if (Updater.NewVersionExists(currentVersion))
+                {
+                    if (!autoUpdate)
+                    {
+                        UpdateAvailable frmUpdateAvailable = new UpdateAvailable();
+                        System.Windows.Forms.DialogResult result = frmUpdateAvailable.ShowDialog();
+                        autoUpdate = frmUpdateAvailable.dontAskAgain;
+                        if (frmUpdateAvailable.dontAskAgain)
+                        {
+                            checkForUpdates = (result == System.Windows.Forms.DialogResult.Yes);
+                        }
+                        if (result == System.Windows.Forms.DialogResult.Yes)
+                        {
+                            Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
+                            this.Close();
+                        }
+                    }
+                    else
+                    {
+                        //Prevent auto update if last try less than 5 minutes.
+                        //Prevents consecutive auto trys if it fails to update
+                        if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\version.txt"))
+                        {
+                            if (System.IO.File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + @"\version.txt") + new TimeSpan(0, 5, 0) < DateTime.Now)
+                            {
+                                Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
+                                this.Close();
+                            }
+                        }
+                        else
+                        {
+                            Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
+                            this.Close();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void cbxAutoUpdate_CheckedChanged(object sender, EventArgs e)
+        {
+            checkForUpdates = cbxAutoUpdate.Checked;
+        }
+
+        private void cbxShowUpdateDialog_CheckedChanged(object sender, EventArgs e)
+        {
+            autoUpdate = !cbxShowUpdateDialog.Checked;
         }
     }
 }
