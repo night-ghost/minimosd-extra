@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r791"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r794"));
     osd.closePanel();
 }
 
@@ -241,9 +241,14 @@ void panEff(int first_col, int first_line)
 void panRSSI(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if(rssiraw_on == 0) rssi = (int16_t)((float)((int16_t)osd_rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+    if((rssiraw_on % 2 == 0))
+    {
+       if(osd_rssi < rssipersent) osd_rssi = rssipersent;
+       if(osd_rssi > rssical) osd_rssi = rssical;
+       if(rssiraw_on == 0) rssi = (int16_t)((float)((int16_t)osd_rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+       if(rssiraw_on == 8) rssi = (int16_t)((float)(chan8_raw / 10 - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+    }
     if(rssiraw_on == 1) rssi = (int16_t)osd_rssi;
-    if(rssiraw_on == 8) rssi = (int16_t)((float)(chan8_raw / 10 - rssipersent)/(float)(rssical-rssipersent)*100.0f);
     if(rssiraw_on == 9) rssi = chan8_raw;
     osd.printf("%c%3i%c", 0x09, rssi, 0x25);
     osd.closePanel();
@@ -1002,16 +1007,16 @@ void panFlightMode(int first_col, int first_line){
     else if (osd_mode == 3) mode_str = "auto"; //Auto
     else if (osd_mode == 4) mode_str = "guid"; //Guided
     else if (osd_mode == 5) mode_str = "loit"; //Loiter
-    else if (osd_mode == 6) mode_str = "retl"; //Return to Launch
+    else if (osd_mode == 6) mode_str = "rtl "; //Return to Launch
     else if (osd_mode == 7) mode_str = "circ"; //Circle
-    //else if (osd_mode == 8) mode_str = "posi"; //Position
+    //else if (osd_mode == 8) mode_str = "posi"; //Position Hold (Old)
     else if (osd_mode == 9) mode_str = "land"; //Land
     else if (osd_mode == 10) mode_str = "oflo"; //OF_Loiter
-    else if (osd_mode == 11) mode_str = "drif"; //OF_Loiter
-    else if (osd_mode == 13) mode_str = "sprt"; //OF_Loiter
-    else if (osd_mode == 14) mode_str = "flip"; //OF_Loiter
-    else if (osd_mode == 15) mode_str = "tune"; //OF_Loiter
-    else if (osd_mode == 16) mode_str = "hybr"; //OF_Loiter
+    else if (osd_mode == 11) mode_str = "drif"; //Drift
+    else if (osd_mode == 13) mode_str = "sprt"; //Sport
+    //else if (osd_mode == 14) mode_str = "flip"; //Flip
+    //else if (osd_mode == 15) mode_str = "tune"; //Tune
+    else if (osd_mode == 16) mode_str = "phld"; //Position Hold (Earlier called Hybrid)
     osd.printf("%c%s%c", 0x7F, mode_str, motor_armed * 0x86);
     osd.closePanel();
 }
