@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r780"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r795"));
     osd.closePanel();
 }
 
@@ -280,16 +280,16 @@ void panRSSI(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    if(rssiraw_on == 0) rssi = (int16_t)((float)((int16_t)osd_rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+    if((rssiraw_on % 2 == 0))
+    {
+       if(osd_rssi < rssipersent) osd_rssi = rssipersent;
+       if(osd_rssi > rssical) osd_rssi = rssical;
+       if(rssiraw_on == 0) rssi = (int16_t)((float)((int16_t)osd_rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+       if(rssiraw_on == 8) rssi = (int16_t)((float)(chan8_raw / 10 - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+    }
     if(rssiraw_on == 1) rssi = (int16_t)osd_rssi;
-    
-    if(rssiraw_on == 8) rssi = (int16_t)((float)(chan8_raw / 10 - rssipersent)/(float)(rssical-rssipersent)*100.0f);
     if(rssiraw_on == 9) rssi = chan8_raw;
-
-    
-//    if (rssi < -99) rssi = -99;
     osd.printf("%c%3i%c", 0x09, rssi, 0x25);
-//    osd.printf("%c%3i%c", 0x09, osd_clear, 0x25); 
     osd.closePanel();
 }
 
