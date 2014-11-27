@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r795"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r798"));
     osd.closePanel();
 }
 
@@ -289,7 +289,7 @@ void panRSSI(int first_col, int first_line){
     }
     if(rssiraw_on == 1) rssi = (int16_t)osd_rssi;
     if(rssiraw_on == 9) rssi = chan8_raw;
-    osd.printf("%c%3i%c", 0x09, rssi, 0x25);
+    osd.printf("%c%4i%c", 0x09, rssi, 0x25);
     osd.closePanel();
 }
 
@@ -512,7 +512,7 @@ void panOff(){
   osd.setPanel(first_col, first_line);
   osd.openPanel();
 
-  osd.printf("%c%3.0f%c%c|%c%3.0f%c%c", 0xb0, (alt_error * converth), high, 0x20, 0xb1, ((aspd_error / 100.0) * converts), spe, 0x20);
+  osd.printf("%c%3.0f%c%c", 0xb0, (alt_error * converth * -1), high, 0x20, 0xb1, ((aspd_error / 100.0) * converts), spe, 0x20);
 
   osd.closePanel();
 }
@@ -1042,22 +1042,24 @@ void panRose(int first_col, int first_line){
 void panWPDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+
+    if (wp_target_bearing > 0){
+      wp_target_bearing_rotate_int = round((wp_target_bearing - osd_heading)/360 *16.0) + 1; 
+    }else if (wp_target_bearing < 0){
+      wp_target_bearing_rotate_int = round(((360 + wp_target_bearing) - osd_heading)/360 *16.0) + 1;
+    } 
+    if (wp_target_bearing_rotate_int < 0) wp_target_bearing_rotate_int += 16;
+    if (wp_target_bearing_rotate_int == 0) wp_target_bearing_rotate_int = 16;
     
-    wp_target_bearing_rotate_int = round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 1; //Convert to int 0-16 
-    if(wp_target_bearing_rotate_int < 1 ) wp_target_bearing_rotate_int += 16; //normalize
-//    else if(wp_target_bearing_rotate_int == 0 ) wp_target_bearing_rotate_int = 16; //normalize
-    else if(wp_target_bearing_rotate_int > 16 ) wp_target_bearing_rotate_int -= 16; //normalize
-      if (xtrack_error > 999) xtrack_error = 999;
-      else if (xtrack_error < -999) xtrack_error = -999;
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
       
-      if (osd_mode == 10 || osd_mode == 15 || osd_mode == 7){     
+//      if (osd_mode == 10 || osd_mode == 15 || osd_mode == 7){     
         osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
-      }else{
-        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
-          }
+//      }else{
+//        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+//          }
     osd.closePanel();
 }
 
