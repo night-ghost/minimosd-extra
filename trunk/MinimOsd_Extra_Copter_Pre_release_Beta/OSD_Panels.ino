@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r794"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Copter r800"));
     osd.closePanel();
 }
 
@@ -960,13 +960,22 @@ void panWPDis(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     
-    wp_target_bearing_rotate_int = ((int)round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 16) % 16 + 1; //[1, 16]
+//    wp_target_bearing_rotate_int = ((int)round(((float)wp_target_bearing - osd_heading)/360.0 * 16.0) + 16) % 16 + 1; //[1, 16]
+
+    if (wp_target_bearing > 0){
+      wp_target_bearing_rotate_int = round((wp_target_bearing - osd_heading)/360 *16.0) + 1; 
+    }else if (wp_target_bearing < 0){
+      wp_target_bearing_rotate_int = round(((360 + wp_target_bearing) - osd_heading)/360 *16.0) + 1;
+    } 
+    if (wp_target_bearing_rotate_int < 0) wp_target_bearing_rotate_int += 16;
+    if (wp_target_bearing_rotate_int == 0) wp_target_bearing_rotate_int = 16;
     
     if (xtrack_error > 999) xtrack_error = 999;
     else if (xtrack_error < -999) xtrack_error = -999;
 
     osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
     showArrow((uint8_t)wp_target_bearing_rotate_int,0);
+
     if (osd_mode == 10){
         osd.printf("%c%c%c%4.0f%c", 0x20, 0x58, 0x65, (xtrack_error* converth), high);
     }else{
