@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r798"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r800"));
     osd.closePanel();
 }
 
@@ -1051,6 +1051,8 @@ void panWPDis(int first_col, int first_line){
     if (wp_target_bearing_rotate_int < 0) wp_target_bearing_rotate_int += 16;
     if (wp_target_bearing_rotate_int == 0) wp_target_bearing_rotate_int = 16;
     
+    if (xtrack_error > 999) xtrack_error = 999;
+    else if (xtrack_error < -999) xtrack_error = -999;
 
       osd.printf("%c%c%2i%c%4.0f%c|",0x57, 0x70, wp_number,0x0,(double)((float)(wp_dist) * converth),high);
       showArrow((uint8_t)wp_target_bearing_rotate_int,0);
