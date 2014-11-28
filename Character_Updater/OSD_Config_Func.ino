@@ -38,17 +38,17 @@ void writeEEPROM(byte value, int address) {
 
 void InitializeOSD() {
 
-//    loadBar();
-//    delay(500);
+    loadBar();
+    delay(500);
 
     writeEEPROM(42, CHK1);
     writeEEPROM(VER-42,CHK2);
     for(panel = 0; panel < npanels; panel++) writeSettings();
 
-//    osd.setPanel(4,9);
-//    osd.openPanel();
-//    osd.printf_P(PSTR("OSD Initialized, reboot")); 
-//    osd.closePanel();
+    osd.setPanel(4,9);
+    osd.openPanel();
+    osd.printf_P(PSTR("OSD Initialized, reboot")); 
+    osd.closePanel();
 
     // run for ever so user resets 
     for(;;) {}
@@ -81,9 +81,9 @@ void writeSettings() {
     writeEEPROM(on, panGPSats_en_ADDR + offset);
     writeEEPROM(1,  panGPSats_x_ADDR + offset);
     writeEEPROM(11, panGPSats_y_ADDR + offset);
-    writeEEPROM(on, panCOG_en_ADDR + offset);
-    writeEEPROM(5,  panCOG_x_ADDR + offset);
-    writeEEPROM(11, panCOG_y_ADDR + offset);
+//    writeEEPROM(on, panGPL_en_ADDR + offset);
+//    writeEEPROM(5,  panGPL_x_ADDR + offset);
+//    writeEEPROM(11, panGPL_y_ADDR + offset);
     writeEEPROM(on, panGPS_en_ADDR + offset);
     writeEEPROM(1,  panGPS_x_ADDR + offset);
     writeEEPROM(14, panGPS_y_ADDR + offset);
@@ -156,9 +156,9 @@ void writeSettings() {
     writeEEPROM(on, panClimb_en_ADDR + offset);
     writeEEPROM(1,  panClimb_x_ADDR + offset);
     writeEEPROM(8,  panClimb_y_ADDR + offset);
-    writeEEPROM(on, panTune_en_ADDR + offset);
-    writeEEPROM(10, panTune_x_ADDR + offset);
-    writeEEPROM(4,  panTune_y_ADDR + offset);
+//    writeEEPROM(on, panTune_en_ADDR + offset);
+//    writeEEPROM(10, panTune_x_ADDR + offset);
+//    writeEEPROM(4,  panTune_y_ADDR + offset);
     writeEEPROM(on, panEff_en_ADDR + offset);
     writeEEPROM(14, panEff_x_ADDR + offset);
     writeEEPROM(13, panEff_y_ADDR + offset);
@@ -186,7 +186,6 @@ void readSettings() {
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
     switch_mode = EEPROM.read(switch_mode_ADDR);
-    panel_auto_switch = EEPROM.read(AUTO_SCREEN_SWITC_ADD);
 //    if (EEPROM.read(ch_toggle_ADDR) < 4 || EEPROM.read(ch_toggle_ADDR) > 8){
 //     	EEPROM.write(ch_toggle_ADDR, 5);
 //	}
@@ -240,9 +239,9 @@ void readPanelSettings() {
     panGPSats_XY[0][panel] = readEEPROM(panGPSats_x_ADDR + offset);
     panGPSats_XY[1][panel] = checkPAL(readEEPROM(panGPSats_y_ADDR + offset));
 
-    setBit(panA_REG[panel], COG_BIT, readEEPROM(panCOG_en_ADDR + offset));
-    panCOG_XY[0][panel] = readEEPROM(panCOG_x_ADDR + offset);
-    panCOG_XY[1][panel] = checkPAL(readEEPROM(panCOG_y_ADDR + offset));
+//    setBit(panA_REG[panel], GPL_BIT, readEEPROM(panGPL_en_ADDR + offset));
+//    panGPL_XY[0][panel] = readEEPROM(panGPL_x_ADDR + offset);
+//    panGPL_XY[1][panel] = checkPAL(readEEPROM(panGPL_y_ADDR + offset));
 
     setBit(panA_REG[panel], GPS_BIT, readEEPROM(panGPS_en_ADDR + offset));
     panGPS_XY[0][panel] = readEEPROM(panGPS_x_ADDR + offset);
@@ -336,9 +335,9 @@ void readPanelSettings() {
     panClimb_XY[0][panel] = readEEPROM(panClimb_x_ADDR + offset);
     panClimb_XY[1][panel] = checkPAL(readEEPROM(panClimb_y_ADDR + offset));
 
-    setBit(panD_REG[panel], Tune_BIT, readEEPROM(panTune_en_ADDR + offset));
-    panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
-    panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
+//    setBit(panD_REG[panel], Tune_BIT, readEEPROM(panTune_en_ADDR + offset));
+//    panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
+//    panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
 
     setBit(panD_REG[panel], RSSI_BIT, readEEPROM(panRSSI_en_ADDR + offset));
     panRSSI_XY[0][panel] = readEEPROM(panRSSI_x_ADDR + offset);

@@ -12,12 +12,12 @@ void uploadFont()
     osd.clear();
     osd.setPanel(6,9);
     osd.openPanel();
-    osd.printf_P(PSTR("Character Update in progress"));
+    osd.printf_P(PSTR("Please wait until|OSD reboots!"));
     delay(2000);
     osd.closePanel();
 
 
-    Serial.printf_P("Ready for Font\n");
+    Serial.printf_P(PSTR("Ready for Font\n"));
 
     while(font_count < 256) { 
         int8_t incomingByte = Serial.read();
@@ -84,12 +84,11 @@ void uploadFont()
             osd.write_NVM(font_count, character_bitmap);    
             byte_count = 0;
             font_count++;
-            Serial.printf_P("Character update is done Done|please upload the normal FW");
+            Serial.printf_P(PSTR("Char Done\n"));
         }
     }
 
     //  character_bitmap[]
 }
-
 
 

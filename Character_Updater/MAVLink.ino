@@ -41,14 +41,13 @@ void read_mavlink(){
             } else {
                 crlf_count = 0;
             }
-//            if (crlf_count == 3) {
-//                uploadFont();
-//            }
+            if (crlf_count == 3) {
+                uploadFont();
+            }
         }
 
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
-            lastMAVBeat = millis();
             mavlink_active = 1;
             //handle msg
             switch(msg.msgid) {
@@ -62,14 +61,14 @@ void read_mavlink(){
                     osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg);
                     //Mode (arducoper armed/disarmed)
                     base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
-//                    if(getBit(base_mode,7)) motor_armed = 1;
-//                    else motor_armed = 0;
+                    if(getBit(base_mode,7)) motor_armed = 1;
+                    else motor_armed = 0;
 
                     osd_nav_mode = 0;          
-                    /*lastMAVBeat = millis();
+                    lastMAVBeat = millis();
                     if(waitingMAVBeats == 1){
                         enable_mav_request = 1;
-                    }*/
+                    }
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -89,8 +88,6 @@ void read_mavlink(){
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
-                    osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
-                    eph = mavlink_msg_gps_raw_int_get_eph(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
@@ -117,8 +114,8 @@ void read_mavlink(){
 //                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
                   wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
                   wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+//                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+//                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
                   xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
                 }
                 break;
@@ -142,21 +139,14 @@ void read_mavlink(){
                 break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-//                  if (osd_climb < 1.66 && osd_climb > -1.66){
-                  osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
-                  osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
-//                  osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
-//                  }
+                    osd_winddirection = abs(mavlink_msg_wind_get_direction(&msg)); // 0..360 deg, 0=north
+                    osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
+//                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }
                 break;
             case MAVLINK_MSG_ID_SCALED_PRESSURE:
                 {
                     temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
-                }
-                break;
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                {
-                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001);
                 }
                 break;
             default:
