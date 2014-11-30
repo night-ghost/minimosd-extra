@@ -10,8 +10,9 @@ http://gabek.dyndns.org:28/wiki/2.PNG
 
 Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
 
+(if you use the latest plane FW you have to upload the character uploading FW as the latest plane fw does not have that function.)
 
-1./   Uploading:
+2./   Uploading:
 
 Click on "Options" menu and choose "Update charset".
 
