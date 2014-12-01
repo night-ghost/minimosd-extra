@@ -24,9 +24,9 @@ In this mode switching will work like this:
 Every position of your 3 position switch is assigned to a screen. Screen 2 is always the middle position of the switch. Screen 1 is one end, and screen off is the other. It is up to your radio. (If your channel is reversed or not)
 The switching values (that you can read in MP) are:
 
-below 1200 = screen 1
-between 1200 and 1800 = screen 2
-over 1800 = screen off
+screen 1: 0 to 1233
+screen 2: 1233 to 1467
+screen off: 1467 to 1701 (or abowe. the abowe range can be used for additional things)
 
 
 Modifying the normal behaviour as in switching by mode switch:
