@@ -10,7 +10,7 @@ void startPanels(){
 void panLogo(){
     osd.setPanel(5, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r800"));
+    osd.printf_P(PSTR("MinimOSD-Extra 2.4|Plane r805"));
     osd.closePanel();
 }
 
@@ -289,6 +289,9 @@ void panRSSI(int first_col, int first_line){
     }
     if(rssiraw_on == 1) rssi = (int16_t)osd_rssi;
     if(rssiraw_on == 9) rssi = chan8_raw;
+
+    if(rssi > 100.0) rssi = 100;
+
     osd.printf("%c%3i%c", 0x09, rssi, 0x25);
     osd.closePanel();
 }
