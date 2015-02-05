@@ -924,8 +924,8 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r793";
-            currentVersion = strVersion + "r793";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r794";
+            currentVersion = strVersion + "r794";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -934,7 +934,7 @@ namespace OSD
 
             xmlconfig(false);
 
-            CheckForUpdates();
+            //CheckForUpdates();
 
             osdDraw1();
             osdDraw2();
@@ -2616,15 +2616,15 @@ namespace OSD
 
             if (ofd.FileName != "")
             {
-                //if (comPort.IsOpen)
-                //    comPort.Close();
+                if (comPort.IsOpen)
+                    comPort.Close();
 
                 try
                 {
 
-                    //comPort.PortName = CMB_ComPort.Text;
-                    //comPort.BaudRate = 57600;
-                    //comPort.Open();
+                    comPort.PortName = CMB_ComPort.Text;
+                    comPort.BaudRate = 57600;
+                    comPort.Open();
 
                 }
                 catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
@@ -2643,11 +2643,6 @@ namespace OSD
                         int frameIndex = 0;
                         for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
                         {
-                            if (frameIndex >= 20)
-                            {
-                                string a = "";
-                            }
-
                             if (frameIndex < 20)
                             {
                                 while (bytes[byteIndex] == '\0')
@@ -2700,11 +2695,11 @@ namespace OSD
                         string str = System.Text.Encoding.UTF8.GetString(bytes);
                         str = str.Replace((char)0, '\0');
                         str = str.Replace("\0", "");
-                        //comPort.Write(bytes, 0, bytes.Length);
+                        comPort.Write(bytes, 0, bytes.Length);
 
                         System.Threading.Thread.Sleep(5);
 
-                        //Console.Write(comPort.ReadExisting());
+                        Console.Write(comPort.ReadExisting());
 
                     }
                     catch { break; }
@@ -2717,7 +2712,7 @@ namespace OSD
                     toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
                     toolStripStatusLabel1.Text = "";
 
-                    //comPort.Close();
+                    comPort.Close();
                 }
                 catch { }
             }
@@ -2799,14 +2794,6 @@ namespace OSD
                                         break;
                                     case "CopterSketchPath":
                                         copterSketchPath = xmlreader.ReadString();
-                                        break;
-                                    case "AutoUpdate":
-                                        autoUpdate = (xmlreader.ReadString().ToUpper() == "TRUE");
-                                        cbxShowUpdateDialog.Checked = !autoUpdate;
-                                        break;
-                                    case "CheckForUpdates":
-                                        checkForUpdates = (xmlreader.ReadString().ToUpper() == "TRUE");
-                                        cbxAutoUpdate.Checked = checkForUpdates;
                                         break;
                                     case "xml":
                                         break;
@@ -4056,7 +4043,6 @@ namespace OSD
         {
             ModelType modelType = ModelType.Unknown;
             byte[] tempEeprom = null;
-            bool fail = false;
             ArduinoSTK sp;
             try
             {
@@ -4530,16 +4516,6 @@ namespace OSD
                     }
                 }
             }
-        }
-
-        private void cbxAutoUpdate_CheckedChanged(object sender, EventArgs e)
-        {
-            checkForUpdates = cbxAutoUpdate.Checked;
-        }
-
-        private void cbxShowUpdateDialog_CheckedChanged(object sender, EventArgs e)
-        {
-            autoUpdate = !cbxShowUpdateDialog.Checked;
         }
     }
 }
