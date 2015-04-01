@@ -38,4 +38,3 @@ private:
 };
 
 #endif // __BETTERSTREAM_H
-
