@@ -1,3 +1,5 @@
+#include "compat.h"
+
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
 
@@ -17,6 +19,7 @@ void request_mavlink_rates()
         MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
         MAV_DATA_STREAM_EXTRA2};
+
     const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
     for (int i=0; i < maxStreams; i++) {
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
@@ -103,6 +106,15 @@ void read_mavlink(){
                     osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                     osd_alt_rel = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
+/*
+packet.airspeed = airspeed;
+<------>packet.groundspeed = groundspeed;
+<------>packet.alt = alt;
+<------>packet.climb = climb;
+<------>packet.heading = heading;
+<------>packet.throttle = throttle;
+*/
+
                 }
                 break;
             case MAVLINK_MSG_ID_ATTITUDE:
@@ -152,8 +164,27 @@ void read_mavlink(){
             case MAVLINK_MSG_ID_SCALED_PRESSURE:
                 {
                     temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
+/*
+
+packet.press_abs = press_abs;
+packet.press_diff = press_diff;
+
+*/
+                    
                 }
                 break;
+
+            case MAVLINK_MSG_ID_SCALED_PRESSURE2:
+                    temperature = mavlink_msg_scaled_pressure2_get_temperature(&msg);
+/*
+
+packet.press_abs = press_abs;
+packet.press_diff = press_diff;
+
+*/
+                break;
+
+
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
                 { 
                     //osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
