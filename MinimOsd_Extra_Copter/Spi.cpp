@@ -4,6 +4,9 @@
 #else
 	#include "wiring.h"
 #endif
+
+#include "compat.h"
+
 #include "Spi.h"
 
 //---------- constructor ----------------------------------------------------
@@ -29,6 +32,7 @@ void SPI::mode(byte config)
   // enable SPI master with configuration byte specified
   SPCR = 0;
   SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR);
+  SPSR |= 1;
   tmp = SPSR;
   tmp = SPDR;
 }
