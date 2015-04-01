@@ -1094,4 +1094,150 @@ void timers()
   if (millis() > one_sec_timer) one_sec_timer_switch = 1;
 }
 
+#if 0 // unused
 
+/* **************************************************************** */
+// Panel  : panSetup
+// Needs  : Nothing, uses whole screen
+// Output : The settings menu
+// Size   : 3 x ?? (rows x chars)
+// Staus  : done
+
+//void panSetup(){
+
+//    if (millis() > text_timer){
+//        text_timer = millis() + 500;
+
+//        osd.clear();
+//        osd.setPanel(5, 7);
+
+//        if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
+//            chan1_raw_middle = chan1_raw;
+//            chan2_raw_middle = chan2_raw;
+//        }
+
+//        if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu++;  //= setup_menu + 1;
+//        else if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu--;  //= setup_menu - 1;
+//        if (setup_menu < 0) setup_menu = 0;
+//        else if (setup_menu > 2) setup_menu = 2;
+
+
+//        switch (setup_menu){
+//        case 0:
+//            {
+//                osd.printf_P(PSTR("    Overspeed    "));
+//                osd.printf("%3.0i%c", overspeed, spe);
+//                overspeed = change_val(overspeed, overspeed_ADDR);
+//                break;
+//            }
+//        case 1:
+//            {
+//                osd.printf_P(PSTR("   Stall Speed   "));
+//                osd.printf("%3.0i%c", stall , spe);
+//                //overwritedisplay();
+//                stall = change_val(stall, stall_ADDR);
+//                break;
+//            }
+//        case 2:
+//            {
+//                osd.printf_P(PSTR("Battery warning "));
+//                osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
+//                battv = change_val(battv, battv_ADDR);
+//                break;
+//            }
+            //      case 4:
+            //        osd.printf_P(PSTR("Battery warning "));
+            //        osd.printf("%3.0i%c", battp , 0x25);
+            //        if ((chan1_raw - 100) > chan1_raw_middle ){
+            //        battp = battp - 1;}
+            //        if ((chan1_raw + 100) < chan1_raw_middle ){
+            //        battp = battp + 1;} 
+            //        EEPROM.write(208, battp);
+            //        break;
+//        }
+//}
+//}
+
+int change_val(int value, int address)
+{
+    uint8_t value_old = value;
+    if (chan1_raw > chan1_raw_middle + 100) value--;
+    if (chan1_raw  < chan1_raw_middle - 100) value++;
+    if(value != value_old && setup_menu ) EEPROM.write(address, value);
+    return value;
+}
+//* **************************************************************** */
+// Panel  : panTune
+// Needs  : X, Y locations
+// Output : Current symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+    
+//  void panTune(int first_col, int first_line){
+//  osd.setPanel(first_col, first_line);
+
+//  osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%3.0f%c", 0x4E, 0x52, (nav_roll), 0x05, 0x4E, 0x50, (nav_pitch), 0x05, 0x4E, 0x48, (nav_bearing), 0x05, 0x54, 0x42, (wp_target_bearing), 0x05, 0x41, 0x45, (alt_error * converth), high, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), spe);
+
+//}
+
+/* **************************************************************** */
+// Panel  : panCenter
+// Needs  : X, Y locations
+// Output : 2 row croshair symbol created by 2 x 4 chars
+// Size   : 2 x 4  (rows x chars)
+// Staus  : done
+
+void panCenter(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
+}
+/* **************************************************************** */
+// Panel  : panGPL
+// Needs  : X, Y locations
+// Output : 1 static symbol with changing FIX symbol
+// Size   : 1 x 2  (rows x chars)
+// Staus  : done
+
+void panGPL(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    char* gps_str;
+    if(osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20"; 
+        osd.printf_P(PSTR("\x10\x20"));
+    else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
+        osd.printf_P(PSTR("\x11\x20"));
+    osd.printf("%s",gps_str);
+
+    
+}
+/* **************************************************************** */
+// Panel  : panBoot
+// Needs  : X, Y locations
+// Output : Booting up text and empty bar after that
+// Size   : 1 x 21  (rows x chars)
+// Staus  : done
+
+void panBoot(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    osd.printf_P(PSTR("Booting up:\x88\x8d\x8d\x8d\x8d\x8d\x8d\x8d\x8e")); 
+}
+
+/* **************************************************************** */
+// Panel  : panMavBeat
+// Needs  : X, Y locations
+// Output : 2 symbols, one static and one that blinks on every 50th received 
+//          mavlink packet.
+// Size   : 1 x 2  (rows x chars)
+// Staus  : done
+
+void panMavBeat(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+    if(mavbeat == 1){
+        osd.printf_P(PSTR("\xEA\xEC"));
+        mavbeat = 0;
+    }
+    else{
+        osd.printf_P(PSTR("\xEA\xEB"));
+    }
+}
+
+#endif
