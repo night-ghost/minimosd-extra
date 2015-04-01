@@ -1,24 +1,14 @@
+// EEPROM reader/writers
+// Utilities for writing and reading from the EEPROM
+inline byte readEEPROM(int address) {
 
-//------------------ Heading and Compass ----------------------------------------
-
-static char buf_show[12];
-const char buf_Rule[36] = {
-  0x82,0x80,0x81,0x80,0x81,0x80,
-  0x84,0x80,0x81,0x80,0x81,0x80,
-  0x83,0x80,0x81,0x80,0x81,0x80,
-  0x85,0x80,0x81,0x80,0x81,0x80};
-void setHeadingPatern()
-{
-  int start;
-  start = round((osd_heading * 24)/360);
-  start -= 3;
-  if(start < 0) start += 24;
-  for(int x=0; x <= 10; x++){
-    buf_show[x] = buf_Rule[start];
-    if(++start > 23) start = 0;
-  }
-  buf_show[7] = '\0';
+    return EEPROM.read(address);
 }
+
+inline void writeEEPROM(byte value, int address) {
+    EEPROM.write(address, value);
+}
+
 
 //------------------ Battery Remaining Picture ----------------------------------
 
@@ -52,8 +42,7 @@ void setHomeVars(OSD &osd)
   //osd_alt_to_home = (osd_alt - osd_home_alt);
 
   //Check disarm to arm switching.
-  if (motor_armed && !last_armed_status)
-  {
+  if (motor_armed && !last_armed_status){
     //If motors armed, reset home in Arducopter version
     osd_got_home = 0;
   }
@@ -65,8 +54,7 @@ void setHomeVars(OSD &osd)
     //osd_alt_cnt = 0;
     //osd_home_alt = osd_alt;
     osd_got_home = 1;
-  }
-  else if(osd_got_home == 1){
+  } else if(osd_got_home == 1){
     float rads = fabs(osd_home_lat) * 0.0174532925;
     double scaleLongDown = cos(rads);
     double scaleLongUp   = 1.0f/cos(rads);
@@ -94,6 +82,7 @@ void setFdataVars()
 {
   //Moved from panel because warnings also need this var and panClimb could be off
   vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
+
   if(max_battery_reading < osd_battery_remaining_A)
     max_battery_reading = osd_battery_remaining_A;
 
@@ -101,6 +90,7 @@ void setFdataVars()
   runt = millis();
 
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (time_lapse) / 1000.0);
+ 
   mah_used += (osd_curr_A * 10.0 * (time_lapse) / 3600000.0);
 
   //Set max data
@@ -115,13 +105,4 @@ void setFdataVars()
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
 }
-
-void checkModellType()
-{
-  if (EEPROM.read(MODELL_TYPE_ADD) != 1) EEPROM.write(MODELL_TYPE_ADD, 1);
-  if (EEPROM.read(FW_VERSION1_ADDR) != 2) EEPROM.write(FW_VERSION1_ADDR, 2);
-  if (EEPROM.read(FW_VERSION2_ADDR) != 4) EEPROM.write(FW_VERSION2_ADDR, 4);
-  if (EEPROM.read(FW_VERSION3_ADDR) != 1) EEPROM.write(FW_VERSION3_ADDR, 1);
-}
-
 
