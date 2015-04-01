@@ -39,12 +39,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* **************** MAIN PROGRAM - MODULES ******************** */
 /* ************************************************************ */
 
-#undef PROGMEM 
-#define PROGMEM __attribute__(( section(".progmem.data") )) 
-
-#undef PSTR 
-#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
-
 #define isPAL 1
 
 /* **********************************************/
@@ -54,6 +48,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
 
+#include "compat.h"
+
 // AVR Includes
 #include <FastSerial.h>
 #include <AP_Common.h>
@@ -61,6 +57,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
+//#include "OSD_Panels.h"
+//#include "MAVLink.h"
+//#include "Font.h"
+
 // Get the common arduino functions
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
@@ -77,9 +77,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 // Configurations
 #include "OSD_Config.h"
+
 #include "ArduCam_Max7456.h"
 #include "OSD_Vars.h"
 #include "OSD_Func.h"
+
+
+#include "prototypes.h"
 
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
@@ -90,6 +94,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
+#define LEDPIN 7
 
 // Objects and Serial definitions
 FastSerialPort0(Serial);
@@ -97,8 +102,43 @@ OSD osd; //OSD object
 
 //SimpleTimer  mavlinkTimer;
 
+volatile uint8_t vsync_wait = 0;
 
 /* **********************************************/
+
+void isr_VSYNC(){
+
+    digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+    vsync_wait=0;
+}
+
+volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile unsigned long int_Timer = 0;         // set in the INT1
+
+// PWM Measurement
+void ReadINT_PIN() {
+
+  // We will start to read when signal goes HIGH
+  if(digitalRead(PWM_PIN) == HIGH) {
+
+    // PWM Signal is HIGH, so measure it's length.
+    int_Timer = micros();
+
+  } else {
+
+    // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
+    if(int_Timer && (New_PWM_Frame == false))
+    {
+      PWM_IN = (int)(micros() - int_Timer);
+      int_Timer = 0;
+
+      New_PWM_Frame = true;
+    }
+  }
+}
+
+
 /* ***************** SETUP() *******************/
 
 void setup() 
@@ -107,6 +147,16 @@ void setup()
     pinMode(10, OUTPUT); // USB ArduCam Only
 #endif
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
+
+    pinMode(LEDPIN,OUTPUT); // led
+
+    pinMode(RssiPin, OUTPUT); // доп вывод
+
+
+//    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
+    attachInterrupt(INT0, isr_VSYNC, FALLING);
+
+    attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 
     Serial.begin(TELEMETRY_SPEED);
     // setup mavlink port
@@ -127,9 +177,7 @@ void setup()
     // OSD debug for development (Shown at start)
 #ifdef membug
     osd.setPanel(1,1);
-    osd.openPanel();
     osd.printf("%i",freeMem()); 
-    osd.closePanel();
 #endif
 
     // Just to easy up development things
@@ -140,22 +188,30 @@ void setup()
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset
-//    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
-//        osd.setPanel(6,9);
-//        osd.openPanel();
-//        osd.printf_P(PSTR("Missing/Old Config")); 
-//        osd.closePanel();
-        //InitializeOSD();
-//    }
+    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
+        osd.setPanel(6,9);
+        osd.printf_P(PSTR("Missing/Old Config")); 
+//        InitializeOSD(); нечего дефолтным значениям тут делать
+    }
 
     // Get correct panel settings from EEPROM
     readSettings();
-    for(panel = 0; panel < npanels; panel++) readPanelSettings();
+
+// а надо ли заполнять память мусором?
+/*
+    for(panel = 0; panel < npanels; panel++) 
+	readPanelSettings();
+*/
+
     panel = 0; //set panel to 0 to start in the first navigation screen
+    readPanelSettings(); // Для первой панели. Для остальных - при переключении
+
+
     // Show bootloader bar
-//    loadBar();
-delay(2000);
-Serial.flush(); 
+
+    delay(2000);
+    Serial.flush();
+
     // Startup MAVLink timers  
     //mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
@@ -172,42 +228,40 @@ Serial.flush();
 
 // Mother of all happenings, The loop()
 // As simple as possible.
+byte update_stat = 1;
 void loop() 
 {
-
-    /*if(enable_mav_request == 1){//Request rate control
-        //osd.clear();
-        //osd.setPanel(3,10);
-        //osd.openPanel();
-        //osd.printf_P(PSTR("Requesting DataStreams...")); 
-        //osd.closePanel();
-        //for(int n = 0; n < 3; n++){
-        //    request_mavlink_rates();//Three times to certify it will be readed
-        //    delay(50);
-        //}
-        enable_mav_request = 0;
-        //delay(2000);
-        osd.clear();
-        waitingMAVBeats = 0;
-        lastMAVBeat = millis();//Preventing error from delay sensing
-    }*/
-
     //Run "timer" every 120 miliseconds
     if(millis() > mavLinkTimer + 120){
       mavLinkTimer = millis();
       OnMavlinkTimer();
+      update_stat = 1;
+      vsync_wait = 1;
     }
+
+    if(update_stat) {
+//     	if(osd.checkVsync()) {
+	if(!vsync_wait){
+	    osd.update();
+	    update_stat = 0;
+        }
+    }
+
     read_mavlink();
-    //mavlinkTimer.Run();
+
+    if(New_PWM_Frame){
+	New_PWM_Frame=false;
+
+	// data in PWM_IN
+    }
 }
 
 /* *********************************************** */
 /* ******** functions used in main loop() ******** */
 void OnMavlinkTimer()
 {
-    setHeadingPatern();  // generate the heading patern
 
-    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
+    osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
@@ -216,7 +270,7 @@ void OnMavlinkTimer()
     
     setFdataVars();
     
-    checkModellType();
+//    checkModellType();
 }
 
 void unplugSlaves(){
@@ -226,3 +280,4 @@ void unplugSlaves(){
 #endif
     digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
+
