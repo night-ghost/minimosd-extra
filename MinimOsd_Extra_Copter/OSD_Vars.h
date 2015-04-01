@@ -147,29 +147,11 @@ static uint8_t      tempconv = 1;
 static uint16_t     tempconvAdd = 0;
 static byte     distchar = 0;
 static byte     climbchar = 0;
-//static byte     signDist = 0x20;
-//static byte     signTemp = 0x20;
-//static byte     signEff = 0x20;
-//static byte     signRssi = 0x20;
-//static byte     signCurr = 0x20;
-//static byte     signAlt = 0x20;
-//static byte     signClimb = 0x20;
-//static byte     signHomeAlt = 0x20;
-//static byte     signVel = 0x20;
-//static byte     signASpeed = 0x20;
-//static byte     signThrot = 0x20;
-//static byte     signBat = 0x20;
-//static byte     signTime = 0x20;
-//static byte     signHomeDist = 0x20;
-//static byte     signBatA = 0x20;
-//static byte     signMode = 0x20;
-//static byte     signLat = 0x20;
-//static byte     signLon = 0x20;
 
 
 static float     convertt = 0;
 //Call sign variables
-//static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
+static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
 static boolean      mavbeat = 0;
@@ -193,60 +175,10 @@ static uint8_t panel = 0;
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
-//byte SerCMD1 = 0;
-//byte SerCMD2 = 0;
 
-
-/*
-// First 8 panels and their X,Y coordinate holders
-//byte panCenter_XY[2]; // = { 13,7,0 };
-byte panPitch_XY[2]; // = { 11,1 };
-byte panRoll_XY[2]; // = { 23,7 };
-byte panBatt_A_XY[2]; // = { 23,1 };
-//byte panBatt_B_XY[2]; // = { 23,3 };
-byte panGPSats_XY[2]; // = { 2,12 };
-byte panCOG_XY[2]; // = { 2,11 };
-byte panGPS_XY[2]; // = { 2,13 };
-byte panBatteryPercent_XY[2];
-
-
-//Second 8 set of panels and their X,Y coordinate holders
-byte panRose_XY[2]; // = { 16,13 };
-byte panHeading_XY[2]; // = { 16,12 };
-//byte panMavBeat_XY[2]; // = { 2,10 };
-byte panHomeDir_XY[2]; // = { 0,0 };
-byte panHomeDis_XY[2]; // = { 0,0 };
-byte panWPDir_XY[2]; // = { 27,12 };
-byte panWPDis_XY[2]; // = { 23,11 };
-byte panTime_XY[2];
-
-
-// Third set of panels and their X,Y coordinate holders
-byte panCur_A_XY[2]; // = { 23,1 };
-//byte panCur_B_XY[2]; // = { 23,3 };
-byte panAlt_XY[2]; // = { 0,0 };
-byte panHomeAlt_XY[2]; // = { 0,0 };
-byte panVel_XY[2]; // = { 0,0 };
-byte panAirSpeed_XY[2]; // = { 0,0 };
-byte panThr_XY[2]; // = { 0,0 };
-byte panFMod_XY[2]; // = { 0,0 };
-byte panHorizon_XY[2]; // = {8,centercalc}
-
-// Third set of panels and their X,Y coordinate holders
-byte panWarn_XY[2];
-byte panWindSpeed_XY[2];
-byte panClimb_XY[2];
-//byte panTune_XY[2];
-byte panRSSI_XY[2];
-byte panEff_XY[2];
-byte panCALLSIGN_XY[2];
-// byte panCh_XY[2];
-byte panTemp_XY[2];
-byte panDistance_XY[2];
-*/
 
 // First 8 panels and their X,Y coordinate holders
-//byte panCenter_XY[2]; // = { 13,7,0 };
+point panCenter_XY; // = { 13,7,0 };
 point panPitch_XY; // = { 11,1 };
 point panRoll_XY; // = { 23,7 };
 point panBatt_A_XY; // = { 23,1 };
