@@ -56,6 +56,9 @@ void writePanels(){
       currentBasePanel = 0;
     }
     if(panel < npanels){
+    	// must be first to other can use free space
+    	if(is_on(panHorizon_XY)) panHorizon(panHorizon_XY.x, panHorizon_XY.y); //14x5
+    	
 //    if(is_on(panCenter_XY)) panCenter(panCenter_XY.x, panCenter_XY.y);   //4x2
       if(is_on(panPitch_XY)) panPitch(panPitch_XY.x, panPitch_XY.y); //5x1
       if(is_on(panRoll_XY)) panRoll(panRoll_XY.x, panRoll_XY.y); //5x1
@@ -89,7 +92,7 @@ void writePanels(){
       if(is_on(panAirSpeed_XY)) panAirSpeed(panAirSpeed_XY.x, panAirSpeed_XY.y); //
       if(is_on(panThr_XY)) panThr(panThr_XY.x, panThr_XY.y); //
       if(is_on(panFMod_XY)) panFlightMode(panFMod_XY.x, panFMod_XY.y);  //
-      if(is_on(panHorizon_XY)) panHorizon(panHorizon_XY.x, panHorizon_XY.y); //14x5
+      
       if(is_on(panCur_A_XY)) panCur_A(panCur_A_XY.x, panCur_A_XY.y);
 
   //  if(ISd(panOff_XY)) panOff(panOff_XY.x, panOff_XY.y);
