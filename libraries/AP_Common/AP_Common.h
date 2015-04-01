@@ -33,6 +33,9 @@ typedef struct {
     char c;
 } prog_char_t;
 
+
+typedef char prog_char;
+
 #include <stdint.h>
 #include "include/menu.h"		/// simple menu subsystem
 #include "c++.h" // c++ additions
@@ -78,24 +81,6 @@ typedef struct {
 # define PSTR(_x)		_x		// help the compiler with printf_P
 # define float double			// silence spurious format warnings for %f
 #else
-// This is a workaround for GCC bug c++/34734.
-//
-// The C++ compiler normally emits many spurious warnings for the use
-// of PSTR (even though it generates correct code).  This workaround
-// has an equivalent effect but avoids the warnings, which otherwise
-// make finding real issues difficult.
-//
-#ifdef DESKTOP_BUILD
-# undef PROGMEM
-# define PROGMEM __attribute__(())
-#else
-# undef PROGMEM
-# define PROGMEM __attribute__(( section(".progmem.data") ))
-#endif
-
-# undef PSTR
-# define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); \
-                (prog_char_t *)&__c[0];}))
 #endif
 
 // a varient of PSTR() for progmem strings passed to %S in printf()
