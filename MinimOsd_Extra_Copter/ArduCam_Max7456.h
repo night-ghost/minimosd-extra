@@ -7,6 +7,10 @@
 #define MAX7456_SELECT 6//SS
 #define MAX7456_VSYNC 2//INT0
 
+#define DATAOUT 11              // MOSI
+#define DATAIN  12              // MISO
+#define SPICLOCK  13            // sck
+
 #define NTSC 0
 #define PAL 1
 #define MAX7456_MODE_MASK_PAL 0x40 //PAL mask 01000000
@@ -22,6 +26,10 @@
 //MAX7456 reg write addresses
 #define MAX7456_VM0_reg   0x00
 #define MAX7456_VM1_reg   0x01
+
+#define MAX7456_HOS_reg   0x02 // horisontal offset
+#define MAX7456_VOS_reg   0x03 // vertical offset
+
 #define MAX7456_DMM_reg   0x04
 #define MAX7456_DMAH_reg  0x05
 #define MAX7456_DMAL_reg  0x06
@@ -82,8 +90,6 @@ class OSD: public BetterStream
     void clear(void);
     void plug(void);
     void setPanel(uint8_t start_col, uint8_t start_row);
-    void openPanel(void);
-    void closePanel(void);
     void control(uint8_t ctrl);
     void detectMode(void);
     void setMode(int mode);
@@ -91,6 +97,8 @@ class OSD: public BetterStream
     void openSingle(uint8_t x, uint8_t y);
     int getMode(void);
     int getCenter(void);
+    void update(void);
+    uint8_t checkVsync(void);
     virtual int     available(void);
     virtual int     read(void);
     virtual int     peek(void);
@@ -99,7 +107,9 @@ class OSD: public BetterStream
     void write_NVM(int font_count, uint8_t *character_bitmap);
     using BetterStream::write;
   private:
-    uint8_t start_col, start_row, col, row, video_mode, video_center;
+    uint8_t col, row, video_mode, video_center;
+    uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+    uint16_t bufpos;
 };
 
 #endif
