@@ -1,5 +1,9 @@
+#define OSD_VERSION "MinimOSD-Extra 2.4|Copter r806 DV"
+
+
 /*Panels variables*/
 //Will come from APM telem port
+
 
 static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
@@ -11,17 +15,17 @@ static float        vs = 0;
 
 static float tdistance = 0;
 static float ddistance = 0;
-static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
+static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 //static float	    nav_roll = 0; // Current desired roll in degrees
-//static float        nav_pitch = 0; // Current desired pitch in degrees
+//static float      nav_pitch = 0; // Current desired pitch in degrees
 //static int16_t	    nav_bearing = 0; // Current desired heading in degrees
 static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
 static int8_t       wp_target_bearing_rotate_int = 0;
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
 //static float	    alt_error = 0; // Current altitude error in meters
-//static float        aspd_error = 0; // Current airspeed error in meters/second
+//static float      aspd_error = 0; // Current airspeed error in meters/second
 static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 static float        eff = 0; //Efficiency
 static uint16_t     eph = 0;
@@ -71,8 +75,8 @@ static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
+static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 
-//static uint8_t    osd_battery_pic_A = 0xb4;       // picture to show battery remaining
 //static float      osd_vbat_B = 0;               // voltage in milivolt
 //static float      osd_curr_B = 0;                 // Battery B current
 //static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
@@ -91,7 +95,7 @@ static unsigned long runt = 0;
 //static unsigned long CallSignBlink = 0;
 
 //static uint8_t      warning_type = 0;
-static char*        warning_string;
+static const char*  warning_string;
 static boolean      warning_found = 0;
 static boolean      canswitch = 1;
 static uint8_t      osd_off_switch = 0;
@@ -165,7 +169,7 @@ static byte     climbchar = 0;
 
 static float     convertt = 0;
 //Call sign variables
-static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
+//static char         char_call[OSD_CALL_SIGN_TOTAL+1] = {0};
 
 //MAVLink session control
 static boolean      mavbeat = 0;
@@ -173,7 +177,7 @@ static boolean      mavbeat = 0;
 //static boolean      iconGS = 0;
 //static boolean      iconHA = 0;
 //static boolean      iconMSL = 0;
-//static boolean      landing = 0;
+static boolean      landing = 0;
 static float        lastMAVBeat = 0;
 static boolean      waitingMAVBeats = 1;
 //static uint8_t      apm_mav_type;
@@ -185,63 +189,108 @@ static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 2;
 static uint8_t panel = 0; 
-// Panel BIT registers
-byte panA_REG[npanels] = {0b00000000};
-byte panB_REG[npanels] = {0b00000000};
-byte panC_REG[npanels] = {0b00000000};
-byte panD_REG[npanels] = {0b00000000};
-byte panE_REG[npanels] = {0b00000000};
+
 
 byte modeScreen = 0; //NTSC:0, PAL:1
 
 //byte SerCMD1 = 0;
 //byte SerCMD2 = 0;
 
+
+/*
 // First 8 panels and their X,Y coordinate holders
-//byte panCenter_XY[2][npanels]; // = { 13,7,0 };
-byte panPitch_XY[2][npanels]; // = { 11,1 };
-byte panRoll_XY[2][npanels]; // = { 23,7 };
-byte panBatt_A_XY[2][npanels]; // = { 23,1 };
+//byte panCenter_XY[2]; // = { 13,7,0 };
+byte panPitch_XY[2]; // = { 11,1 };
+byte panRoll_XY[2]; // = { 23,7 };
+byte panBatt_A_XY[2]; // = { 23,1 };
 //byte panBatt_B_XY[2]; // = { 23,3 };
-byte panGPSats_XY[2][npanels]; // = { 2,12 };
-byte panCOG_XY[2][npanels]; // = { 2,11 };
-byte panGPS_XY[2][npanels]; // = { 2,13 };
-byte panBatteryPercent_XY[2][npanels];
+byte panGPSats_XY[2]; // = { 2,12 };
+byte panCOG_XY[2]; // = { 2,11 };
+byte panGPS_XY[2]; // = { 2,13 };
+byte panBatteryPercent_XY[2];
 
 
 //Second 8 set of panels and their X,Y coordinate holders
-byte panRose_XY[2][npanels]; // = { 16,13 };
-byte panHeading_XY[2][npanels]; // = { 16,12 };
-//byte panMavBeat_XY[2][npanels]; // = { 2,10 };
-byte panHomeDir_XY[2][npanels]; // = { 0,0 };
-byte panHomeDis_XY[2][npanels]; // = { 0,0 };
-//byte panWPDir_XY[2][npanels]; // = { 27,12 };
-byte panWPDis_XY[2][npanels]; // = { 23,11 };
-byte panTime_XY[2][npanels];
+byte panRose_XY[2]; // = { 16,13 };
+byte panHeading_XY[2]; // = { 16,12 };
+//byte panMavBeat_XY[2]; // = { 2,10 };
+byte panHomeDir_XY[2]; // = { 0,0 };
+byte panHomeDis_XY[2]; // = { 0,0 };
+byte panWPDir_XY[2]; // = { 27,12 };
+byte panWPDis_XY[2]; // = { 23,11 };
+byte panTime_XY[2];
 
 
 // Third set of panels and their X,Y coordinate holders
-byte panCur_A_XY[2][npanels]; // = { 23,1 };
+byte panCur_A_XY[2]; // = { 23,1 };
 //byte panCur_B_XY[2]; // = { 23,3 };
-byte panAlt_XY[2][npanels]; // = { 0,0 };
-byte panHomeAlt_XY[2][npanels]; // = { 0,0 };
-byte panVel_XY[2][npanels]; // = { 0,0 };
-byte panAirSpeed_XY[2][npanels]; // = { 0,0 };
-byte panThr_XY[2][npanels]; // = { 0,0 };
-byte panFMod_XY[2][npanels]; // = { 0,0 };
-byte panHorizon_XY[2][npanels]; // = {8,centercalc}
+byte panAlt_XY[2]; // = { 0,0 };
+byte panHomeAlt_XY[2]; // = { 0,0 };
+byte panVel_XY[2]; // = { 0,0 };
+byte panAirSpeed_XY[2]; // = { 0,0 };
+byte panThr_XY[2]; // = { 0,0 };
+byte panFMod_XY[2]; // = { 0,0 };
+byte panHorizon_XY[2]; // = {8,centercalc}
 
 // Third set of panels and their X,Y coordinate holders
-byte panWarn_XY[2][npanels];
-byte panWindSpeed_XY[2][npanels];
-byte panClimb_XY[2][npanels];
-//byte panTune_XY[2][npanels];
-byte panRSSI_XY[2][npanels];
-byte panEff_XY[2][npanels];
-byte panCALLSIGN_XY[2][npanels];
-// byte panCh_XY[2][npanels];
-byte panTemp_XY[2][npanels];
-byte panDistance_XY[2][npanels];
+byte panWarn_XY[2];
+byte panWindSpeed_XY[2];
+byte panClimb_XY[2];
+//byte panTune_XY[2];
+byte panRSSI_XY[2];
+byte panEff_XY[2];
+byte panCALLSIGN_XY[2];
+// byte panCh_XY[2];
+byte panTemp_XY[2];
+byte panDistance_XY[2];
+*/
+
+// First 8 panels and their X,Y coordinate holders
+//byte panCenter_XY[2]; // = { 13,7,0 };
+point panPitch_XY; // = { 11,1 };
+point panRoll_XY; // = { 23,7 };
+point panBatt_A_XY; // = { 23,1 };
+//point panBatt_B_XY; // = { 23,3 };
+point panGPSats_XY; // = { 2,12 };
+point panCOG_XY; // = { 2,11 };
+point panGPS_XY; // = { 2,13 };
+point panBatteryPercent_XY;
+
+
+//Second 8 set of panels and their X,Y coordinate holders
+point panRose_XY; // = { 16,13 };
+point panHeading_XY; // = { 16,12 };
+//point panMavBeat_XY; // = { 2,10 };
+point panHomeDir_XY; // = { 0,0 };
+point panHomeDis_XY; // = { 0,0 };
+point panWPDir_XY; // = { 27,12 };
+point panWPDis_XY; // = { 23,11 };
+point panTime_XY;
+
+
+// Third set of panels and their X,Y coordinate holders
+point panCur_A_XY; // = { 23,1 };
+//point panCur_B_XY; // = { 23,3 };
+point panAlt_XY; // = { 0,0 };
+point panHomeAlt_XY; // = { 0,0 };
+point panVel_XY; // = { 0,0 };
+point panAirSpeed_XY; // = { 0,0 };
+point panThr_XY; // = { 0,0 };
+point panFMod_XY; // = { 0,0 };
+point panHorizon_XY; // = {8,centercalc}
+
+// Third set of panels and their X,Y coordinate holders
+point panWarn_XY;
+point panWindSpeed_XY;
+point panClimb_XY;
+//point panTune_XY;
+point panRSSI_XY;
+point panEff_XY;
+point panCALLSIGN_XY;
+//point panCh_XY;
+point panTemp_XY;
+point panDistance_XY;
+
 
 //*************************************************************************************************************
 //rssi varables
