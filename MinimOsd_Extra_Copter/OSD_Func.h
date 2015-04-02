@@ -1,12 +1,16 @@
 // EEPROM reader/writers
 // Utilities for writing and reading from the EEPROM
-inline byte readEEPROM(int address) {
+inline byte readEEPROM(uint16_t address) {
 
     return EEPROM.read(address);
 }
 
-inline void writeEEPROM(byte value, int address) {
+inline void writeEEPROM(byte value, uint16_t address) {
     EEPROM.write(address, value);
+}
+
+inline boolean getBit(byte Reg, byte whichBit) {
+    return  Reg & (1 << whichBit);
 }
 
 
@@ -14,22 +18,24 @@ inline void writeEEPROM(byte value, int address) {
 
 char setBatteryPic(uint16_t bat_level)
 {
+
   if(bat_level <= 100){
-    return 0xb4;
+    return 0x20;
   }
   else if(bat_level <= 300){
-    return 0xb5;
+    return 0x8d;
   }
   else if(bat_level <= 400){
-    return 0xb6;
+    return 0x8c;
   }
   else if(bat_level <= 500){
-    return 0xb7;
+    return 0x8b;
   }
   else if(bat_level <= 800){
-    return 0xb8;
+    return 0x8a;
   }
-  else return 0xb9;
+  else return 0x89;
+
 }
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
@@ -78,6 +84,8 @@ void setHomeVars(OSD &osd)
   }
 }
 
+
+// накопление статистики и рекордов
 void setFdataVars()
 {
   //Moved from panel because warnings also need this var and panClimb could be off

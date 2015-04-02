@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* **************** MAIN PROGRAM - MODULES ******************** */
 /* ************************************************************ */
 
-#define isPAL 1
+#define isPAL 1 // задает размер буфера экрана
 
 /* **********************************************/
 /* ***************** INCLUDES *******************/
@@ -67,8 +67,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #else
 #include "wiring.h"
 #endif
+
 #include <EEPROM.h>
-//#include <SimpleTimer.h>
+//#include <SimpleTimer.h> - no timer!
 #include <GCS_MAVLink.h>
 
 #ifdef membug
@@ -94,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
-#define LEDPIN 7
+#define LEDPIN AmperagePin
 
 // Objects and Serial definitions
 FastSerialPort0(Serial);
@@ -104,11 +105,12 @@ OSD osd; //OSD object
 
 volatile uint8_t vsync_wait = 0;
 
+
+extern uint8_t mavlink_got;
+
 /* **********************************************/
 
 void isr_VSYNC(){
-
-    digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
     vsync_wait=0;
 }
 
@@ -149,8 +151,11 @@ void setup()
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
 
     pinMode(LEDPIN,OUTPUT); // led
+    digitalWrite(LEDPIN, 1);  // turn on for full light
 
     pinMode(RssiPin, OUTPUT); // доп вывод
+
+    analogReference(DEFAULT);	// для работы с аналоговыми входами
 
 
 //    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
@@ -172,7 +177,7 @@ void setup()
 
     // Start 
     startPanels();
-    delay(500);
+    delay(300);
 
     // OSD debug for development (Shown at start)
 #ifdef membug
@@ -192,32 +197,30 @@ void setup()
         osd.setPanel(6,9);
         osd.printf_P(PSTR("Missing/Old Config")); 
 //        InitializeOSD(); нечего дефолтным значениям тут делать
+	writeEEPROM(42, CHK1);
+	writeEEPROM(VER-42,CHK2); // но номер версии прописАть таки да
     }
 
     // Get correct panel settings from EEPROM
     readSettings();
 
-// а надо ли заполнять память мусором?
-/*
-    for(panel = 0; panel < npanels; panel++) 
-	readPanelSettings();
-*/
-
     panel = 0; //set panel to 0 to start in the first navigation screen
     readPanelSettings(); // Для первой панели. Для остальных - при переключении
 
-
-    // Show bootloader bar
-
+    osd.update();// Show bootloader bar
+    
     delay(2000);
     Serial.flush();
 
+/* no other tasks - get rid of timer!
     // Startup MAVLink timers  
-    //mavlinkTimer.Set(&OnMavlinkTimer, 120);
+    mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
     // House cleaning, clear display and enable timers
-    //osd.clear();
-    //mavlinkTimer.Enable();
+    osd.clear();
+    mavlinkTimer.Enable();
+*/
+
 
 } // END of setup();
 
@@ -226,35 +229,73 @@ void setup()
 /* ***********************************************/
 /* ***************** MAIN LOOP *******************/
 
+byte update_stat = 1;
+
 // Mother of all happenings, The loop()
 // As simple as possible.
-byte update_stat = 1;
 void loop() 
 {
-    //Run "timer" every 120 miliseconds
-    if(millis() > mavLinkTimer + 120){
+/*    //Run "timer" every 100 miliseconds
+    if(millis() > mavLinkTimer + 100){
       mavLinkTimer = millis();
       OnMavlinkTimer();
       update_stat = 1;
       vsync_wait = 1;
     }
+*/
+
+    if(millis() > mavLinkTimer + 100){ // таймер переименовать надо но и так сойдет
+      mavLinkTimer = millis();
+      On100ms();
+    }
+
+
+    read_mavlink();
+
+    if(mavlink_got){ // были свежие данные - обработать
+      OnMavlinkTimer();
+      update_stat =  vsync_wait = 1;	// и перерисовать экран
+    }
 
     if(update_stat) {
-//     	if(osd.checkVsync()) {
 	if(!vsync_wait){
 	    osd.update();
 	    update_stat = 0;
+digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
         }
     }
 
-    read_mavlink();
 
     if(New_PWM_Frame){
 	New_PWM_Frame=false;
 
 	// data in PWM_IN
     }
+    
 }
+
+void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
+
+// или так
+// rssiADC = pulseIn(PWMrssiPin, HIGH,15000)/Settings[S_PWMRSSIDIVIDER]; // Reading W/time out (microseconds to wait for pulse to start: 15000=0.015sec)
+
+
+    { //аналоговый ввод - напряжение видео
+        static uint8_t ind = 0;
+        static uint16_t voltageRawArray[8];
+        uint16_t voltageRaw = 0;
+
+        voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
+        for (uint8_t i=0;i<8;i++)
+            voltageRaw += voltageRawArray[i];
+        osd_vbat_B = float(voltageRaw) * VOLTAGE_RATIO /1023;
+
+	osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
+
+    }
+
+}
+
 
 /* *********************************************** */
 /* ******** functions used in main loop() ******** */
@@ -262,15 +303,13 @@ void OnMavlinkTimer()
 {
 
     osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
-    //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
     
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
     
-    setFdataVars();
+    setFdataVars(); // накопление статистики и рекордов
     
-//    checkModellType();
 }
 
 void unplugSlaves(){

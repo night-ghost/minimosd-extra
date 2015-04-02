@@ -6,6 +6,7 @@ void uploadFont()
 
     // move these local to prevent ram usage
     uint8_t character_bitmap[0x40];
+
     int font_count = 0;
 
     osd.clear();
@@ -40,7 +41,7 @@ void uploadFont()
         // write the character to NVM 
         if(byte_count == 64)
         {
-            osd.write_NVM(font_count, character_bitmap);    
+            osd.write_NVM(font_count, character_bitmap);
             byte_count = 0;
             font_count++;
             Serial.printf_P(PSTR("CD\n"));

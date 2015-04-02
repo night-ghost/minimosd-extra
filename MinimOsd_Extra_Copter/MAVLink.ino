@@ -10,9 +10,13 @@ static uint8_t crlf_count = 0;
 static int packet_drops = 0;
 static int parse_error = 0;
 
+uint8_t mavlink_got = 0;
+
+
 void request_mavlink_rates()
 {
-    const int  maxStreams = 6;
+    const uint8_t  maxStreams = 6;
+    
     const uint8_t MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
@@ -32,9 +36,16 @@ void read_mavlink(){
     mavlink_message_t msg; 
     mavlink_status_t status;
 
+    uint8_t      base_mode=0;
+
+    mavlink_got=0;	// нет данных
+
+
     //grabing data 
     while(Serial.available() > 0) { 
         uint8_t c = Serial.read();
+
+
 
         /* allow CLI to be started by hitting enter 3 times, if no
         heartbeat packets have been received */
@@ -53,6 +64,10 @@ void read_mavlink(){
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
             lastMAVBeat = millis();
             mavlink_active = 1;
+	    mavlink_got = 1;
+
+//digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+
             //handle msg
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
@@ -61,29 +76,22 @@ void read_mavlink(){
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                  //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
-                 //   osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
                     osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg);
                     //Mode (arducoper armed/disarmed)
                     base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
-                    //if(getBit(base_mode,7)) motor_armed = 1;
-                    //else motor_armed = 0;
-                    motor_armed = getBit(base_mode,7);
 
-                    osd_nav_mode = 0;          
-                    /*lastMAVBeat = millis();
-                    if(waitingMAVBeats == 1){
-                        enable_mav_request = 1;
-                    }*/
+                    motor_armed = getBit(base_mode,7);
                 }
                 break;
+                
             case MAVLINK_MSG_ID_SYS_STATUS:
                 {
 
                     osd_vbat_A = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); //Battery voltage, in millivolts (1 = 1 millivolt)
                     osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg); //Battery current, in 10*milliamperes (1 = 10 milliampere)         
                     osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg); //Remaining battery energy: (0%: 0, 100%: 100)
+
                     //osd_mode = apm_mav_component;//Debug
-                    //osd_nav_mode = apm_mav_system;//Debug
                 }
                 break;
 
@@ -106,17 +114,9 @@ void read_mavlink(){
                     osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                     osd_alt_rel = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
-/*
-packet.airspeed = airspeed;
-<------>packet.groundspeed = groundspeed;
-<------>packet.alt = alt;
-<------>packet.climb = climb;
-<------>packet.heading = heading;
-<------>packet.throttle = throttle;
-*/
-
                 }
                 break;
+
             case MAVLINK_MSG_ID_ATTITUDE:
                 {
                     osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
@@ -125,7 +125,7 @@ packet.airspeed = airspeed;
                 }
                 break;
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
-                {
+                { //desired values
 //                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
 //                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
 //                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
@@ -136,11 +136,13 @@ packet.airspeed = airspeed;
                   xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
                 }
                 break;
+
             case MAVLINK_MSG_ID_MISSION_CURRENT:
                 {
                     wp_number = (uint8_t)mavlink_msg_mission_current_get_seq(&msg);
                 }
                 break;
+
             case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 {
 //                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
@@ -184,7 +186,7 @@ packet.press_diff = press_diff;
 */
                 break;
 
-
+/*
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
                 { 
                     //osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
@@ -193,6 +195,7 @@ packet.press_diff = press_diff;
                     //osd_alt_rel = (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001);
                 }
                 break; 
+*/
             default:
                 //Do nothing
                 break;

@@ -130,7 +130,7 @@ void OSD::setBrightness()
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------
 
-void OSD::setMode(int themode)
+void OSD::setMode(uint8_t themode)
 {
   switch(themode){
     case 0:
@@ -146,7 +146,7 @@ void OSD::setMode(int themode)
 
 //------------------ Get Mode (PAL 0/NTSC 1) --------------------------------
 
-int OSD::getMode()
+uint8_t OSD::getMode()
 {
   switch(video_mode){
     case MAX7456_MODE_MASK_NTCS:
@@ -161,7 +161,7 @@ int OSD::getMode()
 
 //------------------ Get Center (PAL/NTSC) ----------------------------------
 
-int OSD::getCenter()
+uint8_t OSD::getCenter()
 {
   return video_center; //first line for center panel
 }
@@ -179,8 +179,6 @@ void OSD::clear()
 {
   // clear the screen
   digitalWrite(MAX7456_SELECT,LOW);
-  //Spi.transfer(MAX7456_DMM_reg);
-  //Spi.transfer(MAX7456_CLEAR_display);
   MAX_write(MAX7456_DMM_reg, MAX7456_CLEAR_display);
   digitalWrite(MAX7456_SELECT,HIGH);
 }
@@ -189,7 +187,7 @@ void OSD::clear()
 
 void
 OSD::setPanel(uint8_t st_col, uint8_t st_row){
-  col = st_col;
+  col = st_col; // нужны для отработки перевода строки с сохранением колонки
   row = st_row;
   bufpos = st_row*30+st_col;
 }
@@ -208,14 +206,14 @@ size_t
 OSD::write(uint8_t c){
   
   if(c == '|'){
-   row++;
-   bufpos = row*30+col;
+    row++;
+    bufpos = row*30+col;
   } else
-   osdbuf[bufpos++] = c;
+    osdbuf[bufpos++] = c;
   return 1;
 }
 
-/*
+/* для сравнения
 uint8_t spi_transfer(uint8_t data)
 {
   SPDR = data;                    // Start the transmission
@@ -254,16 +252,6 @@ OSD::update() {
  Spi.transfer(MAX7456_END_string);
  PORTD |= _BV(PD6);
 // memset(osdbuf, ' ', sizeof(osdbuf));
-}
-
-uint8_t OSD::checkVsync() {
- uint8_t s;
- PORTD &= ~_BV(PD6);
- Spi.transfer(MAX7456_STAT_reg_read);
- s = Spi.transfer(0xff);
- PORTD |= _BV(PD6);
- return (s & 0x10) == 0;
-
 }
 
 

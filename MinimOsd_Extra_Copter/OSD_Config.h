@@ -22,59 +22,15 @@
 
 #define RC_NEUTRAL 1500     // PWM pulse width for center stick
 
+
+#define VOLTAGE_RATIO 1
+
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
 // changed in future.
 // byte  = 1
 // int   = 4
 // float = 8
-
-// Panel 8bit REGISTER with BIT positions
-// panA_REG Byte has:
-//#define Cen_BIT        0
-#define Pit_BIT        1
-#define Rol_BIT        2
-#define BatA_BIT       3
-#define Bp_BIT         4
-#define GPSats_BIT     5
-#define COG_BIT        6
-#define GPS_BIT        7
-
-// panB_REG Byte has:
-#define Rose_BIT       0
-#define Head_BIT       1
-//#define MavB_BIT       2
-#define HDir_BIT       3
-#define HDis_BIT       4
-#define WDir_BIT       5 //
-#define WDis_BIT       6 //
-#define Time_BIT       7 
-
-// panC_REG Byte has:
-#define CurA_BIT       0
-#define As_BIT         1
-#define Alt_BIT        2
-#define Vel_BIT        3
-#define Thr_BIT        4
-#define FMod_BIT       5
-#define Hor_BIT        6
-#define Halt_BIT       7
-
-// panD_REG Byte has:
-#define Warn_BIT       0
-#define Off_BIT        1
-#define WindS_BIT      2
-#define Climb_BIT      3
-//#define Tune_BIT       4
-#define CALLSIGN_BIT   5
-#define RSSI_BIT       6
-#define Eff_BIT        7
-
-// panE_REG Byte has:
-
-//#define Ch_BIT         0
-#define TEMP_BIT       1
-#define DIST_BIT       2
 
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -83,9 +39,9 @@
 
 
 // First of 8 panels
-//#define panCenter_en_ADDR 0
-//#define panCenter_x_ADDR 2
-//#define panCenter_y_ADDR 4
+#define panCenter_en_ADDR 0
+#define panCenter_x_ADDR 2
+#define panCenter_y_ADDR 4
 #define panPitch_en_ADDR 6
 #define panPitch_x_ADDR 8
 #define panPitch_y_ADDR 10
@@ -243,7 +199,7 @@
 #define SIGN_HA_ON_ADDR 878
 #define SIGN_GS_ON_ADDR 880
 #define SIGN_AS_ON_ADDR 882 
-//#define MODELL_TYPE_ADD 884 
+//#define MODELL_TYPE_ADD 884
 #define AUTO_SCREEN_SWITC_ADD 886
 #define OSD_BATT_SHOW_PERCENT_ADDR 888
 #define measure_ADDR 890
@@ -267,16 +223,6 @@
 #define OSD_CALL_SIGN_ADDR 920
 #define OSD_CALL_SIGN_TOTAL 8
 
-/*#define FW_VERSION1_ADDR 930
-#define FW_VERSION2_ADDR 932
-#define FW_VERSION3_ADDR 934
-
-#define CS_VERSION1_ADDR 936
-#define CS_VERSION2_ADDR 938
-
-#define CS_VERSION3_ADDR 940
-*/
-
 #define CHK1 1000
 #define CHK2 1006
 
@@ -290,4 +236,46 @@ struct Point {
 };
 
 typedef struct Point point;
+
+struct Panel {
+    point center;
+    point pitch;
+    point roll;
+    point batt_A;
+    point GPS_sats;
+    point COG;
+    point GPS;
+    point rose;
+    point heading;
+    point mavBeat;
+    point homeDir;
+    point homeDist;
+    point WP_dir;
+    point WP_dist;
+    point RSSI;
+    point curr_A;
+    point alt;
+    point vel;
+    point throttle; // panThr
+    point FMod;
+    point horizon;
+    point homeAlt;
+    point airSpeed;
+    point batteryPercent;
+    point time;
+    point warn;
+    point windSpeed;
+    point climb;
+    point temp;
+    point dist; // panDistance
+    point callSign;
+
+    //point curr_B;
+    //point tune;
+    //point eff;
+    //point ch;
+//    point batt_B;
+    //point fdata;
+};
+
 

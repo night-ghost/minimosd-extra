@@ -31,8 +31,8 @@ static float        eff = 0; //Efficiency
 static uint16_t     eph = 0;
 
 static uint8_t      currentBasePanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
-static uint8_t      base_mode=0;
-static uint8_t      panel_auto_switch=0;
+
+static uint8_t      panel_auto_switch=0;	// номер экрана, на который переключаться при Warning-е
 static bool         motor_armed = 0;
 static bool         last_armed_status = 0;
 static bool         ma = 0;
@@ -75,20 +75,23 @@ static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      batt_warn_level = 0;
-static uint8_t      osd_battery_pic_A = 0xb4;       // picture to show battery remaining
+static uint8_t      osd_battery_pic_A = 0x8d;       // picture to show battery remaining
 
-//static float      osd_vbat_B = 0;               // voltage in milivolt
+
+static float      osd_vbat_B = 0;               // voltage in milivolt
 //static float      osd_curr_B = 0;                 // Battery B current
-//static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
-//static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
+static uint16_t   osd_battery_remaining_B = 0;  // 0 to 100 <=> 0 to 1000
+static uint8_t    osd_battery_pic_B = 0x8d;     // picture to show battery remaining
+
+
 static uint16_t     remaining_estimated_flight_time_seconds = 0.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
-static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-//static unsigned long text_timer = 0;
 static unsigned long one_sec_timer = 0;
 static unsigned long mavLinkTimer = 0;
 //static unsigned long warning_timer =0;
 //static unsigned long current_flight_start_Time = 0.0;
+//static unsigned long text_timer = 0;
+
 static unsigned long total_flight_time_milis = 0.0;
 static uint16_t      total_flight_time_seconds = 0.0;
 static unsigned long runt = 0;
@@ -182,7 +185,7 @@ point panCenter_XY; // = { 13,7,0 };
 point panPitch_XY; // = { 11,1 };
 point panRoll_XY; // = { 23,7 };
 point panBatt_A_XY; // = { 23,1 };
-//point panBatt_B_XY; // = { 23,3 };
+point panBatt_B_XY; // = { 23,3 };
 point panGPSats_XY; // = { 2,12 };
 point panCOG_XY; // = { 2,11 };
 point panGPS_XY; // = { 2,13 };

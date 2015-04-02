@@ -92,13 +92,12 @@ class OSD: public BetterStream
     void setPanel(uint8_t start_col, uint8_t start_row);
     void control(uint8_t ctrl);
     void detectMode(void);
-    void setMode(int mode);
+    void setMode(uint8_t mode);
     void setBrightness();
     void openSingle(uint8_t x, uint8_t y);
-    int getMode(void);
-    int getCenter(void);
+    uint8_t getMode(void);
+    uint8_t getCenter(void);
     void update(void);
-    uint8_t checkVsync(void);
     virtual int     available(void);
     virtual int     read(void);
     virtual int     peek(void);
