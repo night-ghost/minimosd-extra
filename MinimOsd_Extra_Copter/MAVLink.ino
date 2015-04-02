@@ -176,6 +176,7 @@ packet.press_diff = press_diff;
                 }
                 break;
 
+#if 0
             case MAVLINK_MSG_ID_SCALED_PRESSURE2:
                     temperature = mavlink_msg_scaled_pressure2_get_temperature(&msg);
 /*
@@ -185,6 +186,7 @@ packet.press_diff = press_diff;
 
 */
                 break;
+#endif
 
 /*
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 

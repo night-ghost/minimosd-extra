@@ -5,23 +5,20 @@
 typedef struct __mavlink_rc_channels_raw_t
 {
  uint32_t time_boot_ms; ///< Timestamp (milliseconds since system boot)
- uint16_t chan1_raw; ///< RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan2_raw; ///< RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan3_raw; ///< RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan4_raw; ///< RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan5_raw; ///< RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan6_raw; ///< RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan7_raw; ///< RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint16_t chan8_raw; ///< RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- uint8_t port; ///< Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
- uint8_t rssi; ///< Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+ uint16_t chan1_raw; ///< RC channel 1 value, in microseconds
+ uint16_t chan2_raw; ///< RC channel 2 value, in microseconds
+ uint16_t chan3_raw; ///< RC channel 3 value, in microseconds
+ uint16_t chan4_raw; ///< RC channel 4 value, in microseconds
+ uint16_t chan5_raw; ///< RC channel 5 value, in microseconds
+ uint16_t chan6_raw; ///< RC channel 6 value, in microseconds
+ uint16_t chan7_raw; ///< RC channel 7 value, in microseconds
+ uint16_t chan8_raw; ///< RC channel 8 value, in microseconds
+ uint8_t port; ///< Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+ uint8_t rssi; ///< Receive signal strength indicator, 0: 0%, 255: 100%
 } mavlink_rc_channels_raw_t;
 
 #define MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN 22
 #define MAVLINK_MSG_ID_35_LEN 22
-
-#define MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC 244
-#define MAVLINK_MSG_ID_35_CRC 244
 
 
 
@@ -50,23 +47,23 @@ typedef struct __mavlink_rc_channels_raw_t
  * @param msg The MAVLink message to compress the data into
  *
  * @param time_boot_ms Timestamp (milliseconds since system boot)
- * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
- * @param chan1_raw RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan2_raw RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan3_raw RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan4_raw RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan5_raw RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan6_raw RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan7_raw RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan8_raw RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param rssi Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+ * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+ * @param chan1_raw RC channel 1 value, in microseconds
+ * @param chan2_raw RC channel 2 value, in microseconds
+ * @param chan3_raw RC channel 3 value, in microseconds
+ * @param chan4_raw RC channel 4 value, in microseconds
+ * @param chan5_raw RC channel 5 value, in microseconds
+ * @param chan6_raw RC channel 6 value, in microseconds
+ * @param chan7_raw RC channel 7 value, in microseconds
+ * @param chan8_raw RC channel 8 value, in microseconds
+ * @param rssi Receive signal strength indicator, 0: 0%, 255: 100%
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
 						       uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN];
+	char buf[22];
 	_mav_put_uint32_t(buf, 0, time_boot_ms);
 	_mav_put_uint16_t(buf, 4, chan1_raw);
 	_mav_put_uint16_t(buf, 6, chan2_raw);
@@ -79,7 +76,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_pack(uint8_t system_id, uint8
 	_mav_put_uint8_t(buf, 20, port);
 	_mav_put_uint8_t(buf, 21, rssi);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 22);
 #else
 	mavlink_rc_channels_raw_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -94,34 +91,30 @@ static inline uint16_t mavlink_msg_rc_channels_raw_pack(uint8_t system_id, uint8
 	packet.port = port;
 	packet.rssi = rssi;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 22);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RC_CHANNELS_RAW;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
+	return mavlink_finalize_message(msg, system_id, component_id, 22, 244);
 }
 
 /**
  * @brief Pack a rc_channels_raw message on a channel
  * @param system_id ID of this system
  * @param component_id ID of this component (e.g. 200 for IMU)
- * @param chan The MAVLink channel this message will be sent over
+ * @param chan The MAVLink channel this message was sent over
  * @param msg The MAVLink message to compress the data into
  * @param time_boot_ms Timestamp (milliseconds since system boot)
- * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
- * @param chan1_raw RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan2_raw RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan3_raw RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan4_raw RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan5_raw RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan6_raw RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan7_raw RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan8_raw RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param rssi Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+ * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+ * @param chan1_raw RC channel 1 value, in microseconds
+ * @param chan2_raw RC channel 2 value, in microseconds
+ * @param chan3_raw RC channel 3 value, in microseconds
+ * @param chan4_raw RC channel 4 value, in microseconds
+ * @param chan5_raw RC channel 5 value, in microseconds
+ * @param chan6_raw RC channel 6 value, in microseconds
+ * @param chan7_raw RC channel 7 value, in microseconds
+ * @param chan8_raw RC channel 8 value, in microseconds
+ * @param rssi Receive signal strength indicator, 0: 0%, 255: 100%
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
@@ -129,7 +122,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_pack_chan(uint8_t system_id, 
 						           uint32_t time_boot_ms,uint8_t port,uint16_t chan1_raw,uint16_t chan2_raw,uint16_t chan3_raw,uint16_t chan4_raw,uint16_t chan5_raw,uint16_t chan6_raw,uint16_t chan7_raw,uint16_t chan8_raw,uint8_t rssi)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN];
+	char buf[22];
 	_mav_put_uint32_t(buf, 0, time_boot_ms);
 	_mav_put_uint16_t(buf, 4, chan1_raw);
 	_mav_put_uint16_t(buf, 6, chan2_raw);
@@ -142,7 +135,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_pack_chan(uint8_t system_id, 
 	_mav_put_uint8_t(buf, 20, port);
 	_mav_put_uint8_t(buf, 21, rssi);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 22);
 #else
 	mavlink_rc_channels_raw_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -157,19 +150,15 @@ static inline uint16_t mavlink_msg_rc_channels_raw_pack_chan(uint8_t system_id, 
 	packet.port = port;
 	packet.rssi = rssi;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 22);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RC_CHANNELS_RAW;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
+	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 22, 244);
 }
 
 /**
- * @brief Encode a rc_channels_raw struct
+ * @brief Encode a rc_channels_raw struct into a message
  *
  * @param system_id ID of this system
  * @param component_id ID of this component (e.g. 200 for IMU)
@@ -182,41 +171,27 @@ static inline uint16_t mavlink_msg_rc_channels_raw_encode(uint8_t system_id, uin
 }
 
 /**
- * @brief Encode a rc_channels_raw struct on a channel
- *
- * @param system_id ID of this system
- * @param component_id ID of this component (e.g. 200 for IMU)
- * @param chan The MAVLink channel this message will be sent over
- * @param msg The MAVLink message to compress the data into
- * @param rc_channels_raw C-struct to read the message contents from
- */
-static inline uint16_t mavlink_msg_rc_channels_raw_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_rc_channels_raw_t* rc_channels_raw)
-{
-	return mavlink_msg_rc_channels_raw_pack_chan(system_id, component_id, chan, msg, rc_channels_raw->time_boot_ms, rc_channels_raw->port, rc_channels_raw->chan1_raw, rc_channels_raw->chan2_raw, rc_channels_raw->chan3_raw, rc_channels_raw->chan4_raw, rc_channels_raw->chan5_raw, rc_channels_raw->chan6_raw, rc_channels_raw->chan7_raw, rc_channels_raw->chan8_raw, rc_channels_raw->rssi);
-}
-
-/**
  * @brief Send a rc_channels_raw message
  * @param chan MAVLink channel to send the message
  *
  * @param time_boot_ms Timestamp (milliseconds since system boot)
- * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
- * @param chan1_raw RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan2_raw RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan3_raw RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan4_raw RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan5_raw RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan6_raw RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan7_raw RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param chan8_raw RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
- * @param rssi Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+ * @param port Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+ * @param chan1_raw RC channel 1 value, in microseconds
+ * @param chan2_raw RC channel 2 value, in microseconds
+ * @param chan3_raw RC channel 3 value, in microseconds
+ * @param chan4_raw RC channel 4 value, in microseconds
+ * @param chan5_raw RC channel 5 value, in microseconds
+ * @param chan6_raw RC channel 6 value, in microseconds
+ * @param chan7_raw RC channel 7 value, in microseconds
+ * @param chan8_raw RC channel 8 value, in microseconds
+ * @param rssi Receive signal strength indicator, 0: 0%, 255: 100%
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
 static inline void mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN];
+	char buf[22];
 	_mav_put_uint32_t(buf, 0, time_boot_ms);
 	_mav_put_uint16_t(buf, 4, chan1_raw);
 	_mav_put_uint16_t(buf, 6, chan2_raw);
@@ -229,11 +204,7 @@ static inline void mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint
 	_mav_put_uint8_t(buf, 20, port);
 	_mav_put_uint8_t(buf, 21, rssi);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, buf, 22, 244);
 #else
 	mavlink_rc_channels_raw_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -248,65 +219,9 @@ static inline void mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint
 	packet.port = port;
 	packet.rssi = rssi;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, (const char *)&packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, (const char *)&packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, (const char *)&packet, 22, 244);
 #endif
 }
-
-#if MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN <= MAVLINK_MAX_PAYLOAD_LEN
-/*
-  This varient of _send() can be used to save stack space by re-using
-  memory from the receive buffer.  The caller provides a
-  mavlink_message_t which is the size of a full mavlink message. This
-  is usually the receive buffer for the channel, and allows a reply to an
-  incoming message with minimum stack space usage.
- */
-static inline void mavlink_msg_rc_channels_raw_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
-{
-#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_uint16_t(buf, 4, chan1_raw);
-	_mav_put_uint16_t(buf, 6, chan2_raw);
-	_mav_put_uint16_t(buf, 8, chan3_raw);
-	_mav_put_uint16_t(buf, 10, chan4_raw);
-	_mav_put_uint16_t(buf, 12, chan5_raw);
-	_mav_put_uint16_t(buf, 14, chan6_raw);
-	_mav_put_uint16_t(buf, 16, chan7_raw);
-	_mav_put_uint16_t(buf, 18, chan8_raw);
-	_mav_put_uint8_t(buf, 20, port);
-	_mav_put_uint8_t(buf, 21, rssi);
-
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, buf, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
-#else
-	mavlink_rc_channels_raw_t *packet = (mavlink_rc_channels_raw_t *)msgbuf;
-	packet->time_boot_ms = time_boot_ms;
-	packet->chan1_raw = chan1_raw;
-	packet->chan2_raw = chan2_raw;
-	packet->chan3_raw = chan3_raw;
-	packet->chan4_raw = chan4_raw;
-	packet->chan5_raw = chan5_raw;
-	packet->chan6_raw = chan6_raw;
-	packet->chan7_raw = chan7_raw;
-	packet->chan8_raw = chan8_raw;
-	packet->port = port;
-	packet->rssi = rssi;
-
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, (const char *)packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN, MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS_RAW, (const char *)packet, MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
-#endif
-#endif
-}
-#endif
 
 #endif
 
@@ -326,7 +241,7 @@ static inline uint32_t mavlink_msg_rc_channels_raw_get_time_boot_ms(const mavlin
 /**
  * @brief Get field port from rc_channels_raw message
  *
- * @return Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
+ * @return Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
  */
 static inline uint8_t mavlink_msg_rc_channels_raw_get_port(const mavlink_message_t* msg)
 {
@@ -336,7 +251,7 @@ static inline uint8_t mavlink_msg_rc_channels_raw_get_port(const mavlink_message
 /**
  * @brief Get field chan1_raw from rc_channels_raw message
  *
- * @return RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 1 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan1_raw(const mavlink_message_t* msg)
 {
@@ -346,7 +261,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan1_raw(const mavlink_m
 /**
  * @brief Get field chan2_raw from rc_channels_raw message
  *
- * @return RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 2 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan2_raw(const mavlink_message_t* msg)
 {
@@ -356,7 +271,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan2_raw(const mavlink_m
 /**
  * @brief Get field chan3_raw from rc_channels_raw message
  *
- * @return RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 3 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan3_raw(const mavlink_message_t* msg)
 {
@@ -366,7 +281,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan3_raw(const mavlink_m
 /**
  * @brief Get field chan4_raw from rc_channels_raw message
  *
- * @return RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 4 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan4_raw(const mavlink_message_t* msg)
 {
@@ -376,7 +291,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan4_raw(const mavlink_m
 /**
  * @brief Get field chan5_raw from rc_channels_raw message
  *
- * @return RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 5 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan5_raw(const mavlink_message_t* msg)
 {
@@ -386,7 +301,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan5_raw(const mavlink_m
 /**
  * @brief Get field chan6_raw from rc_channels_raw message
  *
- * @return RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 6 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan6_raw(const mavlink_message_t* msg)
 {
@@ -396,7 +311,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan6_raw(const mavlink_m
 /**
  * @brief Get field chan7_raw from rc_channels_raw message
  *
- * @return RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 7 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan7_raw(const mavlink_message_t* msg)
 {
@@ -406,7 +321,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan7_raw(const mavlink_m
 /**
  * @brief Get field chan8_raw from rc_channels_raw message
  *
- * @return RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+ * @return RC channel 8 value, in microseconds
  */
 static inline uint16_t mavlink_msg_rc_channels_raw_get_chan8_raw(const mavlink_message_t* msg)
 {
@@ -416,7 +331,7 @@ static inline uint16_t mavlink_msg_rc_channels_raw_get_chan8_raw(const mavlink_m
 /**
  * @brief Get field rssi from rc_channels_raw message
  *
- * @return Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+ * @return Receive signal strength indicator, 0: 0%, 255: 100%
  */
 static inline uint8_t mavlink_msg_rc_channels_raw_get_rssi(const mavlink_message_t* msg)
 {
@@ -444,6 +359,6 @@ static inline void mavlink_msg_rc_channels_raw_decode(const mavlink_message_t* m
 	rc_channels_raw->port = mavlink_msg_rc_channels_raw_get_port(msg);
 	rc_channels_raw->rssi = mavlink_msg_rc_channels_raw_get_rssi(msg);
 #else
-	memcpy(rc_channels_raw, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN);
+	memcpy(rc_channels_raw, _MAV_PAYLOAD(msg), 22);
 #endif
 }

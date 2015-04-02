@@ -19,19 +19,19 @@ inline boolean getBit(byte Reg, byte whichBit) {
 char setBatteryPic(uint16_t bat_level)
 {
 
-  if(bat_level <= 100){
+  if(bat_level <= 25){
     return 0x20;
   }
-  else if(bat_level <= 300){
+  else if(bat_level <= 60){
     return 0x8d;
   }
-  else if(bat_level <= 400){
+  else if(bat_level <= 100){
     return 0x8c;
   }
-  else if(bat_level <= 500){
+  else if(bat_level <= 145){
     return 0x8b;
   }
-  else if(bat_level <= 800){
+  else if(bat_level <= 205){
     return 0x8a;
   }
   else return 0x89;

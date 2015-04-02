@@ -393,7 +393,7 @@ void panAlt(byte first_col, byte first_line){
 
 void panClimb(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
-    osd.printf_P(PSTR("%c%4.0f%c "), 0x15, int(vs / 10.0) * 10.0, climbchar);
+    osd.printf_P(PSTR("\x15%4.0f%c"), int(vs) * 1.0, climbchar);
 }
 
 /* **************************************************************** */
@@ -557,7 +557,7 @@ void panBatteryPercent(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
     if (EEPROM.read(OSD_BATT_SHOW_PERCENT_ADDR) == 1){
 //        osd.printf_P(PSTR("\x17%3.0i\x25"), 0x17, osd_battery_remaining_A, 0x25);
-      osd.printf_P(PSTR("\x88%c\x8e%3.0i\x25"), osd_battery_pic_A, osd_battery_remaining_A, 0x25);
+      osd.printf_P(PSTR("\x88%c\x8e%3.0i%%"), osd_battery_pic_A, osd_battery_remaining_A/255*100);
 
     }else{
 //        osd.printf_P(PSTR("%c%4.0f%c"), 0x17, mah_used, 0x01);
@@ -602,13 +602,13 @@ void panHomeDis(byte first_col, byte first_line){
 void panHorizon(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
   
-  // сначала очистим и нарисуем стрелочки
-    //osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
-    osd.printf_P(PSTR("\xb3\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb2|"
-                      "\xb3\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb2|"
-                      "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"
-                      "\xb6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb5|"
-                      "\xb6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb5"));
+  // сначала очистим и нарисуем стрелочки. Самая правая колонка - ILS, ее бы лучше вынести в отдельный элемент.
+
+    osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3\x20|"
+                      "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3\x20|"
+                      "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5\x20|"
+                      "\xb5\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb6\x20|"
+                      "\xb5\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb6\x20"));
 
     showHorizon((first_col + 1), first_line);
 
@@ -616,7 +616,7 @@ void panHorizon(byte first_col, byte first_line){
     showILS(first_col, first_line);
     
     // Птичка по центру
-    osd.setPanel(first_col+3, first_line+7);
+    osd.setPanel(first_col+6, first_line+2);
     osd.printf_P(PSTR("\xb8\xb9"));
 }
 
@@ -747,7 +747,8 @@ void panRose(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
 
 //  osd.printf_P(PSTR("%s|\xc3%s\x87"), "\x20\xc0\xc0\xc0\xc0\xc0\xc7\xc0\xc0\xc0\xc0\xc0\x20", buf_show);
-    osd.printf_P(PSTR("\x20\xb7\xb7\xb7\xb7\xb7\xb4\xb7\xb7\xb7\xb7\xb7\x20|\xc3%s\x87"), buf_show);
+    osd.printf_P(PSTR(                  "\x20\xb7\xb7\xb7\xb4\xb7\xb7\xb7\x20|\xc3%s\x87"), buf_show);
+    
 //    osd.printf_P(PSTR("%c%s%c"), 0xc3, buf_show, 0x87);
 }
 
@@ -977,11 +978,12 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
 // Calculate and show artificial horizon
 // used formula: y = m * x + n <=> y = tan(a) * x + n
 void showHorizon(byte start_col, byte start_row) {
-    byte col, row, pitch_line, middle, hit, subval;
+    byte col, row;
+    int pitch_line, middle, hit, subval;
     int roll;
     int line_set = LINE_SET_STRAIGHT__;
     int line_set_overflow = LINE_SET_STRAIGHT_O;
-    uint8_t subval_overflow = 9;
+    int subval_overflow = 9;
     
     // preset the line char attributes
     roll = osd_roll;
