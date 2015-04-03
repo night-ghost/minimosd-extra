@@ -15,6 +15,13 @@ void startPanels(){
 /******* PANELS - POSITION *******/
 
 void writePanels(){ 
+
+#ifdef IS_PLANE
+    if ((takeofftime == 1) && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100)){
+        landed = millis();
+    }
+#endif
+
     //if(millis() < (lastMAVBeat + 2200))
     //  waitingMAVBeats = 1;
     //if(is_on(panWarn_XY)) panWarn(panWarn_XY.x, panWarn_XY.y); // this must be here so warnings are always checked
@@ -31,11 +38,20 @@ void writePanels(){
 
   //Flight summary panel
   //Only show flight summary 10 seconds after landing and if throttle < 15
+#ifdef IS_COPTER
   else if (!motor_armed && (((millis() / 10000) % 2) == 0) && (tdistance > 50)){ 
     if (currentBasePanel != 1){
       osd.clear();
       currentBasePanel = 1;
     }
+#else
+#ifdef IS_PLANE
+    //Only show flight summary 7 seconds after landing
+  else if ((millis() - 7000) > landed){
+#else
+    if(0) {
+#endif
+#endif
     panFdata(); 
   }
   //Normal osd panel
@@ -95,16 +111,22 @@ void writePanels(){
       if(is_on(panWindSpeed_XY)) panWindSpeed(panWindSpeed_XY.x, panWindSpeed_XY.y);
   
       if(is_on(panClimb_XY)) panClimb(panClimb_XY.x, panClimb_XY.y);
-  //  if(is_on(panTune_XY)) panTune(panTune_XY.x, panTune_XY.y);
+#ifdef IS_PLANE
+      if(is_on(panTune_XY)) panTune(panTune_XY.x, panTune_XY.y);
+#endif
       if(is_on(panRSSI_XY)) panRSSI(panRSSI_XY.x, panRSSI_XY.y); //??x??
       if(is_on(panEff_XY)) panEff(panEff_XY.x, panEff_XY.y);
 
       if(is_on(panTemp_XY)) panTemp(panTemp_XY.x, panTemp_XY.y);
   //  if(is_on(panCh_XY)) panCh(panCh_XY.x, panCh_XY.y);
       if(is_on(panDistance_XY)) panDistance(panDistance_XY.x, panDistance_XY.y);
+
     }
   }
 //  if(is_on(panCALLSIGN_XY)) panCALLSIGN(panCALLSIGN_XY.x, panCALLSIGN_XY.y); //call sign even in off panel
+    // show warnings even if screen is disabled 
+    if(is_on(panWarn_XY)) panWarn(panWarn_XY.x, panWarn_XY.y);
+
 
   timers();
 
@@ -198,6 +220,8 @@ void panTemp(byte first_col, byte first_line){
 void panEff(byte first_col, byte first_line)
 {
   osd.setPanel(first_col, first_line);
+
+#ifdef IS_COPTER
   //Check takeoff just to prevent inicial false readings
   if (motor_armed)
   {
@@ -208,6 +232,42 @@ void panEff(byte first_col, byte first_line)
     }
     osd.printf_P(PSTR("\x17%2i\x3A%02i"), ((int)remaining_estimated_flight_time_seconds/60)%60,(int)remaining_estimated_flight_time_seconds%60);
   }
+#endif
+
+#ifdef IS_PLANE
+    if (osd_throttle >= 1){
+      if (ma == 0) {
+              ma = 1;
+            }
+        if (osd_groundspeed != 0) eff = (float(osd_curr_A * 10.0) / (osd_groundspeed * converts))* 0.1 + eff * 0.9;
+          if (eff > 0 && eff <= 9999) {
+            osd.printf_P(PSTR("%c%4.0f%c"), 0x16, eff, 0x01);
+          }else{
+          osd.printf_P(PSTR("\x16\x20\x20\x20\x20\x20"));
+          }
+
+    }else{
+
+        if ((osd_throttle < 1)){
+            if (ma == 1) {
+              palt = osd_alt_to_home;
+              ddistance = tdistance;
+              ma = 0;
+            }
+        }
+        if (osd_climb < -0.05){
+            glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * converth;
+            if (glide > 9999) glide = 9999;
+            if (glide > -0){
+                osd.printf_P(PSTR("\x18%4.0f%c"), glide, high);
+            }
+        }else if (osd_climb >= -0.05 && osd_pitch < 0) {
+              osd.printf_P(PSTR("\x18\x20\x20\x90\x91\x20"));
+        }else{
+              osd.printf_P(PSTR("\x18\x20\x20\x20\x20\x20"));
+        }
+    }
+#endif
 }
 
 /* **************************************************************** */
@@ -284,6 +344,12 @@ void panWindSpeed(byte first_col, byte first_line){
 void panOff(){
   bool rotatePanel = 0;
 
+      if(ch_toggle == 5) ch_raw = chan5_raw;
+      else if(ch_toggle == 6) ch_raw = chan6_raw;
+      else if(ch_toggle == 7) ch_raw = chan7_raw;
+      else if(ch_toggle == 8) ch_raw = chan8_raw;
+
+
   //If there is a warning force switch to panel 0
   if(canswitch == 0){
     if(panel != panel_auto_switch){ 
@@ -313,10 +379,6 @@ void panOff(){
       }
     }
     else */ {
-      if(ch_toggle == 5) ch_raw = chan5_raw;
-      else if(ch_toggle == 6) ch_raw = chan6_raw;
-      else if(ch_toggle == 7) ch_raw = chan7_raw;
-      else if(ch_toggle == 8) ch_raw = chan8_raw;
 
       //Switch mode by value
       if (switch_mode == 0){
@@ -439,6 +501,55 @@ void panAirSpeed(byte first_col, byte first_line){
 }
 
 /* **************************************************************** */
+
+uint8_t warning;
+
+void check_warn()
+{
+ uint8_t wmask = 0;
+ uint8_t bit, prev_warn;
+
+ if (!one_sec_timer_switch) return;
+
+ if ((osd_fix_type) < 2) 
+    wmask |= 1;
+ if (osd_airspeed * converts < stall && takeofftime == 1) 
+    wmask |= 2;
+ if ((osd_airspeed * converts) > (float)overspeed) 
+    wmask |= 4;
+
+ if (osd_vbat_A < float(battv)/10.0 || (osd_battery_remaining_A < batt_warn_level && batt_warn_level != 0))
+    wmask |= 8;
+
+ if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on)
+    wmask |= 16;
+
+ if(wmask == 0) 
+    warning = 0;
+ else {
+    prev_warn = warning;
+    if(warning == 0) warning = 1;
+    else             warning = prev_warn+1;
+
+    bit = 1 << (warning-1);
+
+    while(1) {
+        if(warning == 6) {
+	    warning = 1;
+	    bit = 1;
+        }
+        if(wmask&bit) break;
+        warning++;
+        bit <<= 1;
+    }
+    /* stay blank for one cycle for single warning */
+    if(warning == prev_warn) warning = 0;
+ }
+
+    if (wmask && panel_auto_switch < 3) canswitch = 0;
+    else if (ch_raw < 1200) canswitch = 1;
+}
+
 // Panel  : panWarn
 // Needs  : X, Y locations
 // Output : Airspeed value from MAVlink with symbols
@@ -451,6 +562,29 @@ void panWarn(byte first_col, byte first_line){
 
 #define WARNINGS 5
 
+#ifdef IS_PLANE
+    check_warn();
+
+    switch(warning) {
+         case 1:
+                 osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
+                 break;
+         case 2:
+                 osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
+                 break;
+         case 3:
+                 osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
+                 break;
+         case 4:
+                 osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
+                 break;
+         case 5:
+                 osd.printf_P(PSTR("\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"));
+    }
+#endif
+
+
+#ifdef IS_COPTER
   if (one_sec_timer_switch == 1){
     boolean warning[]={0,0,0,0,0,0,0}; // Make and clear the array
 
@@ -526,8 +660,9 @@ void panWarn(byte first_col, byte first_line){
               canswitch = 1; // выключатель в выключенном состоянии
           }
   if (rotation > WARNINGS) rotation = 0;
-
   osd.printf_P(warning_string);
+#endif
+
  
   }
 }  
@@ -588,7 +723,12 @@ void panTime(byte first_col, byte first_line){
 
 void panHomeDis(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
-    osd.printf_P(PSTR("\x0B%5.0f%c"), (double)((osd_home_distance) * converth), high);
+
+    if ((osd_home_distance * converth) > 9999.0) {
+      osd.printf_P(PSTR("\0b%5.2f%c"), ((osd_home_distance * converth) / distconv), distchar);
+    }else{
+      osd.printf_P(PSTR("\x0B%5.0f%c"), (double)((osd_home_distance) * converth), high);
+    }
 }
 
 
@@ -612,9 +752,11 @@ void panHorizon(byte first_col, byte first_line){
 
     showHorizon((first_col + 1), first_line);
 
+//#ifdef IS_COPTER
     //Show ground level on  HUD
     showILS(first_col, first_line);
-    
+//#endif
+
     // Птичка по центру
     osd.setPanel(first_col+6, first_line+2);
     osd.printf_P(PSTR("\xb8\xb9"));
@@ -653,6 +795,12 @@ void panRoll(byte first_col, byte first_line){
 
 void panBatt_A(byte first_col, byte first_line){
     osd.setPanel(first_col, first_line);
+
+/*************** This commented code is for the next ArduPlane Version
+    if(osd_battery_remaining_A > 100){
+        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_A, 0x0d);
+    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_A, 0x0d, osd_battery_pic_A);
+    */
 
 //    osd.printf_P(PSTR("\xBC%5.2f\x0D"), (double)osd_vbat_A);
     osd.printf_P(PSTR("%5.2f\x0D"), (double)osd_vbat_A);
@@ -797,7 +945,7 @@ void panWPDis(byte first_col, byte first_line){
     osd.printf_P(PSTR("\x57\x70%2i %4.0f%c|"), wp_number,(double)((float)(wp_dist) * converth),high);
     showArrow((uint8_t)wp_target_bearing_rotate_int,0);
 
-    if (osd_mode == 10){
+    if (osd_mode == 10){ // auto
         osd.printf_P(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error* converth), high);
     }else{
         osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
@@ -853,8 +1001,9 @@ void panFlightMode(byte first_col, byte first_line){
 
 */
 
-
     PGM_P mode_str;
+
+#ifdef IS_COPTER
 
     switch (osd_mode){
     case 0:
@@ -923,6 +1072,23 @@ void panFlightMode(byte first_col, byte first_line){
 	
     }
 
+#endif
+#ifdef IS_PLANE
+    if (osd_mode == 0) mode_str = PSTR("manu"); //Manual
+    if (osd_mode == 1) mode_str = PSTR("circ"); //CIRCLE
+    if (osd_mode == 2) mode_str = PSTR("stab"); //Stabilize
+    if (osd_mode == 3) mode_str = PSTR("trai"); //Training
+    if (osd_mode == 4) mode_str = PSTR("acro"); //ACRO
+    if (osd_mode == 5) mode_str = PSTR("fbwa"); //FLY_BY_WIRE_A
+    if (osd_mode == 6) mode_str = PSTR("fbwb"); //FLY_BY_WIRE_B
+    if (osd_mode == 7) mode_str = PSTR("cruz"); //Cruise
+    if (osd_mode == 8) mode_str = PSTR("atun"); //autotune
+    if (osd_mode == 10) mode_str = PSTR("auto"); //AUTO
+    if (osd_mode == 11) mode_str = PSTR("rtl "); //Return to Launch.
+    if (osd_mode == 12) mode_str = PSTR("loit"); //Loiter
+    if (osd_mode == 15) mode_str = PSTR("guid"); //GUIDED
+    if (osd_mode == 16) mode_str = PSTR("init"); //initializing
+#endif
 
     osd.printf_P(mode_str );
     osd.write( motor_armed ? 0x86:' ');
@@ -1032,8 +1198,11 @@ void showHorizon(byte start_col, byte start_row) {
     }
 }
 
-// Calculate and shows verical speed aid
-void showILS(int start_col, int start_row) { 
+
+void showILS(byte start_col, byte start_row) {
+#ifdef IS_COPTER // Calculate and shows verical speed aid
+
+
     //Show line on panel center because horizon line can be
     //high or low depending on pitch attitude
     char subval_char = 0xCF;
@@ -1071,6 +1240,35 @@ void showILS(int start_col, int start_row) {
     //Enough calculations. Let's show the result
     osd.openSingle(start_col + AH_COLS + 2, start_row);
     osd.write( subval_char);
+#endif
+
+#ifdef IS_PLANE // Calculate and shows ILS
+
+  //Vertical calculation
+    int currentAngleDisplacement = atan(osd_alt_to_home / osd_home_distance) * 57.2957795 - 10;
+    //Calc current char position.
+    //int numberOfPixels = CHAR_ROWS * AH_ROWS;
+    int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+    int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+    int charPosition = linePosition / 9;
+    int selectedChar = 9 - (linePosition % 9) + 0xC7;
+    if(charPosition >= 0 && charPosition <= CHAR_ROWS) {
+      osd.openSingle(start_col + AH_COLS + 2, start_row + charPosition);
+      osd.write(selectedChar);
+    }
+
+  //Horizontal calculation
+    currentAngleDisplacement = osd_home_direction - takeoff_heading;
+    //Horizontal calculation
+    totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
+    linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+    charPosition = linePosition / 6;
+    selectedChar = (linePosition % 6) + 0xBF;
+    if(charPosition >= 0 && charPosition <= CHAR_COLS)  {
+      osd.openSingle(start_col + charPosition, start_row + AH_ROWS + 1);
+      osd.write( selectedChar);
+    }
+#endif
 }
 
 void do_converts()
@@ -1108,6 +1306,31 @@ void timers()
     blinker = !blinker;
   }
   if (millis() > one_sec_timer) one_sec_timer_switch = 1;
+}
+
+
+//* **************************************************************** */
+// Panel  : panTune
+// Needs  : X, Y locations
+// Output : Current symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+    
+void panTune(byte first_col, byte first_line){
+  osd.setPanel(first_col, first_line);
+
+#ifdef IS_COPTER
+  osd.printf_P(PSTR("\x4E\x52%2.0f\x05|\x4E\x50%2.0f\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), (nav_roll), 
+				       (nav_pitch), 
+				    			 (nav_bearing),  
+				    					    (wp_target_bearing), 
+				    							        (alt_error * converth), high, 
+				    							    		     (xtrack_error), 0x6D, 
+				    							    		    			((aspd_error / 100.0) * converts), spe);
+#endif
+#ifdef IS_PLANE
+    osd.printf_P(PSTR("\xb0%3.0f%c|\xb1%3.0f%c"), (alt_error * converth * -1), high, ((aspd_error / 100.0) * converts), spe);
+#endif
 }
 
 
@@ -1189,25 +1412,6 @@ int change_val(uint8_t value, int address)
     if (chan1_raw  < chan1_raw_middle - 100) value++;
     if(value != value_old && setup_menu ) EEPROM.write(address, value);
     return value;
-}
-
-//* **************************************************************** */
-// Panel  : panTune
-// Needs  : X, Y locations
-// Output : Current symbol and altitude value in meters from MAVLink
-// Size   : 1 x 7Hea  (rows x chars)
-// Staus  : done
-    
-void panTune(byte first_col, byte first_line){
-  osd.setPanel(first_col, first_line);
-
-  osd.printf_P(PSTR("\x4E\x52%2.0f\x05|\x4E\x50%2.0f\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), (nav_roll), 
-				       (nav_pitch), 
-				    			 (nav_bearing),  
-				    					    (wp_target_bearing), 
-				    							        (alt_error * converth), high, 
-				    							    		     (xtrack_error), 0x6D, 
-				    							    		    			((aspd_error / 100.0) * converts), spe);
 }
 
 /* **************************************************************** */

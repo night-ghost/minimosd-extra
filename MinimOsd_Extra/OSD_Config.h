@@ -1,10 +1,13 @@
+#define IS_PLANE 1  // plane functions
+#define IS_COPTER 1 // copter functions
 
-#define on 1
-#define off 0
-
-// Version number, incrementing this will erase/upload factory settings.
+// EEPROM Version number, incrementing this will erase/upload factory settings.
 // Only devs should increment this
 #define VER 76
+
+
+#define VERSION "2.4"
+#define RELEASE "r806 DV"
 
 
 // additional pins
@@ -19,6 +22,21 @@
 // PD3 Int1 - перемычка PAL
 // оно может читать PWM
 #define PWM_PIN PD3 
+
+/////////////////////////////////////////////////
+
+#ifdef IS_COPTER
+#define OSD_VERSION "MinimOSD-Extra " VERSION "|Copter " RELEASE
+#endif
+#ifdef IS_PLANE
+#define OSD_VERSION "MinimOSD-Extra " VERSION "|Plane " RELEASE
+#endif
+
+
+#define on 1
+#define off 0
+
+
 
 #define RC_NEUTRAL 1500     // PWM pulse width for center stick
 
@@ -36,7 +54,6 @@
 // EEPROM Storage addresses
 
 #define OffsetBITpanel       250 // размер для одного экрана
-
 
 // First of 8 panels
 #define panCenter_en_ADDR 0
@@ -164,9 +181,9 @@
 #define panClimb_x_ADDR 184
 #define panClimb_y_ADDR 186
 
-//#define panTune_en_ADDR 188
-//#define panTune_x_ADDR 190
-//#define panTune_y_ADDR 192
+#define panTune_en_ADDR 188
+#define panTune_x_ADDR 190
+#define panTune_y_ADDR 192
 
 #define panEff_en_ADDR 194
 #define panEff_x_ADDR 196
@@ -184,9 +201,9 @@
 #define panTemp_x_ADDR 214
 #define panTemp_y_ADDR 216
 
-//#define panFdata_en_ADDR 218
-//#define panFdata_x_ADDR 220
-//#define panFdata_y_ADDR 222
+#define panFdata_en_ADDR 218
+#define panFdata_x_ADDR 220
+#define panFdata_y_ADDR 222
 
 #define panDistance_en_ADDR 224
 #define panDistance_x_ADDR 226

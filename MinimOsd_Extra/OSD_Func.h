@@ -47,14 +47,29 @@ void setHomeVars(OSD &osd)
 
   //osd_alt_to_home = (osd_alt - osd_home_alt);
 
+#ifdef IS_COPTER
   //Check disarm to arm switching.
   if (motor_armed && !last_armed_status){
     //If motors armed, reset home in Arducopter version
     osd_got_home = 0;
   }
+
   last_armed_status = motor_armed;
 
-  if(osd_got_home == 0 && osd_fix_type > 1){
+  if(osd_got_home == 0 && osd_fix_type > 1 ){
+#else
+#ifdef IS_PLANE
+  if(osd_throttle > 3 && takeoff_heading == -400)
+    takeoff_heading = osd_heading;
+
+  osd_alt_to_home = (osd_alt - osd_home_alt);
+  
+  if(osd_got_home == 0 && osd_fix_type == 3 ){
+#else
+  if(1){
+#endif
+#endif
+
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
     //osd_alt_cnt = 0;
@@ -97,13 +112,29 @@ void setFdataVars()
   unsigned long time_lapse = millis() - runt;
   runt = millis();
 
+
+  if (takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
+    takeofftime = 1;
+    tdistance = 0;
+    FTime = (time_lapse/1000);
+  }
+
+
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (time_lapse) / 1000.0);
  
   mah_used += (osd_curr_A * 10.0 * (time_lapse) / 3600000.0);
 
   //Set max data
-  if (motor_armed)
-  {
+#ifdef IS_COPTER
+  if (motor_armed)  {
+#else
+#ifdef IS_PLANE
+  if (takeofftime == 1){
+#else
+    if(0){
+#endif
+#endif
+
     total_flight_time_milis += time_lapse;
     total_flight_time_seconds = total_flight_time_milis / 1000;
     if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;

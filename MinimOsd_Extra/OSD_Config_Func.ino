@@ -135,7 +135,9 @@ void readPanelSettings() {
 
     panClimb_XY=read_one(panClimb_en_ADDR);
 
-//    panTune_XY=read_one(panTune_en_ADDR);
+#ifdef IS_PLANE
+    panTune_XY=read_one(panTune_en_ADDR);
+#endif
 
     panRSSI_XY=read_one(panRSSI_en_ADDR);
     
@@ -293,9 +295,9 @@ void writeSettings() {
     writeEEPROM(on, panClimb_en_ADDR + offset);
     writeEEPROM(1,  panClimb_x_ADDR + offset);
     writeEEPROM(8,  panClimb_y_ADDR + offset);
-//    writeEEPROM(on, panTune_en_ADDR + offset);
-//    writeEEPROM(10, panTune_x_ADDR + offset);
-//    writeEEPROM(4,  panTune_y_ADDR + offset);
+    writeEEPROM(on, panTune_en_ADDR + offset);
+    writeEEPROM(10, panTune_x_ADDR + offset);
+    writeEEPROM(4,  panTune_y_ADDR + offset);
     writeEEPROM(on, panEff_en_ADDR + offset);
     writeEEPROM(14, panEff_x_ADDR + offset);
     writeEEPROM(13, panEff_y_ADDR + offset);
