@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSD", "OSD.csproj", "{E35F835A-8B3E-42D5-8852-A6E0F41823B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTToolUpdater", "CTToolUpdater\CTToolUpdater.csproj", "{D15070DB-90C7-4322-8A60-642C2258E22E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,10 +13,9 @@ Global
 		{E35F835A-8B3E-42D5-8852-A6E0F41823B5}.Debug|x86.Build.0 = Debug|x86
 		{E35F835A-8B3E-42D5-8852-A6E0F41823B5}.Release|x86.ActiveCfg = Release|x86
 		{E35F835A-8B3E-42D5-8852-A6E0F41823B5}.Release|x86.Build.0 = Release|x86
-		{D15070DB-90C7-4322-8A60-642C2258E22E}.Debug|x86.ActiveCfg = Debug|x86
-		{D15070DB-90C7-4322-8A60-642C2258E22E}.Debug|x86.Build.0 = Debug|x86
-		{D15070DB-90C7-4322-8A60-642C2258E22E}.Release|x86.ActiveCfg = Release|x86
-		{D15070DB-90C7-4322-8A60-642C2258E22E}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = OSD.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

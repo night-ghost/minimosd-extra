@@ -16,28 +16,41 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.Diagnostics;
 
+
 namespace OSD
 {
     public partial class OSD : Form
     {
-        //max 7456 datasheet pg 10
+		
+         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
         //ntsc = 13r 30 char
-        Int16 panel_number = 0;
-        const Int16 npanel = 2;
+public const int CHAR_W=12;
+public const  int CHAR_H=18;
+
+public const  int SCREEN_W=30;
+public const  int SCREEN_H=16;
+public const  int SCREEN_H_NTSC=13;		
+		
+		
+        int panel_number = 0;
+        const int npanel = 3; // количество панелей 
+		
         const Int16 toggle_offset = 3;
-        Size basesize = new Size(30, 16);
+        public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
         /// <summary>
         /// the un-scaled font render image
         /// </summary>
         //Bitmap[] screen = new Bitmap[npanel];
 
-        Bitmap[] screen = new Bitmap[npanel];
+        public Bitmap screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
         //Bitmap screen2 = new Bitmap(30 * 12, 16 * 18);
         /// <summary>
         /// the scaled to size background control
         /// </summary>
-        Bitmap image = new Bitmap(30 * 12, 16 * 18);
+        Bitmap image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+		Graphics gr;
+		
         /// <summary>
         /// Bitmaps of all the chars created from the mcm
         /// </summary>
@@ -45,11 +58,11 @@ namespace OSD
         /// <summary>
         /// record of what panel is using what squares
         /// </summary>
-        string[][] usedPostion = new string[30][];
+        public string[][] usedPostion = new string[SCREEN_W][];
         /// <summary>
         /// used to track currently selected panel across calls
         /// </summary>
-        string[] currentlyselected = new string[npanel];
+        public string[] currentlyselected = new string[npanel];
         /// <summary>
         /// used to track current processing panel across calls (because i maintained the original code for panel drawing)
         /// </summary>
@@ -70,8 +83,9 @@ namespace OSD
         /// background image
         /// </summary>
         Image bgpicture;
+		public osd_screen[] scr = new osd_screen[npanel];
 
-        bool[] mousedown = new bool[npanel];
+        public bool[] mousedown = new bool[npanel];
         //bool mousedown1 = false;
         //bool mousedown2 = false;
 
@@ -79,23 +93,36 @@ namespace OSD
 
         Panels pan;
         int nosdfunctions = 0;
-        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
-        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
-        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
-        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+		
+		public  int panel_num=0;
+				
+		
+//        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+//        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+//			
+//		Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2 = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
+//        Tuple<string, Func<int, int, int>, int, int, int, int, int>[] panelItems2_default = new Tuple<string, Func<int, int, int>, int, int, int, int, int>[32];
 
-        Graphics[] gr = new Graphics[npanel];
+       
         //Graphics gr2;
-        // in pixels
-        int[] x = new int[npanel];
-        int[] y = new int[npanel];
-        //int x2 = 0, y2 = 0;
+        //s
+        int print_x; // текущие координаты вывода
+        int print_y;
 
         Boolean fwWasRead = false;
 
         public OSD()
         {
+			
+
+			int i;
+			for(i=0;i<npanel;i++) {
+				var s = new osd_screen(i, this );
+				scr[i]=s;
+			}
+
             InitializeComponent();
+
 
             // load default font
             chars = mcm.readMCM("MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm");
@@ -106,15 +133,16 @@ namespace OSD
                 bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
             }
             catch { }
-            for (int i = 0; i < npanel; i++)
+            for (i = 0; i < npanel; i++)
             {
-                screen[i] = new Bitmap(30 * 12, 16 * 18);
-                gr[i] = Graphics.FromImage(screen[i]);
                 mousedown[i] = false;
-                x[i] = 0;
-                y[i] = 0;
                 currentlyselected[i] = "";
             }
+            print_x = 0;
+            print_y = 0;
+			
+			screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+            gr = Graphics.FromImage(screen);
 
             pan = new Panels(this);
 
@@ -126,31 +154,29 @@ namespace OSD
         {
             if (pal)
             {
-                basesize = new Size(30, 16);
-                for (int i = 0; i < npanel; i++)
-                {
-                    screen[i] = new Bitmap(30 * 12, 16 * 18);
-                }
-                image = new Bitmap(30 * 12, 16 * 18);
-
-                NUM_X.Maximum = 29;
-                NUM_Y.Maximum = 15;
-                NUM_X2.Maximum = 29;
-                NUM_Y2.Maximum = 15;
+                basesize = new Size(SCREEN_W, SCREEN_H);                
+                
+                screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+                
+                image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+				
+				for(int k=0;k<npanel;k++){
+                	scr[panel_number].NUM_X.Maximum = SCREEN_W-1;
+                	scr[panel_number].NUM_Y.Maximum = SCREEN_H-1;
+				}
+                
             }
             else
             {
-                basesize = new Size(30, 13);
-                for (int i = 0; i < npanel; i++)
-                {
-                    screen[i] = new Bitmap(30 * 12, 13 * 18);
-                }
-                image = new Bitmap(30 * 12, 13 * 18);
+                basesize = new Size(SCREEN_W, SCREEN_H_NTSC);
 
-                NUM_X.Maximum = 29;
-                NUM_Y.Maximum = 15;
-                NUM_X2.Maximum = 29;
-                NUM_Y2.Maximum = 15;
+                screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
+ 
+                image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
+				for(int k=0;k<npanel;k++){
+                	scr[panel_number].NUM_X.Maximum = SCREEN_W-1;
+                	scr[panel_number].NUM_Y.Maximum = SCREEN_H-1;                
+				}
             }
 
 
@@ -164,120 +190,131 @@ namespace OSD
 
 
             int a = 0;
+			int n;
 
             for (a = 0; a < usedPostion.Length; a++)
             {
-                usedPostion[a] = new string[16];
+                usedPostion[a] = new string[SCREEN_H];
             }
 
-            a = 0;
+            
 
-            // first 8
-            // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Pitch", pan.panPitch, 7, 1, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Roll", pan.panRoll, 13, 1, panRoll_en_ADDR, panRoll_x_ADDR, panRoll_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 14, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery B", pan.panBatt_B, 21, 3, panBatt_B_en_ADDR, panBatt_B_x_ADDR, panBatt_B_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Visible Sats", pan.panGPSats, 26, 11, panGPSats_en_ADDR, panGPSats_x_ADDR, panGPSats_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Real heading", pan.panCOG, 22, 14, panCOG_en_ADDR, panCOG_x_ADDR, panCOG_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Coord", pan.panGPS, 1, 14, panGPS_en_ADDR, panGPS_x_ADDR, panGPS_y_ADDR);
-
-            //second 8
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading Rose", pan.panRose, 21, 15, panRose_en_ADDR, panRose_x_ADDR, panRose_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading", pan.panHeading, 24, 13, panHeading_en_ADDR, panHeading_x_ADDR, panHeading_y_ADDR);
-            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 1, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
-            // rssi
-
-            // third 8
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 3, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 8, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
-
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 14, 14, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
-
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Velocity", pan.panVel, 1, 2, panVel_en_ADDR, panVel_x_ADDR, panVel_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_en_ADDR, panAirSpeed_x_ADDR, panAirSpeed_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Throttle", pan.panThr, 1, 3, panThr_en_ADDR, panThr_x_ADDR, panThr_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Flight Mode", pan.panFlightMode, 1, 13, panFMod_en_ADDR, panFMod_x_ADDR, panFMod_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Horizon", pan.panHorizon, 8, 6, panHorizon_en_ADDR, panHorizon_x_ADDR, panHorizon_y_ADDR);
-
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_en_ADDR, panWindSpeed_x_ADDR, panWindSpeed_y_ADDR);
-
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 23, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 7, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 11, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
-            //            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 1, 11, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
-            panelItems[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Trip Distance", pan.panDistance, 22, 2, panDistance_en_ADDR, panDistance_x_ADDR, panDistance_y_ADDR);
-
-            nosdfunctions = a;
-            //make backup in case EEPROM needs reset to deualt
-            panelItems_default = panelItems;
-
-            //Fill List of items in tabe number 1
-            LIST_items.Nodes.Clear();
-            startup = true;
-            foreach (var thing in panelItems)
-            {
-                if (thing != null)
-                {
-
-                    if (thing.Item1 == "Center")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Tune")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "WP Distance")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Temperature")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-
-                    else if (thing.Item1 == "Trip Distance")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-
-                    else if (thing.Item1 == "Channel Raw")
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else
-                    {
-                        TreeNode tn = LIST_items.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = true;
-                    }
-                }
-            }
-            LIST_items.CheckBoxes = true;
-            LIST_items.Sort();
-            startup = false;
-
+		  	for(n=0;n<npanel;n++){ // для всех панелей
+				a = 0;
+				var pi=this.scr[n].panelItems;
+	            // first 8
+	            // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Pitch", pan.panPitch, 7, 1, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Roll", pan.panRoll, 13, 1, panRoll_en_ADDR, panRoll_x_ADDR, panRoll_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 14, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery B", pan.panBatt_B, 21, 3, panBatt_B_en_ADDR, panBatt_B_x_ADDR, panBatt_B_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Visible Sats", pan.panGPSats, 26, 11, panGPSats_en_ADDR, panGPSats_x_ADDR, panGPSats_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Real heading", pan.panCOG, 22, 14, panCOG_en_ADDR, panCOG_x_ADDR, panCOG_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Coord", pan.panGPS, 1, 14, panGPS_en_ADDR, panGPS_x_ADDR, panGPS_y_ADDR);
+	
+	            //second 8
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading Rose", pan.panRose, 21, 15, panRose_en_ADDR, panRose_x_ADDR, panRose_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading", pan.panHeading, 24, 13, panHeading_en_ADDR, panHeading_x_ADDR, panHeading_y_ADDR);
+	//          pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 1, 11, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
+	            // rssi
+	
+	            // third 8
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 3, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 8, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
+	
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 14, 14, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
+	
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Velocity", pan.panVel, 1, 2, panVel_en_ADDR, panVel_x_ADDR, panVel_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_en_ADDR, panAirSpeed_x_ADDR, panAirSpeed_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Throttle", pan.panThr, 1, 3, panThr_en_ADDR, panThr_x_ADDR, panThr_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Flight Mode", pan.panFlightMode, 1, 13, panFMod_en_ADDR, panFMod_x_ADDR, panFMod_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Horizon", pan.panHorizon, 8, 6, panHorizon_en_ADDR, panHorizon_x_ADDR, panHorizon_y_ADDR);
+				pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("ILS", pan.panILS, 24, 6, panILS_en_ADDR, panILS_x_ADDR, panILS_y_ADDR);
+	
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_en_ADDR, panWindSpeed_x_ADDR, panWindSpeed_y_ADDR);
+	
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 23, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 7, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 11, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 1, 11, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
+	            pi[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Trip Distance", pan.panDistance, 22, 2, panDistance_en_ADDR, panDistance_x_ADDR, panDistance_y_ADDR);
+	
+	            nosdfunctions = a;
+	            //make backup in case EEPROM needs reset to deualt
+	            this.scr[n].panelItems_default = pi;
+				
+				System.Windows.Forms.TreeView li=this.scr[n].LIST_items;
+					
+	            //Fill List of items in tabe number 1
+	            this.scr[n].LIST_items.Nodes.Clear();
+	            startup = true;
+	            foreach (var thing in pi)
+	            {
+	                if (thing != null)
+	                {
+	
+	                    if (thing.Item1 == "Center")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	
+	                    else if (thing.Item1 == "Tune")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	                    else if (thing.Item1 == "WP Distance")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	
+	                    else if (thing.Item1 == "Temperature")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	
+	
+	                    else if (thing.Item1 == "Trip Distance")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	
+	
+	                    else if (thing.Item1 == "Channel Raw")
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = false;
+	                    }
+	                    else
+	                    {
+	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+	                        tn.Checked = true;
+	                    }
+	                }
+	            }
+	            li.CheckBoxes = true;
+	            li.Sort();
+	            startup = false;
+				
+				osdDraw(n);
+					
+		  	}	// цикл по экранам
+			
             //startup = true;
             //List<string> instruments = new List<string>();
             //LIST_items.Nodes.Clear();
@@ -289,169 +326,10 @@ namespace OSD
             //        tn.Checked = (tuple.Item3 == 1);
             //    }
             //}
-            a = 0;
-            startup = false;
-            // first 8
-            // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Center", pan.panCenter, 13, 8, panCenter_en_ADDR, panCenter_x_ADDR, panCenter_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Pitch", pan.panPitch, 22, 10, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Roll", pan.panRoll, 11, 1, panRoll_en_ADDR, panRoll_x_ADDR, panRoll_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery A", pan.panBatt_A, 1, 13, panBatt_A_en_ADDR, panBatt_A_x_ADDR, panBatt_A_y_ADDR);
-            //items[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery B", pan.panBatt_B, 21, 3, panBatt_B_en_ADDR, panBatt_B_x_ADDR, panBatt_B_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Visible Sats", pan.panGPSats, 1, 9, panGPSats_en_ADDR, panGPSats_x_ADDR, panGPSats_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Real heading", pan.panCOG, 1, 10, panCOG_en_ADDR, panCOG_x_ADDR, panCOG_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("GPS Coord", pan.panGPS, 1, 14, panGPS_en_ADDR, panGPS_x_ADDR, panGPS_y_ADDR);
 
-            //second 8
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading Rose", pan.panRose, 21, 15, panRose_en_ADDR, panRose_x_ADDR, panRose_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heading", pan.panHeading, 24, 13, panHeading_en_ADDR, panHeading_x_ADDR, panHeading_y_ADDR);
-            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_en_ADDR, panMavBeat_x_ADDR, panMavBeat_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Direction", pan.panHomeDir, 14, 1, panHomeDir_en_ADDR, panHomeDir_x_ADDR, panHomeDir_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_en_ADDR, panHomeDis_x_ADDR, panHomeDis_y_ADDR);
-            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Direction", pan.panWPDir, 20, 12, panWPDir_en_ADDR, panWPDir_x_ADDR, panWPDir_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("WP Distance", pan.panWPDis, 9, 14, panWPDis_en_ADDR, panWPDis_x_ADDR, panWPDis_y_ADDR);
-            // rssi
 
-            // third 8
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Altitude", pan.panAlt, 22, 4, panAlt_en_ADDR, panAlt_x_ADDR, panAlt_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Home Altitude", pan.panHomeAlt, 22, 3, panHomeAlt_en_ADDR, panHomeAlt_x_ADDR, panHomeAlt_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Vertical Speed", pan.panClimb, 1, 7, panClimb_en_ADDR, panClimb_x_ADDR, panClimb_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Battery Percent", pan.panBatteryPercent, 22, 13, panBatteryPercent_en_ADDR, panBatteryPercent_x_ADDR, panBatteryPercent_y_ADDR);
-
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Current", pan.panCur_A, 1, 12, panCur_A_en_ADDR, panCur_A_x_ADDR, panCur_A_y_ADDR);
-
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Velocity", pan.panVel, 1, 2, panVel_en_ADDR, panVel_x_ADDR, panVel_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_en_ADDR, panAirSpeed_x_ADDR, panAirSpeed_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Throttle", pan.panThr, 1, 3, panThr_en_ADDR, panThr_x_ADDR, panThr_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Flight Mode", pan.panFlightMode, 1, 13, panFMod_en_ADDR, panFMod_x_ADDR, panFMod_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Horizon", pan.panHorizon, 8, 6, panHorizon_en_ADDR, panHorizon_x_ADDR, panHorizon_y_ADDR);
-
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Wind Speed", pan.panWindSpeed, 1, 14, panWindSpeed_en_ADDR, panWindSpeed_x_ADDR, panWindSpeed_y_ADDR);
-
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Warnings", pan.panWarn, 9, 4, panWarn_en_ADDR, panWarn_x_ADDR, panWarn_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Time", pan.panTime, 22, 4, panTime_en_ADDR, panTime_x_ADDR, panTime_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("RSSI", pan.panRSSI, 12, 13, panRSSI_en_ADDR, panRSSI_x_ADDR, panRSSI_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Tune", pan.panTune, 1, 1, panTune_en_ADDR, panTune_x_ADDR, panTune_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Efficiency", pan.panEff, 1, 3, panEff_en_ADDR, panEff_x_ADDR, panEff_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Call Sign", pan.panCALLSIGN, 1, 0, panCALLSIGN_en_ADDR, panCALLSIGN_x_ADDR, panCALLSIGN_y_ADDR);
-            //            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Channel Raw", pan.panCh, 1, 0, panCh_en_ADDR, panCh_x_ADDR, panCh_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Temperature", pan.panTemp, 22, 14, panTemp_en_ADDR, panTemp_x_ADDR, panTemp_y_ADDR);
-            panelItems2[a++] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>("Trip Distance", pan.panDistance, 22, 2, panDistance_en_ADDR, panDistance_x_ADDR, panDistance_y_ADDR);
-
-            //make backup in case EEPROM needs reset to deualt
-            panelItems2_default = panelItems2;
-
-            //Fill List of items in tabe number 2
-            LIST_items2.Nodes.Clear();
-
-            startup = true;
-            foreach (var thing in panelItems2)
-            {
-                if (thing != null)
-                {
-
-                    if (thing.Item1 == "Center")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Tune")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Pitch")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Roll")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Battery A")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Visible Sats")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "GPS Coord")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "GPS Lock")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Heading")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Altitude")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Vertical Speed")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Current")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Horizon")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-
-                    else if (thing.Item1 == "Tune")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Efficiency")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Call Sign")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else if (thing.Item1 == "Warnings")
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = false;
-                    }
-                    else
-                    {
-                        TreeNode tn = LIST_items2.Nodes.Add(thing.Item1, thing.Item1);
-                        tn.Checked = true;
-                    }
-                }
-            }
-            LIST_items2.CheckBoxes = true;
-            LIST_items2.Sort();
-            startup = false;
-
-            osdDraw1();
-            osdDraw2();
+            
+            
 
             //Setup configuration panel
             STALL_numeric.Value = pan.stall;
@@ -528,20 +406,19 @@ namespace OSD
 
         public void setPanel(int x, int y)
         {
-            this.x[panel_number] = x * 12;
-            this.y[panel_number] = y * 18;
-        }
+            print_x = x * CHAR_W;
+            print_y = y * CHAR_H;
 
-        public void openPanel()
-        {
-            d[panel_number] = 0;
-            r[panel_number] = 0;
-        }
+		    print_col = 0; // в пределах одного элемента
+            print_row = 0;
+ 
+		}
+
 
         public void openSingle(int x, int y)
         {
             setPanel(x, y);
-            openPanel();
+            
         }
 
         public int getCenter()
@@ -552,8 +429,8 @@ namespace OSD
         }
 
         // used for printf tracking line and row
-        int[] d = new int[npanel];
-        int[] r = new int[npanel];
+        int print_col;
+        int print_row;
 
         public void printf(string format, params object[] args)
         {
@@ -569,8 +446,8 @@ namespace OSD
             {
                 if (ch == '|')
                 {
-                    d[panel_number] += 1;
-                    r[panel_number] = 0;
+                    print_col += 1;
+                    print_row = 0;
                     continue;
                 }
 
@@ -579,11 +456,11 @@ namespace OSD
                     // draw red boxs
                     if (selectedrectangle)
                     {
-                        gr[panel_number].DrawRectangle(Pens.Red, (this.x[panel_number] + r[panel_number] * 12) % screen[panel_number].Width, (this.y[panel_number] + d[panel_number] * 18), 12, 18);
+                        gr.DrawRectangle(Pens.Red, (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
                     }
 
-                    int w1 = (this.x[panel_number] / 12 + r[panel_number]) % basesize.Width;
-                    int h1 = (this.y[panel_number] / 18 + d[panel_number]);
+                    int w1 = (this.print_x / CHAR_W + print_row) % basesize.Width;
+                    int h1 = (this.print_y / CHAR_H + print_col);
 
                     if (w1 < basesize.Width && h1 < basesize.Height)
                     {
@@ -594,133 +471,57 @@ namespace OSD
                         }
                         else
                         {
-                            gr[panel_number].DrawImage(chars[ch], (this.x[panel_number] + r[panel_number] * 12) % screen[panel_number].Width, (this.y[panel_number] + d[panel_number] * 18), 12, 18);
+                            gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
+							
+//							testDraw(chars[ch]);
                         }
 
                         usedPostion[w1][h1] = processingpanel;
                     }
                 }
                 catch { System.Diagnostics.Debug.WriteLine("printf exception"); }
-                r[panel_number]++;
+                print_row++;
             }
 
         }
 
 
-        string getMouseOverItem(int x, int y)
-        {
-            int ansW, ansH;
+        
 
-            getCharLoc(x, y, out ansW, out ansH);
-
-            if (usedPostion[ansW][ansH] != null && usedPostion[ansW][ansH] != "")
-            {
-                TreeNode[] tnArray = LIST_items.Nodes.Find(usedPostion[ansW][ansH], true);
-                LIST_items.Focus();
-                LIST_items.SelectedNode = tnArray[0];
-                //LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
-                return usedPostion[ansW][ansH];
-            }
-
-            return "";
-        }
-
-        string getMouseOverItem2(int x, int y)
-        {
-            int ansW, ansH;
-
-            getCharLoc2(x, y, out ansW, out ansH);
-
-            if (usedPostion[ansW][ansH] != null && usedPostion[ansW][ansH] != "")
-            {
-                TreeNode[] tnArray = LIST_items2.Nodes.Find(usedPostion[ansW][ansH], true);
-                LIST_items2.Focus();
-                LIST_items2.SelectedNode = tnArray[0];
-                //LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
-                return usedPostion[ansW][ansH];
-            }
-
-            return "";
-        }
-
-        void getCharLoc(int x, int y, out int xpos, out int ypos)
-        {
-
-            x = Constrain(x, 0, pictureBox1.Width - 1);
-            y = Constrain(y, 0, pictureBox1.Height - 1);
-
-            float scaleW = pictureBox1.Width / (float)screen[panel_number].Width;
-            float scaleH = pictureBox1.Height / (float)screen[panel_number].Height;
-
-            int ansW = (int)((x / scaleW / 12) % 30);
-            int ansH = 0;
-            if (CHK_pal.Checked)
-            {
-                ansH = (int)((y / scaleH / 18) % 16);
-            }
-            else
-            {
-                ansH = (int)((y / scaleH / 18) % 13);
-            }
-
-            xpos = Constrain(ansW, 0, 30 - 1);
-            ypos = Constrain(ansH, 0, 16 - 1);
-        }
-
-        void getCharLoc2(int x, int y, out int xpos, out int ypos)
-        {
-
-            x = Constrain(x, 0, pictureBox2.Width - 1);
-            y = Constrain(y, 0, pictureBox2.Height - 1);
-
-            float scaleW = pictureBox2.Width / (float)screen[panel_number].Width;
-            float scaleH = pictureBox2.Height / (float)screen[panel_number].Height;
-
-            int ansW = (int)((x / scaleW / 12) % 30);
-            int ansH = 0;
-            if (CHK_pal.Checked)
-            {
-                ansH = (int)((y / scaleH / 18) % 16);
-            }
-            else
-            {
-                ansH = (int)((y / scaleH / 18) % 13);
-            }
-
-            xpos = Constrain(ansW, 0, 30 - 1);
-            ypos = Constrain(ansH, 0, 16 - 1);
-        }
+        public bool pal_checked(){
+			return CHK_pal.Checked;
+		}
+        
 
         public void printf_P(string format, params object[] args)
         {
             printf(format, args);
         }
 
-        public void closePanel()
-        {
-            x[panel_number] = 0;
-            y[panel_number] = 0;
-        }
+        
         // draw image and characters overlay
-        void osdDraw1()
+        public void osdDraw(int k)
         {
-            panel_number = 0;
+			if(k<0 || k>=npanel) return;
+			
+            panel_number = k;
             if (startup)
                 return;
 
             for (int b = 0; b < usedPostion.Length; b++)
             {
-                usedPostion[b] = new string[16];
+                usedPostion[b] = new string[SCREEN_H];
             }
+			
+			System.Windows.Forms.PictureBox pb = scr[k].pictureBox;
+            image = new Bitmap(pb.Width, pb.Height);
 
-            image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            float scaleW = pb.Width / (float)screen.Width;
+            float scaleH = pb.Height / (float)screen.Height;
 
-            float scaleW = pictureBox1.Width / (float)screen[panel_number].Width;
-            float scaleH = pictureBox1.Height / (float)screen[panel_number].Height;
+            screen = new Bitmap(screen.Width, screen.Height);
 
-            screen[panel_number] = new Bitmap(screen[panel_number].Width, screen[panel_number].Height);
-
-            gr[panel_number] = Graphics.FromImage(screen[panel_number]);
+            gr = Graphics.FromImage(screen);
 
             image = new Bitmap(image.Width, image.Height);
 
@@ -728,19 +529,19 @@ namespace OSD
 
             try
             {
-                grfull.DrawImage(bgpicture, 0, 0, pictureBox1.Width, pictureBox1.Height);
+                grfull.DrawImage(bgpicture, 0, 0, pb.Width, pb.Height);
             }
             catch { }
 
             //Drawing the grid
             if (checkBox1.Checked)
             {
-                for (int b = 1; b < 16; b++)
+                for (int b = 1; b < SCREEN_H; b++)
                 {
-                    for (int a = 1; a < 30; a++)
+                    for (int a = 1; a < SCREEN_W; a++)
                     {
-                        grfull.DrawLine(new Pen(Color.Gray, 1), a * 12 * scaleW, 0, a * 12 * scaleW, pictureBox1.Height);
-                        grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * 18 * scaleH, pictureBox1.Width, b * 18 * scaleH);
+                        grfull.DrawLine(new Pen(Color.Gray, 1), a * CHAR_W * scaleW, 0, a * CHAR_W * scaleW, pb.Height);
+                        grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * CHAR_H * scaleH, pb.Width, b * CHAR_H * scaleH);
                     }
                 }
             }
@@ -750,7 +551,7 @@ namespace OSD
 
             List<string> list = new List<string>();
 
-            foreach (TreeNode tn in LIST_items.Nodes)
+            foreach (TreeNode tn in this.scr[k].LIST_items.Nodes)
             {
                 foreach (TreeNode tn2 in tn.Nodes)
                 {
@@ -765,7 +566,7 @@ namespace OSD
 
             foreach (string it in list)
             {
-                foreach (var thing in panelItems)
+                foreach (var thing in this.scr[k].panelItems)
                 {
                     selectedrectangle = false;
                     if (thing != null)
@@ -794,119 +595,13 @@ namespace OSD
                 }
             }
 
-            grfull.DrawImage(screen[panel_number], 0, 0, image.Width, image.Height);
+            grfull.DrawImage(screen, 0, 0, image.Width, image.Height);
 
-            pictureBox1.Image = image;
+            pb.Image = image;
+			
         }
 
-        // draw image and characters overlay for second panel
-        void osdDraw2()
-        {
-            panel_number = 1;
-            if (startup)
-                return;
-
-            for (int b = 0; b < usedPostion.Length; b++)
-            {
-                usedPostion[b] = new string[16];
-            }
-
-            image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
-
-            float scaleW = pictureBox2.Width / (float)screen[panel_number].Width;
-            float scaleH = pictureBox2.Height / (float)screen[panel_number].Height;
-
-            screen[panel_number] = new Bitmap(screen[panel_number].Width, screen[panel_number].Height);
-
-            gr[panel_number] = Graphics.FromImage(screen[panel_number]);
-
-            image = new Bitmap(image.Width, image.Height);
-
-            Graphics grfull = Graphics.FromImage(image);
-
-            try
-            {
-                grfull.DrawImage(bgpicture, 0, 0, pictureBox2.Width, pictureBox2.Height);
-            }
-            catch { }
-
-            if (checkBox1.Checked)
-            {
-                for (int b = 1; b < 16; b++)
-                {
-                    for (int a = 1; a < 30; a++)
-                    {
-                        grfull.DrawLine(new Pen(Color.Gray, 1), a * 12 * scaleW, 0, a * 12 * scaleW, pictureBox2.Height);
-                        grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * 18 * scaleH, pictureBox2.Width, b * 18 * scaleH);
-                    }
-                }
-            }
-
-            pan.setHeadingPatern();
-            pan.setBatteryPic();
-
-            List<string> list = new List<string>();
-
-            foreach (TreeNode tn in LIST_items2.Nodes)
-            {
-                foreach (TreeNode tn2 in tn.Nodes)
-                {
-                    if (tn2.Checked)
-                        list.Add(tn2.Text);
-                }
-                if (tn.Checked)
-                    list.Add(tn.Text);
-            }
-
-            list.Reverse();
-
-            foreach (string it in list)
-            {
-                foreach (var thing in panelItems2)
-                {
-                    selectedrectangle = false;
-                    if (thing != null)
-                    {
-                        if (thing.Item1 == it)
-                        {
-                            if (thing.Item1 == currentlyselected[1])
-                            {
-                                selectedrectangle = true;
-                            }
-
-                            processingpanel = thing.Item1;
-
-                            // ntsc and below the middle line
-                            if (thing.Item4 >= getCenter() && !CHK_pal.Checked)
-                            {
-                                thing.Item2(thing.Item3, thing.Item4 - 3);
-                            }
-                            else // pal and no change
-                            {
-                                thing.Item2(thing.Item3, thing.Item4);
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            grfull.DrawImage(screen[panel_number], 0, 0, image.Width, image.Height);
-
-            pictureBox2.Image = image;
-        }
-
-
-        int Constrain(double value, double min, double max)
-        {
-            if (value < min)
-                return (int)min;
-            if (value > max)
-                return (int)max;
-
-            return (int)value;
-        }
-
+        
         public enum ModelType
         {
             Plane = 0,
@@ -924,8 +619,8 @@ namespace OSD
                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r793";
-            currentVersion = strVersion + "r793";
+            this.Text = this.Text + " " + strVersion + " - Pre-Release r806 DV";
+            currentVersion = strVersion + "r806 DV";
 
             CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -934,74 +629,55 @@ namespace OSD
 
             xmlconfig(false);
 
-            CheckForUpdates();
-
-            osdDraw1();
-            osdDraw2();
+ 		   	osdDraw(panel_number);
+            
         }
 
 
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string item = ((CheckedListBox)sender).SelectedItem.ToString();
-
-            currentlyselected[0] = item;
-
-            osdDraw1();
-
-            foreach (var thing in panelItems)
-            {
-                if (thing != null && thing.Item1 == item)
-                {
-                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
-                    NUM_Y.Value = Constrain(thing.Item4, 0, 16 - 1);
-                }
-            }
-        }
-
-        private void checkedListBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string item = ((CheckedListBox)sender).SelectedItem.ToString();
-
-            currentlyselected[1] = item;
-
-            osdDraw2();
-
-            foreach (var thing in panelItems2)
-            {
-                if (thing != null && thing.Item1 == item)
-                {
-                    NUM_X2.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
-                    NUM_Y2.Value = Constrain(thing.Item4, 0, 16 - 1);
-                }
-            }
-        }
+//        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+//        {
+//            string item = ((CheckedListBox)sender).SelectedItem.ToString();
+//
+//            currentlyselected[0] = item;
+//
+//            osdDraw(this.panel_number);
+//
+//            foreach (var thing in this.scr[this.panel_number].panelItems)
+//            {
+//                if (thing != null && thing.Item1 == item)
+//                {
+//                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
+//                    NUM_Y.Value = Constrain(thing.Item4, 0, SCREEN_H - 1);
+//                }
+//            }
+//        }
+//
+// 
 
 
-
-        private void checkedListBox1_SelectedValueChanged(object sender, EventArgs e)
-        {
-            if (((CheckedListBox)sender).Text == "Horizon")
-            {
-                //groupBox1.Enabled = false;
-            }
-            else
-            {
-                //groupBox1.Enabled = true;
-            }
-        }
-
-        private void checkedListBox2_SelectedValueChanged(object sender, EventArgs e)
-        {
-            if (((CheckedListBox)sender).Text == "Horizon")
-            {
-                //groupBox1.Enabled = false;
-            }
-            else
-            {
-                //groupBox1.Enabled = true;
-            }
-        }
+//        private void checkedListBox1_SelectedValueChanged(object sender, EventArgs e)
+//        {
+//            if (((CheckedListBox)sender).Text == "Horizon")
+//            {
+//                //groupBox1.Enabled = false;
+//            }
+//            else
+//            {
+//                //groupBox1.Enabled = true;
+//            }
+//        }
+//
+//        private void checkedListBox2_SelectedValueChanged(object sender, EventArgs e)
+//        {
+//            if (((CheckedListBox)sender).Text == "Horizon")
+//            {
+//                //groupBox1.Enabled = false;
+//            }
+//            else
+//            {
+//                //groupBox1.Enabled = true;
+//            }
+//        }
 
 
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -1023,116 +699,12 @@ namespace OSD
 
             // add a delay to this so it runs after the control value has been defined.
             if (this.IsHandleCreated)
-                this.BeginInvoke((MethodInvoker)delegate { osdDraw1(); });
+                this.BeginInvoke((MethodInvoker)delegate { osdDraw(panel_number); });
         }
 
-        private void checkedListBox2_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
-            //if (((CheckedListBox)sender).SelectedItem != null)
-            //{
-            //  if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
-            //{
-            //  int index = LIST_items2.Items.IndexOf("Center");
-            //LIST_items2.SetItemChecked(index, false);
-            //}
-            //else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
-            // {
-            //   int index = LIST_items2.Items.IndexOf("Horizon");
-            //  LIST_items2.SetItemChecked(index, false);
-            //}
-        }
-
-        // add a delay to this so it runs after the control value has been defined.
-        //if (this.IsHandleCreated)
-        //  this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
-        //   }
+       
 
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            string item;
-            try
-            {
-                item = currentlyselected[0];
-                //item = LIST_items.SelectedItem.ToString();
-            }
-            catch { return; }
-
-            for (int a = 0; a < panelItems.Length; a++)
-            {
-                if (panelItems[a] != null && panelItems[a].Item1 == item)
-                {
-                    panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, (int)NUM_X.Value, panelItems[a].Item4, panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
-                }
-            }
-
-            osdDraw1();
-        }
-
-
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-            string item;
-            try
-            {
-                item = currentlyselected[0];
-                //item = LIST_items.SelectedItem.ToString();
-            }
-            catch { return; }
-
-            for (int a = 0; a < panelItems.Length; a++)
-            {
-                if (panelItems[a] != null && panelItems[a].Item1 == item)
-                {
-                    panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, panelItems[a].Item3, (int)NUM_Y.Value, panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
-
-                }
-            }
-
-            osdDraw1();
-        }
-
-        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
-        {
-            string item;
-            try
-            {
-                item = currentlyselected[1];
-            }
-            catch { return; }
-
-            for (int a = 0; a < panelItems2.Length; a++)
-            {
-                if (panelItems2[a] != null && panelItems2[a].Item1 == item)
-                {
-                    panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, (int)NUM_X2.Value, panelItems2[a].Item4, panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
-                }
-            }
-
-            osdDraw2();
-        }
-
-        private void numericUpDown4_ValueChanged(object sender, EventArgs e)
-        {
-            string item;
-            try
-            {
-                item = currentlyselected[1];
-            }
-            catch { return; }
-
-            for (int a = 0; a < panelItems2.Length; a++)
-            {
-                if (panelItems2[a] != null && panelItems2[a].Item1 == item)
-                {
-                    panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, panelItems2[a].Item3, (int)NUM_Y2.Value, panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
-
-                }
-            }
-
-            osdDraw2();
-        }
         //Write data to MinimOSD EPPROM
         private void BUT_WriteOSD_Click(object sender, EventArgs e)
         {
@@ -1144,7 +716,7 @@ namespace OSD
             {
                 //First Panel 
                 List<TreeNode> AllNodes = new List<TreeNode>();
-                foreach (TreeNode tn in LIST_items.Nodes)
+                foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes)
                 {
                     foreach (TreeNode tn2 in tn.Nodes)
                     {
@@ -1156,11 +728,11 @@ namespace OSD
                 foreach (TreeNode tn in AllNodes)
                 {
                     string str = tn.Text;
-                    foreach (var tuple in this.panelItems)
+                    foreach (var tuple in this.scr[this.panel_number].panelItems)
                     {
                         if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                         {
-                            TreeNode[] trArray = LIST_items.Nodes.Find(str, true);
+                            TreeNode[] trArray = this.scr[this.panel_number].LIST_items.Nodes.Find(str, true);
                             eeprom[tuple.Item5] = (byte)(trArray[0].Checked ? 1 : 0);
                             eeprom[tuple.Item6] = (byte)tuple.Item3; // x
                             eeprom[tuple.Item7] = (byte)tuple.Item4; // y
@@ -1172,34 +744,6 @@ namespace OSD
             }
             else if (current.Text == "Panel 2")
             {
-                //Second Panel 
-                List<TreeNode> AllNodes = new List<TreeNode>();
-                foreach (TreeNode tn in LIST_items2.Nodes)
-                {
-                    foreach (TreeNode tn2 in tn.Nodes)
-                    {
-                        AllNodes.Add(tn2);
-                    }
-                    AllNodes.Add(tn);
-                }
-
-                foreach (TreeNode tn in AllNodes)
-                {
-
-                    string str = tn.Text;
-                    foreach (var tuple in this.panelItems2)
-                    {
-                        if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
-                        {
-                            TreeNode[] trArray = LIST_items2.Nodes.Find(str, true);
-                            eeprom[tuple.Item5 + OffsetBITpanel] = (byte)(trArray[0].Checked ? 1 : 0);
-                            eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
-                            eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
-
-                            //Console.WriteLine(str);
-                        }
-                    }
-                }
             }
             else if (current.Text == "Config")
             {
@@ -1343,9 +887,11 @@ namespace OSD
         {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
+
+		  for(int k=0;k<npanel;k++) {
             //First Panel 
             List<TreeNode> AllNodes = new List<TreeNode>();
-            foreach (TreeNode tn in LIST_items.Nodes)
+            foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes)
             {
                 foreach (TreeNode tn2 in tn.Nodes)
                 {
@@ -1357,7 +903,7 @@ namespace OSD
             foreach (TreeNode tn in AllNodes)
             {
                 string str = tn.Text;
-                foreach (var tuple in this.panelItems_default)
+                foreach (var tuple in this.scr[this.panel_number].panelItems_default)
                 {
                     if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
                     {
@@ -1371,34 +917,7 @@ namespace OSD
                     }
                 }
             }
-            //Second Panel 
-            AllNodes = new List<TreeNode>();
-            foreach (TreeNode tn in LIST_items2.Nodes)
-            {
-                foreach (TreeNode tn2 in tn.Nodes)
-                {
-                    AllNodes.Add(tn2);
-                }
-                AllNodes.Add(tn);
-            }
-
-            foreach (TreeNode tn in AllNodes)
-            {
-                string str = tn.Text;
-                foreach (var tuple in this.panelItems2_default)
-                {
-                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
-                    {
-                        if (str == "Center") eeprom[tuple.Item5] = 0;
-                        else if (str == "Tune") eeprom[tuple.Item5] = 0;
-                        else if (str == "Channel Raw") eeprom[tuple.Item5] = 0;
-                        else eeprom[tuple.Item5] = 1;
-
-                        eeprom[tuple.Item6 + OffsetBITpanel] = (byte)tuple.Item3; // x
-                        eeprom[tuple.Item7 + OffsetBITpanel] = (byte)tuple.Item4; // y
-                    }
-                }
-            }
+		  }
             //Setup configuration panel
             eeprom[SIGN_AS_ON_ADDR] = pan.sign_air_speed;
             eeprom[SIGN_GS_ON_ADDR] = pan.sign_ground_speed;
@@ -1501,9 +1020,9 @@ namespace OSD
         // EEPROM Storage addresses
         const int OffsetBITpanel = 250;
         // First of 8 panels
-        //        const int panCenter_en_ADDR = 0;
-        //        const int panCenter_x_ADDR = 2;
-        //        const int panCenter_y_ADDR = 4;
+        const int panCenter_en_ADDR = 0;
+        const int panCenter_x_ADDR = 2;
+        const int panCenter_y_ADDR = 4;
         const int panPitch_en_ADDR = 6;
         const int panPitch_x_ADDR = 8;
         const int panPitch_y_ADDR = 10;
@@ -1542,9 +1061,9 @@ namespace OSD
         const int panHomeDis_en_ADDR = 72;
         const int panHomeDis_x_ADDR = 74;
         const int panHomeDis_y_ADDR = 76;
-        //        const int panWPDir_en_ADDR = 80;
-        //        const int panWPDir_x_ADDR = 82;
-        //        const int panWPDir_y_ADDR = 84;
+        const int panWPDir_en_ADDR = 80;
+        const int panWPDir_x_ADDR = 82;
+        const int panWPDir_y_ADDR = 84;
         const int panWPDis_en_ADDR = 86;
         const int panWPDis_x_ADDR = 88;
         const int panWPDis_y_ADDR = 90;
@@ -1617,7 +1136,11 @@ namespace OSD
         const int panDistance_en_ADDR = 224;
         const int panDistance_x_ADDR = 226;
         const int panDistance_y_ADDR = 228;
-
+		const int panILS_en_ADDR = 230;
+        const int panILS_x_ADDR = 232;
+        const int panILS_y_ADDR = 234;
+        
+		
         //
         const int SIGN_MSL_ON_ADDR = 876;
         const int SIGN_HA_ON_ADDR = 878;
@@ -1659,16 +1182,16 @@ namespace OSD
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            osdDraw1();
-            osdDraw2();
+          	osdDraw(panel_number);  
         }
 
         private void OSD_Resize(object sender, EventArgs e)
         {
+			
             try
             {
-                osdDraw1();
-                osdDraw2();
+                osdDraw(panel_number);
+             
             }
             catch { }
         }
@@ -1846,40 +1369,25 @@ namespace OSD
             if (!fail)
             {
 
-                for (int a = 0; a < panelItems.Length; a++)
+			for(int k=0;k<npanel;k++){
+                for (int a = 0; a < this.scr[k].panelItems.Length; a++)
                 {
-                    if (panelItems[a] != null)
+                    if (this.scr[k].panelItems[a] != null)
                     {
-                        if (panelItems[a].Item5 >= 0)
+						var pi=this.scr[k].panelItems[a];
+                        if (pi.Item5 >= 0)
                         {
-                            TreeNode[] tnArray = LIST_items.Nodes.Find(panelItems[a].Item1, true);
+                            TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(pi.Item1, true);
                             if (tnArray.Length > 0)
-                                tnArray[0].Checked = (eeprom[panelItems[a].Item5] == 1);
+                                tnArray[0].Checked = (eeprom[pi.Item5] == 1);
 
                             //LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
                         }
-                        if (panelItems[a].Item7 >= 0 || panelItems[a].Item6 >= 0)
-                            panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, eeprom[panelItems[a].Item6], eeprom[panelItems[a].Item7], panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
+                        if (pi.Item7 >= 0 || pi.Item6 >= 0)
+                            this.scr[k].panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(pi.Item1, pi.Item2, eeprom[pi.Item6], eeprom[pi.Item7], pi.Item5, pi.Item6, pi.Item7);
                     }
                 }
-                //Second panel
-                for (int a = 0; a < panelItems2.Length; a++)
-                {
-                    if (panelItems2[a] != null)
-                    {
-                        if (panelItems2[a].Item5 >= 0)
-                        {
-                            TreeNode[] tnArray = LIST_items2.Nodes.Find(panelItems2[a].Item1, true);
-                            if (tnArray.Length > 0)
-                                tnArray[0].Checked = (eeprom[panelItems2[a].Item5 + OffsetBITpanel] == 1);
-
-                            //LIST_items2.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
-                        }
-
-                        if (panelItems2[a].Item7 >= 0 || panelItems2[a].Item6 >= 0)
-                            panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, eeprom[panelItems2[a].Item6 + OffsetBITpanel], eeprom[panelItems2[a].Item7 + OffsetBITpanel], panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
-                    }
-                }
+			}
             }
 
             //Setup configuration panel
@@ -2027,9 +1535,10 @@ namespace OSD
             this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
             this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+			
 
-            osdDraw1();
-            osdDraw2();
+        	osdDraw(panel_number);
+            
 
             //if (!fail)
             //    MessageBox.Show("Done!");
@@ -2125,8 +1634,9 @@ namespace OSD
         private void CHK_pal_CheckedChanged(object sender, EventArgs e)
         {
             changeToPal(CHK_pal.Checked);
-            osdDraw1();
-            osdDraw2();
+			
+            osdDraw(panel_number);
+            
         }
 
         private void pALToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
@@ -2153,27 +1663,19 @@ namespace OSD
                     //Write
                     {
                         //Panel 1
-                        sw.WriteLine("{0}", "Panel 1");
-                        foreach (var item in panelItems)
-                        {
-                            if (item != null)
-                            {
-                                TreeNode[] tnArray = LIST_items.Nodes.Find(item.Item1, true);
-                                if (tnArray.Length > 0)
-                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
-                            }
-                        }
-                        //Panel 2
-                        sw.WriteLine("{0}", "Panel 2");
-                        foreach (var item in panelItems2)
-                        {
-                            if (item != null)
-                            {
-                                TreeNode[] tnArray = LIST_items2.Nodes.Find(item.Item1, true);
-                                if (tnArray.Length > 0)
-                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
-                            }
-                        }
+						for(int k=0;k<npanel;k++) {
+                        	sw.WriteLine("{0}", "Panel "+k);
+                        	foreach (var item in this.scr[k].panelItems)
+                        	{
+	                            if (item != null)
+                            	{
+	                                TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(item.Item1, true);
+                                	if (tnArray.Length > 0)
+	                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
+                            	}
+                        	}
+						}
+
                         //Config 
                         sw.WriteLine("{0}", "Configuration");
                         sw.WriteLine("{0}\t{1}", "Model Type", (byte)(ModelType)cbxModelType.SelectedItem); //We're just saving what's in the config screen, not the eeprom model type
@@ -2220,54 +1722,39 @@ namespace OSD
                 {
                     using (StreamReader sr = new StreamReader(ofd.OpenFile()))
                     {
-                        //Panel 1
-                        string stringh = sr.ReadLine(); //
-                        //while (!sr.EndOfStream)
-                        for (int i = 0; i < nosdfunctions; i++)
-                        {
-                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            for (int a = 0; a < panelItems.Length; a++)
-                            {
-                                if (panelItems[a] != null && panelItems[a].Item1 == strings[0])
-                                {
-                                    // incase there is an invalid line number or to shore
-                                    try
-                                    {
-                                        panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems[a].Item1, panelItems[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems[a].Item5, panelItems[a].Item6, panelItems[a].Item7);
-
-                                        TreeNode[] tnArray = LIST_items.Nodes.Find(panelItems[a].Item1, true);
-                                        if (tnArray.Length > 0)
-                                            tnArray[0].Checked = (strings[3] == "True");
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                        //Panel 2
-                        stringh = sr.ReadLine(); //
-                        //while (!sr.EndOfStream)
-                        for (int i = 0; i < nosdfunctions - 1; i++) //nosdfunctions - 1 -> because panel 2 as no warning panel setting
-                        {
-                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            for (int a = 0; a < panelItems.Length; a++)
-                            {
-                                if (panelItems2[a] != null && panelItems2[a].Item1 == strings[0])
-                                {
-                                    // incase there is an invalid line number or to shore
-                                    try
-                                    {
-                                        panelItems2[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(panelItems2[a].Item1, panelItems2[a].Item2, int.Parse(strings[1]), int.Parse(strings[2]), panelItems2[a].Item5, panelItems2[a].Item6, panelItems2[a].Item7);
-
-                                        TreeNode[] tnArray = LIST_items2.Nodes.Find(panelItems2[a].Item1, true);
-                                        if (tnArray.Length > 0)
-                                            tnArray[0].Checked = (strings[3] == "True");
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                        //Config 
-                        stringh = sr.ReadLine(); //
+						while(true) {
+                        	//Panel 1
+                        	//string stringh = sr.ReadLine(); //
+							string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
+							int k=0;
+						
+							if(hdr[0]!="Panel") break;
+							
+							k=int.Parse(hdr[1]);
+							//while (!sr.EndOfStream)
+                        	for (int i = 0; i < nosdfunctions; i++)
+                        	{
+	                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            	for (int a = 0; a < this.scr[k].panelItems.Length; a++)
+                            	{
+	                                if (this.scr[k].panelItems[a] != null && this.scr[k].panelItems[a].Item1 == strings[0])
+                                	{
+										var pi=this.scr[k].panelItems[a];
+	                                    // incase there is an invalid line number or to shore
+                                    	try
+                                    	{
+	                                        this.scr[k].panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(pi.Item1, pi.Item2, int.Parse(strings[1]), int.Parse(strings[2]), pi.Item5, pi.Item6, pi.Item7);
+	
+                                        	TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(this.scr[k].panelItems[a].Item1, true);
+                                        	if (tnArray.Length > 0)
+	                                            tnArray[0].Checked = (strings[3] == "True");
+                                    	}
+                                    	catch { }
+                                	}
+                            	}
+                        	}
+						}
+//                        stringh = sr.ReadLine(); //config
                         while (!sr.EndOfStream)
                         {
                             string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
@@ -2384,9 +1871,9 @@ namespace OSD
                     updatingRSSI = false;
                 }
             }
-
-            osdDraw1();
-            osdDraw2();
+			
+           	osdDraw(panel_number);
+            
         }
 
         private void loadDefaultsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2399,79 +1886,7 @@ namespace OSD
             Application.Exit();
         }
 
-        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
-        {
-            getMouseOverItem(e.X, e.Y);
-
-            mousedown[0] = false;
-        }
-
-        private void pictureBox2_MouseUp(object sender, MouseEventArgs e)
-        {
-            getMouseOverItem2(e.X, e.Y);
-
-            mousedown[1] = false;
-        }
-
-        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown[0] == true)
-            {
-                int ansW, ansH;
-                getCharLoc(e.X, e.Y, out ansW, out ansH);
-                if (ansH >= getCenter() && !CHK_pal.Checked)
-                {
-                    ansH += 3;
-                }
-
-                NUM_X.Value = Constrain(ansW, 0, basesize.Width - 1);
-                NUM_Y.Value = Constrain(ansH, 0, 16 - 1);
-
-                pictureBox1.Focus();
-            }
-            else
-            {
-                mousedown[0] = false;
-            }
-        }
-
-        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && mousedown[1] == true)
-            {
-                int ansW, ansH;
-                getCharLoc2(e.X, e.Y, out ansW, out ansH);
-                if (ansH >= getCenter() && !CHK_pal.Checked)
-                {
-                    ansH += 3;
-                }
-
-                NUM_X2.Value = Constrain(ansW, 0, basesize.Width - 1);
-                NUM_Y2.Value = Constrain(ansH, 0, 16 - 1);
-
-                pictureBox2.Focus();
-            }
-            else
-            {
-                mousedown[1] = false;
-            }
-        }
-
-        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-            currentlyselected[0] = getMouseOverItem(e.X, e.Y);
-
-            mousedown[0] = true;
-        }
-
-        private void pictureBox2_MouseDown(object sender, MouseEventArgs e)
-        {
-            currentlyselected[1] = getMouseOverItem2(e.X, e.Y);
-
-            mousedown[1] = true;
-        }
-
-
+        
 
         private void updateFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2601,8 +2016,8 @@ namespace OSD
                 }
                 catch { MessageBox.Show("Bad Image"); }
                 customImage = true;
-                osdDraw1();
-                osdDraw2();
+				osdDraw(panel_number);
+                
             }
         }
 
@@ -2645,7 +2060,7 @@ namespace OSD
                         {
                             if (frameIndex >= 20)
                             {
-                                string a = "";
+                                //string a = "";
                             }
 
                             if (frameIndex < 20)
@@ -2728,9 +2143,9 @@ namespace OSD
             xmlconfig(true);
         }
 
-        private String arduinoIDEPath = "Arduino-1.0.2";
-        private String planeSketchPath = "ArduCAM_OSD_Plane";
-        private String copterSketchPath = "ArduCAM_OSD_Copter";
+        private String arduinoIDEPath = "Arduino-1.6.1";
+        private String planeSketchPath = "ArduCAM_OSD";
+        private String copterSketchPath = "ArduCAM_OSD";
         private bool autoUpdate = false;
         private bool checkForUpdates = true;
 
@@ -2788,7 +2203,7 @@ namespace OSD
                                         CMB_ComPort.Text = temp;
                                         break;
                                     case "Pal":
-                                        string temp2 = xmlreader.ReadString();
+                                        //string temp2 = xmlreader.ReadString();
                                         //CHK_pal.Checked = (temp2 == "True");
                                         break;
                                     case "ArduinoIDEPath":
@@ -2935,7 +2350,7 @@ namespace OSD
                         Console.WriteLine("Waiting...");
                         timeout++;
 
-                        if (timeout > 6)
+                        if (timeout > 10)
                         {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
@@ -3113,8 +2528,9 @@ namespace OSD
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
             pan.do_converts();
-            osdDraw1();
-            osdDraw2();
+			
+ 	        osdDraw(panel_number);
+            
         }
 
         private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
@@ -3175,8 +2591,9 @@ namespace OSD
             pan.callsign_str = pan.callsign_str.ToLower(new CultureInfo("en-US", false));
 
             CALLSIGNmaskedText.Text = pan.callsign_str;
-            osdDraw1();
-            osdDraw2();
+			
+            osdDraw(panel_number);
+            
         }
 
         private void BRIGHTNESScomboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -3204,235 +2621,14 @@ namespace OSD
         {
             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
             //Refresh battery percent presentation
-            osdDraw1();
-            osdDraw2();
+			
+            osdDraw(panel_number);
+            
         }
 
-        //Controls if it's a populate process or user input
-        private Boolean AutomaticCheck = true;
-        private void rbtSortAlphabetic_CheckedChanged(object sender, EventArgs e)
-        {
-            AutomaticCheck = true;
-            List<TreeNode> allNodes = new List<TreeNode>();
-            foreach (TreeNode nd1 in LIST_items.Nodes)
-            {
-                foreach (TreeNode nd2 in nd1.Nodes)
-                {
-                    allNodes.Add(nd2);
-                }
-                allNodes.Add(nd1);
-            }
-            LIST_items.Nodes.Clear();
-            LIST_items.CheckBoxes = true;
-            if (rbtSortAlphabetic.Checked)
-            {
-                List<string> instruments = new List<string>();
-                foreach (TreeNode node in allNodes)
-                {
-                    if ((node.Text != "Attitude") &&
-                        (node.Text != "General") &&
-                        (node.Text != "Energy") &&
-                        (node.Text != "Location") &&
-                        (node.Text != "Speed"))
-                    {
-                        LIST_items.Nodes.Add(node);
-                    }
-                }
-                LIST_items.Sort();
-            }
-            else
-            {
-                LIST_items.Nodes.Add("Attitude", "Attitude");
-                LIST_items.Nodes.Add("General", "General");
-                LIST_items.Nodes.Add("Energy", "Energy");
-                LIST_items.Nodes.Add("Location", "Location");
-                LIST_items.Nodes.Add("Speed", "Speed");
 
-                foreach (TreeNode node in allNodes)
-                {
-                    if ((node.Text == "Horizon") ||
-                        (node.Text == "Pitch") ||
-                        (node.Text == "Roll"))
-                        LIST_items.Nodes["Attitude"].Nodes.Add(node);
 
-                    if ((node.Text == "Call Sign") ||
-                        (node.Text == "RSSI") ||
-                        (node.Text == "Flight Mode") ||
-                        (node.Text == "Temperature") ||
-                        (node.Text == "Throttle") ||
-                        (node.Text == "Time") ||
-                        (node.Text == "Warnings"))
-                        LIST_items.Nodes["General"].Nodes.Add(node);
-
-                    if ((node.Text == "Battery A") ||
-                        (node.Text == "Battery Percent") ||
-                        (node.Text == "Current") ||
-                        (node.Text == "Efficiency") ||
-                        (node.Text == "Tune"))
-                        LIST_items.Nodes["Energy"].Nodes.Add(node);
-
-                    if ((node.Text == "Altitude") ||
-                        (node.Text == "GPS Coord") ||
-                        (node.Text == "Heading") ||
-                        (node.Text == "Heading Rose") ||
-                        (node.Text == "Real heading") ||
-                        (node.Text == "Home Altitude") ||
-                        (node.Text == "Home Direction") ||
-                        (node.Text == "Home Distance") ||
-                        (node.Text == "Trip Distance") ||
-                        (node.Text == "Visible Sats") ||
-                        (node.Text == "WP Distance"))
-                        LIST_items.Nodes["Location"].Nodes.Add(node);
-
-                    if ((node.Text == "Air Speed") ||
-                        (node.Text == "Vertical Speed") ||
-                        (node.Text == "Velocity") ||
-                        (node.Text == "Wind Speed"))
-                        LIST_items.Nodes["Speed"].Nodes.Add(node);
-                }
-            }
-
-            LIST_items.ExpandAll();
-            AutomaticCheck = false;
-        }
-
-        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            if (!AutomaticCheck)
-                foreach (TreeNode node in e.Node.Nodes)
-                    node.Checked = e.Node.Checked;
-            if (this.IsHandleCreated)
-                this.BeginInvoke((MethodInvoker)delegate { osdDraw1(); });
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            //string item = ((CheckedListBox)sender).SelectedItem.ToString();
-
-            currentlyselected[0] = e.Node.Text;
-            osdDraw1();
-
-            foreach (var thing in panelItems)
-            {
-                if (thing != null && thing.Item1 == e.Node.Text)
-                {
-                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
-                    NUM_Y.Value = Constrain(thing.Item4, 0, 16 - 1);
-                }
-            }
-        }
-
-        private void rbtSortAlphabetic2_CheckedChanged(object sender, EventArgs e)
-        {
-            AutomaticCheck = true;
-            List<TreeNode> allNodes = new List<TreeNode>();
-            foreach (TreeNode nd1 in LIST_items2.Nodes)
-            {
-                foreach (TreeNode nd2 in nd1.Nodes)
-                {
-                    allNodes.Add(nd2);
-                }
-                allNodes.Add(nd1);
-            }
-            LIST_items2.Nodes.Clear();
-            LIST_items2.CheckBoxes = true;
-            if (rbtSortAlphabetic2.Checked)
-            {
-                List<string> instruments = new List<string>();
-                foreach (TreeNode node in allNodes)
-                {
-                    if ((node.Text != "Attitude") &&
-                        (node.Text != "General") &&
-                        (node.Text != "Energy") &&
-                        (node.Text != "Location") &&
-                        (node.Text != "Speed"))
-                    {
-                        LIST_items2.Nodes.Add(node);
-                    }
-                }
-                LIST_items2.Sort();
-            }
-            else
-            {
-                LIST_items2.Nodes.Add("Attitude", "Attitude");
-                LIST_items2.Nodes.Add("General", "General");
-                LIST_items2.Nodes.Add("Energy", "Energy");
-                LIST_items2.Nodes.Add("Location", "Location");
-                LIST_items2.Nodes.Add("Speed", "Speed");
-
-                foreach (TreeNode node in allNodes)
-                {
-                    if ((node.Text == "Horizon") ||
-                        (node.Text == "Pitch") ||
-                        (node.Text == "Roll"))
-                        LIST_items2.Nodes["Attitude"].Nodes.Add(node);
-
-                    if ((node.Text == "Call Sign") ||
-                        (node.Text == "RSSI") ||
-                        (node.Text == "Flight Mode") ||
-                        (node.Text == "Temperature") ||
-                        (node.Text == "Throttle") ||
-                        (node.Text == "Time") ||
-                        (node.Text == "Warnings"))
-                        LIST_items2.Nodes["General"].Nodes.Add(node);
-
-                    if ((node.Text == "Battery A") ||
-                        (node.Text == "Battery Percent") ||
-                        (node.Text == "Current") ||
-                        (node.Text == "Efficiency") ||
-                        (node.Text == "Tune"))
-                        LIST_items2.Nodes["Energy"].Nodes.Add(node);
-
-                    if ((node.Text == "Altitude") ||
-                        (node.Text == "GPS Coord") ||
-                        (node.Text == "Heading") ||
-                        (node.Text == "Heading Rose") ||
-                        (node.Text == "Real heading") ||
-                        (node.Text == "Home Altitude") ||
-                        (node.Text == "Home Direction") ||
-                        (node.Text == "Home Distance") ||
-                        (node.Text == "Trip Distance") ||
-                        (node.Text == "Visible Sats") ||
-                        (node.Text == "WP Distance"))
-                        LIST_items2.Nodes["Location"].Nodes.Add(node);
-
-                    if ((node.Text == "Air Speed") ||
-                        (node.Text == "Vertical Speed") ||
-                        (node.Text == "Velocity") ||
-                        (node.Text == "Wind Speed"))
-                        LIST_items2.Nodes["Speed"].Nodes.Add(node);
-                }
-            }
-
-            LIST_items2.ExpandAll();
-            AutomaticCheck = false;
-        }
-
-        private void LIST_items2_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            if (!AutomaticCheck)
-                foreach (TreeNode node in e.Node.Nodes)
-                    node.Checked = e.Node.Checked;
-            if (this.IsHandleCreated)
-                this.BeginInvoke((MethodInvoker)delegate { osdDraw2(); });
-        }
-
-        private void LIST_items2_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            //string item = ((CheckedListBox)sender).SelectedItem.ToString();
-
-            currentlyselected[1] = e.Node.Text;
-            osdDraw2();
-
-            foreach (var thing in panelItems2)
-            {
-                if (thing != null && thing.Item1 == e.Node.Text)
-                {
-                    NUM_X2.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
-                    NUM_Y2.Value = Constrain(thing.Item4, 0, 16 - 1);
-                }
-            }
-        }
+       
 
         public ModelType modelType = ModelType.Plane; 
         private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
@@ -3451,19 +2647,25 @@ namespace OSD
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
 
-            //if (modelType == ModelType.Plane)
-            //{
-            //    if(!customImage)
-            //        bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
-            //}
-            //else if (modelType == ModelType.Copter)
-            //{
-            //    if (!customImage)
-            //        bgpicture = Image.FromFile("quad.png");
-            //}
-
-            osdDraw1();
-            osdDraw2();
+            if (modelType == ModelType.Plane)
+            {
+                if(!customImage)
+                    bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
+            }
+            else if (modelType == ModelType.Copter)
+            {
+                if (!customImage)
+					try {
+                    	bgpicture = Image.FromFile("quad.png");
+				} catch (Exception ex)
+                {
+                    //fail = true;
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+			
+            osdDraw(panel_number);
+            
         }
 
         enum PanelsAutoSwitch
@@ -3481,23 +2683,16 @@ namespace OSD
             //Get panel warnings check status
             Boolean isPanel1WarningChecked = false;
             Boolean isPanel2WarningChecked = false;
-            //Panel 1
-            foreach (var item in panelItems)
-            {
-                if (item != null && item.Item1 == "Warnings")
-                {
-                    TreeNode[] tnArray = LIST_items.Nodes.Find(item.Item1, true);
-                    isPanel1WarningChecked = tnArray[0].Checked;
-                }
-            }
-            //Panel 2
-            foreach (var item in panelItems2)
-            {
-                if (item != null && item.Item1 == "Warnings")
-                {
-                    TreeNode[] tnArray = LIST_items2.Nodes.Find(item.Item1, true);
-                    isPanel2WarningChecked = tnArray[0].Checked;
-                }
+			for(int k=0;k<npanel;k++) {
+            	//Panel 
+            	foreach (var item in this.scr[k].panelItems)
+            	{
+                	if (item != null && item.Item1 == "Warnings")
+                	{
+	                    TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(item.Item1, true);
+                    	isPanel1WarningChecked = tnArray[0].Checked;
+                	}
+            	}
             }
 
 
@@ -3522,8 +2717,8 @@ namespace OSD
             else
                 pan.sign_air_speed = 0x00;
             airSpeedSign = cbxAirSpeedSign.Checked;
-            osdDraw1();
-            osdDraw2();
+			osdDraw(panel_number);
+            
         }
 
         public Boolean groundSpeedSign = false;
@@ -3534,8 +2729,8 @@ namespace OSD
             else
                 pan.sign_ground_speed = 0x00;
             groundSpeedSign = cbxGroundSpeedSign.Checked;
-            osdDraw1();
-            osdDraw2();
+		
+			osdDraw(panel_number);
         }
 
         public Boolean homeAltSign = false;
@@ -3546,8 +2741,8 @@ namespace OSD
             else
                 pan.sign_home_altitude = 0x00;
             homeAltSign = cbxHomeAltitudeSign.Checked;
-            osdDraw1();
-            osdDraw2();
+			
+			osdDraw(panel_number);
         }
 
         public Boolean mslAltSign = false;
@@ -3558,124 +2753,12 @@ namespace OSD
             else
                 pan.sign_msl_altitude = 0x00;
             mslAltSign = cbxMslAltitudeSign.Checked;
-            osdDraw1();
-            osdDraw2();
+			
+			osdDraw(panel_number);
         }
 
-        private void btnGeneratePanelsFile_Click(object sender, EventArgs e)
-        {
-            if (String.IsNullOrEmpty(sketchPath))
-            {
-                MessageBox.Show("Sketch path not selected." + Environment.NewLine + "Please select Arducam_OSD path going to Options -> Set Arduino Sketches Path...");
-                return;
-            }
-            if (!Directory.Exists(sketchPath))
-            {
-                MessageBox.Show("Sketch path (" + sketchPath + ") not found!");
-                return;
-            }
-            string panelsFile = sketchPath + @"/" + "OSD_Panels.ino";
-            string baseFileName = "OSD_Panels.ino." + ((ModelType)cbxModelType.SelectedValue).ToString() + ".base";
-            string baseFile = sketchPath + @"/" + baseFileName;
-            if (!File.Exists(baseFile))
-            {
-                MessageBox.Show("Source code file (" + baseFileName + ") not found!");
-                return;
-            }
 
-            List<TreeNode> AllNodes = new List<TreeNode>();
-            foreach (TreeNode tn in LIST_items.Nodes)
-            {
-                foreach (TreeNode tn2 in tn.Nodes)
-                {
-                    AllNodes.Add(tn2);
-                }
-                AllNodes.Add(tn);
-            }
 
-            //Get source code
-            string content = string.Empty;
-            using (StreamReader reader = new StreamReader(baseFile))
-            {
-                content = reader.ReadToEnd();
-                reader.Close();
-            }
-
-            //
-            string panelName = String.Empty;
-            foreach (TreeNode tn in AllNodes)
-            {
-                panelName = String.Empty;
-                //Get both tree nodes
-                string str = tn.Text;
-                TreeNode[] trArray1 = LIST_items.Nodes.Find(str, true);
-                TreeNode[] trArray2 = LIST_items2.Nodes.Find(str, true);
-                //Get related tuple on panel1 so we can extract method name
-                foreach (var tuple in this.panelItems)
-                {
-                    if ((tuple == null) || ((tuple.Item1 != str)) || tuple.Item5 == -1)
-                    {
-                        continue;
-                    }
-                    //Get panel name
-                    panelName = tuple.Item2.Method.Name;
-                }
-                if (!trArray1[0].Checked && !trArray2[0].Checked && !String.IsNullOrEmpty(panelName))
-                    content = commentPanelCallInSourceCode(panelName, content);
-            }
-
-            //Write new panels file
-            using (StreamWriter writer = new StreamWriter(panelsFile))
-            {
-                writer.Write(content);
-                writer.Close();
-            }
-            MessageBox.Show("File " + panelsFile + " generated successfully." + Environment.NewLine + "For now, for the next step you should compile the sketch via Arduino IDE.");
-        }
-
-        private string commentPanelCallInSourceCode(string panelName, string code)
-        {
-            int pos = code.IndexOf(panelName);
-            if(pos < 0)
-                return code;
-            //Get the if statement that calls the method
-            int commentIndex = pos;
-            for (commentIndex = pos; commentIndex > 0; commentIndex--)
-            {
-                if (code.Substring(commentIndex, 3) == "if(")
-                    break;
-            }
-            if (commentIndex >= 0)
-            {
-                code = code.Substring(0, commentIndex) + @"//" + code.Substring(commentIndex);
-            }
-            return code;
-        }
-
-        private void OSD_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (!btnGeneratePanelsFile.Visible && e.X >= btnGeneratePanelsFile.Location.X && e.X <= (btnGeneratePanelsFile.Location.X + btnGeneratePanelsFile.Size.Width)
-                                              && e.Y >= btnGeneratePanelsFile.Location.Y && e.Y <= (btnGeneratePanelsFile.Location.Y + btnGeneratePanelsFile.Size.Height))
-            {
-                btnGeneratePanelsFile.Visible = true;
-                setSketchesPathToolStripMenuItem.Visible = true;
-                updateCharsetDevToolStripMenuItem.Visible = true;
-                updateCharsetcustomFwToolStripMenuItem.Visible = true;
-                getFwFromOSDToolStripMenuItem.Visible = true;
-            }
-        }
-
-        string sketchPath = String.Empty;
-
-        private void setSketchesPathToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.SelectedPath = sketchPath;
-            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                sketchPath = fbd.SelectedPath;
-            }
-        }
 
         private void cbxRSSIChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -3748,8 +2831,9 @@ namespace OSD
 
             chars = mcm.readMCM(ofd.FileName);
             lblPresentedCharset.Text = "Presented Charset: " + ofd.SafeFileName;
-            osdDraw1();
-            osdDraw2();
+			
+		
+			osdDraw(panel_number);
         }
 
         private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4483,54 +3567,18 @@ namespace OSD
             CALLSIGNmaskedText.Text = validString;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        
+		
+		int Constrain(double value, double min, double max)
         {
-            Process.Start(@"E:\Documents and Settings\vitorr\My Documents\minimosd-extra\trunk\Tools\OSD\CTToolUpdater.exe");
-            this.Close();
+            if (value < min)
+                return (int)min;
+            if (value > max)
+                return (int)max;
+
+            return (int)value;
         }
 
-        private void CheckForUpdates()
-        {
-            if (checkForUpdates)
-            {
-                if (Updater.NewVersionExists(currentVersion))
-                {
-                    if (!autoUpdate)
-                    {
-                        UpdateAvailable frmUpdateAvailable = new UpdateAvailable();
-                        System.Windows.Forms.DialogResult result = frmUpdateAvailable.ShowDialog();
-                        autoUpdate = frmUpdateAvailable.dontAskAgain;
-                        if (frmUpdateAvailable.dontAskAgain)
-                        {
-                            checkForUpdates = (result == System.Windows.Forms.DialogResult.Yes);
-                        }
-                        if (result == System.Windows.Forms.DialogResult.Yes)
-                        {
-                            Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
-                            this.Close();
-                        }
-                    }
-                    else
-                    {
-                        //Prevent auto update if last try less than 5 minutes.
-                        //Prevents consecutive auto trys if it fails to update
-                        if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\version.txt"))
-                        {
-                            if (System.IO.File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + @"\version.txt") + new TimeSpan(0, 5, 0) < DateTime.Now)
-                            {
-                                Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
-                                this.Close();
-                            }
-                        }
-                        else
-                        {
-                            Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\CTToolUpdater.exe");
-                            this.Close();
-                        }
-                    }
-                }
-            }
-        }
 
         private void cbxAutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
@@ -4541,5 +3589,25 @@ namespace OSD
         {
             autoUpdate = !cbxShowUpdateDialog.Checked;
         }
+		public Size get_basesize(){
+			return basesize;
+		}
+		
+		private void PANEL_tabs_Selected(object sender, TabControlEventArgs e)
+        {
+			//System.Windows.Forms.TabControl
+ 			string s = ((TabControl)sender).SelectedTab.Name;
+			
+					
+			string[] hdr = s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+			
+			if(hdr.Length>1) {
+				int k=int.Parse(hdr[1]);
+				
+            	osdDraw(k-1);
+			}
+
+        }
+ 
     }
 }

@@ -35,7 +35,7 @@ void panWPDis(byte first_col, byte first_line);
 void panAlt(byte first_col, byte first_line);
 void panCur_A(byte first_col, byte first_line);
 void panCur_A(byte first_col, byte first_line);
-void showArrow(uint8_t rotate_arrow,uint8_t method);  
+void showArrow(uint8_t rotate_arrow,uint8_t method);
 void timers();
 void panCALLSIGN(byte first_col, byte first_line);
 void panDistance(byte first_col, byte first_line);

@@ -146,7 +146,7 @@ namespace OSD
         static uint16_t osd_throttle = 100;               // throtle
         static float osd_curr_A = 453;
         static float osd_windspeed = 10;
-        static float osd_windspeedz = 2;
+  //      static float osd_windspeedz = 2;
         static float osd_climb = 2;
         static float nav_roll = 0;
         static float nav_pitch = 0;
@@ -161,10 +161,10 @@ namespace OSD
         static float eff = 10;
 
         //MAVLink session control
-        static boolean mavbeat = 1;
+    //    static boolean mavbeat = 1;
         //static float lastMAVBeat = 0;
         //static boolean waitingMAVBeats = 1;
-        static uint8_t apm_mav_type = 2;
+    //    static uint8_t apm_mav_type = 2;
         //static uint8_t apm_mav_system = 7;
         //static uint8_t apm_mav_component = 0;
         //static boolean enable_mav_request = 0;
@@ -210,11 +210,11 @@ namespace OSD
         public int panCOG(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
 
             osd.printf("%c%c%4i%c", 0x94, 0x95, tr, 0x05);
 
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -228,11 +228,11 @@ namespace OSD
         public int panDistance(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
 
             osd.printf("%c%c%4.2f%c", 0x8F, 0x20, tdistance * converth, bigDistanceChar);
             
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -246,11 +246,11 @@ namespace OSD
         public int panTemp(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             {
                 osd.printf("%5.1f%c", temperature * tempconv + tempconvAdd, temperatureChar);
             }
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -264,11 +264,11 @@ namespace OSD
  //       public int panCh(int first_col, int first_line)
  //       {
  //           osd.setPanel(first_col, first_line);
- //           osd.openPanel();
+ //           
  //           {
  //               osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
  //           }
- //           osd.closePanel();
+ //           
  //           return 0;
  //       }
 
@@ -282,11 +282,11 @@ namespace OSD
         public int panEff(int first_col, int first_line)
         {
         osd.setPanel(first_col, first_line);
-        osd.openPanel();
+        
         {
         osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
         }
-        osd.closePanel();
+        
          return 0;
         }
 
@@ -300,11 +300,11 @@ namespace OSD
  	    public int panRSSI(int first_col, int first_line)
         {
  	        osd.setPanel(first_col, first_line);
- 	        osd.openPanel();
+ 	        
  	        {
  	            osd.printf("%c%3i%c", 0x09, osd_rssi, 0x25);
  	        }
-            osd.closePanel();
+            
  	        return 0;
  	    }
 
@@ -318,9 +318,9 @@ namespace OSD
         public int panCALLSIGN(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%s", callsign_str);
-            osd.closePanel();
+            
             return 0;
         }
  
@@ -336,12 +336,12 @@ namespace OSD
         public int panTune(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%c%2.0f%c|%c%2.0f%c", 0xb0, (alt_error * converth), high, 0xb1, ((aspd_error / 100.0) * converts), spe);           
  //           {
  //               osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%4.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (wp_target_bearing), 0xB0, 0x41, 0x45, (alt_error), 0x8D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), 0x88);
  //           }  
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -355,12 +355,12 @@ namespace OSD
         public int panClimb(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             
             {
                 osd.printf("%c%3.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
             }
-            osd.closePanel();
+            
             return 0;
         }
         
@@ -374,11 +374,11 @@ namespace OSD
         public int panWindSpeed(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             {
                 osd.printf("%c%3.0f%c|%c%c%2.0f%c%2.0f%c", 0x1D, (double)(osd_windspeed * convertspeed), velocityChar, 0xA4, 0xA5, (double)(osd_windspeed * convertspeed), velocityChar);
             }
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -392,11 +392,11 @@ namespace OSD
         public int panOff(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             {
                // osd.printf("%c", 0x00);
             }
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -411,11 +411,11 @@ namespace OSD
         public int panCur_A(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             {
                 osd.printf("%c%5.2f%c%c", 0xBD, (osd_curr_A * .01), 0x0E);
             }
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -429,14 +429,14 @@ namespace OSD
         public int panAlt(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
             if (this.osd.mslAltSign)//ArduCopter
                 osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
             else
                 osd.printf("%5.0f%c", (double)(osd_alt * converth), altitudeChar);
 
-            osd.closePanel();
+            
             return 0;
         }
         /* **************************************************************** */
@@ -447,9 +447,9 @@ namespace OSD
         // Staus  : done
          public int panWarn(int first_col, int first_line){
          osd.setPanel(first_col, first_line);
-         osd.openPanel();
+         
          osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
-         osd.closePanel();
+         
          return 0;
          }
 
@@ -463,13 +463,13 @@ namespace OSD
         public int panHomeAlt(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
             if (this.osd.homeAltSign)//ArduCopter
                 osd.printf("%c%5.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
             else
                 osd.printf("%5.0f%c", (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -483,12 +483,12 @@ namespace OSD
         public int panVel(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             if (this.osd.groundSpeedSign)//ArduCopter
                 osd.printf("%c%3.0f%c", 0x14, (double)(osd_groundspeed * convertspeed), velocityChar);
             else
                 osd.printf("%3.0f%c", (double)(osd_groundspeed * convertspeed), velocityChar);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -502,12 +502,12 @@ namespace OSD
         public int panAirSpeed(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             if (this.osd.airSpeedSign)//ArduCopter
                 osd.printf("%c%3.0f%c", 0x13, (double)(osd_airspeed * convertspeed), velocityChar);
             else
                 osd.printf("%3.0f%c", (double)(osd_airspeed * convertspeed), velocityChar);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -521,7 +521,7 @@ namespace OSD
         public int panBatteryPercent(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             if (Convert.ToBoolean(osd_battery_show_percentage))
             {
                 osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining, 0x25);
@@ -530,7 +530,7 @@ namespace OSD
             {
                 osd.printf("%c%4.0i%c", 0x17, osd_battery_remaining, 0x01);
             }
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -544,9 +544,9 @@ namespace OSD
         public int panTime(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%3i%c%02i", ((int)start_Time / 60), 0x3A, (int)start_Time % 60);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -560,9 +560,9 @@ namespace OSD
         public int panThr(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%c%3.0i%c", 0x02, osd_throttle, 0x25);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -576,9 +576,9 @@ namespace OSD
         public int panHomeDis(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%c%5.0f%c", 0x0B, (double)(osd_home_distance * converth), bigDistanceChar);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -589,14 +589,14 @@ namespace OSD
         // Size   : 2 x 4  (rows x chars)
         // Staus  : done
 
-//        public int panCenter(int first_col, int first_line)
-//        {
-//            osd.setPanel(first_col, first_line);
-//            osd.openPanel();
-//            osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
-//            osd.closePanel();
-//            return 0;
-//        }
+        public int panCenter(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            
+            osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
+            
+            return 0;
+        }
 
         /* **************************************************************** */
         // Panel  : panHorizon
@@ -609,16 +609,38 @@ namespace OSD
         {
             //showHorizon((first_col + 1), first_line);
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
             osd.printf_P(PSTR("\xc6\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xc5|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
             osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
-            osd.closePanel();
+            
             return 0;
         }
 
+	        /* **************************************************************** */
+        // Panel  : panHorizon
+        // Needs  : X, Y locations
+        // Output : 12 x 4 Horizon line surrounded by 2 cols (left/right rules)
+        // Size   : 14 x 4  (rows x chars)
+        // Staus  : done
+
+        public int panILS(int first_col, int first_line)
+        {
+            //showHorizon((first_col + 1), first_line);
+            osd.setPanel(first_col, first_line);
+            
+            osd.printf_P(PSTR("\x20|"));
+            osd.printf_P(PSTR("\x20|"));
+            osd.printf_P(PSTR("\xcb|"));
+            osd.printf_P(PSTR("\x20|"));
+            osd.printf_P(PSTR("\x20"));
+            
+            return 0;
+        }
+
+		
         /* **************************************************************** */
         // Panel  : panPitch
         // Needs  : X, Y locations
@@ -629,9 +651,9 @@ namespace OSD
         public int panPitch(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%4i%c%c", osd_pitch, 0x05, 0x07);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -645,9 +667,9 @@ namespace OSD
         public int panRoll(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%4i%c%c", osd_roll, 0x05, 0x06);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -661,10 +683,28 @@ namespace OSD
         public int panBatt_A(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd.printf("%c%5.2f%c%c", 0xE2,(double)osd_vbat, 0x8E, osd_battery_pic);
             osd.printf("%c%5.2f%c", 0xBC, (double)osd_vbat, 0x0D);
-            osd.closePanel();
+            
+            return 0;
+        }
+
+		
+        /* **************************************************************** */
+        // Panel  : panBattery A (Voltage 1)
+        // Needs  : X, Y locations
+        // Output : Voltage value as in XX.X and symbol of over all battery status
+        // Size   : 1 x 8  (rows x chars)
+        // Staus  : done
+
+        public int panBatt_B(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            
+            //osd.printf("%c%5.2f%c%c", 0xE2,(double)osd_vbat, 0x8E, osd_battery_pic);
+            osd.printf("%c%5.2f%c", 0xBC, (double)osd_vbat, 0x0D);
+            
             return 0;
         }
 
@@ -673,9 +713,9 @@ namespace OSD
         public int panLogo(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf_P(PSTR("\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|ArduCam OSD"));
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -685,9 +725,9 @@ namespace OSD
         {
             panLogo(10, 5);
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf_P(PSTR("Waiting for|MAVLink heartbeats..."));
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -701,7 +741,7 @@ namespace OSD
         //public int panGPL(int first_col, int first_line)
         //{
           //  osd.setPanel(first_col, first_line);
-            //osd.openPanel();
+            //
             //switch (osd_fix_type)
             //{
              //   case 0:
@@ -723,7 +763,7 @@ namespace OSD
           } else {
             osd.printf_P(PSTR("\x11"));
           }  */
-            //osd.closePanel();
+            //
             //return 0;
         //}
 
@@ -737,10 +777,10 @@ namespace OSD
         public int panGPSats(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd.printf("%c%2i", 0x0f, osd_satellites_visible);
             osd.printf("%c%2i", 0x2a, osd_satellites_visible);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -754,9 +794,9 @@ namespace OSD
         public int panGPS(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%c%10.6f%c|%c%10.6f", 0x03, (double)osd_lat, 0x20, 0x04, (double)osd_lon);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -770,10 +810,10 @@ namespace OSD
         public int panHeading(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd.printf("%004.0f%c", (double)osd_heading, 0x05);
             osd.printf("%3i%c", (Int16)2, 0x05);
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -787,12 +827,12 @@ namespace OSD
         public int panRose(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
             osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x87"));
            
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -807,13 +847,29 @@ namespace OSD
         public int panBoot(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3"));
-            osd.closePanel();
+            
             return 0;
 
         }
 
+/* **************************************************************** */
+// Panel  : panCh
+// Needs  : X, Y locations
+// Output : Scaled channel values from MAVLink
+// Size...
+// Staus  : done
+
+public int panCh(int first_col, int first_line){
+    osd.setPanel(first_col, first_line);
+
+    osd.printf_P(PSTR("C1%5i|C2%5i|C3%5i|C4%5i|C5%5i|C6%5i"),
+			             	//chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw);
+			             1550, 1302, 1640, 1456, 1100, 1940);
+	return 0;
+}		
+		
         /* **************************************************************** */
         // Panel  : panMavBeat
         // Needs  : X, Y locations
@@ -825,7 +881,7 @@ namespace OSD
 //        public int panMavBeat(int first_col, int first_line)
 //        {
 //            osd.setPanel(first_col, first_line);
-//            osd.openPanel();
+//            
 //            if (mavbeat == 1)
 //            {
 //                osd.printf_P(PSTR("\xEA\xEC"));
@@ -835,7 +891,7 @@ namespace OSD
 //            {
 //                osd.printf_P(PSTR("\xEA\xEB"));
 //            }
-//          osd.closePanel();
+//          
 //            return 0;
 //        }
 
@@ -847,16 +903,16 @@ namespace OSD
         // Size   : 1 x 2  (rows x chars)
         // Staus  : not ready
 
-//        public int panWPDir(int first_col, int first_line)
-//        {
-//            osd.setPanel(first_col, first_line);
-//            osd.openPanel();
-//            {
-//                osd.printf("%c%c",  0xA4, 0xA5);
-//            }
-//            osd.closePanel();
-//            return 0;
-//        }
+        public int panWPDir(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            
+            {
+                osd.printf("%c%c",  0xA4, 0xA5);
+            }
+            
+            return 0;
+        }
 
         /* **************************************************************** */
         // Panel  : panWPDis
@@ -868,9 +924,9 @@ namespace OSD
         public int panWPDis(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             osd.printf("%c%c%c%2i%c%4.0f%c|%c%c%c%c%c%5.0f%c", 0x57, 0x70, 0x0, wp_number, 0x0, (double)((float)(wp_dist * converth)), smallDistanceChar, 0xa4, 0xa5, 0x20, 0x58, 0x45, (xtrack_error), smallDistanceChar); //Print in Km 
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -884,9 +940,9 @@ namespace OSD
         public int panHomeDir(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             showArrow();
-            osd.closePanel();
+            
             return 0;
         }
 
@@ -900,7 +956,7 @@ namespace OSD
         public int panFlightMode(int first_col, int first_line)
         {
             osd.setPanel(first_col, first_line);
-            osd.openPanel();
+            
             if (this.osd.modelType == OSD.ModelType.Copter)//ArduCopter
             {
                 osd.printf_P(PSTR("\x7Fstab\x86"));//Stabilize
@@ -932,7 +988,7 @@ namespace OSD
                 //if (osd_mode == (byte)ArdupilotMega.MAVLink.MAV_MODE.MAV_MODE_TEST3) osd.printf_P(PSTR("\x7F\xE7"));//CIRCLE
             }
             //    if(osd_mode == 3 && osd_nav_mode == 4) osd.printf_P(PSTR("\xD0\xD2"));
-            osd.closePanel();
+            
             return 0;
         }
 

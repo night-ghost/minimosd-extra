@@ -57,9 +57,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
-//#include "OSD_Panels.h"
-//#include "MAVLink.h"
-//#include "Font.h"
 
 // Get the common arduino functions
 #if defined(ARDUINO) && ARDUINO >= 100

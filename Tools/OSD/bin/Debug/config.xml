@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <Config>
-  <comport>COM4</comport>
+  <comport>/dev/ttyS0</comport>
   <Pal>True</Pal>
-  <ArduinoIDEPath>Arduino-1.0.2</ArduinoIDEPath>
-  <PlaneSketchPath>ArduCAM_OSD_Plane</PlaneSketchPath>
-  <CopterSketchPath>ArduCAM_OSD_Copter</CopterSketchPath>
+  <ArduinoIDEPath>Arduino-1.6.1</ArduinoIDEPath>
+  <PlaneSketchPath>ArduCAM_OSD</PlaneSketchPath>
+  <CopterSketchPath>ArduCAM_OSD</CopterSketchPath>
   <AutoUpdate>False</AutoUpdate>
   <CheckForUpdates>True</CheckForUpdates>
 </Config>
