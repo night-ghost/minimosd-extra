@@ -54,7 +54,7 @@ namespace OSD
 
                         string i1 = line.Substring((x % 4) * 2, 2);
 
-                        //Console.WriteLine(image + " " + line + " " + i1 + " " + x + " " + y);
+                        Console.WriteLine(image + " " + line + " " + i1 + " " + x + " " + y);
 
                         if (i1 == "01" || i1 == "11")
                         {
