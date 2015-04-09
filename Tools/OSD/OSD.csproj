@@ -138,7 +138,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="osd_screen.cs" />
-    <None Include="config.h" />
+    <Compile Include="config.cs" />
+    <Compile Include="Panel.cs" />
+    <Compile Include="Pos.cs" />
+    <Compile Include="Const.cs" />
+    <Compile Include="Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="osd.ico" />
