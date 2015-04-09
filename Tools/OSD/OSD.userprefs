@@ -1,0 +1,30 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="OSD.cs">
+    <Files>
+      <File FileName="OSD.cs" Line="460" Column="88" />
+      <File FileName="OSD.Designer.cs" Line="22" Column="1" />
+      <File FileName="osd_screen.cs" Line="184" Column="111" />
+      <File FileName="Panels.cs" Line="645" Column="40" />
+      <File FileName="config.cs" Line="14" Column="37" />
+      <File FileName="Panel.cs" Line="5" Column="2" />
+      <File FileName="Tuple.cs" Line="79" Column="15" />
+      <File FileName="Pos.cs" Line="15" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="OSD" expanded="True">
+            <Node name="OSD.cs" expanded="True" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/osd_screen.cs" line="322" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

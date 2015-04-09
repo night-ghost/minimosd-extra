@@ -1,0 +1,3173 @@
+--- OSD.cs	2015-04-09 13:21:15.184774259 +0500
++++ OSD.cs.x	2015-04-09 13:14:19.526362427 +0500
+@@ -1,4 +1,4 @@
+-using System;
++﻿using System;
+ using System.Collections.Generic;
+ using System.ComponentModel;
+ using System.Data;
+@@ -16,11 +16,8 @@
+ using System.Net;
+ using System.Diagnostics;
+ 
+-
+-namespace OSD
+-{
+-    public partial class OSD : Form
+-    {
++namespace OSD {
++	public partial class OSD : Form {
+ 		
+          //max 7456 datasheet pg 10
+         //pal  = 16r 30 char
+@@ -62,7 +56,7 @@
+         /// <summary>
+         /// used to track currently selected panel across calls
+         /// </summary>
+-        public string[] currentlyselected = new string[npanel];
++		public string currentlyselected;
+         /// <summary>
+         /// used to track current processing panel across calls (because i maintained the original code for panel drawing)
+         /// </summary>
+@@ -75,25 +69,16 @@
+         /// use to as a invalidator
+         /// </summary>
+         bool startup = false;
+-        /// <summary>
+-        /// 328 eeprom memory
+-        /// </summary>
+-        byte[] eeprom = new byte[1024];
++        
++		
+         /// <summary>
+         /// background image
+         /// </summary>
+         Image bgpicture;
+ 		public osd_screen[] scr = new osd_screen[npanel];
+-
+-        public bool[] mousedown = new bool[npanel];
+-        //bool mousedown1 = false;
+-        //bool mousedown2 = false;
+-
+         SerialPort comPort = new SerialPort();
+-
+         Panels pan;
+         int nosdfunctions = 0;
+-		
+ 		public  int panel_num=0;
+ 				
+ 		
+@@ -108,11 +93,9 @@
+         //s
+         int print_x; // текущие координаты вывода
+         int print_y;
+-
+         Boolean fwWasRead = false;
+ 
+-        public OSD()
+-        {
++		public OSD () {
+ 			
+ 
+ 			int i;
+@@ -127,17 +110,16 @@
+             // load default font
+             chars = mcm.readMCM("MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm");
+             lblPresentedCharset.Text = "Presented Charset: " + "MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm";
+-            // load default bg picture
+-            try
+-            {
++			// load default bg pic			{
++			try {
+                 bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
++			} catch {
+             }
+-            catch { }
+-            for (i = 0; i < npanel; i++)
+-            {
+-                mousedown[i] = false;
+-                currentlyselected[i] = "";
++			for (i = 0; i < npanel; i++) {
++                
++                
+             }
++			currentlyselected = "";
+             print_x = 0;
+             print_y = 0;
+ 			
+@@ -150,10 +132,8 @@
+             setupFunctions(); //setup panel item box
+         }
+ 
+-        void changeToPal(bool pal)
+-        {
+-            if (pal)
+-            {
++		void changeToPal (bool pal) {
++			if (pal) {
+                 basesize = new Size(SCREEN_W, SCREEN_H);                
+                 
+                 screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+@@ -165,9 +145,7 @@
+                 	scr[panel_number].NUM_Y.Maximum = SCREEN_H-1;
+ 				}
+                 
+-            }
+-            else
+-            {
++			} else {
+                 basesize = new Size(SCREEN_W, SCREEN_H_NTSC);
+ 
+                 screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
+@@ -182,18 +160,14 @@
+ 
+         }
+         //Set item boxes
+-        void setupFunctions()
+-        {
+-            //currentlyselected1 = "";
+-            //currentlyselected2 = "";
++		void setupFunctions () {
+             processingpanel = "";
+ 
+ 
+             int a = 0;
+ 			int n;
+ 
+-            for (a = 0; a < usedPostion.Length; a++)
+-            {
++			for (a = 0; a < usedPostion.Length; a++) {
+                 usedPostion[a] = new string[SCREEN_H];
+             }
+ 
+@@ -259,49 +233,28 @@
+ 	            //Fill List of items in tabe number 1
+ 	            this.scr[n].LIST_items.Nodes.Clear();
+ 	            startup = true;
+-	            foreach (var thing in pi)
+-	            {
+-	                if (thing != null)
+-	                {
++				foreach (var thing in pi) {
++					if (thing != null) {
+ 	
+-	                    if (thing.Item1 == "Center")
+-	                    {
++						if (thing.Item1 == "Center") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	
+-	                    else if (thing.Item1 == "Tune")
+-	                    {
++						} else if (thing.Item1 == "Tune") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	                    else if (thing.Item1 == "WP Distance")
+-	                    {
++						} else if (thing.Item1 == "WP Distance") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	
+-	                    else if (thing.Item1 == "Temperature")
+-	                    {
++						} else if (thing.Item1 == "Temperature") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	
+-	
+-	                    else if (thing.Item1 == "Trip Distance")
+-	                    {
++						} else if (thing.Item1 == "Trip Distance") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	
+-	
+-	                    else if (thing.Item1 == "Channel Raw")
+-	                    {
++						} else if (thing.Item1 == "Channel Raw") {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = false;
+-	                    }
+-	                    else
+-	                    {
++						} else {
+ 	                        TreeNode tn = li.Nodes.Add(thing.Item1, thing.Item1);
+ 	                        tn.Checked = true;
+ 	                    }
+@@ -353,14 +306,11 @@
+                 cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+             cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+ 
+-            if (pan.converts == 0)
+-            {
++			if (pan.converts == 0) {
+                 UNITS_combo.SelectedIndex = 0; //metric
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                 OVERSPEED_label.Text = "Overspeed (km/h)";
+-            }
+-            else if (pan.converts == 1)
+-            {
++			} else if (pan.converts == 1) {
+                 UNITS_combo.SelectedIndex = 1; //imperial
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                 OVERSPEED_label.Text = "Overspeed (mph)";
+@@ -368,8 +318,10 @@
+ 
+             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+ 
+-            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+-            else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
++			if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9)
++				ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
++			else
++				ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
+ 
+             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+ 
+@@ -387,8 +339,7 @@
+             CMB_ComPort.Text = "COM5";
+         }
+ 
+-        private string[] GetPortNames()
+-        {
++		private string[] GetPortNames () {
+             string[] devs = new string[0];
+ 
+             if (Directory.Exists("/dev/"))
+@@ -404,8 +355,7 @@
+             return all;
+         }
+ 
+-        public void setPanel(int x, int y)
+-        {
++		public void setPanel (int x, int y) {
+             print_x = x * CHAR_W;
+             print_y = y * CHAR_H;
+ 
+@@ -414,15 +364,12 @@
+  
+ 		}
+ 
+-
+-        public void openSingle(int x, int y)
+-        {
++		public void openSingle (int x, int y) {
+             setPanel(x, y);
+             
+         }
+ 
+-        public int getCenter()
+-        {
++		public int getCenter () {
+             if (CHK_pal.Checked)
+                 return 8;
+             return 6;
+@@ -432,8 +379,7 @@
+         int print_col;
+         int print_row;
+ 
+-        public void printf(string format, params object[] args)
+-        {
++		public void printf (string format, params object[] args) {
+             StringBuilder sb = new StringBuilder();
+ 
+             sb = new StringBuilder(AT.MIN.Tools.sprintf(format, args));
+@@ -442,35 +388,25 @@
+ 
+             //Console.WriteLine(sb.ToString());
+ 
+-            foreach (char ch in sb.ToString().ToCharArray())
+-            {
+-                if (ch == '|')
+-                {
++			foreach (char ch in sb.ToString().ToCharArray()) {
++				if (ch == '|') {
+                     print_col += 1;
+                     print_row = 0;
+                     continue;
+                 }
+-
+-                try
+-                {
+                     // draw red boxs
+-                    if (selectedrectangle)
+-                    {
++				if (selectedrectangle) {
+                         gr.DrawRectangle(Pens.Red, (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
+                     }
+ 
+                     int w1 = (this.print_x / CHAR_W + print_row) % basesize.Width;
+                     int h1 = (this.print_y / CHAR_H + print_col);
+ 
+-                    if (w1 < basesize.Width && h1 < basesize.Height)
+-                    {
++				if (w1 < basesize.Width && h1 < basesize.Height) {
+                         // check if this box has bene used
+-                        if (usedPostion[w1][h1] != null)
+-                        {
++					if (usedPostion [w1] [h1] != null) {
+                             //System.Diagnostics.Debug.WriteLine("'" + used[this.x / 12 + r * 12 / 12][this.y / 18 + d * 18 / 18] + "'");
+-                        }
+-                        else
+-                        {
++					} else {
+                             gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
+ 							
+ //							testDraw(chars[ch]);
+@@ -478,38 +414,34 @@
+ 
+                         usedPostion[w1][h1] = processingpanel;
+                     }
+-                }
+-                catch { System.Diagnostics.Debug.WriteLine("printf exception"); }
+-                print_row++;
+-            }
+ 
+-        }
+ 
++				//	System.Diagnostics.Debug.WriteLine ("printf exception");
+ 
++				print_row++;
++			}
+         
++		}
+ 
+         public bool pal_checked(){
+ 			return CHK_pal.Checked;
+ 		}
+         
+-
+-        public void printf_P(string format, params object[] args)
+-        {
++		public void printf_P (string format, params object[] args) {
+             printf(format, args);
+         }
+ 
+         
+         // draw image and characters overlay
+-        public void osdDraw(int k)
+-        {
+-			if(k<0 || k>=npanel) return;
++		public void osdDraw (int k) {
++			if (k < 0 || k >= npanel)
++				return;
+ 			
+             panel_number = k;
+             if (startup)
+                 return;
+ 
+-            for (int b = 0; b < usedPostion.Length; b++)
+-            {
++			for (int b = 0; b < usedPostion.Length; b++) {
+                 usedPostion[b] = new string[SCREEN_H];
+             }
+ 			
+@@ -525,21 +457,15 @@
+ 
+             image = new Bitmap(image.Width, image.Height);
+ 
+-            Graphics grfull = Graphics.FromImage(image);
+-
+-            try
+-            {
++			Graphics grfull = Graphics.FromImage (imag			{
+                 grfull.DrawImage(bgpicture, 0, 0, pb.Width, pb.Height);
++			} catch {
+             }
+-            catch { }
+ 
+             //Drawing the grid
+-            if (checkBox1.Checked)
+-            {
+-                for (int b = 1; b < SCREEN_H; b++)
+-                {
+-                    for (int a = 1; a < SCREEN_W; a++)
+-                    {
++			if (checkBox1.Checked) {
++				for (int b = 1; b < SCREEN_H; b++) {
++					for (int a = 1; a < SCREEN_W; a++) {
+                         grfull.DrawLine(new Pen(Color.Gray, 1), a * CHAR_W * scaleW, 0, a * CHAR_W * scaleW, pb.Height);
+                         grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * CHAR_H * scaleH, pb.Width, b * CHAR_H * scaleH);
+                     }
+@@ -551,10 +477,8 @@
+ 
+             List<string> list = new List<string>();
+ 
+-            foreach (TreeNode tn in this.scr[k].LIST_items.Nodes)
+-            {
+-                foreach (TreeNode tn2 in tn.Nodes)
+-                {
++			foreach (TreeNode tn in this.scr[k].LIST_items.Nodes) {
++				foreach (TreeNode tn2 in tn.Nodes) {
+                     if (tn2.Checked)
+                         list.Add(tn2.Text);
+                 }
+@@ -564,29 +488,21 @@
+ 
+             list.Reverse();
+ 
+-            foreach (string it in list)
+-            {
+-                foreach (var thing in this.scr[k].panelItems)
+-                {
++			foreach (string it in list) {
++				foreach (var thing in this.scr[k].panelItems) {
+                     selectedrectangle = false;
+-                    if (thing != null)
+-                    {
+-                        if (thing.Item1 == it)
+-                        {
+-                            if (thing.Item1 == currentlyselected[0])
+-                            {
++					if (thing != null) {
++						if (thing.Item1 == it) {
++							if (thing.Item1 == currentlyselected) {
+                                 selectedrectangle = true;
+                             }
+ 
+                             processingpanel = thing.Item1;
+ 
+                             // ntsc and below the middle line
+-                            if (thing.Item4 >= getCenter() && !CHK_pal.Checked)
+-                            {
++							if (thing.Item4 >= getCenter () && !CHK_pal.Checked) {
+                                 thing.Item2(thing.Item3, thing.Item4 - 3);
+-                            }
+-                            else // pal and no change
+-                            {
++							} else { // pal and no change
+                                 thing.Item2(thing.Item3, thing.Item4);
+                             }
+ 
+@@ -602,17 +518,15 @@
+         }
+ 
+         
+-        public enum ModelType
+-        {
++		public enum ModelType {
+             Plane = 0,
+             Copter = 1,
+             Unknown = 9
+         }
+ 
+-        string currentVersion = "";
++//        string currentVersion = "";
+ 
+-        private void OSD_Load(object sender, EventArgs e)
+-        {
++		private void OSD_Load (object sender, EventArgs e) {
+             if (cbxModelType.Items.Count == 0)
+                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
+             if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+@@ -634,27 +548,6 @@
+         }
+ 
+ 
+-//        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+-//        {
+-//            string item = ((CheckedListBox)sender).SelectedItem.ToString();
+-//
+-//            currentlyselected[0] = item;
+-//
+-//            osdDraw(this.panel_number);
+-//
+-//            foreach (var thing in this.scr[this.panel_number].panelItems)
+-//            {
+-//                if (thing != null && thing.Item1 == item)
+-//                {
+-//                    NUM_X.Value = Constrain(thing.Item3, 0, basesize.Width - 1);
+-//                    NUM_Y.Value = Constrain(thing.Item4, 0, SCREEN_H - 1);
+-//                }
+-//            }
+-//        }
+-//
+-// 
+-
+-
+ //        private void checkedListBox1_SelectedValueChanged(object sender, EventArgs e)
+ //        {
+ //            if (((CheckedListBox)sender).Text == "Horizon")
+@@ -680,8 +573,7 @@
+ //        }
+ 
+ 
+-        private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
+-        {
++		private void checkedListBox1_ItemCheck (object sender, ItemCheckEventArgs e) {
+             // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
+             //            if (((CheckedListBox)sender).SelectedItem != null)
+             //            {
+@@ -699,39 +591,33 @@
+ 
+             // add a delay to this so it runs after the control value has been defined.
+             if (this.IsHandleCreated)
+-                this.BeginInvoke((MethodInvoker)delegate { osdDraw(panel_number); });
++				this.BeginInvoke ((MethodInvoker)delegate {
++					osdDraw (panel_number); });
+         }
+ 
+        
+ 
+ 
+         //Write data to MinimOSD EPPROM
+-        private void BUT_WriteOSD_Click(object sender, EventArgs e)
+-        {
++		private void BUT_WriteOSD_Click (object sender, EventArgs e) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             this.toolStripStatusLabel1.Text = "";
+ 
+             TabPage current = PANEL_tabs.SelectedTab;
+-            if (current.Text == "Panel 1")
+-            {
++			if (current.Text == "Panel 1") {
+                 //First Panel 
+                 List<TreeNode> AllNodes = new List<TreeNode>();
+-                foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes)
+-                {
+-                    foreach (TreeNode tn2 in tn.Nodes)
+-                    {
++				foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {
++					foreach (TreeNode tn2 in tn.Nodes) {
+                         AllNodes.Add(tn2);
+                     }
+                     AllNodes.Add(tn);
+                 }
+ 
+-                foreach (TreeNode tn in AllNodes)
+-                {
++				foreach (TreeNode tn in AllNodes) {
+                     string str = tn.Text;
+-                    foreach (var tuple in this.scr[this.panel_number].panelItems)
+-                    {
+-                        if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+-                        {
++					foreach (var tuple in this.scr[this.panel_number].panelItems) {
++						if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1) {
+                             TreeNode[] trArray = this.scr[this.panel_number].LIST_items.Nodes.Find(str, true);
+                             eeprom[tuple.Item5] = (byte)(trArray[0].Checked ? 1 : 0);
+                             eeprom[tuple.Item6] = (byte)tuple.Item3; // x
+@@ -741,20 +627,14 @@
+                         }
+                     }
+                 }
+-            }
+-            else if (current.Text == "Panel 2")
+-            {
+-            }
+-            else if (current.Text == "Config")
+-            {
++			} else if (current.Text == "Panel 2") {
++			} else if (current.Text == "Config") {
+                 //Setup configuration panel
+                 //It only checks if configuration screen model type matches fw model type if model type already have been read from eeprom
+                 //(either by pushing the "Read From OSD" or by uploading the fw)
+-                if (fwWasRead)
+-                {
++				if (fwWasRead) {
+                     ModelType fwModelType = (ModelType)eeprom[MODEL_TYPE_ADD];
+-                    if (fwModelType != (ModelType)cbxModelType.SelectedItem)
+-                    {
++					if (fwModelType != (ModelType)cbxModelType.SelectedItem) {
+                         if (MessageBox.Show("OSD firmware is of type " + fwModelType.ToString() + " and you have selected " + cbxModelType.SelectedText + " model type." + Environment.NewLine +
+                             "Are you sure you want to upload this configuration?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != System.Windows.Forms.DialogResult.Yes)
+                             return;
+@@ -786,19 +666,16 @@
+                 eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
+ 
+                 //for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+-                for (int i = 0; i < pan.callsign_str.Length; i++)
+-                {
++				for (int i = 0; i < pan.callsign_str.Length; i++) {
+                     eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
+                     Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
+                 }
+                 if (pan.callsign_str.Length < OSD_CALL_SIGN_TOTAL)
+-                    for (int i = pan.callsign_str.Length; i < OSD_CALL_SIGN_TOTAL; i++) eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('\0');
++					for (int i = pan.callsign_str.Length; i < OSD_CALL_SIGN_TOTAL; i++)
++						eeprom [OSD_CALL_SIGN_ADDR + i] = Convert.ToByte ('\0');
+             }
+ 
+-            ArduinoSTK sp;
+-
+-            try
+-            {
++			ArduinoSTK 			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -812,69 +689,65 @@
+                 sp.RtsEnable = false; //added
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
++			if (sp.connectA				{
+                     bool spupload_flag = false;
+                     //nav_up = sp.upload(eeprom, 0, OffsetBITpanel * npanel, 0);
+                     //conf_up = sp.upload(eeprom, measure_ADDR, (OSD_RSSI_LOW_ADDR - measure_ADDR), measure_ADDR);
+-                    if (current.Text == "Panel 1")
+-                    {
+-                        for (int i = 0; i < 10; i++)
+-                        { //try to upload two times if it fail
++					if (current.Text == "Panel 1") {
++						for (int i = 0; i < 10; i++) { //try to upload two times if it fail
+                             spupload_flag = sp.upload(eeprom, (short)0, (short)OffsetBITpanel, (short)0);
+-                            if (!spupload_flag)
+-                            {
+-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                            }
+-                            else break;
+-                        }
+-                        if (spupload_flag) MessageBox.Show("Done writing Panel 1 data!");
+-                        else MessageBox.Show("Failed to upload new Panel 1 data");
+-                    }
+-                    else if (current.Text == "Panel 2")
+-                    {
+-                        for (int i = 0; i < 10; i++)
+-                        { //try to upload two times if it fail
+-                            spupload_flag = sp.upload(eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel), (short)OffsetBITpanel);
+-                            if (!spupload_flag)
+-                            {
+-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                            }
+-                            else break;
+-                        }
+-                        if (spupload_flag) MessageBox.Show("Done writing Panel 2 data!");
+-                        else MessageBox.Show("Failed to upload new Panel 2 data");
+-                    }
+-                    else if (current.Text == "Config")
+-                    {
+-                        for (int i = 0; i < 10; i++)
+-                        { //try to upload two times if it fail
+-                            spupload_flag = sp.upload(eeprom, (short)SIGN_MSL_ON_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGN_MSL_ON_ADDR + 1), (short)SIGN_MSL_ON_ADDR);
+-                            if (!spupload_flag)
+-                            {
+-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                                else Console.WriteLine("keepalive fail (iter " + i + ")");
++							if (!spupload_flag) {
++								if (sp.keepalive ())
++									Console.WriteLine ("keepalive successful (iter " + i + ")");
++								else
++									Console.WriteLine ("keepalive fail (iter " + i + ")");
++							} else
++								break;
+                             }
+-                            else break;
++						if (spupload_flag)
++							MessageBox.Show ("Done writing Panel 1 data!");
++						else
++							MessageBox.Show ("Failed to upload new Panel 1 data");
++					} else if (current.Text == "Panel 2") {
++						for (int i = 0; i < 10; i++) { //try to upload two times if it fail
++							spupload_flag = sp.upload (eeprom, (short)OffsetBITpanel, (short)(OffsetBITpanel), (short)OffsetBITpanel);
++							if (!spupload_flag) {
++								if (sp.keepalive ())
++									Console.WriteLine ("keepalive successful (iter " + i + ")");
++								else
++									Console.WriteLine ("keepalive fail (iter " + i + ")");
++							} else
++								break;
+                         }
+-                        if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+-                        else MessageBox.Show("Failed to upload new configuration data");
++						if (spupload_flag)
++							MessageBox.Show ("Done writing Panel 2 data!");
++						else
++							MessageBox.Show ("Failed to upload new Panel 2 data");
++					} else if (current.Text == "Config") {
++						for (int i = 0; i < 10; i++) { //try to upload two times if it fail
++							spupload_flag = sp.upload (eeprom, (short)SIGN_MSL_ON_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGN_MSL_ON_ADDR + 1), (short)SIGN_MSL_ON_ADDR);
++							if (!spupload_flag) {
++								if (sp.keepalive ())
++									Console.WriteLine ("keepalive successful (iter " + i + ")");
++								else
++									Console.WriteLine ("keepalive fail (iter " + i + ")");
++							} else
++								break;
+                     }
++						if (spupload_flag)
++							MessageBox.Show ("Done writing configuration data!");
++						else
++							MessageBox.Show ("Failed to upload new configuration data");
+                 }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+             }
+ 
+@@ -883,34 +756,32 @@
+ 
+ 
+         //Write data to MinimOSD EPPROM
+-        private void BUT_ResetOSD_EEPROM()
+-        {
++		private void BUT_ResetOSD_EEPROM () {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             this.toolStripStatusLabel1.Text = "";
+ 
+ 		  for(int k=0;k<npanel;k++) {
+             //First Panel 
+             List<TreeNode> AllNodes = new List<TreeNode>();
+-            foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes)
+-            {
+-                foreach (TreeNode tn2 in tn.Nodes)
+-                {
++				foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {
++					foreach (TreeNode tn2 in tn.Nodes) {
+                     AllNodes.Add(tn2);
+                 }
+                 AllNodes.Add(tn);
+             }
+ 
+-            foreach (TreeNode tn in AllNodes)
+-            {
++				foreach (TreeNode tn in AllNodes) {
+                 string str = tn.Text;
+-                foreach (var tuple in this.scr[this.panel_number].panelItems_default)
+-                {
+-                    if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1)
+-                    {
+-                        if (str == "Center") eeprom[tuple.Item5] = 0;
+-                        else if (str == "Tune") eeprom[tuple.Item5] = 0;
+-                        else if (str == "Channel Raw") eeprom[tuple.Item5] = 0;
+-                        else eeprom[tuple.Item5] = 1;
++					foreach (var tuple in this.scr[this.panel_number].panelItems_default) {
++						if ((tuple != null) && ((tuple.Item1 == str)) && tuple.Item5 != -1) {
++							if (str == "Center")
++								eeprom [tuple.Item5] = 0;
++							else if (str == "Tune")
++								eeprom [tuple.Item5] = 0;
++							else if (str == "Channel Raw")
++								eeprom [tuple.Item5] = 0;
++							else
++								eeprom [tuple.Item5] = 1;
+ 
+                         eeprom[tuple.Item6] = (byte)tuple.Item3; // x
+                         eeprom[tuple.Item7] = (byte)tuple.Item4; // y
+@@ -946,16 +817,12 @@
+ 
+             eeprom[CHK_VERSION] = VER;
+ 
+-            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+-            {
++			for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) {
+                 eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('a');
+                 Console.WriteLine("Call Sign ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
+             }
+ 
+-            ArduinoSTK sp;
+-
+-            try
+-            {
++			ArduinoSTK 			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -969,44 +836,38 @@
+                 sp.RtsEnable = false; //added
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
++			if (sp.connectA				{
+                     bool spupload_flag = false;
+-                    for (int i = 0; i < 10; i++)
+-                    { //try to upload two times if it fail
++					for (int i = 0; i < 10; i++) { //try to upload two times if it fail
+                         spupload_flag = sp.upload(eeprom, 0, CHK_VERSION + 1, 0);
+-                        if (!spupload_flag)
+-                        {
+-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                        }
+-                        else break;
+-                    }
+-                    if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+-                    else MessageBox.Show("Failed to upload new configuration data");
++						if (!spupload_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
++						} else
++							break;
+                 }
+-                catch (Exception ex)
+-                {
++					if (spupload_flag)
++						MessageBox.Show ("Done writing configuration data!");
++					else
++						MessageBox.Show ("Failed to upload new configuration data");
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+             }
+ 
+             sp.Close();
+         }
+ 
+-
+-
+-        private void comboBox1_Click(object sender, EventArgs e)
+-        {
++		private void comboBox1_Click (object sender, EventArgs e) {
+             CMB_ComPort.Items.Clear();
+             CMB_ComPort.Items.AddRange(GetPortNames());
+         }
+@@ -1177,34 +1033,24 @@
+         const int CS_VERSION1_ADDR = 936;
+         const int CS_VERSION2_ADDR = 938;
+         const int CS_VERSION3_ADDR = 940;
+-
+         const int CHK_VERSION = 1010;
+ 
+-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+-        {
++		private void checkBox1_CheckedChanged (object sender, EventArgs e) {
+           	osdDraw(panel_number);  
+         }
+ 
+-        private void OSD_Resize(object sender, EventArgs e)
+-        {
+-			
+-            try
+-            {
++		private void OSD_Resize (object sender, EventArgs e) {			{
+                 osdDraw(panel_number);
+              
++			} catch {
+             }
+-            catch { }
+         }
+ 
+-        private void ReadCharsetVersion()
+-        {
++		private void ReadCharsetVersion () {
+             byte[] tempEeprom = new byte[1024];
+ 
+             bool fail = false;
+-            ArduinoSTK sp;
+-
+-            try
+-            {
++			ArduinoSTK 			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -1214,53 +1060,44 @@
+                 sp.DtrEnable = true;
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
+-                    for (int i = 0; i < 5; i++)
+-                    { //try to download two times if it fail
++			if (sp.connectA				{
++					for (int i = 0; i < 5; i++) { //try to download two times if it fail
+                         tempEeprom = sp.download(1024);
+-                        if (!sp.down_flag)
+-                        {
+-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                        }
+-                        else break;
+-                    }
++						if (!sp.down_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
++						} else
++							break;
+                 }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+                 fail = true;
+             }
+ 
+             sp.Close();
+ 
+-            if (!fail)
+-            {
++			if (!fail) {
+                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + tempEeprom[CS_VERSION1_ADDR].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 1].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 2].ToString(); 
+             }
+         }
+ 
+-        private void WriteCharsetVersion(string version)
+-        {
++		private void WriteCharsetVersion (string version) {
+             byte[] tempEeprom = new byte[3];
+             tempEeprom[0] = (byte)version[0];
+             tempEeprom[1] = (byte)version[1];
+             tempEeprom[2] = (byte)version[2];
+             //Set Com port
+-            ArduinoSTK sp;
+-            try
+-            {
++			ArduinoSTK			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -1274,50 +1111,43 @@
+                 sp.RtsEnable = false; //added
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
++			if (sp.connectA				{
+                     bool spupload_flag = false;
+-                        for (int i = 0; i < 10; i++)
+-                        { //try to upload two times if it fail
++					for (int i = 0; i < 10; i++) { //try to upload two times if it fail
+                             spupload_flag = sp.upload(tempEeprom, (short)0, (short)tempEeprom.Length, (short)CS_VERSION1_ADDR);
+-                            if (!spupload_flag)
+-                            {
+-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                                else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                            }
+-                            else break;
+-                        }
+-                        if (spupload_flag) MessageBox.Show("Done writing configuration data!");
+-                        else MessageBox.Show("Failed to upload new configuration data");
++						if (!spupload_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
++						} else
++							break;
+                 }
+-                catch (Exception ex)
+-                {
++					if (spupload_flag)
++						MessageBox.Show ("Done writing configuration data!");
++					else
++						MessageBox.Show ("Failed to upload new configuration data");
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+             }
+ 
+             sp.Close();
+         }
+ 
+-        private void BUT_ReadOSD_Click(object sender, EventArgs e)
+-        {
++		private void BUT_ReadOSD_Click (object sender, EventArgs e) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             this.toolStripStatusLabel1.Text = "";
+ 
+             bool fail = false;
+-            ArduinoSTK sp;
+-
+-            try
+-            {
++			ArduinoSTK 			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -1327,31 +1157,26 @@
+                 sp.DtrEnable = true;
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
+-                    for (int i = 0; i < 5; i++)
+-                    { //try to download two times if it fail
++			if (sp.connectA				{
++					for (int i = 0; i < 5; i++) { //try to download two times if it fail
+                         eeprom = sp.download(1024);
+-                        if (!sp.down_flag)
+-                        {
+-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                        }
+-                        else break;
+-                    }
++						if (!sp.down_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
++						} else
++							break;
+                 }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+                 fail = true;
+             }
+@@ -1359,24 +1184,19 @@
+             sp.Close();
+ 
+             //Verify EEPROM version
+-            if (eeprom[CHK_VERSION] != VER)
+-            { // no match
++			if (eeprom [CHK_VERSION] != VER) { // no match
+                 MessageBox.Show("The EEPROM mapping is outdated! An automatic update will start.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                 BUT_ResetOSD_EEPROM(); //write defaults
+                 MessageBox.Show("EEPROM mapping updated!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                 return;
+             }
+-            if (!fail)
+-            {
++			if (!fail) {
+ 
+ 			for(int k=0;k<npanel;k++){
+-                for (int a = 0; a < this.scr[k].panelItems.Length; a++)
+-                {
+-                    if (this.scr[k].panelItems[a] != null)
+-                    {
++					for (int a = 0; a < this.scr[k].panelItems.Length; a++) {
++						if (this.scr [k].panelItems [a] != null) {
+ 						var pi=this.scr[k].panelItems[a];
+-                        if (pi.Item5 >= 0)
+-                        {
++							if (pi.Item5 >= 0) {
+                             TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(pi.Item1, true);
+                             if (tnArray.Length > 0)
+                                 tnArray[0].Checked = (eeprom[pi.Item5] == 1);
+@@ -1398,21 +1218,15 @@
+             pan.cs_version1 = eeprom[CS_VERSION1_ADDR];
+             pan.cs_version2 = eeprom[CS_VERSION1_ADDR + 1];
+             pan.cs_version3 = eeprom[CS_VERSION1_ADDR + 2];
+-            if((pan.fw_version1 == '0') && (pan.fw_version2 == '0') && (pan.fw_version3 == '0'))
+-            {
++			if ((pan.fw_version1 == '0') && (pan.fw_version2 == '0') && (pan.fw_version3 == '0')) {
+                 lblFWModelType.Text = "Model Type found in OSD: Unknown or custom";
+-            }
+-            else
+-            {
++			} else {
+                 lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version1 + "." + pan.fw_version2 + "." + pan.fw_version3;
+             }
+ 
+-            if ((pan.cs_version1 == '0') && (pan.cs_version2 == '0') && (pan.cs_version3 == '0'))
+-            {
++			if ((pan.cs_version1 == '0') && (pan.cs_version2 == '0') && (pan.cs_version3 == '0')) {
+                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
+-            }
+-            else
+-            {
++			} else {
+                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + (pan.cs_version1 - '0').ToString() + "." + (pan.cs_version2 - '0').ToString() + "." + (pan.cs_version3 - '0').ToString();
+             }
+ 
+@@ -1427,20 +1241,15 @@
+             cbxModelType.SelectedItem = (ModelType)pan.model_type;
+             pan.converts = eeprom[measure_ADDR];
+             //Modify units
+-            if (pan.converts == 0)
+-            {
++			if (pan.converts == 0) {
+                 UNITS_combo.SelectedIndex = 0; //metric
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                 OVERSPEED_label.Text = "Overspeed (km/h)";
+-            }
+-            else if (pan.converts == 1)
+-            {
++			} else if (pan.converts == 1) {
+                 UNITS_combo.SelectedIndex = 1; //imperial
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                 OVERSPEED_label.Text = "Overspeed (mph)";
+-            }
+-            else //garbage value in EEPROM - default to metric
+-            {
++			} else { //garbage value in EEPROM - default to metric
+                 pan.converts = 0; //correct value
+                 UNITS_combo.SelectedIndex = 0; //metric
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+@@ -1472,17 +1281,14 @@
+             RSSI_numeric_min.Value = 0;
+             RSSI_numeric_max.Value = 0;
+             RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+-            if ((int)(pan.rssiraw_on / 2) == 0)
+-            {
++			if ((int)(pan.rssiraw_on / 2) == 0) {
+                 RSSI_numeric_min.Value = pan.rssipersent;
+                 RSSI_numeric_max.Value = pan.rssical;
+                 RSSI_numeric_min.Minimum = 0;
+                 RSSI_numeric_min.Maximum = 255;
+                 RSSI_numeric_max.Minimum = 0;
+                 RSSI_numeric_max.Maximum = 255;
+-            }
+-            else
+-            {
++			} else {
+                 RSSI_numeric_min.Value = pan.rssipersent * 10;
+                 RSSI_numeric_max.Value = pan.rssical * 10;
+                 RSSI_numeric_min.Minimum = 900;
+@@ -1497,8 +1303,10 @@
+             updatingRSSI = false;
+ 
+             pan.ch_toggle = eeprom[OSD_Toggle_ADDR];
+-            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+-            else ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
++			if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9)
++				ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
++			else
++				ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
+ 
+             pan.auto_screen_switch = eeprom[AUTO_SCREEN_SWITCH_ADD];
+             cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+@@ -1523,8 +1331,7 @@
+             BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+ 
+             char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
+-            for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
+-            {
++			for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) {
+                 str_call[i] = Convert.ToChar(eeprom[OSD_CALL_SIGN_ADDR + i]);
+                 Console.WriteLine("Call Sign read ", i, " is ", eeprom[OSD_CALL_SIGN_ADDR + i]);
+             }
+@@ -1542,69 +1349,56 @@
+ 
+             //if (!fail)
+             //    MessageBox.Show("Done!");
+-            if (sp.down_flag)
+-            {
++			if (sp.down_flag) {
+                 fwWasRead = true;
+                 MessageBox.Show("Done downloading data!");
+-            }
+-            else MessageBox.Show("Failed to download data!");
++			} else
++				MessageBox.Show ("Failed to download data!");
+             sp.down_flag = false;
+ 
+         }
+ 
+-
+-        byte[] readIntelHEXv2(StreamReader sr)
+-        {
++		byte[] readIntelHEXv2 (StreamReader sr) {
+             byte[] FLASH = new byte[1024 * 1024];
+ 
+             int optionoffset = 0;
+             int total = 0;
+             bool hitend = false;
+ 
+-            while (!sr.EndOfStream)
+-            {
++			while (!sr.EndOfStream) {
+                 toolStripProgressBar1.Value = (int)(((float)sr.BaseStream.Position / (float)sr.BaseStream.Length) * 100);
+ 
+                 string line = sr.ReadLine();
+ 
+-                if (line.StartsWith(":"))
+-                {
++				if (line.StartsWith (":")) {
+                     int length = Convert.ToInt32(line.Substring(1, 2), 16);
+                     int address = Convert.ToInt32(line.Substring(3, 4), 16);
+                     int option = Convert.ToInt32(line.Substring(7, 2), 16);
+                     Console.WriteLine("len {0} add {1} opt {2}", length, address, option);
+ 
+-                    if (option == 0)
+-                    {
++					if (option == 0) {
+                         string data = line.Substring(9, length * 2);
+-                        for (int i = 0; i < length; i++)
+-                        {
++						for (int i = 0; i < length; i++) {
+                             byte byte1 = Convert.ToByte(data.Substring(i * 2, 2), 16);
+                             FLASH[optionoffset + address] = byte1;
+                             address++;
+                             if ((optionoffset + address) > total)
+                                 total = optionoffset + address;
+                         }
+-                    }
+-                    else if (option == 2)
+-                    {
++					} else if (option == 2) {
+                         optionoffset = (int)Convert.ToUInt16(line.Substring(9, 4), 16) << 4;
+-                    }
+-                    else if (option == 1)
+-                    {
++					} else if (option == 1) {
+                         hitend = true;
+                     }
+                     int checksum = Convert.ToInt32(line.Substring(line.Length - 2, 2), 16);
+ 
+                     byte checksumact = 0;
+-                    for (int z = 0; z < ((line.Length - 1 - 2) / 2); z++) // minus 1 for : then mins 2 for checksum itself
+-                    {
++					for (int z = 0; z < ((line.Length - 1 - 2) / 2); z++) { // minus 1 for : then mins 2 for checksum itself
+                         checksumact += Convert.ToByte(line.Substring(z * 2 + 1, 2), 16);
+                     }
+                     checksumact = (byte)(0x100 - checksumact);
+ 
+-                    if (checksumact != checksum)
+-                    {
++					if (checksumact != checksum) {
+                         MessageBox.Show("The hex file loaded is invalid, please try again.");
+                         throw new Exception("Checksum Failed - Invalid Hex");
+                     }
+@@ -1612,8 +1406,7 @@
+                 //Regex regex = new Regex(@"^:(..)(....)(..)(.*)(..)$"); // length - address - option - data - checksum
+             }
+ 
+-            if (!hitend)
+-            {
++			if (!hitend) {
+                 MessageBox.Show("The hex file did no contain an end flag. aborting");
+                 throw new Exception("No end flag in file");
+             }
+@@ -1623,52 +1416,41 @@
+             return FLASH;
+         }
+ 
+-        void sp_Progress(int progress)
+-        {
++		void sp_Progress (int progress) {
+             toolStripStatusLabel1.Text = "Uploading " + progress + " %";
+             toolStripProgressBar1.Value = progress;
+ 
+             statusStrip1.Refresh();
+         }
+ 
+-        private void CHK_pal_CheckedChanged(object sender, EventArgs e)
+-        {
++		private void CHK_pal_CheckedChanged (object sender, EventArgs e) {
+             changeToPal(CHK_pal.Checked);
+ 			
+             osdDraw(panel_number);
+             
+         }
+ 
+-        private void pALToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
+-        {
++		private void pALToolStripMenuItem_CheckStateChanged (object sender, EventArgs e) {
+             CHK_ntsc.Checked = !CHK_pal.Checked;
+         }
+ 
+-        private void nTSCToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
+-        {
++		private void nTSCToolStripMenuItem_CheckStateChanged (object sender, EventArgs e) {
+             CHK_pal.Checked = !CHK_ntsc.Checked;
+         }
+ 
+-        private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void saveToFileToolStripMenuItem_Click (object sender, EventArgs e) {
+             SaveFileDialog sfd = new SaveFileDialog() { Filter = "*.osd|*.osd" };
+ 
+             sfd.ShowDialog();
+ 
+-            if (sfd.FileName != "")
+-            {
+-                try
+-                {
+-                    using (StreamWriter sw = new StreamWriter(sfd.OpenFile()))
++			if (sfd.FileName !				{
++					using (StreamWriter sw = new StreamWriter(sfd.OpenFile())) {
+                     //Write
+-                    {
+                         //Panel 1
+ 						for(int k=0;k<npanel;k++) {
+                         	sw.WriteLine("{0}", "Panel "+k);
+-                        	foreach (var item in this.scr[k].panelItems)
+-                        	{
+-	                            if (item != null)
+-                            	{
++							foreach (var item in this.scr[k].panelItems) {
++								if (item != null) {
+ 	                                TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(item.Item1, true);
+                                 	if (tnArray.Length > 0)
+ 	                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.Item1, item.Item3, item.Item4, tnArray[0].Checked.ToString());
+@@ -1700,9 +1482,7 @@
+                         sw.WriteLine("{0}\t{1}", "Sign MSL Altitude", pan.sign_msl_altitude);
+                         sw.Close();
+                     }
+-                }
+-                catch
+-                {
++				} catch {
+                     MessageBox.Show("Error writing file");
+                 }
+             }
+@@ -1710,91 +1490,96 @@
+ 
+         private Boolean updatingRSSI = false;
+ 
+-        private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void loadFromFileToolStripMenuItem_Click (object sender, EventArgs e) {
+             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
+             //const int nosdfunctions = 29;
+             ofd.ShowDialog();
+ 
+-            if (ofd.FileName != "")
+-            {
+-                try
+-                {
+-                    using (StreamReader sr = new StreamReader(ofd.OpenFile()))
+-                    {
++			if (ofd.FileName !				{
++					using (StreamReader sr = new StreamReader(ofd.OpenFile())) {
+ 						while(true) {
+                         	//Panel 1
+                         	//string stringh = sr.ReadLine(); //
+ 							string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
+ 							int k=0;
+ 						
+-							if(hdr[0]!="Panel") break;
++							if (hdr [0] != "Panel")
++								break;
+ 							
+ 							k=int.Parse(hdr[1]);
+ 							//while (!sr.EndOfStream)
+-                        	for (int i = 0; i < nosdfunctions; i++)
+-                        	{
++							for (int i = 0; i < nosdfunctions; i++) {
+ 	                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+-                            	for (int a = 0; a < this.scr[k].panelItems.Length; a++)
+-                            	{
+-	                                if (this.scr[k].panelItems[a] != null && this.scr[k].panelItems[a].Item1 == strings[0])
+-                                	{
++								for (int a = 0; a < this.scr[k].panelItems.Length; a++) {
++									if (this.scr [k].panelItems [a] != null && this.scr [k].panelItems [a].Item1 == strings [0]) {
+ 										var pi=this.scr[k].panelItems[a];
+-	                                    // incase there is an invalid line number or to shore
+-                                    	try
+-                                    	{
++										// incase there is an invalid l										{
+ 	                                        this.scr[k].panelItems[a] = new Tuple<string, Func<int, int, int>, int, int, int, int, int>(pi.Item1, pi.Item2, int.Parse(strings[1]), int.Parse(strings[2]), pi.Item5, pi.Item6, pi.Item7);
+ 	
+                                         	TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(this.scr[k].panelItems[a].Item1, true);
+                                         	if (tnArray.Length > 0)
+ 	                                            tnArray[0].Checked = (strings[3] == "True");
++										} catch {
+                                     	}
+-                                    	catch { }
+                                 	}
+                             	}
+                         	}
+ 						}
+ //                        stringh = sr.ReadLine(); //config
+-                        while (!sr.EndOfStream)
+-                        {
++						while (!sr.EndOfStream) {
+                             string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+-                            if (strings[0] == "Units") pan.converts = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Overspeed") pan.overspeed = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
+-                            else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
+-                            else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
+-                            else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
+-                            else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
+-                            else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
+-                            else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)byte.Parse(strings[1]); //we're not overwriting "eeprom" model type
+-                            else if (strings[0] == "Sign Air Speed") pan.sign_air_speed = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
+-                            else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
++							if (strings [0] == "Units")
++								pan.converts = byte.Parse (strings [1]);
++							else if (strings [0] == "Overspeed")
++								pan.overspeed = byte.Parse (strings [1]);
++							else if (strings [0] == "Stall")
++								pan.stall = byte.Parse (strings [1]);
++							else if (strings [0] == "Battery")
++								pan.battv = byte.Parse (strings [1]);
++							else if (strings [0] == "RSSI High")
++								pan.rssical = byte.Parse (strings [1]);
++							else if (strings [0] == "RSSI Low")
++								pan.rssipersent = byte.Parse (strings [1]);
++							else if (strings [0] == "RSSI Enable Raw")
++								pan.rssiraw_on = byte.Parse (strings [1]);
++							else if (strings [0] == "Toggle Channel")
++								pan.ch_toggle = byte.Parse (strings [1]);
++							else if (strings [0] == "Auto Screen Switch")
++								pan.auto_screen_switch = byte.Parse (strings [1]);
++							else if (strings [0] == "Chanel Rotation Switching")
++								pan.switch_mode = byte.Parse (strings [1]);
++							else if (strings [0] == "Video Mode")
++								pan.pal_ntsc = byte.Parse (strings [1]);
++							else if (strings [0] == "Battery Warning Level")
++								pan.batt_warn_level = byte.Parse (strings [1]);
++							else if (strings [0] == "RSSI Warning Level")
++								pan.rssi_warn_level = byte.Parse (strings [1]);
++							else if (strings [0] == "OSD Brightness")
++								pan.osd_brightness = byte.Parse (strings [1]);
++							else if (strings [0] == "Call Sign")
++								pan.callsign_str = strings [1];
++							else if (strings [0] == "Model Type")
++								cbxModelType.SelectedItem = (ModelType)byte.Parse (strings [1]); //we're not overwriting "eeprom" model type
++							else if (strings [0] == "Sign Air Speed")
++								pan.sign_air_speed = byte.Parse (strings [1]);
++							else if (strings [0] == "Sign Ground  Speed")
++								pan.sign_ground_speed = byte.Parse (strings [1]);
++							else if (strings [0] == "Sign Home Altitude")
++								pan.sign_home_altitude = byte.Parse (strings [1]);
++							else if (strings [0] == "Sign MSL Altitude")
++								pan.sign_msl_altitude = byte.Parse (strings [1]);
+                         }
+ 
+                         //Modify units
+-                        if (pan.converts == 0)
+-                        {
++						if (pan.converts == 0) {
+                             UNITS_combo.SelectedIndex = 0; //metric
+                             STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                             OVERSPEED_label.Text = "Overspeed (km/h)";
+-                        }
+-                        else if (pan.converts == 1)
+-                        {
++						} else if (pan.converts == 1) {
+                             UNITS_combo.SelectedIndex = 1; //imperial
+                             STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                             OVERSPEED_label.Text = "Overspeed (mph)";
+-                        }
+-                        else //red garbage value in EEPROM - default to metric
+-                        {
++						} else { //red garbage value in EEPROM - default to metric
+                             pan.converts = 0; //correct value
+                             UNITS_combo.SelectedIndex = 0; //metric
+                             STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+@@ -1816,17 +1601,14 @@
+                         RSSI_numeric_min.Value = 0;
+                         RSSI_numeric_max.Value = 0;
+                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+-                        if ((int)(pan.rssiraw_on / 2) == 0)
+-                        {
++						if ((int)(pan.rssiraw_on / 2) == 0) {
+                             RSSI_numeric_min.Value = pan.rssipersent;
+                             RSSI_numeric_max.Value = pan.rssical;
+                             RSSI_numeric_min.Minimum = 0;
+                             RSSI_numeric_min.Maximum = 255;
+                             RSSI_numeric_max.Minimum = 0;
+                             RSSI_numeric_max.Maximum = 255;
+-                        }
+-                        else
+-                        {
++						} else {
+                             RSSI_numeric_min.Value = pan.rssipersent * 10;
+                             RSSI_numeric_max.Value = pan.rssical * 10;
+                             RSSI_numeric_min.Minimum = 900;
+@@ -1836,8 +1618,10 @@
+                         }
+                         cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+ 
+-                        if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+-                        else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
++						if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9)
++							ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
++						else
++							ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
+ 
+                         cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
+@@ -1861,13 +1645,8 @@
+                         this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+ 
+                     }
+-                }
+-                catch
+-                {
+-                    MessageBox.Show("Error Reading file");
+-                }
+-                finally
+-                {
++				} catch {
++					MessageBox.Show ("Error Reading file")				{
+                     updatingRSSI = false;
+                 }
+             }
+@@ -1876,20 +1655,15 @@
+             
+         }
+ 
+-        private void loadDefaultsToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void loadDefaultsToolStripMenuItem_Click (object sender, EventArgs e) {
+             setupFunctions();
+         }
+ 
+-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void exitToolStripMenuItem_Click (object sender, EventArgs e) {
+             Application.Exit();
+         }
+ 
+-        
+-
+-        private void updateFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void updateFirmwareToolStripMenuItem_Click (object sender, EventArgs e) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             this.toolStripStatusLabel1.Text = "";
+ 
+@@ -1898,25 +1672,21 @@
+             if(ofd.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
+                 return;
+ 
+-            if (ofd.FileName != "")
+-            {
++			if (ofd.FileName != "") {
+                 byte[] FLASH;
+-                bool spuploadflash_flag = false;
+-                try
+-                {
++				bool spuploadflash_flag =				{
+                     toolStripStatusLabel1.Text = "Reading Hex File";
+ 
+                     statusStrip1.Refresh();
+ 
+                     FLASH = readIntelHEXv2(new StreamReader(ofd.FileName));
++				} catch {
++					MessageBox.Show ("Bad Hex File");
++					return;
+                 }
+-                catch { MessageBox.Show("Bad Hex File"); return; }
+ 
+                 //bool fail = false;
+-                ArduinoSTK sp;
+-
+-                try
+-                {
++				ArduinoS				{
+                     if (comPort.IsOpen)
+                         comPort.Close();
+ 
+@@ -1930,26 +1700,25 @@
+                     sp.RtsEnable = false; //added
+ 
+                     sp.Open();
++				} catch {
++					MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++					return;
+                 }
+-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+                 toolStripStatusLabel1.Text = "Connecting to Board";
+ 
+-                if (sp.connectAP())
+-                {
+-                    sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);
+-                    try
+-                    {
+-                        for (int i = 0; i < 3; i++) //try to upload 3 times
+-                        { //try to upload n times if it fail
++				if (sp.connectAP ()) {
++					sp.Progress += new ArduinoSTK.ProgressEventHandler (sp_					{
++						for (int i = 0; i < 3; i++) { //try to upload 3 times //try to upload n times if it fail
+                             spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+-                            if (!spuploadflash_flag)
+-                            {
+-                                if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                                else Console.WriteLine("keepalive fail (iter " + i + ")");
++							if (!spuploadflash_flag) {
++								if (sp.keepalive ())
++									Console.WriteLine ("keepalive successful (iter " + i + ")");
++								else
++									Console.WriteLine ("keepalive fail (iter " + i + ")");
+                                 //toolStripStatusLabel1.Text = "Lost sync. Reconnecting...";
+-                            }
+-                            else break;
++							} else
++								break;
+                         }
+ 
+                         //if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
+@@ -1962,30 +1731,23 @@
+                         //        MessageBoxButtons.OK,        
+                         //        MessageBoxIcon.Warning); 
+                         //}
+-                    }
+-                    catch (Exception ex)
+-                    {
++					} catch (Exception ex) {
+                         //fail = true;
+                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                     }
+ 
+-                }
+-                else
+-                {
++				} else {
+                     MessageBox.Show("Failed to talk to bootloader");
+                 }
+ 
+                 sp.Close();
+ 
+-                if (spuploadflash_flag)
+-                {
++				if (spuploadflash_flag) {
+ 
+                     toolStripStatusLabel1.Text = "Done";
+ 
+                     MessageBox.Show("Done!");
+-                }
+-                else
+-                {
++				} else {
+                     MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
+                                 "Error",
+                                 MessageBoxButtons.OK,
+@@ -2000,71 +1762,60 @@
+         }
+ 
+         private Boolean customImage = false;
+-        private void customBGPictureToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++
++		private void customBGPictureToolStripMenuItem_Click (object sender, EventArgs e) {
+             OpenFileDialog ofd = new OpenFileDialog();
+             ofd.Filter = "jpg or bmp|*.jpg;*.bmp";
+ 
+             ofd.ShowDialog();
+ 
+-            if (ofd.FileName != "")
+-            {
+-                try
+-                {
++			if (ofd.FileName !				{
+                     bgpicture = Image.FromFile(ofd.FileName);
+ 
++				} catch {
++					MessageBox.Show ("Bad Image");
+                 }
+-                catch { MessageBox.Show("Bad Image"); }
+                 customImage = true;
+ 				osdDraw(panel_number);
+                 
+             }
+         }
+ 
+-        private void sendTLogToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void sendTLogToolStripMenuItem_Click (object sender, EventArgs e) {
+ 
+             OpenFileDialog ofd = new OpenFileDialog();
+             ofd.Filter = "Tlog|*.tlog";
+ 
+             ofd.ShowDialog();
+ 
+-            if (ofd.FileName != "")
+-            {
++			if (ofd.FileName != "") {
+                 //if (comPort.IsOpen)
+-                //    comPort.Close();
+-
+-                try
+-                {
++				//    comPort.Cl				{
+ 
+                     //comPort.PortName = CMB_ComPort.Text;
+                     //comPort.BaudRate = 57600;
+                     //comPort.Open();
+ 
++				} catch {
++					MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++					return;
+                 }
+-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+                 BinaryReader br = new BinaryReader(ofd.OpenFile());
+ 
+                 this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+                 this.toolStripStatusLabel1.Text = "Sending TLOG data...";
+ 
+-                while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+-                {
+-                    try
+-                    {
++				while (br.BaseStream.Position < br.BaseStream.Length && !this.IsD					{
+                         string message = "";
+                         byte[] bytes = br.ReadBytes(200000);
+                         int frameIndex = 0;
+-                        for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
+-                        {
+-                            if (frameIndex >= 20)
+-                            {
++						for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++) {
++							if (frameIndex >= 20) {
+                                 //string a = "";
+                             }
+ 
+-                            if (frameIndex < 20)
+-                            {
++							if (frameIndex < 20) {
+                                 while (bytes[byteIndex] == '\0')
+                                     byteIndex++;
+                                 int length = (int)bytes[byteIndex];
+@@ -2087,8 +1838,7 @@
+                                 message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
+                                 byteIndex++;
+                                 message += "Message: ";
+-                                for (int x = 0; x < length; x++)
+-                                {
++								for (int x = 0; x < length; x++) {
+                                     while (bytes[byteIndex] == '\0')
+                                         byteIndex++;
+                                     message += ((char)bytes[byteIndex]).ToString();
+@@ -2105,8 +1855,7 @@
+                                 byteIndex++;
+                             }
+ 
+-                            if (bytes[byteIndex] == 0xFE)
+-                            {
++							if (bytes [byteIndex] == 0xFE) {
+                                 frameIndex++;
+                             }
+ 
+@@ -2121,25 +1870,21 @@
+ 
+                         //Console.Write(comPort.ReadExisting());
+ 
+-                    }
+-                    catch { break; }
+-
+-                    Application.DoEvents();
++					} catch {
++						break;
+                 }
+ 
+-                try
+-                {
++					Application.DoEvents ();				{
+                     toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+                     toolStripStatusLabel1.Text = "";
+ 
+                     //comPort.Close();
++				} catch {
+                 }
+-                catch { }
+             }
+         }
+ 
+-        private void OSD_FormClosed(object sender, FormClosedEventArgs e)
+-        {
++		private void OSD_FormClosed (object sender, FormClosedEventArgs e) {
+             xmlconfig(true);
+         }
+ 
+@@ -2149,12 +1894,8 @@
+         private bool autoUpdate = false;
+         private bool checkForUpdates = true;
+ 
+-        private void xmlconfig(bool write)
+-        {
+-            if (write || !File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.xml"))
+-            {
+-                try
+-                {
++		private void xmlconfig (bool write) {
++			if (write || !File.Exists (Path.GetDirectoryName (Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.x				{
+                     XmlTextWriter xmlwriter = new XmlTextWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.xml", Encoding.ASCII);
+                     xmlwriter.Formatting = Formatting.Indented;
+ 
+@@ -2182,22 +1923,14 @@
+                     xmlwriter.Close();
+ 
+                     //appconfig.Save();
++				} catch (Exception ex) {
++					MessageBox.Show (ex.ToString ());
+                 }
+-                catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+-            }
+-            else
+-            {
+-                try
+-                {
+-                    using (XmlTextReader xmlreader = new XmlTextReader(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.xml"))
+-                    {
+-                        while (xmlreader.Read())
+-                        {
+-                            xmlreader.MoveToElement();
+-                            try
+-                            {
+-                                switch (xmlreader.Name)
+-                                {
++			}				{
++					using (XmlTextReader xmlreader = new XmlTextReader(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + @"config.xml")) {
++						while (xmlreader.Read()) {
++							xmlreader.M							{
++								switch (xmlreader.Name) {
+                                     case "comport":
+                                         string temp = xmlreader.ReadString();
+                                         CMB_ComPort.Text = temp;
+@@ -2230,20 +1963,20 @@
+                                             break;
+                                         break;
+                                 }
+-                            }
+-                            catch (Exception ee) { Console.WriteLine(ee.Message); } // silent fail on bad entry
++							} catch (Exception ee) {
++								Console.WriteLine (ee.Message);
++							} // silent fail on bad entry
+                         }
+                     }
+-                }
+-                catch (Exception ex) { Console.WriteLine("Bad Config File: " + ex.ToString()); } // bad config file
++				} catch (Exception ex) {
++					Console.WriteLine ("Bad Config File: " + ex.ToString ());
++				} // bad config file
+             }
+         }
+ 
+-        private Boolean IsValidCharsetFile(OpenFileDialog ofd)
+-        {
++		private Boolean IsValidCharsetFile (OpenFileDialog ofd) {
+             string errorMessage = "";
+-            using (var stream = ofd.OpenFile())
+-            {
++			using (var stream = ofd.OpenFile()) {
+                 StreamReader sr = new StreamReader(stream);
+                 //Check header
+                 long lineNumber = 1;
+@@ -2251,17 +1984,14 @@
+                     errorMessage += "Invalid file header." + Environment.NewLine;
+ 
+                 lineNumber++;
+-                while(!sr.EndOfStream)
+-                {
++				while (!sr.EndOfStream) {
+                     string line = sr.ReadLine();
+-                    if (line.Length != 8)
+-                    {
++					if (line.Length != 8) {
+                         errorMessage += "Invalid line length in line:" + lineNumber + Environment.NewLine;
+                         break;
+                     }
+                     foreach(char c in line)
+-                        if (c != '0' && c != '1')
+-                        {
++						if (c != '0' && c != '1') {
+                             errorMessage += "Invalid char in line:" + lineNumber + Environment.NewLine;
+                             break;
+                         }
+@@ -2275,8 +2005,7 @@
+             return string.IsNullOrEmpty(errorMessage);
+         }
+ 
+-        private void updateFontToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void updateFontToolStripMenuItem_Click (object sender, EventArgs e) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             toolStripStatusLabel1.Text = "";
+ 
+@@ -2293,16 +2022,13 @@
+             //Get file version
+             string fileVersion = "000";
+             string tempFileName = ofd.SafeFileName.ToUpper();
+-            if(tempFileName.StartsWith("MINIMOSD_"))
+-            {
++			if (tempFileName.StartsWith ("MINIMOSD_")) {
+                 tempFileName = tempFileName.Remove(0, 9);
+-                if(tempFileName.EndsWith(".MCM"))
+-                {
++				if (tempFileName.EndsWith (".MCM")) {
+                     tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                     string[] versionArray = tempFileName.Split('.');
+                     Int16 version1, version2, version3;
+-                    if(versionArray.Length > 2)
+-                    {
++					if (versionArray.Length > 2) {
+                         if(Int16.TryParse(versionArray[0], out version1) && 
+                            Int16.TryParse(versionArray[1], out version2) && 
+                            Int16.TryParse(versionArray[2], out version3))
+@@ -2311,13 +2037,9 @@
+                 }
+             }
+ 
+-            if (ofd.FileName != "")
+-            {
++			if (ofd.FileName != "") {
+                 if (comPort.IsOpen)
+-                    comPort.Close();
+-
+-                try
+-                {
++					comPort.Clo				{
+ 
+                     comPort.PortName = CMB_ComPort.Text;
+                     comPort.BaudRate = 57600;
+@@ -2344,40 +2066,37 @@
+ 
+                     int timeout = 0;
+ 
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(500);
+                         Console.WriteLine("Waiting...");
+                         timeout++;
+ 
+-                        if (timeout > 10)
+-                        {
++						if (timeout > 10) {
+                             MessageBox.Show("Error entering font mode - No Data");
+                             comPort.Close();
+                             return;
+                         }
+                     }
+                     string readFont = comPort.ReadLine();
+-                    if (!readFont.Contains("Ready for Font") && !readFont.Contains("RFF"))
+-                    {
++					if (!readFont.Contains ("Ready for Font") && !readFont.Contains ("RFF")) {
+                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                         comPort.Close();
+                         return;
+                     }
+ 
++				} catch {
++					MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++					return;
+                 }
+-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-                using (var stream = ofd.OpenFile())
+-                {
++				using (var stream = ofd.OpenFile()) {
+ 
+                     BinaryReader br = new BinaryReader(stream);
+                     StreamReader sr2 = new StreamReader(br.BaseStream);
+ 
+                     string device = sr2.ReadLine();
+                     
+-                    if (device != "MAX7456")
+-                    {
++					if (device != "MAX7456") {
+                         MessageBox.Show("Invalid MCM");
+                         comPort.Close();
+                         return;
+@@ -2386,17 +2105,13 @@
+                     br.BaseStream.Seek(0, SeekOrigin.Begin);
+ 
+                     long length = br.BaseStream.Length;
+-                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+-                    {
+-                        try
+-                        {
++					while (br.BaseStream.Position < br.BaseStream.Length && !this.						{
+                             toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+                             toolStripStatusLabel1.Text = "CharSet Uploading";
+ 
+ 
+                             int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
+-                            if ((br.BaseStream.Position + read) > br.BaseStream.Length)
+-                            {
++							if ((br.BaseStream.Position + read) > br.BaseStream.Length) {
+                                 read = (int)(br.BaseStream.Length - br.BaseStream.Position);
+                             }
+                             length -= read;
+@@ -2404,13 +2119,11 @@
+                             comPort.Write(buffer, 0, buffer.Length);
+                             int timeout = 0;
+ 
+-                            while (comPort.BytesToRead == 0 && read == 768)
+-                            {
++							while (comPort.BytesToRead == 0 && read == 768) {
+                                 System.Threading.Thread.Sleep(10);
+                                 timeout++;
+ 
+-                                if (timeout > 10)
+-                                {
++								if (timeout > 10) {
+                                     MessageBox.Show("CharSet upload failed - no response");
+                                     comPort.Close();
+                                     return;
+@@ -2418,13 +2131,11 @@
+                             }
+ 
+                             comPort.ReadExisting();
+-                            if (length < 1000)
+-                            {
++							if (length < 1000) {
+                                 lblFWModelType.Text = lblFWModelType.Text;
+                             }
+ 
+-                        }
+-                        catch { 
++						} catch { 
+                             break; 
+                         }
+ 
+@@ -2433,13 +2144,11 @@
+                     comPort.WriteLine("\r\n");
+                     //Wait for last char acknowledge
+                     int t = 0;
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(10);
+                         t++;
+ 
+-                        if (t > 10)
+-                        {
++						if (t > 10) {
+                             MessageBox.Show("No end");
+                             comPort.Close();
+                             return;
+@@ -2475,54 +2184,40 @@
+             }
+         }
+ 
+-        private void STALL_numeric_ValueChanged(object sender, EventArgs e)
+-        {
++		private void STALL_numeric_ValueChanged (object sender, EventArgs e) {
+             pan.stall = (byte)STALL_numeric.Value;
+         }
+ 
+-        private void RSSI_numeric_min_ValueChanged(object sender, EventArgs e)
+-        {
++		private void RSSI_numeric_min_ValueChanged (object sender, EventArgs e) {
+             if (updatingRSSI)
+                 return;
+-            if (cbxRSSIChannel.SelectedIndex == 0)
+-            {
++			if (cbxRSSIChannel.SelectedIndex == 0) {
+                 pan.rssipersent = (byte)RSSI_numeric_min.Value;
+-            }
+-            else
+-            {
++			} else {
+                 pan.rssipersent = (byte)(RSSI_numeric_min.Value / 10);
+             }
+         }
+ 
+-        private void RSSI_numeric_max_ValueChanged(object sender, EventArgs e)
+-        {
++		private void RSSI_numeric_max_ValueChanged (object sender, EventArgs e) {
+             if (updatingRSSI)
+                 return;
+-            if (cbxRSSIChannel.SelectedIndex == 0)
+-            {
++			if (cbxRSSIChannel.SelectedIndex == 0) {
+                 pan.rssical = (byte)RSSI_numeric_max.Value;
+-            }
+-            else
+-            {
++			} else {
+                 pan.rssical = (byte)(RSSI_numeric_max.Value / 10);
+             }
+         }
+ 
+-        private void OVERSPEED_numeric_ValueChanged(object sender, EventArgs e)
+-        {
++		private void OVERSPEED_numeric_ValueChanged (object sender, EventArgs e) {
+             pan.overspeed = (byte)OVERSPEED_numeric.Value;
+         }
+ 
+-        private void UNITS_combo_SelectedIndexChanged(object sender, EventArgs e)
+-        {
+-            if (UNITS_combo.SelectedIndex == 0)
+-            {
++		private void UNITS_combo_SelectedIndexChanged (object sender, EventArgs e) {
++			if (UNITS_combo.SelectedIndex == 0) {
+                 pan.converts = 0; //metric
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                 OVERSPEED_label.Text = "Overspeed (km/h)";
+-            }
+-            else if (UNITS_combo.SelectedIndex == 1)
+-            {
++			} else if (UNITS_combo.SelectedIndex == 1) {
+                 pan.converts = 1; //imperial
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                 OVERSPEED_label.Text = "Overspeed (mph)";
+@@ -2533,20 +2228,16 @@
+             
+         }
+ 
+-        private void MINVOLT_numeric_ValueChanged(object sender, EventArgs e)
+-        {
++		private void MINVOLT_numeric_ValueChanged (object sender, EventArgs e) {
+             pan.battv = (byte)(MINVOLT_numeric.Value * 10);
+         }
+ 
+-        private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e)
+-        {
++		private void ONOFF_combo_SelectedIndexChanged (object sender, EventArgs e) {
+             pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + toggle_offset);
+         }
+ 
+-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+-        {
+-            switch (cbxRSSIChannel.SelectedIndex)
+-            {
++		private void checkBox2_CheckedChanged (object sender, EventArgs e) {
++			switch (cbxRSSIChannel.SelectedIndex) {
+                 case 0:
+                     pan.rssiraw_on = 0;
+                     break;
+@@ -2557,35 +2248,27 @@
+             pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
+         }
+ 
+-        private void TOGGLE_BEHChanged(object sender, EventArgs e)
+-        {
++		private void TOGGLE_BEHChanged (object sender, EventArgs e) {
+             pan.switch_mode = Convert.ToByte(TOGGLE_BEH.Checked);
+         }
+ 
+-
+-        private void CHK_pal_Click(object sender, EventArgs e)
+-        {
++		private void CHK_pal_Click (object sender, EventArgs e) {
+             pan.pal_ntsc = 1;
+         }
+ 
+-        private void CHK_ntsc_Click(object sender, EventArgs e)
+-        {
++		private void CHK_ntsc_Click (object sender, EventArgs e) {
+             pan.pal_ntsc = 0;
+         }
+ 
+-        private void RSSI_WARNnumeric_ValueChanged(object sender, EventArgs e)
+-        {
++		private void RSSI_WARNnumeric_ValueChanged (object sender, EventArgs e) {
+             pan.rssi_warn_level = (byte)RSSI_WARNnumeric.Value;
+         }
+ 
+-        private void BATT_WARNnumeric_ValueChanged(object sender, EventArgs e)
+-        {
++		private void BATT_WARNnumeric_ValueChanged (object sender, EventArgs e) {
+             pan.batt_warn_level = (byte)BATT_WARNnumeric.Value;
+         }
+ 
+-
+-        private void CALLSIGNmaskedText_Validated(object sender, EventArgs e)
+-        {
++		private void CALLSIGNmaskedText_Validated (object sender, EventArgs e) {
+             pan.callsign_str = CALLSIGNmaskedText.Text;
+             //convert to lowercase on validate
+             pan.callsign_str = pan.callsign_str.ToLower(new CultureInfo("en-US", false));
+@@ -2596,29 +2279,24 @@
+             
+         }
+ 
+-        private void BRIGHTNESScomboBox_SelectedIndexChanged(object sender, EventArgs e)
+-        {
++		private void BRIGHTNESScomboBox_SelectedIndexChanged (object sender, EventArgs e) {
+             pan.osd_brightness = (byte)BRIGHTNESScomboBox.SelectedIndex;
+         }
+ 
+-        private void gettingStartedToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
+-            try
+-            {
++		private void gettingStartedToolStripMenuItem_Click (object sender, EventArgs 			{
+                 System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
++			} catch {
++				MessageBox.Show ("Webpage open failed... do you have a virus?");
+             }
+-            catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
+         }
+ 
+-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void aboutToolStripMenuItem_Click (object sender, EventArgs e) {
+             //MessageBox.Show("Author: Michael Oborne \nCo-authors: Pedro Santos \n Zoltán Gábor", "About ArduCAM OSD Config", MessageBoxButtons.OK, MessageBoxIcon.Information);
+             AboutBox1 about = new AboutBox1();
+             about.Show();
+         }
+ 
+-        private void rbtBatteryPercent_CheckedChanged(object sender, EventArgs e)
+-        {
++		private void rbtBatteryPercent_CheckedChanged (object sender, EventArgs e) {
+             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
+             //Refresh battery percent presentation
+ 			
+@@ -2626,39 +2304,28 @@
+             
+         }
+ 
+-
+-
+-       
+-
+         public ModelType modelType = ModelType.Plane; 
+-        private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e)
+-        {
++
++		private void cbxModelType_SelectedIndexChanged (object sender, EventArgs e) {
+             modelType = (ModelType)cbxModelType.SelectedItem;
+-            if (UNITS_combo.SelectedIndex == 0)
+-            {
++			if (UNITS_combo.SelectedIndex == 0) {
+                 pan.converts = 0; //metric
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                 OVERSPEED_label.Text = "Overspeed (km/h)";
+-            }
+-            else if (UNITS_combo.SelectedIndex == 1)
+-            {
++			} else if (UNITS_combo.SelectedIndex == 1) {
+                 pan.converts = 1; //imperial
+                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                 OVERSPEED_label.Text = "Overspeed (mph)";
+             }
+ 
+-            if (modelType == ModelType.Plane)
+-            {
++			if (modelType == ModelType.Plane) {
+                 if(!customImage)
+                     bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
+-            }
+-            else if (modelType == ModelType.Copter)
+-            {
++			} else if (modelType == ModelType.Copter) {
+                 if (!customImage)
+ 					try {
+                     	bgpicture = Image.FromFile("quad.png");
+-				} catch (Exception ex)
+-                {
++					} catch (Exception ex) {
+                     //fail = true;
+                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 }
+@@ -2668,16 +2335,14 @@
+             
+         }
+ 
+-        enum PanelsAutoSwitch
+-        {
++		enum PanelsAutoSwitch {
+             Disabled = 3,
+             Panel1 = 0,
+             Panel2 = 1,
+             //PanelOff = 2
+         }
+ 
+-        private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged(object sender, EventArgs e)
+-        {
++		private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged (object sender, EventArgs e) {
+             pan.auto_screen_switch = (byte)(PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem;
+ 
+             //Get panel warnings check status
+@@ -2685,10 +2350,8 @@
+             Boolean isPanel2WarningChecked = false;
+ 			for(int k=0;k<npanel;k++) {
+             	//Panel 
+-            	foreach (var item in this.scr[k].panelItems)
+-            	{
+-                	if (item != null && item.Item1 == "Warnings")
+-                	{
++				foreach (var item in this.scr[k].panelItems) {
++					if (item != null && item.Item1 == "Warnings") {
+ 	                    TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(item.Item1, true);
+                     	isPanel1WarningChecked = tnArray[0].Checked;
+                 	}
+@@ -2696,8 +2359,7 @@
+             }
+ 
+ 
+-            switch ((PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem)
+-            {
++			switch ((PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem) {
+                 case PanelsAutoSwitch.Panel1:
+                     if (!isPanel1WarningChecked)
+                         MessageBox.Show("You have selected to auto switch to panel 1. " + Environment.NewLine + "However you didn't configured warnings on panel 1.", "Panel Auto Switch Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+@@ -2710,8 +2372,8 @@
+         }
+ 
+         public Boolean airSpeedSign = false;
+-        private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
+-        {
++
++		private void cbxAirSpeedSign_CheckedChanged (object sender, EventArgs e) {
+             if (cbxAirSpeedSign.Checked)
+                 pan.sign_air_speed = 0x13;
+             else
+@@ -2722,8 +2384,8 @@
+         }
+ 
+         public Boolean groundSpeedSign = false;
+-        private void cbxGroundSpeedSign_CheckedChanged(object sender, EventArgs e)
+-        {
++
++		private void cbxGroundSpeedSign_CheckedChanged (object sender, EventArgs e) {
+             if (cbxGroundSpeedSign.Checked)
+                 pan.sign_ground_speed = 0x14;
+             else
+@@ -2734,8 +2396,8 @@
+         }
+ 
+         public Boolean homeAltSign = false;
+-        private void cbxHomeAltitudeSign_CheckedChanged(object sender, EventArgs e)
+-        {
++
++		private void cbxHomeAltitudeSign_CheckedChanged (object sender, EventArgs e) {
+             if (cbxHomeAltitudeSign.Checked)
+                 pan.sign_home_altitude = 0x12;
+             else
+@@ -2746,8 +2408,8 @@
+         }
+ 
+         public Boolean mslAltSign = false;
+-        private void cbxMslAltitudeSign_CheckedChanged(object sender, EventArgs e)
+-        {
++
++		private void cbxMslAltitudeSign_CheckedChanged (object sender, EventArgs e) {
+             if (cbxMslAltitudeSign.Checked)
+                 pan.sign_msl_altitude = 0x11;
+             else
+@@ -2757,28 +2419,21 @@
+ 			osdDraw(panel_number);
+         }
+ 
+-
+-
+-
+-        private void cbxRSSIChannel_SelectedIndexChanged(object sender, EventArgs e)
+-        {
++		private void cbxRSSIChannel_SelectedIndexChanged (object sender, EventArgs e) {
+             SetRSSIValues(); 
+         }
+ 
+-        private void SetRSSIValues()
+-        {
++		private void SetRSSIValues () {
+             //updatingRSSI = true;
+             int OldMax = (int)RSSI_numeric_min.Maximum;
+             RSSI_numeric_min.Minimum = 0;
+             RSSI_numeric_min.Maximum = 2000;
+             RSSI_numeric_max.Minimum = 0;
+             RSSI_numeric_max.Maximum = 2000;
+-            if (cbxRSSIChannel.SelectedIndex == 0)
+-            {
++			if (cbxRSSIChannel.SelectedIndex == 0) {
+                 lblRSSIMin.Text = "RSSI Min Value";
+                 lblRSSIMax.Text = "RSSI Max Value";
+-                if (OldMax == 2000)
+-                {
++				if (OldMax == 2000) {
+                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
+                     //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
+                     RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 1100;
+@@ -2790,13 +2445,10 @@
+                 RSSI_numeric_min.Maximum = 255;
+                 RSSI_numeric_max.Minimum = 0;
+                 RSSI_numeric_max.Maximum = 255;
+-            }
+-            else
+-            {
++			} else {
+                 lblRSSIMin.Text = "RSSI Min Value (pwm)";
+                 lblRSSIMax.Text = "RSSI Max Value (pwm)";
+-                if (OldMax == 255)
+-                {
++				if (OldMax == 255) {
+                     //RSSI_numeric_min.Value = pan.rssipersent * 100 / 255 + 100;
+                     //RSSI_numeric_max.Value = pan.rssical * 100 / 255 + 100;
+                     RSSI_numeric_min.Value = (pan.rssipersent * 1100 / 255) + 900;
+@@ -2810,8 +2462,7 @@
+                 RSSI_numeric_max.Minimum = 900;
+             }
+             
+-            switch (cbxRSSIChannel.SelectedIndex)
+-            {
++			switch (cbxRSSIChannel.SelectedIndex) {
+                 case 0:
+                     pan.rssiraw_on = 0;
+                     break;
+@@ -2822,8 +2473,7 @@
+             pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
+         }
+ 
+-        private void presentCustomCharsetToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void presentCustomCharsetToolStripMenuItem_Click (object sender, EventArgs e) {
+             OpenFileDialog ofd = new OpenFileDialog();
+             ofd.Filter = "mcm|*.mcm";
+             if(ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+@@ -2836,8 +2486,7 @@
+ 			osdDraw(panel_number);
+         }
+ 
+-        private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void updateCharsetDevToolStripMenuItem_Click (object sender, EventArgs e) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             toolStripStatusLabel1.Text = "";
+ 
+@@ -2854,16 +2503,13 @@
+             //Get file version
+             string fileVersion = "000";
+             string tempFileName = ofd.SafeFileName.ToUpper();
+-            if (tempFileName.StartsWith("MINIMOSD_"))
+-            {
++			if (tempFileName.StartsWith ("MINIMOSD_")) {
+                 tempFileName = tempFileName.Remove(0, 9);
+-                if (tempFileName.EndsWith(".MCM"))
+-                {
++				if (tempFileName.EndsWith (".MCM")) {
+                     tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                     string[] versionArray = tempFileName.Split('.');
+                     Int16 version1, version2, version3;
+-                    if (versionArray.Length > 2)
+-                    {
++					if (versionArray.Length > 2) {
+                         if (Int16.TryParse(versionArray[0], out version1) &&
+                            Int16.TryParse(versionArray[1], out version2) &&
+                            Int16.TryParse(versionArray[2], out version3))
+@@ -2872,13 +2518,9 @@
+                 }
+             }
+ 
+-            if (ofd.FileName != "")
+-            {
++			if (ofd.FileName != "") {
+                 if (comPort.IsOpen)
+-                    comPort.Close();
+-
+-                try
+-                {
++					comPort.Clo				{
+ 
+                     comPort.PortName = CMB_ComPort.Text;
+                     comPort.BaudRate = 57600;
+@@ -2905,39 +2547,36 @@
+ 
+                     int timeout = 0;
+ 
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(500);
+                         Console.WriteLine("Waiting...");
+                         timeout++;
+ 
+-                        if (timeout > 6)
+-                        {
++						if (timeout > 6) {
+                             MessageBox.Show("Error entering font mode - No Data");
+                             comPort.Close();
+                             return;
+                         }
+                     }
+-                    if (!comPort.ReadLine().Contains("RFF"))
+-                    {
++					if (!comPort.ReadLine ().Contains ("RFF")) {
+                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                         comPort.Close();
+                         return;
+                     }
+ 
++				} catch {
++					MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++					return;
+                 }
+-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-                using (var stream = ofd.OpenFile())
+-                {
++				using (var stream = ofd.OpenFile()) {
+ 
+                     BinaryReader br = new BinaryReader(stream);
+                     StreamReader sr2 = new StreamReader(br.BaseStream);
+ 
+                     string device = sr2.ReadLine();
+ 
+-                    if (device != "MAX7456")
+-                    {
++					if (device != "MAX7456") {
+                         MessageBox.Show("Invalid MCM");
+                         comPort.Close();
+                         return;
+@@ -2946,17 +2585,13 @@
+                     br.BaseStream.Seek(0, SeekOrigin.Begin);
+ 
+                     long length = br.BaseStream.Length;
+-                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+-                    {
+-                        try
+-                        {
++					while (br.BaseStream.Position < br.BaseStream.Length && !this.						{
+                             toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+                             toolStripStatusLabel1.Text = "CharSet Uploading";
+ 
+ 
+                             int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
+-                            if ((br.BaseStream.Position + read) > br.BaseStream.Length)
+-                            {
++							if ((br.BaseStream.Position + read) > br.BaseStream.Length) {
+                                 read = (int)(br.BaseStream.Length - br.BaseStream.Position);
+                             }
+                             length -= read;
+@@ -2964,13 +2599,11 @@
+                             comPort.Write(buffer, 0, buffer.Length);
+                             int timeout = 0;
+ 
+-                            while (comPort.BytesToRead == 0 && read == 768)
+-                            {
++							while (comPort.BytesToRead == 0 && read == 768) {
+                                 System.Threading.Thread.Sleep(10);
+                                 timeout++;
+ 
+-                                if (timeout > 10)
+-                                {
++								if (timeout > 10) {
+                                     MessageBox.Show("CharSet upload failed - no response");
+                                     comPort.Close();
+                                     return;
+@@ -2978,14 +2611,11 @@
+                             }
+ 
+                             comPort.ReadExisting();
+-                            if (length < 1000)
+-                            {
++							if (length < 1000) {
+                                 lblFWModelType.Text = lblFWModelType.Text;
+                             }
+ 
+-                        }
+-                        catch
+-                        {
++						} catch {
+                             break;
+                         }
+ 
+@@ -2994,13 +2624,11 @@
+                     comPort.WriteLine("\r\n");
+                     //Wait for last char acknowledge
+                     int t = 0;
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(10);
+                         t++;
+ 
+-                        if (t > 10)
+-                        {
++						if (t > 10) {
+                             MessageBox.Show("No end");
+                             comPort.Close();
+                             return;
+@@ -3036,28 +2664,24 @@
+             }
+         }
+ 
+-        private bool UploadFirmware(string fileName)
+-        {
++		private bool UploadFirmware (string fileName) {
+             if (string.IsNullOrEmpty(fileName))
+                 return false;
+ 
+             byte[] FLASH;
+-            bool spuploadflash_flag = false;
+-            try
+-            {
++			bool spuploadflash_flag = fa			{
+                 toolStripStatusLabel1.Text = "Reading Hex File";
+ 
+                 statusStrip1.Refresh();
+ 
+                 FLASH = readIntelHEXv2(new StreamReader(fileName));
++			} catch {
++				MessageBox.Show ("Bad Hex File");
++				return false;
+             }
+-            catch { MessageBox.Show("Bad Hex File"); return false; }
+ 
+             //bool fail = false;
+-            ArduinoSTK sp;
+-
+-            try
+-            {
++			ArduinoSTK 			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -3071,26 +2695,25 @@
+                 sp.RtsEnable = false; //added
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return false;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return false; }
+ 
+             toolStripStatusLabel1.Text = "Connecting to Board";
+ 
+-            if (sp.connectAP())
+-            {
+-                sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);
+-                try
+-                {
+-                    for (int i = 0; i < 3; i++) //try to upload 3 times
+-                    { //try to upload n times if it fail
++			if (sp.connectAP ()) {
++				sp.Progress += new ArduinoSTK.ProgressEventHandler (sp_Pro				{
++					for (int i = 0; i < 3; i++) { //try to upload 3 times //try to upload n times if it fail
+                         spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+-                        if (!spuploadflash_flag)
+-                        {
+-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
++						if (!spuploadflash_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
+                             //toolStripStatusLabel1.Text = "Lost sync. Reconnecting...";
+-                        }
+-                        else break;
++						} else
++							break;
+                     }
+ 
+                     //if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
+@@ -3103,30 +2726,23 @@
+                     //        MessageBoxButtons.OK,        
+                     //        MessageBoxIcon.Warning); 
+                     //}
+-                }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     //fail = true;
+                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 }
+ 
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+             }
+ 
+             sp.Close();
+ 
+-            if (spuploadflash_flag)
+-            {
++			if (spuploadflash_flag) {
+ 
+                 toolStripStatusLabel1.Text = "Done";
+ 
+                 MessageBox.Show("Done!");
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
+                             "Error",
+                             MessageBoxButtons.OK,
+@@ -3136,14 +2752,11 @@
+             return true;
+         }
+ 
+-        private ModelType GetModelType()
+-        {
++		private ModelType GetModelType () {
+             ModelType modelType = ModelType.Unknown;
+             byte[] tempEeprom = null;
+             bool fail = false;
+-            ArduinoSTK sp;
+-            try
+-            {
++			ArduinoSTK			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -3153,32 +2766,27 @@
+                 sp.DtrEnable = true;
+ 
+                 sp.Open();
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return ModelType.Unknown;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return ModelType.Unknown; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
+-                    for (int i = 0; i < 5; i++)
+-                    { //try to download two times if it fail
++			if (sp.connectA				{
++					for (int i = 0; i < 5; i++) { //try to download two times if it fail
+                         tempEeprom = sp.download(1024);
+-                        if (!sp.down_flag)
+-                        {
+-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
+-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
+-                        }
+-                        else break;
++						if (!sp.down_flag) {
++							if (sp.keepalive ())
++								Console.WriteLine ("keepalive successful (iter " + i + ")");
++							else
++								Console.WriteLine ("keepalive fail (iter " + i + ")");
++						} else
++							break;
+                     }
+                     modelType = (ModelType)tempEeprom[MODEL_TYPE_ADD];
+-                }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+-            }
+-            else
+-            {
++			} else {
+                 MessageBox.Show("Failed to talk to bootloader");
+             }
+ 
+@@ -3188,8 +2796,7 @@
+             return modelType;
+         }
+ 
+-        private bool UploadFont(OpenFileDialog ofd)
+-        {
++		private bool UploadFont (OpenFileDialog ofd) {
+             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+             toolStripStatusLabel1.Text = "";
+ 
+@@ -3200,16 +2807,13 @@
+             //Get file version
+             string fileVersion = "000";
+             string tempFileName = ofd.SafeFileName.ToUpper();
+-            if (tempFileName.StartsWith("MINIMOSD_"))
+-            {
++			if (tempFileName.StartsWith ("MINIMOSD_")) {
+                 tempFileName = tempFileName.Remove(0, 9);
+-                if (tempFileName.EndsWith(".MCM"))
+-                {
++				if (tempFileName.EndsWith (".MCM")) {
+                     tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                     string[] versionArray = tempFileName.Split('.');
+                     Int16 version1, version2, version3;
+-                    if (versionArray.Length > 2)
+-                    {
++					if (versionArray.Length > 2) {
+                         if (Int16.TryParse(versionArray[0], out version1) &&
+                            Int16.TryParse(versionArray[1], out version2) &&
+                            Int16.TryParse(versionArray[2], out version3))
+@@ -3218,13 +2822,9 @@
+                 }
+             }
+ 
+-            if (ofd.FileName != "")
+-            {
++			if (ofd.FileName != "") {
+                 if (comPort.IsOpen)
+-                    comPort.Close();
+-
+-                try
+-                {
++					comPort.Clo				{
+ 
+                     comPort.PortName = CMB_ComPort.Text;
+                     comPort.BaudRate = 57600;
+@@ -3251,39 +2851,36 @@
+ 
+                     int timeout = 0;
+ 
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(500);
+                         Console.WriteLine("Waiting...");
+                         timeout++;
+ 
+-                        if (timeout > 6)
+-                        {
++						if (timeout > 6) {
+                             MessageBox.Show("Error entering font mode - No Data");
+                             comPort.Close();
+                             return false;
+                         }
+                     }
+-                    if (!comPort.ReadLine().Contains("RFF"))
+-                    {
++					if (!comPort.ReadLine ().Contains ("RFF")) {
+                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                         comPort.Close();
+                         return false;
+                     }
+ 
++				} catch {
++					MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++					return false;
+                 }
+-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return false; }
+ 
+-                using (var stream = ofd.OpenFile())
+-                {
++				using (var stream = ofd.OpenFile()) {
+ 
+                     BinaryReader br = new BinaryReader(stream);
+                     StreamReader sr2 = new StreamReader(br.BaseStream);
+ 
+                     string device = sr2.ReadLine();
+ 
+-                    if (device != "MAX7456")
+-                    {
++					if (device != "MAX7456") {
+                         MessageBox.Show("Invalid MCM");
+                         comPort.Close();
+                         return false;
+@@ -3292,17 +2889,13 @@
+                     br.BaseStream.Seek(0, SeekOrigin.Begin);
+ 
+                     long length = br.BaseStream.Length;
+-                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
+-                    {
+-                        try
+-                        {
++					while (br.BaseStream.Position < br.BaseStream.Length && !this.						{
+                             toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+                             toolStripStatusLabel1.Text = "CharSet Uploading";
+ 
+ 
+                             int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
+-                            if ((br.BaseStream.Position + read) > br.BaseStream.Length)
+-                            {
++							if ((br.BaseStream.Position + read) > br.BaseStream.Length) {
+                                 read = (int)(br.BaseStream.Length - br.BaseStream.Position);
+                             }
+                             length -= read;
+@@ -3310,13 +2903,11 @@
+                             comPort.Write(buffer, 0, buffer.Length);
+                             int timeout = 0;
+ 
+-                            while (comPort.BytesToRead == 0 && read == 768)
+-                            {
++							while (comPort.BytesToRead == 0 && read == 768) {
+                                 System.Threading.Thread.Sleep(10);
+                                 timeout++;
+ 
+-                                if (timeout > 10)
+-                                {
++								if (timeout > 10) {
+                                     MessageBox.Show("CharSet upload failed - no response");
+                                     comPort.Close();
+                                     return false;
+@@ -3324,14 +2915,11 @@
+                             }
+ 
+                             comPort.ReadExisting();
+-                            if (length < 1000)
+-                            {
++							if (length < 1000) {
+                                 lblFWModelType.Text = lblFWModelType.Text;
+                             }
+ 
+-                        }
+-                        catch
+-                        {
++						} catch {
+                             break;
+                         }
+ 
+@@ -3340,13 +2928,11 @@
+                     comPort.WriteLine("\r\n");
+                     //Wait for last char acknowledge
+                     int t = 0;
+-                    while (comPort.BytesToRead == 0)
+-                    {
++					while (comPort.BytesToRead == 0) {
+                         System.Threading.Thread.Sleep(10);
+                         t++;
+ 
+-                        if (t > 10)
+-                        {
++						if (t > 10) {
+                             MessageBox.Show("No end");
+                             comPort.Close();
+                             return false;
+@@ -3383,10 +2969,7 @@
+             return true;
+         }
+ 
+-        private bool GetLatestFW(ModelType modelType)
+-        {
+-            try
+-            {
++		private bool GetLatestFW (ModelType modelTyp			{
+                 string localFwDir = AppDomain.CurrentDomain.BaseDirectory + "\\FW";
+                 string fileName = "MinimOSD_Extra_" + modelType.ToString() + ".hex";
+ 
+@@ -3407,24 +2990,20 @@
+                 int readCount;
+                 byte[] buffer = new byte[bufferSize];
+                 readCount = ftpStream.Read(buffer, 0, bufferSize);
+-                while (readCount > 0)
+-                {
++				while (readCount > 0) {
+                     latestPlaneFile.Write(buffer, 0, readCount);
+                     readCount = ftpStream.Read(buffer, 0, bufferSize);
+                 }
+                 ftpStream.Close();
+                 latestPlaneFile.Close();
+                 response.Close();
+-            }
+-            catch
+-            {
++			} catch {
+                 return false;
+             }
+             return true;
+         }
+ 
+-        private void updateCharsetcustomFwToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void updateCharsetcustomFwToolStripMenuItem_Click (object sender, EventArgs e) {
+             #region Get and validate font file
+             OpenFileDialog ofd = new OpenFileDialog();
+             ofd.Filter = "mcm|*.mcm";
+@@ -3441,8 +3020,7 @@
+             ModelType modelType = GetModelType();
+             modelType = ModelType.Copter;
+             string modelFileName = "MinimOSD_" + modelType.ToString() + ".hex";
+-            if (modelType == ModelType.Unknown)
+-            {
++			if (modelType == ModelType.Unknown) {
+                 if(MessageBox.Show("Unknown current fw." + Environment.NewLine +
+                                    "If you proceed you'll need to upload  the fw manually after charset upload." + Environment.NewLine + 
+                                    "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+@@ -3450,8 +3028,7 @@
+             }
+ 
+             //Get latest fw from ftp
+-            if (!GetLatestFW(modelType))
+-            {
++			if (!GetLatestFW (modelType)) {
+                 if(MessageBox.Show("Unable to get latest fw from internet." + Environment.NewLine +
+                                    "If you proceed you'll need to upload the fw manually after charset upload." + Environment.NewLine + 
+                                    "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+@@ -3471,16 +3048,10 @@
+                 UploadFirmware(modelFileName);
+         }
+ 
+-
+-
+-        private void GetFwFromOSD()
+-        {
++		private void GetFwFromOSD () {
+             ArduinoSTK sp;
+             byte[] FLASH = new byte[32 * 1024];
+-            //byte[] FLASH = new byte[30382];
+-
+-            try
+-            {
++			//byte[] FLASH = new byte[3038			{
+                 if (comPort.IsOpen)
+                     comPort.Close();
+ 
+@@ -3495,18 +3066,16 @@
+ 
+                 sp.Open();
+ 
++			} catch {
++				MessageBox.Show ("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
++				return;
+             }
+-            catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+ 
+-            if (sp.connectAP())
+-            {
+-                try
+-                {
++			if (sp.connectA				{
+                     int start = 0;
+                     short length = 0x100;
+ 
+-                    while (start < FLASH.Length)
+-                    {
++					while (start < FLASH.Length) {
+                         sp.setaddress(start);
+                         sp.downloadflash(length).CopyTo(FLASH, start);
+                         start += length;
+@@ -3518,22 +3087,18 @@
+                     bw.Close();
+ 
+                     sw = new StreamWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "FW" + Path.DirectorySeparatorChar + @"flash.hex", false);
+-                    for (int i = 0; i < FLASH.Length; i += 16)
+-                    {
++					for (int i = 0; i < FLASH.Length; i += 16) {
+                         string add = string.Format("{0:X4}", i);
+-                        if (i % (0x1000 << 4) == 0)
+-                        {
++						if (i % (0x1000 << 4) == 0) {
+                             if (i != 0)
+                                 sw.WriteLine(":02000002{0:X4}{1:X2}", ((i >> 4) & 0xf000), 0x100 - (2 + 2 + (((i >> 4) & 0xf000) >> 8) & 0xff));
+                         }
+-                        if (add.Length == 5)
+-                        {
++						if (add.Length == 5) {
+                             add = add.Substring(1);
+                         }
+                         sw.Write(":{0:X2}{1}00", 16, add);
+                         byte ck = (byte)(16 + (i & 0xff) + ((i >> 8) & 0xff));
+-                        for (int a = 0; a < 16; a++)
+-                        {
++						for (int a = 0; a < 16; a++) {
+                             ck += FLASH[i + a];
+                             sw.Write("{0:X2}", FLASH[i + a]);
+                         }
+@@ -3541,25 +3106,20 @@
+                     }
+ 
+                     sw.Close();
+-                }
+-                catch (Exception ex)
+-                {
++				} catch (Exception ex) {
+                     MessageBox.Show(ex.Message);
+                 }
+             }
+             sp.Close();
+         }
+ 
+-        private void getFwFromOSDToolStripMenuItem_Click(object sender, EventArgs e)
+-        {
++		private void getFwFromOSDToolStripMenuItem_Click (object sender, EventArgs e) {
+             GetFwFromOSD();
+         }
+ 
+-        private void CALLSIGNmaskedText_Validating(object sender, CancelEventArgs e)
+-        {
++		private void CALLSIGNmaskedText_Validating (object sender, CancelEventArgs e) {
+             string validString = "";
+-            foreach (char c in CALLSIGNmaskedText.Text)
+-            {
++			foreach (char c in CALLSIGNmaskedText.Text) {
+ 
+                 if ((c == '-') || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) || ((c >= '0') && (c <= '9')))
+                     validString += c;
+@@ -3567,10 +3127,7 @@
+             CALLSIGNmaskedText.Text = validString;
+         }
+ 
+-        
+-		
+-		int Constrain(double value, double min, double max)
+-        {
++		int Constrain (double value, double min, double max) {
+             if (value < min)
+                 return (int)min;
+             if (value > max)
+@@ -3579,16 +3136,14 @@
+             return (int)value;
+         }
+ 
+-
+-        private void cbxAutoUpdate_CheckedChanged(object sender, EventArgs e)
+-        {
++		private void cbxAutoUpdate_CheckedChanged (object sender, EventArgs e) {
+             checkForUpdates = cbxAutoUpdate.Checked;
+         }
+ 
+-        private void cbxShowUpdateDialog_CheckedChanged(object sender, EventArgs e)
+-        {
++		private void cbxShowUpdateDialog_CheckedChanged (object sender, EventArgs e) {
+             autoUpdate = !cbxShowUpdateDialog.Checked;
+         }
++
+ 		public Size get_basesize(){
+ 			return basesize;
+ 		}
+@@ -3593,8 +3148,7 @@
+ 			return basesize;
+ 		}
+ 		
+-		private void PANEL_tabs_Selected(object sender, TabControlEventArgs e)
+-        {
++		private void PANEL_tabs_Selected (object sender, TabControlEventArgs e) {
+ 			//System.Windows.Forms.TabControl
+  			string s = ((TabControl)sender).SelectedTab.Name;
+ 			
+@@ -3604,6 +3158,9 @@
+ 			if(hdr.Length>1) {
+ 				int k=int.Parse(hdr[1]);
+ 				
++				
++				currentlyselected = "";
++				
+             	osdDraw(k-1);
+ 			}
+ 
