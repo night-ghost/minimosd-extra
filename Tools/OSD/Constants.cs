@@ -10,7 +10,7 @@ namespace OSD {
 		// EEPROM Storage addresses
 
 		// First of 8 panels
-		public const int panCenter_XY = 0;
+		const int panCenter_XY = 0;
 		const int panPitch_XY = 2;
 		const int panRoll_XY = 4;
 		const int panBatt_A_XY = 6;
@@ -19,7 +19,6 @@ namespace OSD {
 		const int panCOG_XY = 12;
 		const int panGPS_XY = 14;
 
-		// Second set of 8 panels
 		const int panRose_XY = 16;
 		const int panHeading_XY = 18;
 		const int panHomeDir_XY = 20;
@@ -28,8 +27,6 @@ namespace OSD {
 		const int panWPDis_XY = 26;
 		const int panRSSI_XY = 28;
 
-
-		// Third set of 8 panels
 		const int panCur_A_XY = 30;
 		const int panCurB_XY = 32;
 		const int panAlt_XY = 34;
@@ -42,54 +39,49 @@ namespace OSD {
 		const int panBatteryPercent_XY = 48;
 		const int panTime_XY = 50;
 		const int panWarn_XY = 52;
-		const int panOff_XY = 54;
-		const int panWindSpeed_XY = 56;
-		const int panClimb_XY = 58;
-		const int panTune_XY = 60;
-		const int panEff_XY = 62;
-		const int panCALLSIGN_XY = 64;
-		const int panCh_XY = 66;
-		const int panTemp_XY = 68;
-		const int panDistance_XY = 70;
-		const int panILS_XY = 72;
+		const int panWindSpeed_XY = 54;
+		const int panClimb_XY = 56;
+		const int panTune_XY = 58;
+		const int panEff_XY = 60;
+		const int panCALLSIGN_XY = 62;
+		const int panCh_XY = 64;
+		const int panTemp_XY = 66;
+		const int panDistance_XY = 68;
+		const int panGPS2_XY = 70;
 		//        const int panMavBeat_XY = 74;
     
-		const int OffsetBITpanel = 128; // размер памяти одного экрана
+		public const int OffsetBITpanel = 128; // размер памяти одного экрана
 
-		const int Settings_offset = 512; // 4 экрана всего
+		public const int Settings_offset = 512; // 4 экрана всего
 		//
-		const int SIGN_MSL_ON_ADDR = 876;
-		const int SIGN_HA_ON_ADDR = 878;
-		const int SIGN_GS_ON_ADDR = 880;
-		const int SIGN_AS_ON_ADDR = 882;
-		const int MODEL_TYPE_ADD = 884;
-		const int AUTO_SCREEN_SWITCH_ADD = 886;
-		const int OSD_BATT_SHOW_PERCENT_ADDR = 888;
-		const int measure_ADDR = 890;
-		const int overspeed_ADDR = 892;
-		const int stall_ADDR = 894;
-		const int battv_ADDR = 896;
-		//const int battp_ADDR = 898;
-		const int OSD_RSSI_HIGH_ADDR = 900;
-		const int OSD_RSSI_LOW_ADDR = 902;
-		const int RADIO_ON_ADDR = 904;
-		const int OSD_Toggle_ADDR = 906;
-		const int OSD_RSSI_RAW_ADDR = 908;
-		const int switch_mode_ADDR = 910;
-		const int PAL_NTSC_ADDR = 912;
-		const int OSD_BATT_WARN_ADDR = 914;
-		const int OSD_RSSI_WARN_ADDR = 916;
-		const int OSD_BRIGHTNESS_ADDR = 918;
-		const int OSD_CALL_SIGN_ADDR = 920;
-		const int OSD_CALL_SIGN_TOTAL = 8;
-		const int FW_VERSION1_ADDR = 930;
-		const int FW_VERSION2_ADDR = 932;
-		const int FW_VERSION3_ADDR = 934;
-		const int CS_VERSION1_ADDR = 936;
-		const int CS_VERSION2_ADDR = 938;
-		const int CS_VERSION3_ADDR = 940;
-		const int CHK_VERSION = 1010;
 
+	// флаги
+/*		
+	    bool OSD_BATT_SHOW_PERCENT:1;
+	    bool measure:1;
+	    bool RADIO_ON:1;
+	    bool PAL_NTSC:1;
+
+	    bool SIGN_MSL_ON:1; sign_msl_altitude
+	    bool SIGN_HA_ON:1; sign_home_altitude
+	    bool SIGN_GS_ON:1; sign_ground_speed
+	    bool SIGN_AS_ON:1; sign_air_speed
+*/		
+		public const int osd_battery_show_percentage 	= 0;
+		public const int converts 				= 1;
+		public const int radio_on 				= 2;
+		public const int pal_ntsc				= 3;
+		public const int sign_msl_altitude		= 4;
+		public const int sign_home_altitude 	= 5;
+		public const int sign_ground_speed 		= 6;
+		public const int sign_air_speed 		= 7;
+	// new!
+		public const int useExtVbattA			= 8;
+		public const int useExtVbattB			= 9;
+    	public const int useExtCurr				= 10;
+		public const int radar_on 				= 11;		
+		public const int ils_on 				= 12;		
+	
 	}
 }
 

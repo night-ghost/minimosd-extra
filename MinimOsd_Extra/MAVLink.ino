@@ -4,13 +4,14 @@
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
 
 // true when we have received at least 1 MAVLink packet
-static bool mavlink_active;
+static bool mavlink_active = 0; // флаг активности (навсегда)
 static uint8_t crlf_count = 0;
 
 static int packet_drops = 0;
 static int parse_error = 0;
 
-uint8_t mavlink_got = 0;
+uint8_t mavlink_got = 0; // флаг получения пакета
+uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)
 
 
 void request_mavlink_rates()
@@ -55,7 +56,7 @@ void read_mavlink(){
             } else {
                 crlf_count = 0;
             }
-            if (crlf_count == 3) {
+            if (crlf_count >= 3) {
                 uploadFont();
             }
         }
@@ -63,8 +64,7 @@ void read_mavlink(){
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
             lastMAVBeat = millis();
-            mavlink_active = 1;
-	    mavlink_got = 1;
+            mavlink_active = mavlink_on = mavlink_got = 1;
 
 //digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
 

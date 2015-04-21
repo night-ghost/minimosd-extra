@@ -106,19 +106,55 @@ Call Sign	0	0	False
 Channel Raw	0	10	True
 Temperature	1	11	False
 Trip Distance	22	2	False
+Panel 3
+Center	13	8	False
+Pitch	7	1	True
+Roll	13	1	True
+Battery A	14	13	True
+Battery B	21	3	True
+Visible Sats	26	11	True
+Real heading	22	14	True
+GPS Coord	1	14	True
+Heading Rose	21	15	True
+Heading	24	13	True
+Home Direction	14	3	True
+Home Distance	22	1	True
+WP Direction	20	12	True
+WP Distance	1	11	False
+Altitude	22	3	True
+Home Altitude	22	2	True
+Vertical Speed	1	8	True
+Battery Percent	14	15	True
+Current	14	14	True
+Velocity	1	2	True
+Air Speed	1	1	True
+Throttle	1	3	True
+Flight Mode	1	13	True
+Horizon	8	6	True
+ILS	24	6	True
+Wind Speed	24	7	True
+Warnings	9	4	True
+Time	23	4	True
+RSSI	7	13	True
+Tune	1	1	False
+Efficiency	1	11	True
+Call Sign	0	0	True
+Channel Raw	1	0	False
+Temperature	1	11	False
+Trip Distance	22	2	False
 Configuration
 Model Type	1
-Units	0
+Units	False
 Overspeed	40
 Stall	5
-Battery	101
+Battery	104
 RSSI High	255
 RSSI Low	0
-RSSI Enable Raw	0
+RSSI Enable Raw	2
 Toggle Channel	8
-Auto Screen Switch	255
+Auto Screen Switch	0
 Chanel Rotation Switching	0
-Video Mode	0
+Video Mode	False
 Battery Warning Level	11
 RSSI Warning Level	0
 OSD Brightness	1

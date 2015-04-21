@@ -80,6 +80,8 @@
   #define MAX7456_screen_rows 0x0D
 #endif
 
+//#include "eeprom.h"
+
 //------------------ the OSD class -----------------------------------------------
 
 class OSD: public BetterStream

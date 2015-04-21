@@ -17,53 +17,72 @@ namespace OSD
     {
         OSD osd;
 
-        public Panels(OSD os)
-        {
-            osd = os;
-        }
+        public Panels(OSD os) {
+			osd = os;
+		}
+		
 
-        string PSTR(string input)
-        {
-            return input;
-        }
+        string PSTR (string input) {
+			return input;
+		}
+		
 
-        double abs(double input)
-        {
-            return Math.Abs(input);
-        }
+        double abs (double input) {
+			return Math.Abs(input);
+		}
+		
 
-        int round(double input)
-        {
-            return (int)Math.Round(input, 0);
-        }
+        int round (double input) {
+			return (int)Math.Round(input, 0);
+		}
+		
 
-        double tan(double input)
-        {
-            return Math.Tan(input);
-        }
+        double tan (double input) {
+			return Math.Tan(input);
+		}
+		
 
         /*Panels variables*/
         //Will come from APM telem port
 
         //Config vars
         public uint8_t model_type = 0; //0 - Plane; 1 - Copter
-        public uint8_t fw_version1 = 0;
-        public uint8_t fw_version2 = 0;
-        public uint8_t fw_version3 = 0;
-        public uint8_t cs_version1 = 0;
-        public uint8_t cs_version2 = 0;
-        public uint8_t cs_version3 = 0;
+		
+        public string fw_version = "";
+        public string cs_version = "";
         
-        public uint8_t sign_air_speed = 0;
-        public uint8_t sign_ground_speed = 0;
-        public uint8_t sign_home_altitude = 0;
-        public uint8_t sign_msl_altitude = 0; 
+        public byte  sign_air_speed = 0;
+        public byte sign_ground_speed = 0 ;
+        public byte sign_home_altitude = 0 ;
+        public byte sign_msl_altitude = 0 ; 
 
         public uint8_t overspeed = 40;
         public uint8_t stall = 5;
         public uint8_t battv = 101;                //Batery warning voltage - units Volt *10 
-        public uint8_t converts = 0;                //1- Imperial; 0- Metric
-
+        public bool converts = false;                //1- Imperial; 0- Metric
+		
+// new!
+		public float rssi_koef=1;
+		public float Curr_koef=1;
+		public float battA_koef=1;
+		public float battB_koef=1;
+		
+		public bool flgBattA=false ;
+		public bool flgBattB=false ;
+		
+		public bool flgCurrent=false;
+		public bool flgILS=true;
+		public bool flgRadar=true;
+		
+		public byte battBv=101;
+		
+		public float roll_k=1;
+		public float pitch_k=1;
+		public float roll_k_ntsc=1;
+		public float pitch_k_ntsc=1;
+		
+		
+//*************************		
         private byte temperatureChar = 0x1B;
         private byte bigDistanceChar = 0x1B;
         private byte smallDistanceChar = 0x1B;
@@ -75,46 +94,46 @@ namespace OSD
         private float converth = 1.0f;
         private float tempconv = 10;
         private float tempconvAdd = 0;
-        private float distconv = 1000;
+//        private float distconv = 1000;
+		
+        public void do_converts () {
+			switch(converts) { 
+			case false:
+				convertspeed = 3.6f;
+				converth = 1.0f;
+				tempconv = 10;
+				tempconvAdd = 0;
+//				distconv = 1000;
 
-        public void do_converts()
-        {
-            switch (converts)
-            { 
-                case 0:
-                    convertspeed = 3.6f;
-                    converth = 1.0f;
-                    tempconv = 10;
-                    tempconvAdd = 0;
-                    distconv = 1000;
-
-                    temperatureChar = 0xBA;
-                    bigDistanceChar = 0x1B;
-                    climbChar = 0x1A;
-                    velocityChar = 0x10;
-                    altitudeChar = 0x6D;
-                    smallDistanceChar = 0x6D;
-                    break;
-                case 1:
-                    convertspeed = 2.23f;
-                    converth = 3.28f;
-                    tempconv = 18;
-                    tempconvAdd = 3200;
-                    distconv = 5280;
-                    temperatureChar = 0xBB;
-                    bigDistanceChar = 0x1C;
-                    climbChar = 0x1E;
-                    velocityChar = 0x19;
-                    altitudeChar = 0x66;
-                    smallDistanceChar = 0x66;
-                    break;
-            }
-        }
+				temperatureChar = 0xBA;
+				bigDistanceChar = 0x1B;
+				climbChar = 0x1A;
+				velocityChar = 0x10;
+				altitudeChar = 0x6D;
+				smallDistanceChar = 0x6D;
+				break;
+				
+			case true:
+				convertspeed = 2.23f;
+				converth = 3.28f;
+				tempconv = 18;
+				tempconvAdd = 3200;
+				//distconv = 5280;
+				temperatureChar = 0xBB;
+				bigDistanceChar = 0x1C;
+				climbChar = 0x1E;
+				velocityChar = 0x19;
+				altitudeChar = 0x66;
+				smallDistanceChar = 0x66;
+				break;
+			}
+		}
+		
 
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
         static uint16_t osd_battery_remaining = 10;      // 0 to 100 <=> 0 to 1000
-        public byte osd_battery_show_percentage = 1;      // use remaining % or used mAh
+        public bool  osd_battery_show_percentage = true;      // use remaining % or used mAh
         static uint8_t osd_battery_pic = 0xb4;         // picture to show battery remaining
 
         static uint8_t spe = 0;
@@ -176,9 +195,9 @@ namespace OSD
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
         public uint8_t ch_toggle = 8; //CH8
-        public boolean switch_mode = 0;
-        public boolean auto_screen_switch = 1;
-        public boolean pal_ntsc = 1; //PAL 1 - NTSC 0
+        public byte  switch_mode = 1;
+        public byte   auto_screen_switch = 1;
+        public bool  pal_ntsc = true; //PAL 1 - NTSC 0
         public uint8_t osd_brightness = 0; // low bright
         
         public uint8_t rssi_warn_level = 5;
@@ -261,16 +280,20 @@ namespace OSD
         // Size   : 1 x 7Hea  (rows x chars)
         // Staus  : done
 
- //       public int panCh(int first_col, int first_line)
- //       {
- //           osd.setPanel(first_col, first_line);
- //           
- //           {
- //               osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
- //           }
- //           
- //           return 0;
- //       }
+       public int panCh(int first_col, int first_line)
+       {
+           osd.setPanel(first_col, first_line);
+           
+
+//           osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
+
+    	   osd.printf_P(PSTR("C1%5i|C2%5i|C3%5i|C4%5i|C5%5i|C6%5i"),
+			             	//chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw);
+			             1550, 1302, 1640, 1456, 1100, 1940);
+
+           
+           return 0;
+       }
 
         /* **************************************************************** */
         // Panel  : efficiency
@@ -337,7 +360,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-            osd.printf("%c%2.0f%c|%c%2.0f%c", 0xb0, (alt_error * converth), high, 0xb1, ((aspd_error / 100.0) * converts), spe);           
+            osd.printf("%c%2.0f%c|%c%2.0f%c", 0xb0, (alt_error * converth), high, 0xb1, ((aspd_error / 100.0) * (converts?1:0) ), spe);           
  //           {
  //               osd.printf("%c%c%2.0f%c|%c%c%2.0f%c|%c%c%4.0i%c|%c%c%4.0i%c|%c%c%3.0f%c|%c%c%3.0f%c|%c%c%4.0f%c", 0x4E, 0x52, (nav_roll), 0xB0, 0x4E, 0x50, (nav_pitch), 0xB0, 0x4E, 0x48, (nav_bearing), 0xB0, 0x54, 0x42, (wp_target_bearing), 0xB0, 0x41, 0x45, (alt_error), 0x8D, 0x58, 0x45, (xtrack_error), 0x6D, 0x41, 0x45, ((aspd_error / 100.0) * converts), 0x88);
  //           }  
@@ -607,43 +630,19 @@ namespace OSD
 
         public int panHorizon(int first_col, int first_line)
         {
-            //showHorizon((first_col + 1), first_line);
             osd.setPanel(first_col, first_line);
             
-//            osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-//            osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-//            osd.printf_P(PSTR("\xc6\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xc5|"));
-//            osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|"));
-//            osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
   	osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
                       "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
                       "\xC6\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xcb\xC5|"+
-                      "\xb5\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb6|"+
-                      "\xb5\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb6"));
-			
+                      "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
+                      "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3"));
+			if(osd.conf.eeprom.flags[OSD.radar_on]) {
+				osd.setPanel(first_col+7, first_line+3);
+				osd.printf_P(PSTR("\xb7"));
+			}				
 			osd.setPanel(first_col+6, first_line+2);
     		osd.printf_P(PSTR("\xb8\xb9"));
-            return 0;
-        }
-
-	        /* **************************************************************** */
-        // Panel  : panHorizon
-        // Needs  : X, Y locations
-        // Output : 12 x 4 Horizon line surrounded by 2 cols (left/right rules)
-        // Size   : 14 x 4  (rows x chars)
-        // Staus  : done
-
-        public int panILS(int first_col, int first_line)
-        {
-            //showHorizon((first_col + 1), first_line);
-            osd.setPanel(first_col, first_line);
-            
-            osd.printf_P(PSTR("\x20|"));
-            osd.printf_P(PSTR("\x20|"));
-            osd.printf_P(PSTR("\xcb|"));
-            osd.printf_P(PSTR("\x20|"));
-            osd.printf_P(PSTR("\x20"));
-            
             return 0;
         }
 
@@ -802,11 +801,28 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-            osd.printf("%c%10.6f%c|%c%10.6f", 0x03, (double)osd_lat, 0x20, 0x04, (double)osd_lon);
+            osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat,  0x04, (double)osd_lon);
             
             return 0;
         }
 
+        /* **************************************************************** */
+        // Panel  : panGPS2
+        // Needs  : X, Y locations
+        // Output : one row numeric value of current GPS location with LAT/LON symbols as on first char
+        // Size   : 1 x 25  (rows x chars)
+        // Staus  : done
+
+        public int panGPS2(int first_col, int first_line)
+        {
+            osd.setPanel(first_col, first_line);
+            
+            osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+            
+            return 0;
+        }
+		
+		
         /* **************************************************************** */
         // Panel  : panHeading
         // Needs  : X, Y locations
@@ -861,21 +877,6 @@ namespace OSD
 
         }
 
-/* **************************************************************** */
-// Panel  : panCh
-// Needs  : X, Y locations
-// Output : Scaled channel values from MAVLink
-// Size...
-// Staus  : done
-
-public int panCh(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-
-    osd.printf_P(PSTR("C1%5i|C2%5i|C3%5i|C4%5i|C5%5i|C6%5i"),
-			             	//chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw);
-			             1550, 1302, 1640, 1456, 1100, 1940);
-	return 0;
-}		
 		
         /* **************************************************************** */
         // Panel  : panMavBeat

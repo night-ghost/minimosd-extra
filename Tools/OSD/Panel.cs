@@ -2,6 +2,8 @@ using System;
 
 namespace OSD {
 	
+	// проще и лучше чем эти туплы :)
+	
 	[Serializable]// "Pitch", pan.panPitch, 22, 10, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR
 	public class Panel {
 		public string name;

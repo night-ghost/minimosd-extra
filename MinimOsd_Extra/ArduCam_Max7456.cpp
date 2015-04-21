@@ -14,6 +14,11 @@
 #include <EEPROM.h>
 #include "OSD_Config.h"
 
+
+extern Settings sets;
+extern Flags flags;
+
+
 OSD::OSD()
 {
 }
@@ -43,14 +48,10 @@ void OSD::init()
   byte osdbl_r = Spi.transfer(0xff);
   // byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);
 
-  //Spi.transfer(MAX7456_VM0_reg);
- // Spi.transfer(MAX7456_RESET | video_mode);
   MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
   delay(50);
   //set black level
   byte osdbl_w = (osdbl_r & 0xef); //Set bit 4 to zero 11101111
-  //Spi.transfer(MAX7456_OSDBL_reg); //black level write register
-  //Spi.transfer(osdbl_w);
   MAX_write(MAX7456_OSDBL_reg, osdbl_w); //black level write register
 
 // set position - may be EEPROM.read(OSD_SHIFT_X)
@@ -81,7 +82,7 @@ void OSD::detectMode()
   }
   //If no signal was detected so it uses EEPROM config
   else{
-      if (EEPROM.read(PAL_NTSC_ADDR) == 0){ //NTSC
+      if (flags.PAL_NTSC){ //NTSC
           setMode(0);
       } 
       else { //PAL
@@ -102,7 +103,7 @@ void OSD::setBrightness()
 	MAX7456_WHITE_level_120,// 3
     };
 
-    uint8_t blevel = EEPROM.read(OSD_BRIGHTNESS_ADDR);
+    uint8_t blevel = sets.OSD_BRIGHTNESS;
     uint8_t x;
 /*
     if(blevel == 0) //low brightness

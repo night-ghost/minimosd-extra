@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ArdupilotMega
 {
-    class ArduinoSTK : SerialPort
+    public class ArduinoSTK : SerialPort
     {
         public delegate void ProgressEventHandler(int progress);
 
@@ -124,78 +124,97 @@ namespace ArdupilotMega
         /// </summary>
         /// <param name="length">eeprom length</param>
         /// <returns>downloaded data</returns>
-        public byte[] download(short length)
-        {
-            if (!this.IsOpen)
-            {
-                throw new Exception();
-            }
-            byte[] data = new byte[length];
+        public byte[] download (short length) {
+			if(!this.IsOpen) {
+				throw new Exception();
+			}
+			byte[] data = new byte[length];
 
-            byte[] command = new byte[] { (byte)'t', (byte)(length >> 8), (byte)(length & 0xff), (byte)'E', (byte)' ' };
-            this.Write(command, 0, command.Length);
+			byte[] command = new byte[] { (byte)'t', (byte)(length>>8), (byte)(length&0xff), (byte)'E', (byte)' ' };
+			this.Write(command, 0, command.Length);
 
-            if (this.ReadByte() == 0x14)
-            { // 0x14
+			if(this.ReadByte()==0x14) { // 0x14
 
-                int step = 0;
-                while (step < length)
-                {
-                    byte chr = (byte)this.ReadByte();
-                    data[step] = chr;
-                    step++;
-                }
+				int step = 0;
+				while(step < length) {
+					byte chr = (byte)this.ReadByte();
+					data[step] = chr;
+					step++;
+				}
 
-                if (this.ReadByte() != 0x10)  // 0x10
-                {
-                    down_flag = false;
-                    return data;
-                    //throw new Exception("Lost Sync 0x10");
-                }
-            }
-            else
-            {
-                down_flag = false;
-                return data;
-                //throw new Exception("Lost Sync 0x14");
-            }
-            down_flag = true;
-            return data;
-        }
+				if(this.ReadByte()!=0x10) {  // 0x10
+					down_flag = false;
+					return data;
+					//throw new Exception("Lost Sync 0x10");
+				}
+			} else {
+				down_flag = false;
+				return data;
+				//throw new Exception("Lost Sync 0x14");
+			}
+			down_flag = true;
+			return data;
+		}
 
-        public byte[] downloadflash(short length)
-        {
-            if (!this.IsOpen)
-            {
-                throw new Exception("Port Not Open");
-            }
-            byte[] data = new byte[length];
+//		unsafe public bool  download2 ( byte* data, short length) {
+//			if(!this.IsOpen) {
+//				throw new Exception();
+//			}
+//			
+//			byte[] command = new byte[] { (byte)'t', (byte)(length>>8), (byte)(length&0xff), (byte)'E', (byte)' ' };
+//			this.Write(command, 0, command.Length);
+//
+//			if(this.ReadByte()==0x14) { // 0x14
+//
+//				int step = 0;
+//				while(step < length) {
+//					byte chr = (byte)this.ReadByte();
+//					data[step] = chr;
+//					step++;
+//				}
+//
+//				if(this.ReadByte()!=0x10) {  // 0x10
+//					down_flag = false;
+//					return down_flag;
+//					//throw new Exception("Lost Sync 0x10");
+//				}
+//			} else {
+//				down_flag = false;
+//				return down_flag;
+//				//throw new Exception("Lost Sync 0x14");
+//			}
+//			down_flag = true;
+//			return down_flag;
+//		}
+		
+        public byte[] downloadflash (short length) {
+			if(!this.IsOpen) {
+				throw new Exception("Port Not Open");
+			}
+			byte[] data = new byte[length];
 
-            this.ReadTimeout = 1000;
+			this.ReadTimeout = 1000;
 
-            byte[] command = new byte[] { (byte)'t', (byte)(length >> 8), (byte)(length & 0xff), (byte)'F', (byte)' ' };
-            this.Write(command, 0, command.Length);
+			byte[] command = new byte[] { (byte)'t', (byte)(length>>8), (byte)(length&0xff), (byte)'F', (byte)' ' };
+			this.Write(command, 0, command.Length);
 
-            if (this.ReadByte() == 0x14)
-            { // 0x14
+			if(this.ReadByte()==0x14) { // 0x14
 
-                int read = length;
-                while (read > 0)
-                {
-                    //Console.WriteLine("offset {0} read {1}", length - read, read);
-                    read -= this.Read(data, length - read, read);
-                    //System.Threading.Thread.Sleep(1);
-                }
+				int read = length;
+				while(read > 0) {
+					//Console.WriteLine("offset {0} read {1}", length - read, read);
+					read -= this.Read(data, length - read, read);
+					//System.Threading.Thread.Sleep(1);
+				}
 
-                if (this.ReadByte() != 0x10)  // 0x10
-                    throw new Exception("Lost Sync 0x10");
-            }
-            else
-            {
-                throw new Exception("Lost Sync 0x14");
-            }
-            return data;
-        }
+				if(this.ReadByte()!=0x10)  // 0x10
+					throw new Exception("Lost Sync 0x10");
+			} else {
+				throw new Exception("Lost Sync 0x14");
+			}
+			return data;
+		}
+		
 
         public bool uploadflash(byte[] data, int startfrom, int length, int startaddress)
         {

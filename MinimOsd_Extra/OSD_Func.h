@@ -42,12 +42,38 @@ char setBatteryPic(uint16_t bat_level)
 
 void setHomeVars(OSD &osd)
 {
-  float dstlon, dstlat;
-  long bearing;
+    float dstlon, dstlat;
+    long bearing;
+    byte en=0;
 
   //osd_alt_to_home = (osd_alt - osd_home_alt);
 
 #ifdef IS_COPTER
+ #ifdef IS_PLANE
+    // copter & plane - differ by model_type
+    switch(sets.model_type){
+    case 0: //plane
+	if(osd_throttle > 3 && takeoff_heading == -400)
+	    takeoff_heading = osd_heading;
+
+	osd_alt_to_home = (osd_alt - osd_home_alt);
+  
+	if(osd_got_home == 0 && osd_fix_type == 3 )
+	    en=1;
+	break;
+
+    case 1:
+        if (motor_armed && !last_armed_status){
+	//If motors armed, reset home in Arducopter version
+	    osd_got_home = 0;
+	}
+
+	last_armed_status = motor_armed;
+
+	if(osd_got_home == 0 && osd_fix_type > 1 )
+	    en=1;
+    }
+ #else
   //Check disarm to arm switching.
   if (motor_armed && !last_armed_status){
     //If motors armed, reset home in Arducopter version
@@ -56,50 +82,53 @@ void setHomeVars(OSD &osd)
 
   last_armed_status = motor_armed;
 
-  if(osd_got_home == 0 && osd_fix_type > 1 ){
+  if(osd_got_home == 0 && osd_fix_type > 1 )
+    en=1;
+ #endif
 #else
-#ifdef IS_PLANE
+ #ifdef IS_PLANE
   if(osd_throttle > 3 && takeoff_heading == -400)
     takeoff_heading = osd_heading;
 
   osd_alt_to_home = (osd_alt - osd_home_alt);
   
-  if(osd_got_home == 0 && osd_fix_type == 3 ){
-#else
-  if(1){
+  if(osd_got_home == 0 && osd_fix_type == 3 )
+    en=1;
+  
+ #endif
 #endif
-#endif
 
-    osd_home_lat = osd_lat;
-    osd_home_lon = osd_lon;
-    //osd_alt_cnt = 0;
-    //osd_home_alt = osd_alt;
-    osd_got_home = 1;
-  } else if(osd_got_home == 1){
-    float rads = fabs(osd_home_lat) * 0.0174532925;
-    double scaleLongDown = cos(rads);
-    double scaleLongUp   = 1.0f/cos(rads);
+    if(en){
+        osd_home_lat = osd_lat;
+        osd_home_lon = osd_lon;
+        //osd_alt_cnt = 0;
+        //osd_home_alt = osd_alt;
+        osd_got_home = 1;
+    } else if(osd_got_home == 1){
+        float rads = fabs(osd_home_lat) * 0.0174532925;
+        double scaleLongDown = cos(rads);
+        double scaleLongUp   = 1.0f/cos(rads);
+    
+        //DST to Home
+        dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
+        dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
+        osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
 
-    //DST to Home
-    dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
-    dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
-    osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+        //DIR to Home
+        dstlon = (osd_home_lon - osd_lon); //OffSet_X
+        dstlat = (osd_home_lat - osd_lat) * scaleLongUp; //OffSet Y
+        bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
+        if(bearing < 0) bearing += 360;//normalization
+        bearing = bearing - 180;//absolut return direction
+        if(bearing < 0) bearing += 360;//normalization
+        bearing = bearing - osd_heading;//relative home direction
+        if(bearing < 0) bearing += 360; //normalization
 
-    //DIR to Home
-    dstlon = (osd_home_lon - osd_lon); //OffSet_X
-    dstlat = (osd_home_lat - osd_lat) * scaleLongUp; //OffSet Y
-    bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
-    if(bearing < 0) bearing += 360;//normalization
-    bearing = bearing - 180;//absolut return direction
-    if(bearing < 0) bearing += 360;//normalization
-    bearing = bearing - osd_heading;//relative home direction
-    if(bearing < 0) bearing += 360; //normalization
-    osd_home_direction = ((int)round((float)(bearing/360.0f) * 16.0f) % 16) + 1;//array of arrows =)
-    //if(osd_home_direction > 16) osd_home_direction = 1;
+        osd_home_direction = ((int)round((float)(bearing/360.0f) * 16.0f) % 16) + 1;//array of arrows =)
   }
 }
 
-
+// вычисление нужных переменных
 // накопление статистики и рекордов
 void setFdataVars()
 {
@@ -120,19 +149,44 @@ void setFdataVars()
   }
 
 
-  if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (time_lapse) / 1000.0);
+    if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (time_lapse) / 1000.0);
+
+    mah_used += (osd_curr_A * 10.0 * (time_lapse) / 3600000.0);
+
+
+    int rssi_v;
+    byte ch = sets.RSSI_raw / 2;
+
+
+    if(ch == 0) rssi_v = osd_rssi;
+    if(ch == 4) rssi_v = chan8_raw; 
+    if(ch == 1 || ch == 2) rssi_v = rssi_in;
+
+    if((sets.RSSI_raw % 2 == 0))  {
+
+       if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
+       if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
+
+       rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(float)(sets.RSSI_high-sets.RSSI_low)*100.0f);
  
-  mah_used += (osd_curr_A * 10.0 * (time_lapse) / 3600000.0);
+    } else 
+        rssi = rssi_v;
+
+    if(rssi > 100) rssi = 100;
 
   //Set max data
 #ifdef IS_COPTER
-  if (motor_armed)  {
+ #ifdef IS_PLANE
+    if(sets.model_type == 0 && takeofftime == 1 || sets.model_type == 2 && motor_armed){
+ #else
+    if (motor_armed)  {
+ #endif
 #else
-#ifdef IS_PLANE
+ #ifdef IS_PLANE
   if (takeofftime == 1){
-#else
+ #else
     if(0){
-#endif
+ #endif
 #endif
 
     total_flight_time_milis += time_lapse;
@@ -144,4 +198,5 @@ void setFdataVars()
     if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
   }
 }
+
 

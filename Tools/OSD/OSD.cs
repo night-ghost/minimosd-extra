@@ -33,18 +33,23 @@ public const  int SCREEN_H=16;
 public const  int SCREEN_H_NTSC=13;		
 		
 		
-        int panel_number = 0;
-        const int npanel = 3; // количество панелей 
+public enum ModelType {
+	Plane = 0,
+	Copter = 1,
+	Unknown = 9
+};
+		
+public const int npanel = 4; // количество панелей 
+
+/*------------------------------------------------*/		
+        public int panel_number =0;
 		
         const Int16 toggle_offset = 3;
         public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
         /// <summary>
         /// the un-scaled font render image
         /// </summary>
-        //Bitmap[] screen = new Bitmap[npanel];
-
         public Bitmap screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
-        //Bitmap screen2 = new Bitmap(30 * 12, 16 * 18);
         /// <summary>
         /// the scaled to size background control
         /// </summary>
@@ -82,28 +87,17 @@ public const  int SCREEN_H_NTSC=13;
         Image bgpicture;
 		public osd_screen[] scr = new osd_screen[npanel];
 
-        public bool[] mousedown = new bool[npanel];
-        //bool mousedown1 = false;
-        //bool mousedown2 = false;
 
         SerialPort comPort = new SerialPort();
 
-        Panels pan;
-        int nosdfunctions = 0;
+        Panels pan; // там в основном статика так что работает без создания экземпляра
+
+		int osd_functions_N = 0;
 		
 		public  int panel_num=0;
 
-		public Config conf;
+		internal Config conf;
 		
-//        Panel[] panelItems = new Panel[32];
-//        Panel[] panelItems_default = new Panel[32];
-//			
-//		Panel[] panelItems2 = new Panel[32];
-//        Panel[] panelItems2_default = new Panel[32];
-
-       
-        //Graphics gr2;
-        //s
         int print_x; // текущие координаты вывода
         int print_y;
 
@@ -111,7 +105,7 @@ public const  int SCREEN_H_NTSC=13;
 
         public OSD() {
 			
-			conf = new Config();
+			conf = new Config(this); // конфиг по умолчанию
 						
 			for (int i=0; i<npanel; i++) {
 				var s = new osd_screen(i, this);
@@ -143,37 +137,34 @@ public const  int SCREEN_H_NTSC=13;
             setupFunctions(); //setup panel item box
         }
 
-        void changeToPal(bool pal)
-        {
-            if (pal)
-            {
-                basesize = new Size(SCREEN_W, SCREEN_H);                
+        void changeToPal (bool pal) {
+			if(pal) {
+				basesize = new Size(SCREEN_W, SCREEN_H);                
                 
-                screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+				screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
                 
-                image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
+				image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
 				
-				for(int k=0;k<npanel;k++){
-                	scr[panel_number].NUM_X.Maximum = SCREEN_W-1;
-                	scr[panel_number].NUM_Y.Maximum = SCREEN_H-1;
+				for (int k=0; k<npanel; k++) {
+					scr[panel_number].NUM_X.Maximum = SCREEN_W - 1;
+					scr[panel_number].NUM_Y.Maximum = SCREEN_H - 1;
 				}
                 
-            }
-            else
-            {
-                basesize = new Size(SCREEN_W, SCREEN_H_NTSC);
+			} else {
+				basesize = new Size(SCREEN_W, SCREEN_H_NTSC);
 
-                screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
+				screen = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
  
-                image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
-				for(int k=0;k<npanel;k++){
-                	scr[panel_number].NUM_X.Maximum = SCREEN_W-1;
-                	scr[panel_number].NUM_Y.Maximum = SCREEN_H-1;                
+				image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
+				for (int k=0; k<npanel; k++) {
+					scr[panel_number].NUM_X.Maximum = SCREEN_W - 1;
+					scr[panel_number].NUM_Y.Maximum = SCREEN_H - 1;                
 				}
-            }
+			}
 
 
-        }
+		}
+		
         //Set item boxes
         void setupFunctions () {
 			processingpanel = "";
@@ -190,7 +181,7 @@ public const  int SCREEN_H_NTSC=13;
 
 			for (n=0; n<npanel; n++) { // для всех панелей
 				a = 0;
-				var pi = this.scr[n].panelItems;
+				var pi = scr[n].panelItems;
 				// first 8
 				// Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
 				pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
@@ -201,6 +192,7 @@ public const  int SCREEN_H_NTSC=13;
 				pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY);
 				pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY);
 				pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY);
+				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY);
 	
 				//second 8
 				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY);
@@ -225,7 +217,6 @@ public const  int SCREEN_H_NTSC=13;
 				pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY);
 				pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY);
 				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY);
-				pi[a++] = new Panel("ILS", pan.panILS, 24, 6, panILS_XY);
 	
 				pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY);
 	
@@ -239,14 +230,14 @@ public const  int SCREEN_H_NTSC=13;
 				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY);
 				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY);
 	
-				nosdfunctions = a;
-				//make backup in case EEPROM needs reset to deualt
-				this.scr[n].panelItems_default = pi;
+				osd_functions_N = a;
+				//make backup in case EEPROM needs reset to default
+				scr[n].panelItems_default = pi;
 				
-				System.Windows.Forms.TreeView li = this.scr[n].LIST_items;
+				System.Windows.Forms.TreeView li = scr[n].LIST_items;
 					
 				//Fill List of items in tabe number 1
-				this.scr[n].LIST_items.Nodes.Clear();
+				scr[n].LIST_items.Nodes.Clear();
 				startup = true;
 				foreach(var thing in pi) {
 					if(thing!=null) {
@@ -270,6 +261,9 @@ public const  int SCREEN_H_NTSC=13;
 						} else if(thing.name=="Channel Raw") {
 					
 							tn.Checked = false;
+						} else if(thing.name=="GPS2") {
+					
+							tn.Checked = false;
 						} else {
 	                        
 							tn.Checked = true;
@@ -285,20 +279,7 @@ public const  int SCREEN_H_NTSC=13;
 					
 			}	// цикл по экранам
 			
-			//startup = true;
-			//List<string> instruments = new List<string>();
-			//LIST_items.Nodes.Clear();
-			//foreach (var tuple in this.panelItems)
-			//{
-			//    if ((tuple != null))
-			//    {
-			//        TreeNode tn = LIST_items.Nodes.Add(tuple.Item1, tuple.Item1);
-			//        tn.Checked = (tuple.Item3 == 1);
-			//    }
-			//}
-
-
-            
+			          
             
 
 			//Setup configuration panel
@@ -306,7 +287,7 @@ public const  int SCREEN_H_NTSC=13;
 			RSSI_numeric_min.Value = pan.rssipersent;
 			RSSI_numeric_max.Value = pan.rssical;
 			RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
-			cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+			cbxRSSIChannel.SelectedIndex = rssi_decode((int)(pan.rssiraw_on ));
 
 			OVERSPEED_numeric.Value = pan.overspeed;
 
@@ -321,13 +302,13 @@ public const  int SCREEN_H_NTSC=13;
 
 			if(cbxWarningsAutoPanelSwitch.Items.Count==0)
 				cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
-			cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+			cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)(pan.auto_screen_switch);
 
-			if(pan.converts==0) {
+			if(!pan.converts) {
 				UNITS_combo.SelectedIndex = 0; //metric
 				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
 				OVERSPEED_label.Text = "Overspeed (km/h)";
-			} else if(pan.converts==1) {
+			} else  {
 				UNITS_combo.SelectedIndex = 1; //imperial
 				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
 				OVERSPEED_label.Text = "Overspeed (mph)";
@@ -354,105 +335,113 @@ public const  int SCREEN_H_NTSC=13;
 			this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
 
 			CMB_ComPort.Text = "COM5";
+	// new!
+			numMinVoltB.Text = (pan.battBv/10.0).ToString ();
+			txtRSSI_k.Text = pan.rssi_koef.ToString();
+			txtCurr_k.Text = pan.Curr_koef.ToString();
+			txtBattA_k.Text = pan.battA_koef.ToString();
+			txtBattB_k.Text = pan.battB_koef.ToString();
+			txtRollPal.Text = pan.roll_k.ToString();
+			txtPitchPal.Text = pan.pitch_k.ToString();
+			txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+			txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
+			
+			
+			cbBattA_source.SelectedIndex = pan.flgBattA?1:0;
+			
+			cbCurrentSoure.SelectedIndex =pan.flgCurrent?1:0;
+			
+			chkRadar.Checked = pan.flgRadar;
+			chkILS.Checked = pan.flgILS;
 		}
 
-        private string[] GetPortNames()
-        {
-            string[] devs = new string[0];
+        private string[] GetPortNames () {
+			string[] devs = new string[0];
 
-            if (Directory.Exists("/dev/"))
-                devs = Directory.GetFiles("/dev/", "*ACM*");
+			if(Directory.Exists("/dev/"))
+				devs = Directory.GetFiles("/dev/", "*ACM*");
 
-            string[] ports = SerialPort.GetPortNames();
+			string[] ports = SerialPort.GetPortNames();
 
-            string[] all = new string[devs.Length + ports.Length];
+			string[] all = new string[devs.Length + ports.Length];
 
-            devs.CopyTo(all, 0);
-            ports.CopyTo(all, devs.Length);
+			devs.CopyTo(all, 0);
+			ports.CopyTo(all, devs.Length);
 
-            return all;
-        }
+			return all;
+		}
+		
 
-        public void setPanel(int x, int y)
-        {
-            print_x = x * CHAR_W;
-            print_y = y * CHAR_H;
+        public void setPanel (int x, int y) {
+			print_x = x * CHAR_W;
+			print_y = y * CHAR_H;
 
-		    print_col = 0; // в пределах одного элемента
-            print_row = 0;
+			print_col = 0; // в пределах одного элемента
+			print_row = 0;
  
 		}
+		
 
 
-        public void openSingle(int x, int y)
-        {
-            setPanel(x, y);
-            
-        }
+        public void openSingle (int x, int y) {
+			setPanel(x, y);          
+		}
+		
 
-        public int getCenter()
-        {
-            if (CHK_pal.Checked)
-                return 8;
-            return 6;
-        }
+        public int getCenter () {
+			if(CHK_pal.Checked)
+				return 8;
+			return 6;
+		}
+		
 
         // used for printf tracking line and row
         int print_col;
         int print_row;
 
-        public void printf(string format, params object[] args)
-        {
-            StringBuilder sb = new StringBuilder();
+        public void printf (string format, params object[] args) {
+			StringBuilder sb = new StringBuilder();
 
-            sb = new StringBuilder(AT.MIN.Tools.sprintf(format, args));
+			sb = new StringBuilder(AT.MIN.Tools.sprintf(format, args));
 
-            //sprintf(sb, format, __arglist(args));
+			//sprintf(sb, format, __arglist(args));
 
-            //Console.WriteLine(sb.ToString());
+			//Console.WriteLine(sb.ToString());
 
-            foreach (char ch in sb.ToString().ToCharArray())
-            {
-                if (ch == '|')
-                {
-                    print_col += 1;
-                    print_row = 0;
-                    continue;
-                }
+			foreach(char ch in sb.ToString().ToCharArray()) {
+				if(ch=='|') {
+					print_col += 1;
+					print_row = 0;
+					continue;	
+				}
+				try {
+					// draw red boxs
+					if(selectedrectangle) {
+						gr.DrawRectangle(Pens.Red, (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
+					}
 
-                try
-                {
-                    // draw red boxs
-                    if (selectedrectangle)
-                    {
-                        gr.DrawRectangle(Pens.Red, (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
-                    }
+					int w1 = (this.print_x / CHAR_W + print_row) % basesize.Width;
+					int h1 = (this.print_y / CHAR_H + print_col);
 
-                    int w1 = (this.print_x / CHAR_W + print_row) % basesize.Width;
-                    int h1 = (this.print_y / CHAR_H + print_col);
+					if(w1 < basesize.Width && h1 < basesize.Height) {
+						// check if this box has bene used
+						if(usedPostion[w1][h1]!=null) {
+							//System.Diagnostics.Debug.WriteLine("'" + used[this.x / 12 + r * 12 / 12][this.y / 18 + d * 18 / 18] + "'");
+						} else {
+							gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);							
+						}
 
-                    if (w1 < basesize.Width && h1 < basesize.Height)
-                    {
-                        // check if this box has bene used
-                        if (usedPostion[w1][h1] != null)
-                        {
-                            //System.Diagnostics.Debug.WriteLine("'" + used[this.x / 12 + r * 12 / 12][this.y / 18 + d * 18 / 18] + "'");
-                        }
-                        else
-                        {
-                            gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);
-							
-//							testDraw(chars[ch]);
-                        }
+						usedPostion[w1][h1] = processingpanel;
+					}
+				} catch {
+					System.Diagnostics.Debug.WriteLine("printf exception");
+				}
+				print_row++;
+			}
 
-                        usedPostion[w1][h1] = processingpanel;
-                    }
-                }
-                catch { System.Diagnostics.Debug.WriteLine("printf exception"); }
-                print_row++;
-            }
-
-        }
+		}
+		
+		
 
 
         
@@ -462,191 +451,251 @@ public const  int SCREEN_H_NTSC=13;
 		}
         
 
-        public void printf_P(string format, params object[] args)
-        {
-            printf(format, args);
-        }
+        public void printf_P (string format, params object[] args) {
+			printf(format, args);
+		}
+		
 
         
         // draw image and characters overlay
-        public void osdDraw(int k)
-        {
-			if(k<0 || k>=npanel) return;
+        public void osdDraw (int k) {
+			if(k < 0 || k >= npanel)
+				return;
 			
-            panel_number = k;
-            if (startup)
-                return;
+			panel_number = k;
+			if(startup)
+				return;
 
-            for (int b = 0; b < usedPostion.Length; b++)
-            {
-                usedPostion[b] = new string[SCREEN_H];
-            }
+			for (int b = 0; b < usedPostion.Length; b++) {
+				usedPostion[b] = new string[SCREEN_H];
+			}
 			
 			System.Windows.Forms.PictureBox pb = scr[k].pictureBox;
-            image = new Bitmap(pb.Width, pb.Height);
+			image = new Bitmap(pb.Width, pb.Height);
 
-            float scaleW = pb.Width / (float)screen.Width;
-            float scaleH = pb.Height / (float)screen.Height;
+			float scaleW = pb.Width / (float)screen.Width;
+			float scaleH = pb.Height / (float)screen.Height;
 
-            screen = new Bitmap(screen.Width, screen.Height);
+			screen = new Bitmap(screen.Width, screen.Height);
 
-            gr = Graphics.FromImage(screen);
+			gr = Graphics.FromImage(screen);
 
-            image = new Bitmap(image.Width, image.Height);
+			image = new Bitmap(image.Width, image.Height);
 
-            Graphics grfull = Graphics.FromImage(image);
-
-            try
-            {
-                grfull.DrawImage(bgpicture, 0, 0, pb.Width, pb.Height);
-            }
-            catch { }
-
-            //Drawing the grid
-            if (checkBox1.Checked)
-            {
-                for (int b = 1; b < SCREEN_H; b++)
-                {
-                    for (int a = 1; a < SCREEN_W; a++)
-                    {
-                        grfull.DrawLine(new Pen(Color.Gray, 1), a * CHAR_W * scaleW, 0, a * CHAR_W * scaleW, pb.Height);
-                        grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * CHAR_H * scaleH, pb.Width, b * CHAR_H * scaleH);
-                    }
-                }
-            }
-
-            pan.setHeadingPatern();
-            pan.setBatteryPic();
-
-            List<string> list = new List<string>();
-
-            foreach (TreeNode tn in this.scr[k].LIST_items.Nodes)
-            {
-                foreach (TreeNode tn2 in tn.Nodes)
-                {
-                    if (tn2.Checked)
-                        list.Add(tn2.Text);
-                }
-                if (tn.Checked)
-                    list.Add(tn.Text);
-            }
-
-            list.Reverse();
-
-            foreach (string it in list)
-            {
-                foreach (var thing in this.scr[k].panelItems)
-                {
-                    selectedrectangle = false;
-                    if (thing != null)
-                    {
-                        if (thing.name == it)
-                        {
-                            if (thing.name == currentlyselected)
-                            {
-                                selectedrectangle = true;
-                            }
-
-                            processingpanel = thing.name;
-
-                            // ntsc and below the middle line
-                            if (thing.y >= getCenter() && !CHK_pal.Checked)
-                            {
-                                thing.show(thing.x, thing.y - 3);
-                            }
-                            else // pal and no change
-                            {
-                                thing.show(thing.x, thing.y);
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            grfull.DrawImage(screen, 0, 0, image.Width, image.Height);
-
-            pb.Image = image;
+			Graphics grfull = Graphics.FromImage(image);
 			
-        }
+			try {
+				grfull.DrawImage(bgpicture, 0, 0, pb.Width, pb.Height);
+			} catch {
+			}
 
-        
-        public enum ModelType
-        {
-            Plane = 0,
-            Copter = 1,
-            Unknown = 9
-        }
+			//Drawing the grid
+			if(checkBox1.Checked) {
+				for (int b = 1; b < SCREEN_H; b++) {
+					for (int a = 1; a < SCREEN_W; a++) {
+						grfull.DrawLine(new Pen(Color.Gray, 1), a * CHAR_W * scaleW, 0, a * CHAR_W * scaleW, pb.Height);
+						grfull.DrawLine(new Pen(Color.Gray, 1), 0, b * CHAR_H * scaleH, pb.Width, b * CHAR_H * scaleH);
+					}
+				}
+			}
+
+			pan.setHeadingPatern();
+			pan.setBatteryPic();
+
+			List<string> list = new List<string>();
+
+			foreach(TreeNode tn in this.scr[k].LIST_items.Nodes) {
+				foreach(TreeNode tn2 in tn.Nodes) {
+					if(tn2.Checked)
+						list.Add(tn2.Text);
+				}
+				if(tn.Checked)
+					list.Add(tn.Text);
+			}
+
+			list.Reverse();
+
+			foreach(string it in list) {
+				foreach(var thing in this.scr[k].panelItems) {
+					selectedrectangle = false;
+					if(thing!=null) {
+						if(thing.name==it) {
+							if(thing.name==currentlyselected) {
+								selectedrectangle = true;
+							}
+
+							processingpanel = thing.name;
+
+							// ntsc and below the middle line
+							if(thing.y >= getCenter() && !CHK_pal.Checked) {
+								thing.show(thing.x, thing.y - 3);
+							} else { // pal and no change
+								thing.show(thing.x, thing.y);
+							}
+
+						}
+					}
+				}
+			}
+			
+			
+
+			grfull.DrawImage(screen, 0, 0, image.Width, image.Height);
+
+			pb.Image = image;
+			
+		}
+	
 
         string currentVersion = "";
 
-        private void OSD_Load(object sender, EventArgs e)
-        {
-            if (cbxModelType.Items.Count == 0)
-                cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
-            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
-                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+        private void OSD_Load (object sender, EventArgs e) {
+			if(cbxModelType.Items.Count==0)
+				cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
+			if(cbxWarningsAutoPanelSwitch.Items.Count==0)
+				cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
-            string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release r806 DV";
-            currentVersion = strVersion + "r806 DV";
+			string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+			this.Text = this.Text + " " + strVersion + " - Pre-Release r806 DV";
+			currentVersion = strVersion + "r806 DV";
 
-            CMB_ComPort.Items.AddRange(GetPortNames());
+			CMB_ComPort.Items.AddRange(GetPortNames());
 
-            if (CMB_ComPort.Items.Count > 0)
-                CMB_ComPort.SelectedIndex = 0;
+			if(CMB_ComPort.Items.Count > 0)
+				CMB_ComPort.SelectedIndex = 0;
 
-            xmlconfig(false);
+			xmlconfig(false);
 
- 		   	osdDraw(panel_number);
+			osdDraw(panel_number);
             
-        }
-
-
-
-
-        private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            // if (((CheckedListBox)sender).SelectedItem != null && ((CheckedListBox)sender).SelectedItem.ToString() == "Horizon")
-            //            if (((CheckedListBox)sender).SelectedItem != null)
-            //            {
-            //                if (((CheckedListBox)sender).SelectedItem.ToString() == "Horizon" && e.NewValue == CheckState.Checked)
-            //                {
-            //                    int index = LIST_items.Items.IndexOf("Center");
-            //                    LIST_items.SetItemChecked(index, false);
-            //                }
-            //                else if (((CheckedListBox)sender).SelectedItem.ToString() == "Center" && e.NewValue == CheckState.Checked)
-            //                {
-            //                    int index = LIST_items.Items.IndexOf("Horizon");
-            //                    LIST_items.SetItemChecked(index, false);
-            //                }
-            //            }
-
-            // add a delay to this so it runs after the control value has been defined.
-            if (this.IsHandleCreated)
-                this.BeginInvoke((MethodInvoker)delegate { osdDraw(panel_number); });
-        }
-
-
-		void setEepromXY (Panel pan, bool enabled) {
-			Config.eeprom[panel_number * OffsetBITpanel + pan.pos] = (byte)pan.x; // x
-			Config.eeprom[panel_number * OffsetBITpanel + pan.pos + 1] = (byte)(enabled ? pan.y : pan.y|0x80);
 		}
 		
-		Pos getEepromXY (Panel pan) {
-			return  new Pos(Config.eeprom[panel_number * OffsetBITpanel + pan.pos], Config.eeprom[panel_number * OffsetBITpanel + pan.pos+1]);
-			;
+
+
+
+
+        private void checkedListBox1_ItemCheck (object sender, ItemCheckEventArgs e) {
+			// add a delay to this so it runs after the control value has been defined.
+			if(this.IsHandleCreated)
+				this.BeginInvoke((MethodInvoker)delegate {
+					osdDraw(panel_number); });
 		}
+		
+
+
 
         //Write data to MinimOSD EPPROM
         private void BUT_WriteOSD_Click (object sender, EventArgs e) {
+			this.BeginInvoke((MethodInvoker)delegate {
+					Sub_WriteOSD(); 
+			});
+		}
+		
+		private void Sub_WriteOSD(){
 			toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
 			this.toolStripStatusLabel1.Text = "";
+			int wr_start=0;
+			int wr_length=0;
 
 			TabPage current = PANEL_tabs.SelectedTab;
+			
+			if(current.Text=="Config") {
+				//Setup configuration panel
+				//It only checks if configuration screen model type matches fw model type if model type already have been read from eeprom
+				//(either by pushing the "Read From OSD" or by uploading the fw)
+				if(fwWasRead) {
+					ModelType fwModelType = (ModelType)conf.eeprom.sets.model_type;
 
-			if(panel_number >= 0 && panel_number < npanel) {
+					if(fwModelType!=(ModelType)cbxModelType.SelectedItem) {
+						if(MessageBox.Show("OSD firmware is of type " + fwModelType.ToString() + " and you have selected " + cbxModelType.SelectedText + " model type." + Environment.NewLine +
+                            "Are you sure you want to upload this configuration?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)!=System.Windows.Forms.DialogResult.Yes)
+							return;
+					}
+				}
+				
+				// пройтись по всем панелям и проверить, включено ли отображение батареи B
+				//если да то pan.flgBattB=true
+				pan.flgBattB=false;
+				for(int i=0;i<npanel ;i++){
+					foreach(var p in scr[i].panelItems) {
+						if((p!=null) && ((p.name=="Battery B")) && p.pos!=-1) {
+							var trArray = scr[i].LIST_items.Nodes.Find(p.name, true);
+							pan.flgBattB |= trArray[0].Checked;
+						}
+					}
+				}
+				
+				wr_start = Settings_offset;
+				wr_length = Config.Settings_size;
+				
+				conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
+				conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
+				conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
+				conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
+				conf.eeprom.flags[converts] = pan.converts;
+				conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
+				
+				conf.eeprom.sets.overspeed = pan.overspeed;
+				conf.eeprom.sets.stall  = pan.stall;
+				conf.eeprom.sets.battv  = pan.battv;
+
+				conf.eeprom.sets.OSD_RSSI_HIGH = pan.rssical;
+				conf.eeprom.sets.OSD_RSSI_LOW = pan.rssipersent;
+				conf.eeprom.sets.OSD_RSSI_RAW = pan.rssiraw_on;
+
+				conf.eeprom.sets.ch_toggle = pan.ch_toggle;
+				conf.eeprom.sets.switch_mode = pan.switch_mode;
+				
+				conf.eeprom.flags[pal_ntsc] = pan.pal_ntsc;
+
+				conf.eeprom.sets.OSD_BATT_WARN  = pan.batt_warn_level;
+				conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
+				conf.eeprom.sets.OSD_RSSI_WARN  = pan.rssi_warn_level;
+
+				conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
+
+				
+				conf.eeprom.osd_call_sign = pan.callsign_str;
+
+				conf.eeprom.sets.CHK1_VERSION  = VER;
+				conf.eeprom.sets.CHK2_VERSION  = 0x55 ^ VER;
+				
+/*
+ 	//// коэффициенты внешних измерений
+    float evBattA_koef; 
+    float evBattB_koef;
+    float eCurrent_koef;
+    float eRSSI_koef;
+		
+	// коэффициенты горизонта
+    float horiz_kRoll; //0.010471976 horizon, conversion factor for pitch 
+    float horiz_kPitch; //0.017453293  horizon, conversion factor for roll
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+    
+ */
+// new!
+				conf.eeprom.sets.battBv=pan.battBv;
+				conf.eeprom.sets.eRSSI_koef=pan.rssi_koef;
+				conf.eeprom.sets.eCurrent_koef=pan.Curr_koef;
+				conf.eeprom.sets.evBattA_koef=pan.battA_koef;
+				conf.eeprom.sets.evBattB_koef=pan.battB_koef;
+				conf.eeprom.sets.horiz_kRoll=pan.roll_k;
+				conf.eeprom.sets.horiz_kPitch=pan.pitch_k;
+				conf.eeprom.sets.horiz_kRoll_a=pan.roll_k_ntsc;
+				conf.eeprom.sets.horiz_kPitch_a=pan.pitch_k_ntsc;
+				conf.eeprom.flags[useExtVbattA]=pan.flgBattA;
+				conf.eeprom.flags[useExtCurr]=pan.flgCurrent;
+				conf.eeprom.flags[radar_on]=pan.flgRadar;
+				conf.eeprom.flags[ils_on]=pan.flgILS;
+				
+			} else if(panel_number >= 0 && panel_number < npanel) {
 				//First Panel 
+
+				wr_start = panel_number * OffsetBITpanel;
+				wr_length = OffsetBITpanel;
+				
 				List<TreeNode> AllNodes = new List<TreeNode>();
 				foreach(TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {
 					foreach(TreeNode tn2 in tn.Nodes) {
@@ -657,122 +706,60 @@ public const  int SCREEN_H_NTSC=13;
 
 				foreach(TreeNode tn in AllNodes) {
 					string str = tn.Text;
-					foreach(var pan in this.scr[this.panel_number].panelItems) {
+					foreach(var pan in scr[panel_number].panelItems) {
 						if((pan!=null) && ((pan.name==str)) && pan.pos!=-1) {
-							TreeNode[] trArray = this.scr[this.panel_number].LIST_items.Nodes.Find(str, true);
-							setEepromXY(pan, trArray[0].Checked);
-//							eeprom[pan.Item5] = (byte)(trArray[0].Checked ? 1 : 0);
-//							eeprom[pan.Item6] = (byte)pan.Item3; // x
-//							eeprom[pan.Item7] = (byte)pan.Item4; // y
+							TreeNode[] trArray = scr[panel_number].LIST_items.Nodes.Find(str, true);
+							conf.setEepromXY(pan, trArray[0].Checked);
 
 							//Console.WriteLine(str);
 						}
 					}
 				}
 	
-			} else if(current.Text=="Config") {
-				//Setup configuration panel
-				//It only checks if configuration screen model type matches fw model type if model type already have been read from eeprom
-				//(either by pushing the "Read From OSD" or by uploading the fw)
-				if(fwWasRead) {
-					ModelType fwModelType = (ModelType)Config.eeprom[MODEL_TYPE_ADD];
-					if(fwModelType!=(ModelType)cbxModelType.SelectedItem) {
-						if(MessageBox.Show("OSD firmware is of type " + fwModelType.ToString() + " and you have selected " + cbxModelType.SelectedText + " model type." + Environment.NewLine +
-                            "Are you sure you want to upload this configuration?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)!=System.Windows.Forms.DialogResult.Yes)
-							return;
-					}
-				}
-				Config.eeprom[SIGN_AS_ON_ADDR] = pan.sign_air_speed;
-				Config.eeprom[SIGN_GS_ON_ADDR] = pan.sign_ground_speed;
-				Config.eeprom[SIGN_HA_ON_ADDR] = pan.sign_home_altitude;
-				Config.eeprom[SIGN_MSL_ON_ADDR] = pan.sign_msl_altitude;
-				Config.eeprom[measure_ADDR] = pan.converts;
-				Config.eeprom[overspeed_ADDR] = pan.overspeed;
-				Config.eeprom[stall_ADDR] = pan.stall;
-				Config.eeprom[battv_ADDR] = pan.battv;
+			} 
 
-				Config.eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
-				Config.eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
-				Config.eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
-
-				Config.eeprom[AUTO_SCREEN_SWITCH_ADD] = pan.auto_screen_switch;
-				Config.eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
-				Config.eeprom[switch_mode_ADDR] = pan.switch_mode;
+			if(wr_length ==0) {
+				MessageBox.Show("Zero write length!");
+				return;
+			}
+			
+			int err;
+			if(current.Text=="Config") {			
+				err = conf.writeEEPROM(wr_start, wr_length);
+				if(err > 0)
+					MessageBox.Show("Failed to upload new configuration data");
+				else if(err==0) 
+					MessageBox.Show("Done writing configuration data!");
 				
-				Config.eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
+			} else if(panel_number >= 0 && panel_number < npanel) {
+				err = conf.writeEEPROM(wr_start, wr_length);
+				if(err > 0)
+					MessageBox.Show("Failed to upload new Panel data");
+				else if(err==0)
+					MessageBox.Show("Done writing Panel data!");
+			}  
 
-				Config.eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-				Config.eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = Convert.ToByte(pan.osd_battery_show_percentage);
-				Config.eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
-
-				Config.eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
-
-				//for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++)
-				for (int i = 0; i < pan.callsign_str.Length; i++) {
-					Config.eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte(pan.callsign_str[i]);
-					Console.WriteLine("Call Sign ", i, " is ", Config.eeprom[OSD_CALL_SIGN_ADDR + i]);
-				}
-				if(pan.callsign_str.Length < OSD_CALL_SIGN_TOTAL)
-					for (int i = pan.callsign_str.Length; i < OSD_CALL_SIGN_TOTAL; i++)
-						Config.eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('\0');
-			}
-
-			ArduinoSTK sp = OpenArduino();
-
-			if(sp!=null && sp.connectAP()) {
-				try {
-					bool spupload_flag = false;
-
-					if(panel_number >= 0 && panel_number < npanel) {
-						for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-							int start = panel_number * OffsetBITpanel;
-							spupload_flag = sp.upload(Config.eeprom, (short)start, (short)OffsetBITpanel, (short)start);
-							if(!spupload_flag) {
-								if(sp.keepalive())
-									Console.WriteLine("keepalive successful (iter " + i + ")");
-								else
-									Console.WriteLine("keepalive fail (iter " + i + ")");
-							} else
-								break;
-						}
-						if(spupload_flag)
-							MessageBox.Show("Done writing Panel data!");
-						else
-							MessageBox.Show("Failed to upload new Panel data");
-					} else if(current.Text=="Config") {
-						for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-							spupload_flag = sp.upload(Config.eeprom, (short)SIGN_MSL_ON_ADDR, (short)((OSD_CALL_SIGN_ADDR + OSD_CALL_SIGN_TOTAL) - SIGN_MSL_ON_ADDR + 1), (short)SIGN_MSL_ON_ADDR);
-							if(!spupload_flag) {
-								if(sp.keepalive())
-									Console.WriteLine("keepalive successful (iter " + i + ")");
-								else
-									Console.WriteLine("keepalive fail (iter " + i + ")");
-							} else
-								break;
-						}
-						if(spupload_flag)
-							MessageBox.Show("Done writing configuration data!");
-						else
-							MessageBox.Show("Failed to upload new configuration data");
-					}
-				} catch (Exception ex) {
-					MessageBox.Show(ex.Message);
-				}
-			} else {
-				MessageBox.Show("Failed to talk to bootloader");
-			}
-
-			sp.Close();
 		}
-
+		
+		private void BUT_ResetOSD_EEPROM_click (object sender, EventArgs e) {
+			this.BeginInvoke((MethodInvoker)delegate {
+					BUT_ResetOSD_EEPROM(); 
+			});
+			
+		}
+		
 
         //Write data to MinimOSD EPPROM
-        private void BUT_ResetOSD_EEPROM () {
+        private int BUT_ResetOSD_EEPROM () {
 			toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
 			this.toolStripStatusLabel1.Text = "";
 
+			conf.eeprom.clear();
+			
 			for (int k=0; k<npanel; k++) {
 				//First Panel 
+				panel_number=k ;
+				
 				List<TreeNode> AllNodes = new List<TreeNode>();
 				foreach(TreeNode tn in scr[panel_number].LIST_items.Nodes) {
 					foreach(TreeNode tn2 in tn.Nodes) {
@@ -792,77 +779,75 @@ public const  int SCREEN_H_NTSC=13;
 								en = false;
 							else if(str=="Channel Raw")
 								en = false;
+							else if(str=="GPS2")
+								en = false;
 							else
 								en = true;
 							
-							setEepromXY(it, en);							
+							conf.setEepromXY(it, en);							
 						}
 					}
 				}
 			}
 			
 			//Setup configuration panel
-			Config.eeprom[SIGN_AS_ON_ADDR] = pan.sign_air_speed;
-			Config.eeprom[SIGN_GS_ON_ADDR] = pan.sign_ground_speed;
-			Config.eeprom[SIGN_HA_ON_ADDR] = pan.sign_home_altitude;
-			Config.eeprom[SIGN_MSL_ON_ADDR] = pan.sign_msl_altitude;
-			Config.eeprom[measure_ADDR] = pan.converts;
-			Config.eeprom[overspeed_ADDR] = pan.overspeed;
-			Config.eeprom[stall_ADDR] = pan.stall;
-			Config.eeprom[battv_ADDR] = pan.battv;
-
-			Config.eeprom[OSD_RSSI_HIGH_ADDR] = pan.rssical;
-			Config.eeprom[OSD_RSSI_LOW_ADDR] = pan.rssipersent;
-			Config.eeprom[OSD_RSSI_RAW_ADDR] = pan.rssiraw_on;
-
-			Config.eeprom[AUTO_SCREEN_SWITCH_ADD] = pan.auto_screen_switch;
-			Config.eeprom[OSD_Toggle_ADDR] = pan.ch_toggle;
-			Config.eeprom[switch_mode_ADDR] = pan.switch_mode;
-
-			Config.eeprom[PAL_NTSC_ADDR] = pan.pal_ntsc;
-
-			Config.eeprom[OSD_BATT_WARN_ADDR] = pan.batt_warn_level;
-			Config.eeprom[OSD_BATT_SHOW_PERCENT_ADDR] = Convert.ToByte(pan.osd_battery_show_percentage);
-			Config.eeprom[OSD_RSSI_WARN_ADDR] = pan.rssi_warn_level;
-
-			Config.eeprom[OSD_BRIGHTNESS_ADDR] = pan.osd_brightness;
-
-			Config.eeprom[CHK_VERSION] = VER;
-
-			for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) {
-				Config.eeprom[OSD_CALL_SIGN_ADDR + i] = Convert.ToByte('a');
-				Console.WriteLine("Call Sign ", i, " is ", Config.eeprom[OSD_CALL_SIGN_ADDR + i]);
-			}
-
-			ArduinoSTK sp = OpenArduino();
-
-			if(sp!=null && sp.connectAP()) {
-				try {
-					bool spupload_flag = false;
-				
-					for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-						spupload_flag = sp.upload(Config.eeprom, 0, 1024, 0);
-						if(!spupload_flag) {
-							if(sp.keepalive())
-								Console.WriteLine("keepalive successful (iter " + i + ")");
-							else
-								Console.WriteLine("keepalive fail (iter " + i + ")");
-						} else
-							break;
-					}
-					if(spupload_flag)
-						MessageBox.Show("Done writing configuration data!");
-					else
-						MessageBox.Show("Failed to upload new configuration data");
-				} catch (Exception ex) {
-					MessageBox.Show(ex.Message);
-				}
-			} else {
-				MessageBox.Show("Failed to talk to bootloader");
-			}
+			conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
+			conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
+			conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
+			conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
+			conf.eeprom.flags[converts] = pan.converts;
 			
+			conf.eeprom.sets.overspeed = pan.overspeed;
+			conf.eeprom.sets.stall  = pan.stall;
+			conf.eeprom.sets.battv  = pan.battv;
 
-			sp.Close();
+			conf.eeprom.sets.OSD_RSSI_HIGH = pan.rssical;
+			conf.eeprom.sets.OSD_RSSI_LOW = pan.rssipersent;
+			conf.eeprom.sets.OSD_RSSI_RAW  = pan.rssiraw_on;
+
+			conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
+			conf.eeprom.sets.ch_toggle = pan.ch_toggle;
+			conf.eeprom.sets.switch_mode = pan.switch_mode;
+
+			conf.eeprom.flags[pal_ntsc] = pan.pal_ntsc;
+
+			conf.eeprom.sets.OSD_BATT_WARN  = pan.batt_warn_level;
+			conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
+			conf.eeprom.sets.OSD_RSSI_WARN = pan.rssi_warn_level;
+
+			conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
+
+			conf.eeprom.sets.CHK1_VERSION  = VER;
+			conf.eeprom.sets.CHK2_VERSION  = 0x55 ^ VER;
+			
+			conf.eeprom.osd_call_sign="12345678";
+	
+/*
+ 	//// коэффициенты внешних измерений
+    float evBattA_koef; 
+    float evBattB_koef;
+    float eCurrent_koef;
+    float eRSSI_koef;
+		
+	// коэффициенты горизонта
+    float horiz_kRoll; //0.010471976 horizon, conversion factor for pitch 
+    float horiz_kPitch; //0.017453293  horizon, conversion factor for roll
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+    
+ * */			
+			
+			int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
+			if(err > 0) {
+				MessageBox.Show("Failed to upload configuration data");
+				return 1;
+			} else if(err==0) {
+				MessageBox.Show("Done writing configuration data!");			
+				return 0;
+			}
+			return -err;
+
 		}
 
 
@@ -891,205 +876,118 @@ public const  int SCREEN_H_NTSC=13;
             catch { }
         }
 
-        private void ReadCharsetVersion () {
-			byte[] tempEeprom = new byte[1024];
 
-			bool fail = false;
-			ArduinoSTK sp = OpenArduino();
-
-
-			if(sp!=null && sp.connectAP()) {
-				try {					
-					for (int i = 0; i < 5; i++) { //try to download two times if it fail
-						tempEeprom = sp.download(1024);
-						if(!sp.down_flag) {
-							if(sp.keepalive())
-								Console.WriteLine("keepalive successful (iter " + i + ")");
-							else
-								Console.WriteLine("keepalive fail (iter " + i + ")");
-						} else
-							break;
-					}
-				} catch (Exception ex) {
-					MessageBox.Show(ex.Message);
-				}
-			} else {
-				MessageBox.Show("Failed to talk to bootloader");
-				fail = true;
-			}
-
-			sp.Close();
-
-			if(!fail) {
-				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + tempEeprom[CS_VERSION1_ADDR].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 1].ToString() + "." + tempEeprom[CS_VERSION1_ADDR + 2].ToString(); 
-			}
-		}
-
-        private void WriteCharsetVersion (string version) {
-			byte[] tempEeprom = new byte[3];
-			tempEeprom[0] = (byte)version[0];
-			tempEeprom[1] = (byte)version[1];
-			tempEeprom[2] = (byte)version[2];
-            
-			ArduinoSTK sp = OpenArduino();
-
-			if(sp!=null && sp.connectAP()) { 
-				try {
-					bool spupload_flag = false;
-					for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-						spupload_flag = sp.upload(tempEeprom, (short)0, (short)tempEeprom.Length, (short)CS_VERSION1_ADDR);
-						if(!spupload_flag) {
-							if(sp.keepalive())
-								Console.WriteLine("keepalive successful (iter " + i + ")");
-							else
-								Console.WriteLine("keepalive fail (iter " + i + ")");
-						} else
-							break;
-					}
-					if(spupload_flag)
-						MessageBox.Show("Done writing configuration data!");
-					else
-						MessageBox.Show("Failed to upload new configuration data");
-				} catch (Exception ex) {
-					MessageBox.Show(ex.Message);
-				}
-			} else {
-				MessageBox.Show("Failed to talk to bootloader");
-			}
-
-			sp.Close();
-		}
 
         private void BUT_ReadOSD_Click (object sender, EventArgs e) {
 			toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
 			this.toolStripStatusLabel1.Text = "";
 
-			bool fail = false;
-			ArduinoSTK sp = OpenArduino();
-
-			if(sp!=null && sp.connectAP()) {
-				try {
-					for (int i = 0; i < 5; i++) { //try to download two times if it fail
-						Config.eeprom = sp.download(1024);
-						if(!sp.down_flag) {
-							if(sp.keepalive())
-								Console.WriteLine("keepalive successful (iter " + i + ")");
-							else
-								Console.WriteLine("keepalive fail (iter " + i + ")");
-						} else
-							break;
-					}
-				} catch (Exception ex) {
-					MessageBox.Show(ex.Message);
-				}
-			} else {
-				MessageBox.Show("Failed to talk to bootloader");
-				fail = true;
-			}
-
-			sp.Close();
-
+			bool fail = conf.readEEPROM(Config.EEPROM_SIZE);
+			
+			if(fail)
+				return  ;
+			
+			
 			//Verify EEPROM version
-			if(Config.eeprom[CHK_VERSION]!=VER) { // no match
+			if(conf.eeprom.sets.CHK1_VERSION != VER) { // no match
 				MessageBox.Show("The EEPROM mapping is outdated! An automatic update will start.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				BUT_ResetOSD_EEPROM(); //write defaults
-				MessageBox.Show("EEPROM mapping updated!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				if(BUT_ResetOSD_EEPROM()==0) //write defaults
+					MessageBox.Show("EEPROM mapping updated!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				return;
 			}
-			if(!fail) {
+//			if(fail) {
+//				MessageBox.Show("Failed to download data!");
+//				return;
+//			} else {
+//				fwWasRead = true;
+//				MessageBox.Show("Done downloading data!");
+//			} 
+			
+			for (int k=0; k<npanel; k++) {
+				for (int a = 0; a < scr[k].panelItems.Length; a++) {
+					if(this.scr[k].panelItems[a]!=null) {
+						var pi = scr[k].panelItems[a];
+						Pos p = conf.getEepromXY(pi);
 
-				for (int k=0; k<npanel; k++) {
-					for (int a = 0; a < scr[k].panelItems.Length; a++) {
-						if(this.scr[k].panelItems[a]!=null) {
-							var pi = scr[k].panelItems[a];
-							Pos p = getEepromXY(pi);
-
-							if(pi.pos >= 0) {
-								TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(pi.name, true);
-								
-								if(tnArray.Length > 0)
-									tnArray[0].Checked = (p.y < 0x80);
-								
-								p.y &= 0x80;
-								
-								p.x = (byte)Constrain(p.x, 0, SCREEN_W);
-								p.y = (byte)Constrain(p.y, 0, SCREEN_H);
-								
-								//LIST_items.SetItemCheckState(a, eeprom[panelItems[a].Item5] == 0 ? CheckState.Unchecked : CheckState.Checked);
-								scr[k].panelItems[a] = new Panel(pi.name, pi.show, p.x, p.y, pi.pos);
-
-							}
+						if(pi.pos >= 0) {
+							TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(pi.name, true);
 							
+							if(tnArray.Length > 0)
+								tnArray[0].Checked = (p.y < 0x80);
+							
+							p.y &= 0x80;
+							
+							pi.x = (byte)Constrain(p.x, 0, SCREEN_W);
+							pi.y = (byte)Constrain(p.y, 0, SCREEN_H);
+							
+							//scr[k].panelItems[a] = new Panel(pi.name, pi.show, p.x, p.y, pi.pos);
+
 						}
+						
 					}
 				}
-				
 			}
-
+				
 			//Setup configuration panel
-			pan.model_type = Config.eeprom[MODEL_TYPE_ADD];
-			pan.fw_version1 = Config.eeprom[FW_VERSION1_ADDR];
-			pan.fw_version2 = Config.eeprom[FW_VERSION1_ADDR + 1];
-			pan.fw_version3 = Config.eeprom[FW_VERSION1_ADDR + 2];
+			pan.model_type = conf.eeprom.sets.model_type;
+			pan.fw_version = conf.eeprom.FW_version ;
 			
-			pan.cs_version1 = Config.eeprom[CS_VERSION1_ADDR];
-			pan.cs_version2 = Config.eeprom[CS_VERSION1_ADDR + 1];
-			pan.cs_version3 = Config.eeprom[CS_VERSION1_ADDR + 2];
-			if((pan.fw_version1=='0') && (pan.fw_version2=='0') && (pan.fw_version3=='0')) {
+			pan.cs_version = conf.eeprom.CS_version;
+
+			if(pan.fw_version=="0.0.0")  {
 				lblFWModelType.Text = "Model Type found in OSD: Unknown or custom";
 			} else {
-				lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version1 + "." + pan.fw_version2 + "." + pan.fw_version3;
+				lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version;
 			}
 
-			if((pan.cs_version1=='0') && (pan.cs_version2=='0') && (pan.cs_version3=='0')) {
+			if(pan.cs_version=="0.0.0") {
 				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
 			} else {
-				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + (pan.cs_version1 - '0').ToString() + "." + (pan.cs_version2 - '0').ToString() + "." + (pan.cs_version3 - '0').ToString();
+				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + pan.cs_version;
 			}
 
-			pan.sign_air_speed = Config.eeprom[SIGN_AS_ON_ADDR];
-			pan.sign_ground_speed = Config.eeprom[SIGN_GS_ON_ADDR];
-			pan.sign_home_altitude = Config.eeprom[SIGN_HA_ON_ADDR];
-			pan.sign_msl_altitude = Config.eeprom[SIGN_MSL_ON_ADDR];
+			pan.sign_air_speed = (byte)(conf.eeprom.flags[sign_air_speed]?1:0);
+			pan.sign_ground_speed = (byte)(conf.eeprom.flags[sign_ground_speed]?1:0);
+			pan.sign_home_altitude = (byte)(conf.eeprom.flags[sign_home_altitude]?1:0);
+			pan.sign_msl_altitude = (byte)(conf.eeprom.flags[sign_msl_altitude]?1:0);
 
-			cbxAirSpeedSign.Checked = (pan.sign_air_speed!=0);
-			cbxGroundSpeedSign.Checked = (pan.sign_ground_speed!=0);
-			cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude!=0);
-			cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude!=0);
-			cbxModelType.SelectedItem = (ModelType)pan.model_type;
-			pan.converts = Config.eeprom[measure_ADDR];
+			cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
+			cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
+			cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0;
+			cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0;
+			try {
+				cbxModelType.SelectedItem = (ModelType)pan.model_type;
+			} catch{
+				cbxModelType.SelectedItem = ModelType.Unknown;
+			}
+			pan.converts = conf.eeprom.flags[converts];
 			//Modify units
-			if(pan.converts==0) {
+			if(!pan.converts) {
 				UNITS_combo.SelectedIndex = 0; //metric
 				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
 				OVERSPEED_label.Text = "Overspeed (km/h)";
-			} else if(pan.converts==1) {
+			} else {
 				UNITS_combo.SelectedIndex = 1; //imperial
 				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
 				OVERSPEED_label.Text = "Overspeed (mph)";
-			} else { //garbage value in EEPROM - default to metric
-				pan.converts = 0; //correct value
-				UNITS_combo.SelectedIndex = 0; //metric
-				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
-				OVERSPEED_label.Text = "Overspeed (km/h)";
-			}
+			} 
 
-			pan.overspeed = Config.eeprom[overspeed_ADDR];
+			pan.overspeed = conf.eeprom.sets.overspeed ;
 			OVERSPEED_numeric.Value = pan.overspeed;
 
-			pan.stall = Config.eeprom[stall_ADDR];
+			pan.stall = conf.eeprom.sets.stall ;
 			STALL_numeric.Value = pan.stall;
 
-			pan.battv = Config.eeprom[battv_ADDR];
+			pan.battv = conf.eeprom.sets.battv ;
 			MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
-			pan.rssical = Config.eeprom[OSD_RSSI_HIGH_ADDR];
+			pan.rssical = conf.eeprom.sets.OSD_RSSI_HIGH ;
 			//RSSI_numeric_max.Value = pan.rssical;
 
-			pan.rssipersent = Config.eeprom[OSD_RSSI_LOW_ADDR];
+			pan.rssipersent = conf.eeprom.sets.OSD_RSSI_LOW ;
 			//RSSI_numeric_min.Value = pan.rssipersent;
 
-			pan.rssiraw_on = Config.eeprom[OSD_RSSI_RAW_ADDR];
+			pan.rssiraw_on = conf.eeprom.sets.OSD_RSSI_RAW ;
 
 			updatingRSSI = true;
 			RSSI_numeric_min.Minimum = 0;
@@ -1099,7 +997,7 @@ public const  int SCREEN_H_NTSC=13;
 			RSSI_numeric_min.Value = 0;
 			RSSI_numeric_max.Value = 0;
 			RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
-			if((int)(pan.rssiraw_on / 2)==0) {
+			if((int)(pan.rssiraw_on /2)==0 || pan.rssiraw_on /2 == 2) {
 				RSSI_numeric_min.Value = pan.rssipersent;
 				RSSI_numeric_max.Value = pan.rssical;
 				RSSI_numeric_min.Minimum = 0;
@@ -1114,72 +1012,112 @@ public const  int SCREEN_H_NTSC=13;
 				RSSI_numeric_max.Minimum = 900;
 				RSSI_numeric_max.Maximum = 2000;
 			}
-			if(pan.rssiraw_on <= 1)
-				cbxRSSIChannel.SelectedIndex = 0;
-			else
-				cbxRSSIChannel.SelectedIndex = 1;
+			cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
+
 			updatingRSSI = false;
 
-			pan.ch_toggle = Config.eeprom[OSD_Toggle_ADDR];
-			if(pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9)
+			pan.ch_toggle = conf.eeprom.sets.ch_toggle;
+			try {			
 				ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
-			else
+			} catch {
 				ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
-
-			pan.auto_screen_switch = Config.eeprom[AUTO_SCREEN_SWITCH_ADD];
-			cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
-
-			pan.switch_mode = Config.eeprom[switch_mode_ADDR];
-			TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
-
-			pan.pal_ntsc = Config.eeprom[PAL_NTSC_ADDR];
-			CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
-
-			pan.batt_warn_level = Config.eeprom[OSD_BATT_WARN_ADDR];
-			BATT_WARNnumeric.Value = pan.batt_warn_level;
-
-			pan.osd_battery_show_percentage = Config.eeprom[OSD_BATT_SHOW_PERCENT_ADDR];
-			rbtBatteryPercent.Checked = Convert.ToBoolean(pan.osd_battery_show_percentage);
-			rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
-
-			pan.rssi_warn_level = Config.eeprom[OSD_RSSI_WARN_ADDR];
-			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
-
-			pan.osd_brightness = Config.eeprom[OSD_BRIGHTNESS_ADDR];
-			BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
-
-			char[] str_call = new char[OSD_CALL_SIGN_TOTAL];
-			for (int i = 0; i < OSD_CALL_SIGN_TOTAL; i++) {
-				str_call[i] = Convert.ToChar(Config.eeprom[OSD_CALL_SIGN_ADDR + i]);
-				Console.WriteLine("Call Sign read ", i, " is ", Config.eeprom[OSD_CALL_SIGN_ADDR + i]);
 			}
 
-			pan.callsign_str = new string(str_call);
-			CALLSIGNmaskedText.Text = pan.callsign_str;
+			pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch ;
+			cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
+			pan.switch_mode = conf.eeprom.sets.switch_mode;
+			TOGGLE_BEH.Checked = pan.switch_mode!=0;
+
+			pan.pal_ntsc = conf.eeprom.flags[pal_ntsc];
+			CHK_pal.Checked = pan.pal_ntsc;
+
+			pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN  ;
+			BATT_WARNnumeric.Value = pan.batt_warn_level;
+
+			pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
+			rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
+			rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
+
+			pan.rssi_warn_level = conf.eeprom.sets.OSD_RSSI_WARN;
+			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+			pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
+			BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+
+			
+			pan.callsign_str=conf.eeprom.osd_call_sign;
+				
+			CALLSIGNmaskedText.Text = pan.callsign_str;
+			
 			this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
 			this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
 			this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+
+/*
+ 	//// коэффициенты внешних измерений
+    float evBattA_koef; 
+    float evBattB_koef;
+    float eCurrent_koef;
+    float eRSSI_koef;
+		
+	// коэффициенты горизонта
+    float horiz_kRoll; //0.010471976 horizon, conversion factor for pitch 
+    float horiz_kPitch; //0.017453293  horizon, conversion factor for roll
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+    
+ * */		
+// new!
+			pan.battBv = conf.eeprom.sets.battBv;
+			numMinVoltB.Text = (pan.battBv/10.0).ToString();
 			
+			pan.rssi_koef = conf.eeprom.sets.eRSSI_koef;
+			txtRSSI_k.Text = pan.rssi_koef.ToString();
+			
+			pan.Curr_koef = conf.eeprom.sets.eCurrent_koef;
+			txtCurr_k.Text = pan.Curr_koef.ToString();
+			
+			pan.battA_koef = conf.eeprom.sets.evBattA_koef;
+			txtBattA_k.Text = pan.battA_koef.ToString();
+			
+			pan.battB_koef = conf.eeprom.sets.evBattB_koef;
+			txtBattB_k.Text = pan.battB_koef.ToString();
+			
+			pan.roll_k = conf.eeprom.sets.horiz_kRoll;
+			txtRollPal.Text = pan.roll_k.ToString();
+			
+			pan.pitch_k = conf.eeprom.sets.horiz_kPitch;
+			txtPitchPal.Text = pan.pitch_k.ToString();
+			
+			pan.roll_k_ntsc = conf.eeprom.sets.horiz_kRoll_a;
+			txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+			
+			pan.pitch_k_ntsc = conf.eeprom.sets.horiz_kPitch_a;
+			txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();			
+			
+			
+			pan.flgBattA = conf.eeprom.flags[useExtVbattA];
+			cbBattA_source.SelectedIndex = pan.flgBattA?1:0;
+						
+			pan.flgCurrent = conf.eeprom.flags[useExtCurr];
+			cbCurrentSoure.SelectedIndex =pan.flgCurrent?1:0;
+			
+			pan.flgRadar = conf.eeprom.flags[radar_on];
+			chkRadar.Checked = pan.flgRadar;
+			
+			pan.flgILS = conf.eeprom.flags[ils_on];
+			chkILS.Checked = pan.flgILS;							
 
-			osdDraw(panel_number);
-            
-
-			//if (!fail)
-			//    MessageBox.Show("Done!");
-			if(sp.down_flag) {
-				fwWasRead = true;
-				MessageBox.Show("Done downloading data!");
-			} else
-				MessageBox.Show("Failed to download data!");
-			sp.down_flag = false;
+			osdDraw(panel_number);            
 
 		}
 
 
         byte[] readIntelHEXv2(StreamReader sr)
         {
-            byte[] FLASH = new byte[1024 * 1024];
+            byte[] FLASH = new byte[1024 * 256];
 
             int optionoffset = 0;
             int total = 0;
@@ -1247,21 +1185,21 @@ public const  int SCREEN_H_NTSC=13;
             return FLASH;
         }
 
-        void sp_Progress(int progress)
-        {
-            toolStripStatusLabel1.Text = "Uploading " + progress + " %";
-            toolStripProgressBar1.Value = progress;
+        void sp_Progress (int progress) {
+			toolStripStatusLabel1.Text = "Uploading " + progress + " %";
+			toolStripProgressBar1.Value = progress;
 
-            statusStrip1.Refresh();
-        }
+			statusStrip1.Refresh();
+		}
+		
 
-        private void CHK_pal_CheckedChanged(object sender, EventArgs e)
-        {
-            changeToPal(CHK_pal.Checked);
+        private void CHK_pal_CheckedChanged (object sender, EventArgs e) {
+			changeToPal(CHK_pal.Checked);
 			
-            osdDraw(panel_number);
+			osdDraw(panel_number);
             
-        }
+		}
+		
 
         private void pALToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
@@ -1322,12 +1260,44 @@ public const  int SCREEN_H_NTSC=13;
                         sw.WriteLine("{0}\t{1}", "Sign Ground  Speed", pan.sign_ground_speed);
                         sw.WriteLine("{0}\t{1}", "Sign Home Altitude", pan.sign_home_altitude);
                         sw.WriteLine("{0}\t{1}", "Sign MSL Altitude", pan.sign_msl_altitude);
-                        sw.Close();
+/*
+ 	//// коэффициенты внешних измерений
+    float evBattA_koef; 
+    float evBattB_koef;
+    float eCurrent_koef;
+    float eRSSI_koef;
+		
+	// коэффициенты горизонта
+    float horiz_kRoll; //0.010471976 horizon, conversion factor for pitch 
+    float horiz_kPitch; //0.017453293  horizon, conversion factor for roll
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+    
+ * */                        
+						sw.WriteLine("{0}\t{1}", "BattB",pan.battBv);
+						sw.WriteLine("{0}\t{1}", "rssi_k",pan.rssi_koef);
+						sw.WriteLine("{0}\t{1}", "curr_k",pan.Curr_koef);
+						sw.WriteLine("{0}\t{1}", "batt_a_k",pan.battA_koef);
+						sw.WriteLine("{0}\t{1}", "batt_b_k",pan.battB_koef);
+						sw.WriteLine("{0}\t{1}", "roll_k",pan.roll_k);
+						sw.WriteLine("{0}\t{1}", "pitch_k",pan.pitch_k);
+						sw.WriteLine("{0}\t{1}", "roll_kn",pan.roll_k_ntsc);
+						sw.WriteLine("{0}\t{1}", "pitch_kn",pan.pitch_k_ntsc);
+						
+						
+						sw.WriteLine("{0}\t{1}", "fBattA",pan.flgBattA);
+						sw.WriteLine("{0}\t{1}", "fBattB",pan.flgBattB);
+						sw.WriteLine("{0}\t{1}", "fCurr",pan.flgCurrent);
+						
+						sw.WriteLine("{0}\t{1}", "fRadar",pan.flgRadar);
+						sw.WriteLine("{0}\t{1}", "fILS",pan.flgILS);
+						sw.Close();
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
-                    MessageBox.Show("Error writing file");
+					MessageBox.Show("Error writing file: "+ex.Message);
                 }
             }
         }
@@ -1339,50 +1309,53 @@ public const  int SCREEN_H_NTSC=13;
             OpenFileDialog ofd = new OpenFileDialog() { Filter = "*.osd|*.osd" };
             //const int nosdfunctions = 29;
             ofd.ShowDialog();
-
-            if (ofd.FileName != "")
-            {
-                try
-                {
-                    using (StreamReader sr = new StreamReader(ofd.OpenFile()))
-                    {
-						while(true) {
-                        	//Panel 1
-                        	//string stringh = sr.ReadLine(); //
+			
+			startup=true;
+			
+			string[] strings={""};
+			
+            if (ofd.FileName != "") {
+                try {
+                    using (StreamReader sr = new StreamReader(ofd.OpenFile())) {
+						while(!sr.EndOfStream) {
+							//Panel 1
+							//string stringh = sr.ReadLine(); //
 							string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
-							int k=0;
+							int k = 0;
 						
-							if(hdr[0]!="Panel") break;
+							if(hdr[0]!="Panel")
+								break;
 							
-							k=int.Parse(hdr[1]);
+							k = int.Parse(hdr[1]);
 							//while (!sr.EndOfStream)
-                        	for (int i = 0; i < nosdfunctions; i++)
-                        	{
-	                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            	for (int a = 0; a < this.scr[k].panelItems.Length; a++)
-                            	{
-	                                if (this.scr[k].panelItems[a] != null && scr[k].panelItems[a].name == strings[0])
-                                	{
-										var pi=this.scr[k].panelItems[a];
-	                                    // incase there is an invalid line number or to shore
-                                    	try
-                                    	{
-	                                        this.scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
+							for (int i = 0; i < osd_functions_N; i++) {
+								strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+								for (int a = 0; a < this.scr[k].panelItems.Length; a++) {
+									if(this.scr[k].panelItems[a]!=null && scr[k].panelItems[a].name==strings[0]) {
+										var pi = this.scr[k].panelItems[a];
+										// incase there is an invalid line number or to shore
+										try {
+											this.scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
 	
-                                        	TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
-                                        	if (tnArray.Length > 0)
-	                                            tnArray[0].Checked = (strings[3] == "True");
-                                    	}
-                                    	catch { }
-                                	}
-                            	}
-                        	}
+											TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
+											if(tnArray.Length > 0)
+												tnArray[0].Checked = (strings[3]=="True");
+										} catch {
+										}
+									}
+								}
+							}
 						}
 //                        stringh = sr.ReadLine(); //config
-                        while (!sr.EndOfStream)
-                        {
-                            string[] strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            if (strings[0] == "Units") pan.converts = byte.Parse(strings[1]);
+                        while (!sr.EndOfStream)  {
+                            strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+							
+                            if (strings[0] == "Units") 
+								try {
+									pan.converts = byte.Parse(strings[1])!=0;
+								} catch{
+									pan.converts = bool.Parse(strings[1]);
+								}
                             else if (strings[0] == "Overspeed") pan.overspeed = byte.Parse(strings[1]);
                             else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
@@ -1392,7 +1365,12 @@ public const  int SCREEN_H_NTSC=13;
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
                             else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
                             else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
-                            else if (strings[0] == "Video Mode") pan.pal_ntsc = byte.Parse(strings[1]);
+                            else if (strings[0] == "Video Mode") 
+								try {
+									pan.pal_ntsc = byte.Parse(strings[1])!=0;
+								} catch {
+									pan.pal_ntsc = bool.Parse(strings[1]);								
+								}
                             else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
@@ -1402,29 +1380,33 @@ public const  int SCREEN_H_NTSC=13;
                             else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
                             else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
                             else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
-                        }
+							else if (strings[0] == "BattB") pan.battBv=byte.Parse(strings[1]);
+							else if (strings[0] == "rssi_k") pan.rssi_koef=float.Parse(strings[1]);
+							else if (strings[0] == "curr_k") pan.Curr_koef=float.Parse(strings[1]);
+							else if (strings[0] == "batt_a_k") pan.battA_koef=float.Parse(strings[1]);
+							else if (strings[0] == "batt_b_k") pan.battB_koef=float.Parse(strings[1]);
+							else if (strings[0] == "roll_k") pan.roll_k=float.Parse(strings[1]);
+							else if (strings[0] == "pitch_k") pan.pitch_k=float.Parse(strings[1]);
+							else if (strings[0] == "roll_kn") pan.roll_k_ntsc=float.Parse(strings[1]);
+							else if (strings[0] == "pitch_kn") pan.pitch_k_ntsc=float.Parse(strings[1]);
+							else if (strings[0] == "fBattA") pan.flgBattA=bool.Parse(strings[1]);
+							else if (strings[0] == "fBattB") pan.flgBattB=bool.Parse(strings[1]);
+							else if (strings[0] == "fCurr") pan.flgCurrent=bool.Parse(strings[1]);							
+							else if (strings[0] == "fRadar") pan.flgRadar=bool.Parse(strings[1]);
+							else if (strings[0] == "fILS") pan.flgILS=bool.Parse(strings[1]);
+						}
 
                         //Modify units
-                        if (pan.converts == 0)
-                        {
+                        if (!pan.converts) {
                             UNITS_combo.SelectedIndex = 0; //metric
                             STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                             OVERSPEED_label.Text = "Overspeed (km/h)";
-                        }
-                        else if (pan.converts == 1)
-                        {
+                        } else {
                             UNITS_combo.SelectedIndex = 1; //imperial
                             STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                             OVERSPEED_label.Text = "Overspeed (mph)";
                         }
-                        else //red garbage value in EEPROM - default to metric
-                        {
-                            pan.converts = 0; //correct value
-                            UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
-                            OVERSPEED_label.Text = "Overspeed (km/h)";
-                        }
-
+                        
                         OVERSPEED_numeric.Value = pan.overspeed;
                         STALL_numeric.Value = pan.stall;
                         MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
@@ -1440,25 +1422,34 @@ public const  int SCREEN_H_NTSC=13;
                         RSSI_numeric_min.Value = 0;
                         RSSI_numeric_max.Value = 0;
                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
-                        if ((int)(pan.rssiraw_on / 2) == 0)
-                        {
-                            RSSI_numeric_min.Value = pan.rssipersent;
-                            RSSI_numeric_max.Value = pan.rssical;
+                        if ((int)(pan.rssiraw_on / 2) == 0 || pan.rssiraw_on / 2 ==1 ) // analog
+                        {                            
                             RSSI_numeric_min.Minimum = 0;
                             RSSI_numeric_min.Maximum = 255;
                             RSSI_numeric_max.Minimum = 0;
                             RSSI_numeric_max.Maximum = 255;
+							RSSI_numeric_min.Value = pan.rssipersent;
+                            RSSI_numeric_max.Value = pan.rssical;
                         }
-                        else
+                        else // pwm
                         {
-                            RSSI_numeric_min.Value = pan.rssipersent * 10;
-                            RSSI_numeric_max.Value = pan.rssical * 10;
                             RSSI_numeric_min.Minimum = 900;
                             RSSI_numeric_min.Maximum = 2000;
                             RSSI_numeric_max.Minimum = 900;
                             RSSI_numeric_max.Maximum = 2000;
+							try {								
+                            	RSSI_numeric_min.Value = pan.rssipersent * 10;
+							} catch {
+								RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
+							}
+							try {
+                            	RSSI_numeric_max.Value = pan.rssical * 10;
+							} catch{
+								RSSI_numeric_max.Value = RSSI_numeric_max.Minimum;
+							}
+							
                         }
-                        cbxRSSIChannel.SelectedIndex = (int)(pan.rssiraw_on / 2);
+                        cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
@@ -1475,27 +1466,42 @@ public const  int SCREEN_H_NTSC=13;
 
                         CALLSIGNmaskedText.Text = pan.callsign_str;
 
-                        cbxAirSpeedSign.Checked = (pan.sign_air_speed != 0);
-                        cbxGroundSpeedSign.Checked = (pan.sign_ground_speed != 0);
-                        cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude != 0);
-                        cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude != 0);
+                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
+                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
+                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
+                        cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0 ;
 
                         this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
                         this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
                         this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
-
+			// new!
+						numMinVoltB.Text = (pan.battBv/10.0).ToString ();
+						txtRSSI_k.Text = pan.rssi_koef.ToString();
+						txtCurr_k.Text = pan.Curr_koef.ToString();
+						txtBattA_k.Text = pan.battA_koef.ToString();
+						txtBattB_k.Text = pan.battB_koef.ToString();
+						txtRollPal.Text = pan.roll_k.ToString();
+						txtPitchPal.Text = pan.pitch_k.ToString();
+						txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+						txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
+						
+						
+						cbBattA_source.SelectedIndex = pan.flgBattA?1:0;
+						cbCurrentSoure.SelectedIndex =pan.flgCurrent?1:0;
+						
+						chkRadar.Checked = pan.flgRadar;
+						chkILS.Checked = pan.flgILS;						
                     }
                 }
-                catch
-                {
-                    MessageBox.Show("Error Reading file");
+                catch(Exception ex)    {
+                    MessageBox.Show("Error Reading file at "+ex.Message + " str="+strings[0] );
                 }
                 finally
                 {
                     updatingRSSI = false;
                 }
             }
-			
+			startup=false;
            	osdDraw(panel_number);
             
         }
@@ -1555,16 +1561,6 @@ public const  int SCREEN_H_NTSC=13;
 								break;
 						}
 
-						//if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
-						//{
-						//    if (sp.IsOpen)
-						//        sp.Close();
-
-						//    MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",                                    
-						//        "Error",                            
-						//        MessageBoxButtons.OK,        
-						//        MessageBoxIcon.Warning); 
-						//}
 					} catch (Exception ex) {
 
 						MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1590,7 +1586,7 @@ public const  int SCREEN_H_NTSC=13;
 				}
 			}
 
-			//Check EEPROM version
+			//read EEPROM 
 			this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
 
 		}
@@ -1603,8 +1599,7 @@ public const  int SCREEN_H_NTSC=13;
 
             ofd.ShowDialog();
 
-            if (ofd.FileName != "")
-            {
+            if (ofd.FileName != "") {
                 try
                 {
                     bgpicture = Image.FromFile(ofd.FileName);
@@ -1627,18 +1622,6 @@ public const  int SCREEN_H_NTSC=13;
 
             if (ofd.FileName != "")
             {
-                //if (comPort.IsOpen)
-                //    comPort.Close();
-
-                try
-                {
-
-                    //comPort.PortName = CMB_ComPort.Text;
-                    //comPort.BaudRate = 57600;
-                    //comPort.Open();
-
-                }
-                catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
 
                 BinaryReader br = new BinaryReader(ofd.OpenFile());
 
@@ -1928,7 +1911,7 @@ public const  int SCREEN_H_NTSC=13;
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
 
-                    System.Threading.Thread.Sleep(7000);
+                    System.Threading.Thread.Sleep(2000);
 
                     comPort.ReadExisting();
 
@@ -2066,7 +2049,7 @@ public const  int SCREEN_H_NTSC=13;
                     toolStripStatusLabel1.Text = "CharSet Done";
                 }
 
-                WriteCharsetVersion(fileVersion);
+                conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
             }
         }
@@ -2080,13 +2063,13 @@ public const  int SCREEN_H_NTSC=13;
         {
             if (updatingRSSI)
                 return;
-            if (cbxRSSIChannel.SelectedIndex == 0)
+            if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex==2)// analog
             {
                 pan.rssipersent = (byte)RSSI_numeric_min.Value;
             }
             else
             {
-                pan.rssipersent = (byte)(RSSI_numeric_min.Value / 10);
+                pan.rssipersent = (byte)(RSSI_numeric_min.Value / 10); // pwm
             }
         }
 
@@ -2094,7 +2077,7 @@ public const  int SCREEN_H_NTSC=13;
         {
             if (updatingRSSI)
                 return;
-            if (cbxRSSIChannel.SelectedIndex == 0)
+            if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex==2)
             {
                 pan.rssical = (byte)RSSI_numeric_max.Value;
             }
@@ -2113,13 +2096,13 @@ public const  int SCREEN_H_NTSC=13;
         {
             if (UNITS_combo.SelectedIndex == 0)
             {
-                pan.converts = 0; //metric
+                pan.converts = false; //metric
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (UNITS_combo.SelectedIndex == 1)
             {
-                pan.converts = 1; //imperial
+                pan.converts = true; //imperial
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
@@ -2141,16 +2124,8 @@ public const  int SCREEN_H_NTSC=13;
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            switch (cbxRSSIChannel.SelectedIndex)
-            {
-                case 0:
-                    pan.rssiraw_on = 0;
-                    break;
-                case 1:
-                    pan.rssiraw_on = 8;
-                    break;
-            }
-            pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
+            
+            pan.rssiraw_on = Convert.ToByte(rssi_encode(cbxRSSIChannel.SelectedIndex) + Convert.ToInt32(RSSI_RAW.Checked));
         }
 
         private void TOGGLE_BEHChanged(object sender, EventArgs e)
@@ -2161,12 +2136,12 @@ public const  int SCREEN_H_NTSC=13;
 
         private void CHK_pal_Click(object sender, EventArgs e)
         {
-            pan.pal_ntsc = 1;
+            pan.pal_ntsc = true;
         }
 
         private void CHK_ntsc_Click(object sender, EventArgs e)
         {
-            pan.pal_ntsc = 0;
+            pan.pal_ntsc = false;
         }
 
         private void RSSI_WARNnumeric_ValueChanged(object sender, EventArgs e)
@@ -2215,7 +2190,7 @@ public const  int SCREEN_H_NTSC=13;
 
         private void rbtBatteryPercent_CheckedChanged(object sender, EventArgs e)
         {
-            pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked);
+            pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked)!=0;
             //Refresh battery percent presentation
 			
             osdDraw(panel_number);
@@ -2232,13 +2207,13 @@ public const  int SCREEN_H_NTSC=13;
             modelType = (ModelType)cbxModelType.SelectedItem;
             if (UNITS_combo.SelectedIndex == 0)
             {
-                pan.converts = 0; //metric
+                pan.converts = false; //metric
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             }
             else if (UNITS_combo.SelectedIndex == 1)
             {
-                pan.converts = 1; //imperial
+                pan.converts = true; //imperial
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
@@ -2369,12 +2344,19 @@ public const  int SCREEN_H_NTSC=13;
             RSSI_numeric_min.Maximum = 2000;
             RSSI_numeric_max.Minimum = 0;
             RSSI_numeric_max.Maximum = 2000;
-            if (cbxRSSIChannel.SelectedIndex == 0)
+            if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) // analog
             {
                 lblRSSIMin.Text = "RSSI Min Value";
                 lblRSSIMax.Text = "RSSI Max Value";
-                if (OldMax == 2000)
-                {
+
+                RSSI_numeric_min.Minimum = 0;
+				RSSI_numeric_min.Value=0;
+                RSSI_numeric_min.Maximum = 255;
+                RSSI_numeric_max.Minimum = 0;
+				RSSI_numeric_max.Value=0;
+                RSSI_numeric_max.Maximum = 255;
+
+				if (OldMax == 2000)  {
                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
                     //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
                     RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 1100;
@@ -2382,17 +2364,20 @@ public const  int SCREEN_H_NTSC=13;
                     //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
                     //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
                 }
-                RSSI_numeric_min.Minimum = 0;
-                RSSI_numeric_min.Maximum = 255;
-                RSSI_numeric_max.Minimum = 0;
-                RSSI_numeric_max.Maximum = 255;
             }
-            else
+            else // PWM
             {
                 lblRSSIMin.Text = "RSSI Min Value (pwm)";
                 lblRSSIMax.Text = "RSSI Max Value (pwm)";
-                if (OldMax == 255)
-                {
+
+                RSSI_numeric_min.Maximum = 2000;
+				RSSI_numeric_min.Value = 2000;
+                RSSI_numeric_min.Minimum = 900;
+                RSSI_numeric_max.Maximum = 2000;
+				RSSI_numeric_max.Value = 2000;
+                RSSI_numeric_max.Minimum = 900;
+
+				if (OldMax == 255) {
                     //RSSI_numeric_min.Value = pan.rssipersent * 100 / 255 + 100;
                     //RSSI_numeric_max.Value = pan.rssical * 100 / 255 + 100;
                     RSSI_numeric_min.Value = (pan.rssipersent * 1100 / 255) + 900;
@@ -2400,24 +2385,37 @@ public const  int SCREEN_H_NTSC=13;
                     //pan.rssipersent = (byte)(pan.rssipersent * 100 / 255 + 100);
                     //pan.rssical = (byte)(pan.rssical * 100 / 255 + 100);
                 }
-                RSSI_numeric_min.Maximum = 2000;
-                RSSI_numeric_min.Minimum = 900;
-                RSSI_numeric_max.Maximum = 2000;
-                RSSI_numeric_max.Minimum = 900;
             }
             
-            switch (cbxRSSIChannel.SelectedIndex)
-            {
-                case 0:
-                    pan.rssiraw_on = 0;
-                    break;
-                case 1:
-                    pan.rssiraw_on = 8;
-                    break;
-            }
-            pan.rssiraw_on = Convert.ToByte(pan.rssiraw_on + Convert.ToInt32(RSSI_RAW.Checked));
+          
+            pan.rssiraw_on = Convert.ToByte(rssi_encode(cbxRSSIChannel.SelectedIndex) + Convert.ToInt32(RSSI_RAW.Checked));
         }
-
+		
+		private int rssi_decode(int v){
+			switch(v/2) {
+			case 4:
+				return 1;
+			case 1:
+				return 2;
+			case 2: 
+				return 3;
+			}
+			return v/2;
+		}
+		
+		private int rssi_encode(int v){
+			switch (v)
+            {
+                case 1:
+                    return 8;
+				case 2:
+                    return 2;
+				case 3:
+                    return 4;
+            }
+			return 0;
+		}
+		
         private void presentCustomCharsetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -2489,7 +2487,7 @@ public const  int SCREEN_H_NTSC=13;
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
 
-                    System.Threading.Thread.Sleep(7000);
+                    System.Threading.Thread.Sleep(2000);
 
                     comPort.ReadExisting();
 
@@ -2627,7 +2625,7 @@ public const  int SCREEN_H_NTSC=13;
                     toolStripStatusLabel1.Text = "CharSet Done";
                 }
 
-                WriteCharsetVersion(fileVersion);
+                conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
             }
         }
@@ -2668,17 +2666,7 @@ public const  int SCREEN_H_NTSC=13;
                         }
                         else break;
                     }
-
-                    //if (!sp.uploadflash(FLASH, 0, FLASH.Length, 0))
-                    //{
-                    //    if (sp.IsOpen)
-                    //        sp.Close();
-
-                    //    MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",                                    
-                    //        "Error",                            
-                    //        MessageBoxButtons.OK,        
-                    //        MessageBoxIcon.Warning); 
-                    //}
+                    
                 }
                 catch (Exception ex)
                 {
@@ -2711,44 +2699,6 @@ public const  int SCREEN_H_NTSC=13;
             return true;
         }
 
-        private ModelType GetModelType()
-        {
-            ModelType modelType = ModelType.Unknown;
-            byte[] tempEeprom = null;
-            //bool fail = false;
-            ArduinoSTK sp=OpenArduino();
-
-            if (sp.connectAP())
-            {
-                try
-                {
-                    for (int i = 0; i < 5; i++)
-                    { //try to download two times if it fail
-                        tempEeprom = sp.download(1024);
-                        if (!sp.down_flag)
-                        {
-                            if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
-                            else Console.WriteLine("keepalive fail (iter " + i + ")");
-                        }
-                        else break;
-                    }
-                    modelType = (ModelType)tempEeprom[MODEL_TYPE_ADD];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Failed to talk to bootloader");
-            }
-
-            sp.Close();
-                
-            //Setup configuration panel
-            return modelType;
-        }
 
         private bool UploadFont(OpenFileDialog ofd)
         {
@@ -2913,6 +2863,8 @@ public const  int SCREEN_H_NTSC=13;
                             comPort.Close();
                             return false;
                         }
+
+       
                     }
                     //Console.WriteLine(comPort.ReadExisting());
                     if (comPort.BytesToRead != 0)
@@ -2939,7 +2891,7 @@ public const  int SCREEN_H_NTSC=13;
                     toolStripStatusLabel1.Text = "CharSet Done";
                 }
 
-                WriteCharsetVersion(fileVersion);
+                conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
             }
             return true;
@@ -2985,53 +2937,55 @@ public const  int SCREEN_H_NTSC=13;
             return true;
         }
 
-        private void updateCharsetcustomFwToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+        private void updateCharsetcustomFwToolStripMenuItem_Click (object sender, EventArgs e) {
             #region Get and validate font file
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "mcm|*.mcm";
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "mcm|*.mcm";
 
-            DialogResult dialogResp = ofd.ShowDialog();
-            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
-                return;
+			DialogResult dialogResp = ofd.ShowDialog();
+			if((dialogResp!=System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim()==""))
+				return;
 
-            if (!IsValidCharsetFile(ofd))
-                return;
+			if(!IsValidCharsetFile(ofd))
+				return;
             #endregion
 
-            //Get current fw version (plane, copter...)
-            ModelType modelType = GetModelType();
-            modelType = ModelType.Copter;
-            string modelFileName = "MinimOSD_" + modelType.ToString() + ".hex";
-            if (modelType == ModelType.Unknown)
-            {
-                if(MessageBox.Show("Unknown current fw." + Environment.NewLine +
+			//Get current fw version (plane, copter...)
+			ModelType modelType = conf.GetModelType();
+			modelType = ModelType.Copter;
+			string modelFileName = "MinimOSD_" + modelType.ToString() + ".hex";
+			if(modelType==ModelType.Unknown) {
+				if(MessageBox.Show("Unknown current fw." + Environment.NewLine +
                                    "If you proceed you'll need to upload  the fw manually after charset upload." + Environment.NewLine + 
-                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
-                    return;
-            }
+                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)==System.Windows.Forms.DialogResult.No)
+					return;
+			}
 
-            //Get latest fw from ftp
-            if (!GetLatestFW(modelType))
-            {
-                if(MessageBox.Show("Unable to get latest fw from internet." + Environment.NewLine +
+			//Get latest fw from ftp
+			if(!GetLatestFW(modelType)) {
+				if(MessageBox.Show("Unable to get latest fw from internet." + Environment.NewLine +
                                    "If you proceed you'll need to upload the fw manually after charset upload." + Environment.NewLine + 
-                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
-                return;
-            }
+                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)==System.Windows.Forms.DialogResult.No)
+					return;
+			}
 
-            //Upload font fw
-            if(!UploadFirmware("charuploader.hex"))
-                return;
+			//Upload font fw
+			if(!UploadFirmware("charuploader.hex")) {
+				MessageBox.Show("Unable to write character uploader!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return;
+			}
 
-            //Upload font
-            if(!UploadFont(ofd))
-                return;
+			//Upload font
+			if(!UploadFont(ofd))
+				return;
 
-            //Upload fw
-            if(modelType != ModelType.Unknown)
-                UploadFirmware(modelFileName);
-        }
+			//Upload fw
+			if(modelType!=ModelType.Unknown)
+				UploadFirmware(modelFileName);
+			else
+				MessageBox.Show("Wrong ModelType!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+		}
 
 
 
@@ -3043,15 +2997,12 @@ public const  int SCREEN_H_NTSC=13;
             ArduinoSTK sp=OpenArduino();
 
 
-            if (sp!=null && sp.connectAP())
-            {
-                try
-                {
+            if (sp!=null && sp.connectAP()) {
+                try {
                     int start = 0;
                     short length = 0x100;
 
-                    while (start < FLASH.Length)
-                    {
+                    while (start < FLASH.Length) {
                         sp.setaddress(start);
                         sp.downloadflash(length).CopyTo(FLASH, start);
                         start += length;
@@ -3086,11 +3037,10 @@ public const  int SCREEN_H_NTSC=13;
                     }
 
                     sw.Close();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     MessageBox.Show(ex.Message);
                 }
+        
             }
             sp.Close();
         }
@@ -3138,7 +3088,7 @@ public const  int SCREEN_H_NTSC=13;
 			return basesize;
 		}
 
-		ArduinoSTK OpenArduino () {
+		public ArduinoSTK OpenArduino () {
 			ArduinoSTK sp;
 			try{
 				if(comPort.IsOpen)
@@ -3179,5 +3129,86 @@ public const  int SCREEN_H_NTSC=13;
 
         }
  
+        private void txtRSSI_k_TextChanged(object sender, EventArgs e)
+        {
+            pan.rssi_koef = float.Parse(txtRSSI_k.Text);
+            txtRSSI_k.Text = pan.rssi_koef.ToString();
+        }
+
+       
+        private void txtCurr_k_TextChanged(object sender, EventArgs e)
+        {
+            pan.Curr_koef = float.Parse(txtCurr_k.Text);
+            txtCurr_k.Text = pan.Curr_koef.ToString();
+        }
+
+        private void txtBattA_k_TextChanged(object sender, EventArgs e)
+        {
+            pan.battA_koef = float.Parse(txtBattA_k.Text);
+            txtBattA_k.Text = pan.battA_koef.ToString();
+        }
+
+        
+		private void cbBattA_source_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.flgBattA = (cbBattA_source.SelectedIndex > 0);
+        }
+		
+		
+         
+        
+
+        private void cbCurrentSoure_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pan.flgCurrent = (cbCurrentSoure.SelectedIndex > 0);
+        }
+
+        private void numMinVoltB_ValueChanged(object sender, EventArgs e)
+        {
+            pan.battBv = (byte)(numMinVoltB.Value * 10);
+        }
+
+        private void txtBattB_k_TextChanged(object sender, EventArgs e)
+        {
+            pan.battB_koef = float.Parse(txtBattB_k.Text);
+            txtBattB_k.Text = pan.battB_koef.ToString() ;
+        }
+
+        private void txtRollPal_TextChanged(object sender, EventArgs e)
+        {
+            pan.roll_k = float.Parse(txtRollPal.Text);
+            txtRollPal.Text = pan.roll_k.ToString();
+        }
+
+        private void txtPitchPal_TextChanged(object sender, EventArgs e)
+        {
+            pan.pitch_k = float.Parse(txtPitchPal.Text);
+            txtPitchPal.Text = pan.pitch_k.ToString();
+        }
+
+        private void txtRollNtsc_TextChanged(object sender, EventArgs e)
+        {
+            pan.roll_k_ntsc = float.Parse(txtRollNtsc.Text);
+            txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+        }
+
+        private void txtPitchNtsc_TextChanged(object sender, EventArgs e)
+        {
+            pan.pitch_k_ntsc = float.Parse(txtPitchNtsc.Text);
+            txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
+        }
+
+        private void chkRadar_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.flgRadar = chkRadar.Checked;
+        }
+
+        private void chkILS_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.flgILS = chkILS.Checked;
+        }
+
+		
+		
     }
 }

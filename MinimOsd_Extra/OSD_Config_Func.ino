@@ -10,16 +10,23 @@ boolean inline is_on(point p){
 
 
 void readSettings() {
+
+// считаем все кучно
+
+    for(byte i=0; i<sizeof(Flags); i++)
+	((byte *)&flags)[i] = EEPROM.read(EEPROM_offs(flags) +i );
+
+
+    for(byte i=0; i<sizeof(Settings); i++)
+	((byte *)&sets)[i] = EEPROM.read(EEPROM_offs(sets) + i );
+
+/*
     overspeed = EEPROM.read(overspeed_ADDR);
     stall = EEPROM.read(stall_ADDR);
     battv = EEPROM.read(battv_ADDR);
     switch_mode = EEPROM.read(switch_mode_ADDR);
     panel_auto_switch = EEPROM.read(AUTO_SCREEN_SWITC_ADD);
     ch_toggle = EEPROM.read(ch_toggle_ADDR);
-
-//    if (ch_toggle < 6 || ch_toggle > 8){
-//     	EEPROM.write(ch_toggle_ADDR, ch_toggle=6);
-//	}
 
     //  battp = EEPROM.read(battp_ADDR);
     rssical = EEPROM.read(OSD_RSSI_HIGH_ADDR);
@@ -36,14 +43,14 @@ void readSettings() {
         if(char_call[i] == 0) break;
     }
     char_call[i+1] ='\0'; //null terminate the string 
-
+*/
 }
-
+/*
 point read_one(uint16_t addr){
     point p;
     byte en;
 
-    addr += OffsetBITpanel * panel; // offset
+    addr += OffsetBITpanel * panelN; // offset
 
     en=readEEPROM(addr);
     if(!en)
@@ -57,20 +64,26 @@ point read_one(uint16_t addr){
     p.y=checkPAL(readEEPROM(addr+4));
     return p;
 }
+*/
 
 // cчитать настройки текущей панели из EEPROM
 void readPanelSettings() {
 
     static uint8_t currentPanel=255;
     
-    if(panel==currentPanel) return;
-    if(panel>npanels) return; // не читаем мусор при переключении на служебные панели с верхними номерами
-    currentPanel=panel;
+    if(panelN==currentPanel) return;
+    if(panelN>npanels) return; // не читаем мусор при переключении на служебные панели с верхними номерами
+    currentPanel=panelN;
+
+
+    for(byte i=0; i<sizeof(Panel); i++)
+	((byte *)&panel)[i] = EEPROM.read( OffsetBITpanel * panelN + i );
+
 
 /*
     все располагается стандартно, так что можно читать унифицированно все параметры
 */
-
+/*
 //   panCenter_XY=read_one(panCenter_en_ADDR);
 
     panBatteryPercent_XY=read_one(panBatteryPercent_en_ADDR);
@@ -150,6 +163,7 @@ void readPanelSettings() {
     panTemp_XY=read_one(panTemp_en_ADDR);
 
     panDistance_XY=read_one(panDistance_en_ADDR);
+*/
 }
 
 uint8_t checkPAL(uint8_t line){
@@ -160,7 +174,7 @@ uint8_t checkPAL(uint8_t line){
 }
 
 void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
-    if(panel >= 1 && panel <= 32) {
+    if(panelN >= 1 && panelN <= 32) {
 
         writeEEPROM(panel_s, (6 * panelu) - 6 + 0);
         if(panel_s != 0) {
@@ -200,7 +214,7 @@ void writeSettings() {
     //  - Enable/Disable
     //  - X coordinate on screen
     //  - Y coordinate on screen
-    uint16_t offset = OffsetBITpanel * panel;
+    uint16_t offset = OffsetBITpanel * panelN;
 
 //    writeEEPROM(off, panCenter_en_ADDR + offset);
 //    writeEEPROM(13, panCenter_x_ADDR + offset);
@@ -324,3 +338,43 @@ void writeSettings() {
 }
 
 */
+
+
+
+/* prints hex numbers with leading zeroes */
+// copyright, Peter H Anderson, Baltimore, MD, Nov, '07
+// source: http://www.phanderson.com/arduino/arduino_display.html
+void print_hex(int v, int num_places)
+{
+  int mask=0, n, num_nibbles, digit;
+ 
+  for (n=1; n<=num_places; n++) {
+    mask = (mask << 1) | 0x0001;
+  }
+  v = v & mask; // truncate v to specified number of places
+ 
+  num_nibbles = num_places / 4;
+  if ((num_places % 4) != 0) {
+    ++num_nibbles;
+  }
+  do {
+    digit = ((v >> (num_nibbles-1) * 4)) & 0x0f;
+    osd.print(digit, HEX);
+  } 
+  while(--num_nibbles);
+}
+
+void hex_dump(byte *p, int len) {
+ int i=0; 
+ int j;
+ 
+ for(j=0;j<len; j+=8){
+    osd.write('|');
+    print_hex(j,8);
+    osd.write(' ');
+    for(i=0; i<8; i++){
+	osd.write(' ');
+	print_hex(p[i+j],8);
+    }
+ }
+}
