@@ -68,7 +68,7 @@ namespace OSD
 		internal byte OSD_RSSI_WARN;
 	
 	
-	    internal fixed byte _OSD_CALL_SIGN[Config.OSD_CALL_SIGN_TOTAL+1]; // OSD_CALL_SIGN_TOTAL+1
+	    internal fixed byte _OSD_CALL_SIGN[Config.OSD_CALL_SIGN_TOTAL+1]; 
 
 	    internal byte CHK1_VERSION;
 	    internal byte CHK2_VERSION;
@@ -87,8 +87,8 @@ namespace OSD
 	    internal float eRSSI_koef;
 			
 		// коэффициенты горизонта
-	    internal float horiz_kRoll; //0.010471976 horizon, conversion factor for pitch 
-	    internal float horiz_kPitch; //0.017453293  horizon, conversion factor for roll
+	    internal float horiz_kRoll;  
+	    internal float horiz_kPitch; 
 	
 	    internal float horiz_kRoll_a; // коэффициенты горизонта для NTSC
 	    internal float horiz_kPitch_a;
@@ -99,10 +99,13 @@ namespace OSD
 	[StructLayout(LayoutKind.Explicit)]
 	internal unsafe struct EEPROM {
 		[FieldOffset(0)]
-		internal fixed byte _data[Config.EEPROM_SIZE];
+		internal fixed byte _data[Config.EEPROM_SIZE]; // сырые данные
+		// обращение к настройкам панелей по смещению
 	
+		// битовые флаги
 		[FieldOffset(OSD.Settings_offset)] // 512 - 4 экрана по 128, остальное для настроек
 		internal Flags flags;
+		// прочие настройки
 		[FieldOffset(OSD.Settings_offset+4)]
 		internal Settings sets;
 	
@@ -228,18 +231,19 @@ namespace OSD
 	internal class Config
 	{
 		
-		public const int EEPROM_SIZE=1024;
+		public const int EEPROM_SIZE=1024; // ATmega328
 		
 		public const int OSD_CALL_SIGN_TOTAL = 8; // длина позывного
 
-		const int Settings_offset = OSD.Settings_offset; // 512;
+		const int Settings_offset = OSD.Settings_offset; // 512 - половина
 		const int OffsetBITpanel = OSD.OffsetBITpanel;
-		public  const int  Settings_size=512; //sizeof(Settings) + 4;
+		public  const int  Settings_size=EEPROM_SIZE-Settings_offset; //512; //sizeof(Settings) + 4 - остаток
 		
 		internal EEPROM eeprom;
 		
 		private OSD osd;// ссылка на родителя для удобия доступа
 	
+	// методы
 		public Config(OSD aosd) {
 			osd = aosd;
 			eeprom = new EEPROM();
@@ -281,7 +285,7 @@ namespace OSD
 			return fail ;
 		}
 		
-		public int  writeEEPROM (int start, int length) {
+		public int writeEEPROM (int start, int length) {
 			ArduinoSTK sp = osd.OpenArduino();
 			int err = 0;
 
@@ -317,8 +321,8 @@ namespace OSD
 		}
 		
 		public void setEepromXY (Panel pan, bool enabled) {
-			eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)pan.x; // x
-			eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)(enabled ? pan.y : pan.y|0x80);
+			eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)(pan.x & 0x3f | (pan.sign ==0?0x80:0)); // x
+			eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)(enabled ? pan.y & 0x3f : pan.y|0x80);
 		}
 		
 		public Pos getEepromXY (Panel pan) {
@@ -327,10 +331,9 @@ namespace OSD
 		}	
 		
 		public string ReadCharsetVersion () {
-			//byte[] tempEeprom = new byte[EEPROM_SIZE];
 			EEPROM tempEeprom = new EEPROM();
 
-			
+		
 			bool fail = false;
 			ArduinoSTK sp = osd.OpenArduino();
 
@@ -430,7 +433,7 @@ namespace OSD
         {
             OSD.ModelType modelType = OSD.ModelType.Unknown;
             EEPROM tempEeprom = new EEPROM();
-            //bool fail = false;
+ 
             ArduinoSTK sp=osd.OpenArduino();
 
             if (sp.connectAP())
@@ -471,48 +474,3 @@ namespace OSD
 	} // class
 } // namespace
 
-/*
-BitVector32 vector1 = new BitVector32( 0 );
-
-// Маски для первых пяти битов 
-int bit1 = BitVector32.CreateMask();
-int bit2 = BitVector32.CreateMask(bit1);
-int bit3 = BitVector32.CreateMask(bit2);
-int bit4 = BitVector32.CreateMask(bit3);
-int bit5 = BitVector32.CreateMask(bit4);
-
-Console.WriteLine(vector1.ToString()); // Получаем BitVector32{00000000000000000000000000000000} 
-
-vector1[bit1] = true; // установить 1 бит 
-
-Console.WriteLine(vector1.ToString()); // Получаем BitVector32{00000000000000000000000000000001} 
-
-vector1[bit3] = true; // установить 3 бит 
-
-Console.WriteLine(vector1.ToString()); // Получаем BitVector32{00000000000000000000000000000101} 
-
-vector1[bit5] = true; // установить 5 бит 
-
-Console.WriteLine(vector1.ToString()); // Получаем BitVector32{00000000000000000000000000010101} 
-
-BitVector32 vector2 = new BitVector32( 0 );
-
-// Создаем 4 секции (окна). Первая имеет максимум значений 6, т.е занимает 4 бита. 
-// Вторая - максимум 3 (т.е. два бита), затем 1 бит, затем 4 бита. 
-BitVector32.Section sect1 = BitVector32.CreateSection( 6 );
-BitVector32.Section sect2 = BitVector32.CreateSection( 3, sect1 );
-BitVector32.Section sect3 = BitVector32.CreateSection( 1, sect2 );
-BitVector32.Section sect4 = BitVector32.CreateSection(15, sect3 );
-
-vector2[sect2] = 3;
-
-Console.WriteLine(vector2.ToString()); // Получим BitVector32{00000000000000000000000000011000} 
-
-vector2[sect4] = 1;
-
-Console.WriteLine(vector2.ToString()); // Получим BitVector32{00000000000000000000000001011000} 
-
-Console.ReadLine();
-  
- 
- */

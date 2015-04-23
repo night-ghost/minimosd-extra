@@ -85,12 +85,10 @@ namespace OSD
             this.label16 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.numMinVoltB = new System.Windows.Forms.NumericUpDown();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.grpTLog = new System.Windows.Forms.GroupBox();
+            this.lblTLog = new System.Windows.Forms.Label();
+            this.btnTLog = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
-            this.cbxMslAltitudeSign = new System.Windows.Forms.CheckBox();
-            this.cbxHomeAltitudeSign = new System.Windows.Forms.CheckBox();
-            this.cbxGroundSpeedSign = new System.Windows.Forms.CheckBox();
-            this.cbxAirSpeedSign = new System.Windows.Forms.CheckBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.BRIGHTNESScomboBox = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -164,7 +162,7 @@ namespace OSD
             this.groupBox16.SuspendLayout();
             this.groupBox13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinVoltB)).BeginInit();
-            this.groupBox10.SuspendLayout();
+       		this.grpTLog.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.groupBox7.SuspendLayout();
@@ -397,8 +395,8 @@ namespace OSD
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
             this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.sendTLogToolStripMenuItem.Text = "Send TLog...";
-            this.sendTLogToolStripMenuItem.ToolTipText = "Send a Mavlink transmission log to the OSD to test the layout";
+            this.sendTLogToolStripMenuItem.Text = "Load TLog.";
+            this.sendTLogToolStripMenuItem.ToolTipText = "Load a Mavlink transmission log to play into the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
             // 
             // updateFontToolStripMenuItem
@@ -492,7 +490,7 @@ namespace OSD
             // 
             this.tabPageConfig.Controls.Add(this.groupBox15);
             this.tabPageConfig.Controls.Add(this.groupBox13);
-            this.tabPageConfig.Controls.Add(this.groupBox10);
+            this.tabPageConfig.Controls.Add(this.grpTLog);
             this.tabPageConfig.Controls.Add(this.groupBox9);
             this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
@@ -727,76 +725,44 @@ namespace OSD
             this.numMinVoltB.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numMinVoltB.ValueChanged += new System.EventHandler(this.numMinVoltB_ValueChanged);
             // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.label14);
-            this.groupBox10.Controls.Add(this.cbxMslAltitudeSign);
-            this.groupBox10.Controls.Add(this.cbxHomeAltitudeSign);
-            this.groupBox10.Controls.Add(this.cbxGroundSpeedSign);
-            this.groupBox10.Controls.Add(this.cbxAirSpeedSign);
-            this.groupBox10.Location = new System.Drawing.Point(169, 232);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(150, 144);
-            this.groupBox10.TabIndex = 8;
-            this.groupBox10.TabStop = false;
-            // 
+			this.grpTLog.Controls.Add(this.lblTLog);
+            this.grpTLog.Controls.Add(this.btnTLog);
+            this.grpTLog.Controls.Add(this.label14);
+            this.grpTLog.Location = new System.Drawing.Point(169, 232);
+            this.grpTLog.Name = "grpTLog";
+            this.grpTLog.Size = new System.Drawing.Size(150, 144);
+            this.grpTLog.TabIndex = 8;
+            this.grpTLog.TabStop = false;
+			this.grpTLog.Enabled =false ;
+            //.
+            // lblTLog
+            //.
+            this.lblTLog.Location = new System.Drawing.Point(38, 93);
+            this.lblTLog.Name = "lblTLog";
+            this.lblTLog.Size = new System.Drawing.Size(99, 18);
+            this.lblTLog.TabIndex = 16;
+            this.lblTLog.Text = "0";
+            this.lblTLog.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            //.
+            // btnTLog
+            //.
+            this.btnTLog.Location = new System.Drawing.Point(36, 42);
+            this.btnTLog.Name = "btnTLog";
+            this.btnTLog.Size = new System.Drawing.Size(101, 24);
+            this.btnTLog.TabIndex = 15;
+            this.btnTLog.Text = "Start";
+            this.btnTLog.UseVisualStyleBackColor = true;
+            this.btnTLog.Click += new System.EventHandler(this.btnTLog_Click);
+			//
             // label14
-            // 
+            //
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(6, 15);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(121, 13);
+            this.label14.Size = new System.Drawing.Size(63, 13);
             this.label14.TabIndex = 14;
-            this.label14.Text = "Show sign before value:";
-            // 
-            // cbxMslAltitudeSign
-            // 
-            this.cbxMslAltitudeSign.AutoSize = true;
-            this.cbxMslAltitudeSign.Location = new System.Drawing.Point(5, 92);
-            this.cbxMslAltitudeSign.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxMslAltitudeSign.Name = "cbxMslAltitudeSign";
-            this.cbxMslAltitudeSign.Size = new System.Drawing.Size(86, 17);
-            this.cbxMslAltitudeSign.TabIndex = 13;
-            this.cbxMslAltitudeSign.Text = "MSL Altitude";
-            this.cbxMslAltitudeSign.UseVisualStyleBackColor = true;
-            this.cbxMslAltitudeSign.CheckedChanged += new System.EventHandler(this.cbxMslAltitudeSign_CheckedChanged);
-            // 
-            // cbxHomeAltitudeSign
-            // 
-            this.cbxHomeAltitudeSign.AutoSize = true;
-            this.cbxHomeAltitudeSign.Location = new System.Drawing.Point(5, 72);
-            this.cbxHomeAltitudeSign.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxHomeAltitudeSign.Name = "cbxHomeAltitudeSign";
-            this.cbxHomeAltitudeSign.Size = new System.Drawing.Size(92, 17);
-            this.cbxHomeAltitudeSign.TabIndex = 12;
-            this.cbxHomeAltitudeSign.Text = "Home Altitude";
-            this.cbxHomeAltitudeSign.UseVisualStyleBackColor = true;
-            this.cbxHomeAltitudeSign.CheckedChanged += new System.EventHandler(this.cbxHomeAltitudeSign_CheckedChanged);
-            // 
-            // cbxGroundSpeedSign
-            // 
-            this.cbxGroundSpeedSign.AutoSize = true;
-            this.cbxGroundSpeedSign.Location = new System.Drawing.Point(5, 51);
-            this.cbxGroundSpeedSign.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxGroundSpeedSign.Name = "cbxGroundSpeedSign";
-            this.cbxGroundSpeedSign.Size = new System.Drawing.Size(95, 17);
-            this.cbxGroundSpeedSign.TabIndex = 11;
-            this.cbxGroundSpeedSign.Text = "Ground Speed";
-            this.cbxGroundSpeedSign.UseVisualStyleBackColor = true;
-            this.cbxGroundSpeedSign.CheckedChanged += new System.EventHandler(this.cbxGroundSpeedSign_CheckedChanged);
-            // 
-            // cbxAirSpeedSign
-            // 
-            this.cbxAirSpeedSign.AutoSize = true;
-            this.cbxAirSpeedSign.Location = new System.Drawing.Point(5, 30);
-            this.cbxAirSpeedSign.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxAirSpeedSign.Name = "cbxAirSpeedSign";
-            this.cbxAirSpeedSign.Size = new System.Drawing.Size(72, 17);
-            this.cbxAirSpeedSign.TabIndex = 10;
-            this.cbxAirSpeedSign.Text = "Air Speed";
-            this.cbxAirSpeedSign.UseVisualStyleBackColor = true;
-            this.cbxAirSpeedSign.CheckedChanged += new System.EventHandler(this.cbxAirSpeedSign_CheckedChanged);
-            // 
+			this.label14.Text = "TLog player";
+			// 
             // groupBox9
             // 
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
@@ -1081,7 +1047,7 @@ namespace OSD
             this.cbBattA_source.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbBattA_source.FormattingEnabled = true;
             this.cbBattA_source.Items.AddRange(new object[] {
-            "Mavlink",
+            "Mavlink Voltage",
             "Pin BattA"});
             this.cbBattA_source.Location = new System.Drawing.Point(51, 16);
             this.cbBattA_source.Name = "cbBattA_source";
@@ -1524,9 +1490,9 @@ namespace OSD
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinVoltB)).EndInit();
-            this.groupBox10.ResumeLayout(false);
-            this.groupBox10.PerformLayout();
-            this.groupBox9.ResumeLayout(false);
+			this.grpTLog.ResumeLayout(false);
+            this.grpTLog.PerformLayout();
+			this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
@@ -1633,12 +1599,9 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbxWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblFWModelType;
-        private System.Windows.Forms.CheckBox cbxAirSpeedSign;
-        private System.Windows.Forms.GroupBox groupBox10;
+        
+        private System.Windows.Forms.GroupBox grpTLog;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.CheckBox cbxMslAltitudeSign;
-        private System.Windows.Forms.CheckBox cbxHomeAltitudeSign;
-        private System.Windows.Forms.CheckBox cbxGroundSpeedSign;
         private System.Windows.Forms.ToolStripMenuItem setSketchesPathToolStripMenuItem;
         private System.Windows.Forms.ComboBox cbxRSSIChannel;
         private System.Windows.Forms.Label label15;
@@ -1686,6 +1649,8 @@ namespace OSD
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label OVERSPEED_label;
         private System.Windows.Forms.NumericUpDown OVERSPEED_numeric;
+		private System.Windows.Forms.Label lblTLog;
+        private System.Windows.Forms.Button btnTLog;
     }
 	
 }

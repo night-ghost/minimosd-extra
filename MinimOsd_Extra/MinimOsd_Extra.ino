@@ -88,12 +88,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* ***************** DEFINITIONS *******************/
 
 //OSD Hardware 
-//#define ArduCAM328
 #define MinimOSD
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 #define LEDPIN AmperagePin
+
+
 
 // Objects and Serial definitions
 FastSerialPort0(Serial);
@@ -146,15 +147,12 @@ void setup()     {
 
     int start_dly=2000;
 
-#ifdef ArduCAM328
-    pinMode(10, OUTPUT); // USB ArduCam Only
-#endif
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
 
     pinMode(LEDPIN,OUTPUT); // led
     digitalWrite(LEDPIN, 1);  // turn on for full light
 
-    pinMode(RssiPin, OUTPUT); // доп вывод - выход
+//    pinMode(RssiPin, OUTPUT); // доп вывод - выход
 
     //analogReference(DEFAULT);	// для работы с аналоговыми входами на полный диапазон питания
     analogReference(INTERNAL);  // INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
@@ -172,9 +170,6 @@ void setup()     {
     // setup mavlink port
     mavlink_comm_0_port = &Serial;
 
-#ifdef membug
-    Serial.println(freeMem());
-#endif
 
     // Prepare OSD for displaying 
     unplugSlaves();
@@ -182,7 +177,7 @@ void setup()     {
     osd.setPanel(5, 5);
     osd.printf_P(PSTR(OSD_VERSION));
     
-    // Get correct panel settings from EEPROM
+    // Get correct settings from EEPROM
     readSettings();
 
     // Check EEPROM to see if we have initialized it already or not
@@ -203,16 +198,21 @@ void setup()     {
     panelN = 0; //set panel to 0 to start in the first navigation screen
     readPanelSettings(); // Для первой панели. Для остальных - при переключении
 
-    osd.init();
-
-    // Start 
-    startPanels();
+    osd.init();    // Start 
+    
     delay(300);
 
     osd.update();// Show bootloader bar
 
     delay(start_dly);
     Serial.flush();
+
+#ifdef DEBUG
+/*    osd.setPanel(0,0);
+    hex_dump((byte *)&panel,0x70);
+    osd.update();
+    delay(10000); */
+#endif
 
 /* no other tasks - get rid of timer!
     // Startup MAVLink timers  
@@ -248,7 +248,7 @@ void loop()
 
     read_mavlink();
 
-    if(mavlink_got || (lastMAVBeat + 2500 < millis() && mavlink_on  ) ){ // были свежие данные - обработать, если данных не было давно - предупредить
+    if(mavlink_got || (lastMAVBeat + 2500 < millis()) && mavlink_on  ){ // были свежие данные - обработать, если данных не было давно - предупредить
       OnMavlinkTimer();
       update_stat = vsync_wait = 1;	// и перерисовать экран
       mavlink_on = mavlink_got;
@@ -273,9 +273,19 @@ digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает 
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
-// или так
-// rssiADC = pulseIn(PWMrssiPin, HIGH,15000)/Settings[S_PWMRSSIDIVIDER]; // Reading W/time out (microseconds to wait for pulse to start: 15000=0.015sec)
+    if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
+        static uint8_t ind = 0;
+        static uint16_t voltageRawArray[8];
+        uint16_t voltageRaw = 0;
 
+        voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
+        for (uint8_t i=0;i<8;i++)
+            voltageRaw += voltageRawArray[i];
+        osd_vbat_A = float(voltageRaw) * sets.evBattA_koef /1023 / 80; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+
+	mavlink_got=1;
+// 	вычислить osd_battery_remaining_A по напряжению!
+    }
 
     if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
         static uint8_t ind = 0;
@@ -289,8 +299,7 @@ void On100ms(){ // периодические события, не связан�
 
 // 	вычислить osd_battery_remaining_B по напряжению!
 
-	osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
-
+	mavlink_got=1;
     }
 
     if(flags.useExtCurr){ //аналоговый ввод - ток
@@ -302,6 +311,7 @@ void On100ms(){ // периодические события, не связан�
         for (uint8_t i=0;i<8;i++)
             currentRaw += currentRawArray[i];
         osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+	mavlink_got=1;
     }
 
 
@@ -319,6 +329,7 @@ void On100ms(){ // периодические события, не связан�
             for (uint8_t i=0;i<8;i++)
                 rssi_in += RSSI_rawArray[i];
             rssi_in /= 8; // 8 элементов
+	    mavlink_got=1;
 	}
     }
 }
@@ -330,6 +341,7 @@ void OnMavlinkTimer()
 {
 
     osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
+    osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
     
@@ -341,9 +353,6 @@ void OnMavlinkTimer()
 
 void unplugSlaves(){
     //Unplug list of SPI
-#ifdef ArduCAM328
-    digitalWrite(10,  HIGH); // unplug USB HOST: ArduCam Only
-#endif
     digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 

@@ -33,6 +33,7 @@ namespace OSD
         public System.Windows.Forms.Label label1;
         public System.Windows.Forms.NumericUpDown NUM_Y;
         public System.Windows.Forms.NumericUpDown NUM_X;
+		public System.Windows.Forms.CheckBox chkSign;
 		
 		private int number;
 		private OSD osd;
@@ -58,6 +59,7 @@ namespace OSD
             this.NUM_Y = new System.Windows.Forms.NumericUpDown();
             this.NUM_X = new System.Windows.Forms.NumericUpDown();
 			this.pictureBox = new System.Windows.Forms.PictureBox();
+			this.chkSign = new System.Windows.Forms.CheckBox();
 			
 			this.tabPage.SuspendLayout();
 			this.groupBox.SuspendLayout();
@@ -106,9 +108,10 @@ namespace OSD
             this.groupBox.Controls.Add(this.label1);
             this.groupBox.Controls.Add(this.NUM_Y);
             this.groupBox.Controls.Add(this.NUM_X);
-            this.groupBox.Location = new System.Drawing.Point(3, 285);
+			this.groupBox.Controls.Add(this.chkSign);
+            this.groupBox.Location = new System.Drawing.Point(3, 258);
             this.groupBox.Name = "groupBox"+num;
-            this.groupBox.Size = new System.Drawing.Size(169, 82);
+            this.groupBox.Size = new System.Drawing.Size(169, 120);
             this.groupBox.TabIndex = 2;
             this.groupBox.TabStop = false;
             // 
@@ -132,7 +135,7 @@ namespace OSD
             // 
             // NUM_Y
             // 
-            this.NUM_Y.Location = new System.Drawing.Point(30, 46);
+            this.NUM_Y.Location = new System.Drawing.Point(56, 46);
             this.NUM_Y.Maximum = new decimal(new int[] {
             	15,
             	0,
@@ -145,7 +148,7 @@ namespace OSD
             // 
             // NUM_X
             // 
-            this.NUM_X.Location = new System.Drawing.Point(30, 20);
+            this.NUM_X.Location = new System.Drawing.Point(56, 20);
             this.NUM_X.Maximum = new decimal(new int[] {
             	29,
             	0,
@@ -163,7 +166,7 @@ namespace OSD
             // 
             this.LIST_items.Location = new System.Drawing.Point(3, 40);
             this.LIST_items.Name = "LIST_items";
-            this.LIST_items.Size = new System.Drawing.Size(169, 237);
+            this.LIST_items.Size = new System.Drawing.Size(169, 218);
             this.LIST_items.TabIndex = 5;
             this.LIST_items.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
             this.LIST_items.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -174,12 +177,25 @@ namespace OSD
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.pictureBox.Location = new System.Drawing.Point(178, 17);
             this.pictureBox.Name = "pictureBox1";
-            this.pictureBox.Size = new System.Drawing.Size(497, 339);
+            this.pictureBox.Size = new System.Drawing.Size(497, 361);
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
             this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
             this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);			
+			
+			//
+			// chkSign
+			//
+			this.chkSign.AutoSize = true;
+            this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkSign.Location = new System.Drawing.Point(10, 81);
+            this.chkSign.Name = "chkSign";
+            this.chkSign.Size = new System.Drawing.Size(137, 17);
+            this.chkSign.TabIndex = 4;
+            this.chkSign.Text = "Show sign before value";
+            this.chkSign.UseVisualStyleBackColor = true;
+			this.chkSign.CheckedChanged += new System.EventHandler(this.chkSign_CheckedChanged);
 			return 0;
 		}
 		public int  last_init(){
@@ -191,7 +207,7 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.NUM_X)).EndInit();
 			this.tabPage.ResumeLayout(false);
             this.tabPage.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();			
 			return 0;
 		}
 		
@@ -288,9 +304,10 @@ namespace OSD
 			if(!AutomaticCheck)
 				foreach(TreeNode node in e.Node.Nodes)
 					node.Checked = e.Node.Checked;
+
 			if(osd.IsHandleCreated)
 				osd.BeginInvoke((MethodInvoker)delegate {
-					osd.osdDraw(number); });
+					osd.Draw(number); });
 		}
 		
 
@@ -298,12 +315,14 @@ namespace OSD
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
-			osd.osdDraw(number);
+			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
 				if(thing!=null && thing.name==e.Node.Text) {
 					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
+					chkSign.Checked = thing.sign==1;
+					chkSign.Visible = thing.sign!=-1;
 				}
 			}
 		}
@@ -314,12 +333,14 @@ namespace OSD
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
-			osd.osdDraw(number);
+			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
 				if(thing!=null && thing.name==e.Node.Text) {
 					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
+					chkSign.Checked = thing.sign==1;
+					chkSign.Visible = thing.sign!=-1;
 				}
 			}
 		}
@@ -334,7 +355,7 @@ namespace OSD
                 }
             }
 
-            osd.osdDraw(number);
+            osd.Draw(number);
         }
 
 
@@ -350,7 +371,7 @@ namespace OSD
 				}
 			}
 
-			osd.osdDraw(number);
+			osd.Draw(number);
 		}
 		
 		private void pictureBox1_MouseUp (object sender, MouseEventArgs e) {
@@ -437,7 +458,21 @@ namespace OSD
 			ypos = Constrain(ansH, 0, OSD.SCREEN_H - 1);
 		}
 
-		
+		private void chkSign_CheckedChanged(object sender, EventArgs e) {
+    		
+			string item = osd.currentlyselected;
+			
+			for (int a = 0; a < panelItems.Length; a++) {
+				if(panelItems[a]!=null && panelItems[a].name==item) {
+					if(panelItems[a].sign>=0)
+						panelItems[a].sign = chkSign.Checked?1:0;
+
+				}
+			}
+
+			osd.Draw(number);
+        
+        }		
 		
 	}
 }

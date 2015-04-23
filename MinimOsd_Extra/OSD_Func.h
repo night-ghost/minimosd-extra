@@ -46,7 +46,7 @@ void setHomeVars(OSD &osd)
     long bearing;
     byte en=0;
 
-  //osd_alt_to_home = (osd_alt - osd_home_alt);
+
 
 #ifdef IS_COPTER
  #ifdef IS_PLANE
@@ -158,12 +158,11 @@ void setFdataVars()
     byte ch = sets.RSSI_raw / 2;
 
 
-    if(ch == 0) rssi_v = osd_rssi;
-    if(ch == 4) rssi_v = chan8_raw; 
-    if(ch == 1 || ch == 2) rssi_v = rssi_in;
+    if(ch == 0) rssi_v = osd_rssi; // mavlink
+    if(ch == 4) rssi_v = chan_raw[7]; // ch 8
+    if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
 
     if((sets.RSSI_raw % 2 == 0))  {
-
        if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
        if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
 

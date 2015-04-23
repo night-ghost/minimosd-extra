@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.Diagnostics;
+using System.Threading;
 
 
 namespace OSD
@@ -102,6 +103,9 @@ public const int npanel = 4; // количество панелей
         int print_y;
 
         Boolean fwWasRead = false;
+		private bool tlog_run=false ;
+		public byte[] tlog_data;
+		System.Threading.Thread tlog_thread;
 
         public OSD() {
 			
@@ -184,51 +188,51 @@ public const int npanel = 4; // количество панелей
 				var pi = scr[n].panelItems;
 				// first 8
 				// Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-				pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
-				pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
-				pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
-				pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY);
-				pi[a++] = new Panel("Battery B", pan.panBatt_B, 21, 3, panBatt_B_XY);
-				pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY);
-				pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY);
-				pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY);
-				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY);
+				pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY,-1);
+				pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY,-1);
+				pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY,-1);
+				pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY,1);
+				pi[a++] = new Panel("Battery B", pan.panBatt_B, 21, 3, panBatt_B_XY,1);
+				pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY,1);
+				pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY,1);
+				pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY,1);
+				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY,1);
 	
 				//second 8
-				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY);
-				pi[a++] = new Panel("Heading", pan.panHeading, 24, 13, panHeading_XY);
-				//          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
-				pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
-				pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY);
-				pi[a++] = new Panel("WP Direction", pan.panWPDir, 20, 12, panWPDir_XY);
-				pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY);
+				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY,-1);
+				pi[a++] = new Panel("Heading", pan.panHeading, 24, 13, panHeading_XY,-1);
+	//          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
+				pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY,-1);
+				pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY,1);
+				pi[a++] = new Panel("WP Direction", pan.panWPDir, 20, 12, panWPDir_XY,-1);
+				pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY,1);
 				// rssi
 	
 				// third 8
-				pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY);
-				pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY);
-				pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY);
-				pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY);
+				pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY,1);
+				pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY,1);
+				pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY,1);
+				pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY,1);
 	
-				pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCur_A_XY);
+				pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCur_A_XY,1);
 	
-				pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY);
-				pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY);
-				pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY);
-				pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY);
-				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY);
+				pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY,1);
+				pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY,1);
+				pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY,1);
+				pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY,1);
+				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY,1);
 	
-				pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY);
+				pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY,1);
 	
-				pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
-				pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY);
-				pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY);
-				pi[a++] = new Panel("Tune", pan.panTune, 1, 1, panTune_XY);
-				pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY);
-				pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_XY);
-				pi[a++] = new Panel("Channel Raw", pan.panCh, 1, 0, panCh_XY);
-				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY);
-				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY);
+				pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY,-1);
+				pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1);
+				pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY,1);
+				pi[a++] = new Panel("Tune", pan.panTune, 1, 1, panTune_XY,1);
+				pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY,1);
+				pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_XY,-1);
+				pi[a++] = new Panel("Channel Raw", pan.panCh, 1, 0, panCh_XY,-1);
+				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY,-1);
+				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY,1);
 	
 				osd_functions_N = a;
 				//make backup in case EEPROM needs reset to default
@@ -275,7 +279,7 @@ public const int npanel = 4; // количество панелей
 				li.Sort();
 				startup = false;
 				
-				osdDraw(n);
+				Draw(n);
 					
 			}	// цикл по экранам
 			
@@ -295,10 +299,10 @@ public const int npanel = 4; // количество панелей
 				cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
 			cbxModelType.SelectedItem = (ModelType)pan.model_type;
 
-			cbxAirSpeedSign.Checked = (pan.sign_air_speed!=0);
-			cbxGroundSpeedSign.Checked = (pan.sign_ground_speed!=0);
-			cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude!=0);
-			cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude!=0);
+//			cbxAirSpeedSign.Checked = (pan.sign_air_speed!=0);
+//			cbxGroundSpeedSign.Checked = (pan.sign_ground_speed!=0);
+//			cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude!=0);
+//			cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude!=0);
 
 			if(cbxWarningsAutoPanelSwitch.Items.Count==0)
 				cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
@@ -401,18 +405,32 @@ public const int npanel = 4; // количество панелей
 
         public void printf (string format, params object[] args) {
 			StringBuilder sb = new StringBuilder();
-
-			sb = new StringBuilder(AT.MIN.Tools.sprintf(format, args));
+			
+			try {
+				sb = new StringBuilder(AT.MIN.Tools.sprintf(format, args));
+			}catch(Exception ex){
+				var x=ex;
+			}
 
 			//sprintf(sb, format, __arglist(args));
 
 			//Console.WriteLine(sb.ToString());
 
 			foreach(char ch in sb.ToString().ToCharArray()) {
-				if(ch=='|') {
+				write (ch);
+			}
+
+		}
+		
+		public void write(int ch){
+			write ((char)ch);
+		}
+		
+		public void write(char ch) {
+			if(ch=='|') {
 					print_col += 1;
 					print_row = 0;
-					continue;	
+					return;	
 				}
 				try {
 					// draw red boxs
@@ -427,6 +445,7 @@ public const int npanel = 4; // количество панелей
 						// check if this box has bene used
 						if(usedPostion[w1][h1]!=null) {
 							//System.Diagnostics.Debug.WriteLine("'" + used[this.x / 12 + r * 12 / 12][this.y / 18 + d * 18 / 18] + "'");
+							gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);							
 						} else {
 							gr.DrawImage(chars[ch], (print_x + print_row * CHAR_W) % screen.Width, (print_y + print_col * CHAR_H), CHAR_W, CHAR_H);							
 						}
@@ -437,10 +456,7 @@ public const int npanel = 4; // количество панелей
 					System.Diagnostics.Debug.WriteLine("printf exception");
 				}
 				print_row++;
-			}
-
 		}
-		
 		
 
 
@@ -458,7 +474,7 @@ public const int npanel = 4; // количество панелей
 
         
         // draw image and characters overlay
-        public void osdDraw (int k) {
+        public void Draw (int k) {
 			if(k < 0 || k >= npanel)
 				return;
 			
@@ -528,9 +544,9 @@ public const int npanel = 4; // количество панелей
 
 							// ntsc and below the middle line
 							if(thing.y >= getCenter() && !CHK_pal.Checked) {
-								thing.show(thing.x, thing.y - 3);
+								thing.show(thing.x, thing.y - 3,thing.sign);
 							} else { // pal and no change
-								thing.show(thing.x, thing.y);
+								thing.show(thing.x, thing.y,thing.sign);
 							}
 
 						}
@@ -566,7 +582,7 @@ public const int npanel = 4; // количество панелей
 
 			xmlconfig(false);
 
-			osdDraw(panel_number);
+			Draw(panel_number);
             
 		}
 		
@@ -578,7 +594,7 @@ public const int npanel = 4; // количество панелей
 			// add a delay to this so it runs after the control value has been defined.
 			if(this.IsHandleCreated)
 				this.BeginInvoke((MethodInvoker)delegate {
-					osdDraw(panel_number); });
+					Draw(panel_number); });
 		}
 		
 
@@ -596,6 +612,7 @@ public const int npanel = 4; // количество панелей
 			this.toolStripStatusLabel1.Text = "";
 			int wr_start=0;
 			int wr_length=0;
+			ModelType fwModelType;
 
 			TabPage current = PANEL_tabs.SelectedTab;
 			
@@ -604,7 +621,7 @@ public const int npanel = 4; // количество панелей
 				//It only checks if configuration screen model type matches fw model type if model type already have been read from eeprom
 				//(either by pushing the "Read From OSD" or by uploading the fw)
 				if(fwWasRead) {
-					ModelType fwModelType = (ModelType)conf.eeprom.sets.model_type;
+					fwModelType = (ModelType)conf.eeprom.sets.model_type;
 
 					if(fwModelType!=(ModelType)cbxModelType.SelectedItem) {
 						if(MessageBox.Show("OSD firmware is of type " + fwModelType.ToString() + " and you have selected " + cbxModelType.SelectedText + " model type." + Environment.NewLine +
@@ -612,6 +629,7 @@ public const int npanel = 4; // количество панелей
 							return;
 					}
 				}
+				
 				
 				// пройтись по всем панелям и проверить, включено ли отображение батареи B
 				//если да то pan.flgBattB=true
@@ -628,10 +646,17 @@ public const int npanel = 4; // количество панелей
 				wr_start = Settings_offset;
 				wr_length = Config.Settings_size;
 				
-				conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
-				conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
-				conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
-				conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
+//				conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
+//				conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
+//				conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
+//				conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
+				fwModelType =  (ModelType)cbxModelType.SelectedItem;
+				try {
+					conf.eeprom.sets.model_type=(byte)fwModelType;
+				}
+				catch(Exception ex) {
+					var x = ex;		
+				}
 				conf.eeprom.flags[converts] = pan.converts;
 				conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
 				
@@ -791,10 +816,10 @@ public const int npanel = 4; // количество панелей
 			}
 			
 			//Setup configuration panel
-			conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
-			conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
-			conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
-			conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
+//			conf.eeprom.flags[sign_air_speed] = pan.sign_air_speed!=0;
+//			conf.eeprom.flags[sign_ground_speed] = pan.sign_ground_speed!=0;
+//			conf.eeprom.flags[sign_home_altitude] = pan.sign_home_altitude!=0;
+//			conf.eeprom.flags[sign_msl_altitude] = pan.sign_msl_altitude!=0;
 			conf.eeprom.flags[converts] = pan.converts;
 			
 			conf.eeprom.sets.overspeed = pan.overspeed;
@@ -862,7 +887,7 @@ public const int npanel = 4; // количество панелей
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-          	osdDraw(panel_number);  
+          	Draw(panel_number);  
         }
 
         private void OSD_Resize(object sender, EventArgs e)
@@ -870,7 +895,7 @@ public const int npanel = 4; // количество панелей
 			
             try
             {
-                osdDraw(panel_number);
+                Draw(panel_number);
              
             }
             catch { }
@@ -903,7 +928,9 @@ public const int npanel = 4; // количество панелей
 //				MessageBox.Show("Done downloading data!");
 //			} 
 			
+			int tN=panel_number;
 			for (int k=0; k<npanel; k++) {
+				panel_number=k;
 				for (int a = 0; a < scr[k].panelItems.Length; a++) {
 					if(this.scr[k].panelItems[a]!=null) {
 						var pi = scr[k].panelItems[a];
@@ -915,11 +942,10 @@ public const int npanel = 4; // количество панелей
 							if(tnArray.Length > 0)
 								tnArray[0].Checked = (p.y < 0x80);
 							
-							p.y &= 0x80;
+							pi.x = (byte)Constrain(p.x & 0x7f, 0, SCREEN_W);
+							pi.y = (byte)Constrain(p.y & 0x7f, 0, SCREEN_H);
 							
-							pi.x = (byte)Constrain(p.x, 0, SCREEN_W);
-							pi.y = (byte)Constrain(p.y, 0, SCREEN_H);
-							
+							pi.sign = (p.x & 0x80) == 0?1:0;
 							//scr[k].panelItems[a] = new Panel(pi.name, pi.show, p.x, p.y, pi.pos);
 
 						}
@@ -943,18 +969,12 @@ public const int npanel = 4; // количество панелей
 			if(pan.cs_version=="0.0.0") {
 				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
 			} else {
-				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + pan.cs_version;
+				try {
+					lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + pan.cs_version;
+				} catch{}
 			}
 
-			pan.sign_air_speed = (byte)(conf.eeprom.flags[sign_air_speed]?1:0);
-			pan.sign_ground_speed = (byte)(conf.eeprom.flags[sign_ground_speed]?1:0);
-			pan.sign_home_altitude = (byte)(conf.eeprom.flags[sign_home_altitude]?1:0);
-			pan.sign_msl_altitude = (byte)(conf.eeprom.flags[sign_msl_altitude]?1:0);
 
-			cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
-			cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
-			cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0;
-			cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0;
 			try {
 				cbxModelType.SelectedItem = (ModelType)pan.model_type;
 			} catch{
@@ -998,19 +1018,28 @@ public const int npanel = 4; // количество панелей
 			RSSI_numeric_max.Value = 0;
 			RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
 			if((int)(pan.rssiraw_on /2)==0 || pan.rssiraw_on /2 == 2) {
-				RSSI_numeric_min.Value = pan.rssipersent;
-				RSSI_numeric_max.Value = pan.rssical;
 				RSSI_numeric_min.Minimum = 0;
 				RSSI_numeric_min.Maximum = 255;
 				RSSI_numeric_max.Minimum = 0;
 				RSSI_numeric_max.Maximum = 255;
-			} else {
-				RSSI_numeric_min.Value = pan.rssipersent * 10;
-				RSSI_numeric_max.Value = pan.rssical * 10;
+				RSSI_numeric_min.Value = pan.rssipersent;
+				RSSI_numeric_max.Value = pan.rssical;
+				
+			} else {				
 				RSSI_numeric_min.Minimum = 900;
 				RSSI_numeric_min.Maximum = 2000;
 				RSSI_numeric_max.Minimum = 900;
 				RSSI_numeric_max.Maximum = 2000;
+				try {
+					RSSI_numeric_min.Value = pan.rssipersent * 10;
+				}catch{
+					RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
+				}
+				try {
+					RSSI_numeric_max.Value = pan.rssical * 10;
+				}catch{
+					RSSI_numeric_max.Value = RSSI_numeric_max.Maximum;
+				}
 			}
 			cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
@@ -1110,7 +1139,7 @@ public const int npanel = 4; // количество панелей
 			pan.flgILS = conf.eeprom.flags[ils_on];
 			chkILS.Checked = pan.flgILS;							
 
-			osdDraw(panel_number);            
+			Draw(panel_number=tN );            
 
 		}
 
@@ -1196,7 +1225,7 @@ public const int npanel = 4; // количество панелей
         private void CHK_pal_CheckedChanged (object sender, EventArgs e) {
 			changeToPal(CHK_pal.Checked);
 			
-			osdDraw(panel_number);
+			Draw(panel_number);
             
 		}
 		
@@ -1211,29 +1240,22 @@ public const int npanel = 4; // количество панелей
             CHK_pal.Checked = !CHK_ntsc.Checked;
         }
 
-        private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+        private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e) {
             SaveFileDialog sfd = new SaveFileDialog() { Filter = "*.osd|*.osd" };
 
             sfd.ShowDialog();
 
-            if (sfd.FileName != "")
-            {
-                try
-                {
-                    using (StreamWriter sw = new StreamWriter(sfd.OpenFile()))
-                    //Write
-                    {
+            if (sfd.FileName != ""){
+                try {
+                    using (StreamWriter sw = new StreamWriter(sfd.OpenFile())){       //Write                    
                         //Panel 1
 						for(int k=0;k<npanel;k++) {
                         	sw.WriteLine("{0}", "Panel "+k);
-                        	foreach (var item in this.scr[k].panelItems)
-                        	{
-	                            if (item != null)
-                            	{
+                        	foreach (var item in this.scr[k].panelItems){
+	                            if (item != null){
 	                                TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
                                 	if (tnArray.Length > 0)
-	                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}", item.name, item.x, item.y, tnArray[0].Checked.ToString());
+	                                    sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", item.name, item.x, item.y, tnArray[0].Checked.ToString(),item.sign);
                             	}
                         	}
 						}
@@ -1256,10 +1278,11 @@ public const int npanel = 4; // количество панелей
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
                         sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
                         sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
-                        sw.WriteLine("{0}\t{1}", "Sign Air Speed", pan.sign_air_speed);
-                        sw.WriteLine("{0}\t{1}", "Sign Ground  Speed", pan.sign_ground_speed);
-                        sw.WriteLine("{0}\t{1}", "Sign Home Altitude", pan.sign_home_altitude);
-                        sw.WriteLine("{0}\t{1}", "Sign MSL Altitude", pan.sign_msl_altitude);
+//                        sw.WriteLine("{0}\t{1}", "Sign Air Speed", pan.sign_air_speed);
+//                        sw.WriteLine("{0}\t{1}", "Sign Ground  Speed", pan.sign_ground_speed);
+//                        sw.WriteLine("{0}\t{1}", "Sign Home Altitude", pan.sign_home_altitude);
+//                        sw.WriteLine("{0}\t{1}", "Sign MSL Altitude", pan.sign_msl_altitude);
+
 /*
  	//// коэффициенты внешних измерений
     float evBattA_koef; 
@@ -1330,14 +1353,19 @@ public const int npanel = 4; // количество панелей
 							//while (!sr.EndOfStream)
 							for (int i = 0; i < osd_functions_N; i++) {
 								strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-								for (int a = 0; a < this.scr[k].panelItems.Length; a++) {
+								for (int a = 0; a < scr[k].panelItems.Length; a++) {
 									if(this.scr[k].panelItems[a]!=null && scr[k].panelItems[a].name==strings[0]) {
-										var pi = this.scr[k].panelItems[a];
+										var pi = scr[k].panelItems[a];
 										// incase there is an invalid line number or to shore
 										try {
-											this.scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
-	
-											TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
+											//scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
+											pi.x = int.Parse(strings[1]);
+											pi.y = int.Parse(strings[2]);
+											try {
+												pi.sign = int.Parse(strings[4]);
+											} catch {}
+												
+											TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
 											if(tnArray.Length > 0)
 												tnArray[0].Checked = (strings[3]=="True");
 										} catch {
@@ -1375,11 +1403,11 @@ public const int npanel = 4; // количество панелей
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
-                            else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)byte.Parse(strings[1]); //we're not overwriting "eeprom" model type
-                            else if (strings[0] == "Sign Air Speed") pan.sign_air_speed = byte.Parse(strings[1]);
-                            else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
-                            else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
-                            else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
+                            else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1]) ); //we're not overwriting "eeprom" model type
+//                            else if (strings[0] == "Sign Air Speed") pan.sign_air_speed = byte.Parse(strings[1]);
+//                            else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
+//                            else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
+//                            else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
 							else if (strings[0] == "BattB") pan.battBv=byte.Parse(strings[1]);
 							else if (strings[0] == "rssi_k") pan.rssi_koef=float.Parse(strings[1]);
 							else if (strings[0] == "curr_k") pan.Curr_koef=float.Parse(strings[1]);
@@ -1396,6 +1424,10 @@ public const int npanel = 4; // количество панелей
 							else if (strings[0] == "fILS") pan.flgILS=bool.Parse(strings[1]);
 						}
 
+						
+                            
+						//pan.model_type = (byte)cbxModelType.SelectedItem;
+							
                         //Modify units
                         if (!pan.converts) {
                             UNITS_combo.SelectedIndex = 0; //metric
@@ -1466,10 +1498,10 @@ public const int npanel = 4; // количество панелей
 
                         CALLSIGNmaskedText.Text = pan.callsign_str;
 
-                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
-                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
-                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
-                        cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0 ;
+//                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
+//                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
+//                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
+//                        cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0 ;
 
                         this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
                         this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
@@ -1502,7 +1534,7 @@ public const int npanel = 4; // количество панелей
                 }
             }
 			startup=false;
-           	osdDraw(panel_number);
+           	Draw(panel_number);
             
         }
 
@@ -1607,7 +1639,7 @@ public const int npanel = 4; // количество панелей
                 }
                 catch { MessageBox.Show("Bad Image"); }
                 customImage = true;
-				osdDraw(panel_number);
+				Draw(panel_number);
                 
             }
         }
@@ -1620,105 +1652,106 @@ public const int npanel = 4; // количество панелей
 
             ofd.ShowDialog();
 
-            if (ofd.FileName != "")
+            if (ofd.FileName == "")
+				return;
+			
+            
+
+            BinaryReader br = new BinaryReader(ofd.OpenFile());
+
+            this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+            this.toolStripStatusLabel1.Text = "Loading TLOG data...";
+
+            while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
             {
-
-                BinaryReader br = new BinaryReader(ofd.OpenFile());
-
-                this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
-                this.toolStripStatusLabel1.Text = "Sending TLOG data...";
-
-                while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed)
-                {
-                    try
-                    {
-                        string message = "";
-                        byte[] bytes = br.ReadBytes(200000);
-                        int frameIndex = 0;
-                        for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
-                        {
-                            if (frameIndex >= 20)
-                            {
-                                //string a = "";
-                            }
-
-                            if (frameIndex < 20)
-                            {
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                int length = (int)bytes[byteIndex];
-                                message += "Payload length: " + length.ToString();
-                                byteIndex++;
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "System ID: " + ((int)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                                message += "Message: ";
-                                for (int x = 0; x < length; x++)
-                                {
-                                    while (bytes[byteIndex] == '\0')
-                                        byteIndex++;
-                                    message += ((char)bytes[byteIndex]).ToString();
-                                    byteIndex++;
-                                }
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
-                                message += Environment.NewLine;
-                                byteIndex++;
-                            }
-
-                            if (bytes[byteIndex] == 0xFE)
-                            {
-                                frameIndex++;
-                            }
-
-                        }
-
-                        string str = System.Text.Encoding.UTF8.GetString(bytes);
-                        str = str.Replace((char)0, '\0');
-                        str = str.Replace("\0", "");
-                        //comPort.Write(bytes, 0, bytes.Length);
-
-                        System.Threading.Thread.Sleep(5);
-
-                        //Console.Write(comPort.ReadExisting());
-
-                    }
-                    catch { break; }
-
-                    Application.DoEvents();
-                }
-
                 try
                 {
-                    toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-                    toolStripStatusLabel1.Text = "";
+                    string message = "";
+                    byte[] bytes = br.ReadBytes(20000000);
+                    int frameIndex = 0;
+                    for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)   {
+						message="";
+                        if (frameIndex < 20) {
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            int length = (int)bytes[byteIndex];
+                            message += "Payload length: " + length.ToString();
+                            byteIndex++;
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
+                            byteIndex++;
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "System ID: " + ((int)bytes[byteIndex]).ToString();
+                            byteIndex++;
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
+                            byteIndex++;
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
+                            byteIndex++;
+                            message += "Message: ";
+                            for (int x = 0; x < length; x++)
+                            {
+                                while (bytes[byteIndex] == '\0')
+                                    byteIndex++;
+                                message += ((char)bytes[byteIndex]).ToString();
+                                byteIndex++;
+                            }
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
+                            byteIndex++;
+                            while (bytes[byteIndex] == '\0')
+                                byteIndex++;
+                            message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+                            message += Environment.NewLine;
+                            byteIndex++;
+							Console.Write (message);
+                        } else {
+							break;
+						}
 
-                    //comPort.Close();
+                        if (bytes[byteIndex] == 0xFE)
+                        {
+                            frameIndex++;
+                        }
+
+                    }
+
+                    string str = System.Text.Encoding.UTF8.GetString(bytes);
+                    str = str.Replace((char)0, '\0');
+                    str = str.Replace("\0", "");
+                    //comPort.Write(bytes, 0, bytes.Length);
+					
+					tlog_data=bytes;
+ 					grpTLog.Enabled =true;
+                    //Console.Write(comPort.ReadExisting());
+
                 }
-                catch { }
-            }
-        }
+                catch { break; }
 
-        private void OSD_FormClosed(object sender, FormClosedEventArgs e)
+                Application.DoEvents();
+            }
+
+            try
+            {
+                toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+                toolStripStatusLabel1.Text = "";
+
+                //comPort.Close();
+            }
+            catch { }
+		}
+
+		private void OSD_FormClosed(object sender, FormClosedEventArgs e)
         {
+			if(tlog_run)
+				tlog_thread.Abort();
+			
             xmlconfig(true);
         }
 
@@ -1856,6 +1889,14 @@ public const int npanel = 4; // количество панелей
 
         private void updateFontToolStripMenuItem_Click(object sender, EventArgs e)
         {
+			Application.DoEvents();
+			
+			this.BeginInvoke((MethodInvoker)delegate {
+					sub_updateCharset(); 
+			});
+		}
+		
+		private void sub_updateCharset(){
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             toolStripStatusLabel1.Text = "";
 
@@ -1868,7 +1909,9 @@ public const int npanel = 4; // количество панелей
 
             if (!IsValidCharsetFile(ofd))
                 return;
-
+			
+			Application.DoEvents();
+			
             //Get file version
             string fileVersion = "000";
             string tempFileName = ofd.SafeFileName.ToUpper();
@@ -1889,7 +1932,9 @@ public const int npanel = 4; // количество панелей
                     }
                 }
             }
-
+			
+			Application.DoEvents();
+			
             if (ofd.FileName != "")
             {
                 if (comPort.IsOpen)
@@ -1906,30 +1951,33 @@ public const int npanel = 4; // количество панелей
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
-                    //System.Threading.Thread.Sleep(2);
+                    System.Threading.Thread.Sleep(2);
 
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
 
                     System.Threading.Thread.Sleep(2000);
+					
+					if(comPort.BytesToRead!=0)
+                    	comPort.ReadExisting();
 
-                    comPort.ReadExisting();
-
                     comPort.WriteLine("");
                     comPort.WriteLine("");
                     comPort.WriteLine("");
                     comPort.WriteLine("");
-                    comPort.WriteLine("");
+                    // comPort.WriteLine("");
 
                     int timeout = 0;
 
                     while (comPort.BytesToRead == 0)
                     {
                         System.Threading.Thread.Sleep(500);
+						comPort.WriteLine("");
                         Console.WriteLine("Waiting...");
                         timeout++;
-
-                        if (timeout > 10)
+						Application.DoEvents();
+						
+                        if (timeout > 30)
                         {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
@@ -1980,6 +2028,7 @@ public const int npanel = 4; // количество панелей
                             }
                             length -= read;
                             byte[] buffer = br.ReadBytes(read);
+							Console.WriteLine("write "+buffer.ToString () );
                             comPort.Write(buffer, 0, buffer.Length);
                             int timeout = 0;
 
@@ -1988,7 +2037,7 @@ public const int npanel = 4; // количество панелей
                                 System.Threading.Thread.Sleep(10);
                                 timeout++;
 
-                                if (timeout > 10)
+                                if (timeout > 100)
                                 {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
@@ -2108,7 +2157,7 @@ public const int npanel = 4; // количество панелей
             }
             pan.do_converts();
 			
- 	        osdDraw(panel_number);
+ 	        Draw(panel_number);
             
         }
 
@@ -2163,7 +2212,7 @@ public const int npanel = 4; // количество панелей
 
             CALLSIGNmaskedText.Text = pan.callsign_str;
 			
-            osdDraw(panel_number);
+            Draw(panel_number);
             
         }
 
@@ -2193,7 +2242,7 @@ public const int npanel = 4; // количество панелей
             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked)!=0;
             //Refresh battery percent presentation
 			
-            osdDraw(panel_number);
+            Draw(panel_number);
             
         }
 
@@ -2235,7 +2284,7 @@ public const int npanel = 4; // количество панелей
                 }
             }
 			
-            osdDraw(panel_number);
+            Draw(panel_number);
             
         }
 
@@ -2279,7 +2328,7 @@ public const int npanel = 4; // количество панелей
                     break;
             }
         }
-
+/*
         public Boolean airSpeedSign = false;
         private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
         {
@@ -2288,7 +2337,7 @@ public const int npanel = 4; // количество панелей
             else
                 pan.sign_air_speed = 0x00;
             airSpeedSign = cbxAirSpeedSign.Checked;
-			osdDraw(panel_number);
+			Draw(panel_number);
             
         }
 
@@ -2301,7 +2350,7 @@ public const int npanel = 4; // количество панелей
                 pan.sign_ground_speed = 0x00;
             groundSpeedSign = cbxGroundSpeedSign.Checked;
 		
-			osdDraw(panel_number);
+			Draw(panel_number);
         }
 
         public Boolean homeAltSign = false;
@@ -2313,7 +2362,7 @@ public const int npanel = 4; // количество панелей
                 pan.sign_home_altitude = 0x00;
             homeAltSign = cbxHomeAltitudeSign.Checked;
 			
-			osdDraw(panel_number);
+			Draw(panel_number);
         }
 
         public Boolean mslAltSign = false;
@@ -2325,9 +2374,9 @@ public const int npanel = 4; // количество панелей
                 pan.sign_msl_altitude = 0x00;
             mslAltSign = cbxMslAltitudeSign.Checked;
 			
-			osdDraw(panel_number);
+			Draw(panel_number);
         }
-
+*/
 
 
 
@@ -2339,6 +2388,8 @@ public const int npanel = 4; // количество панелей
         private void SetRSSIValues()
         {
             //updatingRSSI = true;
+			if(updatingRSSI) return;
+			
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
             RSSI_numeric_min.Maximum = 2000;
@@ -2359,8 +2410,10 @@ public const int npanel = 4; // количество панелей
 				if (OldMax == 2000)  {
                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
                     //RSSI_numeric_max.Value = (pan.rssical * 10 - 1000) * 255 / 1000;
-                    RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 1100;
-                    RSSI_numeric_max.Value = (pan.rssical * 10 - 900) * 255 / 1100;
+					try {
+                    	RSSI_numeric_min.Value = (pan.rssipersent * 10 - 900) * 255 / 1100;
+                    	RSSI_numeric_max.Value = (pan.rssical * 10 - 900) * 255 / 1100;
+					} catch{}
                     //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
                     //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
                 }
@@ -2380,8 +2433,10 @@ public const int npanel = 4; // количество панелей
 				if (OldMax == 255) {
                     //RSSI_numeric_min.Value = pan.rssipersent * 100 / 255 + 100;
                     //RSSI_numeric_max.Value = pan.rssical * 100 / 255 + 100;
-                    RSSI_numeric_min.Value = (pan.rssipersent * 1100 / 255) + 900;
-                    RSSI_numeric_max.Value = (pan.rssical * 1100 / 255) + 900;
+					try {
+                    	RSSI_numeric_min.Value = (pan.rssipersent * 1100 / 255) + 900;
+                    	RSSI_numeric_max.Value = (pan.rssical * 1100 / 255) + 900;
+					} catch {}
                     //pan.rssipersent = (byte)(pan.rssipersent * 100 / 255 + 100);
                     //pan.rssical = (byte)(pan.rssical * 100 / 255 + 100);
                 }
@@ -2427,7 +2482,7 @@ public const int npanel = 4; // количество панелей
             lblPresentedCharset.Text = "Presented Charset: " + ofd.SafeFileName;
 			
 		
-			osdDraw(panel_number);
+			Draw(panel_number);
         }
 
         private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3124,7 +3179,7 @@ public const int npanel = 4; // количество панелей
 				int k=int.Parse(hdr[1]);
 	            currentlyselected = "";
 
-            	osdDraw(k-1);
+            	Draw(k-1);
 			}
 
         }
@@ -3208,7 +3263,102 @@ public const int npanel = 4; // количество панелей
             pan.flgILS = chkILS.Checked;
         }
 
+		private void btnTLog_Click(object sender, EventArgs e)    {
+            tlog_run=!tlog_run;
+            btnTLog.Text = tlog_run ? "Stop" : "Start";
+			
+			if(tlog_run){
+				tlog_thread = new System.Threading.Thread(thread_proc);
+				tlog_thread.Start();
+			} else {
+				tlog_thread.Abort();
+			}
+		}
 		
-		
+		void thread_proc(){
+            byte[] bytes = tlog_data;
+			int frStart;
+			int frEnd;
+            int frameIndex = 0;
+			int np=0;
+			string message;
+
+                if (comPort.IsOpen)
+                    comPort.Close();
+
+                try
+                {
+
+                    comPort.PortName = CMB_ComPort.Text;
+                    comPort.BaudRate = 57600;
+
+                    comPort.Open();
+
+                }
+                catch { 
+					MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+					return; 
+				}
+			
+			while(true){
+				np=0;
+            	for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)   {
+					if(comPort.BytesToRead!=0)
+                    	comPort.ReadExisting();
+
+					frStart=byteIndex;
+					message="";
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    int length = (int)bytes[byteIndex];
+                    message += "Payload length: " + length.ToString();
+                    byteIndex++;
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
+                    byteIndex++;
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "System ID: " + ((int)bytes[byteIndex]).ToString();
+                    byteIndex++;
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
+                    byteIndex++;
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
+                    byteIndex++;
+                    message += "Message: ";
+                    for (int x = 0; x < length; x++)
+                    {
+                        while (bytes[byteIndex] == '\0')
+                            byteIndex++;
+                        message += ((char)bytes[byteIndex]).ToString();
+                        byteIndex++;
+                    }
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
+                    byteIndex++;
+                    while (bytes[byteIndex] == '\0')
+                        byteIndex++;
+                    message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+                    message += Environment.NewLine;
+                    byteIndex++;
+					Console.Write (message);
+
+                    if (bytes[byteIndex] == 0xFE) {
+                            frameIndex++;						
+                    }
+					frEnd=byteIndex;
+
+					comPort.Write(bytes, frStart, frEnd-frStart);
+					np++;
+					lblTLog.Text = np.ToString ();
+					System.Threading.Thread.Sleep(200); // 5 frames/s
+                }
+			}			
+        }				
     }
 }

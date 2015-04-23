@@ -1,20 +1,33 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="config.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Constants.cs">
     <Files>
-      <File FileName="OSD.cs" Line="324" Column="1" />
-      <File FileName="config.cs" Line="96" Column="28" />
-      <File FileName="OSD.Designer.cs" Line="1269" Column="61" />
-      <File FileName="ArduinoSTK.cs" Line="353" Column="14" />
-      <File FileName="Panels.cs" Line="593" Column="29" />
-      <File FileName="osd_screen.cs" Line="292" Column="17" />
-      <File FileName="Constants.cs" Line="47" Column="1" />
+      <File FileName="OSD.cs" Line="179" Column="4" />
+      <File FileName="config.cs" Line="54" Column="17" />
+      <File FileName="OSD.Designer.cs" Line="1652" Column="45" />
+      <File FileName="Panels.cs" Line="1160" Column="15" />
+      <File FileName="osd_screen.cs" Line="202" Column="60" />
+      <File FileName="Constants.cs" Line="80" Column="1" />
+      <File FileName="Properties/app.manifest" Line="1" Column="1" />
+      <File FileName="Properties/AssemblyInfo.cs" Line="19" Column="56" />
+      <File FileName="OSD.resx" Line="1" Column="1" />
+      <File FileName="OSD_SA_v5.mcm" Line="1" Column="1" />
+      <File FileName="Pos.cs" Line="1" Column="1" />
+      <File FileName="Tools.cs" Line="214" Column="54" />
+      <File FileName="Properties/Settings.settings" Line="1" Column="1" />
+      <File FileName="AboutBox1.Designer.cs" Line="1" Column="1" />
+      <File FileName="AboutBox1.resx" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="OSD" expanded="True">
-            <Node name="config.cs" selected="True" />
+            <Node name="Properties" expanded="True">
+              <Node name="Resources.resx" expanded="True" />
+            </Node>
+            <Node name="Resources" expanded="True" />
+            <Node name="AboutBox1.cs" expanded="True" />
+            <Node name="Constants.cs" selected="True" />
             <Node name="OSD.cs" expanded="True" />
           </Node>
         </State>
@@ -23,9 +36,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/osd_screen.cs" line="316" />
-      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/OSD.cs" line="945" />
-      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/OSD.cs" line="684" />
+      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/OSD.cs" line="654" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

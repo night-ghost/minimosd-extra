@@ -22,17 +22,15 @@ static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 static float        nav_roll = 0; // Current desired roll in degrees
 static float        nav_pitch = 0; // Current desired pitch in degrees
-static int16_t      nav_bearing = 0; // Current desired heading in degrees
+static float        nav_bearing = 0; // Current desired heading in degrees
 
 static int16_t      wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
-static int8_t       wp_target_bearing_rotate_int = 0;
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
 #ifdef IS_PLANE
 static float	    alt_error = 0; // Current altitude error in meters
 static float        aspd_error = 0; // Current airspeed error in meters/second
 static boolean      takeofftime = 0;
-static float        start_Time = -1.0;
 static float        osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
 static float        osd_alt = 0;
@@ -53,14 +51,16 @@ static bool         last_armed_status = 0;
 static bool         ma = 0;
 
 static uint16_t     ch_raw = 0;
+
+static uint16_t chan_raw[8];
 //static uint16_t     chan1_raw = 0;
 //static uint16_t     chan2_raw = 0;
 //static uint16_t     chan3_raw = 0;
 //static uint16_t     chan4_raw = 0;
-static uint16_t     chan5_raw = 0;
-static uint16_t     chan6_raw = 0;
-static uint16_t     chan7_raw = 0;
-static uint16_t     chan8_raw = 0;
+//static uint16_t     chan5_raw = 0;
+//static uint16_t     chan6_raw = 0;
+//static uint16_t     chan7_raw = 0;
+//static uint16_t     chan8_raw = 0;
 
 static uint8_t      check_warning = 1;
 
@@ -126,12 +126,11 @@ static int16_t       osd_roll = 0;                   // roll from DCM
 static float        osd_heading = 0;                // ground course heading from GPS
 static float        glide = 0;
 
-static float        osd_alt_abs = 0;                    // altitude
 static float        osd_alt_rel = 0;                    // altitude
 static float        osd_alt_gps = 0;                    // altitude
 static float        osd_airspeed = 0;              // airspeed
 static float        osd_windspeed = 0;
-static float        osd_windspeedz = 0;
+//static float        osd_windspeedz = 0;
 static float        osd_winddirection = 0;
 
 static float        osd_groundspeed = 0;            // ground speed
@@ -143,21 +142,19 @@ static byte         distchar = 0;
 static byte         climbchar = 0;
 
 
-static float     convertt = 0;
 
 
 
 //MAVLink session control
-static boolean      mavbeat = 0;
+static byte         mavbeat = 0;
 
 static boolean      landing = 0;
-static float        lastMAVBeat = 0;
-static boolean      waitingMAVBeats = 1;
+static long         lastMAVBeat = 0;
+//`static byte         waitingMAVBeats = 1;
 
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
-static boolean      enable_mav_request = 0;
-static boolean      blinker = 0;
+static byte         blinker = 0;
 static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 4;

@@ -35,42 +35,41 @@ typedef struct Point point;
 
 
 struct Panel {
-#define panCenter_XY = 0;
-#define panPitch_XY = 2;
-#define panRoll_XY = 4;
-#define panBatt_A_XY = 6;
-#define panBatt_B_XY = 8;
-#define panGPSats_XY = 10;
-#define panCOG_XY = 12;
-#define panGPS_XY = 14;
-    point center;
-    point pitch;
-    point roll;
-    point batt_A;
-    point batt_B;
-    point GPS_sats;
-    point COG;
-    point GPS;
 
-#define panRose_XY = 16;
-#define panHeading_XY = 18;
-#define panHomeDir_XY = 20;
-#define panHomeDis_XY = 22;
-#define panWPDir_XY = 24;
-#define panWPDis_XY = 26;
-#define panRSSI_XY = 28;
 
-    point rose;
-    point heading;
-    point mavBeat;
-    point homeDir;
-    point homeDist;
-    point WP_dir;
-    point WP_dist;
-    point RSSI;
 
-#define panCur_A_XY = 30;
-#define panCurB_XY = 32;
+
+
+
+
+
+    point center; 	// #define panCenter_XY = 0;
+    point pitch;  	// #define panPitch_XY = 2;
+    point roll;	  	// #define panRoll_XY = 4;
+    point batt_A; 	// #define panBatt_A_XY = 6;
+    point batt_B; 	// #define panBatt_B_XY = 8;
+    point GPS_sats;	// #define panGPSats_XY = 10;
+    point COG;		//#define panCOG_XY = 12;
+    point GPS;		//#define panGPS_XY = 14;
+
+
+
+
+
+
+
+
+
+    point rose;		//#define panRose_XY = 16;
+    point heading;	//#define panHeading_XY = 18;
+    point homeDir;      //#define panHomeDir_XY = 20;
+    point homeDist;     //#define panHomeDis_XY = 22;
+    point WP_dir;       //#define panWPDir_XY = 24;
+    point WP_dist;      //#define panWPDis_XY = 26;
+    point RSSI;         //#define panRSSI_XY = 28;   
+
+#define panCurrA_XY = 30;
+#define panCurrB_XY = 32;
 #define panAlt_XY = 34;
 #define panVel_XY = 36;
 #define panThr_XY = 38;
@@ -133,11 +132,6 @@ struct Flags { // 4 байта
     bool RADIO_ON:1;
     bool PAL_NTSC:1;
     
-    bool SIGN_MSL_ON:1;
-    bool SIGN_HA_ON:1;
-    bool SIGN_GS_ON:1;
-    bool SIGN_AS_ON:1;
-
 // new!
     bool useExtVbattA:1;// 8
     bool useExtVbattB:1;// 9

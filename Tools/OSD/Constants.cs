@@ -61,26 +61,18 @@ namespace OSD {
 	    bool measure:1;
 	    bool RADIO_ON:1;
 	    bool PAL_NTSC:1;
-
-	    bool SIGN_MSL_ON:1; sign_msl_altitude
-	    bool SIGN_HA_ON:1; sign_home_altitude
-	    bool SIGN_GS_ON:1; sign_ground_speed
-	    bool SIGN_AS_ON:1; sign_air_speed
 */		
 		public const int osd_battery_show_percentage 	= 0;
 		public const int converts 				= 1;
 		public const int radio_on 				= 2;
 		public const int pal_ntsc				= 3;
-		public const int sign_msl_altitude		= 4;
-		public const int sign_home_altitude 	= 5;
-		public const int sign_ground_speed 		= 6;
-		public const int sign_air_speed 		= 7;
+		
 	// new!
-		public const int useExtVbattA			= 8;
-		public const int useExtVbattB			= 9;
-    	public const int useExtCurr				= 10;
-		public const int radar_on 				= 11;		
-		public const int ils_on 				= 12;		
+		public const int useExtVbattA			= 4;
+		public const int useExtVbattB			= 5;
+    	public const int useExtCurr				= 6;
+		public const int radar_on 				= 7;		
+		public const int ils_on 				= 8;		
 	
 	}
 }

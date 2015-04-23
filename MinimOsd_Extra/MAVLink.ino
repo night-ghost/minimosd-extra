@@ -14,6 +14,7 @@ uint8_t mavlink_got = 0; // флаг получения пакета
 uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)
 
 
+/*
 void request_mavlink_rates()
 {
     const uint8_t  maxStreams = 6;
@@ -32,6 +33,7 @@ void request_mavlink_rates()
             MAVStreams[i], MAVRates[i], 1);
     }
 }
+*/
 
 void read_mavlink(){
     mavlink_message_t msg; 
@@ -86,10 +88,12 @@ void read_mavlink(){
                 
             case MAVLINK_MSG_ID_SYS_STATUS:
                 {
-
-                    osd_vbat_A = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); //Battery voltage, in millivolts (1 = 1 millivolt)
-                    osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg); //Battery current, in 10*milliamperes (1 = 10 milliampere)         
-                    osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg); //Remaining battery energy: (0%: 0, 100%: 100)
+                    if(!flags.useExtVbattA){
+                        osd_vbat_A = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); //Battery voltage, in millivolts (1 = 1 millivolt)
+                        osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg); //Remaining battery energy: (0%: 0, 100%: 100)
+                    }
+                    if (!flags.useExtCurr)
+                        osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg); //Battery current, in 10*milliamperes (1 = 10 milliampere)
 
                     //osd_mode = apm_mav_component;//Debug
                 }
@@ -147,14 +151,14 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 {
-//                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
-//                    chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
-//                    chan3_raw = mavlink_msg_rc_channels_raw_get_chan3_raw(&msg);
-//                    chan4_raw = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
-                    chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
-                    chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                    chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                    chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
+                    chan_raw[0] = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
+                    chan_raw[1] = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
+                    chan_raw[2] = mavlink_msg_rc_channels_raw_get_chan3_raw(&msg);
+                    chan_raw[3] = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
+                    chan_raw[4] = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
+                    chan_raw[5] = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
+                    chan_raw[6] = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
+                    chan_raw[7] = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
                     osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
                 break;           

@@ -105,28 +105,14 @@ void OSD::setBrightness()
 
     uint8_t blevel = sets.OSD_BRIGHTNESS;
     uint8_t x;
-/*
-    if(blevel == 0) //low brightness
-        blevel = MAX7456_WHITE_level_80;
-    else if(blevel == 1) 
-        blevel = MAX7456_WHITE_level_90;
-    else if(blevel == 2)
-        blevel = MAX7456_WHITE_level_100;
-    else if(blevel == 3) //high brightness
-        blevel = MAX7456_WHITE_level_120;
-    else 
-        blevel = MAX7456_WHITE_level_80; //low brightness if bad value
-*/
+
     if(blevel>3) blevel=0;
     blevel=levels[blevel];
 
     // set all rows to same charactor white level, 90%
-    for (x = 0x0; x < 0x10; x++)
-    {
-        //Spi.transfer(x + 0x10);
-        //Spi.transfer(blevel);
+    for (x = 0x0; x < 0x10; x++) 
         MAX_write(x + 0x10, blevel);
-    }
+
 }
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------
@@ -188,9 +174,9 @@ void OSD::clear()
 
 void
 OSD::setPanel(uint8_t st_col, uint8_t st_row){
-  col = st_col; // нужны для отработки перевода строки с сохранением колонки
-  row = st_row;
-  bufpos = st_row*30+st_col;
+  col = st_col & 0x7f; // col,row нужны для отработки перевода строки с сохранением колонки
+  row = st_row & 0x7f; // в старших битах флаги, размер экрана все равно мелкий
+  bufpos = row*30+col;
 }
 
 
@@ -198,7 +184,7 @@ OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 void
 OSD::openSingle(uint8_t x, uint8_t y){
-  bufpos = y*30+x;
+  bufpos = (y & 0x7f)*30+(x & 0x7f);
 }
 
 //------------------ write ---------------------------------------------------
@@ -290,8 +276,7 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   Spi.transfer(MAX7456_CMAH_reg); // set start address high
   Spi.transfer(char_address_hi);
 
-  for(x = 0; x < NVM_ram_size; x++) // write out 54 (out of 64) bytes of character to shadow ram
-  {
+  for(x = 0; x < NVM_ram_size; x++) {// write out 54 (out of 64) bytes of character to shadow ram
     screen_char = character_bitmap[x];
     Spi.transfer(MAX7456_CMAL_reg); // set start address low
     Spi.transfer(x);
@@ -305,6 +290,7 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   
   // wait until bit 5 in the status register returns to 0 (12ms)
   while (1) {
+   delay(2);
    Spi.transfer(MAX7456_STAT_reg_read);
    if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   } 

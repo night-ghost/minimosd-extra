@@ -1,6 +1,8 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
+//#define DEBUG
+
 // sets.model_type plane=0 copter=1
 
 // EEPROM Version number, incrementing this will erase/upload factory settings.
@@ -28,15 +30,19 @@
 /////////////////////////////////////////////////
 
 #ifdef IS_COPTER
-#define OSD_VERSION "MinimOSD-Extra " VERSION "|uni " RELEASE
-#ifdef IS_PLANE
-#define OSD_VERSION "MinimOSD-Extra " VERSION "|Copter " RELEASE
+ #ifdef IS_PLANE
+  #define OSD_VERSION "MinimOSD-Extra " VERSION "|uni " RELEASE
+ #else
+  #define OSD_VERSION "MinimOSD-Extra " VERSION "|Copter " RELEASE
+ #endif
 #else
+ #ifdef IS_PLANE
+  #define OSD_VERSION "MinimOSD-Extra " VERSION "|Plane " RELEASE
+ #else
+  #define OSD_VERSION "MinimOSD-Extra " VERSION "|" RELEASE
+ #endif
 #endif
-#ifdef IS_PLANE
-#define OSD_VERSION "MinimOSD-Extra " VERSION "|Plane " RELEASE
-#endif
-#endif
+
 
 #define on 1
 #define off 0
