@@ -10,16 +10,12 @@ void writePanels(){
     }
 #endif
 
-    //if(millis() < (lastMAVBeat + 2200))
-    //  waitingMAVBeats = 1;
-    //if(is_on(panWarn_XY)) panWarn(panWarn_XY.x, panWarn_XY.y); // this must be here so warnings are always checked
-
   //Base panel selection
   //No mavlink data available panel
   if(millis() > (lastMAVBeat + 2200)){
-    if (currentBasePanel != 2){
+    if (currentBasePanel != npanels){
       osd.clear();
-      currentBasePanel = 2;
+      currentBasePanel = npanels;
     }
     panWaitMAVBeats({5,10}); //Waiting for MAVBeats...
   }
@@ -102,10 +98,10 @@ void writePanels(){
       if(is_on(panel.temp)) panTemp(panel.temp);
       if(is_on(panel.ch)) panCh(panel.ch);
       if(is_on(panel.distance)) panDistance(panel.distance);
-
+      if(is_on(panel.callSign)) panCALLSIGN(panel.callSign); 
     }
   }
-//  if(is_on(panel.callSign)) panCALLSIGN(panel.callSign.x, panel.callSign.y); //call sign even in off panel.el
+//  
     // show warnings even if screen is disabled
     if(is_on(panel.warn)) panWarn(panel.warn);
 
@@ -134,8 +130,8 @@ void panOff(){
         ch_raw = chan_raw[7];
 
 
-  //If there is a warning force switch to panel 0
-  if(canswitch == 0){
+  //If there is a warning but warnings disabled force switch to panel 0
+  if(canswitch == 0 && !is_on(panel.warn)){ 
     if(panelN != sets.auto_screen_switch){
       osd_clear = 1;
     }
@@ -305,7 +301,7 @@ void panEff(point p){
     static float ddistance = 0;
     float        eff = 0; //Efficiency
 
-    if(sets.model_type==0){
+    if(sets.model_type==0){ // plane
         if (osd_throttle >= 1){
           if (ma == 0) 
               ma = 1;
@@ -324,7 +320,7 @@ void panEff(point p){
 
         }else{
 
-            if ((osd_throttle < 1)){
+            if ((osd_throttle < 1)){ // запоминаем высоту и путь при выключенном газе
                 if (ma == 1) {
                   palt = osd_alt_to_home;
                   ddistance = tdistance;
@@ -335,7 +331,7 @@ void panEff(point p){
 		osd.write(0x18);
 
             if (osd_climb < -0.05){
-                glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * converth;
+                float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * converth;
                 if (glide > 9999) glide = 9999;
                 if (glide > -0){
                     osd.printf_P(PSTR("%4.0f%c"), glide, high);
@@ -451,7 +447,7 @@ void panAlt(point p){
 
     if(has_sign(p))
 	osd.write(0x11);
-    osd.printf_P(PSTR("%5.0f%c"), (double)(osd_alt_gps * converth), high);
+    osd.printf_P(PSTR("%5.0f%c"), (double)(osd_alt_gps/1000.0 * converth), high);
 }
 
 /* **************************************************************** */
@@ -518,6 +514,8 @@ void panAirSpeed(point p){
 
 /* **************************************************************** */
 
+#define WARNINGS 6
+
 uint8_t warning;
 
 void check_warn()
@@ -527,19 +525,30 @@ void check_warn()
 
  if (!one_sec_timer_switch) return;
 
+//1
  if ((osd_fix_type) < 2) 
     wmask |= 1;
- if (osd_airspeed * converts < sets.stall && takeofftime == 1) 
+
+//2    
+ if (sets.model_type==0 && osd_airspeed * converts < sets.stall && takeofftime == 1) // plane
     wmask |= 2;
+
+//3    
  if ((osd_airspeed * converts) > (float)sets.overspeed) 
     wmask |= 4;
 
- if (osd_vbat_A < float(sets.battv)/10.0 || (osd_battery_remaining_A < sets.batt_warn_level && sets.batt_warn_level != 0))
+//4
+ if (osd_vbat_A/1000.0 < float(sets.battv)/10.0 || (osd_battery_remaining_A < sets.batt_warn_level && sets.batt_warn_level != 0))
     wmask |= 8;
 
+//5
  if (rssi < sets.rssi_warn_level && rssi != -99 && !sets.RSSI_raw)
     wmask |= 16;
 
+//6
+ if (sets.model_type==1 && abs(vs) > sets.stall * 10 && sets.stall >0) // copter
+    wmask |= 32;
+    
  if(wmask == 0) 
     warning = 0;
  else {
@@ -550,7 +559,7 @@ void check_warn()
     bit = 1 << (warning-1);
 
     while(1) {
-        if(warning == 6) {
+        if(warning >= WARNINGS+1) {
 	    warning = 1;
 	    bit = 1;
         }
@@ -577,9 +586,8 @@ void panWarn(point p){
     osd.setPanel(p.x,p.y);
 
 
-#define WARNINGS 5
 
-#ifdef IS_COPTER
+#if 0
   if (one_sec_timer_switch == 1){
     boolean warning[]={0,0,0,0,0,0,0}; // Make and clear the array
 
@@ -592,15 +600,15 @@ void panWarn(point p){
                   warning[2] = 1; 
                   warning[0] = 1;
                   }
-                if ((osd_airspeed * converts) > (float)sets.overspeed && sets.overspeed > 0) {
+                if ( (osd_airspeed * converts) > (float)sets.overspeed && sets.overspeed > 0) {
                   warning[3] = 1; 
                   warning[0] = 1;
                   }
-                if (osd_vbat_A < float(sets.battv)/10.0 || (osd_battery_remaining_A < sets.batt_warn_level && sets.batt_warn_level != 0)) {
+                if (sets.battv> 0 && osd_vbat_A/1000.0 < float(sets.battv)/10.0 || (osd_battery_remaining_A < sets.batt_warn_level && sets.batt_warn_level != 0)) {
                   warning[4] = 1; 
                   warning[0] = 1;
                   }
-                if (rssi < sets.rssi_warn_level && rssi != -99 && !sets.RSSI_raw) {
+                if (sets.rssi_warn_level>0 && rssi < sets.rssi_warn_level && rssi != -99 && !sets.RSSI_raw) {
                   warning[5] = 1; 
                   warning[0] = 1;
                   }
@@ -657,33 +665,33 @@ void panWarn(point p){
   if (rotation > WARNINGS) rotation = 0;
   osd.printf_P(warning_string);
 
-#else
-#ifdef IS_PLANE
+#endif
+
     check_warn();
 
     switch(warning) {
-         case 1:
-                 osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
-                 break;
-         case 2:
-                 osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
-                 break;
-         case 3:
-                 osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
-                 break;
-         case 4:
-                 osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
-                 break;
-         case 5:
-                 osd.printf_P(PSTR("\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"));
+    case 1:
+        osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21")); //No GPS fix!
+        break;
+    case 2:
+        osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
+        break;
+    case 3:
+        osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20")); //Over Speed!
+        break;
+    case 4:
+        osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21")); //Battery Low!
+        break;
+    case 5:
+        osd.printf_P(PSTR("\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20")); //Low Rssi
+        break;
+    case 6:
+        osd.printf_P(PSTR("\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21")); //Hi VSpeed!
+        break;
+    default:
+        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20")); //Blank line
     }
-#endif
-#endif
-
-
- 
-  }
-}  
+}
 
 
 
@@ -710,16 +718,16 @@ void panThr(point p){
 void panBatteryPercent(point p){
     osd.setPanel(p.x,p.y);
 
-    if(has_sign(p))
-	osd.write(0x88);
+//    if(has_sign(p))
+    osd.write(0x88); // донышко батарейки не зависит от
 
     if (flags.OSD_BATT_SHOW_PERCENT){
 //        osd.printf_P(PSTR("\x17%3.0i\x25"), 0x17, osd_battery_remaining_A, 0x25);
-      osd.printf_P(PSTR("%c\x8e%3.0i%%"), osd_battery_pic_A, osd_battery_remaining_A/255*100);
+      osd.printf_P(PSTR("%c%c\x8e%3.0i%%"), osd_battery_pic_A[0], osd_battery_pic_A[1], osd_battery_remaining_A/255*100);
 
     }else{
 //        osd.printf_P(PSTR("%c%4.0f%c"), 0x17, mah_used, 0x01);
-        osd.printf_P(PSTR("%c\x8e%4.0f\x01"), osd_battery_pic_A, mah_used);
+        osd.printf_P(PSTR("%c%c\x8e%4.0f\x01"), osd_battery_pic_A[0], osd_battery_pic_A[1], mah_used);
     }
 
 
@@ -832,15 +840,15 @@ void panBatt_A(point p){
 
 /*************** This commented code is for the next ArduPlane Version
     if(osd_battery_remaining_A > 100){
-        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_A, 0x0d);
-    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_A, 0x0d, osd_battery_pic_A);
+        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_A/1000.0, 0x0d);
+    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_A/1000.0, 0x0d, osd_battery_pic_A);
     */
 
-//    osd.printf_P(PSTR("\xBC%5.2f\x0D"), (double)osd_vbat_A);
+//    osd.printf_P(PSTR("\xBC%5.2f\x0D"), (double)osd_vbat_A/1000.0);
     if(has_sign(p))
 	osd.write(0xBC);
 
-    osd.printf_P(PSTR("%5.2f\x0D"), (double)osd_vbat_A);
+    osd.printf_P(PSTR("%5.2f\x0D"), (double)osd_vbat_A/1000.0);
 }
 
 
@@ -857,13 +865,13 @@ void panBatt_B(point p){
 
 /*************** This commented code is for the next ArduPlane Version
     if(osd_battery_remaining_B > 100){
-        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_B, 0x0d);
-    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_B, 0x0d, osd_battery_pic_B);
+        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_B/1000.0, 0x0d);
+    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_B/1000.0, 0x0d, osd_battery_pic_B);
     */
     if(has_sign(p))
 	osd.write(0x26);
 
-    osd.printf_P(PSTR("%5.2f\x0D"), (double)osd_vbat_B);
+    osd.printf_P(PSTR("%5.2f\x0D"), (double)osd_vbat_B/1000.0);
 }
 
 
@@ -959,7 +967,7 @@ void panRose(point p){
  // generate the heading patern
     char buf_show[12];
 
-    const char buf_Rule[] PROGMEM = {
+    static const char buf_Rule[] PROGMEM = {
       0x82,0x80,0x81,0x80,0x81,0x80,
       0x84,0x80,0x81,0x80,0x81,0x80,
       0x83,0x80,0x81,0x80,0x81,0x80,
@@ -969,6 +977,7 @@ void panRose(point p){
   int start = round((osd_heading * 24)/360) - 3;
  
   if(start < 0) start += 24;
+  
   for(uint8_t x=0; x <= 10; x++){
     buf_show[x] = buf_Rule[start];
     if(++start > 23) start = 0;
@@ -1580,20 +1589,6 @@ void panTune(point p){
 
 
 /* **************************************************************** */
-// Panel  : panCenter
-// Needs  : X, Y locations
-// Output : 2 row croshair symbol created by 2 x 4 chars
-// Size   : 2 x 4  (rows x chars)
-// Staus  : done
-
-void panCenter(point p){
-    osd.setPanel(p.x,p.y);
-
-    osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
-}
-
-
-/* **************************************************************** */
 // Panel  : panCh
 // Needs  : X, Y locations
 // Output : Scaled channel values from MAVLink
@@ -1711,6 +1706,20 @@ void panMavBeat(point p){
     }
 }
 
+
+
+/* **************************************************************** */
+// Panel  : panCenter
+// Needs  : X, Y locations
+// Output : 2 row croshair symbol created by 2 x 4 chars
+// Size   : 2 x 4  (rows x chars)
+// Staus  : done
+
+void panCenter(point p){
+    osd.setPanel(p.x,p.y);
+
+    osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
+}
 
 
 

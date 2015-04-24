@@ -16,26 +16,38 @@ inline boolean getBit(byte Reg, byte whichBit) {
 
 //------------------ Battery Remaining Picture ----------------------------------
 
-char setBatteryPic(uint16_t bat_level)
+char setBatteryPic(uint16_t bat_level,byte *bp)
 {
 
-  if(bat_level <= 25){
-    return 0x20;
-  }
-  else if(bat_level <= 60){
-    return 0x8d;
-  }
-  else if(bat_level <= 100){
-    return 0x8c;
-  }
-  else if(bat_level <= 145){
-    return 0x8b;
-  }
-  else if(bat_level <= 205){
-    return 0x8a;
-  }
-  else return 0x89;
+    if(bat_level>128) {
+	*bp++=0x89; // нижняя полная, работаем с верхней
+	bat_level -=128;
+    }else {
+	bp[1] = 0x8d; // верхняя пустая, работаем с нижней
+	if(bat_level <= 17 && blinker){
+	    *bp   = 0x20;
+	    bp[1] = 0x20;
+	    return 1;	// если совсем мало то пробел вместо батареи - мигаем
+	}
+    }
 
+    // разбиваем участок 0..128 на 5 частей
+  if(bat_level <= 26){
+    *bp   = 0x8d;
+  }
+  else if(bat_level <= 51){
+    *bp   = 0x8c;
+  }
+  else if(bat_level <= 77){
+    *bp   = 0x8b;
+  }
+  else if(bat_level <= 103){
+    *bp   = 0x8a;
+  }
+  else 
+    *bp   = 0x89;
+
+    return 0;
 }
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
@@ -56,7 +68,7 @@ void setHomeVars(OSD &osd)
 	if(osd_throttle > 3 && takeoff_heading == -400)
 	    takeoff_heading = osd_heading;
 
-	osd_alt_to_home = (osd_alt - osd_home_alt);
+	osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
   
 	if(osd_got_home == 0 && osd_fix_type == 3 )
 	    en=1;
@@ -90,7 +102,7 @@ void setHomeVars(OSD &osd)
   if(osd_throttle > 3 && takeoff_heading == -400)
     takeoff_heading = osd_heading;
 
-  osd_alt_to_home = (osd_alt - osd_home_alt);
+  osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
   
   if(osd_got_home == 0 && osd_fix_type == 3 )
     en=1;
@@ -101,8 +113,8 @@ void setHomeVars(OSD &osd)
     if(en){
         osd_home_lat = osd_lat;
         osd_home_lon = osd_lon;
+
         //osd_alt_cnt = 0;
-        //osd_home_alt = osd_alt;
         osd_got_home = 1;
     } else if(osd_got_home == 1){
         float rads = fabs(osd_home_lat) * 0.0174532925;
@@ -117,7 +129,9 @@ void setHomeVars(OSD &osd)
         //DIR to Home
         dstlon = (osd_home_lon - osd_lon); //OffSet_X
         dstlat = (osd_home_lat - osd_lat) * scaleLongUp; //OffSet Y
+        
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
+        
         if(bearing < 0) bearing += 360;//normalization
         bearing = bearing - 180;//absolut return direction
         if(bearing < 0) bearing += 360;//normalization

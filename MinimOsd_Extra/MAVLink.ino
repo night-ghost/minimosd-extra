@@ -89,7 +89,7 @@ void read_mavlink(){
             case MAVLINK_MSG_ID_SYS_STATUS:
                 {
                     if(!flags.useExtVbattA){
-                        osd_vbat_A = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); //Battery voltage, in millivolts (1 = 1 millivolt)
+                        osd_vbat_A = mavlink_msg_sys_status_get_voltage_battery(&msg) ; //Battery voltage, in millivolts (1 = 1 millivolt)
                         osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg); //Remaining battery energy: (0%: 0, 100%: 100)
                     }
                     if (!flags.useExtCurr)
@@ -101,7 +101,7 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 {
-                    osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg) / 1000.0f;
+                    osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg);  // *1000
                     osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
@@ -202,7 +202,7 @@ packet.press_diff = press_diff;
                     //That shouldn't be because we may rely only on baro. So using vfr hud alt (testing)
                     //osd_alt_rel = (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001);
                     
-                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001);
+                    osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg);
                 }
                 break; 
 #endif

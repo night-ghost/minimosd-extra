@@ -92,6 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
+
 #define LEDPIN AmperagePin
 
 
@@ -117,6 +118,8 @@ void isr_VSYNC(){
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
 volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
 volatile unsigned long int_Timer = 0;         // set in the INT1
+
+byte update_stat = 1; // есть данные для показа
 
 // PWM Measurement
 void ReadINT_PIN() {
@@ -200,7 +203,7 @@ void setup()     {
 
     osd.init();    // Start 
     
-    delay(300);
+    delay(100);
 
     osd.update();// Show bootloader bar
 
@@ -231,7 +234,6 @@ void setup()     {
 /* ***********************************************/
 /* ***************** MAIN LOOP *******************/
 
-byte update_stat = 1; // есть данные для показа
 
 // Mother of all happenings, The loop()
 // As simple as possible.
@@ -281,7 +283,7 @@ void On100ms(){ // периодические события, не связан�
         voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
         for (uint8_t i=0;i<8;i++)
             voltageRaw += voltageRawArray[i];
-        osd_vbat_A = float(voltageRaw) * sets.evBattA_koef /1023 / 80; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+        osd_vbat_A = float(voltageRaw) * sets.evBattA_koef /1023 / 80 * 1000; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
 
 	mavlink_got=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
@@ -295,7 +297,7 @@ void On100ms(){ // периодические события, не связан�
         voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
         for (uint8_t i=0;i<8;i++)
             voltageRaw += voltageRawArray[i];
-        osd_vbat_B = float(voltageRaw) * sets.evBattB_koef /1023 / 80; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+        osd_vbat_B = float(voltageRaw) * sets.evBattB_koef /1023 / 80 * 1000; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
 
 // 	вычислить osd_battery_remaining_B по напряжению!
 
@@ -310,7 +312,7 @@ void On100ms(){ // периодические события, не связан�
         currentRawArray[(ind++)%8] = analogRead(AmperagePin);
         for (uint8_t i=0;i<8;i++)
             currentRaw += currentRawArray[i];
-        osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+        osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80 * 1000 / 10; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
 	mavlink_got=1;
     }
 
@@ -320,11 +322,13 @@ void On100ms(){ // периодические события, не связан�
 
         static uint8_t ind = 0;
         static uint16_t RSSI_rawArray[8];
+        int d;
 
         if(ch == 1 || ch == 2) {
-            if(ch == 1) RSSI_rawArray[(ind++)%8] = analogRead(RssiPin);
-             else
-            if(ch == 2) RSSI_rawArray[(ind++)%8] = pulseIn(RssiPin,HIGH, 15000);
+            if(ch == 1) d = analogRead(RssiPin);
+            else        d = pulseIn(RssiPin,HIGH, 20000);
+            
+            RSSI_rawArray[(ind++)%8] = d;
 
             for (uint8_t i=0;i<8;i++)
                 rssi_in += RSSI_rawArray[i];
@@ -339,16 +343,14 @@ void On100ms(){ // периодические события, не связан�
 /* ******** functions used in main loop() ******** */
 void OnMavlinkTimer()
 {
-
-    osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
-    osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
+    setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
+    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
-    
+
     setFdataVars(); // накопление статистики и рекордов
 
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
-
 }
 
 void unplugSlaves(){

@@ -58,8 +58,9 @@ namespace OSD
 		
 	    internal byte stall;
 	    internal byte battv;
-		internal byte switch_mode;
+		internal byte switch_mode;		// режим переключения: 0 значение, 1 по кругу
 		internal byte auto_screen_switch;
+		
 	    internal byte OSD_RSSI_HIGH;
 	    internal byte OSD_RSSI_LOW;
 	    internal byte OSD_RSSI_RAW;
@@ -94,6 +95,9 @@ namespace OSD
 	    internal float horiz_kPitch_a;
 		
 		internal byte battBv;
+		
+		internal byte vert_offs; // сдвиг экрана по вертикали и горизонтали
+    	internal byte horiz_offs;
 	};		
 
 	[StructLayout(LayoutKind.Explicit)]

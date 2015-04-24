@@ -153,6 +153,12 @@ namespace OSD
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
 			this.OVERSPEED_label = new System.Windows.Forms.Label();
             this.OVERSPEED_numeric = new System.Windows.Forms.NumericUpDown();
+			
+			this.numHOS = new System.Windows.Forms.NumericUpDown();
+            this.numVOS = new System.Windows.Forms.NumericUpDown();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label30 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
 
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -177,7 +183,9 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).BeginInit();
-            
+			((System.ComponentModel.ISupportInitialize)(this.numHOS)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numVOS)).BeginInit();
+			
             this.groupBox11.SuspendLayout();
             this.groupBox12.SuspendLayout();
             //this.tabPage3.SuspendLayout();
@@ -728,27 +736,27 @@ namespace OSD
 			this.grpTLog.Controls.Add(this.lblTLog);
             this.grpTLog.Controls.Add(this.btnTLog);
             this.grpTLog.Controls.Add(this.label14);
-            this.grpTLog.Location = new System.Drawing.Point(169, 232);
+            this.grpTLog.Location = new System.Drawing.Point(325, 303);
             this.grpTLog.Name = "grpTLog";
-            this.grpTLog.Size = new System.Drawing.Size(150, 144);
+            this.grpTLog.Size = new System.Drawing.Size(160, 68);
             this.grpTLog.TabIndex = 8;
             this.grpTLog.TabStop = false;
 			this.grpTLog.Enabled =false ;
             //.
             // lblTLog
             //.
-            this.lblTLog.Location = new System.Drawing.Point(38, 93);
+            this.lblTLog.Location = new System.Drawing.Point(86, 38);
             this.lblTLog.Name = "lblTLog";
-            this.lblTLog.Size = new System.Drawing.Size(99, 18);
+            this.lblTLog.Size = new System.Drawing.Size(64, 18);
             this.lblTLog.TabIndex = 16;
             this.lblTLog.Text = "0";
             this.lblTLog.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             //.
             // btnTLog
             //.
-            this.btnTLog.Location = new System.Drawing.Point(36, 42);
+            this.btnTLog.Location = new System.Drawing.Point(10, 36);
             this.btnTLog.Name = "btnTLog";
-            this.btnTLog.Size = new System.Drawing.Size(101, 24);
+            this.btnTLog.Size = new System.Drawing.Size(64, 24);
             this.btnTLog.TabIndex = 15;
             this.btnTLog.Text = "Start";
             this.btnTLog.UseVisualStyleBackColor = true;
@@ -765,14 +773,82 @@ namespace OSD
 			// 
             // groupBox9
             // 
+			this.groupBox9.Controls.Add(this.numHOS);
+            this.groupBox9.Controls.Add(this.numVOS);
+            this.groupBox9.Controls.Add(this.label31);
+            this.groupBox9.Controls.Add(this.label30);
+            this.groupBox9.Controls.Add(this.label29);
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(325, 313);
+            this.groupBox9.Location = new System.Drawing.Point(169, 238);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(159, 63);
+            this.groupBox9.Size = new System.Drawing.Size(150, 133);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
-            // 
+			// 
+			// numHOS
+            //.
+            this.numHOS.Location = new System.Drawing.Point(80, 102);
+            this.numHOS.Maximum = new decimal(new int[] {
+            31,
+            0,
+            0,
+            0});
+            this.numHOS.Minimum = new decimal(new int[] {
+            31,
+            0,
+            0,
+            -2147483648});
+            this.numHOS.Name = "numHOS";
+            this.numHOS.Size = new System.Drawing.Size(56, 20);
+            this.numHOS.TabIndex = 8;
+            this.numHOS.ValueChanged += new System.EventHandler(this.numHOS_ValueChanged);
+            //.
+            // numVOS
+            //.
+            this.numVOS.Location = new System.Drawing.Point(81, 80);
+            this.numVOS.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.numVOS.Minimum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            -2147483648});
+            this.numVOS.Name = "numVOS";
+            this.numVOS.Size = new System.Drawing.Size(56, 20);
+            this.numVOS.TabIndex = 7;
+           this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
+			//
+            // label31
+            //
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(49, 104);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(25, 13);
+            this.label31.TabIndex = 6;
+            this.label31.Text = "Left";
+            //
+            // label30
+            //
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(48, 82);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(26, 13);
+            this.label30.TabIndex = 5;
+            this.label30.Text = "Top";
+            //.
+            // label29
+            //.
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(10, 63);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(75, 13);
+            this.label29.TabIndex = 4;
+            this.label29.Text = "Screen offsets";
+            //			
             // BRIGHTNESScomboBox
             // 
             this.BRIGHTNESScomboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -783,21 +859,21 @@ namespace OSD
 	            "Medium High",
 	            "High"
 			});
-            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(38, 30);
+            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(35, 30);
             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
-            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(111, 21);
+            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(102, 21);
             this.BRIGHTNESScomboBox.TabIndex = 3;
             this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(6, 12);
+            this.label13.Location = new System.Drawing.Point(5, 12);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(82, 13);
+            this.label13.Size = new System.Drawing.Size(93, 13);
             this.label13.TabIndex = 2;
-            this.label13.Text = "OSD Brightness";
+            this.label13.Text = "Screen Brightness";
             // 
             // groupBox8
             // 
@@ -818,7 +894,7 @@ namespace OSD
             this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
             this.CALLSIGNmaskedText.Mask = "CCCCCCCC";
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
-            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(92, 20);
+            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(102, 20);
             this.CALLSIGNmaskedText.TabIndex = 11;
           
             this.CALLSIGNmaskedText.Validating += new System.ComponentModel.CancelEventHandler(this.CALLSIGNmaskedText_Validating);
@@ -927,7 +1003,7 @@ namespace OSD
             this.UNITS_combo.Location = new System.Drawing.Point(35, 29);
             this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
-            this.UNITS_combo.Size = new System.Drawing.Size(92, 21);
+            this.UNITS_combo.Size = new System.Drawing.Size(102, 21);
             this.UNITS_combo.TabIndex = 3;
             this.UNITS_combo.SelectedIndexChanged += new System.EventHandler(this.UNITS_combo_SelectedIndexChanged);
             // 
@@ -1142,7 +1218,7 @@ namespace OSD
             this.STALL_label.AutoSize = true;
             this.STALL_label.Location = new System.Drawing.Point(7, 12);
             this.STALL_label.Name = "STALL_label";
-            this.STALL_label.Size = new System.Drawing.Size(95, 13);
+            this.STALL_label.Size = new System.Drawing.Size(101, 20);
             this.STALL_label.TabIndex = 2;
             this.STALL_label.Text = "Stall Speed (km/h)";
             // 
@@ -1445,7 +1521,7 @@ namespace OSD
             0,
             0});
             this.OVERSPEED_numeric.Name = "OVERSPEED_numeric";
-            this.OVERSPEED_numeric.Size = new System.Drawing.Size(91, 20);
+            this.OVERSPEED_numeric.Size = new System.Drawing.Size(99, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
@@ -1494,6 +1570,8 @@ namespace OSD
             this.grpTLog.PerformLayout();
 			this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numHOS)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numVOS)).EndInit();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             this.groupBox7.ResumeLayout(false);
@@ -1651,6 +1729,11 @@ namespace OSD
         private System.Windows.Forms.NumericUpDown OVERSPEED_numeric;
 		private System.Windows.Forms.Label lblTLog;
         private System.Windows.Forms.Button btnTLog;
+		private System.Windows.Forms.NumericUpDown numHOS;
+        private System.Windows.Forms.NumericUpDown numVOS;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label label29;
     }
 	
 }

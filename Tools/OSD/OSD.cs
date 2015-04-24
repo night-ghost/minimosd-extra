@@ -186,7 +186,7 @@ public const int npanel = 4; // количество панелей
 			for (n=0; n<npanel; n++) { // для всех панелей
 				a = 0;
 				var pi = scr[n].panelItems;
-				// first 8
+	
 				// Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
 				pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY,-1);
 				pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY,-1);
@@ -198,7 +198,7 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY,1);
 				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY,1);
 	
-				//second 8
+		
 				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY,-1);
 				pi[a++] = new Panel("Heading", pan.panHeading, 24, 13, panHeading_XY,-1);
 	//          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
@@ -206,14 +206,11 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY,1);
 				pi[a++] = new Panel("WP Direction", pan.panWPDir, 20, 12, panWPDir_XY,-1);
 				pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY,1);
-				// rssi
 	
-				// third 8
 				pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY,1);
 				pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY,1);
 				pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY,1);
-				pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY,1);
-	
+				pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY,-1);	
 				pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY,1);
 	
 				pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY,1);
@@ -223,7 +220,6 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY,1);
 	
 				pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY,1);
-	
 				pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY,-1);
 				pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1);
 				pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY,1);
@@ -678,7 +674,8 @@ public const int npanel = 4; // количество панелей
 				conf.eeprom.sets.OSD_RSSI_WARN  = pan.rssi_warn_level;
 
 				conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
-
+				conf.eeprom.sets.horiz_offs = pan.horiz_offs;
+				conf.eeprom.sets.vert_offs = pan.vert_offs;
 				
 				conf.eeprom.osd_call_sign = pan.callsign_str;
 
@@ -841,6 +838,8 @@ public const int npanel = 4; // количество панелей
 			conf.eeprom.sets.OSD_RSSI_WARN = pan.rssi_warn_level;
 
 			conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
+			conf.eeprom.sets.horiz_offs = pan.horiz_offs;
+			conf.eeprom.sets.vert_offs = pan.vert_offs;
 
 			conf.eeprom.sets.CHK1_VERSION  = VER;
 			conf.eeprom.sets.CHK2_VERSION  = 0x55 ^ VER;
@@ -1073,7 +1072,11 @@ public const int npanel = 4; // количество панелей
 
 			pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
 			BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
-
+			
+			pan.horiz_offs= conf.eeprom.sets.horiz_offs;
+			pan.vert_offs= conf.eeprom.sets.vert_offs;
+			numHOS.Value = pan.horiz_offs - 0x20;
+			numVOS.Value =pan.vert_offs - 0x10;
 			
 			pan.callsign_str=conf.eeprom.osd_call_sign;
 				
@@ -1315,6 +1318,8 @@ public const int npanel = 4; // количество панелей
 						
 						sw.WriteLine("{0}\t{1}", "fRadar",pan.flgRadar);
 						sw.WriteLine("{0}\t{1}", "fILS",pan.flgILS);
+						sw.WriteLine("{0}\t{1}", "HOS",pan.horiz_offs);
+						sw.WriteLine("{0}\t{1}", "VOS",pan.vert_offs);
 						sw.Close();
                     }
                 }
@@ -1422,6 +1427,8 @@ public const int npanel = 4; // количество панелей
 							else if (strings[0] == "fCurr") pan.flgCurrent=bool.Parse(strings[1]);							
 							else if (strings[0] == "fRadar") pan.flgRadar=bool.Parse(strings[1]);
 							else if (strings[0] == "fILS") pan.flgILS=bool.Parse(strings[1]);
+							else if (strings[0] == "HOS") pan.horiz_offs=(byte)int.Parse(strings[1]);
+							else if (strings[0] == "VOS") pan.vert_offs=(byte)int.Parse(strings[1]);
 						}
 
 						
@@ -1495,6 +1502,8 @@ public const int npanel = 4; // количество панелей
                         RSSI_WARNnumeric.Value = pan.rssi_warn_level;
 
                         BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+						numHOS.Value = pan.horiz_offs - 0x20;
+						numVOS.Value =pan.vert_offs - 0x10;
 
                         CALLSIGNmaskedText.Text = pan.callsign_str;
 
@@ -3360,6 +3369,17 @@ public const int npanel = 4; // количество панелей
 					System.Threading.Thread.Sleep(200); // 5 frames/s
                 }
 			}			
+			
         }				
-    }
+		private void numVOS_ValueChanged(object sender, EventArgs e)
+        {
+            pan.vert_offs = (byte)(0x10 + numVOS.Value) ;
+        }
+
+        private void numHOS_ValueChanged(object sender, EventArgs e)
+        {
+            pan.horiz_offs = (byte)(0x20 + numHOS.Value);
+        }
+
+	}
 }

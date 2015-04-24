@@ -81,6 +81,8 @@ namespace OSD
 		public float roll_k_ntsc=1;
 		public float pitch_k_ntsc=1;
 		
+		public byte vert_offs=0x10; // сдвиг экрана по вертикали и горизонтали 0...1f
+    	public byte horiz_offs=0x20;// 0...3f
 		
 //*************************		
         private byte temperatureChar = 0x1B;

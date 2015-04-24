@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <Config>
   <comport>/dev/ttyUSB2</comport>
-  <Pal>False</Pal>
+  <Pal>True</Pal>
   <ArduinoIDEPath>Arduino-1.6.1</ArduinoIDEPath>
   <PlaneSketchPath>ArduCAM_OSD</PlaneSketchPath>
   <CopterSketchPath>ArduCAM_OSD</CopterSketchPath>

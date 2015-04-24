@@ -75,8 +75,10 @@ uint8_t checkPAL(uint8_t line){
     return line;
 }
 
+
+/*
 void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
-    if(panelN >= 1 && panelN <= 32) {
+    if(panelN >= 1 && panelN <= npanel) {
 
         writeEEPROM(panel_s, (6 * panelu) - 6 + 0);
         if(panel_s != 0) {
@@ -89,7 +91,7 @@ void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
 	readPanelSettings();
     } 
 }
-
+*/
 
 /* not use defaults - use config tool!
 

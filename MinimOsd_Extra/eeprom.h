@@ -1,29 +1,18 @@
-// EEPROM Stepping, be careful not to overstep. 
-// We reserved floats for just to be sure if some values needs to be
-// changed in future.
-// byte  = 1
-// int   = 4
-// float = 8
-
+// EEPROM Stepping,
 /* *********************************************** */
 // EEPROM Storage addresses
 
 #define OffsetBITpanel       128 // размер для одного экрана
 
-
-	
-	
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip
 
-
-// #define    offsetof(type, mem) ((size_t) ((char *)&((type *) 0)->mem — (char *)((type *)    0)))
 #define    EEPROM_offs(mem) offsetof(Eeprom, mem)
 
 #define OSD_CALL_SIGN_TOTAL 8
 
 #pragma pack(push,1)
 
-struct Point {
+struct Point { // упакованные данные одной панели - координаты и флаги
     byte x;
     byte y;
 };
@@ -33,16 +22,8 @@ typedef struct Point point;
 
 // 
 
-
+// данные одного экрана
 struct Panel {
-
-
-
-
-
-
-
-
     point center; 	// #define panCenter_XY = 0;
     point pitch;  	// #define panPitch_XY = 2;
     point roll;	  	// #define panRoll_XY = 4;
@@ -52,70 +33,39 @@ struct Panel {
     point COG;		//#define panCOG_XY = 12;
     point GPS;		//#define panGPS_XY = 14;
 
-
-
-
-
-
-
-
-
     point rose;		//#define panRose_XY = 16;
     point heading;	//#define panHeading_XY = 18;
     point homeDir;      //#define panHomeDir_XY = 20;
     point homeDist;     //#define panHomeDis_XY = 22;
     point WP_dir;       //#define panWPDir_XY = 24;
     point WP_dist;      //#define panWPDis_XY = 26;
-    point RSSI;         //#define panRSSI_XY = 28;   
+    point RSSI;         //#define panRSSI_XY = 28;
 
-#define panCurrA_XY = 30;
-#define panCurrB_XY = 32;
-#define panAlt_XY = 34;
-#define panVel_XY = 36;
-#define panThr_XY = 38;
-#define panFMod_XY = 40;
-#define panHorizon_XY = 42;
-#define panHomeAlt_XY = 44;
-    point curr_A;
-    point curr_B;
-    point alt;
-    point vel;
-    point throttle; // panThr
-    point FMod;
-    point horizon;
-    point homeAlt;
+    point curr_A;	//#define panCurrA_XY = 30;
+    point curr_B;       //#define panCurrB_XY = 32;
+    point alt;          //#define panAlt_XY = 34;
+    point vel;          //#define panVel_XY = 36;
+    point throttle;     //#define panThr_XY = 38;
+    point FMod;         //#define panFMod_XY = 40;
+    point horizon;      //#define panHorizon_XY = 42;
+    point homeAlt;  	//#define panHomeAlt_XY = 44;
 
-#define panAirSpeed_XY = 46;
-#define panBatteryPercent_XY = 48;
-#define panTime_XY = 50;
-#define panWarn_XY = 52;
-#define panWindSpeed_XY = 54;
-#define panClimb_XY = 56;
-#define panTune_XY = 58;
-    point airSpeed;
-    point batteryPercent;
-    point time;
-    point warn;
-    point windSpeed;
-    point climb;
-    point tune;
+    point airSpeed;        //#define panAirSpeed_XY = 46;
+    point batteryPercent;  //#define panBatteryPercent_XY = 48;
+    point time;            //#define panTime_XY = 50;
+    point warn;            //#define panWarn_XY = 52;
+    point windSpeed;       //#define panWindSpeed_XY = 54;
+    point climb;           //#define panClimb_XY = 56;
+    point tune;            //#define panTune_XY = 58;
 
-#define panEff_XY = 60;
-#define panCALLSIGN_XY = 62;
-#define panCh_XY = 64;
-#define panTemp_XY = 66;
-#define panDistance_XY = 68;
-#define panGPS2_XY = 70;
-
-    point eff;
-    point callSign;
-    point ch;
-    point temp;
-    point distance;
-    point GPS2;
+    point eff;   	//#define panEff_XY = 60;
+    point callSign;     //#define panCALLSIGN_XY = 62;
+    point ch;           //#define panCh_XY = 64;
+    point temp;         //#define panTemp_XY = 66;
+    point distance;     //#define panDistance_XY = 68;
+    point GPS2;         //#define panGPS2_XY = 70;    
 
     //point curr_B;
-    //point tune;
     //point fdata;
 };
 
@@ -126,19 +76,17 @@ union _Panel {
 
 
 struct Flags { // 4 байта
-
     bool OSD_BATT_SHOW_PERCENT:1;
     bool measure:1;
     bool RADIO_ON:1;
     bool PAL_NTSC:1;
     
 // new!
-    bool useExtVbattA:1;// 8
-    bool useExtVbattB:1;// 9
-    bool useExtCurr:1;	// 10
-
-    bool radar_on:1;	// 11
-    bool ils_on:1;	// 12
+    bool useExtVbattA:1;// 5
+    bool useExtVbattB:1;// 6
+    bool useExtCurr:1;	// 7
+    bool radar_on:1;	// 8
+    bool ils_on:1;	// 9
 };
 
 union _Flags {
@@ -147,6 +95,7 @@ union _Flags {
 };
 
 
+// общие настройки
 struct Settings {
     byte model_type; // 0 - plane 1-copter
 
@@ -156,8 +105,9 @@ struct Settings {
     byte overspeed;
     byte stall;
     byte battv;
-    byte switch_mode;
-    byte auto_screen_switch;
+    
+    byte switch_mode; // режим переключения: 0 значение, 1 по кругу
+    byte auto_screen_switch; // номер экрана куда переключаться при наличии сообщений
     
     byte RSSI_high;
     byte RSSI_low; 
@@ -165,7 +115,6 @@ struct Settings {
     
     byte batt_warn_level;
     byte rssi_warn_level;
-
 
     byte OSD_CALL_SIGN[OSD_CALL_SIGN_TOTAL+1];
 
@@ -189,16 +138,20 @@ struct Settings {
     float horiz_kPitch_a;
     
     byte battBv; // мин значение батареи B
+    
+    byte vert_offs; // сдвиг экрана по вертикали и горизонтали
+    byte horiz_offs;
 };
 
 
 
 struct Eeprom {
-    _Panel panels[4];
-//    byte panels[OffsetBITpanel * 4];
-    _Flags flags;
+    _Panel panels[4]; // сначала 4 экрана по 128 байт (64 панели возможно)
+
+// 512
+    _Flags flags; // 4 байта флагов
     
-    Settings sets;
+    Settings sets; // и почти половина EEPROM под остальные настройки
 };
 
 #pragma pack(pop)
