@@ -755,7 +755,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-            	osd.printf("%c%5.2f%c", 0xBC, (double)osd_vbat, 0x0D);
+            	osd.printf("%c%5.2f%c", 0x26, (double)osd_vbat, 0x0D);
 			else 
 				osd.printf("%5.2f%c", (double)osd_vbat, 0x0D);
             

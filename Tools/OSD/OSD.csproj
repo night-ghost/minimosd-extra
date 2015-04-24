@@ -125,9 +125,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="key.snk" />
-    <None Include="OSD_SA_v5.mcm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

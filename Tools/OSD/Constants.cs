@@ -27,8 +27,8 @@ namespace OSD {
 		const int panWPDis_XY = 26;
 		const int panRSSI_XY = 28;
 
-		const int panCur_A_XY = 30;
-		const int panCurB_XY = 32;
+		const int panCurrA_XY = 30;
+		const int panCurrB_XY = 32; // not used
 		const int panAlt_XY = 34;
 		const int panVel_XY = 36;
 		const int panThr_XY = 38;

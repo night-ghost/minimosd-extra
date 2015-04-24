@@ -214,7 +214,7 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY,1);
 				pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY,1);
 	
-				pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCur_A_XY,1);
+				pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY,1);
 	
 				pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY,1);
 				pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY,1);
@@ -2225,7 +2225,8 @@ public const int npanel = 4; // количество панелей
         {
             try
             {
-                System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
+                //System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
+				System.Diagnostics.Process.Start("https://code.google.com/p/minimosd-extra/wiki/Config_Tool");				
             }
             catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
         }
@@ -3155,8 +3156,8 @@ public const int npanel = 4; // количество панелей
 				sp.DataBits = 8;
 				sp.StopBits = StopBits.One;
 				sp.Parity = Parity.None;
-				sp.DtrEnable = true;
-				sp.RtsEnable = false; //added
+//				sp.DtrEnable = true;
+//				sp.RtsEnable = false; //added
 
 				sp.Open();
 				return sp;
@@ -3167,8 +3168,7 @@ public const int npanel = 4; // количество панелей
 			
 		}
 		
-		private void PANEL_tabs_Selected(object sender, TabControlEventArgs e)
-        {
+		private void PANEL_tabs_Selected(object sender, TabControlEventArgs e)  {
 			//System.Windows.Forms.TabControl
  			string s = ((TabControl)sender).SelectedTab.Name;
 			
@@ -3180,7 +3180,8 @@ public const int npanel = 4; // количество панелей
 	            currentlyselected = "";
 
             	Draw(k-1);
-			}
+			} else 
+				panel_number = -1;
 
         }
  
