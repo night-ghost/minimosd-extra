@@ -1073,10 +1073,16 @@ public const int npanel = 4; // количество панелей
 			pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
 			BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
 			
-			pan.horiz_offs= conf.eeprom.sets.horiz_offs;
-			pan.vert_offs= conf.eeprom.sets.vert_offs;
-			numHOS.Value = pan.horiz_offs - 0x20;
-			numVOS.Value =pan.vert_offs - 0x10;
+			try {
+				pan.horiz_offs= conf.eeprom.sets.horiz_offs;
+				pan.vert_offs= conf.eeprom.sets.vert_offs;
+			
+				numHOS.Value = pan.horiz_offs - 0x20;
+				numVOS.Value =pan.vert_offs - 0x10;
+			} catch{
+				pan.horiz_offs= (byte)numHOS.Value;
+				pan.vert_offs= (byte)numVOS.Value;				
+			}
 			
 			pan.callsign_str=conf.eeprom.osd_call_sign;
 				
@@ -3282,6 +3288,8 @@ public const int npanel = 4; // количество панелей
 				tlog_thread.Start();
 			} else {
 				tlog_thread.Abort();
+				if (comPort.IsOpen)
+                    comPort.Close();
 			}
 		}
 		
@@ -3312,62 +3320,66 @@ public const int npanel = 4; // количество панелей
 			
 			while(true){
 				np=0;
-            	for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)   {
-					if(comPort.BytesToRead!=0)
-                    	comPort.ReadExisting();
-
-					frStart=byteIndex;
-					message="";
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    int length = (int)bytes[byteIndex];
-                    message += "Payload length: " + length.ToString();
-                    byteIndex++;
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
-                    byteIndex++;
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "System ID: " + ((int)bytes[byteIndex]).ToString();
-                    byteIndex++;
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
-                    byteIndex++;
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
-                    byteIndex++;
-                    message += "Message: ";
-                    for (int x = 0; x < length; x++)
-                    {
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += ((char)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                    }
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
-                    byteIndex++;
-                    while (bytes[byteIndex] == '\0')
-                        byteIndex++;
-                    message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
-                    message += Environment.NewLine;
-                    byteIndex++;
-					Console.Write (message);
-
-                    if (bytes[byteIndex] == 0xFE) {
-                            frameIndex++;						
-                    }
-					frEnd=byteIndex;
-
-					comPort.Write(bytes, frStart, frEnd-frStart);
-					np++;
-					lblTLog.Text = np.ToString ();
-					System.Threading.Thread.Sleep(200); // 5 frames/s
-                }
+				try {
+	            	for(int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)   {
+						if(comPort.BytesToRead!=0)
+	                    	comPort.ReadExisting();
+	
+						frStart=byteIndex;
+						message="";
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    int length = (int)bytes[byteIndex];
+	                    message += "Payload length: " + length.ToString();
+	                    byteIndex++;
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
+	                    byteIndex++;
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "System ID: " + ((int)bytes[byteIndex]).ToString();
+	                    byteIndex++;
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
+	                    byteIndex++;
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
+	                    byteIndex++;
+	                    message += "Message: ";
+	                    for (int x = 0; x < length; x++)
+	                    {
+	                        while (bytes[byteIndex] == '\0')
+	                            byteIndex++;
+	                        message += ((char)bytes[byteIndex]).ToString();
+	                        byteIndex++;
+	                    }
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
+	                    byteIndex++;
+	                    while (bytes[byteIndex] == '\0')
+	                        byteIndex++;
+	                    message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+	                    message += Environment.NewLine;
+	                    byteIndex++;
+						Console.Write (message);
+	
+	                    if (bytes[byteIndex] == 0xFE) {
+	                            frameIndex++;						
+	                    }
+						frEnd=byteIndex;
+	
+						comPort.Write(bytes, frStart, frEnd-frStart);
+						np++;
+						lblTLog.Text = np.ToString ();
+						System.Threading.Thread.Sleep(200); // 5 frames/s
+	                }
+				} catch {
+					continue;
+				}
 			}			
 			
         }				

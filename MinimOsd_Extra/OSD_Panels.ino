@@ -4,6 +4,8 @@
 
 void writePanels(){ 
 
+    osd.detectMode();
+
 #ifdef IS_PLANE
     if ((takeofftime == 1) && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100)){
         landed = millis();
@@ -967,7 +969,7 @@ void panRose(point p){
  // generate the heading patern
     char buf_show[12];
 
-    static const char buf_Rule[] PROGMEM = {
+    const char buf_Rule[] PROGMEM = {
       0x82,0x80,0x81,0x80,0x81,0x80,
       0x84,0x80,0x81,0x80,0x81,0x80,
       0x83,0x80,0x81,0x80,0x81,0x80,
@@ -987,10 +989,8 @@ void panRose(point p){
 
     osd.setPanel(p.x,p.y);
 
-
 //    osd.printf_P(PSTR(                  "\x20\xb7\xb7\xb7\xb4\xb7\xb7\xb7\x20|\xc3%s\x87"), buf_show);
     osd.printf_P(PSTR(                  "\xc3%s\x87"), buf_show);
-    
 
 }
 

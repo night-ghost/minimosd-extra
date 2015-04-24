@@ -34,14 +34,16 @@
 #define MAX7456_DMAH_reg  0x05
 #define MAX7456_DMAL_reg  0x06
 #define MAX7456_DMDI_reg  0x07
-#define MAX7456_OSDM_reg  0x0c //not used. Is to set mix
-#define MAX7456_OSDBL_reg 0x6c //black level
 
 //MAX7456 reg write addresses to recording NVM process
 #define MAX7456_CMM_reg   0x08
 #define MAX7456_CMAH_reg  0x09
 #define MAX7456_CMAL_reg  0x0a
 #define MAX7456_CMDI_reg  0x0b
+// sharpness
+#define MAX7456_OSDM_reg  0x0c //not used. Is to set mix
+#define MAX7456_OSDBL_reg 0x6c //black level
+
 
 //DMM commands
 #define MAX7456_CLEAR_display 0x04
@@ -61,7 +63,8 @@
 #define MAX7456_SYNC_autosync 0x10
 #define MAX7456_SYNC_internal 0x30
 #define MAX7456_SYNC_external 0x20
-//VM1 command modifiers
+
+//VM1 command modifiers - black level always 0
 #define MAX7456_WHITE_level_80 0x03
 #define MAX7456_WHITE_level_90 0x02
 #define MAX7456_WHITE_level_100 0x01

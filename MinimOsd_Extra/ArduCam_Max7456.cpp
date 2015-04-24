@@ -51,7 +51,7 @@ void OSD::init()
   delay(150);
 
   //set black level
-  MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111
+  MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
 
 // set position - may be EEPROM.read(OSD_SHIFT_X)
   MAX_write(MAX7456_HOS_reg, 0x20); // 0x20 default
@@ -264,6 +264,7 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
   char_address_hi = font_count;
   char_address_lo = 0;
+    cli();
 
   // disable display
   digitalWrite(MAX7456_SELECT,LOW);
@@ -282,16 +283,14 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
   // wait until bit 5 in the status register returns to 0 (12ms)
   while (1) {
-    delay(2);
     Spi.transfer(MAX7456_STAT_reg_read);
     if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   }
 
-#if 1
   MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert);// turn on screen next vertical
-#endif
 
   digitalWrite(MAX7456_SELECT,HIGH);  
+  sei();
 }
 
 //------------------ pure virtual ones (just overriding) ---------------------
