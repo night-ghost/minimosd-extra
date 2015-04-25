@@ -177,15 +177,15 @@ void setFdataVars()
     if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
 
     if((sets.RSSI_raw % 2 == 0))  {
-       if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
-       if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
+        if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
+        if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
 
-       rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(float)(sets.RSSI_high-sets.RSSI_low)*100.0f);
- 
+        rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(float)(sets.RSSI_high-sets.RSSI_low)*100.0f);
+
+        if(rssi > 100) rssi = 100;
     } else 
         rssi = rssi_v;
 
-    if(rssi > 100) rssi = 100;
 
   //Set max data
 #ifdef IS_COPTER

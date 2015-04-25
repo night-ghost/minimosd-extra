@@ -1547,7 +1547,7 @@ void showRADAR(byte center_col, byte center_line) {
 
 void timers() {
   if (one_sec_timer_switch == 1){ 
-    one_sec_timer = millis() + 1000;
+    one_sec_timer = millis() + 500;
     one_sec_timer_switch = 0;
     blinker = !blinker;
   }

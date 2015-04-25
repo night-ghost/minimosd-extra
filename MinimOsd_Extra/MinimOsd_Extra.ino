@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 
-#define LEDPIN AmperagePin
+//#define LEDPIN AmperagePin
 
 
 
@@ -152,8 +152,10 @@ void setup()     {
 
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
 
+#ifdef LEDPIN
     pinMode(LEDPIN,OUTPUT); // led
     digitalWrite(LEDPIN, 1);  // turn on for full light
+#endif
 
 //    pinMode(RssiPin, OUTPUT); // доп вывод - выход
 
@@ -260,7 +262,10 @@ void loop()
 	if(!vsync_wait){
 	    osd.update();
 	    update_stat = 0;
+#ifdef LEDPIN
 digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+#endif
+
         }
     }
 
@@ -280,24 +285,28 @@ void On100ms(){ // периодические события, не связан�
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
 
-        voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
+        voltageRawArray[(ind++)%8] = analogRead(VoltagePin);
         for (uint8_t i=0;i<8;i++)
             voltageRaw += voltageRawArray[i];
-        osd_vbat_A = float(voltageRaw) * sets.evBattA_koef /1023 / 80 * 1000; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
-
+        voltageRaw = float(voltageRaw) * sets.evBattA_koef /1023 / 8 * 1000 * 5.115/0.29; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
+	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4;
 	mavlink_got=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
     }
 
     if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
         static uint8_t ind = 0;
-        static uint16_t voltageRawArray[8];
+        static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
 
-        voltageRawArray[(ind++)%8] = analogRead(VidvoltagePin);
+        voltageBRawArray[(ind++)%8] = analogRead(VidvoltagePin);
         for (uint8_t i=0;i<8;i++)
-            voltageRaw += voltageRawArray[i];
-        osd_vbat_B = float(voltageRaw) * sets.evBattB_koef /1023 / 80 * 1000; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+            voltageRaw += voltageBRawArray[i];
+        voltageRaw = float(voltageRaw) * sets.evBattB_koef /1023 / 8 * 1000 * 5.11/0.292113; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+
+	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
+	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw)/4;
 
 // 	вычислить osd_battery_remaining_B по напряжению!
 
@@ -312,7 +321,7 @@ void On100ms(){ // периодические события, не связан�
         currentRawArray[(ind++)%8] = analogRead(AmperagePin);
         for (uint8_t i=0;i<8;i++)
             currentRaw += currentRawArray[i];
-        osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80 * 1000 / 10; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП
+        osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80 * 1000 / 10 * 20; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	mavlink_got=1;
     }
 
@@ -329,10 +338,11 @@ void On100ms(){ // периодические события, не связан�
             else        d = pulseIn(RssiPin,HIGH, 20000);
             
             RSSI_rawArray[(ind++)%8] = d;
-
+	    
+	    d=0;
             for (uint8_t i=0;i<8;i++)
-                rssi_in += RSSI_rawArray[i];
-            rssi_in /= 8; // 8 элементов
+                d += RSSI_rawArray[i];
+            rssi_in = float(d)/8 * sets.eRSSI_koef; // 8 элементов
 	    mavlink_got=1;
 	}
     }

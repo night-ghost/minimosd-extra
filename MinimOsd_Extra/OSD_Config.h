@@ -15,8 +15,8 @@
 
 
 // additional pins
-#define VoltagePin A0
-#define VidvoltagePin A2
+#define VoltagePin A2
+#define VidvoltagePin A0
 #define AmperagePin A1
 #define RssiPin A3
 #define PWMrssiPin A3           // PWM RSSI uses same pin of analog RSSI A3
