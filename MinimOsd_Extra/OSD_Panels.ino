@@ -725,7 +725,7 @@ void panBatteryPercent(point p){
 
     if (flags.OSD_BATT_SHOW_PERCENT){
 //        osd.printf_P(PSTR("\x17%3.0i\x25"), 0x17, osd_battery_remaining_A, 0x25);
-      osd.printf_P(PSTR("%c%c\x8e%3.0i%%"), osd_battery_pic_A[0], osd_battery_pic_A[1], osd_battery_remaining_A/255*100);
+      osd.printf_P(PSTR("%c%c\x8e%i%%"), osd_battery_pic_A[0], osd_battery_pic_A[1], osd_battery_remaining_A/255*100);
 
     }else{
 //        osd.printf_P(PSTR("%c%4.0f%c"), 0x17, mah_used, 0x01);

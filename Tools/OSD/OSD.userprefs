@@ -1,22 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Constants.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Disassembly">
     <Files>
-      <File FileName="OSD.cs" Line="179" Column="4" />
-      <File FileName="config.cs" Line="54" Column="17" />
-      <File FileName="OSD.Designer.cs" Line="1652" Column="45" />
-      <File FileName="Panels.cs" Line="1160" Column="15" />
+      <File FileName="OSD.cs" Line="3366" Column="36" />
+      <File FileName="config.cs" Line="78" Column="41" />
+      <File FileName="Panels.cs" Line="85" Column="28" />
       <File FileName="osd_screen.cs" Line="202" Column="60" />
-      <File FileName="Constants.cs" Line="80" Column="1" />
-      <File FileName="Properties/app.manifest" Line="1" Column="1" />
-      <File FileName="Properties/AssemblyInfo.cs" Line="19" Column="56" />
-      <File FileName="OSD.resx" Line="1" Column="1" />
-      <File FileName="OSD_SA_v5.mcm" Line="1" Column="1" />
-      <File FileName="Pos.cs" Line="1" Column="1" />
-      <File FileName="Tools.cs" Line="214" Column="54" />
-      <File FileName="Properties/Settings.settings" Line="1" Column="1" />
-      <File FileName="AboutBox1.Designer.cs" Line="1" Column="1" />
-      <File FileName="AboutBox1.resx" Line="1" Column="1" />
+      <File FileName="Constants.cs" Line="17" Column="13" />
+      <File FileName="OSD.Designer.cs" Line="1734" Column="1" />
+      <File FileName="Disassembly" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -27,8 +19,7 @@
             </Node>
             <Node name="Resources" expanded="True" />
             <Node name="AboutBox1.cs" expanded="True" />
-            <Node name="Constants.cs" selected="True" />
-            <Node name="OSD.cs" expanded="True" />
+            <Node name="OSD.cs" expanded="True" selected="True" />
           </Node>
         </State>
       </Pad>

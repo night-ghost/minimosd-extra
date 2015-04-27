@@ -21,7 +21,7 @@ void readSettings() {
 	((byte *)&flags)[i] = EEPROM.read(EEPROM_offs(flags) +i );
 
 
-    for(byte i=0; i<sizeof(Settings); i++)
+    for(int i=0; i<sizeof(Settings); i++) // 512 размер остатка EEPROM так что байта для адреса мало
 	((byte *)&sets)[i] = EEPROM.read(EEPROM_offs(sets) + i );
 
 
@@ -64,8 +64,8 @@ void readPanelSettings() {
     currentPanel=panelN;
 
 
-    for(byte i=0; i<sizeof(Panel); i++)
-	((byte *)&panel)[i] = EEPROM.read( OffsetBITpanel * panelN + i );
+    for(byte i=0; i<sizeof(Panel); i++) // читаем в пределах одного экрана - 128 байт, так что байтного цикла достаточно
+	((byte *)&panel)[i] = EEPROM.read( OffsetBITpanel * (int)panelN + i );
 }
 
 uint8_t checkPAL(uint8_t line){

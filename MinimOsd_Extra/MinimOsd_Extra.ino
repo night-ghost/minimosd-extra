@@ -293,6 +293,13 @@ void On100ms(){ // периодические события, не связан�
 	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4;
 	mavlink_got=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
+	byte n=sets.battv/10 / 3; // количество элементов в батарее
+	int v = (float(osd_vbat_A)/1000/n - 2.9) / (4.2 - 2.9) * 255;
+	
+	if(v<0) osd_battery_remaining_A  = 0;
+	else if(v>255) osd_battery_remaining_A  = 255;
+	else   osd_battery_remaining_A  = v;
+
     }
 
     if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
@@ -307,9 +314,15 @@ void On100ms(){ // периодические события, не связан�
 
 	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
 	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw)/4;
-
+    
 // 	вычислить osd_battery_remaining_B по напряжению!
+	byte n=sets.battBv/10 / 3; // количество элементов в батарее
+	int v = (float(osd_vbat_B)/1000/n - 2.9) / (4.2 - 2.9) * 255;
 
+	if(v<0) osd_battery_remaining_B  = 0;
+	else if(v>255) osd_battery_remaining_B  = 255;
+	else	osd_battery_remaining_B  = v;
+	
 	mavlink_got=1;
     }
 
