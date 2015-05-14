@@ -2,9 +2,9 @@
 
 /******* PANELS - POSITION *******/
 
-void writePanels(){ 
+void writePanels(){
 
-    osd.detectMode();
+    osd.detectMode(); // PAL/NTSC live
 
 #ifdef IS_PLANE
     if ((takeofftime == 1) && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100)){
@@ -159,34 +159,27 @@ void panOff(){
       }
     }
     else  {
-
-      //Switch mode by value
-      if (sets.switch_mode == 0){
+      if (sets.switch_mode == 0){  //Switch mode by value
+        /*
+	    Зазор канала = диапазон изменения / (число экранов+1)
+	    текущий номер = приращение канала / зазор
+        
+        */
+        int d = (1900-1100)/npanels;
+        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
         //First panel
-        if (ch_raw < 1200 && panelN != 0) {
+        if ( panelN != n) {
           osd_clear = 1;
-          panelN = 0;
+          panelN = n;
+          readPanelSettings();
         }
-        //Second panel
-        else if (ch_raw >= 1200 && ch_raw <= 1800 && panelN != 1) { //second panel
-          osd_clear = 1;
-          panelN = 1;
-        }
-        //Panel off
-        else if (ch_raw > 1800 && panelN != npanels) {
-            osd_clear = 1;
-            panelN = npanels; //off panel
-        }
-	readPanelSettings();
-      }
-      //Rotation switch
-      else{
+      } else{ 			 //Rotation switch
         if (ch_raw > 1200)
-          if (osd_switch_time + 1000 < millis()){
+          if (osd_switch_time + 500 < millis()){ // при включенном канале переключаем каждые 0.5 сек
             rotatePanel = 1;
             osd_switch_time = millis();
         }
-      }    
+      }
     }
     if(rotatePanel == 1){
         osd_clear = 1;
@@ -903,7 +896,7 @@ void panGPSats(point p){
 
     if (osd_fix_type == 2) gps_str = 0x1f;
     if (osd_fix_type == 3) gps_str = 0x0f;
-    
+
     if ((eph >= 200) && blinker)
        gps_str = 0x20;
 
@@ -1519,24 +1512,24 @@ void showRADAR(byte center_col, byte center_line) {
     int index = (int)((osd_heading + 22.5) / 45.0);
     index = index > 7 ? 0 : index;
 
-    
+
     // calculate distances from home in lat (y) and lon (x) direction in [m]
-    int dy = (int)(-111319.5 * (osd_home_lat - osd_lat));
-    int dx = (int)(-111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
+//    int dst_y = (int)(-111319.5 * (osd_home_lat - osd_lat));
+//    int dst_x = (int)(-111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
     
     // calculate display offset in y and x direction
-    int zoom = max((int)(abs(dy) / STEP_WIDTH), (int)(abs(dx) / STEP_WIDTH)) + 1;
+    int zoom = max((int)(abs(dst_y) / STEP_WIDTH), (int)(abs(dst_x) / STEP_WIDTH)) + 1;
     
-    osd.setPanel(center_col + 8, center_line);
+    osd.setPanel(center_col + 8, center_line+1);
 
-    osd.printf("%c%5i%c", RADAR_CHAR, (int)(zoom * STEP_WIDTH * converth), distchar);
+    osd.printf_P(PSTR("%c%5i%c"), RADAR_CHAR, (int)(zoom * STEP_WIDTH * converth), high);
 
-    int y = (int)(dy / (zoom / SCALE_Y));
-    int x = (int)(dx / (zoom / SCALE_X) + 0.5);	// for even grid correction
+    byte y = (int)(dst_y / (zoom / SCALE_Y));
+    byte x = (int)(dst_x / (zoom / SCALE_X) + 0.5);	// for even grid correction
 
     // show UAV
     osd.openSingle(center_col + x, center_line - y);
-    osd.printf("%c", arr[index] );
+    osd.write( arr[index] );
 
     // show home
 //    osd.setPanel(center_col, center_line);

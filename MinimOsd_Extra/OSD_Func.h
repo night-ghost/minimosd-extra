@@ -117,18 +117,18 @@ void setHomeVars(OSD &osd)
         //osd_alt_cnt = 0;
         osd_got_home = 1;
     } else if(osd_got_home == 1){
-        float rads = fabs(osd_home_lat) * 0.0174532925;
-        double scaleLongDown = cos(rads);
-        double scaleLongUp   = 1.0f/cos(rads);
-    
+        double scaleLongDown = cos(abs(osd_home_lat) * 0.0174532925);
+
         //DST to Home
         dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
         dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
         osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+	dst_x=(int)dstlat;
+	dst_y=(int)dstlon;
 
         //DIR to Home
         dstlon = (osd_home_lon - osd_lon); //OffSet_X
-        dstlat = (osd_home_lat - osd_lat) * scaleLongUp; //OffSet Y
+        dstlat = (osd_home_lat - osd_lat) / scaleLongDown; //OffSet Y
         
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
         
