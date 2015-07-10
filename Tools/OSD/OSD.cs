@@ -188,6 +188,8 @@ public const int npanel = 4; // количество панелей
 				var pi = scr[n].panelItems;
 	
 				// Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
+				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY,1); // first!
+
 				pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY,-1);
 				pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY,-1);
 				pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY,-1);
@@ -217,7 +219,6 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY,1);
 				pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY,1);
 				pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY,1);
-				pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY,1);
 	
 				pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY,1);
 				pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY,-1);
@@ -229,6 +230,7 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Channel Raw", pan.panCh, 1, 0, panCh_XY,-1);
 				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY,-1);
 				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY,1);
+				pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 16, 7, panRadarScale_XY,1);
 	
 				osd_functions_N = a;
 				//make backup in case EEPROM needs reset to default
@@ -244,28 +246,20 @@ public const int npanel = 4; // количество панелей
 						TreeNode tn = li.Nodes.Add(thing.name, thing.name);
 						
 						if(thing.name=="Center") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="Tune") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="WP Distance") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="Temperature") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="Trip Distance") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="Channel Raw") {
-					
 							tn.Checked = false;
 						} else if(thing.name=="GPS2") {
-					
 							tn.Checked = false;
 						} else {
-	                        
 							tn.Checked = true;
 						}
 					}
@@ -2344,55 +2338,6 @@ public const int npanel = 4; // количество панелей
                     break;
             }
         }
-/*
-        public Boolean airSpeedSign = false;
-        private void cbxAirSpeedSign_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbxAirSpeedSign.Checked)
-                pan.sign_air_speed = 0x13;
-            else
-                pan.sign_air_speed = 0x00;
-            airSpeedSign = cbxAirSpeedSign.Checked;
-			Draw(panel_number);
-            
-        }
-
-        public Boolean groundSpeedSign = false;
-        private void cbxGroundSpeedSign_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbxGroundSpeedSign.Checked)
-                pan.sign_ground_speed = 0x14;
-            else
-                pan.sign_ground_speed = 0x00;
-            groundSpeedSign = cbxGroundSpeedSign.Checked;
-		
-			Draw(panel_number);
-        }
-
-        public Boolean homeAltSign = false;
-        private void cbxHomeAltitudeSign_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbxHomeAltitudeSign.Checked)
-                pan.sign_home_altitude = 0x12;
-            else
-                pan.sign_home_altitude = 0x00;
-            homeAltSign = cbxHomeAltitudeSign.Checked;
-			
-			Draw(panel_number);
-        }
-
-        public Boolean mslAltSign = false;
-        private void cbxMslAltitudeSign_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbxMslAltitudeSign.Checked)
-                pan.sign_msl_altitude = 0x11;
-            else
-                pan.sign_msl_altitude = 0x00;
-            mslAltSign = cbxMslAltitudeSign.Checked;
-			
-			Draw(panel_number);
-        }
-*/
 
 
 
@@ -3311,7 +3256,9 @@ public const int npanel = 4; // количество панелей
                     comPort.BaudRate = 57600;
 
                     comPort.Open();
-
+				
+					comPort.DtrEnable = true;
+				
                 }
                 catch { 
 					MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 

@@ -60,7 +60,7 @@ void writePanels(){
       if(is_on(panel.GPS_sats)) panGPSats(panel.GPS_sats); //5x1
   //  if(is_on(panel.GPL)) panGPL(panel.GPL); //2x1
       if(is_on(panel.GPS)) panGPS(panel.GPS); //12x3
-      if(is_on(panel.GPS2)) panGPS(panel.GPS2); //25x1
+      if(is_on(panel.GPS2)) panGPS2(panel.GPS2); //25x1
       if(is_on(panel.batteryPercent)) panBatteryPercent(panel.batteryPercent); //
       if(is_on(panel.COG)) panCOG(panel.COG); //
 
@@ -1520,9 +1520,17 @@ void showRADAR(byte center_col, byte center_line) {
     // calculate display offset in y and x direction
     int zoom = max((int)(abs(dst_y) / STEP_WIDTH), (int)(abs(dst_x) / STEP_WIDTH)) + 1;
     
-    osd.setPanel(center_col + 8, center_line+1);
+    if(is_on(panel.RadarScale)) { // да, можно независимо отключить!
+        osd.setPanel(panel.RadarScale.x, panel.RadarScale.y);
 
-    osd.printf_P(PSTR("%c%5i%c"), RADAR_CHAR, (int)(zoom * STEP_WIDTH * converth), high);
+	if(has_sign(panel.RadarScale))
+	    osd.write(RADAR_CHAR);
+	
+	if(zoom>=40){ // 10 000 
+	    osd.printf_P(PSTR("%4.2f%c"), (float)(zoom * STEP_WIDTH * converth/1000.0), distchar);
+	} else
+            osd.printf_P(PSTR("%4i%c"), (int)(zoom * STEP_WIDTH * converth), high);
+    }
 
     byte y = (int)(dst_y / (zoom / SCALE_Y));
     byte x = (int)(dst_x / (zoom / SCALE_X) + 0.5);	// for even grid correction

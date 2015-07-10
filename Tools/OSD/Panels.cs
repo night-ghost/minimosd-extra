@@ -1336,5 +1336,17 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             else osd_battery_pic = 0xb9;
         }
 
+		public int panRadarScale(int first_col, int first_line,int sign){
+
+	    	osd.setPanel(first_col, first_line);
+ 			
+			if(sign==1)
+				osd.write(0x1f);
+		    osd.printf_P(PSTR("%4i%c"), (int)(250), chrHigh);
+	
+			return 0;
+		}
+		
     }
 }
+

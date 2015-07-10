@@ -34,14 +34,8 @@ byte MAX_read(byte addr){
   return Spi.transfer(0xff);
 }
 
-void OSD::init()
-{
-  pinMode(MAX7456_SELECT,OUTPUT);
-  pinMode(MAX7456_VSYNC, INPUT_PULLUP);
-//  digitalWrite(MAX7456_VSYNC,HIGH); //enabling pull-up resistor
 
-  detectMode();
-
+void OSD::hw_init(){
   digitalWrite(MAX7456_SELECT,LOW);
 
   //read black level register
@@ -64,6 +58,17 @@ void OSD::init()
   // define sync (auto,int,ext) and
   // making sure the Max7456 is enabled
   control(1);
+}
+
+void OSD::init()
+{
+  pinMode(MAX7456_SELECT,OUTPUT);
+  pinMode(MAX7456_VSYNC, INPUT_PULLUP);
+//  digitalWrite(MAX7456_VSYNC,HIGH); //enabling pull-up resistor
+
+    detectMode();
+
+    hw_init();
 }
 
 //------------------ Detect Mode (PAL/NTSC) ---------------------------------
@@ -90,7 +95,7 @@ void OSD::detectMode()
       
   }
 
-  digitalWrite(MAX7456_SELECT,LOW);
+  digitalWrite(MAX7456_SELECT,HIGH);
 }
 
 //------------------ Set Brightness  ---------------------------------
@@ -118,18 +123,24 @@ void OSD::setBrightness()
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------
 
-void OSD::setMode(uint8_t themode)
-{
-  switch(themode){
+void OSD::setMode(uint8_t themode){
+    uint8_t mode;
+
+    switch(themode){
     case 0:
-      video_mode = MAX7456_MODE_MASK_NTCS;
-      video_center = MAX7456_CENTER_NTSC;
-      break;
+        mode = MAX7456_MODE_MASK_NTCS;
+        video_center = MAX7456_CENTER_NTSC;
+        break;
     case 1:
-      video_mode = MAX7456_MODE_MASK_PAL;
-      video_center = MAX7456_CENTER_PAL;
-      break;
-  }
+        mode = MAX7456_MODE_MASK_PAL;
+        video_center = MAX7456_CENTER_PAL;
+        break;
+    }
+  
+    if(video_mode != mode){
+	video_mode = mode;
+	hw_init();
+    }
 }
 
 //------------------ Get Mode (PAL 0/NTSC 1) --------------------------------

@@ -48,6 +48,7 @@ namespace OSD {
 		const int panTemp_XY = 66;
 		const int panDistance_XY = 68;
 		const int panGPS2_XY = 70;
+		const int panRadarScale_XY = 72;
 		//        const int panMavBeat_XY = 74;
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана

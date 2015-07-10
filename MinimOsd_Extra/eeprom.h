@@ -64,7 +64,7 @@ struct Panel {
     point temp;         //#define panTemp_XY = 66;
     point distance;     //#define panDistance_XY = 68;
     point GPS2;         //#define panGPS2_XY = 70;    
-
+    point RadarScale;	// 72
     //point curr_B;
     //point fdata;
 };
