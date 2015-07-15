@@ -125,7 +125,7 @@ void panOff(){
   byte osd_clear=0;
 
     if(sets.ch_toggle == 1) 
-	ch_raw = PWM_IN;
+	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
     else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
 	ch_raw = chan_raw[sets.ch_toggle-1];
     else 
