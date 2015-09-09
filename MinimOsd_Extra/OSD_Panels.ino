@@ -217,20 +217,18 @@ void panOff(){
 void panCOG(point p){
     osd.setPanel(p.x,p.y);
     
-    byte osd_COG_arrow_rotate_int = round(((osd_cog / 100) - osd_heading)/360.0 * 16.0 +1); //Convert to int 1-16 
+    int cog_100=osd_cog / 100;
     
-    if(osd_COG_arrow_rotate_int <= 0 ) osd_COG_arrow_rotate_int += 16;
-    if(osd_COG_arrow_rotate_int >16)   osd_COG_arrow_rotate_int -= 16;
-    
-    if (((osd_cog / 100) - osd_heading) > 180){
-       off_course = (osd_cog / 100 - osd_heading) - 360;
-    }else if (((osd_cog / 100) - osd_heading) < -180){
-       off_course = (osd_cog / 100 - osd_heading) + 360;
+    if ((cog_100 - osd_heading) > 180){
+       off_course = (cog_100 - osd_heading) - 360;
+    }else if ((cog_100 - osd_heading) < -180){
+       off_course = (cog_100 - osd_heading) + 360;
     }else{
-       off_course = (osd_cog / 100 - osd_heading);
+       off_course = (cog_100 - osd_heading);
     }
     
-    showArrow((uint8_t)osd_COG_arrow_rotate_int,2); // use off_course as global
+    int osd_COG_arrow_rotate_int = round((cog_100 - osd_heading)/360.0 * 16.0)+1; //Convert to int 1-16 
+    showArrow(osd_COG_arrow_rotate_int,2); // use off_course as global
 }
 
 // Panel  : ODO
@@ -399,7 +397,7 @@ void panCALLSIGN(point p){
 void panWindSpeed(point p){
     osd.setPanel(p.x,p.y);
 
-    byte osd_wind_arrow_rotate_int;
+    int osd_wind_arrow_rotate_int;
 
     if (osd_winddirection < 0){
         osd_wind_arrow_rotate_int = round(((osd_winddirection + 360) - osd_heading)/360.0 * 16.0) + 9; //Convert to int 1-16
@@ -1001,7 +999,7 @@ void panWPDir(point p){
     osd.setPanel(p.x,p.y);
 
    
-    byte wp_target_bearing_rotate = round(((float)wp_target_bearing - osd_heading)/360 * 16) + 1; //Convert to int 0-16 
+    int wp_target_bearing_rotate = round(((float)wp_target_bearing - osd_heading)/360 * 16) + 1; //Convert to int 0-16 
 
     showArrow(wp_target_bearing_rotate,0);
 }
@@ -1020,7 +1018,7 @@ void panWPDis(point p){
 	wp_target_bearing+=360;
     
     
-    byte wp_target_bearing_rotate = round(((float)wp_target_bearing - osd_heading)/360 *16.0) + 1;
+    int wp_target_bearing_rotate = round(((float)wp_target_bearing - osd_heading)/360 *16.0) + 1;
     
 
     if (xtrack_error > 999)       xtrack_error = 999;
@@ -1030,10 +1028,10 @@ void panWPDis(point p){
 	osd.write(0x5c);
 
     osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,(double)((float)(wp_dist) * converth),high);
-    showArrow((uint8_t)wp_target_bearing_rotate, 0);
+    showArrow(wp_target_bearing_rotate, 0);
 
     if (osd_mode == 10){ // auto
-        osd.printf_P(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error* converth), high);
+        osd.printf_P(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * converth), high);
     }else{
         osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
     }
@@ -1049,7 +1047,7 @@ void panWPDis(point p){
 void panHomeDir(point p){
     osd.setPanel(p.x,p.y);
 
-    showArrow((uint8_t)osd_home_direction,0);
+    showArrow((int)osd_home_direction,0);
 }
 
 /* **************************************************************** */
@@ -1253,15 +1251,15 @@ void panFlightMode(point p){
  #endif    
 #else
  #ifdef IS_PLANE
-    if (osd_mode == 0) mode_str = PSTR("manu"); //Manual
-    if (osd_mode == 1) mode_str = PSTR("circ"); //CIRCLE
-    if (osd_mode == 2) mode_str = PSTR("stab"); //Stabilize
-    if (osd_mode == 3) mode_str = PSTR("trai"); //Training
-    if (osd_mode == 4) mode_str = PSTR("acro"); //ACRO
-    if (osd_mode == 5) mode_str = PSTR("fbwa"); //FLY_BY_WIRE_A
-    if (osd_mode == 6) mode_str = PSTR("fbwb"); //FLY_BY_WIRE_B
-    if (osd_mode == 7) mode_str = PSTR("cruz"); //Cruise
-    if (osd_mode == 8) mode_str = PSTR("atun"); //autotune
+    if (osd_mode == 0)  mode_str = PSTR("manu"); //Manual
+    if (osd_mode == 1)  mode_str = PSTR("circ"); //CIRCLE
+    if (osd_mode == 2)  mode_str = PSTR("stab"); //Stabilize
+    if (osd_mode == 3)  mode_str = PSTR("trai"); //Training
+    if (osd_mode == 4)  mode_str = PSTR("acro"); //ACRO
+    if (osd_mode == 5)  mode_str = PSTR("fbwa"); //FLY_BY_WIRE_A
+    if (osd_mode == 6)  mode_str = PSTR("fbwb"); //FLY_BY_WIRE_B
+    if (osd_mode == 7)  mode_str = PSTR("cruz"); //Cruise
+    if (osd_mode == 8)  mode_str = PSTR("atun"); //autotune
     if (osd_mode == 10) mode_str = PSTR("auto"); //AUTO
     if (osd_mode == 11) mode_str = PSTR("rtl "); //Return to Launch.
     if (osd_mode == 12) mode_str = PSTR("loit"); //Loiter
@@ -1279,15 +1277,19 @@ void panFlightMode(point p){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-void showArrow(uint8_t rotate_arrow,uint8_t method) {  
+void showArrow(int rotate_arrow, byte method) {
     char arrow_set1 = 0x90;
 
-    if(rotate_arrow>16) rotate_arrow-=16;
-    if(rotate_arrow<0) rotate_arrow+=16;
+
+    while(rotate_arrow>16) rotate_arrow -= 16;
+    while(rotate_arrow<1)  rotate_arrow += 16;
+    
+//    rotate_arrow &= 0x0f;
 
     arrow_set1 += rotate_arrow * 2 - 2;
 
     if(method == 1)      osd.printf_P(PSTR("%3.0f%c|%c%c%2.0f%c"),(double)(osd_windspeed * converts),spe, arrow_set1, arrow_set1 + 1, (double)(nor_osd_windspeed * converts),spe);
+//    else if(method == 2) osd.printf_P(PSTR("%c%c%4i\x05"), arrow_set1, arrow_set1 + 1, rotate_arrow);
     else if(method == 2) osd.printf_P(PSTR("%c%c%4i\x05"), arrow_set1, arrow_set1 + 1, off_course);
     else 		 osd.printf_P(PSTR("%c%c"),        arrow_set1, arrow_set1 + 1);
 }
@@ -1419,7 +1421,7 @@ void showILS(byte start_col, byte start_row) {
 */
 
       //Vertical calculation
-        int currentAngleDisplacement = atan(osd_alt_to_home / osd_home_distance) * 57.2957795 - 10;
+        int currentAngleDisplacement = atan2(osd_alt_to_home, osd_home_distance) * 57.2957795 - 10;
         //Calc current char position.
         //int numberOfPixels = CHAR_ROWS * AH_ROWS;
         int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line

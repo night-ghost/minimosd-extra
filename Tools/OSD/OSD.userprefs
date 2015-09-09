@@ -1,6 +1,6 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="OSD.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="config.cs">
     <Files>
       <File FileName="OSD.cs" Line="3251" Column="4" />
       <File FileName="config.cs" Line="78" Column="41" />
@@ -20,7 +20,8 @@
             </Node>
             <Node name="Resources" expanded="True" />
             <Node name="AboutBox1.cs" expanded="True" />
-            <Node name="OSD.cs" expanded="True" selected="True" />
+            <Node name="config.cs" selected="True" />
+            <Node name="OSD.cs" expanded="True" />
           </Node>
         </State>
       </Pad>

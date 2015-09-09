@@ -83,6 +83,13 @@
   #define MAX7456_screen_rows 0x0D
 #endif
 
+/*
+
+TVout has screen 128*96 so with font 8*8 it can draw screen 16 * 12, with font 4*6 - 32 * 16
+
+*/
+
+
 //#include "eeprom.h"
 
 //------------------ the OSD class -----------------------------------------------

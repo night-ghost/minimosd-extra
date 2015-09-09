@@ -27,7 +27,23 @@ BetterStream::print_P(const prog_char_t *s)
 }
 
 void
+BetterStream::print_P(const prog_char *s)
+{
+        char    c;
+
+        while ('\0' != (c = pgm_read_byte((const prog_char *)s++)))
+                write(c);
+}
+
+void
 BetterStream::println_P(const prog_char_t *s)
+{
+        print_P(s);
+        println();
+}
+
+void
+BetterStream::println_P(const prog_char *s)
 {
         print_P(s);
         println();
