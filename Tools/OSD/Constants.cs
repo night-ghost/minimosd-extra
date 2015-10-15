@@ -55,7 +55,8 @@ namespace OSD {
 
 		public const int Settings_offset = 512; // 4 экрана всего
 		//
-
+		
+		
 	// флаги
 /*		
 	    bool OSD_BATT_SHOW_PERCENT:1;

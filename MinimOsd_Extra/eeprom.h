@@ -141,6 +141,9 @@ struct Settings {
     
     byte vert_offs; // сдвиг экрана по вертикали и горизонтали
     byte horiz_offs;
+
+    byte pwm_src; // трансляция PWM на внешний вывод
+    byte pwm_dst;
 };
 
 

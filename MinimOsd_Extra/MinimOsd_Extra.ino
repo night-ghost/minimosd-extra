@@ -121,6 +121,10 @@ volatile unsigned long int_Timer = 0;         // set in the INT1
 
 byte update_stat = 1; // есть данные для показа
 
+				//Bat_1 Bat_2 Current RSSI
+const byte PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+
+
 // PWM Measurement
 void ReadINT_PIN() {
 
@@ -156,6 +160,7 @@ void setup()     {
     pinMode(LEDPIN,OUTPUT); // led
     digitalWrite(LEDPIN, 1);  // turn on for full light
 #endif
+
 
 //    pinMode(RssiPin, OUTPUT); // доп вывод - выход
 
@@ -199,6 +204,13 @@ void setup()     {
 	start_dly=10000;
     }
 
+
+    if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
+
+	byte pin = alt_pins[sets.pwm_dst-1];
+	
+	pinMode(pin,  OUTPUT);
+    }
 
     panelN = 0; //set panel to 0 to start in the first navigation screen
     readPanelSettings(); // Для первой панели. Для остальных - при переключении
@@ -358,6 +370,17 @@ void On100ms(){ // периодические события, не связан�
             rssi_in = float(d)/8 * sets.eRSSI_koef; // 8 элементов
 	    mavlink_got=1;
 	}
+    }
+    
+    if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
+
+	byte pin = alt_pins[sets.pwm_dst-1];
+	int pwm=chan_raw[sets.pwm_src-1 + 5];
+
+
+	digitalWrite(pin,LOW);
+	delayMicroseconds(pwm);
+	digitalWrite(pin,high);
     }
 }
 

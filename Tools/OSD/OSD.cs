@@ -106,6 +106,10 @@ public const int npanel = 4; // количество панелей
 		private bool tlog_run=false ;
 		public byte[] tlog_data;
 		System.Threading.Thread tlog_thread;
+		
+		bool RSSI_used=false; //  использование дополнительных ног
+		bool curr_used=false;
+		bool batt1_used=false;
 
         public OSD() {
 			
@@ -449,7 +453,9 @@ public const int npanel = 4; // количество панелей
 		}
 		
 
-
+		public void update_used_pins(){
+			
+		}
         
 
         public bool pal_checked(){
@@ -706,6 +712,9 @@ public const int npanel = 4; // количество панелей
 				conf.eeprom.flags[radar_on]=pan.flgRadar;
 				conf.eeprom.flags[ils_on]=pan.flgILS;
 				
+				conf.eeprom.sets.pwm_src = pan.pwm_src ;
+				conf.eeprom.sets.pwm_dst = pan.pwm_dst;
+				
 			} else if(panel_number >= 0 && panel_number < npanel) {
 				//First Panel 
 
@@ -855,7 +864,22 @@ public const int npanel = 4; // количество панелей
     float horiz_kPitch_a;
     
  * */			
-			
+
+			conf.eeprom.sets.evBattA_koef=1; 
+    		conf.eeprom.sets.evBattB_koef=1;
+    		conf.eeprom.sets.eCurrent_koef=1;
+    		conf.eeprom.sets.eRSSI_koef=1;
+		
+			// коэффициенты горизонта
+    		conf.eeprom.sets.horiz_kRoll=1; //0.010471976 horizon, conversion factor for pitch 
+    		conf.eeprom.sets.horiz_kPitch=1; //0.017453293  horizon, conversion factor for roll
+
+    		conf.eeprom.sets.horiz_kRoll_a=1; // коэффициенты горизонта для NTSC
+    		conf.eeprom.sets.horiz_kPitch_a=1;
+
+			conf.eeprom.sets.pwm_src = 0;
+			conf.eeprom.sets.pwm_dst = 0;
+		
 			int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
 			if(err > 0) {
 				MessageBox.Show("Failed to upload configuration data");
@@ -1142,6 +1166,15 @@ public const int npanel = 4; // количество панелей
 			pan.flgILS = conf.eeprom.flags[ils_on];
 			chkILS.Checked = pan.flgILS;							
 
+			pan.pwm_src = conf.eeprom.sets.pwm_src;
+			pan.pwm_dst = conf.eeprom.sets.pwm_dst;
+
+			try {
+				cbOutSource.SelectedIndex = pan.pwm_src;
+				cbOutPin.SelectedIndex = pan.pwm_dst;
+			}
+		    catch(Exception ex)    {       }			
+			
 			Draw(panel_number=tN );            
 
 		}
@@ -1320,6 +1353,10 @@ public const int npanel = 4; // количество панелей
 						sw.WriteLine("{0}\t{1}", "fILS",pan.flgILS);
 						sw.WriteLine("{0}\t{1}", "HOS",pan.horiz_offs);
 						sw.WriteLine("{0}\t{1}", "VOS",pan.vert_offs);
+		// выходной PWM
+						sw.WriteLine("{0}\t{1}", "PWMSRC",pan.pwm_src);
+						sw.WriteLine("{0}\t{1}", "PWMDST",pan.pwm_dst);
+						
 						sw.Close();
                     }
                 }
@@ -1429,6 +1466,9 @@ public const int npanel = 4; // количество панелей
 							else if (strings[0] == "fILS") pan.flgILS=bool.Parse(strings[1]);
 							else if (strings[0] == "HOS") pan.horiz_offs=(byte)int.Parse(strings[1]);
 							else if (strings[0] == "VOS") pan.vert_offs=(byte)int.Parse(strings[1]);
+							else if (strings[0] == "PWMSRC") pan.pwm_src=(byte)int.Parse(strings[1]);
+							else if (strings[0] == "PWMDST") pan.pwm_dst=(byte)int.Parse(strings[1]);
+						
 						}
 
 						
@@ -1532,6 +1572,13 @@ public const int npanel = 4; // количество панелей
 						
 						chkRadar.Checked = pan.flgRadar;
 						chkILS.Checked = pan.flgILS;						
+						
+						try {
+							cbOutSource.SelectedIndex = pan.pwm_src;
+							cbOutPin.SelectedIndex = pan.pwm_dst;
+						}
+		                catch(Exception ex)    {       }
+
                     }
                 }
                 catch(Exception ex)    {
@@ -2403,6 +2450,9 @@ public const int npanel = 4; // количество панелей
                 }
             }
             
+			RSSI_used=(cbxRSSIChannel.SelectedIndex == 2 || cbxRSSIChannel.SelectedIndex == 3);
+			
+			update_used_pins();
           
             pan.rssiraw_on = Convert.ToByte(rssi_encode(cbxRSSIChannel.SelectedIndex) + Convert.ToInt32(RSSI_RAW.Checked));
         }
@@ -3168,6 +3218,9 @@ public const int npanel = 4; // количество панелей
 		private void cbBattA_source_SelectedIndexChanged(object sender, EventArgs e)
         {
             pan.flgBattA = (cbBattA_source.SelectedIndex > 0);
+			batt1_used=(pan.flgBattA);
+			
+			update_used_pins();
         }
 		
 		
@@ -3177,6 +3230,10 @@ public const int npanel = 4; // количество панелей
         private void cbCurrentSoure_SelectedIndexChanged(object sender, EventArgs e)
         {
             pan.flgCurrent = (cbCurrentSoure.SelectedIndex > 0);
+			curr_used=(pan.flgCurrent);
+			
+			update_used_pins();
+			
         }
 
         private void numMinVoltB_ValueChanged(object sender, EventArgs e)
@@ -3339,6 +3396,21 @@ public const int npanel = 4; // количество панелей
         {
             pan.horiz_offs = (byte)(0x20 + numHOS.Value);
         }
+
+        private void cbOutSource_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //
+			pan.pwm_src=(byte)cbOutSource.SelectedIndex;
+        }
+
+        private void cbOutPin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //
+			pan.pwm_dst=(byte)cbOutPin.SelectedIndex;
+        }
+
+
+       
 
 	}
 }

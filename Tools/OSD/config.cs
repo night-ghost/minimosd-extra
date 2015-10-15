@@ -98,6 +98,9 @@ namespace OSD
 		
 		internal byte vert_offs; // сдвиг экрана по вертикали и горизонтали
     	internal byte horiz_offs;
+							// трансляция PWM на внешний вывод
+		internal byte pwm_src;
+		internal byte pwm_dst;
 	};		
 
 	[StructLayout(LayoutKind.Explicit)]

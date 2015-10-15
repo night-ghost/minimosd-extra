@@ -84,6 +84,9 @@ namespace OSD
 		public byte vert_offs=0x10; // сдвиг экрана по вертикали и горизонтали 0...1f
     	public byte horiz_offs=0x20;// 0...3f
 		
+		public byte pwm_src=0;
+		public byte pwm_dst=0;
+		
 //*************************		
         private byte temperatureChar = 0x1B;
         private byte bigDistanceChar = 0x1B;
