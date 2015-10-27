@@ -527,6 +527,7 @@ namespace OSD
             this.cbOutPin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbOutPin.FormattingEnabled = true;
             this.cbOutPin.Items.AddRange(new object[] {
+			"none",
             "V_Bat1",
             "V_Bat2",
             "Curent",

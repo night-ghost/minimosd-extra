@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 
-//#define LEDPIN AmperagePin
+#define LEDPIN AmperagePin
 
 
 
@@ -122,7 +122,8 @@ volatile unsigned long int_Timer = 0;         // set in the INT1
 byte update_stat = 1; // есть данные для показа
 
 				//Bat_1 Bat_2 Current RSSI
-const byte PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+//const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+byte PWM_out_pin=0;
 
 
 // PWM Measurement
@@ -161,6 +162,7 @@ void setup()     {
     digitalWrite(LEDPIN, 1);  // turn on for full light
 #endif
 
+    pinMode(PWM_PIN,INPUT_PULLUP);
 
 //    pinMode(RssiPin, OUTPUT); // доп вывод - выход
 
@@ -204,12 +206,17 @@ void setup()     {
 	start_dly=10000;
     }
 
+    int alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+
 
     if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
 
-	byte pin = alt_pins[sets.pwm_dst-1];
-	
-	pinMode(pin,  OUTPUT);
+	PWM_out_pin = alt_pins[sets.pwm_dst-1];
+
+	if(PWM_out_pin) {
+	    pinMode(PWM_out_pin,  OUTPUT);
+	    digitalWrite(PWM_out_pin, 0);
+	}
     }
 
     panelN = 0; //set panel to 0 to start in the first navigation screen
@@ -224,11 +231,27 @@ void setup()     {
     delay(start_dly);
     Serial.flush();
 
+#ifdef LEDPIN
+    pinMode(LEDPIN,OUTPUT); // led
+    digitalWrite(LEDPIN, 0);  // turn off on init done
+#endif
+
 #ifdef DEBUG
 /*    osd.setPanel(0,0);
     hex_dump((byte *)&panel,0x70);
     osd.update();
-    delay(10000); */
+    delay(10000); 
+*/
+
+/*
+    osd.setPanel(0,0);
+
+    osd.printf_P(PSTR("sets.pwm_src=%d sets.pwm_dst=%d pin=%d VoltagePin=%d"),sets.pwm_src, sets.pwm_dst, PWM_out_pin, VoltagePin);
+//    hex_dump((byte *)alt_pins, 8);
+
+    osd.update();
+    delay(10000); 
+*/    
 #endif
 
 /* no other tasks - get rid of timer!
@@ -274,9 +297,6 @@ void loop()
 	if(!vsync_wait){
 	    osd.update();
 	    update_stat = 0;
-#ifdef LEDPIN
-digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
-#endif
 
         }
     }
@@ -286,6 +306,9 @@ digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает 
 	New_PWM_Frame=false;
 
 	// data in PWM_IN
+#ifdef LEDPIN
+digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+#endif
     }
     
 }
@@ -372,15 +395,14 @@ void On100ms(){ // периодические события, не связан�
 	}
     }
     
-    if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
+    if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
 
-	byte pin = alt_pins[sets.pwm_dst-1];
 	int pwm=chan_raw[sets.pwm_src-1 + 5];
 
-
-	digitalWrite(pin,LOW);
+	digitalWrite(PWM_out_pin,1);
 	delayMicroseconds(pwm);
-	digitalWrite(pin,high);
+	digitalWrite(PWM_out_pin,0);
+
     }
 }
 
