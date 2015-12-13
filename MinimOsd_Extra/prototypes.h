@@ -34,7 +34,6 @@ void panAlt(point p);
 void panCur_A(point p);
 void panCur_A(point p);
 void showArrow(uint8_t rotate_arrow,uint8_t method);
-void timers();
 void panCALLSIGN(point p);
 void panDistance(point p);
 void panTemp(point p);
@@ -54,3 +53,6 @@ void uploadFont();
 
 void On100ms();
 
+void max7456_off();
+int grad_to_sect(int grad);
+//int grad_to_sect(float grad);

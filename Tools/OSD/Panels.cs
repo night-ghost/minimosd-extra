@@ -1218,6 +1218,9 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             }
         }
     }			
+
+	
+			
 	/*
             int x, nose, row, minval, hit, subval = 0;
             int cols = 12;
@@ -1348,6 +1351,29 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 		    osd.printf_P(PSTR("%4i%c"), (int)(250), chrHigh);
 	
 			return 0;
+		}
+		
+		public int panFData(int first_col, int first_line,int sign){
+			
+              double total_flight_time_seconds = 12345,
+                  max_home_distance = 3457,
+                  tdistance = 623.66,
+                  max_osd_groundspeed = 5938.45,
+                  max_osd_home_alt = 24.7,
+                  osd_lat = 45.45,
+                  osd_lon = 46.46;
+			
+			osd.setPanel(first_col, first_line);
+			
+	osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
+              ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
+                                      (int)((max_home_distance) * converth), chrHigh,
+                                                 (int)(tdistance * converth), chrHigh,
+                                                        (int)(max_osd_groundspeed * convertspeed),chrSpe,
+                                                                    (int)(max_osd_home_alt * converth), chrHigh,
+                                                                              osd_lat,
+                                                                                        osd_lon);
+				return 0;
 		}
 		
     }

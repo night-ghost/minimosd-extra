@@ -228,14 +228,16 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY,-1);
 				pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1);
 				pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY,1);
-				pi[a++] = new Panel("Tune", pan.panTune, 1, 1, panTune_XY,1);
+				pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY,1);
 				pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY,1);
 				pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_XY,-1);
-				pi[a++] = new Panel("Channel Raw", pan.panCh, 1, 0, panCh_XY,-1);
+				pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY,-1);
 				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY,-1);
 				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY,1);
 				pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 16, 7, panRadarScale_XY,1);
-	
+				pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY,-1);
+				
+					
 				osd_functions_N = a;
 				//make backup in case EEPROM needs reset to default
 				scr[n].panelItems_default = pi;
@@ -249,22 +251,39 @@ public const int npanel = 4; // количество панелей
 					if(thing!=null) {
 						TreeNode tn = li.Nodes.Add(thing.name, thing.name);
 						
-						if(thing.name=="Center") {
-							tn.Checked = false;
-						} else if(thing.name=="Tune") {
-							tn.Checked = false;
-						} else if(thing.name=="WP Distance") {
-							tn.Checked = false;
-						} else if(thing.name=="Temperature") {
-							tn.Checked = false;
-						} else if(thing.name=="Trip Distance") {
-							tn.Checked = false;
-						} else if(thing.name=="Channel Raw") {
-							tn.Checked = false;
-						} else if(thing.name=="GPS2") {
-							tn.Checked = false;
-						} else {
-							tn.Checked = true;
+						if(n==3){
+							if(thing.name=="Channel Raw") {
+								tn.Checked = true;
+							} else if(thing.name=="Flight Data") {
+								tn.Checked = true;
+							} else if(thing.name=="Temperature") {
+								tn.Checked = true;
+							} else if(thing.name=="Tune") {
+								tn.Checked = true;
+							} else {
+								tn.Checked = false;
+							}
+							
+						} else { // для всех остальных
+							if(thing.name=="Center") {
+								tn.Checked = false;
+							} else if(thing.name=="Tune") {
+								tn.Checked = false;
+							} else if(thing.name=="WP Distance") {
+								tn.Checked = false;
+							} else if(thing.name=="Temperature") {
+								tn.Checked = false;
+							} else if(thing.name=="Trip Distance") {
+								tn.Checked = false;
+							} else if(thing.name=="Channel Raw") {
+								tn.Checked = false;
+							} else if(thing.name=="GPS2") {
+								tn.Checked = false;
+							} else if(thing.name=="Flight Data") {
+								tn.Checked = false;
+							} else {
+								tn.Checked = true;
+							}
 						}
 					}
 					
@@ -568,8 +587,8 @@ public const int npanel = 4; // количество панелей
 				cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
 			string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-			this.Text = this.Text + " " + strVersion + " - Pre-Release r806 DV";
-			currentVersion = strVersion + "r806 DV";
+			this.Text = this.Text + " " + strVersion + " - Pre-Release r807 DV";
+			currentVersion = strVersion + "r807 DV";
 
 			CMB_ComPort.Items.AddRange(GetPortNames());
 
@@ -806,6 +825,8 @@ public const int npanel = 4; // количество панелей
 								en = false;
 							else if(str=="GPS2")
 								en = false;
+							else if(str=="Flight Data")
+								en = false;							
 							else
 								en = true;
 							
@@ -1811,7 +1832,7 @@ public const int npanel = 4; // количество панелей
             xmlconfig(true);
         }
 
-        private String arduinoIDEPath = "Arduino-1.6.1";
+        private String arduinoIDEPath = "Arduino-1.6.5";
         private String planeSketchPath = "ArduCAM_OSD";
         private String copterSketchPath = "ArduCAM_OSD";
         private bool autoUpdate = false;

@@ -65,6 +65,7 @@ struct Panel {
     point distance;     //#define panDistance_XY = 68;
     point GPS2;         //#define panGPS2_XY = 70;    
     point RadarScale;	// 72
+    point Fdata;	// 74
     //point curr_B;
     //point fdata;
 };
@@ -162,3 +163,5 @@ struct Eeprom {
 //#if sizeof(struct Eeprom) > 1024
 //#error EEPROM overflow!
 //#endif
+
+

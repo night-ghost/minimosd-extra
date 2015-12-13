@@ -1,6 +1,7 @@
 #include "compat.h"
 
-#include <FastSerial.h>
+#include <SingleSerial.h>
+//#include <FastSerial.h>
 
 #include "ArduCam_Max7456.h"
 // Get the common arduino functions
@@ -11,12 +12,16 @@
 #endif
 
 #include "Spi.h"
-#include <EEPROM.h>
+//#include <EEPROM.h>
 #include "OSD_Config.h"
 
 
 extern Settings sets;
 extern Flags flags;
+
+uint8_t OSD::col, OSD::row, OSD::video_mode, OSD::video_center;
+uint8_t OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+uint16_t OSD::bufpos;
 
 
 OSD::OSD()
@@ -25,18 +30,25 @@ OSD::OSD()
 
 //------------------ init ---------------------------------------------------
 void MAX_write(byte addr, byte data){
-  Spi.transfer(addr);
-  Spi.transfer(data);
+  SPI::transfer(addr);
+  SPI::transfer(data);
 }
 
 byte MAX_read(byte addr){
-  Spi.transfer(addr);
-  return Spi.transfer(0xff);
+  SPI::transfer(addr);
+  return SPI::transfer(0xff);
 }
 
+void max7456_off(){
+    digitalWrite(MAX7456_SELECT,HIGH);
+}
+
+void max7456_on(){
+    digitalWrite(MAX7456_SELECT,LOW);
+}
 
 void OSD::hw_init(){
-  digitalWrite(MAX7456_SELECT,LOW);
+  max7456_on();
 
   //read black level register
   byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);//black level read register
@@ -51,13 +63,20 @@ void OSD::hw_init(){
   MAX_write(MAX7456_HOS_reg, 0x20); // 0x20 default
   MAX_write(MAX7456_VOS_reg, 0x10); // 0x10 default
 
+
+  MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
+
 //  MAX_write(MAX7456_HOS_reg, sets.horiz_offs); // 0x20 default
 //  MAX_write(MAX7456_VOS_reg, sets.vert_offs); // 0x10 default
 
   setBrightness();
-  // define sync (auto,int,ext) and
-  // making sure the Max7456 is enabled
-  control(1);
+  
+  // define sync (auto,int,ext)
+//      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
+  MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
+
+  max7456_off();
+
 }
 
 void OSD::init()
@@ -76,7 +95,7 @@ void OSD::init()
 void OSD::detectMode()
 {
   //read STAT and auto detect Mode PAL/NTSC
-  digitalWrite(MAX7456_SELECT,LOW);
+  max7456_on();
 
   byte osdstat_r = MAX_read(MAX7456_STAT_reg_read);//status register
 
@@ -86,6 +105,11 @@ void OSD::detectMode()
   else if((B00000010 & osdstat_r) != 0){ //NTSC
       setMode(0);
   }
+//  else if((B00000100 & osdstat_r) != 0){ //loss of sync
+//      setMode(1); // PAL without video 
+//  }
+
+
   //If no signal was detected so it uses EEPROM config
   else{
       if (flags.PAL_NTSC) //NTSC
@@ -95,7 +119,7 @@ void OSD::detectMode()
       
   }
 
-  digitalWrite(MAX7456_SELECT,HIGH);
+  max7456_off();
 }
 
 //------------------ Set Brightness  ---------------------------------
@@ -110,14 +134,13 @@ void OSD::setBrightness()
     };
 
     uint8_t blevel = sets.OSD_BRIGHTNESS;
-    uint8_t x;
 
     if(blevel>3) blevel=0;
     blevel=levels[blevel];
 
     // set all rows to same character white level, 90%
-    for (x = 0x0; x < 0x10; x++) 
-        MAX_write(x + 0x10, blevel);
+    for (byte x = 0x0, a= 0x10; x < 0x10; x++) 
+        MAX_write(a++, blevel);
 
 }
 
@@ -148,9 +171,10 @@ void OSD::setMode(uint8_t themode){
 uint8_t OSD::getMode()
 {
   switch(video_mode){
-    case MAX7456_MODE_MASK_NTCS:
-      return 0;
-      break;
+//    case MAX7456_MODE_MASK_NTCS:
+//      return 0;
+//      break;
+
     case MAX7456_MODE_MASK_PAL:
       return 1;
       break;
@@ -160,57 +184,52 @@ uint8_t OSD::getMode()
 
 //------------------ Get Center (PAL/NTSC) ----------------------------------
 
-uint8_t OSD::getCenter()
+inline uint8_t OSD::getCenter()
 {
   return video_center; //first line for center panel
 }
 
-//------------------ plug ---------------------------------------------------
-
-void OSD::plug()
-{
-  digitalWrite(MAX7456_SELECT,LOW);
-}
 
 //------------------ clear ---------------------------------------------------
 
-void OSD::clear()
-{
+void OSD::clear() {
   // clear the screen
-  digitalWrite(MAX7456_SELECT,LOW);
+  max7456_on();
   MAX_write(MAX7456_DMM_reg, MAX7456_CLEAR_display);
-  digitalWrite(MAX7456_SELECT,HIGH);
+  max7456_off();
 }
 
 //------------------ set panel -----------------------------------------------
 
-void
-OSD::setPanel(uint8_t st_col, uint8_t st_row){
+void OSD::setPanel(uint8_t st_col, uint8_t st_row){
   col = st_col & 0x7f; // col,row нужны для отработки перевода строки с сохранением колонки
   row = st_row & 0x7f; // в старших битах флаги, размер экрана все равно мелкий
   bufpos = row*30+col;
 }
 
 
-//------------------ write single char ---------------------------------------------
-
-void
-OSD::openSingle(uint8_t x, uint8_t y){
-  bufpos = (y & 0x7f)*30+(x & 0x7f);
-}
 
 //------------------ write ---------------------------------------------------
 
-size_t
-OSD::write(uint8_t c){
+size_t OSD::write(uint8_t c){
   
   if(c == '|'){
     row++;
     bufpos = row*30+col;
-  } else
+  } else {
     osdbuf[bufpos++] = c;
+  }
+ 
   return 1;
 }
+
+void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
+    extern OSD osd;
+    bufpos = (y & 0x7f)*30+(x & 0x7f);
+    osd.write(c);
+}
+
+
 
 /* для сравнения
 uint8_t spi_transfer(uint8_t data)
@@ -222,16 +241,23 @@ uint8_t spi_transfer(uint8_t data)
 }
 */
 
-void
-OSD::update() {
+void OSD::update() {
  uint8_t *b = osdbuf;
  uint8_t *end_b = b+sizeof(osdbuf);
+/*
+    uint8_t bit = digitalPinToBitMask(MAX7456_SELECT); // move calculations from critical section
+    uint8_t port = digitalPinToPort(MAX7456_SELECT);
+    volatile uint8_t *out = portOutputRegister(port);
+
+#define SET_LOW()   *out &= ~bit
+#define SET_HIGH()  *out |= bit
+*/
 
  PORTD &= ~_BV(PD6); //  digitalWrite(MAX7456_SELECT,LOW); 
 
   MAX_write(MAX7456_DMAH_reg, 0);
   MAX_write(MAX7456_DMAL_reg, 0);
-  MAX_write(MAX7456_DMM_reg, 1);
+  MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
 
  PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
@@ -248,26 +274,11 @@ OSD::update() {
  Spi.transfer(MAX7456_END_string);
  
  PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
-// memset(osdbuf, ' ', sizeof(osdbuf));
 }
 
 
-void
-OSD::control(uint8_t ctrl){
-  digitalWrite(MAX7456_SELECT,LOW);
-  switch(ctrl){
-    case 0:
-      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
-      break;
-    case 1:
-      MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync);
-      break;
-  }
-  digitalWrite(MAX7456_SELECT,HIGH);
-}
 
-void 
-OSD::write_NVM(int font_count, uint8_t *character_bitmap)
+void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 {
   byte x;
   byte char_address_hi, char_address_lo;
@@ -275,12 +286,12 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
   char_address_hi = font_count;
   char_address_lo = 0;
+
     cli();
 
-  // disable display
-  digitalWrite(MAX7456_SELECT,LOW);
-
+  max7456_on();
   MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display);
+
   MAX_write(MAX7456_CMAH_reg, char_address_hi);// set start address high
 
   for(x = 0; x < NVM_ram_size; x++) {// write out 54 (out of 64) bytes of character to shadow ram
@@ -300,19 +311,20 @@ OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
   MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert);// turn on screen next vertical
 
-  digitalWrite(MAX7456_SELECT,HIGH);  
+  max7456_off();
+
   sei();
 }
 
 //------------------ pure virtual ones (just overriding) ---------------------
 
-int  OSD::available(void){
+byte  OSD::available(void){
 	return 0;
 }
-int  OSD::read(void){
+byte  OSD::read(void){
 	return 0;
 }
-int  OSD::peek(void){
+byte  OSD::peek(void){
 	return 0;
 }
 void OSD::flush(void){

@@ -11,7 +11,8 @@ License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.
 */
 
-#include <FastSerial.h>
+//#include <FastSerial.h>
+#define HardwareSerial_h
 #include <AP_Common.h>
 #include <GCS_MAVLink.h>
 

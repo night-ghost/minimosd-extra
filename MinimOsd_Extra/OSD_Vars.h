@@ -30,7 +30,6 @@ static uint8_t      wp_number = 0; // Current waypoint number
 #ifdef IS_PLANE
 static float	    alt_error = 0; // Current altitude error in meters
 static float        aspd_error = 0; // Current airspeed error in meters/second
-static boolean      takeofftime = 0;
 static long         osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
 static unsigned long FTime = 0;
@@ -43,33 +42,74 @@ static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in m
 
 static uint16_t     eph = 0;
 
-static uint8_t      currentBasePanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
+static uint8_t      currentAutoPanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
 
-static bool         motor_armed = 0;
-static bool         last_armed_status = 0;
-static bool         ma = 0;
 
-static uint16_t     ch_raw = 0;
+//static uint16_t     ch_raw = 0;
 
 static uint16_t chan_raw[8];
-//static uint16_t     chan1_raw = 0;
-//static uint16_t     chan2_raw = 0;
-//static uint16_t     chan3_raw = 0;
-//static uint16_t     chan4_raw = 0;
-//static uint16_t     chan5_raw = 0;
-//static uint16_t     chan6_raw = 0;
-//static uint16_t     chan7_raw = 0;
-//static uint16_t     chan8_raw = 0;
 
 static uint8_t      check_warning = 1;
 
-static float        converts = 0;
+/* [ все переменные, связанные с метрикой, сделать PROGMEM и переключать указатель !
+static float        converts = 0; //*
 static float        converth = 0;
 static uint16_t     distconv = 0;
 
 static uint8_t      spe = 0;
 static uint8_t      high = 0;
 static int16_t      temps = 0;
+
+static uint8_t      tempconv = 1;
+static uint16_t     tempconvAdd = 0;
+static byte         distchar = 0;
+static byte         climbchar = 0;
+//*/ //]
+
+struct Measure {
+    float        converts;
+    float        converth;
+    uint8_t      spe;
+    uint8_t      high;
+    int16_t      temps;
+    uint8_t      tempconv;
+    uint16_t     tempconvAdd;
+    byte         distchar;
+    uint16_t     distconv;
+    byte         climbchar;
+};
+
+
+const struct Measure PROGMEM 
+    metr={
+        3.6, //  converts 
+        1.0,  //converth
+        0x10, //spe
+        0x0c, //high 
+        0xba, //temps
+        10,  // tempconv
+        0,   //tempconvAdd
+        0x1b, //distchar
+        1000, //distconv
+        0x1a  //climbchar
+    },
+    imper = {
+        2.23,
+        3.28,
+        0x19,
+        0x66,
+        0xbb,
+        18,
+        3200,
+        0x1c,
+        5280,
+        0x1e
+     };
+
+
+static const struct Measure *measure; // переключаемая ссылка
+
+
 static uint16_t     osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static uint16_t     osd_vbat_B = 0;                 // voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
@@ -83,27 +123,26 @@ static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_pic_A[2] = {0x8d, 0x8d};     // picture to show battery remaining
 static uint8_t      osd_battery_pic_B[2] = {0x8d, 0x8d};     // picture to show battery remaining
 
-
+static uint16_t     temperature = 0;
 
 
 
 static uint16_t     remaining_estimated_flight_time_seconds = 0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long one_sec_timer = 0;
-static unsigned long last_timer = 0;
+static unsigned long timer_100ms = 0;
+static unsigned long timer_20ms = 0;
 
-static unsigned long total_flight_time_milis = 0.0;
-static uint16_t      total_flight_time_seconds = 0.0;
+static unsigned long total_flight_time_milis = 0;
+static uint16_t      total_flight_time_seconds = 0;
 static unsigned long runt = 0;
 
 
 static const char*  warning_string;
-static boolean      warning_found = 0;
-static boolean      canswitch = 1;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static uint8_t      rotation = 0;
-static unsigned long         osd_switch_time = 0;
+static unsigned long osd_switch_time = 0;
 
 #ifdef IS_PLANE
 static float        palt = 0;	// высота выключения газа
@@ -126,47 +165,66 @@ static int dst_x,dst_y; // расстояние по осям - для рада�
 static int16_t       osd_pitch = 0;                  // pitch from DCM
 static int16_t       osd_roll = 0;                   // roll from DCM
 
-static float        osd_heading = 0;                // ground course heading from GPS
+static int /* float*/        osd_heading = 0;                // ground course heading from GPS
 
 static float        osd_alt_rel = 0;                    // altitude - float from MAVlink!
 static long         osd_alt_gps = 0;                    // altitude GPS
 static float        osd_airspeed = 0;              // airspeed
 static float        osd_windspeed = 0;
 //static float        osd_windspeedz = 0;
-static float        osd_winddirection = 0;
+static int /*float*/        osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
 
 static float        osd_groundspeed = 0;            // ground speed
 
 static uint8_t      osd_throttle = 0;               // throtle
-static uint16_t     temperature = 0;
-static uint8_t      tempconv = 1;
-static uint16_t     tempconvAdd = 0;
-static byte         distchar = 0;
-static byte         climbchar = 0;
 
-
-
-
-
-//MAVLink session control
-static byte         mavbeat = 0;
-
+static int         seconds;
 static long         lastMAVBeat = 0;
 //`static byte         waitingMAVBeats = 1;
 
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
-static byte         blinker = 0;
-static boolean      one_sec_timer_switch = 0;
+//static boolean      one_sec_timer_switch = 0;
 
 static const uint8_t npanels = 4;
 static uint8_t panelN = 0; 
 
 
-byte modeScreen = 0; //NTSC:0, PAL:1
 
 //*************************************************************************************************************
 static uint8_t      osd_rssi = 0; //raw value from mavlink
 static uint16_t     rssi_in = 0; //temp readed value
 static uint16_t     rssi = 0; //normalized 0-100%
+
+struct loc_flags {
+    bool update_stat:1; 		// есть данные для показа
+    bool canswitch:1;
+
+    bool mavlink_got:1;		// флаг получения пакета
+    bool mavlink_on:1;		// флаг активности (сбрасывается по таймауту)
+    bool vsync_wait:1;
+    bool New_PWM_Frame:1;	// Flag marker for new and changed PWM value
+    bool mavlink_active:1; 	// флаг активности (навсегда)
+    bool rotatePanel:1;
+// 9
+    bool osd_clear:1;
+    bool one_sec_timer_switch:1;
+
+//MAVLink session control
+    bool mavbeat:1;
+
+    bool motor_armed:1;
+    bool last_armed_status:1;
+    bool ma:1;
+    bool takeofftime:1;
+
+
+// 16
+
+    bool blinker:1;
+
+//    bool modeScreen:1; //NTSC:0, PAL:1
+//    bool warning_found:1;
+
+};
 

@@ -4,14 +4,16 @@
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
 
 // true when we have received at least 1 MAVLink packet
-static bool mavlink_active = 0; // флаг активности (навсегда)
+//static bool mavlink_active = 0; // флаг активности (навсегда)
 static uint8_t crlf_count = 0;
 
-static int packet_drops = 0;
-static int parse_error = 0;
+// static int packet_drops = 0; unused
+// static int parse_error = 0; unused
 
-uint8_t mavlink_got = 0; // флаг получения пакета
-uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)
+extern volatile struct loc_flags lflags;  // все булевые флаги кучей
+
+//uint8_t mavlink_got = 0; // флаг получения пакета
+//uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)
 
 
 /*
@@ -41,7 +43,7 @@ void read_mavlink(){
 
     uint8_t      base_mode=0;
 
-    mavlink_got=0;	// нет данных
+    lflags.mavlink_got=0;	// нет данных
 
 
     //grabing data 
@@ -49,10 +51,9 @@ void read_mavlink(){
         uint8_t c = Serial.read();
 
 
-
         /* allow CLI to be started by hitting enter 3 times, if no
         heartbeat packets have been received */
-        if (mavlink_active == 0 && millis() < 20000 && millis() > 5000) {
+        if (!lflags.mavlink_active && millis() < 20000 && millis() > 3000) {
             if (c == '\n' || c == '\r') {
                 crlf_count++;
             } else {
@@ -66,7 +67,7 @@ void read_mavlink(){
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
             lastMAVBeat = millis();
-            mavlink_active = mavlink_on = mavlink_got = 1;
+            lflags.mavlink_active = lflags.mavlink_on = lflags.mavlink_got = 1;
 
 //digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
 
@@ -74,7 +75,7 @@ void read_mavlink(){
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 {
-                    mavbeat = 1;
+                    lflags.mavbeat = 1;
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                  //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
@@ -82,7 +83,7 @@ void read_mavlink(){
                     //Mode (arducoper armed/disarmed)
                     base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
 
-                    motor_armed = getBit(base_mode,7);
+                    lflags.motor_armed = getBit(base_mode,7);
                 }
                 break;
                 
@@ -110,6 +111,7 @@ void read_mavlink(){
                     eph = mavlink_msg_gps_raw_int_get_eph(&msg);
                 }
                 break; 
+
             case MAVLINK_MSG_ID_VFR_HUD:
                 {
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
@@ -215,7 +217,7 @@ packet.press_diff = press_diff;
         //next one
     }
     // Update global packet drops counter
-    packet_drops += status.packet_rx_drop_count;
-    parse_error += status.parse_error;
+//    packet_drops += status.packet_rx_drop_count;
+//    parse_error += status.parse_error;
 
 }

@@ -1,7 +1,7 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
-#define DEBUG
+// #define DEBUG
 
 // sets.model_type plane=0 copter=1
 
@@ -11,7 +11,7 @@
 
 
 #define VERSION "2.4"
-#define RELEASE "r806 DV"
+#define RELEASE "r807 DV"
 
 
 // additional pins
@@ -58,8 +58,7 @@
 TODO
 
 
-трансляция PWM из канала на внешний вывод - например для переключения камеры
-
++ трансляция PWM из канала на внешний вывод - например для переключения камеры
 + кольцевая смена экранов по длинному нажатию
 
 

@@ -16,17 +16,21 @@ boolean inline has_sign(point p){
 void readSettings() {
 
 // считаем все кучно
+    uint8_t *p, *ee;
+    uint16_t i;
 
-    for(byte i=0; i<sizeof(Flags); i++)
-	((byte *)&flags)[i] = EEPROM.read(EEPROM_offs(flags) +i );
+    for(i=0, p=(byte *)&flags, ee=(byte *)(EEPROM_offs(flags)); i<sizeof(Flags); i++)
+	*p++ = (byte)eeprom_read_byte( ee++ );
 
 
-    for(int i=0; i<sizeof(Settings); i++) // 512 размер остатка EEPROM так что байта для адреса мало
-	((byte *)&sets)[i] = EEPROM.read(EEPROM_offs(sets) + i );
+    for(i=0, p=(byte *)&sets,  ee=(byte *)(EEPROM_offs(sets));  i<sizeof(Settings); i++) // 512 размер остатка EEPROM так что байта для адреса мало
+	*p++ = (byte)eeprom_read_byte( ee++ );
 
 
 
 // сразу настроим системы измерения
+
+/* 
     if (!flags.measure) { // метрическая система
         converts = 3.6; 
         converth = 1.0;
@@ -50,6 +54,12 @@ void readSettings() {
         distconv = 5280;
         climbchar = 0x1e;
     }
+//*/
+
+    if (flags.measure) 
+	measure = &imper;
+    else
+	measure = &metr;
 
 
 }
@@ -65,7 +75,7 @@ void readPanelSettings() {
 
 
     for(byte i=0; i<sizeof(Panel); i++) // читаем в пределах одного экрана - 128 байт, так что байтного цикла достаточно
-	((byte *)&panel)[i] = EEPROM.read( OffsetBITpanel * (int)panelN + i );
+	((byte *)&panel)[i] = eeprom_read_byte( (byte *) (OffsetBITpanel * (int)panelN + i) );
 }
 
 uint8_t checkPAL(uint8_t line){
@@ -76,7 +86,8 @@ uint8_t checkPAL(uint8_t line){
 }
 
 
-/*
+/* не надо настройки менять изнутри!
+
 void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
     if(panelN >= 1 && panelN <= npanel) {
 

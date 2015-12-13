@@ -1,4 +1,4 @@
-struct Measure {
+struct ADCMeasure {
     byte pin;
     struct Measure *next;
     byte cnt;
@@ -6,5 +6,5 @@ struct Measure {
     float value;
 };
 
-typedef struct Measure measure;
+typedef struct ADCMeasure ADCmeasure;
 

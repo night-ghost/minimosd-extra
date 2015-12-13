@@ -1,13 +1,16 @@
 // EEPROM reader/writers
 // Utilities for writing and reading from the EEPROM
-inline byte readEEPROM(uint16_t address) {
+/*inline byte readEEPROM(uint16_t address) {
 
-    return EEPROM.read(address);
+    return (uint8_t)eeprom_read_byte(address);
 }
 
-inline void writeEEPROM(byte value, uint16_t address) {
-    EEPROM.write(address, value);
+inline void writeEEPROM(uint8_t value, uint16_t address) {
+    eeprom_write_byte(address, value);
 }
+*/
+
+extern volatile struct loc_flags lflags;  // все булевые флаги кучей
 
 inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
@@ -24,7 +27,7 @@ char setBatteryPic(uint16_t bat_level,byte *bp)
 	bat_level -=128;
     }else {
 	bp[1] = 0x8d; // верхняя пустая, работаем с нижней
-	if(bat_level <= 17 && blinker){
+	if(bat_level <= 17 && lflags.blinker){
 	    *bp   = 0x20;
 	    bp[1] = 0x20;
 	    return 1;	// если совсем мало то пробел вместо батареи - мигаем
@@ -52,10 +55,18 @@ char setBatteryPic(uint16_t bat_level,byte *bp)
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
+int grad_to_sect(int grad){
+    return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
+}
+
+/*int grad_to_sect(float grad){
+    return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
+}*/
+
 void setHomeVars(OSD &osd)
 {
     float dstlon, dstlat;
-    long bearing;
+    int bearing;
     byte en=0;
 
 
@@ -75,24 +86,24 @@ void setHomeVars(OSD &osd)
 	break;
 
     case 1:
-        if (motor_armed && !last_armed_status){
+        if (lflags.motor_armed && !lflags.last_armed_status){
 	//If motors armed, reset home in Arducopter version
 	    osd_got_home = 0;
 	}
 
-	last_armed_status = motor_armed;
+	lflags.last_armed_status = lflags.motor_armed;
 
 	if(osd_got_home == 0 && osd_fix_type > 1 )
 	    en=1;
     }
  #else
   //Check disarm to arm switching.
-  if (motor_armed && !last_armed_status){
+  if (lflags.motor_armed && !lflags.last_armed_status){
     //If motors armed, reset home in Arducopter version
     osd_got_home = 0;
   }
 
-  last_armed_status = motor_armed;
+  lflags.last_armed_status = lflags.motor_armed;
 
   if(osd_got_home == 0 && osd_fix_type > 1 )
     en=1;
@@ -133,12 +144,10 @@ void setHomeVars(OSD &osd)
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
         
         if(bearing < 0) bearing += 360;//normalization
-        bearing = bearing - 180;//absolut return direction
+        bearing = bearing - 180 - osd_heading;//absolut return direction  //relative home direction
         if(bearing < 0) bearing += 360;//normalization
-        bearing = bearing - osd_heading;//relative home direction
-        if(bearing < 0) bearing += 360; //normalization
 
-        osd_home_direction = ((int)round((float)(bearing/360.0f) * 16.0f) % 16) + 1;//array of arrows =)
+        osd_home_direction = grad_to_sect(bearing);//array of arrows =)
   }
 }
 
@@ -147,7 +156,7 @@ void setHomeVars(OSD &osd)
 void setFdataVars()
 {
   //Moved from panel because warnings also need this var and panClimb could be off
-  vs = (osd_climb * converth * 60) * 0.1 + vs * 0.9;
+  vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9;
 
   if(max_battery_reading < osd_battery_remaining_A)
     max_battery_reading = osd_battery_remaining_A;
@@ -156,16 +165,16 @@ void setFdataVars()
   runt = millis();
 
 
-  if (takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
-    takeofftime = 1;
+  if (lflags.takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
+    lflags.takeofftime = 1;
     tdistance = 0;
-    FTime = (time_lapse/1000);
+    FTime = time_lapse/1000;
   }
 
 
-    if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (time_lapse) / 1000.0);
+    if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
 
-    mah_used += (osd_curr_A * 10.0 * (time_lapse) / 3600000.0);
+    mah_used += (osd_curr_A * 10.0 * time_lapse / 3600000.0);
 
 
     int rssi_v;
@@ -180,7 +189,7 @@ void setFdataVars()
         if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
         if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
 
-        rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(float)(sets.RSSI_high-sets.RSSI_low)*100.0f);
+        rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(sets.RSSI_high-sets.RSSI_low)*100.0f);
 
         if(rssi > 100) rssi = 100;
     } else 
@@ -190,13 +199,13 @@ void setFdataVars()
   //Set max data
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-    if(sets.model_type == 0 && takeofftime == 1 || sets.model_type == 2 && motor_armed){
+    if(sets.model_type == 0 && lflags.takeofftime == 1 || sets.model_type == 2 && lflags.motor_armed){
  #else
-    if (motor_armed)  {
+    if (lflags.motor_armed)  {
  #endif
 #else
  #ifdef IS_PLANE
-  if (takeofftime == 1){
+  if (lflags.takeofftime == 1){
  #else
     if(0){
  #endif

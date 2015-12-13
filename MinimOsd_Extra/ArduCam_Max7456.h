@@ -4,6 +4,7 @@
 
 /******* FROM DATASHEET *******/
 
+// pinout
 #define MAX7456_SELECT 6//SS
 #define MAX7456_VSYNC 2//INT0
 
@@ -98,30 +99,29 @@ class OSD: public BetterStream
 {
   public:
     OSD(void);
-    void init(void);
-    void hw_init(void);
-    void clear(void);
-    void plug(void);
-    void setPanel(uint8_t start_col, uint8_t start_row);
-    void control(uint8_t ctrl);
-    void detectMode(void);
-    void setMode(uint8_t mode);
-    void setBrightness();
-    void openSingle(uint8_t x, uint8_t y);
-    uint8_t getMode(void);
-    uint8_t getCenter(void);
-    void update(void);
-    virtual int     available(void);
-    virtual int     read(void);
-    virtual int     peek(void);
+    static void init(void);
+    static void hw_init(void);
+    static void clear(void);
+    static void setPanel(uint8_t start_col, uint8_t start_row);
+    static void detectMode(void);
+    static void setMode(uint8_t mode);
+    static void setBrightness();
+    static uint8_t getMode(void);
+    static inline uint8_t getCenter(void);
+    static void update(void);
+    virtual byte     available(void);
+    virtual byte     read(void);
+    virtual byte     peek(void);
     virtual void    flush(void);
     virtual size_t write(uint8_t c);
-    void write_NVM(int font_count, uint8_t *character_bitmap);
+    static void write_NVM(int font_count, uint8_t *character_bitmap);
+    static void write_xy(uint8_t x, uint8_t y, uint8_t c);
     using BetterStream::write;
-  private:
-    uint8_t col, row, video_mode, video_center;
-    uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
-    uint16_t bufpos;
+
+//  private:
+    static uint8_t col, row, video_mode, video_center;
+    static uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+    static uint16_t bufpos;
 };
 
 #endif

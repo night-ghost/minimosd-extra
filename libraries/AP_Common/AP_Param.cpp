@@ -13,7 +13,10 @@
 /// @brief  The AP variable store.
 
 
-#include <FastSerial.h>
+//#include <FastSerial.h>
+#include <SingleSerial.h>
+
+//#define HardwareSerial_h
 #include <AP_Common.h>
 #include <AP_Math.h>
 

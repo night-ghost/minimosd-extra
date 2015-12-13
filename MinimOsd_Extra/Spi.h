@@ -17,9 +17,9 @@ class SPI
 {
   public:
     SPI(void);
-    void mode(byte);
-    byte transfer(byte);
-    byte transfer(byte, byte);
+    static void mode(byte);
+    static byte transfer(byte);
+    static byte transfer(byte, byte);
 };
 
 extern SPI Spi;
