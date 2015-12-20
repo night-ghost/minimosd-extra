@@ -1,5 +1,12 @@
+fixed bug with formatting in configuration applet
+Flight results panel now can be on any screen
+Class SingleSerial - uses ~500 bytes less flash than FastSerial
+other space optimizations - now free 4,5 kbytes of flash
+
 в конфигураторе исправлен баг с форматированием
+панель сводки сделана равноправной и ее можно назначить на любой экран
+Класс SingleSerial - на ~500 байт меньше чем FastSerial
+прочая оптимизация размера кода - теперь свободно 4.5к флеша
 
-панель сводки сделан равноправным и его можно назначить на любой экран
 
-оптимизация размера кода
+

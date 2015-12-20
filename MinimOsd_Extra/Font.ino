@@ -11,7 +11,7 @@ void uploadFont()
 
     osd.clear();
 
-    Serial.printf_P(PSTR("RFF\n"));
+    Serial.print_P(PSTR("RFF\n"));
 
     while(font_count < 256) { 
         int8_t incomingByte = Serial.read();
@@ -44,7 +44,7 @@ void uploadFont()
             osd.write_NVM(font_count, character_bitmap);
             byte_count = 0;
             font_count++;
-            Serial.printf_P(PSTR("CD\n"));
+            Serial.print_P(PSTR("CD\n"));
         }
     }
 }

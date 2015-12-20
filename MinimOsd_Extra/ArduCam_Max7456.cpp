@@ -1,15 +1,13 @@
 #include "compat.h"
 
+#include "Arduino.h"
+
 #include <SingleSerial.h>
 //#include <FastSerial.h>
 
 #include "ArduCam_Max7456.h"
 // Get the common arduino functions
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "wiring.h"
-#endif
+
 
 #include "Spi.h"
 //#include <EEPROM.h>
@@ -105,21 +103,51 @@ void OSD::detectMode()
   else if((B00000010 & osdstat_r) != 0){ //NTSC
       setMode(0);
   }
-//  else if((B00000100 & osdstat_r) != 0){ //loss of sync
+  else if((B00000100 & osdstat_r) != 0){ //loss of sync
 //      setMode(1); // PAL without video 
-//  }
-
-
-  //If no signal was detected so it uses EEPROM config
-  else{
       if (flags.PAL_NTSC) //NTSC
           setMode(0);
       else  //PAL
           setMode(1);
-      
+  }
+
+
+  //If no signal was detected so it uses EEPROM config
+  else{
+/*      if (flags.PAL_NTSC) //NTSC
+          setMode(0);
+      else  //PAL
+          setMode(1);
+*/      
   }
 
   max7456_off();
+}
+
+//------------------ Set Mode (PAL/NTSC) ------------------------------------
+
+void OSD::setMode(uint8_t themode){
+    uint8_t mode;
+
+    switch(themode){
+    case 0:
+        mode = MAX7456_MODE_MASK_NTCS;
+        video_center = MAX7456_CENTER_NTSC;
+        break;
+    case 1:
+        mode = MAX7456_MODE_MASK_PAL;
+        video_center = MAX7456_CENTER_PAL;
+        break;
+    }
+  
+    if(video_mode != mode){
+	video_mode = mode;
+//	hw_init();
+        max7456_on();
+        MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
+        max7456_off();
+
+    }
 }
 
 //------------------ Set Brightness  ---------------------------------
@@ -144,27 +172,6 @@ void OSD::setBrightness()
 
 }
 
-//------------------ Set Mode (PAL/NTSC) ------------------------------------
-
-void OSD::setMode(uint8_t themode){
-    uint8_t mode;
-
-    switch(themode){
-    case 0:
-        mode = MAX7456_MODE_MASK_NTCS;
-        video_center = MAX7456_CENTER_NTSC;
-        break;
-    case 1:
-        mode = MAX7456_MODE_MASK_PAL;
-        video_center = MAX7456_CENTER_PAL;
-        break;
-    }
-  
-    if(video_mode != mode){
-	video_mode = mode;
-	hw_init();
-    }
-}
 
 //------------------ Get Mode (PAL 0/NTSC 1) --------------------------------
 
@@ -190,10 +197,9 @@ inline uint8_t OSD::getCenter()
 }
 
 
-//------------------ clear ---------------------------------------------------
+//-----------------
 
-void OSD::clear() {
-  // clear the screen
+void OSD::clear() {  // clear the screen
   max7456_on();
   MAX_write(MAX7456_DMM_reg, MAX7456_CLEAR_display);
   max7456_off();

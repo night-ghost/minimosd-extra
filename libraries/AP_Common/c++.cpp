@@ -32,7 +32,7 @@ extern "C" void __cxa_pure_virtual()
 {
     while (1)
     {
-        Serial.println("Error: pure virtual call");
+//        Serial.println("Error: pure virtual call");
         delay(1000);
     }
 }
@@ -73,8 +73,8 @@ void displayMemory()
     static int minMemFree=0;
     if (minMemFree<=0 || freeMemory()<minMemFree) {
         minMemFree = freeMemory();
-        Serial.print("bytes free: ");
-        Serial.println(minMemFree);
+//        Serial.print("bytes free: ");
+//        Serial.println(minMemFree);
     }
 }
 

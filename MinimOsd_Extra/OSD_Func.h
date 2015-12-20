@@ -10,7 +10,7 @@ inline void writeEEPROM(uint8_t value, uint16_t address) {
 }
 */
 
-extern volatile struct loc_flags lflags;  // все булевые флаги кучей
+extern struct loc_flags lflags;  // все булевые флаги кучей
 
 inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);

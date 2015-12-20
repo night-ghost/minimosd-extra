@@ -77,3 +77,4 @@ BetterStream::txspace(void)
         // by default claim that there is always space in transmit buffer
         return(255);
 }
+

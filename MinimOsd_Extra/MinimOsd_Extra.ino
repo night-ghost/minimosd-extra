@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 
- #define LEDPIN AmperagePin
+// #define LEDPIN AmperagePin
 
 
 
@@ -105,10 +105,10 @@ SingleSerial Serial;
 
 OSD osd; //OSD object 
 
-volatile struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags
-//volatile uint8_t vsync_wait = 0;
+volatile uint8_t vsync_wait = 0;
 //extern uint8_t mavlink_got;
 //extern uint8_t mavlink_on;
 //byte update_stat = 1; // есть данные для показа
@@ -120,10 +120,12 @@ uint8_t rxBuf[RX_SIZE], txBuf[TX_SIZE];
 /* **********************************************/
 
 void isr_VSYNC(){
-    lflags.vsync_wait=0;
+    vsync_wait=0;
+
+
 }
 
-//volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
 volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
 volatile unsigned long int_Timer = 0;         // set in the INT1
 
@@ -145,11 +147,11 @@ void ReadINT_PIN() {
   } else {
 
     // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-    if(int_Timer && !lflags.New_PWM_Frame){
+    if(int_Timer && !New_PWM_Frame){
       PWM_IN = (int)(micros() - int_Timer);
       int_Timer = 0;
 
-      lflags.New_PWM_Frame = true;
+      New_PWM_Frame = true;
     }
   }
 }
@@ -195,7 +197,7 @@ void setup()     {
     unplugSlaves();
 
     OSD::setPanel(5, 5);
-    osd.printf_P(PSTR(OSD_VERSION));
+    osd.print_P(PSTR(OSD_VERSION));
     
     // Get correct settings from EEPROM
     readSettings();
@@ -308,26 +310,29 @@ void loop()
 
     if(lflags.mavlink_got || (lastMAVBeat + 2500 < pt) && lflags.mavlink_on  ){ // были свежие данные - обработать, если данных не было давно - предупредить
 
-#ifdef LEDPIN
-digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
-#endif
-
       OnMavlinkTimer();
-      lflags.update_stat = lflags.vsync_wait = 1;	// и перерисовать экран
+      lflags.update_stat = 1; // пришли данные
+      vsync_wait = 1;	      // надо перерисовать экран
       lflags.mavlink_on  = lflags.mavlink_got;
     }
 
     if(lflags.update_stat) {
-	if(!lflags.vsync_wait){
+#ifdef LEDPIN
+digitalWrite(LEDPIN, 1); 
+#endif
+	if(!vsync_wait){ // только во время обратного хода
+
+#ifdef LEDPIN
+//digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+digitalWrite(LEDPIN, 0); 
+#endif
 	    osd.update();
 	    lflags.update_stat = 0;
-
         }
     }
 
-
-    if(lflags.New_PWM_Frame){
-	lflags.New_PWM_Frame=false;
+    if(New_PWM_Frame){
+	New_PWM_Frame=false;
 
 	// data in PWM_IN
 #ifdef LEDPIN

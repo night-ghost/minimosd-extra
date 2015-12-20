@@ -202,11 +202,8 @@ struct loc_flags {
 
     bool mavlink_got:1;		// флаг получения пакета
     bool mavlink_on:1;		// флаг активности (сбрасывается по таймауту)
-    bool vsync_wait:1;
-    bool New_PWM_Frame:1;	// Flag marker for new and changed PWM value
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
-// 9
     bool osd_clear:1;
     bool one_sec_timer_switch:1;
 
@@ -217,9 +214,6 @@ struct loc_flags {
     bool last_armed_status:1;
     bool ma:1;
     bool takeofftime:1;
-
-
-// 16
 
     bool blinker:1;
 

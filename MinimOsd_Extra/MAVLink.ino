@@ -10,7 +10,7 @@ static uint8_t crlf_count = 0;
 // static int packet_drops = 0; unused
 // static int parse_error = 0; unused
 
-extern volatile struct loc_flags lflags;  // все булевые флаги кучей
+extern struct loc_flags lflags;  // все булевые флаги кучей
 
 //uint8_t mavlink_got = 0; // флаг получения пакета
 //uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)

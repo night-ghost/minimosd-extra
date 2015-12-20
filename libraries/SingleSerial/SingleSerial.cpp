@@ -294,3 +294,5 @@ void SingleSerial::write(uint8_t c)
 }
 #endif
 
+
+void serialEventRun(void){}

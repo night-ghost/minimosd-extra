@@ -12,6 +12,8 @@
 
 #ifndef AP_PARAM_H
 #define AP_PARAM_H
+
+#define HardwareSerial_h
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
