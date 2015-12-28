@@ -184,7 +184,7 @@ void SingleSerial::end()
 uint8_t SingleSerial::available(void)
 {
 	if (!_open)
-		return (0);
+		return 0;
 	return ((_rxBuffer.head - _rxBuffer.tail) & _rxBuffer.mask);
 }
 /*
@@ -201,13 +201,11 @@ uint8_t SingleSerial::read(void)
 
 	// if the head and tail are equal, the buffer is empty
 	if (!_open || (_rxBuffer.head == _rxBuffer.tail))
-		return (0);
+		return 0;
 
 	// pull character from tail
 	c = _rxBuffer.bytes[_rxBuffer.tail];
 	_rxBuffer.tail = (_rxBuffer.tail + 1) & _rxBuffer.mask;
-
-//	digitalWrite(A1, !digitalRead(A1));
 
 	return (c);
 }
@@ -217,7 +215,7 @@ uint8_t SingleSerial::peek(void)
 
 	// if the head and tail are equal, the buffer is empty
 	if (!_open || (_rxBuffer.head == _rxBuffer.tail))
-		return (-1);
+		return 0;
 
 	// pull character from tail
 	return (_rxBuffer.bytes[_rxBuffer.tail]);
