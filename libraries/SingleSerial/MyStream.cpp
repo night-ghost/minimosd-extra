@@ -28,6 +28,10 @@
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
+
+unsigned int MyStream::_timeout=1000;      // number of milliseconds to wait for the next char before aborting timed read
+unsigned long MyStream::_startMillis;
+
 // private method to read stream with timeout
 uint8_t MyStream::timedRead()
 {

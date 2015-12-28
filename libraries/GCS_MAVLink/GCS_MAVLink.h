@@ -7,11 +7,13 @@
 #define GCS_MAVLink_h
 
 #define HardwareSerial_h
-#include <BetterStream.h>
+#include "../SingleSerial/BetterStream.h"
 
 // we have separate helpers disabled to make it possible
 // to select MAVLink 1.0 in the arduino GUI build
 //#define MAVLINK_SEPARATE_HELPERS
+
+#define MAVLINK_COMM_NUM_CHANNELS 1
 
 #include "include/mavlink/v1.0/ardupilotmega/version.h"
 
@@ -37,6 +39,7 @@ extern mavlink_system_t mavlink_system;
 ///
 static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 {
+#if MAVLINK_COMM_NUM_CHANNELS>1
     switch(chan) {
 	case MAVLINK_COMM_0:
 		mavlink_comm_0_port->write(ch);
@@ -47,6 +50,9 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 	default:
 		break;
 	}
+#else
+		mavlink_comm_0_port->write(ch);
+#endif
 }
 
 /// Read a byte from the nominated MAVLink channel
@@ -56,6 +62,7 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 ///
 static inline uint8_t comm_receive_ch(mavlink_channel_t chan)
 {
+#if MAVLINK_COMM_NUM_CHANNELS>1
     uint8_t data = 0;
 
     switch(chan) {
@@ -69,6 +76,9 @@ static inline uint8_t comm_receive_ch(mavlink_channel_t chan)
 		break;
 	}
     return data;
+#else
+    return mavlink_comm_0_port->read();
+#endif
 }
 
 /// Check for available data on the nominated MAVLink channel
@@ -77,6 +87,7 @@ static inline uint8_t comm_receive_ch(mavlink_channel_t chan)
 /// @returns		Number of bytes available
 static inline uint16_t comm_get_available(mavlink_channel_t chan)
 {
+#if MAVLINK_COMM_NUM_CHANNELS>1
     uint16_t bytes = 0;
     switch(chan) {
 	case MAVLINK_COMM_0:
@@ -89,6 +100,9 @@ static inline uint16_t comm_get_available(mavlink_channel_t chan)
 		break;
 	}
     return bytes;
+#else
+	return mavlink_comm_0_port->available();
+#endif
 }
 
 
@@ -98,6 +112,7 @@ static inline uint16_t comm_get_available(mavlink_channel_t chan)
 /// @returns		Number of bytes available, -1 for error
 static inline int comm_get_txspace(mavlink_channel_t chan)
 {
+#if MAVLINK_COMM_NUM_CHANNELS>1
     switch(chan) {
 	case MAVLINK_COMM_0:
 		return mavlink_comm_0_port->txspace();
@@ -109,6 +124,9 @@ static inline int comm_get_txspace(mavlink_channel_t chan)
 		break;
 	}
     return -1;
+#else
+    return 1;
+#endif
 }
 
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS

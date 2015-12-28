@@ -22,3 +22,4 @@ void adc_setup(){
   ADCSRA |= PS_64;    // set our own prescaler to 64 
 
 }
+

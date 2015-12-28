@@ -70,7 +70,7 @@ void readPanelSettings() {
     static uint8_t currentPanel=255;
     
     if(panelN==currentPanel) return;
-    if(panelN>npanels) return; // не читаем мусор при переключении на служебные панели с верхними номерами
+    if(panelN>=MAX_PANELS) return; // не читаем мусор при переключении на служебные панели с верхними номерами
     currentPanel=panelN;
 
 
@@ -80,7 +80,7 @@ void readPanelSettings() {
 
 uint8_t checkPAL(uint8_t line){
     if(line >= osd.getCenter() && osd.getMode() == 0){
-        line -= 3;//Cutting lines offset after center if NTSC
+        line -= 3;	//Cutting lines offset after center if NTSC
     }
     return line;
 }

@@ -37,9 +37,9 @@ void writePanels(){
   //No mavlink data available panel
   if(pt > (lastMAVBeat + 2200)){
 
-    if (currentAutoPanel != npanels){
+    if (currentAutoPanel != MAX_PANELS){
 //      osd.clear();
-      currentAutoPanel = npanels;
+      currentAutoPanel = MAX_PANELS;
     }
     panWaitMAVBeats({5,10}); //Waiting for MAVBeats...
   }
@@ -73,7 +73,7 @@ void writePanels(){
     //Check for panel toggle
     if(sets.ch_toggle > 0) panOff(); // This must be first so you can always toggle
 
-    if(panelN < npanels){ // конфигурируемые юзером экраны
+    if(panelN < MAX_PANELS){ // конфигурируемые юзером экраны
     	// must be first to other can overwrite free space
       if(is_on(panel.horizon)) panHorizon(panel.horizon); //14x5
 
@@ -202,7 +202,7 @@ void panOff(){
 	    текущий номер = приращение канала / зазор
         
         */
-        int d = (1900-1100)/npanels;
+        int d = (1900-1100)/MAX_PANELS;
         byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
         //First panel
         if ( panelN != n) {
@@ -218,7 +218,7 @@ void panOff(){
     }
     if(lflags.rotatePanel == 1){
         panelN++;
-        if (panelN > npanels)
+        if (panelN > MAX_PANELS)
             panelN = 0;
 
     }
@@ -753,12 +753,13 @@ void panHorizon(point p){
 
   
   // сначала очистим и нарисуем стрелочки.
+//    const char p=
 
-    osd.print_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"
-                     "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"
-                     "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"
-                     "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"
-                     "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3"));
+    osd.print_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"));
+    osd.print_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"));
+    osd.print_P(PSTR("\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"));
+    osd.print_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"));
+    osd.print_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"));
                       
     showHorizon(p.x + 1, p.y);
 
@@ -1123,193 +1124,18 @@ void panFlightMode(point p){
  #ifdef IS_PLANE
     if(sets.model_type==0) {
 	mode_str = (PGM_P)pgm_read_word(&mode_p_strings[osd_mode]);
-
-/*    
-        if (osd_mode == 0) mode_str = PSTR("manu"); //Manual
-        if (osd_mode == 1) mode_str = PSTR("circ"); //CIRCLE
-        if (osd_mode == 2) mode_str = PSTR("stab"); //Stabilize
-        if (osd_mode == 3) mode_str = PSTR("trai"); //Training
-        if (osd_mode == 4) mode_str = PSTR("acro"); //ACRO
-        if (osd_mode == 5) mode_str = PSTR("fbwa"); //FLY_BY_WIRE_A
-        if (osd_mode == 6) mode_str = PSTR("fbwb"); //FLY_BY_WIRE_B
-        if (osd_mode == 7) mode_str = PSTR("cruz"); //Cruise
-        if (osd_mode == 8) mode_str = PSTR("atun"); //autotune
-        if (osd_mode == 10) mode_str = PSTR("auto"); //AUTO
-        if (osd_mode == 11) mode_str = PSTR("rtl "); //Return to Launch
-        if (osd_mode == 12) mode_str = PSTR("loit"); //Loiter
-        if (osd_mode == 15) mode_str = PSTR("guid"); //GUIDED
-        if (osd_mode == 16) mode_str = PSTR("init"); //initializing
-*/
     } else {
-
 	mode_str = (PGM_P)pgm_read_word(&mode_c_strings[osd_mode]);
-
-/*
-        switch (osd_mode){
-        case 0:
-	    mode_str = PSTR("stab"); //Stabilize
-	    break;
-	
-        case  1: 
-	    mode_str = PSTR("acro"); //Acrobatic
-	    break;
-	
-        case  2: 
-	    mode_str = PSTR("alth"); //Alt Hold
-	    break;
-	 
-	case  3: 
-	    mode_str = PSTR("auto"); //Auto
-	    break;
-	 
-	case  4: 
-	    mode_str = PSTR("guid"); //Guided
-	    break;
-	 
-        case  5: 
-	    mode_str = PSTR("loit"); //Loiter
-	    break;
-	 
-	case  6: 
-	    mode_str = PSTR("rtl "); //Return to Launch
-	    break;
-	 
-        case  7: 
-	    mode_str = PSTR("circ"); //Circle
-	    break;
-	 
-	case  8: 
-	    mode_str = PSTR("posi"); //Position Hold (Old)
-	    break;
-	 
-        case  9: 
-	    mode_str = PSTR("land"); //Land
-	    break;
-	 
-        case  10: 
-	    mode_str = PSTR("oflo"); //OF_Loiter
-	    break;
-	 
-        case  11: 
-	    mode_str = PSTR("drif"); //Drift
-	    break;
-	 
-	case  13: 
-	    mode_str = PSTR("sprt"); //Sport
-	    break;
-	 
-	case  14: 
-	    mode_str = PSTR("flip"); //Flip
-	    break;
-	 
-	case  15: 
-	    mode_str = PSTR("tune"); //Tune
-	    break;
-	 
-	case  16: 
-	    mode_str = PSTR("hold"); //Position Hold (Earlier called Hybrid)
-	    break;
-	}
-*/
     }
-
 
  #else
-
 	mode_str = (PGM_P)pgm_read_word(&mode_c_strings[osd_mode]);
-/*
-    switch (osd_mode){
-    case 0:
-	mode_str = PSTR("stab"); //Stabilize
-	break;
-	 
-    case  1: 
-	mode_str = PSTR("acro"); //Acrobatic
-	break;
-	
-    case  2: 
-	mode_str = PSTR("alth"); //Alt Hold
-	break;
-	 
-    case  3: 
-	mode_str = PSTR("auto"); //Auto
-	break;
-	 
-    case  4: 
-	mode_str = PSTR("guid"); //Guided
-	break;
-	 
-    case  5: 
-	mode_str = PSTR("loit"); //Loiter
-	break;
-	 
-    case  6: 
-	mode_str = PSTR("rtl "); //Return to Launch
-	break;
-	 
-    case  7: 
-	mode_str = PSTR("circ"); //Circle
-	break;
-	 
-    case  8: 
-	mode_str = PSTR("posi"); //Position Hold (Old)
-	break;
-	 
-    case  9: 
-	mode_str = PSTR("land"); //Land
-	break;
-	 
-    case  10: 
-	mode_str = PSTR("oflo"); //OF_Loiter
-	break;
-	 
-    case  11: 
-	mode_str = PSTR("drif"); //Drift
-	break;
-	 
-    case  13: 
-	mode_str = PSTR("sprt"); //Sport
-	break;
-	 
-    case  14: 
-	mode_str = PSTR("flip"); //Flip
-	break;
-	 
-    case  15: 
-	mode_str = PSTR("tune"); //Tune
-	break;
-	 
-    case  16: 
-	mode_str = PSTR("hold"); //Position Hold (Earlier called Hybrid)
-	break;
-	
-    }
-*/
  #endif    
 #else
  #ifdef IS_PLANE
-
 	mode_str = (PGM_P)pgm_read_word(&mode_p_strings[osd_mode]);
-/*
-    if (osd_mode == 0)  mode_str = PSTR("manu"); //Manual
-    if (osd_mode == 1)  mode_str = PSTR("circ"); //CIRCLE
-    if (osd_mode == 2)  mode_str = PSTR("stab"); //Stabilize
-    if (osd_mode == 3)  mode_str = PSTR("trai"); //Training
-    if (osd_mode == 4)  mode_str = PSTR("acro"); //ACRO
-    if (osd_mode == 5)  mode_str = PSTR("fbwa"); //FLY_BY_WIRE_A
-    if (osd_mode == 6)  mode_str = PSTR("fbwb"); //FLY_BY_WIRE_B
-    if (osd_mode == 7)  mode_str = PSTR("cruz"); //Cruise
-    if (osd_mode == 8)  mode_str = PSTR("atun"); //autotune
-    if (osd_mode == 10) mode_str = PSTR("auto"); //AUTO
-    if (osd_mode == 11) mode_str = PSTR("rtl "); //Return to Launch
-    if (osd_mode == 12) mode_str = PSTR("loit"); //Loiter
-    if (osd_mode == 15) mode_str = PSTR("guid"); //GUIDED
-    if (osd_mode == 16) mode_str = PSTR("init"); //initializing
-*/
  #endif    
 #endif
-
-
 
     osd.print_P(mode_str);
     osd_write( lflags.motor_armed ? 0x86:' ');
@@ -1678,7 +1504,6 @@ void panSetup(){
             {
                 osd.print_P(PSTR("   Stall Speed   "));
                 printSpeed(sets.stall);
-                //overwritedisplay();
                 sets.stall = change_val(sets.stall, stall_ADDR);
                 break;
             }

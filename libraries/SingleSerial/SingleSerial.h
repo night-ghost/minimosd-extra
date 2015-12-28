@@ -53,7 +53,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "./BetterStream.h"
+#include "BetterStream.h"
 
 
 /// @file	SingleSerial.h
@@ -96,7 +96,7 @@ public:
 //	virtual void begin(long baud);
 	virtual void end(void);
 	virtual uint8_t available(void);
-	virtual uint8_t txspace(void);
+//	virtual uint8_t txspace(void);
 	virtual uint8_t read(void);
 	virtual uint8_t peek(void);
 	virtual void flush(void);

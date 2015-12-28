@@ -187,14 +187,14 @@ uint8_t SingleSerial::available(void)
 		return (0);
 	return ((_rxBuffer.head - _rxBuffer.tail) & _rxBuffer.mask);
 }
-
+/*
 uint8_t SingleSerial::txspace(void)
 {
 	if (!_open)
 		return (0);
 	return ((_txBuffer.mask+1) - ((_txBuffer.head - _txBuffer.tail) & _txBuffer.mask));
 }
-
+*/
 uint8_t SingleSerial::read(void)
 {
 	uint8_t c;

@@ -103,7 +103,7 @@ struct Settings {
     byte ch_toggle; //  9 - ext PWM!
     byte OSD_BRIGHTNESS;
 
-    byte overspeed;
+    byte overspeed; // эти 3 байта могут меняться при внутренней настройке!
     byte stall;
     byte battv;
     

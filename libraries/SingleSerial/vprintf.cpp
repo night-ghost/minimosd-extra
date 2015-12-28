@@ -189,6 +189,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         break;
                 } while ( (c = GETBYTE (in_progmem, 1, fmt)) != 0);
 
+#ifndef SKIP_FLOAT
                 /*
                  * Handle floating-point formats E, F, G, e, f, g.
                  */
@@ -359,7 +360,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
 
                         goto tail;
                 }
-
+#endif
                 /*
                  * Handle string formats c, s, S.
                  */

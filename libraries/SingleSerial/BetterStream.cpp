@@ -71,6 +71,7 @@ BetterStream::_printf_P(const prog_char *fmt, ...)
         va_end(ap);
 }
 
+/*
 uint8_t
 BetterStream::txspace(void)
 {
@@ -78,3 +79,4 @@ BetterStream::txspace(void)
         return(255);
 }
 
+*/

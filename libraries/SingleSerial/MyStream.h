@@ -38,8 +38,8 @@ readBytesBetween( pre_string, terminator, buffer, length)
 class MyStream : public Print
 {
   protected:
-    unsigned long _timeout;      // number of milliseconds to wait for the next char before aborting timed read
-    unsigned long _startMillis;  // used for timeout measurement
+    static unsigned int _timeout;      // number of milliseconds to wait for the next char before aborting timed read
+    static unsigned long _startMillis;  // used for timeout measurement
     uint8_t timedRead();    // private method to read stream with timeout
     uint8_t timedPeek();    // private method to peek stream with timeout
     uint8_t peekNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
@@ -50,7 +50,7 @@ class MyStream : public Print
     virtual uint8_t peek() = 0;
     virtual void flush() = 0;
 
-    MyStream() {_timeout=1000;}
+    MyStream() { /*_timeout=1000; */ }
 
     size_t _write(uint8_t c){ write(c); }
     

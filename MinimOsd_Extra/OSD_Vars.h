@@ -4,7 +4,7 @@
 
  Flags flags; // битовые флаги из EEPROM
  Settings sets;	// настройки из EEPROM
- Panel panel;
+ Panel panel; // элементы экрана из EEPROM
 
 
 static float        max_home_distance = 0;
@@ -15,7 +15,7 @@ static float        max_osd_windspeed = 0;
 static float        nor_osd_windspeed = 0;
 static float        vs = 0;
 
-static float tdistance = 0;
+static float  tdistance = 0;
 
 static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
 
@@ -47,7 +47,7 @@ static uint8_t      currentAutoPanel=255; //0 - Normal OSD; 1 - Flight summary; 
 
 //static uint16_t     ch_raw = 0;
 
-static uint16_t chan_raw[8];
+static uint16_t     chan_raw[8]; // значение каналов управления
 
 static uint8_t      check_warning = 1;
 
@@ -127,8 +127,8 @@ static uint16_t     temperature = 0;
 
 
 
-static uint16_t     remaining_estimated_flight_time_seconds = 0;
-static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
+static uint16_t      remaining_estimated_flight_time_seconds = 0;
+static uint8_t       osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 static unsigned long one_sec_timer = 0;
 static unsigned long timer_100ms = 0;
 static unsigned long timer_20ms = 0;
@@ -186,9 +186,9 @@ static uint8_t      apm_mav_system;
 static uint8_t      apm_mav_component;
 //static boolean      one_sec_timer_switch = 0;
 
-static const uint8_t npanels = 4;
+//static const uint8_t npanels = 4;
+#define MAX_PANELS 4
 static uint8_t panelN = 0; 
-
 
 
 //*************************************************************************************************************

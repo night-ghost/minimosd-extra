@@ -1,5 +1,4 @@
 /*
-
 Copyright (c) 2011.  All rights reserved.
 An Open Source Arduino based OSD and Camera Control project.
 
@@ -52,9 +51,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 // AVR Includes
 //#include <FastSerial.h>
-#include <SingleSerial.h>
-#include <AP_Common.h>
-#include <AP_Math.h>
+#include "libs/SingleSerial/SingleSerial.h"
+#include "libs/AP_Common/AP_Common.h"
+#include "libs/AP_Math/AP_Math.h"
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -69,10 +68,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 //#include <EEPROM.h>
 //#include <SimpleTimer.h> - no timer!
-#include <GCS_MAVLink.h>
+#include "libs/GCS_MAVLink/GCS_MAVLink.h"
 
 #ifdef membug
-#include <MemoryFree.h>
+#include "libs/MemoryFree/MemoryFree.h"
 #endif
 
 // Configurations

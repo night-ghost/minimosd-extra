@@ -13,7 +13,11 @@
 
 #define HardwareSerial_h
 
-#include <../MyStream/MyStream.h>
+
+// printf without float
+//#define SKIP_FLOAT
+
+#include "MyStream.h"
 #include <avr/pgmspace.h>
 #include "../AP_Common/AP_Common.h"
 
@@ -32,7 +36,7 @@ public:
         void            _printf_P(const prog_char *, ...);
                 __attribute__ ((format(__printf__, 2, 3)));
 
-        virtual uint8_t     txspace(void);
+//        virtual uint8_t     txspace(void);
 
 #define printf_P(fmt, ...) _printf_P((const prog_char *)fmt, ## __VA_ARGS__)
 

@@ -7,7 +7,7 @@
 
 #define HardwareSerial_h
 
-#include <AP_Common.h>
+#include "../AP_Common/AP_Common.h"
 #include <stdint.h>
 #include "rotations.h"
 #include "vector2.h"
