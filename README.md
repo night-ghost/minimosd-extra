@@ -1,5 +1,4 @@
 # minimosd-extra
-Automatically exported from code.google.com/p/minimosd-extra
 
 refactored a bit - now uses much less memory and can use less EEPROM
 

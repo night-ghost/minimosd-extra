@@ -3,6 +3,10 @@
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
 
+#define ToDeg(x) (x*57.2957795131) // *180/pi
+
+
+
 // true when we have received at least 1 MAVLink packet
 //static bool mavlink_active = 0; // флаг активности (навсегда)
 static uint8_t crlf_count = 0;

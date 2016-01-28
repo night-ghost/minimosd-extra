@@ -51,9 +51,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 // AVR Includes
 //#include <FastSerial.h>
-#include "libs/SingleSerial/SingleSerial.h"
-#include "libs/AP_Common/AP_Common.h"
-#include "libs/AP_Math/AP_Math.h"
+#include <SingleSerial.h>
+//#include <AP_Common.h>
+//#include <AP_Math.h>
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -68,10 +68,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 //#include <EEPROM.h>
 //#include <SimpleTimer.h> - no timer!
-#include "libs/GCS_MAVLink/GCS_MAVLink.h"
+#include "GCS_MAVLink.h"
 
 #ifdef membug
-#include "libs/MemoryFree/MemoryFree.h"
+#include "MemoryFree.h"
 #endif
 
 // Configurations
@@ -112,9 +112,6 @@ volatile uint8_t vsync_wait = 0;
 //extern uint8_t mavlink_on;
 //byte update_stat = 1; // есть данные для показа
 
-#define RX_SIZE 128
-#define TX_SIZE 16
-uint8_t rxBuf[RX_SIZE], txBuf[TX_SIZE];
 
 /* **********************************************/
 
@@ -186,8 +183,7 @@ void setup()     {
 
     attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 
-//    Serial.begin(TELEMETRY_SPEED);
-    Serial.begin(TELEMETRY_SPEED, rxBuf, RX_SIZE, txBuf, TX_SIZE);
+    Serial.begin(TELEMETRY_SPEED);
     // setup mavlink port
     mavlink_comm_0_port = &Serial;
 

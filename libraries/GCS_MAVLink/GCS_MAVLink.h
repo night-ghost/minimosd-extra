@@ -9,6 +9,8 @@
 #define HardwareSerial_h
 #include "../SingleSerial/BetterStream.h"
 
+#include "compat.h"
+
 // we have separate helpers disabled to make it possible
 // to select MAVLink 1.0 in the arduino GUI build
 //#define MAVLINK_SEPARATE_HELPERS
