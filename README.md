@@ -17,11 +17,21 @@ voltage, current & RSSI can be used from external pins
 
 TLOG player in configurator - now settings can be checked without working plane/copter!
 
-RADAR and ILS in Horizon, can be enabled individually
+RADAR (like in MiniNAZAosd) and ILS in Horizon, can be enabled individually
 
 horizon angles can be adjusted, indepentently in PAL and NTSC
 
+PAL/NTSC detected dynamically - now can use different cameras!
+
 screen offsets via configurator
+
+can use additional pins (that can be found on some boards) for measuring 2nd battery current and voltage
+
+new GPS coords - in one line
+
+Any RC channel can be translated to output pin (eg. for cameras switch)
+
+
 
 /* RUSSIAN */
 

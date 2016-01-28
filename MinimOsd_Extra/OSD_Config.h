@@ -11,7 +11,7 @@
 
 
 #define VERSION "2.4"
-#define RELEASE "r807 DV"
+#define RELEASE "r808 DV"
 
 
 // additional pins
@@ -54,12 +54,3 @@
 
 #include "eeprom.h"
 
-/*
-TODO
-
-
-+ трансляция PWM из канала на внешний вывод - например для переключения камеры
-+ кольцевая смена экранов по длинному нажатию
-
-
-*/

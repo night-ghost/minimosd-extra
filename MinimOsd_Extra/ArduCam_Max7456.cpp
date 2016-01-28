@@ -3,14 +3,12 @@
 #include "Arduino.h"
 
 #include <SingleSerial.h>
-//#include <FastSerial.h>
 
 #include "ArduCam_Max7456.h"
 // Get the common arduino functions
 
 
 #include "Spi.h"
-//#include <EEPROM.h>
 #include "OSD_Config.h"
 
 
@@ -64,9 +62,6 @@ void OSD::hw_init(){
 
   MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
 
-//  MAX_write(MAX7456_HOS_reg, sets.horiz_offs); // 0x20 default
-//  MAX_write(MAX7456_VOS_reg, sets.vert_offs); // 0x10 default
-
   setBrightness();
   
   // define sync (auto,int,ext)
@@ -81,7 +76,6 @@ void OSD::init()
 {
   pinMode(MAX7456_SELECT,OUTPUT);
   pinMode(MAX7456_VSYNC, INPUT_PULLUP);
-//  digitalWrite(MAX7456_VSYNC,HIGH); //enabling pull-up resistor
 
     detectMode();
 

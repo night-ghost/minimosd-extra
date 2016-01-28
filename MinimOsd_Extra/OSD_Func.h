@@ -1,14 +1,3 @@
-// EEPROM reader/writers
-// Utilities for writing and reading from the EEPROM
-/*inline byte readEEPROM(uint16_t address) {
-
-    return (uint8_t)eeprom_read_byte(address);
-}
-
-inline void writeEEPROM(uint8_t value, uint16_t address) {
-    eeprom_write_byte(address, value);
-}
-*/
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
