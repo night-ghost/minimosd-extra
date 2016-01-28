@@ -84,6 +84,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 #include "prototypes.h"
 
+
+
+
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
 
@@ -466,3 +469,8 @@ inline void unplugSlaves(){   //Unplug list of SPI
     max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 
+#include "OSD_Config_Func.h"
+#include "Panels.h"
+#include "MAVLink.h"
+#include "Font.h"
+#include "adc_setup.h"
