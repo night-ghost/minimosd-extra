@@ -1,4 +1,4 @@
-
+void adc_setup();
 void panLogo();
 
 //void writeSettings();
@@ -47,11 +47,18 @@ void panAirSpeed(point p);
 void panFlightMode(point p);
 void panClimb(point p);
 void panTune(point p);
+void panFdata(point p);
+void panBatt_B(point p);
+void panGPS2(point p);
+void panCh(point p);
 void showHorizon(byte start_col, byte start_row);
+void showILS(byte start_col, byte start_row);
+void showRADAR(byte center_col, byte center_line);
 
 void uploadFont();
 
 void On100ms();
+void On20ms();
 
 void max7456_off();
 int grad_to_sect(int grad);

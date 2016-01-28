@@ -1144,7 +1144,7 @@ void panFlightMode(point p){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-void showArrow(int rotate_arrow, byte method) {
+void showArrow(uint8_t rotate_arrow,uint8_t method){
     char arrow_set1 = 0x90;
 
 
