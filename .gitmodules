@@ -1,0 +1,3 @@
+[submodule "libraries/SingleSerial"]
+	path = libraries/SingleSerial
+	url = https://github.com/night-ghost/SingleSerial.git

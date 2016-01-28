@@ -177,7 +177,7 @@ void setFdataVars()
     mah_used += (osd_curr_A * 10.0 * time_lapse / 3600000.0);
 
 
-    int rssi_v;
+    int rssi_v = 0;
     byte ch = sets.RSSI_raw / 2;
 
 

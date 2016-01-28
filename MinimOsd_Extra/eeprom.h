@@ -2,6 +2,8 @@
 /* *********************************************** */
 // EEPROM Storage addresses
 
+#include <avr/eeprom.h>
+
 #define OffsetBITpanel       128 // размер для одного экрана
 
 #define EEPROM_MAX_ADDR 1024 // this is 328 chip
