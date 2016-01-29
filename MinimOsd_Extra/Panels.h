@@ -596,7 +596,8 @@ void check_warn()
     wmask |= 8;
 
 //5
- if (!sets.RSSI_raw && rssi < sets.rssi_warn_level && rssi != -99 )
+    // не сырое значение  
+ if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
     wmask |= 16;
 
 //6

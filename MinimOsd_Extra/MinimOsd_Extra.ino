@@ -340,6 +340,15 @@ digitalWrite(LEDPIN, 0);
     
 }
 
+float avgRSSI(uint16_t d){
+    RSSI_rawArray[(ind++)%8] = d;
+    d=0;
+    for (uint8_t i=0;i<8;i++)
+        d += RSSI_rawArray[i];
+
+    return d/8.0;
+}
+
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
     if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
@@ -360,7 +369,7 @@ void On100ms(){ // периодические события, не связан�
 	
 	if(v<0) osd_battery_remaining_A  = 0;
 	else if(v>255) osd_battery_remaining_A  = 255;
-	else   osd_battery_remaining_A  = v;
+	else           osd_battery_remaining_A  = v;
 
     }
 
@@ -406,22 +415,31 @@ void On100ms(){ // периодические события, не связан�
 
         static uint8_t ind = 0;
         static uint16_t RSSI_rawArray[8];
-        int d;
+        unsigned int d;
 
-        if(ch == 1 || ch == 2) {
-            if(ch == 1) d = analogRead(RssiPin);
-            else        d = pulseIn(RssiPin,HIGH, 20000);
-            
-            RSSI_rawArray[(ind++)%8] = d;
-	    
-	    d=0;
-            for (uint8_t i=0;i<8;i++)
-                d += RSSI_rawArray[i];
-            rssi_in = (float)d/8 * sets.eRSSI_koef; // 8 элементов
+	switch(ch) {
+        case 1:
+    	    d = analogRead(RssiPin);
+    	    goto case_2;
+
+        case 2:
+            d = pulseIn(RssiPin,HIGH, 20000);
+case_2:
+	    rssi_in = avgRSSI(d) * sets.eRSSI_koef; // 8 элементов
+
 	    lflags.mavlink_got=1;
-	}
+	    break;
+
+	case 0:
+	    d=osd_rssi;	// mavlink
+	    goto case_4;
+	 
+	case 4:
+	    d = chan_raw[7]; // ch 8
+case_4:
+	    rssi_in = avgRSSI(d);
+	    break;
     }
-    
 }
 
 

@@ -166,21 +166,30 @@ void setFdataVars()
     mah_used += (osd_curr_A * 10.0 * time_lapse / 3600000.0);
 
 
-    int rssi_v = 0;
-    byte ch = sets.RSSI_raw / 2;
+    uint16_t rssi_v = rssi_in;
+//    byte ch = sets.RSSI_raw / 2;
 
-
-    if(ch == 0) rssi_v = osd_rssi; // mavlink
-    if(ch == 4) rssi_v = chan_raw[7]; // ch 8
-    if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
+//    if(ch == 0) rssi_v = osd_rssi; // mavlink
+//    if(ch == 4) rssi_v = chan_raw[7]; // ch 8
+//    if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
 
     if((sets.RSSI_raw % 2 == 0))  {
-        if(rssi_v < sets.RSSI_low)  rssi_v = sets.RSSI_low;
-        if(rssi_v > sets.RSSI_high) rssi_v = sets.RSSI_high;
+	uint16_t l=sets.RSSI_low, h=sets.RSSI_high;
+	bool rev=false;
+	
+	if(l > h) {
+	    l=h;
+	    h=sets.RSSI_low;
+	    rev=true;
+	}
 
-        rssi = (int16_t)((float)(rssi_v - sets.RSSI_low)/(sets.RSSI_high-sets.RSSI_low)*100.0f);
+        if(rssi_v < l) rssi_v = l;
+        if(rssi_v > h) rssi_v = h;
+
+        rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
 
         if(rssi > 100) rssi = 100;
+        if(rev) rssi=100-rssi;
     } else 
         rssi = rssi_v;
 

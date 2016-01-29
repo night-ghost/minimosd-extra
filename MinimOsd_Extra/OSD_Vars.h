@@ -192,9 +192,9 @@ static uint8_t panelN = 0;
 
 
 //*************************************************************************************************************
-static uint8_t      osd_rssi = 0; //raw value from mavlink
-static uint16_t     rssi_in = 0; //temp readed value
-static uint16_t     rssi = 0; //normalized 0-100%
+static uint8_t      osd_rssi = 0; // raw value from mavlink
+static uint16_t     rssi_in = 0;  // temp readed value after sliding average
+static uint16_t     rssi = 0;     //normalized 0-100%
 
 struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
