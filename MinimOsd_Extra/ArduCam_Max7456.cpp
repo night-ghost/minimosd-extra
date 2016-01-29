@@ -11,6 +11,7 @@
 #include "Spi.h"
 #include "OSD_Config.h"
 
+#include "prototypes.h"
 
 extern Settings sets;
 extern Flags flags;
@@ -50,7 +51,7 @@ void OSD::hw_init(){
   byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);//black level read register
   
   MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
-  delay(150);
+  delay_150();
 
   //set black level
   MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
@@ -66,11 +67,16 @@ void OSD::hw_init(){
   
   // define sync (auto,int,ext)
 //      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
+  MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal); 
+
+  delay_150();
+
   MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
 
   max7456_off();
 
 }
+
 
 void OSD::init()
 {
@@ -132,6 +138,15 @@ void OSD::setMode(uint8_t themode){
         mode = MAX7456_MODE_MASK_PAL;
         video_center = MAX7456_CENTER_PAL;
         break;
+
+    case 2:
+      Spi.transfer((MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal);
+      Serial.println("Internal Sync Set");
+      break;
+    case 3:
+      Spi.transfer((MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_external);
+      Serial.println("External Sync Set");
+      break;  
     }
   
     if(video_mode != mode){

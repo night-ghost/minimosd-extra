@@ -50,10 +50,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "compat.h"
 
 // AVR Includes
-//#include <FastSerial.h>
 #include <SingleSerial.h>
-//#include <AP_Common.h>
-//#include <AP_Math.h>
+
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -86,24 +84,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 
 
-
-/* *************************************************/
-/* ***************** DEFINITIONS *******************/
-
-//OSD Hardware 
-
-#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
-#define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
-
-// #define LEDPIN AmperagePin
-
-
-
 // Objects and Serial definitions
-//FastSerialPort0(Serial);
-
-SingleSerialPort_x(Serial);
-SingleSerial Serial;
+SingleSerialPort(Serial);
 
 OSD osd; //OSD object 
 
@@ -111,28 +93,37 @@ struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевы�
 
 // all bools in lflags
 volatile uint8_t vsync_wait = 0;
-//extern uint8_t mavlink_got;
-//extern uint8_t mavlink_on;
-//byte update_stat = 1; // есть данные для показа
+
+volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile unsigned long int_Timer = 0;         // set in the INT1
+
+				//Bat_1 Bat_2 Current RSSI
+//const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+byte PWM_out_pin=0;
+
+
+// program parts
+
+#include "OSD_Config_Func.h"
+#include "Panels.h"
+#include "MAVLink.h"
+#include "Font.h"
+#include "adc_setup.h"
+
+
+
+
+// #define LEDPIN AmperagePin
+
+
 
 
 /* **********************************************/
 
 void isr_VSYNC(){
     vsync_wait=0;
-
-
 }
-
-volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
-volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
-volatile unsigned long int_Timer = 0;         // set in the INT1
-
-
-				//Bat_1 Bat_2 Current RSSI
-//const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
-byte PWM_out_pin=0;
-
 
 // PWM Measurement
 void ReadINT_PIN() {
@@ -155,6 +146,10 @@ void ReadINT_PIN() {
   }
 }
 
+
+void delay_150(){
+    delay(150);
+}
 
 /* ***************** SETUP() *******************/
 
@@ -232,7 +227,7 @@ void setup()     {
 
     osd.init();    // Start 
     
-    delay(100);
+    delay_150();
 
     osd.update();// Show bootloader bar
 
@@ -341,6 +336,9 @@ digitalWrite(LEDPIN, 0);
 }
 
 float avgRSSI(uint16_t d){
+    static uint8_t ind = 0;
+    static uint16_t RSSI_rawArray[8];
+
     RSSI_rawArray[(ind++)%8] = d;
     d=0;
     for (uint8_t i=0;i<8;i++)
@@ -413,8 +411,6 @@ void On100ms(){ // периодические события, не связан�
     {
         byte ch = sets.RSSI_raw / 2;
 
-        static uint8_t ind = 0;
-        static uint16_t RSSI_rawArray[8];
         unsigned int d;
 
 	switch(ch) {
@@ -439,6 +435,7 @@ case_2:
 case_4:
 	    rssi_in = avgRSSI(d);
 	    break;
+	}
     }
 }
 
@@ -487,8 +484,3 @@ inline void unplugSlaves(){   //Unplug list of SPI
     max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 
-#include "OSD_Config_Func.h"
-#include "Panels.h"
-#include "MAVLink.h"
-#include "Font.h"
-#include "adc_setup.h"

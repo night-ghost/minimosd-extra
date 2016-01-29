@@ -1,3 +1,4 @@
+
 void adc_setup();
 void panLogo();
 
@@ -62,4 +63,5 @@ void On20ms();
 
 void max7456_off();
 int grad_to_sect(int grad);
-//int grad_to_sect(float grad);
+
+void delay_150();
