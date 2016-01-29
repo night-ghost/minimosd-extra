@@ -1504,7 +1504,7 @@ void panCh(point p){
     struct Params {
 	PGM_P name;
 	char type;
-	float k;
+	byte k;
 	void *value;
 	void (*cb)();
 	PGM_P fmt;
@@ -1536,8 +1536,8 @@ static const PROGMEM char f_int[]  = "%.0f";
 
 static const PROGMEM Params params[] = {
 	{n_sets,   'h',   0,   0, 0, 0},        // header with pal/ntsc string
-	{n_batt,   'b', 0.1, &sets.battv , 0, f_batt },
-	{n_battB,  'b', 0.1, &sets.battBv, 0, f_batt  },
+	{n_batt,   'b', 10, &sets.battv , 0, f_batt },
+	{n_battB,  'b', 10, &sets.battBv, 0, f_batt  },
 	
 	{n_screen, 0,   0,   0, 0}, // header
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int},
@@ -1567,17 +1567,21 @@ void move_menu(byte dir){
 	move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
     }
 
+    lflags.mavlink_got=1; // renew screen
+
 }
 
 static uint32_t btn_time, text_timer;
 static uint16_t chan1_raw_middle, chan2_raw_middle;
+
+#define SETUP_START_ROW 1
 
 void panSetup(){
 
     Params p;
     float v;
     byte size;
-    float inc;
+    float inc = 0;
 
     if (millis() > text_timer)
         text_timer = millis() + 200;
@@ -1598,7 +1602,7 @@ void panSetup(){
 
 
     for(byte i=0; i<N_PARAMS; i++) {
-	OSD::setPanel(0 + i, 1);
+	OSD::setPanel(1, SETUP_START_ROW + i);
     
 	p = params[i];
 
@@ -1613,8 +1617,17 @@ void panSetup(){
 
         switch (p.type){
         
+        case 'h':
+    	    if(OSD::getMode()) 
+		osd.print_P(PSTR(" (PAL)"));
+	    else
+		osd.print_P(PSTR(" (NTSC)"));
+	    // no break!
+	case 0:
+	    continue;
+        
         case 'b': // byte param
-	    v=*((byte *)p.value) * p.k;
+	    v=*((byte *)p.value) / (float)p.k;
 	    break;
 	    
         case 'f': // byte param
@@ -1625,69 +1638,71 @@ void panSetup(){
 	osd.printf_P(p.fmt, v);
     }
 
-    OSD::setPanel(0 + setup_menu, col);
+    OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
 
     p = params[setup_menu];
 
-        switch (p.type){
+    int diff =  labs( chan1_raw_middle - chan_raw[0] );
+
+    switch (p.type){
         
         case 'b': // byte param
-	    v=*((byte *)p.value) * p.k;
-    	    inc = 1;
+	    v=*((byte *)p.value) / (float)p.k;
     	    size= 1;
+//	    if( btn_time >  1000) inc = 1;
+//    	    else                  inc = 0.1;
+	    if(     diff>300)	inc=1;
+	    else if(diff>100)	inc=0.1;
 	    break;
-	    
+
         case 'f': // byte param
 	    v=*((float *)p.value);
 	    size=4;
 	
-	    if(     btn_time > 1000) inc=1;
-	    else if(btn_time >  500) inc=0.1;
-	    else if(btn_time >  200) inc=0.01;
-	    else                     inc=0.001;
+//	    if(     btn_time >  2000) inc=1;
+//	    else if(btn_time >  1000) inc=0.1;
+//	    else if(btn_time >   200) inc=0.01;
+//	    else                      inc=0.001;
+
+	    if(     diff>400)	inc=1;
+	    else if(diff>300)	inc=0.1;
+	    else if(diff>200)	inc=0.01;
+	    else if(diff>100)	inc=0.001;
+
 	    break;
-	}
+    }
 
 
-        float value_old = v;
-        bool press=false;
+    float value_old = v;
+    bool press=false;
         
-        if (chan_raw[0] > chan1_raw_middle + 100) {
-    	    v-=inc;
-    	    press=true;
-    	}
-        if (chan_raw[0] < chan1_raw_middle - 100) {
-    	    v +=inc;
-    	    press=true;
-    	}
-    	if(press){
-    	    if(!btn_time) btn_time = millis();
-    	} else            btn_time = 0;
+    
+    if(diff>100){
+	if (chan_raw[0] > chan1_raw_middle) v -=inc;
+	if (chan_raw[0] < chan1_raw_middle) v +=inc;
+
+    	if(!btn_time) btn_time = millis();
+    } else            btn_time = 0;
     
 
-        switch (p.type){
-        
+    switch (p.type){
         case 'b': // byte param
-	    *((byte *)p.value) = (byte) v / p.k;
+	    *((byte *)p.value) = (byte)(v * p.k);
 	    break;
 	    
         case 'f': // float param
 	    *((float *)p.value) = v;
 	    break;
-	}
+    }
 
-	osd.printf_P(p.fmt, v); // upda
 
-        if(v != value_old && setup_menu ) {
-	    eeprom_write_len((byte *)p.value,  (EEPROM_offs(sets) + ((byte *)p.value - (byte *)&sets)),  size );
-
-	    osd.printf_P(p.fmt, v); // updated value
-	    
-	    lflags.mavlink_got=1; // renew screen
-	}
+    if(v != value_old) {
+	eeprom_write_len( (byte *)p.value,  EEPROM_offs(sets) + ((byte *)p.value - (byte *)&sets),  size );
+	osd.printf_P(p.fmt, v); // updated value
+	lflags.mavlink_got=1;   // renew screen
+    }
 
 }
-
 
 #if 0 // unused
 
@@ -1719,7 +1734,7 @@ void panGPL(point p){
 // Staus  : done
 
 void panMavBeat(point p){
-    OSD::setPanel(p.x,p.y);
+    OSD::setPanel(p.x, p.y);
 
     if(lflags.mavbeat == 1){
         osd.print_P(PSTR("\xEA\xEC"));
