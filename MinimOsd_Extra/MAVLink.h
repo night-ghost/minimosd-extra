@@ -6,9 +6,6 @@
 #define ToDeg(x) (x*57.2957795131) // *180/pi
 
 
-
-// true when we have received at least 1 MAVLink packet
-//static bool mavlink_active = 0; // флаг активности (навсегда)
 static uint8_t crlf_count = 0;
 
 // static int packet_drops = 0; unused
@@ -16,11 +13,8 @@ static uint8_t crlf_count = 0;
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
-//uint8_t mavlink_got = 0; // флаг получения пакета
-//uint8_t mavlink_on = 0;  // флаг активности (сбрасывается по таймауту)
 
-
-/*
+/* перенастраивать оборудование без спроса - моветон
 void request_mavlink_rates()
 {
     const uint8_t  maxStreams = 6;
@@ -55,15 +49,16 @@ void read_mavlink(){
         uint8_t c = Serial.read();
 
 
-        /* allow CLI to be started by hitting enter 3 times, if no
-        heartbeat packets have been received */
+/*      allow CLI to be started by hitting enter 3 times, if no
+        heartbeat packets have been received but not more than 20 seconds 
+*/
         if (!lflags.mavlink_active && millis() < 20000 && millis() > 3000) {
             if (c == '\n' || c == '\r') {
                 crlf_count++;
             } else {
                 crlf_count = 0;
             }
-            if (crlf_count >= 3) {
+            if (crlf_count > 3) {
                 uploadFont();
             }
         }
@@ -72,8 +67,6 @@ void read_mavlink(){
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
             lastMAVBeat = millis();
             lflags.mavlink_active = lflags.mavlink_on = lflags.mavlink_got = 1;
-
-//digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
 
             //handle msg
             switch(msg.msgid) {

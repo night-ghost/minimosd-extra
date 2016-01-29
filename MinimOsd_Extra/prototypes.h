@@ -34,7 +34,6 @@ void panWPDis(point p);
 void panAlt(point p);
 void panCur_A(point p);
 void panCur_A(point p);
-void showArrow(uint8_t rotate_arrow,uint8_t method);
 void panCALLSIGN(point p);
 void panDistance(point p);
 void panTemp(point p);
@@ -55,6 +54,9 @@ void panCh(point p);
 void showHorizon(byte start_col, byte start_row);
 void showILS(byte start_col, byte start_row);
 void showRADAR(byte center_col, byte center_line);
+void panSetup();
+
+void showArrow(uint8_t rotate_arrow,uint8_t method);
 
 void uploadFont();
 

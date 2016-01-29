@@ -12,11 +12,23 @@ boolean inline has_sign(point p){
     return !(p.x & 0x80);
 }
 
+// чтение и запись мелких объектов
+void eeprom_read_len(byte *p, uint16_t e, uint16_t l){
+    for(;l>0; l--, e++) {
+	*p++ = (byte)eeprom_read_byte( (byte *)e );
+    }
+}
+
+void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
+    for(;  l>0; l--, e++)
+	eeprom_write_byte( (byte *)e, *p++ );
+
+}
 
 void readSettings() {
 
 // считаем все кучно
-    uint8_t *p, *ee;
+/*    uint8_t *p, *ee;
     uint16_t i;
 
     for(i=0, p=(byte *)&flags, ee=(byte *)(EEPROM_offs(flags)); i<sizeof(Flags); i++)
@@ -25,7 +37,10 @@ void readSettings() {
 
     for(i=0, p=(byte *)&sets,  ee=(byte *)(EEPROM_offs(sets));  i<sizeof(Settings); i++) // 512 размер остатка EEPROM так что байта для адреса мало
 	*p++ = (byte)eeprom_read_byte( ee++ );
+*/
 
+    eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
+    eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
 
 // сразу настроим системы измерения

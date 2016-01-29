@@ -80,8 +80,8 @@ void OSD::hw_init(){
 
 void OSD::init()
 {
-  pinMode(MAX7456_SELECT,OUTPUT);
-  pinMode(MAX7456_VSYNC, INPUT_PULLUP);
+    pinMode(MAX7456_SELECT,OUTPUT);
+    pinMode(MAX7456_VSYNC, INPUT_PULLUP);
 
     detectMode();
 
@@ -138,17 +138,8 @@ void OSD::setMode(uint8_t themode){
         mode = MAX7456_MODE_MASK_PAL;
         video_center = MAX7456_CENTER_PAL;
         break;
-
-    case 2:
-      Spi.transfer((MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal);
-      Serial.println("Internal Sync Set");
-      break;
-    case 3:
-      Spi.transfer((MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_external);
-      Serial.println("External Sync Set");
-      break;  
     }
-  
+ 
     if(video_mode != mode){
 	video_mode = mode;
 //	hw_init();

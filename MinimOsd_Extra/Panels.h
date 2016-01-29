@@ -128,6 +128,12 @@ void writePanels(){
       if(is_on(panel.ch)) panCh(panel.ch);
       if(is_on(panel.distance)) panDistance(panel.distance);
       if(is_on(panel.callSign)) panCALLSIGN(panel.callSign); 
+    } else {
+	// last panel
+	
+	if(!lflags.motor_armed) {
+	    panSetup();
+	}
     }
   }
 //  
@@ -1465,8 +1471,6 @@ void panCh(point p){
 }
 
 
-#if 0 // unused
-
 /* **************************************************************** */
 // Panel  : panSetup
 // Needs  : Nothing, uses whole screen
@@ -1474,59 +1478,218 @@ void panCh(point p){
 // Size   : 3 x ?? (rows x chars)
 // Staus  : done
 
+/* параметры для руления
+
+    switch_mode    режим переключения экранов
+    OSD_BRIGHTNESS контраст надписей
+
+    float evBattA_koef;  // коэффициенты внешних измерений
+    float evBattB_koef;
+    float eCurrent_koef;
+    float eRSSI_koef;
+
+    float horiz_kRoll; // коэффициенты горизонта
+    float horiz_kPitch;
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+....
+    byte battBv; // мин значение батареи B
+....
+    byte vert_offs; // сдвиг экрана по вертикали и горизонтали
+    byte horiz_offs;
+    
+*/
+
+    struct Params {
+	PGM_P name;
+	char type;
+	float k;
+	void *value;
+	void (*cb)();
+	PGM_P fmt;
+    };
+
+void renew(){
+    OSD::hw_init();
+}
+
+static const PROGMEM char n_sets[]        = "      OSD setup ";
+static const PROGMEM char n_batt[]        = "Battery warning ";
+static const PROGMEM char n_battB[]       = "Batt 2 warning  ";
+
+static const PROGMEM char n_screen[]      = "  Screen params ";
+static const PROGMEM char n_contr[]       = "Contrast        ";
+static const PROGMEM char n_horiz[]       = "Horizontal offs ";
+static const PROGMEM char n_vert[]        = "Vertical offs   ";
+
+static const PROGMEM char n_horizon[]     = "  Horizon angles";
+static const PROGMEM char n_k_PitchPAL[]  = "Pitch in PAL    ";
+static const PROGMEM char n_k_RollPAL[]   = "Roll  in PAL    ";
+static const PROGMEM char n_k_PitchNTSC[] = "Pitch in NTSC   ";
+static const PROGMEM char n_k_RollNTSC[]  = "Roll  in NTSC   ";
+
+static const PROGMEM char f_float[]= "%.3f";
+static const PROGMEM char f_batt[] = "%3.1f\x76";
+static const PROGMEM char f_int[]  = "%.0f";
+
+
+static const PROGMEM Params params[] = {
+	{n_sets,   'h',   0,   0, 0, 0},        // header with pal/ntsc string
+	{n_batt,   'b', 0.1, &sets.battv , 0, f_batt },
+	{n_battB,  'b', 0.1, &sets.battBv, 0, f_batt  },
+	
+	{n_screen, 0,   0,   0, 0}, // header
+	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int},
+	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int },
+	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int },
+
+	{n_horizon,     0, 0,   0, 0}, // header
+	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float},
+	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float},
+	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float},
+	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float},
+};
+
+static byte setup_menu;
+
+#define N_PARAMS (sizeof(params)/sizeof(Params))
+
+void move_menu(byte dir){
+
+    setup_menu +=dir;
+    
+    if (     setup_menu < 0       )  setup_menu = N_PARAMS;	// цикл по параметрам,
+    else if (setup_menu >= N_PARAMS) setup_menu = 0;
+
+    if(!params[setup_menu].value) {
+//        osd.print_P(p.name); // header on screen
+	move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
+    }
+
+}
+
+static uint32_t btn_time, text_timer;
+static uint16_t chan1_raw_middle, chan2_raw_middle;
+
 void panSetup(){
 
-    if (millis() > text_timer){
-        text_timer = millis() + 500;
+    Params p;
+    float v;
+    byte size;
+    float inc;
 
-//        osd.clear();
-        OSD::setPanel(5, 7);
-
-        if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
-            chan1_raw_middle = chan_raw[0];
-            chan2_raw_middle = chan_raw[1];
-        }
-
-        if ((chan_raw[1] - 100) > chan2_raw_middle ) setup_menu++;  //= setup_menu + 1;
-        else if ((chan_raw[1] + 100) < chan2_raw_middle ) setup_menu--;  //= setup_menu - 1;
-        if (setup_menu < 0) setup_menu = 0;
-        else if (setup_menu > 2) setup_menu = 2;
+    if (millis() > text_timer)
+        text_timer = millis() + 200;
+    else return;
+    
 
 
-        switch (setup_menu){
-        case 0:
-            {
-                osd.print_P(PSTR("    Overspeed    "));
-                printSpeed(sets.overspeed);
-                overspeed = change_val(sets.overspeed, overspeed_ADDR);
-                break;
-            }
-        case 1:
-            {
-                osd.print_P(PSTR("   Stall Speed   "));
-                printSpeed(sets.stall);
-                sets.stall = change_val(sets.stall, stall_ADDR);
-                break;
-            }
-        case 2:
-            {
-                osd.print_P(PSTR("Battery warning "));
-                osd.printf("%3.1f\x76", float(sets.battv)/10.0);
-                sets.battv = change_val(sets.battv, battv_ADDR);
-                break;
-            }
-        }
+    if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
+        chan1_raw_middle = chan_raw[0];	// запомнить начальные значения  - центр джойстика
+        chan2_raw_middle = chan_raw[1];
     }
+
+
+    if (     (chan_raw[1] - 100) > chan2_raw_middle )  move_menu(1);  // переходы по строкам;
+    else if ((chan_raw[1] + 100) < chan2_raw_middle )  move_menu(-1);  
+
+    byte col;
+
+
+    for(byte i=0; i<N_PARAMS; i++) {
+	OSD::setPanel(0 + i, 1);
+    
+	p = params[i];
+
+        osd.print_P(p.name);
+
+	if(i == setup_menu) {
+	    osd.write('>');
+	    col=OSD::col;
+	} else {
+	    osd.write(' ');
+	}
+
+        switch (p.type){
+        
+        case 'b': // byte param
+	    v=*((byte *)p.value) * p.k;
+	    break;
+	    
+        case 'f': // byte param
+	    v=*((float *)p.value);
+	    break;
+	}
+
+	osd.printf_P(p.fmt, v);
+    }
+
+    OSD::setPanel(0 + setup_menu, col);
+
+    p = params[setup_menu];
+
+        switch (p.type){
+        
+        case 'b': // byte param
+	    v=*((byte *)p.value) * p.k;
+    	    inc = 1;
+    	    size= 1;
+	    break;
+	    
+        case 'f': // byte param
+	    v=*((float *)p.value);
+	    size=4;
+	
+	    if(     btn_time > 1000) inc=1;
+	    else if(btn_time >  500) inc=0.1;
+	    else if(btn_time >  200) inc=0.01;
+	    else                     inc=0.001;
+	    break;
+	}
+
+
+        float value_old = v;
+        bool press=false;
+        
+        if (chan_raw[0] > chan1_raw_middle + 100) {
+    	    v-=inc;
+    	    press=true;
+    	}
+        if (chan_raw[0] < chan1_raw_middle - 100) {
+    	    v +=inc;
+    	    press=true;
+    	}
+    	if(press){
+    	    if(!btn_time) btn_time = millis();
+    	} else            btn_time = 0;
+    
+
+        switch (p.type){
+        
+        case 'b': // byte param
+	    *((byte *)p.value) = (byte) v / p.k;
+	    break;
+	    
+        case 'f': // float param
+	    *((float *)p.value) = v;
+	    break;
+	}
+
+	osd.printf_P(p.fmt, v); // upda
+
+        if(v != value_old && setup_menu ) {
+	    eeprom_write_len((byte *)p.value,  (EEPROM_offs(sets) + ((byte *)p.value - (byte *)&sets)),  size );
+
+	    osd.printf_P(p.fmt, v); // updated value
+	    
+	    lflags.mavlink_got=1; // renew screen
+	}
+
 }
 
-int change_val(uint8_t value, int address)
-{
-    uint8_t value_old = value;
-    if (chan_raw[0] > chan1_raw_middle + 100) value--;
-    if (chan_raw[0] < chan1_raw_middle - 100) value++;
-    if(value != value_old && setup_menu ) eeprom_write_byte(address, value);
-    return value;
-}
+
+#if 0 // unused
 
 /* **************************************************************** */
 // Panel  : panGPL
