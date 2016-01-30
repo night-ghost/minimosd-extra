@@ -657,7 +657,7 @@ void panWarn(point p){
         w=PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"); //No GPS fix!
         break;
     case 2:
-        w=PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20");
+        w=PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"); // Stall!
         break;
     case 3:
         w=PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"); //Over Speed!
@@ -1514,6 +1514,7 @@ void renew(){
     OSD::hw_init();
 }
 
+// в нашем распоряжении 16 строк
 static const PROGMEM char n_sets[]        = "      OSD setup ";
 static const PROGMEM char n_batt[]        = "Battery warning ";
 static const PROGMEM char n_battB[]       = "Batt 2 warning  ";
@@ -1562,10 +1563,7 @@ void move_menu(byte dir){
     if (     setup_menu < 0       )  setup_menu = N_PARAMS;	// цикл по параметрам,
     else if (setup_menu >= N_PARAMS) setup_menu = 0;
 
-    if(!params[setup_menu].value) {
-//        osd.print_P(p.name); // header on screen
-	move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
-    }
+    if(!params[setup_menu].value) move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
 
     lflags.mavlink_got=1; // renew screen
 
@@ -1576,6 +1574,8 @@ static uint16_t chan1_raw_middle, chan2_raw_middle;
 
 #define SETUP_START_ROW 1
 
+
+// TODO задействовать второй джойстик для переключения экранов
 void panSetup(){
 
     Params p;
@@ -1596,7 +1596,7 @@ void panSetup(){
 
 
     if (     (chan_raw[1] - 100) > chan2_raw_middle )  move_menu(1);  // переходы по строкам;
-    else if ((chan_raw[1] + 100) < chan2_raw_middle )  move_menu(-1);  
+    else if ((chan_raw[1] + 100) < chan2_raw_middle )  move_menu(-1);
 
     byte col;
 
@@ -1663,7 +1663,6 @@ void panSetup(){
 //	    else if(btn_time >  1000) inc=0.1;
 //	    else if(btn_time >   200) inc=0.01;
 //	    else                      inc=0.001;
-
 	    if(     diff>400)	inc=1;
 	    else if(diff>300)	inc=0.1;
 	    else if(diff>200)	inc=0.01;
@@ -1678,10 +1677,10 @@ void panSetup(){
         
     
     if(diff>100){
-	if (chan_raw[0] > chan1_raw_middle) v -=inc;
-	if (chan_raw[0] < chan1_raw_middle) v +=inc;
+	if(chan_raw[0] > chan1_raw_middle) v -= inc;
+	if(chan_raw[0] < chan1_raw_middle) v += inc;
 
-    	if(!btn_time) btn_time = millis();
+	if(!btn_time) btn_time = millis();
     } else            btn_time = 0;
     
 
@@ -1716,13 +1715,11 @@ void panSetup(){
 void panGPL(point p){
     OSD::setPanel(p.x,p.y);
 
-
-    if(osd_fix_type == 0 || osd_fix_type == 1) 
+    if(osd_fix_type == 0 || osd_fix_type == 1)
         osd.print_P(PSTR("\x10\x20"));
     else if(osd_fix_type == 2 || osd_fix_type == 3)
         osd.print_P(PSTR("\x11\x20"));
 
-    
 }
 
 /* **************************************************************** */
@@ -1739,8 +1736,7 @@ void panMavBeat(point p){
     if(lflags.mavbeat == 1){
         osd.print_P(PSTR("\xEA\xEC"));
         lflags.mavbeat = 0;
-    }
-    else{
+    } else{
         osd.print_P(PSTR("\xEA\xEB"));
     }
 }

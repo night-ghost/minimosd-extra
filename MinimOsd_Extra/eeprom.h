@@ -103,11 +103,12 @@ struct Settings {
     byte model_type; // 0 - plane 1-copter
 
     byte ch_toggle; //  9 - ext PWM!
+    
     byte OSD_BRIGHTNESS;
 
-    byte overspeed; // эти 3 байта могут меняться при внутренней настройке!
+    byte overspeed; 
     byte stall;
-    byte battv;
+    byte battv; // уровень предупреждения по напряжению
     
     byte switch_mode; // режим переключения: 0 значение, 1 по кругу
     byte auto_screen_switch; // номер экрана куда переключаться при наличии сообщений
@@ -116,7 +117,7 @@ struct Settings {
     byte RSSI_low; 
     byte RSSI_raw;
     
-    byte batt_warn_level;
+    byte batt_warn_level; // уровень предупреждения по заряду
     byte rssi_warn_level;
 
     byte OSD_CALL_SIGN[OSD_CALL_SIGN_TOTAL+1];
@@ -140,7 +141,7 @@ struct Settings {
     float horiz_kRoll_a; // коэффициенты горизонта для NTSC
     float horiz_kPitch_a;
     
-    byte battBv; // мин значение батареи B
+    byte battBv; // мин значение батареи B по напряжению
     
     byte vert_offs; // сдвиг экрана по вертикали и горизонтали
     byte horiz_offs;

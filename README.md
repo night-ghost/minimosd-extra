@@ -32,6 +32,7 @@ new GPS coords - in one line
 Any RC channel can be translated to output pin (eg. for cameras switch)
 
 
+ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
 /* RUSSIAN */
 
@@ -85,3 +86,5 @@ http://forum.rcdesign.ru/f90/thread132831-195.html#post5602416 но через �
 
 После всего этого остается свободно 525 байт памяти и 2+к флеша.
 
+
+Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
