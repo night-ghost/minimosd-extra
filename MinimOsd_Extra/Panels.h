@@ -4,7 +4,7 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
-void osd_write(byte c){
+inline void osd_write(byte c){
     osd.write(c);
 }
 
@@ -19,6 +19,18 @@ float cnvAltError(){
 
 void printTime(int t){
     osd.printf_P(PSTR("%2i\x3a%02i"),((int)t/60)%60, (int)t%60);
+}
+
+void osd_printf_1(PGM_P fmt, float f){
+    osd.printf_P(fmt, f);
+}
+
+void osd_printf_2(PGM_P fmt, float f, byte c){
+    osd.printf_P(fmt, f, c);
+}
+
+void osd_printi_1(PGM_P fmt, int f){
+    osd.printf_P(fmt, f);
 }
 
 void writePanels(){
@@ -137,9 +149,8 @@ void writePanels(){
     }
   }
 //  
-    if(is_on(panel.warn)) panWarn(panel.warn); // this must be here so warnings are always checked
     // show warnings even if screen is disabled
-//    if(is_on(panel.warn)) panWarn(panel.warn);
+     /* if(is_on(panel.warn)) */ panWarn(panel.warn); // this must be here so warnings are always checked
 
 
 
@@ -216,9 +227,9 @@ void panOff(){
         }
       } else{ 			 //Rotation switch
         if (ch_raw > 1200)
-          if (osd_switch_time + 500 < millis()){ // при включенном канале переключаем каждые 0.5 сек
+          if (osd_switch_time < millis()){ // при включенном канале переключаем каждые 0.5 сек
             lflags.rotatePanel = 1;
-            osd_switch_time = millis();
+            osd_switch_time = millis() + 500 ;
         }
       }
     }
@@ -273,11 +284,11 @@ void panCOG(point p){
 }
 
 void printDist(float d){
-      osd.printf_P(PSTR("%5.0f%c"), d, pgm_read_byte(&measure->high));
+      osd_printf_2(PSTR("%5.0f%c"), d, pgm_read_byte(&measure->high));
 }
 
 void printLongDist(float d){
-      osd.printf(PSTR("%5.2f%c"), (d / pgm_read_word(&measure->distconv)), pgm_read_byte(&measure->distchar));
+      osd_printf_2(PSTR("%5.2f%c"), (d / pgm_read_word(&measure->distconv)), pgm_read_byte(&measure->distchar));
 }
 
 void printFullDist(float dd){
@@ -336,7 +347,7 @@ void panFdata(point p){ // итоги полета
 
 void panTemp(point p){
     OSD::setPanel(p.x,p.y);
-    osd.printf_P(PSTR("%5.1f%c"), ((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100), pgm_read_byte(&measure->temps));    
+    osd_printf_2(PSTR("%5.1f%c"), ((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100), pgm_read_byte(&measure->temps));    
 }
 
 /* **************************************************************** */
@@ -364,7 +375,7 @@ void panEff(point p){
 		osd_write(0x16);
             
             if (eff > 0 && eff <= 9999) {
-                  osd.printf_P(PSTR("%4.0f\x01"), eff);
+                  osd_printf_1(PSTR("%4.0f\x01"), eff);
             }else{
                   osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
             }
@@ -385,7 +396,7 @@ void panEff(point p){
                 float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * pgm_read_float(&measure->converth);
                 if (glide > 9999) glide = 9999;
                 if (glide > -0){
-                    osd.printf_P(PSTR("%4.0f%c"), glide, pgm_read_byte(&measure->high));
+                    osd_printf_2(PSTR("%4.0f%c"), glide, pgm_read_byte(&measure->high));
                 }
             }else if (osd_climb >= -0.05 && osd_pitch < 0) {
                   osd.print_P(PSTR("\x20\x20\x90\x91\x20"));
@@ -423,7 +434,7 @@ void panRSSI(point p){
     if(has_sign(p))
 	osd_write(0x09);
 
-    osd.printf_P(PSTR("%3i\x25"), rssi);
+    osd_printi_1(PSTR("%3i\x25"), rssi);
 }
 
 /* **************************************************************** */
@@ -481,7 +492,7 @@ void panCur_A(point p){
     if(has_sign(p))
 	osd_write(0xbd);
 
-    osd.printf_P(PSTR("%5.2f\x0e"), (float(osd_curr_A) * 0.01));
+    osd_printf_1(PSTR("%5.2f\x0e"), (float(osd_curr_A) * 0.01));
 }
 
 /* **************************************************************** */
@@ -514,7 +525,7 @@ void panClimb(point p){
     if(has_sign(p))
 	osd_write(0x15);
 
-    osd.printf_P(PSTR("%4.0f%c"), int(vs) * 1.0, pgm_read_byte(&measure->climbchar));
+    osd_printf_2(PSTR("%4.0f%c"), int(vs) * 1.0, pgm_read_byte(&measure->climbchar));
 }
 
 /* **************************************************************** */
@@ -534,7 +545,7 @@ void panHomeAlt(point p){
 }
 
 void printSpeed(float s){
-    osd.printf_P(PSTR("%3.0f%c"),s,pgm_read_byte(&measure->spe));
+    osd_printf_2(PSTR("%3.0f%c"),s,pgm_read_byte(&measure->spe));
 
 }
 
@@ -690,7 +701,7 @@ void panWarn(point p){
 void panThr(point p){
     OSD::setPanel(p.x,p.y);
 
-    osd.printf_P(PSTR("%3.0i\x25"),osd_throttle);
+    osd_printi_1(PSTR("%3.0i\x25"),osd_throttle);
 }
 
 /* **************************************************************** */
@@ -795,7 +806,7 @@ void panHorizon(point p){
 void panPitch(point p){
     OSD::setPanel(p.x,p.y);
 
-    osd.printf_P(PSTR("%4i\x05\x07"),osd_pitch);
+    osd_printi_1(PSTR("%4i\x05\x07"),osd_pitch);
 }
 
 /* **************************************************************** */
@@ -808,7 +819,7 @@ void panPitch(point p){
 void panRoll(point p){
     OSD::setPanel(p.x,p.y);
 
-    osd.printf_P(PSTR("%4i\x05\x06"),osd_roll);
+    osd_printi_1(PSTR("%4i\x05\x06"),osd_roll);
 }
 
 /* **************************************************************** */
@@ -820,7 +831,7 @@ void panRoll(point p){
 
 
 void printVolt(uint16_t v) {
-    osd.printf_P(PSTR("%5.2f\x0D"), v/1000.0);
+    osd_printf_1(PSTR("%5.2f\x0D"), v/1000.0);
 }
 
 void panBatt_A(point p){
@@ -897,7 +908,7 @@ void panGPSats(point p){
     if(has_sign(p))
 	osd_write(gps_str);
 
-    osd.printf_P(PSTR("%2i"), osd_satellites_visible);    
+    osd_printi_1(PSTR("%2i"), osd_satellites_visible);    
 }
 
 /* **************************************************************** */
@@ -906,6 +917,10 @@ void panGPSats(point p){
 // Output : two row numeric value of current GPS location with LAT/LON symbols as on first char
 // Size   : 2 x 12  (rows x chars)
 // Staus  : done
+
+void print_GPS(PGM_P f){
+    osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+}
 
 void panGPS(point p){
     OSD::setPanel(p.x,p.y);
@@ -917,7 +932,8 @@ void panGPS(point p){
     else 
 	f=PSTR("%10.6f|%10.6f");
 
-    osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+    //osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+    print_GPS(f);
 }
 
 /* **************************************************************** */
@@ -937,7 +953,9 @@ void panGPS2(point p){
     else
     	f=PSTR("%10.6f %10.6f");
 
-    osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+//    osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+    print_GPS(f);
+
 }
 
 /* **************************************************************** */
@@ -950,7 +968,7 @@ void panGPS2(point p){
 void panHeading(point p){
     OSD::setPanel(p.x,p.y);
 
-    osd.printf_P(PSTR("%4i\x05"), (int)osd_heading);
+    osd_printi_1(PSTR("%4i\x05"), (int)osd_heading);
 }
 
 /* **************************************************************** */
@@ -1036,7 +1054,7 @@ void panWPDis(point p){
     showArrow(getTargetBearing(), 0);
 
     if (osd_mode == 10){ // auto
-        osd.printf_P(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * pgm_read_float(&measure->converth)), h);
+        osd_printf_2(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * pgm_read_float(&measure->converth)), h);
     }else{
         osd.print_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
     }
@@ -1398,7 +1416,7 @@ void showRADAR(byte center_col, byte center_line) {
 	
 	float dd=zoom * STEP_WIDTH * pgm_read_float(&measure->converth);
 	if(zoom>=40){ // 10 000 
-	    osd.printf_P(PSTR("%4.2f%c"), (float)(dd/1000.0), pgm_read_byte(&measure->distchar));
+	    osd_printf_2(PSTR("%4.2f%c"), (float)(dd/1000.0), pgm_read_byte(&measure->distchar));
 	} else
             osd.printf_P(PSTR("%4i%c"), (int)(dd), pgm_read_byte(&measure->high));
     }
@@ -1447,7 +1465,7 @@ void panTune(point p){
     else
 	f=PSTR("%3.0f%c|");
 
-    osd.printf_P(f, -cnvAltError(), pgm_read_byte(&measure->high));
+    osd_printf_2(f, -cnvAltError(), pgm_read_byte(&measure->high));
     printSpeed(aspd_error / 100.0);
  #endif
 #endif
