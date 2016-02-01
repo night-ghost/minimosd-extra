@@ -1496,17 +1496,29 @@ void panCh(point p){
     
 */
 
-    struct Params {
-	PGM_P name; 	// наименование
-	char type;	// тип (f-float, b - byte etc)
-	byte k;		// коэффициент сдвига запятой
-	void *value;	// адрес самой переменной
-	void (*cb)();	// callback для применения параметра
-	PGM_P fmt;	// формат печати параметра
-    };
+struct Params {
+    PGM_P name; 	// наименование
+    char type;	// тип (f-float, b - byte etc)
+    byte k;		// коэффициент сдвига запятой
+    void *value;	// адрес самой переменной
+    void (*cb)();	// callback для применения параметра
+    PGM_P fmt;	// формат печати параметра
+};
+
+struct Setup_screen {
+    const Params * const ptr;	// описатель экрана
+    byte size;		// его размер
+    void (*tail)();	// функция отображения остального
+};
+
 
 void renew(){
     OSD::hw_init();
+}
+
+
+void setup_horiz(){
+    showHorizon(8 + 1, 6);
 }
 
 // в нашем распоряжении 16 строк
@@ -1530,35 +1542,51 @@ static const PROGMEM char f_batt[] = "%3.1f\x76";
 static const PROGMEM char f_int[]  = "%.0f";
 
 
-static const PROGMEM Params params[] = {
-	{n_sets,   'h',   0,   0, 0, 0},        // header with pal/ntsc string
+// первый экран настроек
+static const PROGMEM Params params1[] = { 
+	{n_sets,   0,   0,   0,           0, 0},        // header with pal/ntsc string
 	{n_batt,   'b', 10, &sets.battv , 0, f_batt },
 	{n_battB,  'b', 10, &sets.battBv, 0, f_batt  },
 	
-	{n_screen, 0,   0,   0, 0}, // header
+	{n_screen, 0,   0,   0,                    0,     0}, // header
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int},
 	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int },
 	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int },
+};
 
-	{n_horizon,     0, 0,   0, 0}, // header
+// второй экран - горизонт
+static const PROGMEM Params params2[] = { 
+	{n_horizon,     'h', 0,   0,                 0, 0}, // header
 	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float},
 	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float},
 	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float},
 	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float},
 };
 
-static byte setup_menu;
-static uint32_t btn_time, text_timer;
-static uint16_t chan1_raw_middle, chan2_raw_middle;
 
-#define N_PARAMS (sizeof(params)/sizeof(Params))
+static const PROGMEM Setup_screen screens[] = {
+    {params1, (sizeof(params1)/sizeof(Params)), 0 },
+    {params2, (sizeof(params2)/sizeof(Params)), setup_horiz },
+    {0,0} // end marker
+};
+
+#define SETUP_N_SCREENS (sizeof(screens)/sizeof(Setup_screen) - 1)
+
+static byte setup_menu=0; // номер строки меню
+static byte setup_screen=0; // номер экрана меню
+static uint32_t btn_time, text_timer; // время прошлого входа в меню и время нажатия стика
+static uint16_t chan1_raw_middle, chan2_raw_middle; // запомненные при входе значения каналов 1 и 2
+static uint16_t chan3_raw_middle, chan4_raw_middle; // запомненные при входе значения каналов 3 и 4
+const Params *params; // указатель на текущий набор параметров
 
 void move_menu(byte dir){
 
     setup_menu +=dir;
     
-    if (     setup_menu < 0       )  setup_menu = N_PARAMS-1;	// цикл по параметрам,
-    else if (setup_menu >= N_PARAMS) setup_menu = 0;
+    byte n=screens[setup_screen].size;
+    
+    if( (int)setup_menu < 0 ) setup_menu = n-1;	// цикл по параметрам,
+    else if (setup_menu >= n) setup_menu = 0;
 
     if(!params[setup_menu].value) move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
 
@@ -1566,7 +1594,16 @@ void move_menu(byte dir){
 
 }
 
+void move_screen(byte dir){
+    setup_screen +=dir;
 
+    byte n=SETUP_N_SCREENS;
+
+    if( (int)setup_screen <  0 ) setup_screen = n-1;	// цикл по экранам,
+    else if (setup_screen >= n)  setup_screen = 0;
+
+    lflags.mavlink_got=1; // renew screen
+}
 
 #define SETUP_START_ROW 1
 
@@ -1584,20 +1621,29 @@ void panSetup(){
     else return;
     
 
+    params=screens[setup_screen].ptr;
+
 
     if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
         chan1_raw_middle = chan_raw[0];	// запомнить начальные значения  - центр джойстика
         chan2_raw_middle = chan_raw[1];
     }
 
+    if (chan3_raw_middle == 0 && chan4_raw_middle == 0){
+        chan3_raw_middle = chan_raw[2];	// запомнить начальные значения  - центр ВТОРОГО джойстика
+        chan4_raw_middle = chan_raw[3];
+    }
+
 
     if (     (chan_raw[1] - 100) > chan2_raw_middle )  move_menu(1);  // переходы по строкам;
     else if ((chan_raw[1] + 100) < chan2_raw_middle )  move_menu(-1);
 
+    if (     (chan_raw[2] - 100) > chan3_raw_middle )  move_screen(1);  // переходы по экранам;
+    else if ((chan_raw[2] + 100) < chan3_raw_middle )  move_screen(-1);
+
     byte col;
 
-
-    for(byte i=0; i<N_PARAMS; i++) {
+    for(byte i=0; i < screens[setup_screen].size; i++) {
 	OSD::setPanel(1, SETUP_START_ROW + i);
     
 	p = params[i];
@@ -1645,8 +1691,6 @@ void panSetup(){
         case 'b': // byte param
 	    v=*((byte *)p.value) / (float)p.k;
     	    size= 1;
-//	    if( btn_time >  1000) inc = 1;
-//    	    else                  inc = 0.1;
 	    if(     diff>300)	inc=1;
 	    else if(diff>100)	inc=0.1;
 	    break;
@@ -1655,10 +1699,6 @@ void panSetup(){
 	    v=*((float *)p.value);
 	    size=4;
 	
-//	    if(     btn_time >  2000) inc=1;
-//	    else if(btn_time >  1000) inc=0.1;
-//	    else if(btn_time >   200) inc=0.01;
-//	    else                      inc=0.001;
 	    if(     diff>400)	inc=1;
 	    else if(diff>300)	inc=0.1;
 	    else if(diff>200)	inc=0.01;
@@ -1676,7 +1716,7 @@ void panSetup(){
 	if(chan_raw[0] > chan1_raw_middle) v -= inc;
 	if(chan_raw[0] < chan1_raw_middle) v += inc;
 
-	if(!btn_time) btn_time = millis();
+	if(!btn_time) btn_time = millis(); // запомним время первого нажатия
     } else            btn_time = 0;
     
 
