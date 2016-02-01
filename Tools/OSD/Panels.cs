@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OSD
 {
-    // this is mainly copied from osd_panels.pde
+    // this is mainly copied from panels.h
 
 
     using uint16_t = System.UInt16;
@@ -295,9 +295,6 @@ namespace OSD
        {
            osd.setPanel(first_col, first_line);
            
-
-//           osd.printf("%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|%c%c%5i|", 0x43, 0x31, chan1_raw, 0x43, 0x32, chan2_raw, 0x43, 0x33, chan3_raw, 0x43, 0x34, chan4_raw, 0x43, 0x35, chan5_raw, 0x43, 0x36, chan6_raw, 0x43, 0x37, chan7_raw, 0x43, 0x38, chan8_raw);
-
     	   osd.printf_P(PSTR("C1%5i|C2%5i|C3%5i|C4%5i|C5%5i|C6%5i"),
 			             	//chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw);
 			             1550, 1302, 1640, 1456, 1100, 1940);

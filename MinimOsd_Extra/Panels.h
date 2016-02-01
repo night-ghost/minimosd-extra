@@ -1483,31 +1483,26 @@ void panCh(point p){
     switch_mode    режим переключения экранов
     OSD_BRIGHTNESS контраст надписей
 
-    float evBattA_koef;  // коэффициенты внешних измерений
-    float evBattB_koef;
-    float eCurrent_koef;
-    float eRSSI_koef;
-
     float horiz_kRoll; // коэффициенты горизонта
     float horiz_kPitch;
 
     float horiz_kRoll_a; // коэффициенты горизонта для NTSC
     float horiz_kPitch_a;
-....
+
     byte battBv; // мин значение батареи B
-....
+
     byte vert_offs; // сдвиг экрана по вертикали и горизонтали
     byte horiz_offs;
     
 */
 
     struct Params {
-	PGM_P name;
-	char type;
-	byte k;
-	void *value;
-	void (*cb)();
-	PGM_P fmt;
+	PGM_P name; 	// наименование
+	char type;	// тип (f-float, b - byte etc)
+	byte k;		// коэффициент сдвига запятой
+	void *value;	// адрес самой переменной
+	void (*cb)();	// callback для применения параметра
+	PGM_P fmt;	// формат печати параметра
     };
 
 void renew(){
@@ -1553,6 +1548,8 @@ static const PROGMEM Params params[] = {
 };
 
 static byte setup_menu;
+static uint32_t btn_time, text_timer;
+static uint16_t chan1_raw_middle, chan2_raw_middle;
 
 #define N_PARAMS (sizeof(params)/sizeof(Params))
 
@@ -1560,7 +1557,7 @@ void move_menu(byte dir){
 
     setup_menu +=dir;
     
-    if (     setup_menu < 0       )  setup_menu = N_PARAMS;	// цикл по параметрам,
+    if (     setup_menu < 0       )  setup_menu = N_PARAMS-1;	// цикл по параметрам,
     else if (setup_menu >= N_PARAMS) setup_menu = 0;
 
     if(!params[setup_menu].value) move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
@@ -1569,8 +1566,7 @@ void move_menu(byte dir){
 
 }
 
-static uint32_t btn_time, text_timer;
-static uint16_t chan1_raw_middle, chan2_raw_middle;
+
 
 #define SETUP_START_ROW 1
 
@@ -1584,7 +1580,7 @@ void panSetup(){
     float inc = 0;
 
     if (millis() > text_timer)
-        text_timer = millis() + 200;
+        text_timer = millis() + 200; // 5 раз в секунду
     else return;
     
 
