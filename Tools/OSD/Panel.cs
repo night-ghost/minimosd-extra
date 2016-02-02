@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Forms;
 
 namespace OSD {
 	
@@ -11,6 +12,7 @@ namespace OSD {
 		public int pos;
 		public int sign; // 0=no 1=yes -1=disabled
 		public Func<int,int,int,int>show;
+		public TreeNode node;
 		
 		public Panel(String aname, Func<int,int,int,int>ashow, int ax, int ay, int apos, int  asign) {
 			name = aname;

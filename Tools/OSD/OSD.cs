@@ -274,7 +274,9 @@ public const int npanel = 4; // количество панелей
 				foreach(var thing in pi) {
 					if(thing!=null) {
 						TreeNode tn = li.Nodes.Add(thing.name, thing.name);
-						
+						tn.Tag = thing; // зачем каждый раз искать по имени?
+						thing.node =tn; // перекрестные связи рулят
+													
 						if(n==3){
 							if(thing.name=="Channel Raw") {
 								tn.Checked = true;
@@ -511,7 +513,21 @@ public const int npanel = 4; // количество панелей
 			printf(format, args);
 		}
 		
+		
+		public void drawNode(TreeNode tn){
+			Panel thing=(Panel)tn.Tag;
+			
+			selectedrectangle = thing.name==currentlyselected;
 
+			processingpanel = thing.name;
+
+			// ntsc and below the middle line
+			if(thing.y >= getCenter() && !CHK_pal.Checked) {
+				thing.show(thing.x, thing.y - 3,thing.sign);
+			} else { // pal and no change
+				thing.show(thing.x, thing.y,thing.sign);
+			}
+		}
         
         // draw image and characters overlay
         public void Draw (int k) {
@@ -555,12 +571,17 @@ public const int npanel = 4; // количество панелей
 				}
 			}
 
-			pan.setHeadingPatern();
-			pan.setBatteryPic();
+			try {
+				pan.setHeadingPatern();
+				pan.setBatteryPic();
+			} catch (Exception ex) {
+				return;
+			}
 
+/*			
 			List<string> list = new List<string>();
 
-			foreach(TreeNode tn in this.scr[k].LIST_items.Nodes) {
+			foreach(TreeNode tn in scr[k].LIST_items.Nodes) {
 				foreach(TreeNode tn2 in tn.Nodes) {
 					if(tn2.Checked)
 						list.Add(tn2.Text);
@@ -570,7 +591,8 @@ public const int npanel = 4; // количество панелей
 			}
 
 			list.Reverse();
-
+			
+			// TODO: use   thing=tn.tag;
 			foreach(string it in list) {
 				foreach(var thing in this.scr[k].panelItems) {
 					selectedrectangle = false;
@@ -594,6 +616,16 @@ public const int npanel = 4; // количество панелей
 				}
 			}
 			
+//*/
+			
+			foreach(TreeNode tn in scr[k].LIST_items.Nodes) {
+				foreach(TreeNode tn2 in tn.Nodes) {
+					if(tn2.Checked)
+						drawNode(tn2);
+				}
+				if(tn.Checked)
+					drawNode(tn);
+			}
 			
 
 			grfull.DrawImage(screen, 0, 0, image.Width, image.Height);
@@ -766,6 +798,8 @@ public const int npanel = 4; // количество панелей
 
 				wr_start = panel_number * OffsetBITpanel;
 				wr_length = OffsetBITpanel;
+
+// все что мы тут делаем это задаем				
 				
 				List<TreeNode> AllNodes = new List<TreeNode>();
 				foreach(TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {
