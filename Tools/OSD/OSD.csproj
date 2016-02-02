@@ -146,7 +146,9 @@
     <Content Include="osd.ico" />
     <None Include="Resources\saveHS.png" />
     <None Include="Resources\openHS.png" />
-    <Content Include="quad.png" />
+    <Content Include="quad.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="vlcsnap-2012-01-28-07h46m04s95.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

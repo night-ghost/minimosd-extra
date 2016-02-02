@@ -79,17 +79,19 @@ union _Panel {
 
 
 struct Flags { // 4 байта
-    bool OSD_BATT_SHOW_PERCENT:1;
-    bool measure:1;
-    bool RADIO_ON:1;
-    bool PAL_NTSC:1;
+    bool OSD_BATT_SHOW_PERCENT:1;  	// 0
+    bool measure:1;			// 1
+    bool RADIO_ON:1;			// 2
+    bool PAL_NTSC:1;			// 3
     
 // new!
-    bool useExtVbattA:1;// 5
-    bool useExtVbattB:1;// 6
-    bool useExtCurr:1;	// 7
-    bool radar_on:1;	// 8
-    bool ils_on:1;	// 9
+    bool useExtVbattA:1;// 		// 4
+    bool useExtVbattB:1;// 5
+    bool useExtCurr:1;	// 6
+    bool radar_on:1;	// 7
+    bool ils_on:1;	// 8
+    
+    bool mode_auto:1; 	// 9
 };
 
 union _Flags {
@@ -148,6 +150,8 @@ struct Settings {
 
     byte pwm_src; // трансляция PWM на внешний вывод
     byte pwm_dst;
+    
+    byte n_screens;
 };
 
 

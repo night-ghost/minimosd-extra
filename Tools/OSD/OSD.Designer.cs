@@ -48,6 +48,8 @@ namespace OSD
             this.videoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_ntsc = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_pal = new System.Windows.Forms.ToolStripMenuItem();
+			this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
+            this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.resetEepromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,6 +93,8 @@ namespace OSD
             this.label6 = new System.Windows.Forms.Label();
             this.numMinVoltB = new System.Windows.Forms.NumericUpDown();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.cbNscreens = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.numHOS = new System.Windows.Forms.NumericUpDown();
             this.numVOS = new System.Windows.Forms.NumericUpDown();
             this.label31 = new System.Windows.Forms.Label();
@@ -248,8 +252,7 @@ namespace OSD
             	this.fileToolStripMenuItem,
             	this.videoModeToolStripMenuItem,
             	this.optionsToolStripMenuItem,
-            	this.helpToolStripMenuItem
-			});
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(688, 24);
@@ -316,7 +319,8 @@ namespace OSD
             // 
             this.videoModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.CHK_ntsc,
-            this.CHK_pal});
+            this.CHK_pal,
+            this.CHK_auto});
             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
             this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
             this.videoModeToolStripMenuItem.Text = "Video Mode";
@@ -325,7 +329,7 @@ namespace OSD
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(152, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -336,11 +340,21 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(152, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
             this.CHK_pal.Click += new System.EventHandler(this.CHK_pal_Click);
+            // 
+            // autoToolStripMenuItem
+            // 
+            this.CHK_auto.Name = "autoToolStripMenuItem";
+            this.CHK_auto.Size = new System.Drawing.Size(152, 22);
+            this.CHK_auto.Text = "Auto";			
+            this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
+            this.CHK_auto.CheckStateChanged += new System.EventHandler(this.AUTOToolStripMenuItem_CheckStateChanged);
+            
+			// 
             // 
             // optionsToolStripMenuItem
             // 
@@ -355,8 +369,7 @@ namespace OSD
             	this.updateCharsetcustomFwToolStripMenuItem,
             	this.presentCustomCharsetToolStripMenuItem,
             	this.setSketchesPathToolStripMenuItem,
-            	this.getFwFromOSDToolStripMenuItem
-			});
+            this.getFwFromOSDToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
@@ -373,7 +386,7 @@ namespace OSD
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
-            // updateResetEEpromMenuItem
+            // resetEepromToolStripMenuItem
             // 
             this.resetEepromToolStripMenuItem.Name = "resetEepromToolStripMenuItem";
             this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
@@ -791,6 +804,8 @@ namespace OSD
             // 
             // groupBox9
             // 
+            this.groupBox9.Controls.Add(this.cbNscreens);
+            this.groupBox9.Controls.Add(this.label3);
 			this.groupBox9.Controls.Add(this.numHOS);
             this.groupBox9.Controls.Add(this.numVOS);
             this.groupBox9.Controls.Add(this.label31);
@@ -800,13 +815,38 @@ namespace OSD
             this.groupBox9.Controls.Add(this.label13);
             this.groupBox9.Location = new System.Drawing.Point(169, 238);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(150, 133);
+            this.groupBox9.Size = new System.Drawing.Size(150, 138);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Screen";
+            // 
+            // cbNscreens
+            // 
+            this.cbNscreens.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbNscreens.FormattingEnabled = true;
+            this.cbNscreens.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4"});
+            this.cbNscreens.Location = new System.Drawing.Point(85, 109);
+            this.cbNscreens.Name = "cbNscreens";
+            this.cbNscreens.Size = new System.Drawing.Size(56, 21);
+            this.cbNscreens.TabIndex = 10;
+            this.cbNscreens.SelectedIndexChanged += new System.EventHandler(this.cbNscreens_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 112);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(77, 13);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Screens Count";
 			// 
 			// numHOS
-            //.
-            this.numHOS.Location = new System.Drawing.Point(80, 102);
+            // 
+            this.numHOS.Location = new System.Drawing.Point(83, 69);
             this.numHOS.Maximum = new decimal(new int[] {
             31,
             0,
@@ -818,13 +858,13 @@ namespace OSD
             0,
             -2147483648});
             this.numHOS.Name = "numHOS";
-            this.numHOS.Size = new System.Drawing.Size(56, 20);
+            this.numHOS.Size = new System.Drawing.Size(58, 20);
             this.numHOS.TabIndex = 8;
             this.numHOS.ValueChanged += new System.EventHandler(this.numHOS_ValueChanged);
-            //.
+            // 
             // numVOS
-            //.
-            this.numVOS.Location = new System.Drawing.Point(81, 80);
+            // 
+            this.numVOS.Location = new System.Drawing.Point(82, 48);
             this.numVOS.Maximum = new decimal(new int[] {
             15,
             0,
@@ -836,14 +876,14 @@ namespace OSD
             0,
             -2147483648});
             this.numVOS.Name = "numVOS";
-            this.numVOS.Size = new System.Drawing.Size(56, 20);
+            this.numVOS.Size = new System.Drawing.Size(59, 20);
             this.numVOS.TabIndex = 7;
            this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
 			//
             // label31
             //
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(49, 104);
+            this.label31.Location = new System.Drawing.Point(51, 72);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(25, 13);
             this.label31.TabIndex = 6;
@@ -852,20 +892,20 @@ namespace OSD
             // label30
             //
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(48, 82);
+            this.label30.Location = new System.Drawing.Point(50, 50);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(26, 13);
             this.label30.TabIndex = 5;
             this.label30.Text = "Top";
-            //.
+            // 
             // label29
-            //.
+            // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(10, 63);
+            this.label29.Location = new System.Drawing.Point(5, 48);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(75, 13);
+            this.label29.Size = new System.Drawing.Size(40, 13);
             this.label29.TabIndex = 4;
-            this.label29.Text = "Screen offsets";
+            this.label29.Text = "Offsets";
             //			
             // BRIGHTNESScomboBox
             // 
@@ -875,23 +915,22 @@ namespace OSD
 	            "Low",
 	            "Medium",
 	            "Medium High",
-	            "High"
-			});
-            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(35, 30);
+            "High"});
+            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(66, 14);
             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
-            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(102, 21);
+            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(75, 21);
             this.BRIGHTNESScomboBox.TabIndex = 3;
             this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(5, 12);
+            this.label13.Location = new System.Drawing.Point(5, 18);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(93, 13);
+            this.label13.Size = new System.Drawing.Size(56, 13);
             this.label13.TabIndex = 2;
-            this.label13.Text = "Screen Brightness";
+            this.label13.Text = "Brightness";
             // 
             // groupBox8
             // 
@@ -983,8 +1022,7 @@ namespace OSD
 	            "Ch 6",
 	            "Ch 7",
 	            "Ch 8",
-				"External PWM"
-			});
+            "External PWM"});
             this.ONOFF_combo.Location = new System.Drawing.Point(7, 90);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
@@ -1661,6 +1699,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem videoModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem CHK_ntsc;
         private System.Windows.Forms.ToolStripMenuItem CHK_pal;
+		private System.Windows.Forms.ToolStripMenuItem CHK_auto;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadFromFileToolStripMenuItem;
@@ -1780,6 +1819,8 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbOutSource;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox cbNscreens;
+        private System.Windows.Forms.Label label3;
     }
 	
 }

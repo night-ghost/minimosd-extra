@@ -76,6 +76,7 @@ namespace OSD {
     	public const int useExtCurr				= 6;
 		public const int radar_on 				= 7;
 		public const int ils_on 				= 8;
+		public const int mode_auto              = 9;
 	
 	}
 }

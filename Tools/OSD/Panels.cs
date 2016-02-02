@@ -87,6 +87,8 @@ namespace OSD
 		public byte pwm_src=0;
 		public byte pwm_dst=0;
 		
+		public byte n_screens=4;
+		
 //*************************		
         private byte temperatureChar = 0x1B;
         private byte bigDistanceChar = 0x1B;
@@ -207,6 +209,7 @@ namespace OSD
         public byte  switch_mode = 1;
         public byte   auto_screen_switch = 1;
         public bool  pal_ntsc = true; //PAL 1 - NTSC 0
+		public bool mode_auto = false;
         public uint8_t osd_brightness = 0; // low bright
         
         public uint8_t rssi_warn_level = 5;
@@ -1157,7 +1160,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
           AH_ROLL_FACTOR ; // conversion factor for roll
 
     // NTSC: osd.getMode() == 0
-    if(pal_ntsc ) { // ntsc
+    if(!pal_ntsc ) { // ntsc
         AH_PITCH_FACTOR = pitch_k_ntsc  * AH_PITCH_FACTOR0;
         AH_ROLL_FACTOR  = roll_k_ntsc * AH_ROLL_FACTOR0;
     } else {

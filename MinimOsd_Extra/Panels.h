@@ -45,13 +45,15 @@ void writePanels(){
     }
 #endif
 
+    if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
+
   //Base panel selection
   //No mavlink data available panel
   if(pt > (lastMAVBeat + 2200)){
 
-    if (currentAutoPanel != MAX_PANELS){
+    if (currentAutoPanel != sets.n_screens){
 //      osd.clear();
-      currentAutoPanel = MAX_PANELS;
+      currentAutoPanel = sets.n_screens;
     }
     panWaitMAVBeats({5,10}); //Waiting for MAVBeats...
   }
@@ -85,7 +87,7 @@ void writePanels(){
     //Check for panel toggle
     if(sets.ch_toggle > 0) panOff(); // This must be first so you can always toggle
 
-    if(panelN < MAX_PANELS){ // конфигурируемые юзером экраны
+    if(panelN < sets.n_screens){ // конфигурируемые юзером экраны
     	// must be first to other can overwrite free space
       if(is_on(panel.horizon)) panHorizon(panel.horizon); //14x5
 
@@ -219,7 +221,7 @@ void panOff(){
 	    текущий номер = приращение канала / зазор
         
         */
-        int d = (1900-1100)/MAX_PANELS;
+        int d = (1900-1100)/sets.n_screens;
         byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
         //First panel
         if ( panelN != n) {
@@ -235,7 +237,7 @@ void panOff(){
     }
     if(lflags.rotatePanel == 1){
         panelN++;
-        if (panelN > MAX_PANELS)
+        if (panelN > sets.n_screens)
             panelN = 0;
 
     }
@@ -1545,6 +1547,7 @@ static const PROGMEM char n_batt[]        = "Battery warning ";
 static const PROGMEM char n_battB[]       = "Batt 2 warning  ";
 
 static const PROGMEM char n_screen[]      = "  Screen params ";
+static const PROGMEM char n_scr[]         = "Screens Count   ";
 static const PROGMEM char n_contr[]       = "Contrast        ";
 static const PROGMEM char n_horiz[]       = "Horizontal offs ";
 static const PROGMEM char n_vert[]        = "Vertical offs   ";
@@ -1562,11 +1565,12 @@ static const PROGMEM char f_int[]  = "%.0f";
 
 // первый экран настроек
 static const PROGMEM Params params1[] = { 
-	{n_sets,   0,   0,   0,           0, 0},        // header with pal/ntsc string
+	{n_sets,    0,   0,  0,           0, 0},        // header
 	{n_batt,   'b', 10, &sets.battv , 0, f_batt },
 	{n_battB,  'b', 10, &sets.battBv, 0, f_batt  },
 	
-	{n_screen, 0,   0,   0,                    0,     0}, // header
+	{n_screen,  0,  0,   0,                    0,     0}, // header
+	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int},
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int},
 	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int },
 	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int },
@@ -1574,7 +1578,7 @@ static const PROGMEM Params params1[] = {
 
 // второй экран - горизонт
 static const PROGMEM Params params2[] = { 
-	{n_horizon,     'h', 0,   0,                 0, 0}, // header
+	{n_horizon,     'h', 0,   0,                 0, 0}, // header with pal/ntsc string
 	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float},
 	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float},
 	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float},

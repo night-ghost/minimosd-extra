@@ -93,35 +93,43 @@ void OSD::init()
 void OSD::detectMode()
 {
   //read STAT and auto detect Mode PAL/NTSC
-  max7456_on();
+    max7456_on();
+    
+    byte osdstat_r;
 
-  byte osdstat_r = MAX_read(MAX7456_STAT_reg_read);//status register
+    if(!flags.mode_auto) {
+	goto no_auto;
+    }else {
 
-  if ((B00000001 & osdstat_r) != 0){ //PAL
-      setMode(1);  
-  }
-  else if((B00000010 & osdstat_r) != 0){ //NTSC
-      setMode(0);
-  }
-  else if((B00000100 & osdstat_r) != 0){ //loss of sync
-//      setMode(1); // PAL without video 
-      if (flags.PAL_NTSC) //NTSC
+        osdstat_r = MAX_read(MAX7456_STAT_reg_read);//status register
+
+        if ((B00000001 & osdstat_r) != 0){ //PAL
+          setMode(1);  
+        }
+        else if((B00000010 & osdstat_r) != 0){ //NTSC
           setMode(0);
-      else  //PAL
-          setMode(1);
-  }
+        }
+        else if((B00000100 & osdstat_r) != 0){ //loss of sync
+//      setMode(1); // PAL without video 
+no_auto:
+          if (flags.PAL_NTSC) //NTSC
+              setMode(0);
+          else  //PAL
+              setMode(1);
+        }
 
 
-  //If no signal was detected so it uses EEPROM config
-  else{
+    //If no signal was detected so it uses EEPROM config
+        else{
 /*      if (flags.PAL_NTSC) //NTSC
           setMode(0);
       else  //PAL
           setMode(1);
 */      
-  }
+	}
+    }
 
-  max7456_off();
+    max7456_off();
 }
 
 //------------------ Set Mode (PAL/NTSC) ------------------------------------

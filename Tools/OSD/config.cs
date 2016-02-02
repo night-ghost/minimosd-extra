@@ -101,6 +101,8 @@ namespace OSD
 							// трансляция PWM на внешний вывод
 		internal byte pwm_src;
 		internal byte pwm_dst;
+		
+		internal byte n_screens;
 	};		
 
 	[StructLayout(LayoutKind.Explicit)]

@@ -122,15 +122,31 @@ public const int npanel = 4; // количество панелей
 
 			InitializeComponent(); 
 			
+			//create name of default font
+			string fontName = "MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly ().GetName ().Version.ToString () + ".mcm";
+			
+			
+            // load font
+			
+			while(!File.Exists(fontName) ) {
+			
+ 				OpenFileDialog ofd = new OpenFileDialog();
+            	ofd.Filter = "mcm|*.mcm";
+				ofd.Title = "MCM file " + fontName + " not found! Select MCM file";
+            	if(ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK) // нечего делать без шрифта
+                	return;
 
-            // load default font
-			chars = mcm.readMCM ("MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly ().GetName ().Version.ToString () + ".mcm");
+            	fontName = ofd.FileName;
+			}
+			
+			chars = mcm.readMCM (fontName);
+			
 			lblPresentedCharset.Text = "Presented Charset: " + "MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly ().GetName ().Version.ToString () + ".mcm";
             try { // load default bg pic			{
 				bgpicture = Image.FromFile ("vlcsnap-2012-01-28-07h46m04s95.png");
 			} catch {
 			}
-			
+					
             currentlyselected = "";
 
             print_x = 0;
@@ -339,6 +355,7 @@ public const int npanel = 4; // количество панелей
 				ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
 			CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+			CHK_auto.Checked= Convert.ToBoolean(pan.mode_auto);
 
 			BATT_WARNnumeric.Value = pan.batt_warn_level;
 			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -687,6 +704,7 @@ public const int npanel = 4; // количество панелей
 				conf.eeprom.sets.switch_mode = pan.switch_mode;
 				
 				conf.eeprom.flags[pal_ntsc] = pan.pal_ntsc;
+				conf.eeprom.flags[mode_auto] = pan.mode_auto;
 
 				conf.eeprom.sets.OSD_BATT_WARN  = pan.batt_warn_level;
 				conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
@@ -733,6 +751,7 @@ public const int npanel = 4; // количество панелей
 				
 				conf.eeprom.sets.pwm_src = pan.pwm_src ;
 				conf.eeprom.sets.pwm_dst = pan.pwm_dst;
+				conf.eeprom.sets.n_screens = pan.n_screens;
 				
 			} else if(panel_number >= 0 && panel_number < npanel) {
 				//First Panel 
@@ -856,6 +875,7 @@ public const int npanel = 4; // количество панелей
 			conf.eeprom.sets.switch_mode = pan.switch_mode;
 
 			conf.eeprom.flags[pal_ntsc] = pan.pal_ntsc;
+			conf.eeprom.flags[mode_auto] = pan.mode_auto;
 
 			conf.eeprom.sets.OSD_BATT_WARN  = pan.batt_warn_level;
 			conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
@@ -900,6 +920,7 @@ public const int npanel = 4; // количество панелей
 
 			conf.eeprom.sets.pwm_src = 0;
 			conf.eeprom.sets.pwm_dst = 0;
+			conf.eeprom.sets.n_screens = 4;
 		
 			int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
 			if(err > 0) {
@@ -1099,6 +1120,9 @@ public const int npanel = 4; // количество панелей
 			pan.pal_ntsc = conf.eeprom.flags[pal_ntsc];
 			CHK_pal.Checked = pan.pal_ntsc;
 
+			pan.mode_auto = conf.eeprom.flags[mode_auto];
+			CHK_auto.Checked = pan.mode_auto;
+
 			pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN  ;
 			BATT_WARNnumeric.Value = pan.batt_warn_level;
 
@@ -1117,7 +1141,7 @@ public const int npanel = 4; // количество панелей
 				pan.vert_offs= conf.eeprom.sets.vert_offs;
 			
 				numHOS.Value = pan.horiz_offs - 0x20;
-				numVOS.Value =pan.vert_offs - 0x10;
+				numVOS.Value = pan.vert_offs - 0x10;
 			} catch{
 				pan.horiz_offs= (byte)numHOS.Value;
 				pan.vert_offs= (byte)numVOS.Value;				
@@ -1195,7 +1219,14 @@ public const int npanel = 4; // количество панелей
 				cbOutPin.SelectedIndex = pan.pwm_dst;
 			}
 		    catch(Exception ex)    {       }			
+
 			
+			pan.n_screens = conf.eeprom.sets.n_screens;
+			try {
+				cbNscreens.SelectedIndex = pan.n_screens-1;
+			}
+		    catch(Exception ex)    {       }			
+
 			Draw(panel_number=tN );            
 
 		}
@@ -1280,23 +1311,63 @@ public const int npanel = 4; // количество панелей
 		
 
         private void CHK_pal_CheckedChanged (object sender, EventArgs e) {
-			changeToPal(CHK_pal.Checked);
+			if(!CHK_auto.Checked){
+				changeToPal(CHK_pal.Checked);
 			
-			Draw(panel_number);
-            
+				Draw(panel_number);
+			}
 		}
+		
 		
 
         private void pALToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
-            CHK_ntsc.Checked = !CHK_pal.Checked;
+			if(CHK_pal.Checked){
+            	CHK_ntsc.Checked = false;
+				CHK_auto.Checked =false;
+			}
         }
 
         private void nTSCToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
-            CHK_pal.Checked = !CHK_ntsc.Checked;
+			if(CHK_ntsc.Checked) {
+            	CHK_pal.Checked = false;
+				CHK_auto.Checked =false;
+			}
         }
 
+		private void AUTOToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
+        {
+						
+			if(CHK_auto.Checked) {
+				changeToPal(true);
+			
+				Draw(panel_number);
+
+				CHK_pal.Checked  = false;
+				CHK_ntsc.Checked = false;
+				CHK_auto.Checked = true;
+			}
+			
+		}
+		
+		private void CHK_auto_Click(object sender, EventArgs e)
+        {
+						
+			//
+			CHK_auto.Checked = true;
+		}
+		private void CHK_pal_Click(object sender, EventArgs e)
+        {
+            pan.pal_ntsc = true;
+        }
+
+        private void CHK_ntsc_Click(object sender, EventArgs e)
+        {
+            pan.pal_ntsc = false;
+        }
+		
+		
         private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e) {
             SaveFileDialog sfd = new SaveFileDialog() { Filter = "*.osd|*.osd" };
 
@@ -1331,6 +1402,7 @@ public const int npanel = 4; // количество панелей
                         sw.WriteLine("{0}\t{1}", "Auto Screen Switch", pan.auto_screen_switch);
                         sw.WriteLine("{0}\t{1}", "Chanel Rotation Switching", pan.switch_mode);
                         sw.WriteLine("{0}\t{1}", "Video Mode", pan.pal_ntsc);
+						sw.WriteLine("{0}\t{1}", "Auto Mode", pan.mode_auto);
                         sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
                         sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
@@ -1377,6 +1449,8 @@ public const int npanel = 4; // количество панелей
 		// выходной PWM
 						sw.WriteLine("{0}\t{1}", "PWMSRC",pan.pwm_src);
 						sw.WriteLine("{0}\t{1}", "PWMDST",pan.pwm_dst);
+				//
+						sw.WriteLine("{0}\t{1}", "NSCREENS",pan.n_screens);
 						
 						sw.Close();
                     }
@@ -1462,7 +1536,14 @@ public const int npanel = 4; // количество панелей
 								} catch {
 									pan.pal_ntsc = bool.Parse(strings[1]);								
 								}
-                            else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
+							//sw.WriteLine("{0}\t{1}", "Auto Mode", pan.mode_auto);
+                            else if (strings[0] == "Auto Mode") 
+								try {
+									pan.mode_auto = byte.Parse(strings[1])!=0;
+								} catch {
+									pan.mode_auto = bool.Parse(strings[1]);								
+								}
+							else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
@@ -1489,7 +1570,7 @@ public const int npanel = 4; // количество панелей
 							else if (strings[0] == "VOS") pan.vert_offs=(byte)int.Parse(strings[1]);
 							else if (strings[0] == "PWMSRC") pan.pwm_src=(byte)int.Parse(strings[1]);
 							else if (strings[0] == "PWMDST") pan.pwm_dst=(byte)int.Parse(strings[1]);
-						
+							else if (strings[0] == "NSCREENS") pan.n_screens=(byte)int.Parse(strings[1]);
 						}
 
 						
@@ -1558,14 +1639,21 @@ public const int npanel = 4; // количество панелей
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+						CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
                         BATT_WARNnumeric.Value = pan.batt_warn_level;
                         RSSI_WARNnumeric.Value = pan.rssi_warn_level;
 
                         BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
-						numHOS.Value = pan.horiz_offs - 0x20;
-						numVOS.Value =pan.vert_offs - 0x10;
-
+						
+						try {			
+							numHOS.Value = pan.horiz_offs - 0x20;
+							numVOS.Value = pan.vert_offs - 0x10;
+						} catch{
+							pan.horiz_offs= (byte)numHOS.Value;
+							pan.vert_offs= (byte)numVOS.Value;				
+						}
+						
                         CALLSIGNmaskedText.Text = pan.callsign_str;
 
 //                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
@@ -1597,6 +1685,11 @@ public const int npanel = 4; // количество панелей
 						try {
 							cbOutSource.SelectedIndex = pan.pwm_src;
 							cbOutPin.SelectedIndex = pan.pwm_dst;
+						}
+		                catch(Exception ex)    {       }
+
+						try {
+							cbNscreens.SelectedIndex = pan.n_screens-1;
 						}
 		                catch(Exception ex)    {       }
 
@@ -2260,16 +2353,7 @@ public const int npanel = 4; // количество панелей
         }
 
 
-        private void CHK_pal_Click(object sender, EventArgs e)
-        {
-            pan.pal_ntsc = true;
-        }
-
-        private void CHK_ntsc_Click(object sender, EventArgs e)
-        {
-            pan.pal_ntsc = false;
-        }
-
+        
         private void RSSI_WARNnumeric_ValueChanged(object sender, EventArgs e)
         {
             pan.rssi_warn_level = (byte)RSSI_WARNnumeric.Value;
@@ -2303,14 +2387,13 @@ public const int npanel = 4; // количество панелей
             try
             {
                 //System.Diagnostics.Process.Start("https://code.google.com/p/arducam-osd/wiki/arducam_osd?tm=6");
-				System.Diagnostics.Process.Start("https://code.google.com/p/minimosd-extra/wiki/Config_Tool");				
+				System.Diagnostics.Process.Start("https://github.com/night-ghost/minimosd-extra/blob/master/wiki/Config_Tool.md");				
             }
             catch { MessageBox.Show("Webpage open failed... do you have a virus?"); }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("Author: Michael Oborne \nCo-authors: Pedro Santos \n Zoltán Gábor", "About ArduCAM OSD Config", MessageBoxButtons.OK, MessageBoxIcon.Information);
             AboutBox1 about = new AboutBox1();
             about.Show();
         }
@@ -2393,7 +2476,7 @@ public const int npanel = 4; // количество панелей
             	}
             }
 
-
+/* no more auto-switch 
             switch ((PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem)
             {
                 case PanelsAutoSwitch.Panel1:
@@ -2405,8 +2488,9 @@ public const int npanel = 4; // количество панелей
                         MessageBox.Show("You have selected to auto switch to panel 2. " + Environment.NewLine + "However you didn't configured warnings on panel 2.", "Panel Auto Switch Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
             }
-        }
+*/
 
+        }
 
 
         private void cbxRSSIChannel_SelectedIndexChanged(object sender, EventArgs e)
@@ -3431,6 +3515,13 @@ public const int npanel = 4; // количество панелей
         }
 
 
+       
+        private void cbNscreens_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			pan.n_screens = (byte)(cbNscreens.SelectedIndex+1);
+        }
+
+             
        
 
 	}

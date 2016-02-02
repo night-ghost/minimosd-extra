@@ -89,8 +89,11 @@ void readPanelSettings() {
     currentPanel=panelN;
 
 
-    for(byte i=0; i<sizeof(Panel); i++) // читаем в пределах одного экрана - 128 байт, так что байтного цикла достаточно
+/*    for(byte i=0; i<sizeof(Panel); i++) // читаем в пределах одного экрана - 128 байт, так что байтного цикла достаточно
 	((byte *)&panel)[i] = eeprom_read_byte( (byte *) (OffsetBITpanel * (int)panelN + i) );
+*/
+    eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
+
 }
 
 uint8_t checkPAL(uint8_t line){
