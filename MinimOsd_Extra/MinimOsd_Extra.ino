@@ -363,7 +363,7 @@ void On100ms(){ // периодические события, не связан�
 	lflags.mavlink_got=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
 	byte n=sets.battv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_A)/1000/n - 2.9) / (4.2 - 2.9) * 255;
+	int v = (float(osd_vbat_A)/1000/n - 3.3) / (4.2 - 3.3) * 255;
 	
 	if(v<0) osd_battery_remaining_A  = 0;
 	else if(v>255) osd_battery_remaining_A  = 255;
@@ -386,7 +386,7 @@ void On100ms(){ // периодические события, не связан�
     
 // 	вычислить osd_battery_remaining_B по напряжению!
 	byte n=sets.battBv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_B)/1000/n - 2.9) / (4.2 - 2.9) * 255;
+	int v = (float(osd_vbat_B)/1000/n - 3.3) / (4.2 - 3.3) * 255;
 
 	if(v<0) osd_battery_remaining_B  = 0;
 	else if(v>255) osd_battery_remaining_B  = 255;

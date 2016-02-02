@@ -145,10 +145,10 @@ void setHomeVars(OSD &osd)
 void setFdataVars()
 {
   //Moved from panel because warnings also need this var and panClimb could be off
-  vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9;
+  vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9; // комплиментарный фильтр 1/10
 
-  if(max_battery_reading < osd_battery_remaining_A)
-    max_battery_reading = osd_battery_remaining_A;
+  if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
+	max_battery_reading = osd_battery_remaining_A;
 
   unsigned long time_lapse = millis() - runt;
   runt = millis();

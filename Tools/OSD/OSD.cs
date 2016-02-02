@@ -1,3 +1,6 @@
+
+
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +21,7 @@ using System.Diagnostics;
 using System.Threading;
 
 
+
 namespace OSD
 {
     public partial class OSD : Form
@@ -32,7 +36,10 @@ public const  int CHAR_H=18;
 public const  int SCREEN_W=30;
 public const  int SCREEN_H=16;
 public const  int SCREEN_H_NTSC=13;		
-		
+
+public const string VERSION ="r809 DV";
+			
+			
 		
 public enum ModelType {
 	Plane = 0,
@@ -132,6 +139,7 @@ public const int npanel = 4; // количество панелей
 			
  				OpenFileDialog ofd = new OpenFileDialog();
             	ofd.Filter = "mcm|*.mcm";
+				ofd.InitialDirectory = Application.StartupPath;
 				ofd.Title = "MCM file " + fontName + " not found! Select MCM file";
             	if(ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK) // нечего делать без шрифта
                 	return;
@@ -604,8 +612,8 @@ public const int npanel = 4; // количество панелей
 				cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
 			string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-			this.Text = this.Text + " " + strVersion + " - Pre-Release r807 DV";
-			currentVersion = strVersion + "r807 DV";
+			this.Text = this.Text + " " + strVersion + " - Pre-Release " + VERSION;
+			currentVersion = strVersion + VERSION;
 
 			CMB_ComPort.Items.AddRange(GetPortNames());
 

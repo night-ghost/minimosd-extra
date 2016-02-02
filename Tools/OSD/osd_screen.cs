@@ -38,6 +38,8 @@ namespace OSD
 		private int number;
 		private OSD osd;
 		
+		private int clickX, clickY;
+		
 		private bool mousedown;
 		
 		public osd_screen (int num, OSD aosd)
@@ -389,7 +391,9 @@ namespace OSD
 				if(ansH >= osd.getCenter() && !osd.pal_checked()) {
 					ansH += 3;
 				}
-
+				ansW -= clickX; //запомним куда ткнули
+				ansH -= clickY;
+				
 				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
 				NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
 
@@ -426,9 +430,28 @@ namespace OSD
 			getCharLoc(x, y, out ansW, out ansH);
 
 			if(osd.usedPostion[ansW][ansH]!=null && osd.usedPostion[ansW][ansH]!="") {
-				TreeNode[] tnArray = li.Nodes.Find(osd.usedPostion[ansW][ansH], true);
+			
+				string name = osd.usedPostion[ansW][ansH];
+
+				TreeNode[] tnArray = li.Nodes.Find(name, true);
+				
 				li.Focus();
-				li.SelectedNode = tnArray[0];
+				li.SelectedNode = tnArray[0]; // выберем этот элемент в списке
+
+				
+				foreach(var thing in osd.scr[osd.panel_number].panelItems) {
+					if(thing!=null) {
+						if(thing.name==name) {
+
+							clickX = ansW - thing.x; //запомним куда ткнули
+							clickY = ansH - thing.y;
+							break; 
+						}
+					}
+				}
+				// левый верхний угол нашей фигуры thing.x, thing.y
+				
+				
 				//LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
 				return osd.usedPostion[ansW][ansH];
 			}

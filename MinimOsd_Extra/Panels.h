@@ -179,7 +179,7 @@ void writePanels(){
 void panOff(){
     byte old_panel=panelN;
 
-    int ch_raw;
+    uint16_t ch_raw;
 
     if(sets.ch_toggle == 1) 
 	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
@@ -188,6 +188,8 @@ void panOff(){
     else 
         ch_raw = chan_raw[7];
 
+
+/* no more autoswitch - warnings always on
 
   //If there is a warning but warnings disabled force switch to panel 0
   if(lflags.canswitch == 0 && !is_on(panel.warn)){ 
@@ -198,6 +200,7 @@ void panOff(){
 
   }  else{
     //Flight mode switching
+*/
 
 //	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
     if (sets.ch_toggle == 4){
@@ -241,7 +244,7 @@ void panOff(){
             panelN = 0;
 
     }
-  }
+//  }
   if(old_panel != panelN){
         lflags.osd_clear = 1;
     
@@ -398,19 +401,20 @@ void panEff(point p){
                 float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * pgm_read_float(&measure->converth);
                 if (glide > 9999) glide = 9999;
                 if (glide > -0){
-                    osd_printf_2(PSTR("%4.0f%c"), glide, pgm_read_byte(&measure->high));
+                    osd_printf_2(PSTR("%4.0f%c"), glide, pgm_read_byte(&measure->high)); // аэродинамическое качество
                 }
             }else if (osd_climb >= -0.05 && osd_pitch < 0) {
-                  osd.print_P(PSTR("\x20\x20\x90\x91\x20"));
+                  osd.print_P(PSTR("\x20\x20\x90\x91\x20")); //термик
             }else{
                   osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
             }
         }
     } else { // copter
-      //Check takeoff just to prevent inicial false readings
+      //Check takeoff just to prevent initial false readings
       if (lflags.motor_armed) {
         if(osd_battery_remaining_A != last_battery_reading) {
-          remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / (max_battery_reading - osd_battery_remaining_A)) / 1000;
+          remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / 
+        					    (max_battery_reading - osd_battery_remaining_A)) / 1000;
           last_battery_reading = osd_battery_remaining_A;
 	}
 	if(has_sign(p))
