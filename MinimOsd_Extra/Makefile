@@ -11,6 +11,7 @@ ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
 CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11
 CFLAGS_STD = -std=gnu11
+MCU=atmega328p
 
 include /usr/share/arduino/Arduino.mk
 

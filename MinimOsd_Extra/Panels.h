@@ -8,28 +8,28 @@ inline void osd_write(byte c){
     osd.write(c);
 }
 
-float cnvGroundSpeed() { // вынос инварианта
+float NOINLINE cnvGroundSpeed() { // вынос инварианта
 
     return osd_groundspeed * pgm_read_float(&measure->converts);
 }
 
-float cnvAltError(){
+float NOINLINE cnvAltError(){
     return alt_error * pgm_read_float(&measure->converth);
 }
 
-void printTime(int t){
+void NOINLINE printTime(int t){
     osd.printf_P(PSTR("%2i\x3a%02i"),((int)t/60)%60, (int)t%60);
 }
 
-void osd_printf_1(PGM_P fmt, float f){
+void NOINLINE osd_printf_1(PGM_P fmt, float f){
     osd.printf_P(fmt, f);
 }
 
-void osd_printf_2(PGM_P fmt, float f, byte c){
+void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
     osd.printf_P(fmt, f, c);
 }
 
-void osd_printi_1(PGM_P fmt, int f){
+void NOINLINE osd_printi_1(PGM_P fmt, int f){
     osd.printf_P(fmt, f);
 }
 
