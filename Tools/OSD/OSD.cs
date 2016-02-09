@@ -275,7 +275,7 @@ public const int npanel = 4; // количество панелей
 					if(thing!=null) {
 						TreeNode tn = li.Nodes.Add(thing.name, thing.name);
 						tn.Tag = thing; // зачем каждый раз искать по имени?
-						thing.node =tn; // перекрестные связи рулят
+						// thing.node =tn; // перекрестные связи рулят - но только при однозначном соответствии
 													
 						if(n==3){
 							if(thing.name=="Channel Raw") {
@@ -799,7 +799,7 @@ public const int npanel = 4; // количество панелей
 				wr_start = panel_number * OffsetBITpanel;
 				wr_length = OffsetBITpanel;
 
-// все что мы тут делаем это задаем				
+// все что мы тут делаем это задаем	ПОЛНЫЙ список всех существующих	панелей на всех экранах		
 				
 				List<TreeNode> AllNodes = new List<TreeNode>();
 				foreach(TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {

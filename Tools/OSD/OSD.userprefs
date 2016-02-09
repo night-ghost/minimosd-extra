@@ -1,17 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Constants.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="MavlinkOther.cs">
     <Files>
-      <File FileName="OSD.cs" Line="1343" Column="1" />
-      <File FileName="OSD.Designer.cs" Line="327" Column="1" />
-      <File FileName="Panel.cs" Line="1" Column="1" />
-      <File FileName="Panels.cs" Line="90" Column="24" />
-      <File FileName="Program.cs" Line="1" Column="1" />
-      <File FileName="Pos.cs" Line="1" Column="1" />
-      <File FileName="Constants.cs" Line="79" Column="29" />
-      <File FileName="Const.cs" Line="1" Column="1" />
-      <File FileName="config.cs" Line="104" Column="3" />
-      <File FileName="Disassembly" />
+      <File FileName="OSD.cs" Line="869" Column="61" />
+      <File FileName="osd_screen.cs" Line="449" Column="8" />
+      <File FileName="MavlinkOther.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -22,7 +15,7 @@
             </Node>
             <Node name="Resources" expanded="True" />
             <Node name="AboutBox1.cs" expanded="True" />
-            <Node name="key.snk" selected="True" />
+            <Node name="MavlinkOther.cs" selected="True" />
             <Node name="OSD.cs" expanded="True" />
           </Node>
         </State>
@@ -30,9 +23,7 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/OSD.cs" line="684" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

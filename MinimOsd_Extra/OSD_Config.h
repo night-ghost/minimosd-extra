@@ -14,7 +14,8 @@
 #define RELEASE "r809 DV"
 
 
-#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
+//#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
+#define TELEMETRY_SPEED  19200  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 
 
