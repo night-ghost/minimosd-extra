@@ -145,8 +145,8 @@ struct Settings {
     
     byte battBv; // мин значение батареи B по напряжению
     
-    byte vert_offs; // сдвиг экрана по вертикали и горизонтали
-    byte horiz_offs;
+    char vert_offs; // сдвиг экрана по вертикали и горизонтали
+    char horiz_offs;
 
     byte pwm_src; // трансляция PWM на внешний вывод
     byte pwm_dst;

@@ -204,13 +204,11 @@ MAVLINK_HELPER void mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
  * int chan = 0;
  *
  *
- * while(serial.bytesAvailable > 0)
- * {
- *   uint8_t byte = serial.getNextByte();
- *   if (mavlink_parse_char(chan, byte, &msg))
- *     {
+ * while(serial.available > 0) {
+ *   uint8_t byte = serial.read();
+ *   if (mavlink_parse_char(chan, byte, &msg)) {
  *     printf("Received message with ID %d, sequence: %d from component %d of system %d", msg.msgid, msg.seq, msg.compid, msg.sysid);
- *     }
+ *   }
  * }
  *
  *
@@ -235,12 +233,11 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 
 	status->msg_received = 0;
 
-	switch (status->parse_state)
-	{
+	switch (status->parse_state) {
 	case MAVLINK_PARSE_STATE_UNINIT:
+	    status->packet_rx_drop_count = 0;
 	case MAVLINK_PARSE_STATE_IDLE:
-		if (c == MAVLINK_STX)
-		{
+		if (c == MAVLINK_STX) {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 			rxmsg->len = 0;
 			rxmsg->magic = c;
@@ -249,14 +246,13 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_STX:
-			if (status->msg_received 
+		if (status->msg_received 
 /* Support shorter buffers than the
    default maximum packet size */
 #if (MAVLINK_MAX_PAYLOAD_LEN < 255)
 				|| c > MAVLINK_MAX_PAYLOAD_LEN
 #endif
-				)
-		{
+				){
 			status->buffer_overrun++;
 			status->parse_error++;
 			status->msg_received = 0;
@@ -338,6 +334,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	case MAVLINK_PARSE_STATE_GOT_CRC1:
 		if (c != (rxmsg->checksum >> 8)) {
 			// Check second checksum byte
+
 			status->parse_error++;
 			status->msg_received = 0;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
@@ -347,9 +344,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 				rxmsg->len = 0;
 				mavlink_start_checksum(rxmsg);
 			}
-		}
-		else
-		{
+		} else {
 			// Successfully got message
 			status->msg_received = 1;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
@@ -378,6 +373,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	r_mavlink_status->current_rx_seq = status->current_rx_seq+1;
 	r_mavlink_status->packet_rx_success_count = status->packet_rx_success_count;
 	r_mavlink_status->packet_rx_drop_count = status->parse_error;
+	r_mavlink_status->buffer_overrun = status->buffer_overrun;
 	status->parse_error = 0;
 	return status->msg_received;
 }

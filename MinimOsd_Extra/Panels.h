@@ -52,10 +52,10 @@ void writePanels(){
   if(pt > (lastMAVBeat + 2200)){
 
     if (currentAutoPanel != sets.n_screens){
-//      osd.clear();
-      currentAutoPanel = sets.n_screens;
+        currentAutoPanel = sets.n_screens;
     }
-    panWaitMAVBeats({5,10}); //Waiting for MAVBeats...
+    panWaitMAVBeats(); //Waiting for MAVBeats...
+    return; // no warn
   }
 
   //Flight summary panel
@@ -77,6 +77,7 @@ void writePanels(){
 #endif
 #endif
     panFdata({1,1}); 
+    return; // no warn
   }
   //Normal osd panel
   else{
@@ -85,7 +86,7 @@ void writePanels(){
 //	osd.printf_P("p=%d t=%d",panelN, sets.ch_toggle);
 
     //Check for panel toggle
-    if(sets.ch_toggle > 0) panOff(); // This must be first so you can always toggle
+    if(sets.ch_toggle > 0) pan_toggle(); // This must be first so you can always toggle
 
     if(panelN < sets.n_screens){ // конфигурируемые юзером экраны
     	// must be first to other can overwrite free space
@@ -147,6 +148,7 @@ void writePanels(){
 	
 	if(!lflags.motor_armed) {
 	    panSetup();
+	    return; // no warnings
 	}
     }
   }
@@ -154,112 +156,11 @@ void writePanels(){
     // show warnings even if screen is disabled
      /* if(is_on(panel.warn)) */ panWarn(panel.warn); // this must be here so warnings are always checked
 
-
-
-// timers
-  if (lflags.one_sec_timer_switch == 1){ 
-    one_sec_timer = pt + 500;
-    lflags.one_sec_timer_switch = 0;
-    lflags.blinker = !lflags.blinker;
-    if(lflags.blinker) seconds++;
-  }
-  if (pt > one_sec_timer) 
-    lflags.one_sec_timer_switch = 1;
-
 }
 
 
 
-/* **************************************************************** */
-// Panel toggle : panOff
-// Output : OSD off
-// Size   : 1 x 7Hea  (rows x chars)
-// Staus  : done
 
-void panOff(){
-    byte old_panel=panelN;
-
-    uint16_t ch_raw;
-
-    if(sets.ch_toggle == 1) 
-	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
-    else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
-	ch_raw = chan_raw[sets.ch_toggle-1];
-    else 
-        ch_raw = chan_raw[7];
-
-
-/* no more autoswitch - warnings always on
-
-  //If there is a warning but warnings disabled force switch to panel 0
-  if(lflags.canswitch == 0 && !is_on(panel.warn)){ 
-    if(panelN != sets.auto_screen_switch){
-      lflags.osd_clear = 1;
-    }
-    panelN = sets.auto_screen_switch; 
-
-  }  else{
-    //Flight mode switching
-*/
-
-//	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
-    if (sets.ch_toggle == 4){
-      if ((osd_mode != 6) && (osd_mode != 7)){
-        if (osd_off_switch != osd_mode){ 
-            osd_off_switch = osd_mode;
-            osd_switch_time = millis();
-            if (osd_off_switch == osd_switch_last){
-              lflags.rotatePanel = 1;
-            }
-        }
-        if ((millis() - osd_switch_time) > 2000){
-          osd_switch_last = osd_mode;
-        }
-      }
-    }
-    else  {
-      if (sets.switch_mode == 0){  //Switch mode by value
-        /*
-	    Зазор канала = диапазон изменения / (число экранов+1)
-	    текущий номер = приращение канала / зазор
-        
-        */
-        int d = (1900-1100)/sets.n_screens;
-        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
-        //First panel
-        if ( panelN != n) {
-          panelN = n;
-        }
-      } else{ 			 //Rotation switch
-        if (ch_raw > 1200)
-          if (osd_switch_time < millis()){ // при включенном канале переключаем каждые 0.5 сек
-            lflags.rotatePanel = 1;
-            osd_switch_time = millis() + 500 ;
-        }
-      }
-    }
-    if(lflags.rotatePanel == 1){
-        panelN++;
-        if (panelN > sets.n_screens)
-            panelN = 0;
-
-    }
-//  }
-  if(old_panel != panelN){
-        lflags.osd_clear = 1;
-    
-	readPanelSettings();
-  }
-  
-  
-    //If there is a panel switch or a change in base panel then clear osd
-    if ((lflags.osd_clear == 1) || (currentAutoPanel != 0)){
-//      osd.clear();
-      lflags.osd_clear = 0;
-      currentAutoPanel = 0;
-    }
-  
-}
 
 
 /******* PANELS - DEFINITION *******/
@@ -412,10 +313,11 @@ void panEff(point p){
     } else { // copter
       //Check takeoff just to prevent initial false readings
       if (lflags.motor_armed) {
-        if(osd_battery_remaining_A != last_battery_reading) {
-          remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / 
+        if(osd_battery_remaining_A != last_battery_reading && !lflags.uavtalk_active) {
+    	    // UAVtalk sends this itself
+            remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / 
         					    (max_battery_reading - osd_battery_remaining_A)) / 1000;
-          last_battery_reading = osd_battery_remaining_A;
+            last_battery_reading = osd_battery_remaining_A;
 	}
 	if(has_sign(p))
 	    osd_write(0x17);
@@ -601,6 +503,7 @@ void check_warn()
 
 
  if (!lflags.one_sec_timer_switch) return;
+    lflags.one_sec_timer_switch=0;
 
 //1
  if ((osd_fix_type) < 2) 
@@ -885,11 +788,20 @@ void panBatt_B(point p){
 
 //------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
 
-void panWaitMAVBeats(point p){
+void panWaitMAVBeats(){
 
-    OSD::setPanel(p.x,p.y);
 
-    osd.print_P(PSTR("No mavlink data!"));
+    OSD::setPanel(11,7);
+    osd.print(seconds);
+
+    OSD::setPanel(5,9);
+    osd.print_P(PSTR("No input data! "));
+
+#ifdef DEBUG
+    extern int packet_drops;
+    extern long bytes_comes;
+    osd.printf_P(PSTR("||drops=%d bytes=%ld"),packet_drops, bytes_comes);
+#endif
 }
 
 
@@ -1087,6 +999,31 @@ void panHomeDir(point p){
 // Status : done
 
 
+const char PROGMEM u_mode00[] = "manu";    // MANUAL
+const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
+const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
+const char PROGMEM u_mode03[] = "stb3";    // STABILIZED3
+const char PROGMEM u_mode04[] = "stb4";    // STABILIZED4
+const char PROGMEM u_mode05[] = "stb5";    // STABILIZED5
+const char PROGMEM u_mode06[] = "stb6";    // STABILIZED6
+const char PROGMEM u_mode07[] = "posh";    // POSITIONHOLD
+const char PROGMEM u_mode08[] = "cl  ";    // COURSELOCK
+const char PROGMEM u_mode09[] = "posr";    // POSITIONROAM
+const char PROGMEM u_mode10[] = "hl  ";    // HOMELEASH
+const char PROGMEM u_mode11[] = "pa  ";    // ABSOLUTEPOSITION
+const char PROGMEM u_mode12[] = "rtl ";    // RETURNTOBASE
+const char PROGMEM u_mode13[] = "land";    // LAND
+const char PROGMEM u_mode14[] = "pp  ";    // PATHPLANNER
+const char PROGMEM u_mode15[] = "poi ";    // POI
+const char PROGMEM u_mode16[] = "ac  ";    // AUTOCRUISE
+
+char const * const mode_u_strings[] PROGMEM ={ 
+    u_mode00, u_mode01, u_mode02, u_mode03, u_mode04, 
+    u_mode05, u_mode06, u_mode07, u_mode08, u_mode09, 
+    u_mode10, u_mode11, u_mode12, u_mode13, u_mode14,
+    u_mode15, u_mode16
+};
+
 #ifdef IS_COPTER
 const char PROGMEM s_mode00[] = "stab"; //Stabilize	0
 const char PROGMEM s_mode01[] = "acro"; //Acrobatic	1
@@ -1150,7 +1087,9 @@ void panFlightMode(point p){
 
     PGM_P mode_str;
 
-    
+    if(lflags.uavtalk_active) {
+	mode_str = (PGM_P)pgm_read_word(&mode_u_strings[osd_mode]);
+    } else {
 #ifdef IS_COPTER
  #ifdef IS_PLANE
     if(sets.model_type==0) {
@@ -1167,7 +1106,8 @@ void panFlightMode(point p){
 	mode_str = (PGM_P)pgm_read_word(&mode_p_strings[osd_mode]);
  #endif    
 #endif
-
+    }
+    
     osd.print_P(mode_str);
     osd_write( lflags.motor_armed ? 0x86:' ');
 }
@@ -1490,7 +1430,7 @@ void panTune(point p){
 void panCh(point p){
     OSD::setPanel(p.x,p.y);
 
-    for(byte i=0; i<6;i++)
+    for(byte i=0; i<8;i++)
 	osd.printf_P(PSTR("C%d%5i|"), i+1, chan_raw[i] );
 }
 
@@ -1520,28 +1460,35 @@ void panCh(point p){
     
 */
 
+typedef void (*fptr)();
+
 struct Params {
     PGM_P name; 	// наименование
     char type;	// тип (f-float, b - byte etc)
     byte k;		// коэффициент сдвига запятой
     void *value;	// адрес самой переменной
-    void (*cb)();	// callback для применения параметра
+    fptr cb;	// callback для применения параметра
     PGM_P fmt;	// формат печати параметра
+    int min;		// диапазон изменения параметра
+    int max;
 };
 
 struct Setup_screen {
     const Params * const ptr;	// описатель экрана
     byte size;		// его размер
-    void (*tail)();	// функция отображения остального
+    fptr tail;	// функция отображения остального
 };
 
 
 void renew(){
-    OSD::hw_init();
+//Serial.printf_P(PSTR("renew!\n")); Serial.wait();
+
+    OSD::adjust();
 }
 
 
 void setup_horiz(){
+//Serial.printf_P(PSTR("horiz!\n")); Serial.wait();
     showHorizon(8 + 1, 6);
 }
 
@@ -1570,23 +1517,23 @@ static const PROGMEM char f_int[]  = "%.0f";
 // первый экран настроек
 static const PROGMEM Params params1[] = { 
 	{n_sets,    0,   0,  0,           0, 0},        // header
-	{n_batt,   'b', 10, &sets.battv , 0, f_batt },
-	{n_battB,  'b', 10, &sets.battBv, 0, f_batt  },
+	{n_batt,   'b', 10, &sets.battv , 0, f_batt, 0, 255 },
+	{n_battB,  'b', 10, &sets.battBv, 0, f_batt, 0, 255 },
 	
 	{n_screen,  0,  0,   0,                    0,     0}, // header
-	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int},
-	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int},
-	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int },
-	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int },
+	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
+	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 1, 4},
+	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
+	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
 };
 
 // второй экран - горизонт
 static const PROGMEM Params params2[] = { 
 	{n_horizon,     'h', 0,   0,                 0, 0}, // header with pal/ntsc string
-	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float},
-	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float},
-	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float},
-	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float},
+	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float, 0, 4},
+	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float, 0, 4},
+	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float, 0, 4},
+	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float, 0, 4},
 };
 
 
@@ -1598,37 +1545,49 @@ static const PROGMEM Setup_screen screens[] = {
 
 #define SETUP_N_SCREENS (sizeof(screens)/sizeof(Setup_screen) - 1)
 
-static byte setup_menu=0; // номер строки меню
+static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
 static uint32_t btn_time, text_timer; // время прошлого входа в меню и время нажатия стика
 static uint16_t chan1_raw_middle, chan2_raw_middle; // запомненные при входе значения каналов 1 и 2
 static uint16_t chan3_raw_middle, chan4_raw_middle; // запомненные при входе значения каналов 3 и 4
 const Params *params; // указатель на текущий набор параметров
 
-void move_menu(byte dir){
+const Setup_screen *pscreen;
 
-    setup_menu +=dir;
+/*long absl(long l){
+    if(l<0) return -l;
+    return l;
+}*/
+
+
+void move_menu(char dir){
+
+
+    byte n= pgm_read_byte((void *)&pscreen->size) -1;
+
+again:
     
-    byte n=screens[setup_screen].size;
-    
-    if( (int)setup_menu < 0 ) setup_menu = n-1;	// цикл по параметрам,
-    else if (setup_menu >= n) setup_menu = 0;
+    if(      dir < 0 && setup_menu == 0) setup_menu = n;	// цикл по параметрам,
+    else if( dir > 0 && setup_menu == n) setup_menu = 0;
+    else setup_menu +=dir;
 
-    if(!params[setup_menu].value) move_menu(dir); // если нет связанной переменной то еще шаг - пропускаем заголовок
+    if(!pgm_read_word((void *)&params[setup_menu].value) ) goto again; // если нет связанной переменной то еще шаг - пропускаем заголовок
 
-    lflags.mavlink_got=1; // renew screen
-
+    lflags.got_data=1; // renew screen
 }
 
-void move_screen(byte dir){
-    setup_screen +=dir;
+void move_screen(char dir){
 
-    byte n=SETUP_N_SCREENS;
+    setup_menu=1;
 
-    if( (int)setup_screen <  0 ) setup_screen = n-1;	// цикл по экранам,
-    else if (setup_screen >= n)  setup_screen = 0;
+    byte n=SETUP_N_SCREENS - 1;
 
-    lflags.mavlink_got=1; // renew screen
+
+    if(     dir < 0 && setup_screen == 0)  setup_screen = n;	// цикл по экранам,
+    else if(dir > 0 && setup_screen == n)  setup_screen = 0;
+    else setup_screen +=dir;
+
+    lflags.got_data=1; // renew screen
 }
 
 #define SETUP_START_ROW 1
@@ -1637,44 +1596,38 @@ void move_screen(byte dir){
 // TODO задействовать второй джойстик для переключения экранов
 void panSetup(){
 
-    Params p;
+    const Params *p;
     float v;
     byte size;
+    byte type;
     float inc = 0;
-
-    if (millis() > text_timer)
-        text_timer = millis() + 200; // 5 раз в секунду
-    else return;
-    
-
-    params=screens[setup_screen].ptr;
-
-
-    if (chan1_raw_middle == 0 && chan2_raw_middle == 0){
-        chan1_raw_middle = chan_raw[0];	// запомнить начальные значения  - центр джойстика
-        chan2_raw_middle = chan_raw[1];
-    }
-
-    if (chan3_raw_middle == 0 && chan4_raw_middle == 0){
-        chan3_raw_middle = chan_raw[2];	// запомнить начальные значения  - центр ВТОРОГО джойстика
-        chan4_raw_middle = chan_raw[3];
-    }
-
-
-    if (     (chan_raw[1] - 100) > chan2_raw_middle )  move_menu(1);  // переходы по строкам;
-    else if ((chan_raw[1] + 100) < chan2_raw_middle )  move_menu(-1);
-
-    if (     (chan_raw[2] - 100) > chan3_raw_middle )  move_screen(1);  // переходы по экранам;
-    else if ((chan_raw[2] + 100) < chan3_raw_middle )  move_screen(-1);
-
     byte col;
+    char *nm;
+    int min, max;
 
-    for(byte i=0; i < screens[setup_screen].size; i++) {
+
+
+    pscreen = &screens[setup_screen];
+
+    params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
+    size = pgm_read_byte((void *)&pscreen->size);
+
+    if (chan1_raw_middle == 0 && chan2_raw_middle == 0 && chan4_raw_middle == 0){
+        chan1_raw_middle = chan_raw[0];	// запомнить начальные значения  - центр джойстика - лево/право
+        chan2_raw_middle = chan_raw[1]; //                                                   верх-низ
+
+        chan4_raw_middle = chan_raw[3];// запомнить начальные значения  - центр ВТОРОГО джойстика
+    }
+
+
+
+    for(byte i=0; i < size; i++) {
 	OSD::setPanel(1, SETUP_START_ROW + i);
-    
-	p = params[i];
 
-        osd.print_P(p.name);
+	p = &params[i];
+	nm=(char *)pgm_read_word((void *)&p->name);
+
+        osd.print_P(nm);
 
 	if(i == setup_menu) {
 	    osd.write('>');
@@ -1683,7 +1636,9 @@ void panSetup(){
 	    osd.write(' ');
 	}
 
-        switch (p.type){
+	type=pgm_read_byte((void *)&p->type);
+
+        switch (type){
         
         case 'h':
     	    if(OSD::getMode()) 
@@ -1695,40 +1650,76 @@ void panSetup(){
 	    continue;
         
         case 'b': // byte param
-	    v=*((byte *)p.value) / (float)p.k;
+	    { 
+		int l = *((byte *)(pgm_read_word((void *)&p->value) ) ) ;
+		v = l / (float)(pgm_read_byte((void *)&p->k));
+	    }
 	    break;
 	    
         case 'f': // byte param
-	    v=*((float *)p.value);
+	    v=*((float *)(pgm_read_word((void *)&p->value) ));
 	    break;
 	}
 
-	osd.printf_P(p.fmt, v);
+//	osd.printf_P(p.fmt, v);
+	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v);
     }
+
+    fptr tail = (fptr) pgm_read_word((void *)&pscreen->tail);
+
+    if(tail) tail();
+
+    if (millis() > text_timer)
+        text_timer = millis() + 500; // 2 раз в секунду
+    else return;
+
+    lflags.got_data=1;   // renew screen
+
+
+
+    if (     (chan_raw[1] - 100) > chan2_raw_middle ){  move_menu(1);  return; } // переходы по строкам по верх-низ
+    else if ((chan_raw[1] + 100) < chan2_raw_middle ){  move_menu(-1); return; }
+
+    if (     (chan_raw[3] - 100) > chan4_raw_middle ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+    else if ((chan_raw[3] + 100) < chan4_raw_middle ){  move_screen(-1); return; }
+
 
     OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
 
-    p = params[setup_menu];
+    p = &params[setup_menu];
 
-    int diff =  labs( chan1_raw_middle - chan_raw[0] );
+    int diff = ( chan1_raw_middle - chan_raw[0] );
+    if(diff<0) diff = -diff;
 
-    switch (p.type){
-        
+    void *pval=(void *)pgm_read_word((void *)&p->value);
+
+    min =(int)pgm_read_word((void *)&p->min);
+    max =(int)pgm_read_word((void *)&p->max);
+    
+
+
+    type=pgm_read_byte((void *)&p->type);
+    byte k=pgm_read_byte((void *)&p->k);
+
+    switch (type){
         case 'b': // byte param
-	    v=*((byte *)p.value) / (float)p.k;
+    	    { 
+    	        int l=*((byte *)pval);
+		v = l / (float)(k);
+	    }
     	    size= 1;
-	    if(     diff>300)	inc=1;
-	    else if(diff>100)	inc=0.1;
+	    if(     diff>300)	inc=10/(float)k;
+	    else if(diff>150)	inc=1 /(float)k;
 	    break;
 
-        case 'f': // byte param
-	    v=*((float *)p.value);
+        case 'f': // float param
+	    v=*((float *)pval);
 	    size=4;
 	
-	    if(     diff>400)	inc=1;
-	    else if(diff>300)	inc=0.1;
-	    else if(diff>200)	inc=0.01;
-	    else if(diff>100)	inc=0.001;
+	    if(     diff>400) inc=1;
+	    else if(diff>300) inc=0.1;
+	    else if(diff>200) inc=0.01;
+	    else if(diff>100) inc=0.001;
 
 	    break;
     }
@@ -1739,29 +1730,45 @@ void panSetup(){
         
     
     if(diff>100){
-	if(chan_raw[0] > chan1_raw_middle) v -= inc;
-	if(chan_raw[0] < chan1_raw_middle) v += inc;
+//if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
+	if(chan_raw[0] < chan1_raw_middle) v -= inc;
+	if(chan_raw[0] > chan1_raw_middle) v += inc;
 
-	if(!btn_time) btn_time = millis(); // запомним время первого нажатия
-    } else            btn_time = 0;
-    
+        if(v<min) v=min;
+        if(v>max) v=max;
 
-    switch (p.type){
-        case 'b': // byte param
-	    *((byte *)p.value) = (byte)(v * p.k);
-	    break;
-	    
-        case 'f': // float param
-	    *((float *)p.value) = v;
-	    break;
-    }
+    } 
 
 
     if(v != value_old) {
-	eeprom_write_len( (byte *)p.value,  EEPROM_offs(sets) + ((byte *)p.value - (byte *)&sets),  size );
-	osd.printf_P(p.fmt, v); // updated value
-	lflags.mavlink_got=1;   // renew screen
+//Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old); Serial.wait();
+
+        switch (type){
+            case 'b': // byte param
+	        *((byte *)pval) = (byte)(v * k);
+	        break;
+	    
+            case 'f': // float param
+	        *((float *)pval) = v;
+	        break;
+	}
+
+
+	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
+//	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v); // updated value
+	
+	fptr cb = (fptr) pgm_read_word((void *)&p->cb);
+
+
+//Serial.printf_P(PSTR("cb=%x\n"), (int)cb); Serial.wait();
+
+//Serial.printf_P(PSTR("sets.OSD_BRIGHTNESS=%d\n"), sets.OSD_BRIGHTNESS); Serial.wait();
+	
+	if(cb) cb();
     }
+
+
+
 
 }
 

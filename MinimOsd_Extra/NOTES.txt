@@ -1,7 +1,7 @@
 /*
 
-  File       : ArduCAM-OSD Notes
-  Version    : v1.0.02
+  File       : MinimOSD Notes
+  Version    : v1.1.02
   Author     : Jani Hirvinen
 
   File to define all panels that can be used on ArduCAM-OSD hardware. Also their order numbers 

@@ -9,7 +9,7 @@
 
 
 #include "Spi.h"
-#include "OSD_Config.h"
+#include "Config.h"
 
 #include "prototypes.h"
 
@@ -56,9 +56,6 @@ void OSD::hw_init(){
   //set black level
   MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
 
-// set position - may be EEPROM.read(OSD_SHIFT_X)
-  MAX_write(MAX7456_HOS_reg, 0x20); // 0x20 default
-  MAX_write(MAX7456_VOS_reg, 0x10); // 0x10 default
 
 
   MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
@@ -77,6 +74,16 @@ void OSD::hw_init(){
 
 }
 
+
+void OSD::adjust(){
+  max7456_on();
+  setBrightness();
+
+  MAX_write(MAX7456_HOS_reg, 0x20 + sets.horiz_offs); // 0x20 default
+  MAX_write(MAX7456_VOS_reg, 0x10 + sets.vert_offs); // 0x10 default
+
+  max7456_off();
+}
 
 void OSD::init()
 {

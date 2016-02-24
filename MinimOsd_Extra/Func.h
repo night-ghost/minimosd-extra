@@ -220,3 +220,117 @@ void setFdataVars()
 }
 
 
+void pan_toggle(){
+    byte old_panel=panelN;
+
+    uint16_t ch_raw;
+
+    if(sets.ch_toggle == 1) 
+	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
+    else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
+	ch_raw = chan_raw[sets.ch_toggle-1];
+    else 
+        ch_raw = chan_raw[7];
+
+
+/* no more autoswitch - warnings always on
+
+  //If there is a warning but warnings disabled force switch to panel 0
+  if(lflags.canswitch == 0 && !is_on(panel.warn)){ 
+    if(panelN != sets.auto_screen_switch){
+      lflags.osd_clear = 1;
+    }
+    panelN = sets.auto_screen_switch; 
+
+  }  else{
+    //Flight mode switching
+*/
+
+//	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
+    if (sets.ch_toggle == 4){
+      if ((osd_mode != 6) && (osd_mode != 7)){
+        if (osd_off_switch != osd_mode){ 
+            osd_off_switch = osd_mode;
+            osd_switch_time = millis();
+            if (osd_off_switch == osd_switch_last){
+              lflags.rotatePanel = 1;
+            }
+        }
+        if ((millis() - osd_switch_time) > 2000){
+          osd_switch_last = osd_mode;
+        }
+      }
+    }
+    else  {
+      if (sets.switch_mode == 0){  //Switch mode by value
+        /*
+	    Зазор канала = диапазон изменения / (число экранов+1)
+	    текущий номер = приращение канала / зазор
+        */
+        int d = (1900-1100)/sets.n_screens;
+        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
+        //First panel
+        if ( panelN != n) {
+          panelN = n;
+        }
+      } else{ 			 //Rotation switch
+        if (ch_raw > 1200) {
+/*
+    	    if(!lflags.sw_state) {// last state is off
+        	lflags.mode_switch=1; // установим флаг включения
+        	
+    	    }
+    	    
+            if (osd_switch_time < millis()){ // при надолго включенном канале переключаем каждые 0.5 сек
+                lflags.rotatePanel = 1;
+                osd_switch_time = millis() + 500;
+                
+                lflags.mode_switch=0; // больше не надо переключать
+            }
+            lflags.sw_state=1; // состояние
+        } else { // выключено
+    	    if(lflags.mode_switch){ // кратковременное переключение
+    		lflags.mode_switch=0;
+                lflags.rotatePanel = 1;
+    	    }
+            lflags.sw_state=0;
+        }
+*/
+            if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
+                lflags.rotatePanel = 1;
+                osd_switch_time = millis() + 500;
+            }
+        } else { // выключено
+/*    	    if(lflags.mode_switch){ // кратковременное переключение
+    		lflags.mode_switch=0;
+                lflags.rotatePanel = 1;
+    	    }
+            lflags.sw_state=0;
+*/
+        }
+
+      }
+    }
+    if(lflags.rotatePanel == 1){
+	lflags.rotatePanel = 0;
+        panelN++;
+        if (panelN > sets.n_screens)
+            panelN = 0;
+
+    }
+//  }
+  if(old_panel != panelN){
+        lflags.osd_clear = 1;
+    
+	readPanelSettings();
+	lflags.got_data=1; // redraw even no news
+  }
+  
+  
+    //If there is a panel switch or a change in base panel then clear osd
+    if ((lflags.osd_clear == 1) || (currentAutoPanel != 0)){
+//      osd.clear();
+      lflags.osd_clear = 0;
+      currentAutoPanel = 0;
+    }
+}

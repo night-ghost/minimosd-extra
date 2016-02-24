@@ -109,6 +109,7 @@ class OSD: public BetterStream
     virtual size_t write(uint8_t c);
     static void write_NVM(int font_count, uint8_t *character_bitmap);
     static void write_xy(uint8_t x, uint8_t y, uint8_t c);
+    static void adjust();
     using BetterStream::write;
 
 //  private:

@@ -1,6 +1,8 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
+#define USE_UAVTALK 1
+
 // #define DEBUG
 
 // sets.model_type plane=0 copter=1
@@ -11,11 +13,11 @@
 
 
 #define VERSION "2.4"
-#define RELEASE "r809 DV"
+#define RELEASE "r810 DV"
 
 
-//#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
-#define TELEMETRY_SPEED  19200  // How fast our MAVLink telemetry is coming to Serial port
+#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
+//#define TELEMETRY_SPEED  19200  // How fast our MAVLink telemetry is coming to Serial port
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
 
 

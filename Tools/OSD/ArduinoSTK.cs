@@ -331,7 +331,7 @@ namespace ArdupilotMega
 
                 byte[] command = new byte[] { (byte)'d', (byte)(sending >> 8), (byte)(sending & 0xff), (byte)'E' };
                 this.Write(command, 0, command.Length);
-                Console.WriteLine((startfrom + (length - totalleft)) + " - " + sending);
+                Console.WriteLine("write " + (startfrom + (length - totalleft)) + " - " + sending);
                 this.Write(data, startfrom + (length - totalleft), sending);
                 command = new byte[] { (byte)' ' };
                 this.Write(command, 0, command.Length);

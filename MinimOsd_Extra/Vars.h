@@ -164,6 +164,7 @@ static int dst_x,dst_y; // расстояние по осям - для рада�
 
 static int16_t       osd_pitch = 0;                  // pitch from DCM
 static int16_t       osd_roll = 0;                   // roll from DCM
+static int16_t       osd_yaw = 0;                    // yaw from DCM
 
 static int /* float*/        osd_heading = 0;                // ground course heading from GPS
 
@@ -178,13 +179,12 @@ static float        osd_groundspeed = 0;            // ground speed
 
 static uint8_t      osd_throttle = 0;               // throtle
 
-static int         seconds;
-static long         lastMAVBeat = 0;
+static int          seconds;
+static uint32_t     lastMAVBeat = 0;
 //`static byte         waitingMAVBeats = 1;
 
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
-//static boolean      one_sec_timer_switch = 0;
 
 //static const uint8_t npanels = 4;
 #define MAX_PANELS 4
@@ -196,11 +196,13 @@ static uint8_t      osd_rssi = 0; // raw value from mavlink
 static uint16_t     rssi_in = 0;  // temp readed value after sliding average
 static uint16_t     rssi = 0;     //normalized 0-100%
 
+uint8_t crlf_count = 0;
+
 struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
     bool canswitch:1;
 
-    bool mavlink_got:1;		// флаг получения пакета
+    bool got_data:1;		// флаг получения пакета
     bool mavlink_on:1;		// флаг активности (сбрасывается по таймауту)
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
@@ -217,8 +219,15 @@ struct loc_flags {
 
     bool blinker:1;
 
+    bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
+    bool mode_switch:1;
+    bool sw_state:1;
 //    bool modeScreen:1; //NTSC:0, PAL:1
 //    bool warning_found:1;
 
 };
 
+#ifdef DEBUG
+int packet_drops = 0; // unused
+long bytes_comes=0;
+#endif
