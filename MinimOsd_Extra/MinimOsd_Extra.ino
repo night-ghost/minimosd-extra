@@ -316,16 +316,7 @@ void loop()
 
     }
 
-#if defined(USE_UAVTALK)
-//  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
-    if(lflags.mavlink_active || !lflags.uavtalk_active && lflags.blinker){
-        read_mavlink();
-    } else {
-	uavtalk_read();
-    }
-#else
-    read_mavlink();
-#endif
+    getData(); // получить данные с контроллера
 
     pan_toggle(); // проверить переключение экранов
 
@@ -340,10 +331,9 @@ void loop()
 //LED_ON;
     }
 
-    if(lflags.update_stat) {
-	if(!vsync_wait){ // только во время обратного хода
+    if(lflags.update_stat) { // если надо перерисовать экран
+	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
-
 	    osd.update();
 	    lflags.update_stat = 0;
         }

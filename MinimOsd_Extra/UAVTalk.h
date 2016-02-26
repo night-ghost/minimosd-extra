@@ -30,6 +30,13 @@
 #define UAVTALK_H_
 
 
+/*
+	    make symlink to librepilot/build/firmware/uavobjects
+
+*/
+
+
+
 #define VERSION_ADDITIONAL_UAVOBJID
 #define VERSION_RELEASE_15_02_1
 #define FLIGHT_BATT_ON_REVO 1
@@ -48,25 +55,28 @@
 
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2 || defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 
+//#include "uavobjects/flighttelemetrystats.h"
 #define	FLIGHTTELEMETRYSTATS_OBJID			0x2F7E2902
 
+//#include "uavobjects/gcstelemetrystats.h"
 #define	GCSTELEMETRYSTATS_OBJID				0xABC72744
 
-#define	ATTITUDEACTUAL_OBJID				0x33DAD5E6
+#define	ATTITUDEACTUAL_OBJID				0x33DAD5E6// old
+//#include "uavobjects/attitudestate.h'
 #define ATTITUDESTATE_OBJID				0xD7E0D964	// new name since VERSION_RELEASE_14_01_1
-
+//#include "uavobjects/flightstatus.h"
 #define	FLIGHTSTATUS_OBJID				0x9B6A127E
-
+//#include "uavobjects/manualcontrolcommand.h
 #define	MANUALCONTROLCOMMAND_OBJID			0x1E82C2D2
-
-#define GPSPOSITION_OBJID				0xE2A323B6
+#define GPSPOSITION_OBJID				0xE2A323B6// old
+//#include "uavobjects/gpspositionsensor.h"
 #define GPSPOSITIONSENSOR_OBJID 			0x1A5748CE	// new name since VERSION_RELEASE_14_01_1
-
+//#include "uavobjects/gpstime.h"
 #define GPSTIME_OBJID					0xD4478084
-
-#define GPSVELOCITY_OBJID				0x8245DC80
+#define GPSVELOCITY_OBJID				0x8245DC80// old
+//#include "uavobjects/gpsvelocitysensor.h"
 #define GPSVELOCITYSENSOR_OBJID				0x0BC57454	// new name since VERSION_RELEASE_14_01_1
-
+//#include "uavobjects/
 #define SYSTEMALARMS_OBJID				0x7BD9C77A
 
 
@@ -158,6 +168,8 @@
 
 #if defined VERSION_ADDITIONAL_UAVOBJID
 
+
+// flightstatus.h
 #define FLIGHTSTATUS_OBJID_001				0x0ED79A04	// different ID for unreleased next version
 #define FLIGHTSTATUS_OBJID_002				0x1B7AEB74	// different ID for unreleased next version and VERSION_RELEASE_13_06_1
 #define FLIGHTSTATUS_OBJID_003				0x0B37AA16	// different ID for VERSION_RELEASE_13_06_2
@@ -186,6 +198,7 @@
 
 #if defined FLIGHT_BATT_ON_REVO
 
+//flightbatterystate.h
 #define FLIGHTBATTERYSTATE_OBJID			0xD2083596
 #define FLIGHTBATTERYSTATE_OBJID_001			0x26962352	// different ID for VERSION_RELEASE_14_06_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1 and VERSION_RELEASE_15_02_1
 
@@ -204,6 +217,7 @@
 
 
 #define BAROALTITUDE_OBJID				0x99622E6A
+//barosensor.h
 #define BAROSENSOR_OBJID				0x48120EA6	// new name since VERSION_RELEASE_14_01_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1 and VERSION_RELEASE_15_02_1
 
 #define BAROALTITUDE_OBJ_ALTITUDE			0
@@ -211,6 +225,7 @@
 #define BAROALTITUDE_OBJ_PRESSURE			8
 
 
+//oplinkstatus.h
 #define OPLINKSTATUS_OBJID				0x669C55E2
 #define OPLINKSTATUS_OBJID_001				0xBE2584BA	// different ID for VERSION_RELEASE_14_01_1 and VERSION_RELEASE_14_06_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1
 #define OPLINKSTATUS_OBJID_002				0xB1A94E20	// different ID for VERSION_RELEASE_15_02_1

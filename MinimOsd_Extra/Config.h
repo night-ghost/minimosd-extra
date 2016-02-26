@@ -3,7 +3,7 @@
 
 #define USE_UAVTALK 1
 
-// #define DEBUG
+#define DEBUG
 
 // sets.model_type plane=0 copter=1
 

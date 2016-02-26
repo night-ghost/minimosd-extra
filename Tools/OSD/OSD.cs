@@ -1176,7 +1176,11 @@ public const int npanel = 4; // количество панелей
 			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
 
 			pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
-			BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+			try {
+				BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+			} catch {
+				BRIGHTNESScomboBox.SelectedIndex = 3;
+			}
 			
 			try {
 				pan.horiz_offs= conf.eeprom.sets.horiz_offs;

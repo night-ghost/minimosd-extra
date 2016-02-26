@@ -915,7 +915,7 @@ namespace OSD
 	            "Low",
 	            "Medium",
 	            "Medium High",
-            "High"});
+            	"High"});
             this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(66, 14);
             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";

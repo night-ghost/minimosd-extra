@@ -6,6 +6,21 @@ inline boolean getBit(byte Reg, byte whichBit) {
 }
 
 
+// чтение пакетов нужного протокола
+void getData(){
+#if defined(USE_UAVTALK)
+//  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
+    if(lflags.mavlink_active || !lflags.uavtalk_active && lflags.blinker){
+        read_mavlink();
+    } else {
+	uavtalk_read();
+    }
+#else
+    read_mavlink();
+#endif
+}
+
+
 //------------------ Battery Remaining Picture ----------------------------------
 
 char setBatteryPic(uint16_t bat_level,byte *bp)

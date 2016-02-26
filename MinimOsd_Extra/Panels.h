@@ -1522,7 +1522,7 @@ static const PROGMEM Params params1[] = {
 	
 	{n_screen,  0,  0,   0,                    0,     0}, // header
 	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
-	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 1, 4},
+	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 0, 3},
 	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
 	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
 };
