@@ -2,7 +2,11 @@
  ******************************************************************************
  *
  * @file       UAVTalk.h
- * @author     Joerg-D. Rothfuchs
+  by Night_Ghost@ykoctpa.ru
+ 
+ 
+  based on:  MinOpOsd by  Joerg-D. Rothfuchs
+  
  * @brief      Implements a subset of the telemetry communication between
  * 	       OpenPilot CC, CC3D, Revolution and Ardupilot Mega MinimOSD
  * 	       with code from OpenPilot and MinimOSD.
@@ -53,31 +57,64 @@
 // generate release and copy exe to <top>\ground\uavobjgenerator
 // uavobjgenerator -flight ..\..\shared\uavobjectdefinition ..\..\
 
+// заглушки
+#define UAVObjGetData(x, y) 0
+#define UAVObjSetMetadata(x, y) 0
+#define UAVObjGetMetadata(x, y) 0
+#define UAVObjInstanceLogging(x, y) 0
+#define UAVObjInstanceUpdated(x, y) 0
+#define UAVObjRequestInstanceUpdate(x, y)  0
+#define UAVObjCreateInstance(x, y)  0
+#define UAVObjConnectCallback(x, y, z, n)  0
+#define UAVObjConnectQueue(x, y, z)  0
+#define UAVObjSetInstanceData(x, y, z)  0
+#define UAVObjGetInstanceData(x, y, z)  0
+#define UAVObjSetData(x, y)  0
+#define UAVObjGetData(x, y) 0 
+#define UAVObjLogging(x) 0
+#define UAVObjUpdated(x) 0
+#define UAVObjRequestUpdate(x) 0
+#define UAVObjInstanceUpdated(x,y) 0
+#define UAVObjReadOnly(x) 0
+inline byte FlightTelemetryStatsHandle() {}
+
+typedef byte UAVObjHandle;
+typedef long int32_t;
+typedef byte xQueueHandle;
+typedef byte UAVObjEventCallback;
+typedef byte UAVObjMetadata;
+
+#define EV_MASK_ALL_UPDATES 0
+
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2 || defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 
-//#include "uavobjects/flighttelemetrystats.h"
-#define	FLIGHTTELEMETRYSTATS_OBJID			0x2F7E2902
+// historical IDs
+#define	FLIGHTTELEMETRYSTATS_OBJID_000			0x2F7E2902
+#define	GCSTELEMETRYSTATS_OBJID_000			0xABC72744
+#define	ATTITUDEACTUAL_OBJID_000			0x33DAD5E6// old
+#define ATTITUDESTATE_OBJID_000				0xD7E0D964	// new name since VERSION_RELEASE_14_01_1
+#define	FLIGHTSTATUS_OBJID_000				0x9B6A127E
+#define	MANUALCONTROLCOMMAND_OBJID_000			0x1E82C2D2
+#define GPSPOSITION_OBJID_000				0xE2A323B6// old
+#define GPSPOSITIONSENSOR_OBJID_000 			0x1A5748CE	// new name since VERSION_RELEASE_14_01_1
+#define GPSTIME_OBJID_000				0xD4478084
+#define GPSVELOCITY_OBJID_000				0x8245DC80// old
+#define GPSVELOCITYSENSOR_OBJID_000			0x0BC57454	// new name since VERSION_RELEASE_14_01_1
+#define SYSTEMALARMS_OBJID_000				0x7BD9C77A
 
-//#include "uavobjects/gcstelemetrystats.h"
-#define	GCSTELEMETRYSTATS_OBJID				0xABC72744
-
-#define	ATTITUDEACTUAL_OBJID				0x33DAD5E6// old
-//#include "uavobjects/attitudestate.h'
-#define ATTITUDESTATE_OBJID				0xD7E0D964	// new name since VERSION_RELEASE_14_01_1
-//#include "uavobjects/flightstatus.h"
-#define	FLIGHTSTATUS_OBJID				0x9B6A127E
-//#include "uavobjects/manualcontrolcommand.h
-#define	MANUALCONTROLCOMMAND_OBJID			0x1E82C2D2
-#define GPSPOSITION_OBJID				0xE2A323B6// old
-//#include "uavobjects/gpspositionsensor.h"
-#define GPSPOSITIONSENSOR_OBJID 			0x1A5748CE	// new name since VERSION_RELEASE_14_01_1
-//#include "uavobjects/gpstime.h"
-#define GPSTIME_OBJID					0xD4478084
-#define GPSVELOCITY_OBJID				0x8245DC80// old
-//#include "uavobjects/gpsvelocitysensor.h"
-#define GPSVELOCITYSENSOR_OBJID				0x0BC57454	// new name since VERSION_RELEASE_14_01_1
-//#include "uavobjects/
-#define SYSTEMALARMS_OBJID				0x7BD9C77A
+// current IDs
+#include "uavobjects/flighttelemetrystats.h" // 0x6737BB5A
+#include "uavobjects/gcstelemetrystats.h"
+#include "uavobjects/attitudestate.h"
+#include "uavobjects/flightstatus.h"
+#include "uavobjects/manualcontrolcommand.h"
+#include "uavobjects/gpspositionsensor.h"
+#include "uavobjects/gpstime.h"
+#include "uavobjects/gpsvelocitysensor.h"
+#include "uavobjects/flightstatus.h"
+#include "uavobjects/flightbatterystate.h"
+#include "uavobjects/barosensor.h"
+#include "uavobjects/oplinkstatus.h"
 
 
 #define	FLIGHTTELEMETRYSTATS_OBJ_LEN			21
@@ -169,7 +206,7 @@
 #if defined VERSION_ADDITIONAL_UAVOBJID
 
 
-// flightstatus.h
+
 #define FLIGHTSTATUS_OBJID_001				0x0ED79A04	// different ID for unreleased next version
 #define FLIGHTSTATUS_OBJID_002				0x1B7AEB74	// different ID for unreleased next version and VERSION_RELEASE_13_06_1
 #define FLIGHTSTATUS_OBJID_003				0x0B37AA16	// different ID for VERSION_RELEASE_13_06_2
@@ -198,8 +235,8 @@
 
 #if defined FLIGHT_BATT_ON_REVO
 
-//flightbatterystate.h
-#define FLIGHTBATTERYSTATE_OBJID			0xD2083596
+
+#define FLIGHTBATTERYSTATE_OBJID_000			0xD2083596
 #define FLIGHTBATTERYSTATE_OBJID_001			0x26962352	// different ID for VERSION_RELEASE_14_06_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1 and VERSION_RELEASE_15_02_1
 
 #define FLIGHTBATTERYSTATE_OBJ_VOLTAGE			0
@@ -216,17 +253,17 @@
 
 
 
-#define BAROALTITUDE_OBJID				0x99622E6A
-//barosensor.h
-#define BAROSENSOR_OBJID				0x48120EA6	// new name since VERSION_RELEASE_14_01_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1 and VERSION_RELEASE_15_02_1
+#define BAROALTITUDE_OBJID_000				0x99622E6A
+
+#define BAROSENSOR_OBJID_000				0x48120EA6	// new name since VERSION_RELEASE_14_01_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1 and VERSION_RELEASE_15_02_1
 
 #define BAROALTITUDE_OBJ_ALTITUDE			0
 #define BAROALTITUDE_OBJ_TEMPERATURE			4
 #define BAROALTITUDE_OBJ_PRESSURE			8
 
 
-//oplinkstatus.h
-#define OPLINKSTATUS_OBJID				0x669C55E2
+
+#define OPLINKSTATUS_OBJID_000				0x669C55E2
 #define OPLINKSTATUS_OBJID_001				0xBE2584BA	// different ID for VERSION_RELEASE_14_01_1 and VERSION_RELEASE_14_06_1 and VERSION_RELEASE_14_10_1 and VERSION_RELEASE_15_01_1
 #define OPLINKSTATUS_OBJID_002				0xB1A94E20	// different ID for VERSION_RELEASE_15_02_1
 

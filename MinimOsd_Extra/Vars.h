@@ -17,12 +17,13 @@ static float        vs = 0;
 
 static float  tdistance = 0;
 
-static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
+//static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
+static const char strclear[] PROGMEM = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
 
 
 static float        nav_roll = 0; // Current desired roll in degrees
 static float        nav_pitch = 0; // Current desired pitch in degrees
-static float        nav_bearing = 0; // Current desired heading in degrees
+static int /* float */   nav_bearing = 0; // Current desired heading in degrees
 
 static int16_t      wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
 static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
@@ -32,7 +33,6 @@ static float	    alt_error = 0; // Current altitude error in meters
 static float        aspd_error = 0; // Current airspeed error in meters/second
 static long         osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
-static unsigned long FTime = 0;
 static unsigned long landed = 4294967295;
 
 static int          takeoff_heading = -400;         // Calculated takeoff heading
@@ -129,16 +129,17 @@ static uint16_t     temperature = 0;
 
 static uint16_t      remaining_estimated_flight_time_seconds = 0;
 static uint8_t       osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
-static unsigned long one_sec_timer = 0;
-static unsigned long timer_100ms = 0;
+//static unsigned long one_sec_timer = 0;
+//static unsigned long timer_100ms = 0;
 static unsigned long timer_20ms = 0;
+byte count_100ms;
+byte count_1s;
 
 static unsigned long total_flight_time_milis = 0;
-static uint16_t      total_flight_time_seconds = 0;
+//static uint16_t      total_flight_time_seconds = 0;
 static unsigned long runt = 0;
 
 
-static const char*  warning_string;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
 static uint8_t      rotation = 0;
@@ -179,14 +180,12 @@ static float        osd_groundspeed = 0;            // ground speed
 
 static uint8_t      osd_throttle = 0;               // throtle
 
-static int          seconds;
+static byte          seconds; // это только для panCALLSIGN
 static uint32_t     lastMAVBeat = 0;
-//`static byte         waitingMAVBeats = 1;
 
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
 
-//static const uint8_t npanels = 4;
 #define MAX_PANELS 4
 static uint8_t panelN = 0; 
 
@@ -210,7 +209,7 @@ struct loc_flags {
     bool one_sec_timer_switch:1;
 
 //MAVLink session control
-    bool mavbeat:1;
+//    bool mavbeat:1;
 
     bool motor_armed:1;
     bool last_armed_status:1;
@@ -230,4 +229,5 @@ struct loc_flags {
 #ifdef DEBUG
 int packet_drops = 0; // unused
 long bytes_comes=0;
+uint16_t max_dly=0;
 #endif

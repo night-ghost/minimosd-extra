@@ -30,6 +30,7 @@ MAVLINK_HELPER mavlink_message_t* mavlink_get_channel_buffer(uint8_t chan)
 #ifndef m_mavlink_message
 #error ERROR: IF #define MAVLINK_EXTERNAL_RX_BUFFER IS SET, THE BUFFER HAS TO BE ALLOCATED OUTSIDE OF THIS FUNCTION (mavlink_message_t m_mavlink_buffer[MAVLINK_COMM_NUM_BUFFERS];)
 #endif
+//    extern mavlink_message_t m_mavlink_buffer[];
 #else
 	static mavlink_message_t m_mavlink_buffer[MAVLINK_COMM_NUM_BUFFERS];
 #endif
@@ -349,7 +350,8 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 			status->msg_received = 1;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
 			_MAV_PAYLOAD_NON_CONST(rxmsg)[status->packet_idx+1] = (char)c;
-			memcpy(r_message, rxmsg, sizeof(mavlink_message_t));
+			if(r_message)
+			    memcpy(r_message, rxmsg, sizeof(mavlink_message_t));
 		}
 		break;
 	}

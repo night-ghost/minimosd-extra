@@ -172,7 +172,6 @@ void setFdataVars()
   if (lflags.takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
     lflags.takeofftime = 1;
     tdistance = 0;
-    FTime = time_lapse/1000;
   }
 
 
@@ -225,7 +224,7 @@ void setFdataVars()
 #endif
 
     total_flight_time_milis += time_lapse;
-    total_flight_time_seconds = total_flight_time_milis / 1000;
+//    total_flight_time_seconds = total_flight_time_milis / 1000;
     if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;

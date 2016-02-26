@@ -67,17 +67,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 
-//#include <EEPROM.h>
-//#include <SimpleTimer.h> - no timer!
-#include "GCS_MAVLink.h"
-
-#include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
-#include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
-
 #ifdef membug
 #include "MemoryFree.h"
 #endif
-
 
 #include "ArduCam_Max7456.h"
 #include "Vars.h"
@@ -108,7 +100,6 @@ byte PWM_out_pin=0;
 
 // program parts
 
-#include "UAVTalk.h"
 #include "protocols.h"
 #if defined(USE_UAVTALK)// TODO: let it compile
 #include "UAVTalk_core.h"
@@ -291,29 +282,31 @@ void loop()
 
     wdt_reset();
 
-    if(pt > timer_100ms){
-        timer_100ms = pt + 100;
-        On100ms();
-
-    }
-
     if(pt > timer_20ms){
         timer_20ms = pt + 20;
         On20ms();
-    }
 
-    if (pt > one_sec_timer) {
-//        lflags.one_sec_timer_switch = 1;
-        lflags.got_data=1; // каждые полсекунды принудительно
+	if(++count_100ms>5) {
+	    count_100ms=0;
+	    On100ms();
 
-        one_sec_timer = pt + 500;
-//        lflags.one_sec_timer_switch = 0;
-        lflags.blinker = !lflags.blinker;
-        if(lflags.blinker) {
-            seconds++;
-	    lflags.one_sec_timer_switch = 1; // for warnings
 	}
+	if(++count_1s>25) {
+	    count_1s=0;
 
+            lflags.got_data=1; // каждые полсекунды принудительно
+
+            lflags.blinker = !lflags.blinker;
+            if(lflags.blinker) {
+                seconds++;
+	        lflags.one_sec_timer_switch = 1; // for warnings
+
+#ifdef DEBUG    
+		if(seconds % 60 == 30)
+		Serial.printf_P(PSTR("loop time = %sms\n"),max_dly);
+#endif
+	    }
+	}
     }
 
     getData(); // получить данные с контроллера
@@ -344,7 +337,13 @@ void loop()
 
 	// data is in PWM_IN
     }
+
+#ifdef DEBUG    
+    uint16_t dly=millis() - pt;
     
+    if(dly>max_dly)
+	max_dly=dly; // накопление максимального времени цикла
+#endif
 }
 
 float avgRSSI(uint16_t d){
