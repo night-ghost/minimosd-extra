@@ -433,7 +433,7 @@ public const int npanel = 4; // количество панелей
 		
 
         public int getCenter () {
-			if(CHK_pal.Checked)
+			if(CHK_pal.Checked || CHK_auto.Checked)
 				return 8;
 			return 6;
 		}
@@ -522,7 +522,7 @@ public const int npanel = 4; // количество панелей
 			processingpanel = thing.name;
 
 			// ntsc and below the middle line
-			if(thing.y >= getCenter() && !CHK_pal.Checked) {
+			if(thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked)) {
 				thing.show(thing.x, thing.y - 3,thing.sign);
 			} else { // pal and no change
 				thing.show(thing.x, thing.y,thing.sign);
@@ -605,7 +605,7 @@ public const int npanel = 4; // количество панелей
 							processingpanel = thing.name;
 
 							// ntsc and below the middle line
-							if(thing.y >= getCenter() && !CHK_pal.Checked) {
+							if(thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked) ) {
 								thing.show(thing.x, thing.y - 3,thing.sign);
 							} else { // pal and no change
 								thing.show(thing.x, thing.y,thing.sign);
@@ -1062,9 +1062,9 @@ public const int npanel = 4; // количество панелей
 			pan.cs_version = conf.eeprom.CS_version;
 
 			if(pan.fw_version=="0.0.0")  {
-				lblFWModelType.Text = "Model Type found in OSD: Unknown or custom";
+				lblFWModelType.Text = "Firmware version of OSD: Unknown or custom";
 			} else {
-				lblFWModelType.Text = "Model Type found in OSD: " + (ModelType)pan.model_type + " " + pan.fw_version;
+				lblFWModelType.Text = "Firmware version of OSD: " + pan.fw_version;
 			}
 
 			if(pan.cs_version=="0.0.0") {
@@ -1567,7 +1567,8 @@ public const int npanel = 4; // количество панелей
 								} catch{
 									pan.converts = bool.Parse(strings[1]);
 								}
-                            else if (strings[0] == "Overspeed") pan.overspeed = byte.Parse(strings[1]);
+                            else if (strings[0] == "Overspeed") 
+								pan.overspeed = byte.Parse(strings[1]);
                             else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
                             else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
@@ -1821,7 +1822,9 @@ public const int npanel = 4; // количество панелей
 				sp.Close();
 
 				if(spuploadflash_flag) {
-
+					// TODO: update pan.fw_version = conf.eeprom.FW_version ;
+					//		pan.cs_version = conf.eeprom.CS_version;
+					
 					toolStripStatusLabel1.Text = "Done";
 
 					MessageBox.Show("Done!");

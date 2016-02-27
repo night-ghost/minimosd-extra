@@ -230,38 +230,35 @@ namespace OSD
             }
             li.Nodes.Clear();
             li.CheckBoxes = true;
-            if (rbtSortAlphabetic.Checked)
-            {
+            if (rbtSortAlphabetic.Checked) {
                 //List<string> instruments = new List<string>();
-                foreach (TreeNode node in allNodes)
-                {
+                foreach (TreeNode node in allNodes)  {
                     if ((node.Text != "Attitude") &&
                         (node.Text != "General") &&
                         (node.Text != "Energy") &&
                         (node.Text != "Location") &&
+					    (node.Text != "Misc") &&
                         (node.Text != "Speed"))
                     {
                         li.Nodes.Add(node);
                     }
                 }
                 li.Sort();
-            }
-            else
-            {
+            } else    {
                 li.Nodes.Add("Attitude", "Attitude");
                 li.Nodes.Add("General", "General");
                 li.Nodes.Add("Energy", "Energy");
                 li.Nodes.Add("Location", "Location");
                 li.Nodes.Add("Speed", "Speed");
+				li.Nodes.Add("Misc", "Misc");
 
-                foreach (TreeNode node in allNodes)
-                {
+                foreach (TreeNode node in allNodes)  {
                     if ((node.Text == "Horizon") ||
                         (node.Text == "Pitch") ||
                         (node.Text == "Roll"))
                         li.Nodes["Attitude"].Nodes.Add(node);
 
-                    if ((node.Text == "Call Sign") ||
+                    else if ((node.Text == "Call Sign") ||
                         (node.Text == "RSSI") ||
                         (node.Text == "Flight Mode") ||
                         (node.Text == "Temperature") ||
@@ -270,14 +267,14 @@ namespace OSD
                         (node.Text == "Warnings"))
                         li.Nodes["General"].Nodes.Add(node);
 
-                    if ((node.Text == "Battery A") ||
+                    else if ((node.Text == "Battery A") ||
                         (node.Text == "Battery Percent") ||
                         (node.Text == "Current") ||
                         (node.Text == "Efficiency") ||
                         (node.Text == "Tune"))
                         li.Nodes["Energy"].Nodes.Add(node);
 
-                    if ((node.Text == "Altitude") ||
+                    else if ((node.Text == "Altitude") ||
                         (node.Text == "GPS Coord") ||
                         (node.Text == "Heading") ||
                         (node.Text == "Heading Rose") ||
@@ -290,12 +287,15 @@ namespace OSD
                         (node.Text == "WP Distance"))
                         li.Nodes["Location"].Nodes.Add(node);
 
-                    if ((node.Text == "Air Speed") ||
+                    else if ((node.Text == "Air Speed") ||
                         (node.Text == "Vertical Speed") ||
                         (node.Text == "Velocity") ||
                         (node.Text == "Wind Speed"))
                         li.Nodes["Speed"].Nodes.Add(node);
+					else
+						li.Nodes["Misc"].Nodes.Add(node);
                 }
+				
             }
 
             li.ExpandAll();
@@ -407,7 +407,10 @@ namespace OSD
         
 
         private void pictureBox1_MouseDown (object sender, MouseEventArgs e) {
-			osd.currentlyselected = getMouseOverItem(e.X, e.Y);
+			osd.BeginInvoke((MethodInvoker)delegate {
+				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
+			});
+			
 
 			mousedown = true;
         

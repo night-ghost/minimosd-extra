@@ -41,6 +41,11 @@ void read_mavlink(){
     uint8_t      base_mode=0;
     mavlink_status_t status;
 
+#ifdef DEBUG
+    // Update global packet drops counter
+    status.packet_rx_drop_count = 0;
+#endif
+
     //grabing data 
     while(Serial.available()) {
         uint8_t c = Serial.read();

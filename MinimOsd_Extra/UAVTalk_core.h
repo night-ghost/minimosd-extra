@@ -628,10 +628,23 @@ void uavtalk_read(void) {
 				// osd_waypoint_seq = 0;           // waypoint sequence
 				// osd_airspeed = 0;               // air speed (only with pitot tube)
 				// etc.
+			case WAYPOINTACTIVE_OBJID:
+			    wp_number = uavtalk_get_int16(&msg.u, offsetof(WaypointActiveDataPacked, Index));
+			    break;
+			    
+				// osd_airspeed = 0;               // air speed (only with pitot tube)
+			case AIRSPEEDSENSOR_OBJID:
+			    byte connected = uavtalk_get_int8(&msg.u, offsetof(AirspeedSensorDataPacked, SensorConnected));
+			    if(connected)
+				osd_airspeed = uavtalk_get_int16(&msg.u, offsetof(AirspeedSensorDataPacked, TrueAirspeed));
+			    break;
 			}
+			
+// мы подслушиваем разговор наземки и борта, и не вмешиваемся
 //			if (msg.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
 //				uavtalk_respond_object(&msg.u, UAVTALK_TYPE_ACK);
 //			}
+			
 		}
 
 		if(!Serial.available())

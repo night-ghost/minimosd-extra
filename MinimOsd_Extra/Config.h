@@ -3,7 +3,7 @@
 
 #define USE_UAVTALK 1
 
-#define DEBUG
+//#define DEBUG
 
 // sets.model_type plane=0 copter=1
 
@@ -13,7 +13,8 @@
 
 
 #define VERSION "2.4"
-#define RELEASE "r810 DV"
+#define RELEASE_NUM 811
+#define RELEASE "r811DV"
 
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port

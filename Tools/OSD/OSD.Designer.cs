@@ -1290,6 +1290,7 @@ namespace OSD
             this.OVERSPEED_numeric.Size = new System.Drawing.Size(99, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
             // 
             // STALL_label
             // 

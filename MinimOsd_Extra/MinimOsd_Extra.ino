@@ -2,9 +2,11 @@
 Copyright (c) 2011.  All rights reserved.
 An Open Source Arduino based OSD and Camera Control project.
 
-Program  : ArduCAM-OSD (Supports the variant: minimOSD)
-Version  : V2.1, 24 September 2012
-Author(s): Sandro Benigno
+Program  : Minim-OSD 
+
+Version  : V8.11, 26 feb 2016
+
+based on: minimOSD-extra by Sandro Benigno
 Coauthor(s):
 Jani Hirvinen   (All the EEPROM routines)
 Michael Oborne  (OSD Configutator)
@@ -218,6 +220,19 @@ void setup()     {
 //        InitializeOSD(); нечего дефолтным значениям тут делать
 	start_dly=10000; // предупреждение кажем подольше
     }
+    
+#define REL_1 int(RELEASE_NUM/100)
+#define REL_2 int((RELEASE_NUM - REL_1*100 )/10) 
+#define REL_3 int((RELEASE_NUM - REL_1*100 - REL_2*10  )) 
+
+    if(sets.FW_VERSION[0]!=(REL_1 + '0') || sets.FW_VERSION[1]!=(REL_2 + '0') || sets.FW_VERSION[2]!=(REL_3 + '0') ){
+	sets.FW_VERSION[0]=REL_1 + '0';
+	sets.FW_VERSION[1]=REL_2 + '0';
+	sets.FW_VERSION[2]=REL_3 + '0';
+    
+	eeprom_write_len( sets.FW_VERSION,  EEPROM_offs(sets) + ((byte *)sets.FW_VERSION - (byte *)&sets),  sizeof(sets.FW_VERSION) );
+    }
+
 
     const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
 
@@ -303,7 +318,7 @@ void loop()
 
 #ifdef DEBUG    
 		if(seconds % 60 == 30)
-		Serial.printf_P(PSTR("loop time = %sms\n"),max_dly);
+		Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
 #endif
 	    }
 	}
