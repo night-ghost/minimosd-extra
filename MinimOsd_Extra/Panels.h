@@ -911,24 +911,30 @@ void panRose(point p){
       0x85,0x80,0x81,0x80,0x81,0x80
      };
 
-  byte start = (osd_heading * 24+12)/360 - 3;
+    int start = (osd_heading * 24+12)/360 - 4;
  
-  if(start < 0) start += 24;
-  
-  char *c=buf_show;
-  uint8_t x;
-//  *c++=0xc3;
-  for(x=11; x > 0; x--){
-    *c++ = buf_Rule[start];
-    if(++start >= 24) start = 0;
-  }
-//  *c++ = 0x87;
-  *c++ = '\0';
+// Serial.printf_P(PSTR("Rose start=%d\n"), start);
+ 
+    if(start < 0) start += 24;
 
+// Serial.printf_P(PSTR("Rose 2 start=%d\n"), start);
+  
+    char *c=buf_show;
+    uint8_t x;
+//  *c++=0xc3;
+    for(x=9; x != 0; x--){
+        *c++ = buf_Rule[start];
+        if(++start >= 24) start = 0;
+    }
+//  *c++ = 0x87;
+    *c++ = '\0';
+
+// Serial.printf_P(PSTR("Rose buf=%s\n"), buf_show);
 
     OSD::setPanel(p.x,p.y);
 
-//    osd.printf_P(PSTR( "\x20\xb7\xb7\xb7\xb4\xb7\xb7\xb7\x20|\xc3%s\x87"), buf_show);
+    if(has_sign(p))
+	osd.print_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
     osd.printf_P(PSTR("\xc3%s\x87"), buf_show);
 //    osd.printf(buf_show);
 //    osd.print(buf_show);
@@ -1532,8 +1538,8 @@ static const PROGMEM Params params1[] = {
 	{n_screen,  0,  0,   0,                    0,     0}, // header
 	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 0, 3},
-	{n_horiz,  'b', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
-	{n_vert,   'b', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
+	{n_horiz,  'c', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
+	{n_vert,   'c', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
 };
 
 // второй экран - горизонт
@@ -1608,7 +1614,7 @@ void panSetup(){
     byte col;
     char *nm;
     int min, max;
-
+    byte k;
 
 
     pscreen = &screens[setup_screen];
@@ -1641,6 +1647,7 @@ void panSetup(){
 	}
 
 	type=pgm_read_byte((void *)&p->type);
+	k=pgm_read_byte((void *)&p->k);
 
         switch (type){
         
@@ -1656,7 +1663,14 @@ void panSetup(){
         case 'b': // byte param
 	    { 
 		int l = *((byte *)(pgm_read_word((void *)&p->value) ) ) ;
-		v = l / (float)(pgm_read_byte((void *)&p->k));
+		v = l / (float)k;
+	    }
+	    break;
+
+        case 'c': // signed byte param
+	    { 
+		int l = *((char *)(pgm_read_word((void *)&p->value) ) ) ;
+		v = l / (float)k;
 	    }
 	    break;
 	    
@@ -1703,14 +1717,21 @@ void panSetup(){
 
 
     type=pgm_read_byte((void *)&p->type);
-    byte k=pgm_read_byte((void *)&p->k);
+    k=pgm_read_byte((void *)&p->k);
 
     switch (type){
+	case 'c':
+    	    { 
+    	        int l=*((char *)pval);
+		v = l / (float)(k);
+	    }
+	    goto as_byte;
         case 'b': // byte param
     	    { 
     	        int l=*((byte *)pval);
 		v = l / (float)(k);
 	    }
+as_byte:
     	    size= 1;
 	    if(     diff>300)	inc=10/(float)k;
 	    else if(diff>150)	inc=1 /(float)k;
@@ -1745,9 +1766,12 @@ void panSetup(){
 
 
     if(v != value_old) {
-//Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old); Serial.wait();
+//Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
 
         switch (type){
+    	    case 'c':
+    		*((char *)pval) = (char)(v * k);
+    		break;
             case 'b': // byte param
 	        *((byte *)pval) = (byte)(v * k);
 	        break;
@@ -1766,8 +1790,8 @@ void panSetup(){
 
 //Serial.printf_P(PSTR("cb=%x\n"), (int)cb); Serial.wait();
 
-//Serial.printf_P(PSTR("sets.OSD_BRIGHTNESS=%d\n"), sets.OSD_BRIGHTNESS); Serial.wait();
-	
+//Serial.printf_P(PSTR("sets.horiz_offs=%d\n"), sets.horiz_offs); 
+
 	if(cb) cb();
     }
 

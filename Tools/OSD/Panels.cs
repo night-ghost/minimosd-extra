@@ -913,7 +913,9 @@ namespace OSD
             
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x87"));
+			if(sign==1)
+				osd.printf_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
+            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
            
             
             return 0;
@@ -1295,7 +1297,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
 
         //------------------ Heading and Compass ----------------------------------------
-
+/* not used
         byte[] buf_show = new byte[11];
         byte[] buf_Rule = {0xc2,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
                            0xc4,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
@@ -1314,7 +1316,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             }
             // buf_show[11] = (byte)'\0';
         }
-
+*/
         //------------------ Battery Remaining Picture ----------------------------------
 
         public void setBatteryPic()

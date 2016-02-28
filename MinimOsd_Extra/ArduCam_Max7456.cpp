@@ -44,46 +44,50 @@ void max7456_on(){
     digitalWrite(MAX7456_SELECT,LOW);
 }
 
-void OSD::hw_init(){
-  max7456_on();
-
-  //read black level register
-  byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);//black level read register
-  
-  MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
-  delay_150();
-
-  //set black level
-  MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
-
-
-
-  MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
-
-  setBrightness();
-  
-  // define sync (auto,int,ext)
-//      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
-  MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal); 
-
-  delay_150();
-
-  MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
-
-  max7456_off();
-
-}
-
-
 void OSD::adjust(){
   max7456_on();
   setBrightness();
+
+//Serial.printf_P(PSTR("adjust bright=%d horiz=%d vert=%d\n"),sets.OSD_BRIGHTNESS,sets.horiz_offs, sets.vert_offs);
 
   MAX_write(MAX7456_HOS_reg, 0x20 + sets.horiz_offs); // 0x20 default
   MAX_write(MAX7456_VOS_reg, 0x10 + sets.vert_offs); // 0x10 default
 
   max7456_off();
 }
+
+void OSD::hw_init(){
+    max7456_on();
+
+    //read black level register
+    byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);//black level read register
+  
+    MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
+    delay_150();
+
+    //set black level
+    MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
+
+
+
+    MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
+
+    //setBrightness();
+  
+  // define sync (auto,int,ext)
+//      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
+    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal); 
+
+    delay_150();
+
+    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
+
+ // max7456_off();
+
+    adjust();
+}
+
+
 
 void OSD::init()
 {
@@ -120,9 +124,9 @@ void OSD::detectMode()
 //      setMode(1); // PAL without video 
 no_auto:
           if (flags.PAL_NTSC) //NTSC
-              setMode(0);
-          else  //PAL
               setMode(1);
+          else  //PAL
+              setMode(0);
         }
 
 

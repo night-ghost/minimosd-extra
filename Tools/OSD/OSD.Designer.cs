@@ -543,7 +543,7 @@ namespace OSD
 			"none",
             "V_Bat1",
             "V_Bat2",
-            "Curent",
+            "Current",
             "RSSI"});
             this.cbOutPin.Location = new System.Drawing.Point(53, 36);
             this.cbOutPin.Name = "cbOutPin";

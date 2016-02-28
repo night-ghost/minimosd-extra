@@ -26,7 +26,11 @@ namespace OSD
 {
     public partial class OSD : Form
     {
-		
+
+//*****************************************/		
+public const string VERSION ="r812 DV";
+			
+	
          //max 7456 datasheet pg 10
         //pal  = 16r 30 char
         //ntsc = 13r 30 char
@@ -37,9 +41,7 @@ public const  int SCREEN_W=30;
 public const  int SCREEN_H=16;
 public const  int SCREEN_H_NTSC=13;		
 
-public const string VERSION ="r809 DV";
-			
-			
+		
 		
 public enum ModelType {
 	Plane = 0,
@@ -229,7 +231,7 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY,1);
 	
 		
-				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY,-1);
+				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY,1);
 				pi[a++] = new Panel("Heading", pan.panHeading, 24, 13, panHeading_XY,-1);
 	//          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
 				pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY,-1);
@@ -508,7 +510,10 @@ public const int npanel = 4; // количество панелей
 			return CHK_pal.Checked;
 		}
         
-
+		public bool auto_checked(){
+				return CHK_auto.Checked;
+		}
+		
         public void printf_P (string format, params object[] args) {
 			printf(format, args);
 		}
@@ -572,7 +577,7 @@ public const int npanel = 4; // количество панелей
 			}
 
 			try {
-				pan.setHeadingPatern();
+				//pan.setHeadingPatern();
 				pan.setBatteryPic();
 			} catch (Exception ex) {
 				return;

@@ -1,14 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="osd_screen.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Panels.cs">
     <Files>
-      <File FileName="OSD.cs" Line="677" Column="17" />
-      <File FileName="osd_screen.cs" Line="467" Column="1" />
+      <File FileName="OSD.cs" Line="30" Column="45" />
+      <File FileName="osd_screen.cs" Line="391" Column="52" />
       <File FileName="ArduinoSTK.cs" Line="330" Column="42" />
-      <File FileName="Panels.cs" Line="1205" Column="11" />
-      <File FileName="OSD.Designer.cs" Line="1627" Column="52" />
+      <File FileName="Panels.cs" Line="918" Column="72" />
+      <File FileName="OSD.Designer.cs" Line="550" Column="18" />
       <File FileName="config.cs" Line="173" Column="42" />
-      <File FileName="Disassembly" />
       <File FileName="Panel.cs" Line="1" Column="1" />
       <File FileName="Pos.cs" Line="1" Column="1" />
       <File FileName="Program.cs" Line="1" Column="1" />
@@ -29,16 +28,14 @@
             <Node name="Resources" expanded="True" />
             <Node name="AboutBox1.cs" expanded="True" />
             <Node name="OSD.cs" expanded="True" />
-            <Node name="osd_screen.cs" selected="True" />
+            <Node name="Panels.cs" selected="True" />
           </Node>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/usr/src/quad-copter/minimosd-extra/Tools/OSD/osd_screen.cs" line="434" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

@@ -388,7 +388,7 @@ namespace OSD
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
 				getCharLoc(e.X, e.Y, out ansW, out ansH);
-				if(ansH >= osd.getCenter() && !osd.pal_checked()) {
+				if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
 					ansH += 3;
 				}
 				ansW -= clickX; //запомним куда ткнули
