@@ -73,6 +73,8 @@ namespace OSD
 		public bool flgCurrent=false;
 		public bool flgILS=true;
 		public bool flgRadar=true;
+        public bool flgHUD = true;
+        public bool flgTrack = false;
 		
 		public byte battBv=101;
 		
@@ -200,8 +202,9 @@ namespace OSD
         //static boolean enable_mav_request = 0;
         //rssi varables
         //public uint8_t rssi = 0;
-        public uint8_t rssipersent = 0;
-        public uint8_t rssical = 255;
+        public uint16_t rssipersent = 0;
+        public uint16_t rssical = 255;
+		
         public uint8_t rssiraw_on = 0;
         static uint8_t osd_rssi = 2;
         public uint8_t radio_setup_flag = 0;
@@ -673,14 +676,35 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-  	osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
-                      "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
-                      "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"+
-                      "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|"+
+            if (flgHUD)
+            {
+                osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
+                                  "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
+                                  "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|" +
+                                  "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
                       "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3"));
+            }
+            else {
+                osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|" +
+                                  "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|" +
+                                  "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|" +
+                                  "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20|" +
+                                  "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
+            
+            }
+
 			if(osd.conf.eeprom.flags[OSD.radar_on]) {
 				osd.setPanel(first_col+7, first_line+3);
 				osd.printf_P(PSTR("\xb7"));
+
+                if (flgTrack) {
+                    osd.setPanel(first_col + 8, first_line + 3);
+                    osd.printf_P(PSTR("\x24"));
+                    osd.setPanel(first_col + 9, first_line + 3);
+                    osd.printf_P(PSTR("\x24"));
+                    osd.setPanel(first_col + 9, first_line + 4);
+                    osd.printf_P(PSTR("\x24"));
+                }
 			}				
 			
 			osd_roll=10;

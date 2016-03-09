@@ -685,11 +685,19 @@ void panHorizon(point p){
   // сначала очистим и нарисуем стрелочки.
 //    const char p=
 
-    osd.print_P(str_hud);
-    osd.print_P(str_hud);
-    osd.print_P(PSTR("\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"));
-    osd.print_P(str_hud);
-    osd.print_P(str_hud);
+    if(flags.flgHUD) {
+        osd.print_P(str_hud);
+        osd.print_P(str_hud);
+        osd.print_P(PSTR("\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"));
+        osd.print_P(str_hud);
+        osd.print_P(str_hud);
+    } else {
+	for(byte j=5; j!=0; j--) {
+	    for(byte i=14; i!=0; i--)
+		osd.write(' ');
+	    osd.write('|');
+	}
+    }
                       
     showHorizon(p.x + 1, p.y);
 
@@ -1387,6 +1395,23 @@ void showRADAR(byte center_col, byte center_line) {
 
     // show UAV
     OSD::write_xy(center_col + x, center_line - y, arr[index]);
+    
+    if(flags.flgTrack){
+	static Point trk[4];
+	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
+	    for(byte i=4; i!=1;){
+		i--;
+		trk[i] = trk[i-1]; // move points to end
+
+		OSD::write_xy(center_col + x, center_line - y, arr[index]);
+	    }
+	    trk[0].x =x;
+	    trk[0].y =y;
+	}
+	for(byte i=3; i!=0;){
+	    OSD::write_xy(center_col + trk[i].x, center_line - trk[i].y, 0x24);
+	}
+    }
 
     // show home
 //    OSD::setPanel(center_col, center_line);

@@ -85,13 +85,15 @@ struct Flags { // 4 байта
     bool PAL_NTSC:1;			// 3
     
 // new!
-    bool useExtVbattA:1;// 		// 4
+    bool useExtVbattA:1;// 4
     bool useExtVbattB:1;// 5
     bool useExtCurr:1;	// 6
     bool radar_on:1;	// 7
     bool ils_on:1;	// 8
     
     bool mode_auto:1; 	// 9
+    bool flgHUD:1;      // 10
+    bool flgTrack:1;    // 11
 };
 
 union _Flags {
@@ -152,6 +154,9 @@ struct Settings {
     byte pwm_dst;
     
     byte n_screens;
+    
+    uint16_t RSSI_16_low;
+    uint16_t RSSI_16_high;
 };
 
 

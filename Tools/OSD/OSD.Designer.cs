@@ -49,7 +49,6 @@ namespace OSD
             this.CHK_ntsc = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_pal = new System.Windows.Forms.ToolStripMenuItem();
 			this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
-            this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.resetEepromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -162,6 +161,8 @@ namespace OSD
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.cbxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
+            this.chkHUD = new System.Windows.Forms.CheckBox();
+            this.chkTrack = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -329,7 +330,7 @@ namespace OSD
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(152, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -340,21 +341,19 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(152, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
             this.CHK_pal.Click += new System.EventHandler(this.CHK_pal_Click);
             // 
-            // autoToolStripMenuItem
+            // CHK_auto
             // 
-            this.CHK_auto.Name = "autoToolStripMenuItem";
-            this.CHK_auto.Size = new System.Drawing.Size(152, 22);
+            this.CHK_auto.Name = "CHK_auto";
+            this.CHK_auto.Size = new System.Drawing.Size(111, 22);
             this.CHK_auto.Text = "Auto";			
-            this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
             this.CHK_auto.CheckStateChanged += new System.EventHandler(this.AUTOToolStripMenuItem_CheckStateChanged);
-            
-			// 
+            this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
             // 
             // optionsToolStripMenuItem
             // 
@@ -586,12 +585,14 @@ namespace OSD
             // 
             // groupBox15
             // 
+            this.groupBox15.Controls.Add(this.chkTrack);
+            this.groupBox15.Controls.Add(this.chkHUD);
             this.groupBox15.Controls.Add(this.groupBox16);
             this.groupBox15.Controls.Add(this.chkILS);
             this.groupBox15.Controls.Add(this.chkRadar);
-            this.groupBox15.Location = new System.Drawing.Point(501, 143);
+            this.groupBox15.Location = new System.Drawing.Point(490, 123);
             this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(160, 233);
+            this.groupBox15.Size = new System.Drawing.Size(181, 249);
             this.groupBox15.TabIndex = 12;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Horizon";
@@ -608,9 +609,9 @@ namespace OSD
             this.groupBox16.Controls.Add(this.label22);
             this.groupBox16.Controls.Add(this.txtRollPal);
             this.groupBox16.Controls.Add(this.label21);
-            this.groupBox16.Location = new System.Drawing.Point(9, 67);
+            this.groupBox16.Location = new System.Drawing.Point(11, 99);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(140, 161);
+            this.groupBox16.Size = new System.Drawing.Size(161, 144);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "Angle adjust";
@@ -618,7 +619,7 @@ namespace OSD
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(9, 92);
+            this.label24.Location = new System.Drawing.Point(9, 81);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(65, 13);
             this.label24.TabIndex = 31;
@@ -626,7 +627,7 @@ namespace OSD
             // 
             // txtPitchNtsc
             // 
-            this.txtPitchNtsc.Location = new System.Drawing.Point(74, 134);
+            this.txtPitchNtsc.Location = new System.Drawing.Point(96, 118);
             this.txtPitchNtsc.Name = "txtPitchNtsc";
             this.txtPitchNtsc.Size = new System.Drawing.Size(59, 20);
             this.txtPitchNtsc.TabIndex = 30;
@@ -637,7 +638,7 @@ namespace OSD
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(37, 137);
+            this.label25.Location = new System.Drawing.Point(59, 121);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(31, 13);
             this.label25.TabIndex = 29;
@@ -645,7 +646,7 @@ namespace OSD
             // 
             // txtRollNtsc
             // 
-            this.txtRollNtsc.Location = new System.Drawing.Point(74, 112);
+            this.txtRollNtsc.Location = new System.Drawing.Point(96, 96);
             this.txtRollNtsc.Name = "txtRollNtsc";
             this.txtRollNtsc.Size = new System.Drawing.Size(59, 20);
             this.txtRollNtsc.TabIndex = 28;
@@ -656,7 +657,7 @@ namespace OSD
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(37, 115);
+            this.label26.Location = new System.Drawing.Point(59, 99);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(25, 13);
             this.label26.TabIndex = 27;
@@ -673,7 +674,7 @@ namespace OSD
             // 
             // txtPitchPal
             // 
-            this.txtPitchPal.Location = new System.Drawing.Point(74, 61);
+            this.txtPitchPal.Location = new System.Drawing.Point(96, 55);
             this.txtPitchPal.Name = "txtPitchPal";
             this.txtPitchPal.Size = new System.Drawing.Size(59, 20);
             this.txtPitchPal.TabIndex = 25;
@@ -684,7 +685,7 @@ namespace OSD
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(37, 64);
+            this.label22.Location = new System.Drawing.Point(59, 58);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 13);
             this.label22.TabIndex = 24;
@@ -692,7 +693,7 @@ namespace OSD
             // 
             // txtRollPal
             // 
-            this.txtRollPal.Location = new System.Drawing.Point(74, 39);
+            this.txtRollPal.Location = new System.Drawing.Point(96, 33);
             this.txtRollPal.Name = "txtRollPal";
             this.txtRollPal.Size = new System.Drawing.Size(59, 20);
             this.txtRollPal.TabIndex = 23;
@@ -703,7 +704,7 @@ namespace OSD
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(37, 42);
+            this.label21.Location = new System.Drawing.Point(59, 36);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(25, 13);
             this.label21.TabIndex = 22;
@@ -738,16 +739,16 @@ namespace OSD
             this.groupBox13.Controls.Add(this.label16);
             this.groupBox13.Controls.Add(this.label6);
             this.groupBox13.Controls.Add(this.numMinVoltB);
-            this.groupBox13.Location = new System.Drawing.Point(501, 9);
+            this.groupBox13.Location = new System.Drawing.Point(490, 5);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(160, 128);
+            this.groupBox13.Size = new System.Drawing.Size(181, 112);
             this.groupBox13.TabIndex = 11;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Battery B";
             // 
             // txtBattB_k
             // 
-            this.txtBattB_k.Location = new System.Drawing.Point(100, 100);
+            this.txtBattB_k.Location = new System.Drawing.Point(123, 85);
             this.txtBattB_k.Name = "txtBattB_k";
             this.txtBattB_k.Size = new System.Drawing.Size(49, 20);
             this.txtBattB_k.TabIndex = 23;
@@ -758,7 +759,7 @@ namespace OSD
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(9, 103);
+            this.label28.Location = new System.Drawing.Point(35, 90);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(82, 13);
             this.label28.TabIndex = 22;
@@ -1085,7 +1086,7 @@ namespace OSD
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(325, 9);
+            this.groupBox4.Location = new System.Drawing.Point(325, 5);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(160, 291);
             this.groupBox4.TabIndex = 5;
@@ -1196,6 +1197,7 @@ namespace OSD
             this.rbtBatterymAh.TabIndex = 15;
             this.rbtBatterymAh.Text = "Show used mAh";
             this.rbtBatterymAh.UseVisualStyleBackColor = true;
+            this.rbtBatterymAh.CheckedChanged += new System.EventHandler(this.rbtBatterymAh_CheckedChanged);
             // 
             // rbtBatteryPercent
             // 
@@ -1430,7 +1432,7 @@ namespace OSD
             // 
             this.RSSI_numeric_max.Location = new System.Drawing.Point(8, 106);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
-            255,
+            4095,
             0,
             0,
             0});
@@ -1449,7 +1451,7 @@ namespace OSD
             // 
             this.RSSI_numeric_min.Location = new System.Drawing.Point(8, 67);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
-            255,
+            4095,
             0,
             0,
             0});
@@ -1604,10 +1606,32 @@ namespace OSD
             this.cbxShowUpdateDialog.Text = "Prompt for update at startup";
             this.cbxShowUpdateDialog.UseVisualStyleBackColor = true;
             this.cbxShowUpdateDialog.CheckedChanged += new System.EventHandler(this.cbxShowUpdateDialog_CheckedChanged);
-			
-			for(int k=0;k<npanel;k++){
-            	this.scr[k].init();
-			}
+            // 
+            // chkHUD
+            // 
+            this.chkHUD.AutoSize = true;
+            this.chkHUD.Location = new System.Drawing.Point(9, 61);
+            this.chkHUD.Name = "chkHUD";
+            this.chkHUD.Size = new System.Drawing.Size(107, 17);
+            this.chkHUD.TabIndex = 3;
+            this.chkHUD.Text = "show HUD frame";
+            this.chkHUD.UseVisualStyleBackColor = true;
+            this.chkHUD.CheckedChanged += new System.EventHandler(this.chkHUD_CheckedChanged);
+            // 
+            // chkTrack
+            // 
+            this.chkTrack.AutoSize = true;
+            this.chkTrack.Location = new System.Drawing.Point(98, 24);
+            this.chkTrack.Name = "chkTrack";
+            this.chkTrack.Size = new System.Drawing.Size(72, 17);
+            this.chkTrack.TabIndex = 4;
+            this.chkTrack.Text = "with track";
+            this.chkTrack.UseVisualStyleBackColor = true;
+            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
+
+	    for(int k=0;k<npanel;k++){
+		this.scr[k].init();
+	    }
             // 
             // OSD
             // 
@@ -1646,8 +1670,6 @@ namespace OSD
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinVoltB)).EndInit();
-			this.grpTLog.ResumeLayout(false);
-            this.grpTLog.PerformLayout();
 			this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numHOS)).EndInit();
@@ -1666,17 +1688,20 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.OVERSPEED_numeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.STALL_numeric)).EndInit();
             this.groupBoxRSSI.ResumeLayout(false);
             this.groupBoxRSSI.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.OVERSPEED_numeric)).EndInit();
 
-			for(int k=0;k<npanel;k++){
-				this.scr[k].last_init();
-			}
+	    for(int k=0;k<npanel;k++){
+		this.scr[k].last_init();
+	    }
+
+            this.grpTLog.ResumeLayout(false);
+            this.grpTLog.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
             this.groupBox12.ResumeLayout(false);
@@ -1822,6 +1847,8 @@ namespace OSD
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbNscreens;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkTrack;
+        private System.Windows.Forms.CheckBox chkHUD;
     }
 	
 }

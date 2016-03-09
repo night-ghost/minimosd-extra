@@ -4,7 +4,7 @@
   <description asmv2:iconFile="osd.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="OSD_Config" version="2.4.1.1" publicKeyToken="02E7DCADB6D14847" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="OSD_Config" version="2.4.1.2" publicKeyToken="02E7DCADB6D14847" language="neutral" processorArchitecture="x86" />
     <commandLine file="OSD_Config.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -58,14 +58,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="OSD_Config.exe" size="226816">
-      <assemblyIdentity name="OSD_Config" version="2.4.1.1" publicKeyToken="02E7DCADB6D14847" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="OSD_Config.exe" size="227840">
+      <assemblyIdentity name="OSD_Config" version="2.4.1.2" publicKeyToken="02E7DCADB6D14847" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>rsWcHvAo3O4qSDTICVSy0xv0TqU=</dsig:DigestValue>
+        <dsig:DigestValue>EXVX6CQ/W4Id0GD4p0WQRcbdTHQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

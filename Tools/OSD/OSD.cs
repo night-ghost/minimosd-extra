@@ -28,7 +28,7 @@ namespace OSD
     {
 
 //*****************************************/		
-public const string VERSION ="r812 DV";
+public const string VERSION ="r813 DV";
 			
 	
          //max 7456 datasheet pg 10
@@ -368,6 +368,9 @@ public const int npanel = 4; // количество панелей
 
 			CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
 			CHK_auto.Checked= Convert.ToBoolean(pan.mode_auto);
+
+            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+            chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
 			BATT_WARNnumeric.Value = pan.batt_warn_level;
 			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -741,8 +744,8 @@ public const int npanel = 4; // количество панелей
 				conf.eeprom.sets.stall  = pan.stall;
 				conf.eeprom.sets.battv  = pan.battv;
 
-				conf.eeprom.sets.OSD_RSSI_HIGH = pan.rssical;
-				conf.eeprom.sets.OSD_RSSI_LOW = pan.rssipersent;
+                conf.eeprom.sets.RSSI_16_high = pan.rssical;
+                conf.eeprom.sets.RSSI_16_low = pan.rssipersent;
 				conf.eeprom.sets.OSD_RSSI_RAW = pan.rssiraw_on;
 
 				conf.eeprom.sets.ch_toggle = pan.ch_toggle;
@@ -794,6 +797,9 @@ public const int npanel = 4; // количество панелей
 				conf.eeprom.flags[radar_on]=pan.flgRadar;
 				conf.eeprom.flags[ils_on]=pan.flgILS;
 				
+                conf.eeprom.flags[flgTrack] = pan.flgTrack;
+                conf.eeprom.flags[flgHUD] = pan.flgHUD;
+			
 				conf.eeprom.sets.pwm_src = pan.pwm_src ;
 				conf.eeprom.sets.pwm_dst = pan.pwm_dst;
 				conf.eeprom.sets.n_screens = pan.n_screens;
@@ -913,8 +919,8 @@ public const int npanel = 4; // количество панелей
 			conf.eeprom.sets.stall  = pan.stall;
 			conf.eeprom.sets.battv  = pan.battv;
 
-			conf.eeprom.sets.OSD_RSSI_HIGH = pan.rssical;
-			conf.eeprom.sets.OSD_RSSI_LOW = pan.rssipersent;
+            conf.eeprom.sets.RSSI_16_high = pan.rssical;
+            conf.eeprom.sets.RSSI_16_low = pan.rssipersent;
 			conf.eeprom.sets.OSD_RSSI_RAW  = pan.rssiraw_on;
 
 			conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
@@ -964,6 +970,9 @@ public const int npanel = 4; // количество панелей
 
     		conf.eeprom.sets.horiz_kRoll_a=1; // коэффициенты горизонта для NTSC
     		conf.eeprom.sets.horiz_kPitch_a=1;
+
+            conf.eeprom.flags[flgTrack] = pan.flgTrack;
+            conf.eeprom.flags[flgHUD] = pan.flgHUD;
 
 			conf.eeprom.sets.pwm_src = 0;
 			conf.eeprom.sets.pwm_dst = 0;
@@ -1107,46 +1116,52 @@ public const int npanel = 4; // количество панелей
 			pan.battv = conf.eeprom.sets.battv ;
 			MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
-			pan.rssical = conf.eeprom.sets.OSD_RSSI_HIGH ;
+            pan.rssical = conf.eeprom.sets.RSSI_16_high;
 			//RSSI_numeric_max.Value = pan.rssical;
 
-			pan.rssipersent = conf.eeprom.sets.OSD_RSSI_LOW ;
+            pan.rssipersent = conf.eeprom.sets.RSSI_16_low;
 			//RSSI_numeric_min.Value = pan.rssipersent;
 
 			pan.rssiraw_on = conf.eeprom.sets.OSD_RSSI_RAW ;
 
 			updatingRSSI = true;
 			RSSI_numeric_min.Minimum = 0;
-			RSSI_numeric_min.Maximum = 2000;
+			RSSI_numeric_min.Maximum = 2047;
 			RSSI_numeric_max.Minimum = 0;
-			RSSI_numeric_max.Maximum = 2000;
+			RSSI_numeric_max.Maximum = 2047;
 			RSSI_numeric_min.Value = 0;
 			RSSI_numeric_max.Value = 0;
 			RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+			
 			if((int)(pan.rssiraw_on /2)==0 || pan.rssiraw_on /2 == 2) {
-				RSSI_numeric_min.Minimum = 0;
+				/*RSSI_numeric_min.Minimum = 0;
 				RSSI_numeric_min.Maximum = 255;
 				RSSI_numeric_max.Minimum = 0;
-				RSSI_numeric_max.Maximum = 255;
+				RSSI_numeric_max.Maximum = 255; */
+				
 				RSSI_numeric_min.Value = pan.rssipersent;
 				RSSI_numeric_max.Value = pan.rssical;
 				
 			} else {				
+				/*
 				RSSI_numeric_min.Minimum = 900;
 				RSSI_numeric_min.Maximum = 2000;
 				RSSI_numeric_max.Minimum = 900;
 				RSSI_numeric_max.Maximum = 2000;
+				*/
+			}
+
 				try {
-					RSSI_numeric_min.Value = pan.rssipersent * 10;
+					RSSI_numeric_min.Value = pan.rssipersent;
 				}catch{
 					RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
 				}
 				try {
-					RSSI_numeric_max.Value = pan.rssical * 10;
+					RSSI_numeric_max.Value = pan.rssical;
 				}catch{
 					RSSI_numeric_max.Value = RSSI_numeric_max.Maximum;
 				}
-			}
+			
 			cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
 			updatingRSSI = false;
@@ -1169,6 +1184,12 @@ public const int npanel = 4; // количество панелей
 
 			pan.mode_auto = conf.eeprom.flags[mode_auto];
 			CHK_auto.Checked = pan.mode_auto;
+
+            pan.flgTrack = conf.eeprom.flags[flgTrack];
+            pan.flgHUD = conf.eeprom.flags[flgHUD];
+
+            chkTrack.Checked = pan.flgTrack;
+            chkHUD.Checked = pan.flgHUD;
 
 			pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN  ;
 			BATT_WARNnumeric.Value = pan.batt_warn_level;
@@ -1458,6 +1479,8 @@ public const int npanel = 4; // количество панелей
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
                         sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
                         sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
+                        sw.WriteLine("{0}\t{1}", "flgHUD", pan.flgHUD);
+                        sw.WriteLine("{0}\t{1}", "flgTrack", pan.flgTrack);
 //                        sw.WriteLine("{0}\t{1}", "Sign Air Speed", pan.sign_air_speed);
 //                        sw.WriteLine("{0}\t{1}", "Sign Ground  Speed", pan.sign_ground_speed);
 //                        sw.WriteLine("{0}\t{1}", "Sign Home Altitude", pan.sign_home_altitude);
@@ -1576,8 +1599,10 @@ public const int npanel = 4; // количество панелей
 								pan.overspeed = byte.Parse(strings[1]);
                             else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
                             else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
-                            else if (strings[0] == "RSSI High") pan.rssical = byte.Parse(strings[1]);
-                            else if (strings[0] == "RSSI Low") pan.rssipersent = byte.Parse(strings[1]);
+                            else if (strings[0] == "RSSI High") 
+								pan.rssical = (UInt16 )(int.Parse(strings[1]));
+                            else if (strings[0] == "RSSI Low") 
+								pan.rssipersent = (UInt16)(int.Parse(strings[1]));
                             else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
                             else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
                             else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
@@ -1623,6 +1648,8 @@ public const int npanel = 4; // количество панелей
 							else if (strings[0] == "PWMSRC") pan.pwm_src=(byte)int.Parse(strings[1]);
 							else if (strings[0] == "PWMDST") pan.pwm_dst=(byte)int.Parse(strings[1]);
 							else if (strings[0] == "NSCREENS") pan.n_screens=(byte)int.Parse(strings[1]);
+                            else if (strings[0] == "flgHUD") pan.flgHUD = bool.Parse(strings[1]);
+                            else if (strings[0] == "flgTrack") pan.flgTrack = bool.Parse(strings[1]);
 						}
 
 						
@@ -1649,39 +1676,41 @@ public const int npanel = 4; // количество панелей
 
                         updatingRSSI = true;
                         RSSI_numeric_min.Minimum = 0;
-                        RSSI_numeric_min.Maximum = 2000;
+                        RSSI_numeric_min.Maximum = 2047;
                         RSSI_numeric_max.Minimum = 0;
-                        RSSI_numeric_max.Maximum = 2000;
+                        RSSI_numeric_max.Maximum = 2047;
                         RSSI_numeric_min.Value = 0;
                         RSSI_numeric_max.Value = 0;
                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
                         if ((int)(pan.rssiraw_on / 2) == 0 || pan.rssiraw_on / 2 ==1 ) // analog
                         {                            
-                            RSSI_numeric_min.Minimum = 0;
+                            /* RSSI_numeric_min.Minimum = 0;
                             RSSI_numeric_min.Maximum = 255;
                             RSSI_numeric_max.Minimum = 0;
                             RSSI_numeric_max.Maximum = 255;
 							RSSI_numeric_min.Value = pan.rssipersent;
-                            RSSI_numeric_max.Value = pan.rssical;
+                            RSSI_numeric_max.Value = pan.rssical; */
                         }
                         else // pwm
                         {
+							/*
                             RSSI_numeric_min.Minimum = 900;
                             RSSI_numeric_min.Maximum = 2000;
                             RSSI_numeric_max.Minimum = 900;
-                            RSSI_numeric_max.Maximum = 2000;
+                            RSSI_numeric_max.Maximum = 2000; */
+                        }
+							
 							try {								
-                            	RSSI_numeric_min.Value = pan.rssipersent * 10;
+                            	RSSI_numeric_min.Value = pan.rssipersent;
 							} catch {
 								RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
 							}
 							try {
-                            	RSSI_numeric_max.Value = pan.rssical * 10;
+                            	RSSI_numeric_max.Value = pan.rssical;
 							} catch{
 								RSSI_numeric_max.Value = RSSI_numeric_max.Minimum;
 							}
 							
-                        }
                         cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
@@ -1692,6 +1721,9 @@ public const int npanel = 4; // количество панелей
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
 						CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
+
+                        chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+                        chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
                         BATT_WARNnumeric.Value = pan.batt_warn_level;
                         RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -1748,7 +1780,7 @@ public const int npanel = 4; // количество панелей
                     }
                 }
                 catch(Exception ex)    {
-                    MessageBox.Show("Error Reading file at "+ex.Message + " str="+strings[0] );
+                    MessageBox.Show("Error Reading file at "+ex.Message + " str="+strings[0]  + " val=" +strings[1] );
                 }
                 finally
                 {
@@ -2338,11 +2370,11 @@ public const int npanel = 4; // количество панелей
                 return;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex==2)// analog
             {
-                pan.rssipersent = (byte)RSSI_numeric_min.Value;
+                pan.rssipersent = (UInt16)RSSI_numeric_min.Value;
             }
             else
             {
-                pan.rssipersent = (byte)(RSSI_numeric_min.Value / 10); // pwm
+                pan.rssipersent = (UInt16)(RSSI_numeric_min.Value / 10); // pwm
             }
         }
 
@@ -2352,11 +2384,11 @@ public const int npanel = 4; // количество панелей
                 return;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex==2)
             {
-                pan.rssical = (byte)RSSI_numeric_max.Value;
+                pan.rssical = (UInt16)RSSI_numeric_max.Value;
             }
             else
             {
-                pan.rssical = (byte)(RSSI_numeric_max.Value / 10);
+                pan.rssical = (UInt16)(RSSI_numeric_max.Value / 10);
             }
         }
 
@@ -2559,20 +2591,20 @@ public const int npanel = 4; // количество панелей
 			
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
-            RSSI_numeric_min.Maximum = 2000;
+            RSSI_numeric_min.Maximum = 2047;
             RSSI_numeric_max.Minimum = 0;
-            RSSI_numeric_max.Maximum = 2000;
+            RSSI_numeric_max.Maximum = 2047;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) // analog
             {
                 lblRSSIMin.Text = "RSSI Min Value";
                 lblRSSIMax.Text = "RSSI Max Value";
-
+				/*
                 RSSI_numeric_min.Minimum = 0;
 				RSSI_numeric_min.Value=0;
-                RSSI_numeric_min.Maximum = 255;
+                RSSI_numeric_min.Maximum = 2047;
                 RSSI_numeric_max.Minimum = 0;
 				RSSI_numeric_max.Value=0;
-                RSSI_numeric_max.Maximum = 255;
+                RSSI_numeric_max.Maximum = 2047;
 
 				if (OldMax == 2000)  {
                     //RSSI_numeric_min.Value = (pan.rssipersent * 10 - 1000) * 255 / 1000;
@@ -2584,13 +2616,14 @@ public const int npanel = 4; // количество панелей
                     //pan.rssipersent = (byte)((pan.rssipersent - 100) * 255 / 100);
                     //pan.rssical = (byte)((pan.rssical - 100) * 255 / 100);
                 }
+                */
             }
             else // PWM
             {
                 lblRSSIMin.Text = "RSSI Min Value (pwm)";
                 lblRSSIMax.Text = "RSSI Max Value (pwm)";
 
-                RSSI_numeric_min.Maximum = 2000;
+                /*RSSI_numeric_min.Maximum = 2000;
 				RSSI_numeric_min.Value = 2000;
                 RSSI_numeric_min.Minimum = 900;
                 RSSI_numeric_max.Maximum = 2000;
@@ -2607,6 +2640,7 @@ public const int npanel = 4; // количество панелей
                     //pan.rssipersent = (byte)(pan.rssipersent * 100 / 255 + 100);
                     //pan.rssical = (byte)(pan.rssical * 100 / 255 + 100);
                 }
+                */
             }
             
 			RSSI_used=(cbxRSSIChannel.SelectedIndex == 2 || cbxRSSIChannel.SelectedIndex == 3);
@@ -3573,6 +3607,21 @@ public const int npanel = 4; // количество панелей
         private void cbNscreens_SelectedIndexChanged(object sender, EventArgs e)
         {
 			pan.n_screens = (byte)(cbNscreens.SelectedIndex+1);
+        }
+
+        private void chkHUD_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.flgHUD = chkHUD.Checked;
+        }
+
+        private void chkTrack_CheckedChanged(object sender, EventArgs e)
+        {
+            pan.flgTrack = chkTrack.Checked;
+        }
+
+        private void rbtBatterymAh_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
 
              

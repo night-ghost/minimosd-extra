@@ -188,7 +188,7 @@ void setFdataVars()
 //    if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
 
     if((sets.RSSI_raw % 2 == 0))  {
-	uint16_t l=sets.RSSI_low, h=sets.RSSI_high;
+	uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
 	bool rev=false;
 	
 	if(l > h) {
@@ -211,7 +211,7 @@ void setFdataVars()
   //Set max data
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-    if(sets.model_type == 0 && lflags.takeofftime == 1 || sets.model_type == 2 && lflags.motor_armed){
+    if(sets.model_type == 0 && lflags.takeofftime == 1 || lflags.motor_armed){
  #else
     if (lflags.motor_armed)  {
  #endif

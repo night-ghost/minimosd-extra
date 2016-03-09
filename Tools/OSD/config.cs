@@ -1,27 +1,17 @@
 using System;
-//using System.Collections.Specialized;
-//using System.Collections.Generic;
-//using System.ComponentModel;
-//using System.Data;
-//using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-////
-////using System.IO.Ports;
-////using System.IO;
 using ArdupilotMega;
-////using System.Xml;
-//using System.Globalization;
-//using System.Text.RegularExpressions;
-//using System.Net;
-//using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Specialized;
 
 namespace OSD
 {
-	 
+    using uint16_t = System.UInt16;
+    using uint8_t = System.Byte;
+    using int8_t = System.SByte;
+    using boolean = System.Byte;
 	
 	[StructLayout (LayoutKind.Sequential, Pack=1)]
 	public struct Flags { // 4 bytes
@@ -103,6 +93,8 @@ namespace OSD
 		internal byte pwm_dst;
 		
 		internal byte n_screens;
+        internal uint16_t RSSI_16_low;
+        internal uint16_t RSSI_16_high;
 	};		
 
 	[StructLayout(LayoutKind.Explicit)]
