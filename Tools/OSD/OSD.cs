@@ -1068,88 +1068,104 @@ public const int npanel = 4; // количество панелей
 					}
 				}
 			}
-				
-			//Setup configuration panel
-			pan.model_type = conf.eeprom.sets.model_type;
-			pan.fw_version = conf.eeprom.FW_version ;
 			
-			pan.cs_version = conf.eeprom.CS_version;
-
-			if(pan.fw_version=="0.0.0")  {
-				lblFWModelType.Text = "Firmware version of OSD: Unknown or custom";
-			} else {
-				lblFWModelType.Text = "Firmware version of OSD: " + pan.fw_version;
-			}
-
-			if(pan.cs_version=="0.0.0") {
-				lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
-			} else {
-				try {
-					lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + pan.cs_version;
-				} catch{}
-			}
-
-
-			try {
-				cbxModelType.SelectedItem = (ModelType)pan.model_type;
-			} catch{
-				cbxModelType.SelectedItem = ModelType.Unknown;
-			}
-			pan.converts = conf.eeprom.flags[converts];
-			//Modify units
-			if(!pan.converts) {
-				UNITS_combo.SelectedIndex = 0; //metric
-				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
-				OVERSPEED_label.Text = "Overspeed (km/h)";
-			} else {
-				UNITS_combo.SelectedIndex = 1; //imperial
-				STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
-				OVERSPEED_label.Text = "Overspeed (mph)";
-			} 
-
-			pan.overspeed = conf.eeprom.sets.overspeed ;
-			OVERSPEED_numeric.Value = pan.overspeed;
-
-			pan.stall = conf.eeprom.sets.stall ;
-			STALL_numeric.Value = pan.stall;
-
-			pan.battv = conf.eeprom.sets.battv ;
-			MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
-
-            pan.rssical = conf.eeprom.sets.RSSI_16_high;
-			//RSSI_numeric_max.Value = pan.rssical;
-
-            pan.rssipersent = conf.eeprom.sets.RSSI_16_low;
-			//RSSI_numeric_min.Value = pan.rssipersent;
-
-			pan.rssiraw_on = conf.eeprom.sets.OSD_RSSI_RAW ;
-
-			updatingRSSI = true;
-			RSSI_numeric_min.Minimum = 0;
-			RSSI_numeric_min.Maximum = 2047;
-			RSSI_numeric_max.Minimum = 0;
-			RSSI_numeric_max.Maximum = 2047;
-			RSSI_numeric_min.Value = 0;
-			RSSI_numeric_max.Value = 0;
-			RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+	        try {
+			    //Setup configuration panel
+			    pan.model_type = conf.eeprom.sets.model_type;
+			    pan.fw_version = conf.eeprom.FW_version ;
 			
-			if((int)(pan.rssiraw_on /2)==0 || pan.rssiraw_on /2 == 2) {
-				/*RSSI_numeric_min.Minimum = 0;
-				RSSI_numeric_min.Maximum = 255;
-				RSSI_numeric_max.Minimum = 0;
-				RSSI_numeric_max.Maximum = 255; */
+			    pan.cs_version = conf.eeprom.CS_version;
+
+			    if(pan.fw_version=="0.0.0")  {
+    				lblFWModelType.Text = "Firmware version of OSD: Unknown or custom";
+			    } else {
+    				lblFWModelType.Text = "Firmware version of OSD: " + pan.fw_version;
+			    }
+
+			    if(pan.cs_version=="0.0.0") {
+				    lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown or custom ";
+			    } else {
+				    try {
+					    lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Charset " + pan.cs_version;
+				    } catch{}
+			    }
+
+
+			    try {
+				    cbxModelType.SelectedItem = (ModelType)pan.model_type;
+			    } catch{
+				    cbxModelType.SelectedItem = ModelType.Unknown;
+			    }
+			    pan.converts = conf.eeprom.flags[converts];
+			    //Modify units
+			    if(!pan.converts) {
+    				UNITS_combo.SelectedIndex = 0; //metric
+				    STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+				    OVERSPEED_label.Text = "Overspeed (km/h)";
+			    } else {
+    				UNITS_combo.SelectedIndex = 1; //imperial
+				    STALL_label.Text = cbxModelType.SelectedItem.ToString()=="Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+				    OVERSPEED_label.Text = "Overspeed (mph)";
+			    }
+
+                try  {
+                    pan.overspeed = conf.eeprom.sets.overspeed;
+                    OVERSPEED_numeric.Value = pan.overspeed;
+                }    catch {
+                    OVERSPEED_numeric.Value = 0;
+                }
+
+                try
+                {
+                    pan.stall = conf.eeprom.sets.stall;
+                    STALL_numeric.Value = pan.stall;
+                }   catch {
+                    STALL_numeric.Value = 0;
+                }
+
+                try
+                {
+                    pan.battv = conf.eeprom.sets.battv;
+                    MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+                }
+                catch {
+                    MINVOLT_numeric.Value = 0;
+                }
+
+                pan.rssical = conf.eeprom.sets.RSSI_16_high;
+			    //RSSI_numeric_max.Value = pan.rssical;
+
+                pan.rssipersent = conf.eeprom.sets.RSSI_16_low;
+			    //RSSI_numeric_min.Value = pan.rssipersent;
+
+			    pan.rssiraw_on = conf.eeprom.sets.OSD_RSSI_RAW ;
+
+			    updatingRSSI = true;
+			    RSSI_numeric_min.Minimum = 0;
+			    RSSI_numeric_min.Maximum = 2047;
+			    RSSI_numeric_max.Minimum = 0;
+    			RSSI_numeric_max.Maximum = 2047;
+			    RSSI_numeric_min.Value = 0;
+			    RSSI_numeric_max.Value = 0;
+			    RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+			
+			    if((int)(pan.rssiraw_on /2)==0 || pan.rssiraw_on /2 == 2) {
+    				/*RSSI_numeric_min.Minimum = 0;
+				    RSSI_numeric_min.Maximum = 255;
+				    RSSI_numeric_max.Minimum = 0;
+				    RSSI_numeric_max.Maximum = 255; */
+    				
+				    //RSSI_numeric_min.Value = pan.rssipersent;
+				    //RSSI_numeric_max.Value = pan.rssical;
 				
-				RSSI_numeric_min.Value = pan.rssipersent;
-				RSSI_numeric_max.Value = pan.rssical;
-				
-			} else {				
-				/*
-				RSSI_numeric_min.Minimum = 900;
-				RSSI_numeric_min.Maximum = 2000;
-				RSSI_numeric_max.Minimum = 900;
-				RSSI_numeric_max.Maximum = 2000;
-				*/
-			}
+			    } else {				
+    				/*
+				    RSSI_numeric_min.Minimum = 900;
+				    RSSI_numeric_min.Maximum = 2000;
+				    RSSI_numeric_max.Minimum = 900;
+				    RSSI_numeric_max.Maximum = 2000;
+				    */
+			    }
 
 				try {
 					RSSI_numeric_min.Value = pan.rssipersent;
@@ -1162,70 +1178,77 @@ public const int npanel = 4; // количество панелей
 					RSSI_numeric_max.Value = RSSI_numeric_max.Maximum;
 				}
 			
-			cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
+			    cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
-			updatingRSSI = false;
+			    updatingRSSI = false;
 
-			pan.ch_toggle = conf.eeprom.sets.ch_toggle;
-			try {			
-				ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
-			} catch {
-				ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
-			}
+			    pan.ch_toggle = conf.eeprom.sets.ch_toggle;
+			    try {			
+				    ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+			    } catch {
+    				ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
+			    }
 
-			pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch ;
-			cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+			    pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch ;
+			    cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
-			pan.switch_mode = conf.eeprom.sets.switch_mode;
-			TOGGLE_BEH.Checked = pan.switch_mode!=0;
+			    pan.switch_mode = conf.eeprom.sets.switch_mode;
+			    TOGGLE_BEH.Checked = pan.switch_mode!=0;
 
-			pan.pal_ntsc = conf.eeprom.flags[pal_ntsc];
-			CHK_pal.Checked = pan.pal_ntsc;
+			    pan.pal_ntsc = conf.eeprom.flags[pal_ntsc];
+			    CHK_pal.Checked = pan.pal_ntsc;
 
-			pan.mode_auto = conf.eeprom.flags[mode_auto];
-			CHK_auto.Checked = pan.mode_auto;
+			    pan.mode_auto = conf.eeprom.flags[mode_auto];
+			    CHK_auto.Checked = pan.mode_auto;
 
-            pan.flgTrack = conf.eeprom.flags[flgTrack];
-            pan.flgHUD = conf.eeprom.flags[flgHUD];
+                pan.flgTrack = conf.eeprom.flags[flgTrack];
+                pan.flgHUD = conf.eeprom.flags[flgHUD];
 
-            chkTrack.Checked = pan.flgTrack;
-            chkHUD.Checked = pan.flgHUD;
+                chkTrack.Checked = pan.flgTrack;
+                chkHUD.Checked = pan.flgHUD;
 
-			pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN  ;
-			BATT_WARNnumeric.Value = pan.batt_warn_level;
+                try                {
+                    pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN;
+                    BATT_WARNnumeric.Value = pan.batt_warn_level;
+                } catch {
+                    BATT_WARNnumeric.Value = 0;
+                }
 
-			pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
-			rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
-			rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
+			    pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
+			    rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
+			    rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
 
-			pan.rssi_warn_level = conf.eeprom.sets.OSD_RSSI_WARN;
-			RSSI_WARNnumeric.Value = pan.rssi_warn_level;
-
-			pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
-			try {
-				BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
-			} catch {
-				BRIGHTNESScomboBox.SelectedIndex = 3;
-			}
+			    pan.rssi_warn_level = conf.eeprom.sets.OSD_RSSI_WARN;
+                try  {
+                    RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+                } catch {
+                    RSSI_WARNnumeric.Value = 0;
+                }
+			    pan.osd_brightness = conf.eeprom.sets.OSD_BRIGHTNESS;
+			    try {
+    				BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+			    } catch {
+				    BRIGHTNESScomboBox.SelectedIndex = 3;
+			    }
 			
-			try {
-				pan.horiz_offs= conf.eeprom.sets.horiz_offs;
-				pan.vert_offs= conf.eeprom.sets.vert_offs;
+			    try {
+    				pan.horiz_offs= conf.eeprom.sets.horiz_offs;
+				    pan.vert_offs= conf.eeprom.sets.vert_offs;
 			
-				numHOS.Value = pan.horiz_offs - 0x20;
-				numVOS.Value = pan.vert_offs - 0x10;
-			} catch{
-				pan.horiz_offs= (byte)numHOS.Value;
-				pan.vert_offs= (byte)numVOS.Value;				
-			}
+				    numHOS.Value = pan.horiz_offs - 0x20;
+				    numVOS.Value = pan.vert_offs - 0x10;
+			    } catch{
+    				pan.horiz_offs= (byte)numHOS.Value;
+				    pan.vert_offs= (byte)numVOS.Value;				
+			    }
 			
-			pan.callsign_str=conf.eeprom.osd_call_sign;
+			    pan.callsign_str=conf.eeprom.osd_call_sign;
 				
-			CALLSIGNmaskedText.Text = pan.callsign_str;
+			    CALLSIGNmaskedText.Text = pan.callsign_str;
 			
-			this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
-			this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
-			this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+			    this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+			    this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+			    this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
 
 /*
  	//// коэффициенты внешних измерений
@@ -1243,55 +1266,55 @@ public const int npanel = 4; // количество панелей
     
  * */		
 // new!
-			pan.battBv = conf.eeprom.sets.battBv;
-			numMinVoltB.Text = (pan.battBv/10.0).ToString();
+			    pan.battBv = conf.eeprom.sets.battBv;
+			    numMinVoltB.Text = (pan.battBv/10.0).ToString();
 			
-			pan.rssi_koef = conf.eeprom.sets.eRSSI_koef;
-			txtRSSI_k.Text = pan.rssi_koef.ToString();
+			    pan.rssi_koef = conf.eeprom.sets.eRSSI_koef;
+			    txtRSSI_k.Text = pan.rssi_koef.ToString();
 			
-			pan.Curr_koef = conf.eeprom.sets.eCurrent_koef;
-			txtCurr_k.Text = pan.Curr_koef.ToString();
+			    pan.Curr_koef = conf.eeprom.sets.eCurrent_koef;
+			    txtCurr_k.Text = pan.Curr_koef.ToString();
 			
-			pan.battA_koef = conf.eeprom.sets.evBattA_koef;
-			txtBattA_k.Text = pan.battA_koef.ToString();
+			    pan.battA_koef = conf.eeprom.sets.evBattA_koef;
+			    txtBattA_k.Text = pan.battA_koef.ToString();
 			
-			pan.battB_koef = conf.eeprom.sets.evBattB_koef;
-			txtBattB_k.Text = pan.battB_koef.ToString();
+			    pan.battB_koef = conf.eeprom.sets.evBattB_koef;
+			    txtBattB_k.Text = pan.battB_koef.ToString();
 			
-			pan.roll_k = conf.eeprom.sets.horiz_kRoll;
-			txtRollPal.Text = pan.roll_k.ToString();
+			    pan.roll_k = conf.eeprom.sets.horiz_kRoll;
+			    txtRollPal.Text = pan.roll_k.ToString();
 			
-			pan.pitch_k = conf.eeprom.sets.horiz_kPitch;
-			txtPitchPal.Text = pan.pitch_k.ToString();
+			    pan.pitch_k = conf.eeprom.sets.horiz_kPitch;
+			    txtPitchPal.Text = pan.pitch_k.ToString();
 			
-			pan.roll_k_ntsc = conf.eeprom.sets.horiz_kRoll_a;
-			txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+			    pan.roll_k_ntsc = conf.eeprom.sets.horiz_kRoll_a;
+			    txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
 			
-			pan.pitch_k_ntsc = conf.eeprom.sets.horiz_kPitch_a;
-			txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();			
+			    pan.pitch_k_ntsc = conf.eeprom.sets.horiz_kPitch_a;
+			    txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();			
 			
 			
-			pan.flgBattA = conf.eeprom.flags[useExtVbattA];
-			cbBattA_source.SelectedIndex = pan.flgBattA?1:0;
+			    pan.flgBattA = conf.eeprom.flags[useExtVbattA];
+			    cbBattA_source.SelectedIndex = pan.flgBattA?1:0;
 						
-			pan.flgCurrent = conf.eeprom.flags[useExtCurr];
-			cbCurrentSoure.SelectedIndex =pan.flgCurrent?1:0;
+			    pan.flgCurrent = conf.eeprom.flags[useExtCurr];
+			    cbCurrentSoure.SelectedIndex =pan.flgCurrent?1:0;
 			
-			pan.flgRadar = conf.eeprom.flags[radar_on];
-			chkRadar.Checked = pan.flgRadar;
+			    pan.flgRadar = conf.eeprom.flags[radar_on];
+			    chkRadar.Checked = pan.flgRadar;
 			
-			pan.flgILS = conf.eeprom.flags[ils_on];
-			chkILS.Checked = pan.flgILS;							
+			    pan.flgILS = conf.eeprom.flags[ils_on];
+			    chkILS.Checked = pan.flgILS;							
 
-			pan.pwm_src = conf.eeprom.sets.pwm_src;
-			pan.pwm_dst = conf.eeprom.sets.pwm_dst;
+			    pan.pwm_src = conf.eeprom.sets.pwm_src;
+			    pan.pwm_dst = conf.eeprom.sets.pwm_dst;
+            } catch (Exception ex) { }			
+
 
 			try {
-				cbOutSource.SelectedIndex = pan.pwm_src;
-				cbOutPin.SelectedIndex = pan.pwm_dst;
-			}
-		    catch(Exception ex)    {       }			
-
+			    cbOutSource.SelectedIndex = pan.pwm_src;
+			    cbOutPin.SelectedIndex = pan.pwm_dst;
+			}      catch(Exception ex)    {       }			
 			
 			pan.n_screens = conf.eeprom.sets.n_screens;
 			try {
@@ -1413,13 +1436,15 @@ public const int npanel = 4; // количество панелей
 						
 			if(CHK_auto.Checked) {
 				changeToPal(true);
-			
+                pan.mode_auto = true;
 				Draw(panel_number);
 
 				CHK_pal.Checked  = false;
 				CHK_ntsc.Checked = false;
 				CHK_auto.Checked = true;
-			}
+			} else
+                pan.mode_auto = false;
+
 			
 		}
 		
