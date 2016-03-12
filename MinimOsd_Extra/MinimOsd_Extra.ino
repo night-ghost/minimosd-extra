@@ -48,14 +48,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define membug 
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
+// AVR Includes
+#include <SingleSerial.h>
 
 #include "compat.h"
 
 // Configurations
 #include "Config.h"
-
-// AVR Includes
-#include <SingleSerial.h>
 
 #include <math.h>
 #include <inttypes.h>

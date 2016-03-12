@@ -1,8 +1,8 @@
 #include "compat.h"
 
-#include "Arduino.h"
-
 #include <SingleSerial.h>
+
+#include "Arduino.h"
 
 #include "ArduCam_Max7456.h"
 // Get the common arduino functions
