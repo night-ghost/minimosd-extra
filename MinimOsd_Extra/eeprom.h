@@ -2,6 +2,7 @@
 /* *********************************************** */
 // EEPROM Storage addresses
 
+#include "Arduino.h"
 #include <avr/eeprom.h>
 
 #define OffsetBITpanel       128 // размер для одного экрана
