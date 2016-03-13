@@ -1,9 +1,9 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
-//#define USE_UAVTALK 1
+#define USE_UAVTALK 1
 
-#define DEBUG
+//#define DEBUG
 
 // sets.model_type plane=0 copter=1
 
@@ -34,6 +34,19 @@
 // PD3 Int1 - перемычка PAL
 // оно может читать PWM по прерываниям!
 #define PWM_PIN PD3 
+
+
+//#define LEDPIN AmperagePin
+
+#ifdef LEDPIN
+ #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+ #define LED_ON digitalWrite(LEDPIN, HIGH).
+ #define LED_OFF digitalWrite(LEDPIN, LOW).
+#else
+ #define LED_BLINK {}
+ #define LED_ON {}.
+ #define LED_OFF {}
+#endif
 
 /////////////////////////////////////////////////
 

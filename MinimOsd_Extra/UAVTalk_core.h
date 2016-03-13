@@ -451,9 +451,11 @@ void uavtalk_read(void) {
 
 			case ATTITUDEACTUAL_OBJID_000:
 			case ATTITUDESTATE_OBJID_000:
+
         			osd_roll		= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_ROLL);
         			osd_pitch		= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_PITCH);
         			osd_yaw			= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_YAW);
+//Serial.printf_P(PSTR("uav pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_lat == 0) {
                                     osd_heading = osd_yaw;
@@ -464,6 +466,7 @@ void uavtalk_read(void) {
         			osd_roll		= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Roll));
         			osd_pitch		= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Pitch));
         			osd_yaw			= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Yaw));
+//Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_lat == 0) {
                                     osd_heading = osd_yaw;

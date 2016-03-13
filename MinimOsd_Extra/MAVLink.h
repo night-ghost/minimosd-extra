@@ -49,6 +49,7 @@ void read_mavlink(){
     //grabing data 
     while(Serial.available()) {
         uint8_t c = Serial.read();
+//LED_BLINK;
 
 #ifdef DEBUG
 	bytes_comes+=1;
@@ -119,8 +120,10 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_ATTITUDE:
                 osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
-                osd_roll = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
+                osd_roll  = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
                 osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg.m));
+//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//LED_BLINK;
                 break;
 
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:

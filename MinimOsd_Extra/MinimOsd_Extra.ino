@@ -88,10 +88,10 @@ OSD osd; //OSD object
 struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags
-volatile uint8_t vsync_wait = 0;
+volatile byte vsync_wait = 0;
 
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
-volatile int           PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile uint16_t           PWM_IN;           // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
 volatile unsigned long int_Timer = 0;         // set in the INT1
 
 				//Bat_1 Bat_2 Current RSSI
@@ -112,21 +112,6 @@ byte PWM_out_pin=0;
 #include "MAVLink.h"
 #include "Font.h"
 #include "adc_setup.h"
-
-
-
-
-// #define LEDPIN AmperagePin
-
-#ifdef LEDPIN
- #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
- #define LED_ON digitalWrite(LEDPIN, HIGH) 
- #define LED_OFF digitalWrite(LEDPIN, LOW) 
-#else
- #define LED_BLINK {}
- #define LED_ON {} 
- #define LED_OFF {}
-#endif
 
 
 
@@ -296,6 +281,8 @@ void loop()
 
     wdt_reset();
 
+//LED_BLINK;
+
     if(pt > timer_20ms){
         timer_20ms = pt + 20;
         On20ms();
@@ -331,7 +318,7 @@ void loop()
         lflags.got_data=0;
         parseNewData();
 
-	LED_BLINK;
+//	LED_BLINK;
 
         lflags.update_stat = 1; // пришли данные
         vsync_wait = 1;	      // надо перерисовать экран
@@ -373,6 +360,8 @@ float avgRSSI(uint16_t d){
 }
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
+
+//Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
     if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = 0;
@@ -466,6 +455,8 @@ case_4:
 
 // timers
 
+//Serial.printf_P(PSTR("on100ms e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+
 
 }
 
@@ -473,6 +464,7 @@ case_4:
 void On20ms(){ // 50Hz
 
     if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
+//Serial.printf_P(PSTR("on20ms pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
 	int pwm=chan_raw[sets.pwm_src-1 + 5];
 	
@@ -492,6 +484,7 @@ void On20ms(){ // 50Hz
 
     }
 
+//Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
 }
 
@@ -499,6 +492,8 @@ void On20ms(){ // 50Hz
 /* *********************************************** */
 /* ******** functions used in main loop() ******** */
 void parseNewData(){
+
+//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_pitch ); Serial.wait();
     setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
     setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
@@ -506,6 +501,9 @@ void parseNewData(){
 
     setFdataVars(); // накопление статистики и рекордов
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
+
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+
 }
 
 inline void unplugSlaves(){   //Unplug list of SPI

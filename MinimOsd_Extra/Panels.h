@@ -692,11 +692,13 @@ void panHorizon(point p){
         osd.print_P(str_hud);
         osd.print_P(str_hud);
     } else {
+
 	for(byte j=5; j!=0; j--) {
 	    for(byte i=14; i!=0; i--)
 		osd.write(' ');
 	    osd.write('|');
 	}
+
     }
                       
     showHorizon(p.x + 1, p.y);
@@ -725,6 +727,8 @@ void panHorizon(point p){
 
 void panPitch(point p){
     OSD::setPanel(p.x,p.y);
+
+//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
     osd_printi_1(PSTR("%4i\x05\x07"),osd_pitch);
 }
@@ -1395,7 +1399,8 @@ void showRADAR(byte center_col, byte center_line) {
 
     // show UAV
     OSD::write_xy(center_col + x, center_line - y, arr[index]);
-    
+
+
     if(flags.flgTrack){
 	static Point trk[4];
 	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
@@ -1408,10 +1413,11 @@ void showRADAR(byte center_col, byte center_line) {
 	    trk[0].x =x;
 	    trk[0].y =y;
 	}
-	for(byte i=3; i!=0;){
+	for(byte i=3; i!=0;i--){
 	    OSD::write_xy(center_col + trk[i].x, center_line - trk[i].y, 0x24);
 	}
     }
+
 
     // show home
 //    OSD::setPanel(center_col, center_line);

@@ -2,6 +2,9 @@
 /*Panels variables*/
 //Will come from APM telem port
 
+
+#pragma pack(push,1)
+
  Flags flags; // битовые флаги из EEPROM
  Settings sets;	// настройки из EEPROM
  Panel panel; // элементы экрана из EEPROM
@@ -163,11 +166,11 @@ static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 static int dst_x,dst_y; // расстояние по осям - для радара
 
-static int16_t       osd_pitch = 0;                  // pitch from DCM
-static int16_t       osd_roll = 0;                   // roll from DCM
-static int16_t       osd_yaw = 0;                    // yaw from DCM
+int16_t                osd_roll = 0;                   // roll from DCM
+volatile int16_t       osd_pitch = 0;                  // pitch from DCM
+int16_t                osd_yaw = 0;                    // yaw from DCM
 
-static int /* float*/        osd_heading = 0;                // ground course heading from GPS
+static int /* float*/  osd_heading = 0;                // ground course heading from GPS
 
 static float        osd_alt_rel = 0;                    // altitude - float from MAVlink!
 static long         osd_alt_gps = 0;                    // altitude GPS

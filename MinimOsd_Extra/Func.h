@@ -8,6 +8,7 @@ inline boolean getBit(byte Reg, byte whichBit) {
 
 // чтение пакетов нужного протокола
 void getData(){
+//LED_BLINK;
 #if defined(USE_UAVTALK)
 //  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
     if(lflags.mavlink_active || !lflags.uavtalk_active && lflags.blinker){
