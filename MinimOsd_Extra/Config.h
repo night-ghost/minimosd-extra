@@ -36,6 +36,9 @@
 #define PWM_PIN PD3 
 
 
+#define WALKERA_TELEM RssiPin // telemetry output
+
+
 //#define LEDPIN AmperagePin
 
 #ifdef LEDPIN

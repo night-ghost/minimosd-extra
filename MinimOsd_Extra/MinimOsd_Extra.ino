@@ -113,6 +113,11 @@ byte PWM_out_pin=0;
 #include "Font.h"
 #include "adc_setup.h"
 
+#ifdef WALKERA_TELEM
+ #include  "WalkeraTelemOut.h"
+ 
+ WalkeraTelem walkera;
+#endif
 
 
 /* **********************************************/
@@ -195,7 +200,7 @@ void setup()     {
     // also checks if we have new version that needs EEPROM reset
     if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
         OSD::setPanel(1,1);
-        osd.printf_P(PSTR("Missing/Old Config: %d my %d |vers %x sets %x"), sets.CHK1_VERSION, VER); 
+        osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
 /*
         osd.printf_P(PSTR("|vers %x sets %x"), (offsetof(Settings,CHK1_VERSION)), EEPROM_offs(sets) ); 
         hex_dump((byte *)&sets,64);
@@ -301,6 +306,10 @@ void loop()
             if(lflags.blinker) {
                 seconds++;
 	        lflags.one_sec_timer_switch = 1; // for warnings
+
+#ifdef WALKERA_TELEM
+		walkera.sendTelemetry();
+#endif
 
 #ifdef DEBUG    
 		if(seconds % 60 == 30)
