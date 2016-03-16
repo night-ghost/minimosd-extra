@@ -58,7 +58,7 @@ void read_mavlink(){
 /*      allow CLI to be started by hitting enter 3 times, if no
         heartbeat packets have been received but not more than 3 seconds 
 */
-        if (!lflags.mavlink_active && millis() > 3000) {
+        if (!lflags.mavlink_active && millis() < 3000) {
             if (c == '\n' || c == '\r') {
                 crlf_count++;
             } else {
@@ -101,8 +101,8 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
-                osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg.m) / 10000000.0f;
-                osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg.m) / 10000000.0f;
+                osd_lat = gps_norm(mavlink_msg_gps_raw_int_get_lat(&msg.m));
+                osd_lon = gps_norm(mavlink_msg_gps_raw_int_get_lon(&msg.m));
                 osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg.m);
                 osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg.m);
                 osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg.m);

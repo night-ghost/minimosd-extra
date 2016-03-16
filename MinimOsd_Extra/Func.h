@@ -10,6 +10,8 @@ inline boolean getBit(byte Reg, byte whichBit) {
 void getData(){
 //LED_BLINK;
 #if defined(USE_UAVTALK)
+    extern void uavtalk_read(void);
+
 //  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
     if(lflags.mavlink_active || !lflags.uavtalk_active && lflags.blinker){
         read_mavlink();
@@ -133,20 +135,20 @@ void setHomeVars(OSD &osd)
         //osd_alt_cnt = 0;
         osd_got_home = 1;
     } else if(osd_got_home == 1){
-        double scaleLongDown = cos(abs(osd_home_lat) * 0.0174532925);
+        float scaleLongDown = cos(abs(osd_home_lat) * 0.0174532925);
 
         //DST to Home
-        dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
-        dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
+        dstlat = (osd_home_lat - osd_lat) * 111319.5;
+        dstlon = (osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
         osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
-	dst_x=(int)dstlat;
-	dst_y=(int)dstlon;
+	dst_x=(int)fabs(dstlat);
+	dst_y=(int)fabs(dstlon);
 
         //DIR to Home
-        dstlon = (osd_home_lon - osd_lon); //OffSet_X
-        dstlat = (osd_home_lat - osd_lat) / scaleLongDown; //OffSet Y
+//        dstlon = (osd_home_lon - osd_lon); //OffSet_X
+//        dstlat = (osd_home_lat - osd_lat) / scaleLongDown; //OffSet Y
         
-        bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
+        bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolute home direction
         
         if(bearing < 0) bearing += 360;//normalization
         bearing = bearing - 180 - osd_heading;//absolut return direction  //relative home direction
@@ -348,4 +350,9 @@ void pan_toggle(){
       lflags.osd_clear = 0;
       currentAutoPanel = 0;
     }
+}
+
+
+float NOINLINE gps_norm(float f){
+    return f / GPS_MUL;
 }

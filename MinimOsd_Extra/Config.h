@@ -13,8 +13,8 @@
 
 
 #define VERSION "2.4"
-#define RELEASE_NUM 814
-#define RELEASE "r814DV"
+#define RELEASE_NUM 815
+#define RELEASE "r815DV"
 
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port

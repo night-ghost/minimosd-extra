@@ -100,13 +100,13 @@ byte PWM_out_pin=0;
 
 
 // program parts
+#include "Func.h"
 
 #include "protocols.h"
 #if defined(USE_UAVTALK)// TODO: let it compile
 #include "UAVTalk_core.h"
 #endif
 
-#include "Func.h"
 #include "Config_Func.h"
 #include "Panels.h"
 #include "MAVLink.h"
@@ -504,7 +504,7 @@ void parseNewData(){
 
 //Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_pitch ); Serial.wait();
     setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
-    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
+//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
 

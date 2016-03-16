@@ -625,15 +625,22 @@ void panBatteryPercent(point p){
     OSD::setPanel(p.x,p.y);
 
 //    if(has_sign(p))
-    osd_write(0x88); // донышко батарейки не зависит от
+    if(has_sign(p)) {
+	osd_write(0x88); // донышко батарейки не зависит от
 
-    if (flags.OSD_BATT_SHOW_PERCENT){
+        if (flags.OSD_BATT_SHOW_PERCENT){
 //        osd.printf_P(PSTR("\x17%3.0i\x25"), 0x17, osd_battery_remaining_A, 0x25);
-      osd.printf_P(PSTR("%c%c\x8e%i%%"), osd_battery_pic_A[0], osd_battery_pic_A[1], osd_battery_remaining_A/255*100);
+          osd.printf_P(PSTR("%c%c\x8e%i%%"), osd_battery_pic_A[0], osd_battery_pic_A[1], osd_battery_remaining_A/255*100);
 
-    }else{
+        }else{
 //        osd.printf_P(PSTR("%c%4.0f%c"), 0x17, mah_used, 0x01);
-        osd.printf_P(PSTR("%c%c\x8e%4.0f\x01"), osd_battery_pic_A[0], osd_battery_pic_A[1], mah_used);
+            osd.printf_P(PSTR("%c%c\x8e%4.0f\x01"), osd_battery_pic_A[0], osd_battery_pic_A[1], mah_used);
+	}
+    } else {
+	if (flags.OSD_BATT_SHOW_PERCENT)
+	    osd_printi_1(PSTR("%2.0i%%"),  osd_battery_remaining_A/256*100);
+	else
+	    osd_printf_1(PSTR("%4.0f\x01"), mah_used);
     }
 
 
@@ -902,7 +909,7 @@ void panGPS2(point p){
 void panHeading(point p){
     OSD::setPanel(p.x,p.y);
 
-    osd_printi_1(PSTR("%4i\x05"), (int)osd_heading);
+    osd_printi_1(PSTR("%4i\x05"), osd_heading);
 }
 
 /* **************************************************************** */
@@ -1000,7 +1007,7 @@ void panWPDis(point p){
     if (osd_mode == 10){ // auto
         osd_printf_2(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * pgm_read_float(&measure->converth)), h);
     }else{
-        osd.print_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20"));
+        osd.print_P(&strclear[4]);
     }
 }
 
@@ -1266,23 +1273,11 @@ void showHorizon(byte start_col, byte start_row) {
 void showILS(byte start_col, byte start_row) {
 //    OSD::setPanel(start_col, start_row);
 
-
     // Calculate and shows ILS
     
     //now ILS in dimensions of Horizon
     
     if(sets.model_type==0) { // plane
-
-/*	OSD::setPanel(start_col + AH_COLS + 2, start_row);
-	osd.printf_P(PSTR("\x20|"
-			  "\x20|"
-			  "\x20|"
-			  "\x20|"
-			  "\x20"));
-
-	OSD::setPanel(start_col, start_row + AH_ROWS + 1);
-        osd.printf_P(PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"));
-*/
 
       //Vertical calculation
         int currentAngleDisplacement = atan2(osd_alt_to_home, osd_home_distance) * 57.2957795 - 10;

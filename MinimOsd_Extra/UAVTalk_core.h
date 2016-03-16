@@ -535,8 +535,8 @@ void uavtalk_read(void) {
 			case GPSPOSITION_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_001:
-				osd_lat			= uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT) / 10000000.0;
-				osd_lon			= uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON) / 10000000.0;
+				osd_lat			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
+				osd_lon			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_HEADING);
@@ -545,8 +545,8 @@ void uavtalk_read(void) {
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
-				osd_lat			= uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)) / 10000000.0;
-				osd_lon			= uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)) / 10000000.0;
+				osd_lat			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
+				osd_lon			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Heading));

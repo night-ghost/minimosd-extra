@@ -27,7 +27,7 @@ long WalkeraTelem::gpsDdToDmsFormat(float ddm){
     if ((mm < -180.0f) || (mm > 180.0f))
 	mm = 0.0f;
 
-    return mm * 10000000.0f;
+    return mm * GPS_MUL;
 }
 
 void WalkeraTelem::sendTelemetry()
@@ -35,16 +35,14 @@ void WalkeraTelem::sendTelemetry()
 	devoPacket.lat = gpsDdToDmsFormat(osd_lat);
 	devoPacket.lon = gpsDdToDmsFormat(osd_lon);
 
-
 	devoPacket.alt   = (int)(osd_alt_gps / 100.0f); // is already cm!
 	devoPacket.speed = (int)(osd_groundspeed * 0.0194384f * 100.0f);  // * 100 for cm
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = temperature;
 
-
 	devoPacket.crc8 = 0; // Init Checksum with zero Byte
+
 	byte *b = (byte *)&devoPacket;
-    
 	for (byte i = sizeof(devoPacket)-1; i !=0; i--) { // excluding CRC
 		DevoSerial.write(*b);
 		devoPacket.crc8 += *b++; // Add Checksum

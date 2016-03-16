@@ -124,7 +124,7 @@ static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 
 static uint8_t      osd_battery_pic_A[2] = {0x8d, 0x8d};     // picture to show battery remaining
-static uint8_t      osd_battery_pic_B[2] = {0x8d, 0x8d};     // picture to show battery remaining
+//static uint8_t      osd_battery_pic_B[2] = {0x8d, 0x8d};     // picture to show battery remaining
 
 static uint16_t     temperature = 0;
 
@@ -234,3 +234,6 @@ int packet_drops = 0; // unused
 long bytes_comes=0;
 uint16_t max_dly=0;
 #endif
+
+
+#define GPS_MUL 10000000.0f

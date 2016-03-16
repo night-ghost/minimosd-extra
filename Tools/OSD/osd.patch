@@ -1,0 +1,473 @@
+diff -BburpN OSD/AboutBox1.Designer.cs OSD.new/AboutBox1.Designer.cs
+--- OSD/AboutBox1.Designer.cs	2015-04-01 16:55:53.216291227 +0500
++++ OSD.new/AboutBox1.Designer.cs	2016-02-02 10:47:48.000000000 +0500
+@@ -56,7 +56,7 @@
+             this.tableLayoutPanel.Controls.Add(this.label3, 0, 9);
+             this.tableLayoutPanel.Controls.Add(this.label2, 0, 8);
+             this.tableLayoutPanel.Controls.Add(this.label1, 0, 7);
+-            this.tableLayoutPanel.Location = new System.Drawing.Point(5, 145);
++            this.tableLayoutPanel.Location = new System.Drawing.Point(4, 118);
+             this.tableLayoutPanel.Margin = new System.Windows.Forms.Padding(2);
+             this.tableLayoutPanel.Name = "tableLayoutPanel";
+             this.tableLayoutPanel.RowCount = 11;
+@@ -71,7 +71,7 @@
+             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.21095F));
+             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.21095F));
+             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.85741F));
+-            this.tableLayoutPanel.Size = new System.Drawing.Size(556, 219);
++            this.tableLayoutPanel.Size = new System.Drawing.Size(555, 178);
+             this.tableLayoutPanel.TabIndex = 0;
+             // 
+             // labelProductName
+@@ -79,56 +79,63 @@
+             this.labelProductName.Anchor = System.Windows.Forms.AnchorStyles.Left;
+             this.labelProductName.AutoSize = true;
+             this.labelProductName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.labelProductName.Location = new System.Drawing.Point(3, 0);
+-            this.labelProductName.MaximumSize = new System.Drawing.Size(0, 21);
+-            this.labelProductName.MinimumSize = new System.Drawing.Size(0, 26);
++            this.labelProductName.Location = new System.Drawing.Point(2, 0);
++            this.labelProductName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
++            this.labelProductName.MaximumSize = new System.Drawing.Size(0, 17);
++            this.labelProductName.MinimumSize = new System.Drawing.Size(0, 21);
+             this.labelProductName.Name = "labelProductName";
+-            this.labelProductName.Size = new System.Drawing.Size(211, 26);
++            this.labelProductName.Size = new System.Drawing.Size(202, 21);
+             this.labelProductName.TabIndex = 0;
+-            this.labelProductName.Text = "ArduCAM OSD Config";
++            this.labelProductName.Text = "MinimOSD-extra config tool";
+             this.labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+             // 
+             // labelVersion
+             // 
+             this.labelVersion.Dock = System.Windows.Forms.DockStyle.Top;
+             this.labelVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.labelVersion.Location = new System.Drawing.Point(3, 24);
+-            this.labelVersion.MaximumSize = new System.Drawing.Size(0, 21);
++            this.labelVersion.Location = new System.Drawing.Point(2, 20);
++            this.labelVersion.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
++            this.labelVersion.MaximumSize = new System.Drawing.Size(0, 17);
+             this.labelVersion.Name = "labelVersion";
+-            this.labelVersion.Size = new System.Drawing.Size(550, 21);
++            this.labelVersion.Size = new System.Drawing.Size(551, 17);
+             this.labelVersion.TabIndex = 0;
+             this.labelVersion.Text = "2.0";
+             this.labelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+             // 
+             // labelCopyright
+             // 
++            this.labelCopyright.AutoSize = true;
+             this.labelCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
+             this.labelCopyright.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.labelCopyright.Location = new System.Drawing.Point(3, 48);
+-            this.labelCopyright.MaximumSize = new System.Drawing.Size(0, 21);
++            this.labelCopyright.Location = new System.Drawing.Point(2, 40);
++            this.labelCopyright.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
++            this.labelCopyright.MaximumSize = new System.Drawing.Size(0, 17);
+             this.labelCopyright.Name = "labelCopyright";
+-            this.labelCopyright.Size = new System.Drawing.Size(550, 21);
++            this.labelCopyright.Size = new System.Drawing.Size(551, 17);
+             this.labelCopyright.TabIndex = 21;
+-            this.labelCopyright.Text = "Author: Michael Oborne ";
++            this.labelCopyright.Text = "Author: Night Ghost\'s version of Michael Oborne original project";
+             this.labelCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
++            this.labelCopyright.Click += new System.EventHandler(this.labelCopyright_Click);
+             // 
+             // labelCompanyName
+             // 
+             this.labelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
+             this.labelCompanyName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.labelCompanyName.Location = new System.Drawing.Point(3, 72);
+-            this.labelCompanyName.MaximumSize = new System.Drawing.Size(0, 21);
++            this.labelCompanyName.Location = new System.Drawing.Point(2, 60);
++            this.labelCompanyName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
++            this.labelCompanyName.MaximumSize = new System.Drawing.Size(0, 17);
+             this.labelCompanyName.Name = "labelCompanyName";
+-            this.labelCompanyName.Size = new System.Drawing.Size(550, 21);
++            this.labelCompanyName.Size = new System.Drawing.Size(551, 17);
+             this.labelCompanyName.TabIndex = 22;
+             this.labelCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+             // 
+             // label4
+             // 
+             this.label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+-            this.label4.Location = new System.Drawing.Point(3, 112);
++            this.label4.Location = new System.Drawing.Point(2, 93);
++            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+             this.label4.Name = "label4";
+-            this.label4.Size = new System.Drawing.Size(550, 2);
++            this.label4.Size = new System.Drawing.Size(412, 2);
+             this.label4.TabIndex = 29;
+             this.label4.Text = "label4";
+             this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+@@ -137,10 +144,9 @@
+             // 
+             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+             this.okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+-            this.okButton.Location = new System.Drawing.Point(444, 189);
+-            this.okButton.Margin = new System.Windows.Forms.Padding(4);
++            this.okButton.Location = new System.Drawing.Point(471, 156);
+             this.okButton.Name = "okButton";
+-            this.okButton.Size = new System.Drawing.Size(108, 26);
++            this.okButton.Size = new System.Drawing.Size(81, 19);
+             this.okButton.TabIndex = 24;
+             this.okButton.Text = "&OK";
+             this.okButton.Click += new System.EventHandler(this.okButton_Click);
+@@ -149,9 +155,10 @@
+             // 
+             this.label3.AutoSize = true;
+             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.label3.Location = new System.Drawing.Point(3, 163);
++            this.label3.Location = new System.Drawing.Point(2, 135);
++            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+             this.label3.Name = "label3";
+-            this.label3.Size = new System.Drawing.Size(205, 18);
++            this.label3.Size = new System.Drawing.Size(168, 15);
+             this.label3.TabIndex = 28;
+             this.label3.Text = "Licensed under CC 3.0 BY-SA";
+             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+@@ -160,9 +167,10 @@
+             // 
+             this.label2.AutoSize = true;
+             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.label2.Location = new System.Drawing.Point(3, 141);
++            this.label2.Location = new System.Drawing.Point(2, 117);
++            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+             this.label2.Name = "label2";
+-            this.label2.Size = new System.Drawing.Size(135, 18);
++            this.label2.Size = new System.Drawing.Size(112, 15);
+             this.label2.TabIndex = 27;
+             this.label2.Text = "By Sandro Benigno";
+             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+@@ -171,9 +179,10 @@
+             // 
+             this.label1.AutoSize = true;
+             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+-            this.label1.Location = new System.Drawing.Point(3, 119);
++            this.label1.Location = new System.Drawing.Point(2, 99);
++            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+             this.label1.Name = "label1";
+-            this.label1.Size = new System.Drawing.Size(159, 18);
++            this.label1.Size = new System.Drawing.Size(128, 15);
+             this.label1.TabIndex = 26;
+             this.label1.Text = "ArduCAM OSD Project";
+             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+@@ -181,9 +190,10 @@
+             // pictureBox1
+             // 
+             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+-            this.pictureBox1.Location = new System.Drawing.Point(7, 5);
++            this.pictureBox1.Location = new System.Drawing.Point(5, 4);
++            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+             this.pictureBox1.Name = "pictureBox1";
+-            this.pictureBox1.Size = new System.Drawing.Size(552, 133);
++            this.pictureBox1.Size = new System.Drawing.Size(414, 108);
+             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+             this.pictureBox1.TabIndex = 1;
+             this.pictureBox1.TabStop = false;
+@@ -191,17 +201,16 @@
+             // AboutBox1
+             // 
+             this.AcceptButton = this.okButton;
+-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
++            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+-            this.ClientSize = new System.Drawing.Size(568, 370);
++            this.ClientSize = new System.Drawing.Size(570, 301);
+             this.Controls.Add(this.pictureBox1);
+             this.Controls.Add(this.tableLayoutPanel);
+             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+-            this.Margin = new System.Windows.Forms.Padding(4);
+             this.MaximizeBox = false;
+             this.MinimizeBox = false;
+             this.Name = "AboutBox1";
+-            this.Padding = new System.Windows.Forms.Padding(12, 11, 12, 11);
++            this.Padding = new System.Windows.Forms.Padding(9, 9, 9, 9);
+             this.ShowIcon = false;
+             this.ShowInTaskbar = false;
+             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+diff -BburpN OSD/app.config OSD.new/app.config
+--- OSD/app.config	2015-04-07 12:47:13.989050937 +0500
++++ OSD.new/app.config	2016-01-30 15:33:48.000000000 +0500
+@@ -1,3 +1,3 @@
+ <?xml version="1.0"?>
+ <configuration>
+-<startup><supportedRuntime version="v2.1.50727"/></startup></configuration>
++<startup><supportedRuntime version="v2.0.50727" sku="Client"/></startup></configuration>
+diff -BburpN OSD/OSD.cs OSD.new/OSD.cs
+--- OSD/OSD.cs	2015-12-09 15:52:15.606638353 +0500
++++ OSD.new/OSD.cs	2016-02-02 10:41:58.000000000 +0500
+@@ -3432,6 +3432,20 @@ public const int npanel = 4; // коли
+ 
+ 
+        
++        private void cbNscreens_SelectedIndexChanged(object sender, EventArgs e)
++        {
++
++        }
++
++        private void videoModeToolStripMenuItem_Click(object sender, EventArgs e)
++        {
++
++        }
++
++        
++
++
++       
+ 
+ 	}
+ }
+diff -BburpN OSD/OSD.Designer.cs OSD.new/OSD.Designer.cs
+--- OSD/OSD.Designer.cs	2015-10-25 21:26:09.587123695 +0500
++++ OSD.new/OSD.Designer.cs	2016-02-02 10:41:59.000000000 +0500
+@@ -48,6 +47,7 @@ namespace OSD
+             this.videoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+             this.CHK_ntsc = new System.Windows.Forms.ToolStripMenuItem();
+             this.CHK_pal = new System.Windows.Forms.ToolStripMenuItem();
++            this.autoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+             this.checkBox1 = new System.Windows.Forms.ToolStripMenuItem();
+ 			this.resetEepromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+@@ -91,6 +91,8 @@ namespace OSD
+             this.label6 = new System.Windows.Forms.Label();
+             this.numMinVoltB = new System.Windows.Forms.NumericUpDown();
+             this.groupBox9 = new System.Windows.Forms.GroupBox();
++            this.cbNscreens = new System.Windows.Forms.ComboBox();
++            this.label3 = new System.Windows.Forms.Label();
+             this.numHOS = new System.Windows.Forms.NumericUpDown();
+             this.numVOS = new System.Windows.Forms.NumericUpDown();
+             this.label31 = new System.Windows.Forms.Label();
+@@ -248,8 +249,7 @@ namespace OSD
+             	this.fileToolStripMenuItem,
+             	this.videoModeToolStripMenuItem,
+             	this.optionsToolStripMenuItem,
+-            	this.helpToolStripMenuItem
+-			});
++            this.helpToolStripMenuItem});
+             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+             this.menuStrip1.Name = "menuStrip1";
+             this.menuStrip1.Size = new System.Drawing.Size(688, 24);
+@@ -316,16 +316,18 @@ namespace OSD
+             // 
+             this.videoModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+             this.CHK_ntsc,
+-            this.CHK_pal});
++            this.CHK_pal,
++            this.autoToolStripMenuItem});
+             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
+             this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
+             this.videoModeToolStripMenuItem.Text = "Video Mode";
++            this.videoModeToolStripMenuItem.Click += new System.EventHandler(this.videoModeToolStripMenuItem_Click);
+             // 
+             // CHK_ntsc
+             // 
+             this.CHK_ntsc.CheckOnClick = true;
+             this.CHK_ntsc.Name = "CHK_ntsc";
+-            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
++            this.CHK_ntsc.Size = new System.Drawing.Size(152, 22);
+             this.CHK_ntsc.Text = "NTSC";
+             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
+             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
+@@ -336,12 +338,18 @@ namespace OSD
+             this.CHK_pal.CheckOnClick = true;
+             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
+             this.CHK_pal.Name = "CHK_pal";
+-            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
++            this.CHK_pal.Size = new System.Drawing.Size(152, 22);
+             this.CHK_pal.Text = "PAL";
+             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
+             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
+             this.CHK_pal.Click += new System.EventHandler(this.CHK_pal_Click);
+             // 
++            // autoToolStripMenuItem
++            // 
++            this.autoToolStripMenuItem.Name = "autoToolStripMenuItem";
++            this.autoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
++            this.autoToolStripMenuItem.Text = "Auto";
++            // 
+             // optionsToolStripMenuItem
+             // 
+             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+@@ -355,8 +363,7 @@ namespace OSD
+             	this.updateCharsetcustomFwToolStripMenuItem,
+             	this.presentCustomCharsetToolStripMenuItem,
+             	this.setSketchesPathToolStripMenuItem,
+-            	this.getFwFromOSDToolStripMenuItem
+-			});
++            this.getFwFromOSDToolStripMenuItem});
+             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
+@@ -373,7 +380,7 @@ namespace OSD
+             this.checkBox1.Text = "Show Grid";
+             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+             // 
+-            // updateResetEEpromMenuItem
++            // resetEepromToolStripMenuItem
+             // 
+             this.resetEepromToolStripMenuItem.Name = "resetEepromToolStripMenuItem";
+             this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+@@ -791,6 +792,8 @@ namespace OSD
+             // 
+             // groupBox9
+             // 
++            this.groupBox9.Controls.Add(this.cbNscreens);
++            this.groupBox9.Controls.Add(this.label3);
+ 			this.groupBox9.Controls.Add(this.numHOS);
+             this.groupBox9.Controls.Add(this.numVOS);
+             this.groupBox9.Controls.Add(this.label31);
+@@ -800,13 +803,38 @@ namespace OSD
+             this.groupBox9.Controls.Add(this.label13);
+             this.groupBox9.Location = new System.Drawing.Point(169, 238);
+             this.groupBox9.Name = "groupBox9";
+-            this.groupBox9.Size = new System.Drawing.Size(150, 133);
++            this.groupBox9.Size = new System.Drawing.Size(150, 138);
+             this.groupBox9.TabIndex = 10;
+             this.groupBox9.TabStop = false;
++            this.groupBox9.Text = "Screen";
++            // 
++            // cbNscreens
++            // 
++            this.cbNscreens.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
++            this.cbNscreens.FormattingEnabled = true;
++            this.cbNscreens.Items.AddRange(new object[] {
++            "1",
++            "2",
++            "3",
++            "4"});
++            this.cbNscreens.Location = new System.Drawing.Point(85, 109);
++            this.cbNscreens.Name = "cbNscreens";
++            this.cbNscreens.Size = new System.Drawing.Size(56, 21);
++            this.cbNscreens.TabIndex = 10;
++            this.cbNscreens.SelectedIndexChanged += new System.EventHandler(this.cbNscreens_SelectedIndexChanged);
++            // 
++            // label3
++            // 
++            this.label3.AutoSize = true;
++            this.label3.Location = new System.Drawing.Point(5, 112);
++            this.label3.Name = "label3";
++            this.label3.Size = new System.Drawing.Size(77, 13);
++            this.label3.TabIndex = 9;
++            this.label3.Text = "Screens Count";
+ 			// 
+ 			// numHOS
+-            //.
+-            this.numHOS.Location = new System.Drawing.Point(80, 102);
++            // 
++            this.numHOS.Location = new System.Drawing.Point(83, 69);
+             this.numHOS.Maximum = new decimal(new int[] {
+             31,
+             0,
+@@ -818,13 +846,13 @@ namespace OSD
+             0,
+             -2147483648});
+             this.numHOS.Name = "numHOS";
+-            this.numHOS.Size = new System.Drawing.Size(56, 20);
++            this.numHOS.Size = new System.Drawing.Size(58, 20);
+             this.numHOS.TabIndex = 8;
+             this.numHOS.ValueChanged += new System.EventHandler(this.numHOS_ValueChanged);
+-            //.
++            // 
+             // numVOS
+-            //.
+-            this.numVOS.Location = new System.Drawing.Point(81, 80);
++            // 
++            this.numVOS.Location = new System.Drawing.Point(82, 48);
+             this.numVOS.Maximum = new decimal(new int[] {
+             15,
+             0,
+@@ -836,14 +864,14 @@ namespace OSD
+             0,
+             -2147483648});
+             this.numVOS.Name = "numVOS";
+-            this.numVOS.Size = new System.Drawing.Size(56, 20);
++            this.numVOS.Size = new System.Drawing.Size(59, 20);
+             this.numVOS.TabIndex = 7;
+            this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
+ 			//
+             // label31
+             //
+             this.label31.AutoSize = true;
+-            this.label31.Location = new System.Drawing.Point(49, 104);
++            this.label31.Location = new System.Drawing.Point(51, 72);
+             this.label31.Name = "label31";
+             this.label31.Size = new System.Drawing.Size(25, 13);
+             this.label31.TabIndex = 6;
+@@ -852,20 +880,20 @@ namespace OSD
+             // label30
+             //
+             this.label30.AutoSize = true;
+-            this.label30.Location = new System.Drawing.Point(48, 82);
++            this.label30.Location = new System.Drawing.Point(50, 50);
+             this.label30.Name = "label30";
+             this.label30.Size = new System.Drawing.Size(26, 13);
+             this.label30.TabIndex = 5;
+             this.label30.Text = "Top";
+-            //.
++            // 
+             // label29
+-            //.
++            // 
+             this.label29.AutoSize = true;
+-            this.label29.Location = new System.Drawing.Point(10, 63);
++            this.label29.Location = new System.Drawing.Point(5, 48);
+             this.label29.Name = "label29";
+-            this.label29.Size = new System.Drawing.Size(75, 13);
++            this.label29.Size = new System.Drawing.Size(40, 13);
+             this.label29.TabIndex = 4;
+-            this.label29.Text = "Screen offsets";
++            this.label29.Text = "Offsets";
+             //			
+             // BRIGHTNESScomboBox
+             // 
+@@ -875,23 +903,22 @@ namespace OSD
+ 	            "Low",
+ 	            "Medium",
+ 	            "Medium High",
+-	            "High"
+-			});
+-            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(35, 30);
++            "High"});
++            this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(66, 14);
+             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
+             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
+-            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(102, 21);
++            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(75, 21);
+             this.BRIGHTNESScomboBox.TabIndex = 3;
+             this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
+             // 
+             // label13
+             // 
+             this.label13.AutoSize = true;
+-            this.label13.Location = new System.Drawing.Point(5, 12);
++            this.label13.Location = new System.Drawing.Point(5, 18);
+             this.label13.Name = "label13";
+-            this.label13.Size = new System.Drawing.Size(93, 13);
++            this.label13.Size = new System.Drawing.Size(56, 13);
+             this.label13.TabIndex = 2;
+-            this.label13.Text = "Screen Brightness";
++            this.label13.Text = "Brightness";
+             // 
+             // groupBox8
+             // 
+@@ -983,8 +1008,7 @@ namespace OSD
+ 	            "Ch 6",
+ 	            "Ch 7",
+ 	            "Ch 8",
+-				"External PWM"
+-			});
++            "External PWM"});
+             this.ONOFF_combo.Location = new System.Drawing.Point(7, 90);
+             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
+             this.ONOFF_combo.Name = "ONOFF_combo";
+@@ -1780,6 +1793,9 @@ namespace OSD
+         private System.Windows.Forms.ComboBox cbOutSource;
+         private System.Windows.Forms.Label label2;
+         private System.Windows.Forms.Label label1;
++        private System.Windows.Forms.ToolStripMenuItem autoToolStripMenuItem;
++        private System.Windows.Forms.ComboBox cbNscreens;
++        private System.Windows.Forms.Label label3;
+     }
+ 	
+ }

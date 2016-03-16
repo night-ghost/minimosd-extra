@@ -580,16 +580,16 @@ namespace OSD
             if (Convert.ToBoolean(osd_battery_show_percentage))
             {
 				if(sign==1)
-                	osd.printf("%c%3.0i%c", 0x17, osd_battery_remaining, 0x25);
+                  osd.printf("\x88%c%c\x8e%2.0i%%", 0x89, 0x89, 99);
 				else
 					osd.printf("%3.0i%c",  osd_battery_remaining, 0x25);
             }
             else
             {
 				if(sign==1)
-                	osd.printf("%c%4.0i%c", 0x17, osd_battery_remaining, 0x01);
+                  osd.printf("\x88%c%c\x8e%4.0f\x01", 0x89,0x89, 99);
 				else
-					osd.printf("%4.0i%c",  osd_battery_remaining, 0x01);
+                   osd.printf("%4.0f\x01", 978);
             }
             
             return 0;
