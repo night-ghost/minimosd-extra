@@ -101,8 +101,8 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
-                osd_lat = gps_norm(mavlink_msg_gps_raw_int_get_lat(&msg.m));
-                osd_lon = gps_norm(mavlink_msg_gps_raw_int_get_lon(&msg.m));
+                osd_pos.lat = gps_norm(mavlink_msg_gps_raw_int_get_lat(&msg.m));
+                osd_pos.lon = gps_norm(mavlink_msg_gps_raw_int_get_lon(&msg.m));
                 osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg.m);
                 osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg.m);
                 osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg.m);

@@ -152,22 +152,30 @@ static unsigned long osd_switch_time = 0;
 static float        palt = 0;	// высота выключения газа
 #endif
 
+struct Coords {
+    float lat;
+    float lon;
+};
+
 static float        osd_climb = 0;
-static float        osd_lat = 0;                    // latidude
-static float        osd_lon = 0;                    // longitude
+//static float        osd_lat = 0;                    // latidude
+//static float        osd_lon = 0;                    // longitude
+Coords osd_pos = {0,0};
+
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground
 static uint16_t     off_course;
 //static uint8_t      osd_got_home = 0;               // tels if got home position or not
-static float        osd_home_lat = 0;               // home latidude
-static float        osd_home_lon = 0;               // home longitude
+//static float        osd_home_lat = 0;               // home latidude
+//static float        osd_home_lon = 0;               // home longitude
+Coords osd_home = {0,0};
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 static int dst_x,dst_y; // расстояние по осям - для радара
 
 int16_t                osd_roll = 0;                   // roll from DCM
-volatile int16_t       osd_pitch = 0;                  // pitch from DCM
+int16_t                osd_pitch = 0;                  // pitch from DCM
 int16_t                osd_yaw = 0;                    // yaw from DCM
 
 static int /* float*/  osd_heading = 0;                // ground course heading from GPS

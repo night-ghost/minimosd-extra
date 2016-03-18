@@ -252,8 +252,8 @@ void panFdata(point p){ // итоги полета
 		                 (int)(tdistance * pgm_read_float(&measure->converth)), h,
 		                	(int)(max_osd_groundspeed * pgm_read_float(&measure->converts)),pgm_read_byte(&measure->spe),
 		                		    (int)(max_osd_home_alt * pgm_read_float(&measure->converth)), h,
-		                			      osd_lat, 
-		                			    		osd_lon);
+		                			      osd_pos.lat, 
+		                			    		osd_pos.lon);
 }
 
 /* **************************************************************** */
@@ -924,8 +924,8 @@ void panGPSats(point p){
 // Staus  : done
 
 void NOINLINE print_GPS(PGM_P f){
-    if(osd_lon && osd_lat) // не выводим координат если нету
-	osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+    if(osd_pos.lon && osd_pos.lat) // не выводим координат если нету
+	osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
 }
 
 void panGPS(point p){
@@ -938,7 +938,7 @@ void panGPS(point p){
     else 
 	f=PSTR("%10.6f|%10.6f");
 
-    //osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+    //osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
     print_GPS(f);
 }
 
@@ -959,7 +959,7 @@ void panGPS2(point p){
     else
     	f=PSTR("%10.6f %10.6f");
 
-//    osd.printf_P(f, (double)osd_lat, (double)osd_lon);
+//    osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
     print_GPS(f);
 
 }
@@ -1427,7 +1427,7 @@ void showILS(byte start_col, byte start_row) {
 /******************************************************************/
 // Panel  : panUAVPosition
 // Needs  : X, Y locations of center
-// Needs  : globals: osd_home_lat, osd_lat, osd_home_lon, osd_lon
+// Needs  : globals: osd_home.lat, osd_pos.lat, osd_home.lon, osd_pos.lon
 // Output : shows the UAV position in a radar like style
 // Status : do flight test
 /******************************************************************/
@@ -1448,8 +1448,8 @@ void showRADAR(byte center_col, byte center_line) {
 
 
     // calculate distances from home in lat (y) and lon (x) direction in [m]
-//    int dst_y = (int)(-111319.5 * (osd_home_lat - osd_lat));
-//    int dst_x = (int)(-111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
+//    int dst_y = (int)(-111319.5 * (osd_home.lat - osd_pos.lat));
+//    int dst_x = (int)(-111319.5 * (osd_home.lon - osd_pos.lon) * cos(fabs(osd_home.lat) * 0.0174532925));
     
     // calculate display offset in y and x direction
     int zoom = max((int)(abs(dst_y) / STEP_WIDTH), (int)(abs(dst_x) / STEP_WIDTH)) + 1;

@@ -32,8 +32,8 @@ long WalkeraTelem::gpsDdToDmsFormat(float ddm){
 
 void WalkeraTelem::sendTelemetry()
 {
-	devoPacket.lat = gpsDdToDmsFormat(osd_lat);
-	devoPacket.lon = gpsDdToDmsFormat(osd_lon);
+	devoPacket.lat = gpsDdToDmsFormat(osd_pos.lat);
+	devoPacket.lon = gpsDdToDmsFormat(osd_pos.lon);
 
 	devoPacket.alt   = (int)(osd_alt_gps / 100.0f); // is already cm!
 	devoPacket.speed = (int)(osd_groundspeed * 0.0194384f * 100.0f);  // * 100 for cm

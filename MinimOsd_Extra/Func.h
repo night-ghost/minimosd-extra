@@ -119,7 +119,6 @@ void setHomeVars(OSD &osd)
     if(osd_throttle > 10 && takeoff_heading == -400)
 	takeoff_heading = osd_heading;
 
-  
 
     if (lflags.motor_armed && !lflags.last_armed_status){ // plane can be armed too
 	//If motors armed, reset home in Arducopter version
@@ -136,24 +135,23 @@ void setHomeVars(OSD &osd)
 #endif
 
     if(en){
-        osd_home_lat = osd_lat;
-        osd_home_lon = osd_lon;
+        osd_home = osd_pos;
 
         //osd_alt_cnt = 0;
         lflags.osd_got_home = 1;
     } else if(lflags.osd_got_home){
-        float scaleLongDown = cos(abs(osd_home_lat) * 0.0174532925);
+        float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
 
         //DST to Home
-        dstlat = (osd_home_lat - osd_lat) * 111319.5;
-        dstlon = (osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
+        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
+        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
         osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
 	dst_x=(int)fabs(dstlat);
 	dst_y=(int)fabs(dstlon);
 
         //DIR to Home
-//        dstlon = (osd_home_lon - osd_lon); //OffSet_X
-//        dstlat = (osd_home_lat - osd_lat) / scaleLongDown; //OffSet Y
+//        dstlon = (osd_home.lon - osd_pos.lon); //OffSet_X
+//        dstlat = (osd_home.lat - osd_pos.lat) / scaleLongDown; //OffSet Y
         
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolute home direction
         
@@ -163,6 +161,11 @@ void setHomeVars(OSD &osd)
 
         osd_home_direction = grad_to_sect(bearing); 
   }
+}
+
+void NOINLINE calc_max(float &dst, float &src){
+    if (dst < src) dst = src;
+
 }
 
 // вычисление нужных переменных
@@ -240,11 +243,16 @@ void setFdataVars()
 
     total_flight_time_milis += time_lapse;
 //    total_flight_time_seconds = total_flight_time_milis / 1000;
-    if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
-    if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
-    if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
-    if (osd_alt_rel > max_osd_home_alt) max_osd_home_alt = osd_alt_rel;
-    if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
+    //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
+    float dst=osd_home_distance;
+    calc_max(max_home_distance, dst);
+    //if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
+    calc_max(max_osd_airspeed, osd_airspeed);
+    //if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
+    //if (osd_alt_rel > max_osd_home_alt) max_osd_home_alt = osd_alt_rel;
+    calc_max(max_osd_home_alt, osd_alt_rel);
+    //if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
+    calc_max(max_osd_windspeed, osd_windspeed);
   }
 }
 

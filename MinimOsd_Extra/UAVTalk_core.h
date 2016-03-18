@@ -69,6 +69,8 @@ static const PROGMEM uint8_t crc_table[256] = {
 	0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
 };
 
+#define CRC_VAL(c) pgm_read_byte(&crc_table[c])
+
 
 #if defined(DEBUG) && 0
 void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
@@ -82,37 +84,37 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 	osd.printf("%6u header ", millis());
 	c = (uint8_t) (msg->Sync);
 	osd.printf("%2x ", c);
-	crc = crc_table[0 ^ c];
+	crc = CRC_VAL(0 ^ c);
 	c = (uint8_t) (msg->MsgType);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) (msg->Length & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) ((msg->Length >> 8) & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) (msg->ObjID & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 8) & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 16) & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 24) & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = (crc ^ c);
 
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 #else
 	c = (uint8_t) (msg->InstID & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 	c = (uint8_t) ((msg->InstID >> 8) & 0xff);
 	osd.printf("%2x ", c);
-	crc = crc_table[crc ^ c];
+	crc = CRC_VAL(crc ^ c);
 #endif
 	
 	osd.printf("data ");
@@ -121,7 +123,7 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 	  for (i=0; i<msg->Length-HEADER_LEN; i++) {
 		c = *d++;
 	        osd.printf("%2x ", c);
-		crc = crc_table[crc ^ c];
+		crc = CRC_VAL(crc ^ c);
           }
 	}
 	
@@ -167,37 +169,37 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	
 	c = (uint8_t) (msg->Sync);
 	Serial.write(c);
-	msg->Crc = crc_table[0 ^ c];
+	msg->Crc = CRC_VAL(0 ^ c);
 	c = (uint8_t) (msg->MsgType);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) (msg->Length & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) ((msg->Length >> 8) & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) (msg->ObjID & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 8) & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 16) & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = (uint8_t) ((msg->ObjID >> 24) & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 #else
 	c = 0; //(uint8_t) (msg->InstID & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 	c = 0; //(uint8_t) ((msg->InstID >> 8) & 0xff);
 	Serial.write(c);
-	msg->Crc = crc_table[msg->Crc ^ c];
+	msg->Crc = CRC_VAL(msg->Crc ^ c);
 #endif
         
 	if (msg->Length > HEADER_LEN) {
@@ -205,7 +207,7 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	  for (i=0; i<msg->Length-HEADER_LEN; i++) {
 		c = *d++;
 		Serial.write(c);
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
           }
 	}
 	Serial.write(msg->Crc);
@@ -268,12 +270,12 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		if (c == UAVTALK_SYNC_VAL) {
 			status = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->Sync = c;
-			msg->Crc = crc_table[0 ^ c];
+			msg->Crc = CRC_VAL(0 ^ c);
 			length = HEADER_LEN;
 		}
 		break;
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
 			status = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
 			msg->MsgType = c;
@@ -286,7 +288,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		if (cnt < 2) {
 			msg->Length = ((uint16_t) c);
@@ -306,7 +308,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		}
 		break;
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
@@ -335,7 +337,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
@@ -357,7 +359,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_INSTID:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
@@ -372,7 +374,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
-		msg->Crc = crc_table[msg->Crc ^ c];
+		msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		msg->Data[cnt - 1] = c;
 		if (cnt >= msg->Length - length) {
@@ -457,7 +459,7 @@ void uavtalk_read(void) {
         			osd_yaw			= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_YAW);
 //Serial.printf_P(PSTR("uav pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
-                                if (osd_lat == 0) {
+                                if (osd_pos.lat == 0) {
                                     osd_heading = osd_yaw;
                                 }
 				break;
@@ -468,7 +470,7 @@ void uavtalk_read(void) {
         			osd_yaw			= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Yaw));
 //Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
-                                if (osd_lat == 0) {
+                                if (osd_pos.lat == 0) {
                                     osd_heading = osd_yaw;
                                 }
 				break;
@@ -535,8 +537,8 @@ void uavtalk_read(void) {
 			case GPSPOSITION_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_001:
-				osd_lat			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
-				osd_lon			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
+				osd_pos.lat			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
+				osd_pos.lon			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_HEADING);
@@ -545,8 +547,8 @@ void uavtalk_read(void) {
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
-				osd_lat			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
-				osd_lon			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
+				osd_pos.lat			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
+				osd_pos.lon			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Heading));
