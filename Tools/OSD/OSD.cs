@@ -224,19 +224,19 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY,-1);
 				pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY,-1);
 				pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY,1);
-				pi[a++] = new Panel("Battery B", pan.panBatt_B, 21, 3, panBatt_B_XY,1);
+				pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY,1);
 				pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY,1);
 				pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY,1);
 				pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY,1);
-				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 0, 2, panGPS2_XY,1);
+				pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY,1);
 	
 		
-				pi[a++] = new Panel("Heading Rose", pan.panRose, 21, 15, panRose_XY,1);
-				pi[a++] = new Panel("Heading", pan.panHeading, 24, 13, panHeading_XY,-1);
+				pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY,0);
+				pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY,-1);
 	//          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
 				pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY,-1);
 				pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY,1);
-				pi[a++] = new Panel("WP Direction", pan.panWPDir, 20, 12, panWPDir_XY,-1);
+				pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY,-1);
 				pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY,1);
 	
 				pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY,1);
@@ -256,11 +256,11 @@ public const int npanel = 4; // количество панелей
 				pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY,1);
 				pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY,1);
 				pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY,1);
-				pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 0, 0, panCALLSIGN_XY,-1);
+				pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY,-1);
 				pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY,-1);
 				pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY,-1);
 				pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY,1);
-				pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 16, 7, panRadarScale_XY,1);
+				pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY,1);
 				pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY,-1);
 				
 					
