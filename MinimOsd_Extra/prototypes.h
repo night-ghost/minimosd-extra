@@ -65,3 +65,4 @@ void max7456_off();
 int grad_to_sect(int grad);
 
 void delay_150();
+void parseNewData();

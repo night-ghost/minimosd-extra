@@ -250,7 +250,7 @@ size_t OSD::write(uint8_t c){
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
     extern OSD osd;
-    bufpos = (y & 0x7f)*30+(x & 0x7f);
+    setPanel(x,y);
     osd.write(c);
 }
 
@@ -306,11 +306,12 @@ void OSD::update() {
 void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 {
   byte x;
-  byte char_address_hi, char_address_lo;
+  byte char_address_hi;
+  //byte char_address_lo;
   byte screen_char;
 
   char_address_hi = font_count;
-  char_address_lo = 0;
+//  char_address_lo = 0;
 
     cli();
 

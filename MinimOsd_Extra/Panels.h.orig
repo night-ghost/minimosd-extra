@@ -120,9 +120,9 @@ void writePanels(){
 
       if(is_on(panel.Fdata)) panFdata(panel.Fdata); 
 
-      if(lflags.osd_got_home){
+      if(osd_got_home == 1){
         if(is_on(panel.homeDist)) panHomeDis(panel.homeDist); //13x3
-        if(is_on(panel.homeDir))  panHomeDir(panel.homeDir); //13x3
+        if(is_on(panel.homeDir)) panHomeDir(panel.homeDir); //13x3
       }
 
       if(is_on(panel.time)) panTime(panel.time);
@@ -286,15 +286,13 @@ void panEff(point p){
           if (lflags.ma == 0) 
               lflags.ma = 1;
     
-            if (osd_groundspeed != 0) {
-        	//eff = (((float)osd_curr_A * 10.0 ) / cnvGroundSpeed())*0.1 + eff * 0.9;
-        	eff = (((float)osd_curr_A ) / cnvGroundSpeed()) + eff * 0.9;
-	    }
-	    
+            if (osd_groundspeed != 0) 
+        	eff = ((osd_curr_A * 10.0) / cnvGroundSpeed())* 0.1 + eff * 0.9;
+
     	    if(has_sign(p))
 		osd_write(0x16);
             
-            if (eff > 0.0 && eff <= 9999.0) {
+            if (eff > 0 && eff <= 9999) {
                   osd_printf_1(PSTR("%4.0f\x01"), eff);
             }else{
                   osd.print_P(&strclear[7]);// osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
@@ -423,7 +421,7 @@ void panCur_A(point p){
     osd_setPanelSign(p, 0xbd);
 
 
-    osd_printf_1(PSTR("%5.2f\x0e"), (float(osd_curr_A) * 0.01)); // in amps
+    osd_printf_1(PSTR("%5.2f\x0e"), (float(osd_curr_A) * 0.01));
 }
 
 /* **************************************************************** */
@@ -988,7 +986,7 @@ void panRose(point p){
  // generate the heading patern
     char buf_show[14];
 
-    const unsigned char buf_Rule[] PROGMEM = {
+    const char buf_Rule[] PROGMEM = {
       0x82,0x80,0x81,0x80,0x81,0x80,
       0x84,0x80,0x81,0x80,0x81,0x80,
       0x83,0x80,0x81,0x80,0x81,0x80,
@@ -997,7 +995,11 @@ void panRose(point p){
 
     int start = (osd_heading * 24+12)/360 - 4;
  
+// Serial.printf_P(PSTR("Rose start=%d\n"), start);
+ 
     if(start < 0) start += 24;
+
+// Serial.printf_P(PSTR("Rose 2 start=%d\n"), start);
   
     char *c=buf_show;
     uint8_t x;
@@ -1016,6 +1018,8 @@ void panRose(point p){
     if(has_sign(p))
 	osd.print_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
     osd.printf_P(PSTR("\xc3%s\x87"), buf_show);
+//    osd.printf(buf_show);
+//    osd.print(buf_show);
 
 }
 
@@ -1023,7 +1027,6 @@ void panRose(point p){
 int getTargetBearing(){
     if (wp_target_bearing < 0)
 	wp_target_bearing+=360;
-	
     return grad_to_sect((float)wp_target_bearing - osd_heading); //Convert to int 1-16 
 }
 
@@ -1084,7 +1087,7 @@ void panWPDis(point p){
 void panHomeDir(point p){
     OSD::setPanel(p.x,p.y);
 
-    showArrow(osd_home_direction,0);
+    showArrow((int)osd_home_direction,0);
 }
 
 /* **************************************************************** */
@@ -1094,7 +1097,7 @@ void panHomeDir(point p){
 // Size   : 1 x 2  (rows x chars)
 // Status : done
 
-#if defined(USE_UAVTALK)
+
 const char PROGMEM u_mode00[] = "manu";    // MANUAL
 const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
 const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
@@ -1120,7 +1123,6 @@ char const * const mode_u_strings[] PROGMEM ={
     u_mode10, u_mode11, u_mode12, u_mode13, u_mode14,
     u_mode15, u_mode16, u_mode17
 };
-#endif
 
 #ifdef IS_COPTER
 const char PROGMEM s_mode00[] = "stab"; //Stabilize	0
@@ -1185,12 +1187,10 @@ void panFlightMode(point p){
     osd_setPanelSign(p, 0x7f);
 
     PGM_P mode_str;
-#if defined(USE_UAVTALK)
+
     if(lflags.uavtalk_active) {
 	mode_str = (PGM_P)pgm_read_word(&mode_u_strings[osd_mode]);
-    } else 
-#endif
-    {
+    } else {
 #ifdef IS_COPTER
  #ifdef IS_PLANE
     if(sets.model_type==0) {
@@ -1210,8 +1210,7 @@ void panFlightMode(point p){
     }
     
     osd.print_P(mode_str);
-    if(lflags.motor_armed)
-        osd_write(0x86);
+    osd_write( lflags.motor_armed ? 0x86:' ');
 }
 
 
@@ -1519,7 +1518,7 @@ void panTune(point p){
 				    					     (nav_bearing),  
 				    								(wp_target_bearing), 
 				    							    			cnvAltError(), pgm_read_byte(&measure->high), 
-				    							    		    			((float)xtrack_error), 
+				    							    		    			(xtrack_error), 
 				    							    		    					((aspd_error / 100.0) * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
 #else
 

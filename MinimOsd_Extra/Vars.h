@@ -41,7 +41,7 @@ static unsigned long landed = 4294967295;
 static int          takeoff_heading = -400;         // Calculated takeoff heading
 #endif
 
-static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+static int /*float*/ xtrack_error = 0; // Current crosstrack error on x-y plane in meters
 
 static uint16_t     eph = 0;
 
@@ -55,7 +55,7 @@ static uint16_t     chan_raw[8]; // значение каналов управл
 static uint8_t      check_warning = 1;
 
 /* [ все переменные, связанные с метрикой, сделать PROGMEM и переключать указатель !
-static float        converts = 0; //*
+static float        converts = 0; 
 static float        converth = 0;
 static uint16_t     distconv = 0;
 
@@ -67,7 +67,7 @@ static uint8_t      tempconv = 1;
 static uint16_t     tempconvAdd = 0;
 static byte         distchar = 0;
 static byte         climbchar = 0;
-//*/ //]
+*///]
 
 struct Measure {
     float        converts;
@@ -159,7 +159,7 @@ static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground
 static uint16_t     off_course;
-static uint8_t      osd_got_home = 0;               // tels if got home position or not
+//static uint8_t      osd_got_home = 0;               // tels if got home position or not
 static float        osd_home_lat = 0;               // home latidude
 static float        osd_home_lon = 0;               // home longitude
 static long         osd_home_distance = 0;          // distance from home
@@ -224,6 +224,7 @@ struct loc_flags {
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mode_switch:1;
     bool sw_state:1;
+    bool osd_got_home:1;
 //    bool modeScreen:1; //NTSC:0, PAL:1
 //    bool warning_found:1;
 

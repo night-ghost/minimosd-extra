@@ -45,17 +45,20 @@
 #define VERSION_RELEASE_15_02_1
 #define FLIGHT_BATT_ON_REVO 1
 
-// TODO enhancement:
-// Generate the following automatically out of the XML files.
-//
-// These object constants are version dependent!
-//
-// Short hints getting them manually:
-// http://wiki.openpilot.org/display/Doc/Windows%3A+Building+and+Packaging
-// git clone git://git.openpilot.org/OpenPilot.git OpenPilot
-// QT Creator > Datei oder Projekt oeffnen... uavobjgenerator
-// generate release and copy exe to <top>\ground\uavobjgenerator
-// uavobjgenerator -flight ..\..\shared\uavobjectdefinition ..\..\
+/*
+     TODO enhancement:  --> DONE! @DV
+
+ Generate the following automatically out of the XML files.
+
+ These object constants are version dependent!
+
+ Short hints getting them manually:
+ http://wiki.openpilot.org/display/Doc/Windows%3A+Building+and+Packaging
+ git clone git://git.openpilot.org/OpenPilot.git OpenPilot
+ QT Creator > Datei oder Projekt oeffnen... uavobjgenerator
+ generate release and copy exe to <top>\ground\uavobjgenerator
+ uavobjgenerator -flight ..\..\shared\uavobjectdefinition ..\..\
+*/
 
 // заглушки
 #define UAVObjGetData(x, y) 0

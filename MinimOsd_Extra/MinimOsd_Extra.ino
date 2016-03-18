@@ -103,7 +103,7 @@ byte PWM_out_pin=0;
 #include "Func.h"
 
 #include "protocols.h"
-#if defined(USE_UAVTALK)// TODO: let it compile
+#if defined(USE_UAVTALK)
 #include "UAVTalk_core.h"
 #endif
 

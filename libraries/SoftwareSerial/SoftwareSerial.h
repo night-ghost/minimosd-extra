@@ -31,7 +31,7 @@ http://arduiniana.org.
 #include <inttypes.h>
 //#include <Stream.h>
 
-#include "../SingleSerial/BetterStream.h""
+#include "../SingleSerial/BetterStream.h"
 
 /******************************************************************************
 * Definitions

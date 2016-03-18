@@ -63,7 +63,9 @@ char setBatteryPic(uint16_t bat_level,byte *bp)
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
 int grad_to_sect(int grad){
-    return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
+    //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
+    
+    return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
 }
 
 /*int grad_to_sect(float grad){
@@ -81,49 +83,54 @@ void setHomeVars(OSD &osd)
 #ifdef IS_COPTER
  #ifdef IS_PLANE
     // copter & plane - differ by model_type
-    switch(sets.model_type){
-    case 0: //plane
+    if(sets.model_type == 0){  //plane
 	if(osd_throttle > 3 && takeoff_heading == -400)
 	    takeoff_heading = osd_heading;
 
-	osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
-  
-	if(osd_got_home == 0 && osd_fix_type == 3 )
-	    en=1;
-	break;
-
-    case 1:
-        if (lflags.motor_armed && !lflags.last_armed_status){
-	//If motors armed, reset home in Arducopter version
-	    osd_got_home = 0;
-	}
-
-	lflags.last_armed_status = lflags.motor_armed;
-
-	if(osd_got_home == 0 && osd_fix_type > 1 )
+	if(!lflags.osd_got_home && osd_fix_type == 3 )
 	    en=1;
     }
- #else
+    
+    if (lflags.motor_armed && !lflags.last_armed_status){
+	lflags.osd_got_home = 0;   //If motors armed, reset home
+    }
+
+    lflags.last_armed_status = lflags.motor_armed;
+
+    if(!lflags.osd_got_home && osd_fix_type > 1 )
+	en=1;
+
+ #else // pure copter
   //Check disarm to arm switching.
   if (lflags.motor_armed && !lflags.last_armed_status){
-    //If motors armed, reset home in Arducopter version
-    osd_got_home = 0;
+    lflags.osd_got_home = 0;	//If motors armed, reset home 
   }
 
   lflags.last_armed_status = lflags.motor_armed;
 
-  if(osd_got_home == 0 && osd_fix_type > 1 )
+  if(!lflags.osd_got_home && osd_fix_type > 1 )
     en=1;
- #endif
-#else
- #ifdef IS_PLANE
-  if(osd_throttle > 3 && takeoff_heading == -400)
-    takeoff_heading = osd_heading;
 
-  osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
+ #endif
+#else // not copter
+ #ifdef IS_PLANE
+
+
+    if(osd_throttle > 10 && takeoff_heading == -400)
+	takeoff_heading = osd_heading;
+
   
-  if(osd_got_home == 0 && osd_fix_type == 3 )
-    en=1;
+
+    if (lflags.motor_armed && !lflags.last_armed_status){ // plane can be armed too
+	//If motors armed, reset home in Arducopter version
+	lflags.osd_got_home = 0;
+	takeoff_heading = osd_heading;
+    }
+
+    lflags.last_armed_status = lflags.motor_armed;
+
+    if(!lflags.osd_got_home && osd_fix_type == 3 )
+	en=1;
   
  #endif
 #endif
@@ -133,8 +140,8 @@ void setHomeVars(OSD &osd)
         osd_home_lon = osd_lon;
 
         //osd_alt_cnt = 0;
-        osd_got_home = 1;
-    } else if(osd_got_home == 1){
+        lflags.osd_got_home = 1;
+    } else if(lflags.osd_got_home){
         float scaleLongDown = cos(abs(osd_home_lat) * 0.0174532925);
 
         //DST to Home
@@ -154,7 +161,7 @@ void setHomeVars(OSD &osd)
         bearing = bearing - 180 - osd_heading;//absolut return direction  //relative home direction
         if(bearing < 0) bearing += 360;//normalization
 
-        osd_home_direction = grad_to_sect(bearing);//array of arrows =)
+        osd_home_direction = grad_to_sect(bearing); 
   }
 }
 
@@ -162,26 +169,31 @@ void setHomeVars(OSD &osd)
 // накопление статистики и рекордов
 void setFdataVars()
 {
-  //Moved from panel because warnings also need this var and panClimb could be off
-  vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9; // комплиментарный фильтр 1/10
+    unsigned long time_lapse = millis() - runt;
+    runt = millis();
 
-  if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
+
+  //Moved from panel because warnings also need this var and panClimb could be off
+    vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9; // комплиментарный фильтр 1/10
+
+    if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
 	max_battery_reading = osd_battery_remaining_A;
 
-  unsigned long time_lapse = millis() - runt;
-  runt = millis();
 
+    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
 
-  if (lflags.takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
-    lflags.takeofftime = 1;
-    tdistance = 0;
-  }
+    if (lflags.takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
+	lflags.takeofftime = 1;
+	tdistance = 0;
+    }
 
+    float time_1000 = time_lapse / 1000.0;
 
-    if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
+    //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
+    if(lflags.osd_got_home) tdistance += (osd_groundspeed * time_1000);
 
-    mah_used += (osd_curr_A * 10.0 * time_lapse / 3600000.0);
-
+    //mah_used += (osd_curr_A * 10.0 * time_lapse / (3600.0 * 1000.0));
+    mah_used += ((float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 
     uint16_t rssi_v = rssi_in;
 //    byte ch = sets.RSSI_raw / 2;

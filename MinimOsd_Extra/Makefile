@@ -6,12 +6,18 @@
 #ALTERNATE_CORE_PATH = /home/sudar/Dropbox/code/arduino-sketches/hardware/attiny/
 
 BOARD_TAG    = atmega328
+VARIANT    = standard
+F_CPU = 16000000
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
 CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11
 CFLAGS_STD = -std=gnu11
 MCU=atmega328p
+
+ARDUINO_LIBS = SingleSerial
+ARDUINO_LIBS += GCS_MAVLink
+ARDUINO_LIBS += SoftwareSerial
 
 include /usr/share/arduino/Arduino.mk
 
