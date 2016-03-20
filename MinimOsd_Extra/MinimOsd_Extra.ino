@@ -127,6 +127,7 @@ void isr_VSYNC(){
 }
 
 // PWM Measurement
+#if defined(PWM_PIN)
 void ReadINT_PIN() {
 
   // We will start to read when signal goes HIGH
@@ -146,6 +147,7 @@ void ReadINT_PIN() {
     }
   }
 }
+#endif
 
 
 void delay_150(){
@@ -166,7 +168,10 @@ void setup()     {
     digitalWrite(LEDPIN, 1);  // turn on for full light
 #endif
 
-    pinMode(PWM_PIN,INPUT_PULLUP);
+#if defined(PWM_PIN)
+    pinMode(PWM_PIN, INPUT_PULLUP);
+    attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
+#endif
 
 //    pinMode(RssiPin, OUTPUT); // доп вывод - выход
 
@@ -180,7 +185,6 @@ void setup()     {
 //    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
     attachInterrupt(INT0, isr_VSYNC, FALLING);
 
-    attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 
     Serial.begin(TELEMETRY_SPEED);
     // setup mavlink port
@@ -282,14 +286,18 @@ void setup()     {
 // As simple as possible.
 void loop() 
 {
-    long pt=millis();
+    //long pt=millis();
+    unsigned long pt;
+    pt=millis();
+    //millis_plus(&pt, 0);
 
     wdt_reset();
 
 //LED_BLINK;
 
     if(pt > timer_20ms){
-        timer_20ms = pt + 20;
+        //timer_20ms = pt + 20;
+        millis_plus(&timer_20ms, 20);
         On20ms();
 
 	if(++count_100ms>5) {
@@ -313,7 +321,7 @@ void loop()
 
 #ifdef DEBUG    
 		if(seconds % 60 == 30)
-		Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
+		    Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
 #endif
 	    }
 	}
@@ -323,7 +331,7 @@ void loop()
 
     pan_toggle(); // проверить переключение экранов
 
-    if(lflags.got_data /* || (lastMAVBeat + 2500 < pt ) && lflags.mavlink_on */  ){ // были свежие данные - обработать, если данных не было давно - предупредить
+    if(lflags.got_data){ // были свежие данные - обработать, если данных не было давно - предупредить
         lflags.got_data=0;
         parseNewData();
 
@@ -380,13 +388,13 @@ void On100ms(){ // периодические события, не связан�
         voltageRawArray[(ind++)%8] = analogRead(VoltagePin);
         for (uint8_t i=0;i<8;i++)
             voltageRaw += voltageRawArray[i];
-        voltageRaw = float(voltageRaw) * sets.evBattA_koef /1023 / 8 * 1000 * 5.115/0.29; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+        voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
 	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4;
 	lflags.got_data=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
 	byte n=sets.battv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_A)/1000/n - 3.3) / (4.2 - 3.3) * 255;
+	int v = (float(osd_vbat_A)/1000/n - 3.3) * (255.0 / (4.2 - 3.3));
 	
 	if(v<0) osd_battery_remaining_A  = 0;
 	else if(v>255) osd_battery_remaining_A  = 255;
@@ -402,14 +410,14 @@ void On100ms(){ // периодические события, не связан�
         voltageBRawArray[(ind++)%8] = analogRead(VidvoltagePin);
         for (uint8_t i=0;i<8;i++)
             voltageRaw += voltageBRawArray[i];
-        voltageRaw = float(voltageRaw) * sets.evBattB_koef /1023 / 8 * 1000 * 5.11/0.292113; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+        voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
 	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw)/4;
     
 // 	вычислить osd_battery_remaining_B по напряжению!
 	byte n=sets.battBv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_B)/1000/n - 3.3) / (4.2 - 3.3) * 255;
+	int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
 
 	if(v<0) osd_battery_remaining_B  = 0;
 	else if(v>255) osd_battery_remaining_B  = 255;
@@ -426,7 +434,7 @@ void On100ms(){ // периодические события, не связан�
         currentRawArray[(ind++)%8] = analogRead(AmperagePin);
         for (uint8_t i=0;i<8;i++)
             currentRaw += currentRawArray[i];
-        osd_curr_A = float(currentRaw) * sets.eCurrent_koef /1023 / 80 * 1000 / 10 * 20; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+        osd_curr_A = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	lflags.got_data=1;
     }
 

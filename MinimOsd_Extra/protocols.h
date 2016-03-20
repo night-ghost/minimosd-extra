@@ -24,5 +24,3 @@ union {
 
 #include "GCS_MAVLink.h"
 
-
-

@@ -226,10 +226,15 @@ void OSD::clear() {  // clear the screen
 
 //------------------ set panel -----------------------------------------------
 
+void NOINLINE OSD::calc_pos(){
+  bufpos = row*30+col;
+
+}
+
 void OSD::setPanel(uint8_t st_col, uint8_t st_row){
   col = st_col & 0x7f; // col,row нужны для отработки перевода строки с сохранением колонки
   row = st_row & 0x7f; // в старших битах флаги, размер экрана все равно мелкий
-  bufpos = row*30+col;
+  calc_pos();
 }
 
 
@@ -240,7 +245,8 @@ size_t OSD::write(uint8_t c){
   
   if(c == '|'){
     row++;
-    bufpos = row*30+col;
+    //bufpos = row*30+col;
+    calc_pos();
   } else {
     osdbuf[bufpos++] = c;
   }

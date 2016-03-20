@@ -116,6 +116,8 @@ class OSD: public BetterStream
     static uint8_t col, row, video_mode, video_center;
     static uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
     static uint16_t bufpos;
+    
+    static void NOINLINE calc_pos();
 };
 
 #endif

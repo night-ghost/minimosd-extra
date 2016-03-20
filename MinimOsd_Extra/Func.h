@@ -168,27 +168,40 @@ void NOINLINE calc_max(float &dst, float &src){
 
 }
 
+/* +36 bytes :(
+void filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
+    dst = (val * k) + dst * (1.0 - k); 
+}
+*/
+
+void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
+    *dst = millis() + inc;
+}
+
+
 // вычисление нужных переменных
 // накопление статистики и рекордов
 void setFdataVars()
 {
-    unsigned long time_lapse = millis() - runt;
-    runt = millis();
-
+    unsigned long time_lapse = millis() - runtime;
+    //runtime = millis();
+    millis_plus(&runtime, 0);
 
   //Moved from panel because warnings also need this var and panClimb could be off
-    vs = (osd_climb * pgm_read_float(&measure->converth) * 60) * 0.1 + vs * 0.9; // комплиментарный фильтр 1/10
+    vertical_speed = (osd_climb * pgm_read_float(&measure->converth) ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
+//    filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60,  0.1); // комплиментарный фильтр 1/10
 
     if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
 	max_battery_reading = osd_battery_remaining_A;
 
-
+#ifdef IS_PLANE
     osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
 
-    if (lflags.takeofftime == 0 && osd_alt_to_home > 5 && osd_throttle > 10){
+    if (!lflags.takeofftime  && osd_alt_to_home > 5 && osd_throttle > 10){
 	lflags.takeofftime = 1;
 	tdistance = 0;
     }
+#endif
 
     float time_1000 = time_lapse / 1000.0;
 
@@ -219,6 +232,7 @@ void setFdataVars()
         if(rssi_v > h) rssi_v = h;
 
         rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
+        //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
         if(rssi > 100) rssi = 100;
         if(rev) rssi=100-rssi;
@@ -257,6 +271,7 @@ void setFdataVars()
 }
 
 
+
 void pan_toggle(){
     byte old_panel=panelN;
 
@@ -288,7 +303,8 @@ void pan_toggle(){
       if ((osd_mode != 6) && (osd_mode != 7)){
         if (osd_off_switch != osd_mode){ 
             osd_off_switch = osd_mode;
-            osd_switch_time = millis();
+            //osd_switch_time = millis();
+            millis_plus(&osd_switch_time, 0);
             if (osd_off_switch == osd_switch_last){
               lflags.rotatePanel = 1;
             }
@@ -335,7 +351,8 @@ void pan_toggle(){
 */
             if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
                 lflags.rotatePanel = 1;
-                osd_switch_time = millis() + 500;
+                //osd_switch_time = millis() + 500;
+                millis_plus(&osd_switch_time, 500);
             }
         } else { // выключено
 /*    	    if(lflags.mode_switch){ // кратковременное переключение
@@ -365,14 +382,16 @@ void pan_toggle(){
   
   
     //If there is a panel switch or a change in base panel then clear osd
-    if ((lflags.osd_clear == 1) || (currentAutoPanel != 0)){
+/*    if ((lflags.osd_clear == 1) || (currentAutoPanel != 0)){
 //      osd.clear();
       lflags.osd_clear = 0;
       currentAutoPanel = 0;
     }
+*/
 }
 
 
-float NOINLINE gps_norm(float f){
+float NOINLINE gps_norm(long f){
     return f / GPS_MUL;
 }
+

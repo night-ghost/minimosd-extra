@@ -260,6 +260,12 @@ void uavtalk_send_gcstelemetrystats(void) {
 }
 */
 
+void NOINLINE set_crc(uavtalk_message_t *msg, byte c){
+    msg->Crc = CRC_VAL(msg->Crc ^ c);
+}
+
+#define BYTE_OF(v,n) (((byte *)&(v))[n])
+
 uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 	static uint8_t status = UAVTALK_PARSE_STATE_WAIT_SYNC;
 	static uint8_t cnt = 0;
@@ -270,12 +276,14 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		if (c == UAVTALK_SYNC_VAL) {
 			status = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->Sync = c;
-			msg->Crc = CRC_VAL(0 ^ c);
+			msg->Crc = 0;
+			set_crc(msg,c); //	msg->Crc = CRC_VAL(0 ^ c);
+			
 			length = HEADER_LEN;
 		}
 		break;
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
 			status = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
 			msg->MsgType = c;
@@ -288,13 +296,16 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		if (cnt < 2) {
-			msg->Length = ((uint16_t) c);
+			//msg->Length = ((uint16_t) c);
+			BYTE_OF(msg->Length,0) = c;
 		}
 		else {
-			msg->Length += ((uint16_t) c) << 8;
+			//msg->Length += ((uint16_t) c) << 8;
+			BYTE_OF(msg->Length,1) = c;
+			
                         if ((msg->Length < length) || (msg->Length > 255 + length)) {
                                // Drop corrupted messages:
                                // Minimal length is length
@@ -307,21 +318,19 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
                         }
 		}
 		break;
+		
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
-			msg->ObjID = ((uint32_t) c);
-			break;
 		case 2:
-			msg->ObjID += ((uint32_t) c) << 8;
-			break;
 		case 3:
-			msg->ObjID += ((uint32_t) c) << 16;
+			BYTE_OF(msg->ObjID,cnt-1) = c;
 			break;
 		case 4:
-			msg->ObjID += ((uint32_t) c) << 24;
+			//msg->ObjID += ((uint32_t) c) << 24;
+			BYTE_OF(msg->ObjID,3) = c;
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 			if (msg->Length == length) { // no data exists
 				status = UAVTALK_PARSE_STATE_GOT_DATA;
@@ -337,14 +346,17 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
-			msg->InstID = ((uint32_t) c);
+			//msg->InstID = ((uint32_t) c);
+			BYTE_OF(msg->InstID,0) = c;
 			break;
 		case 2:
-			msg->InstID += ((uint32_t) c) << 8;
+			//msg->InstID += ((uint32_t) c) << 8;
+			BYTE_OF(msg->InstID,1) = c;
+			
 			if (msg->Length == length) { // no data exists
 				status = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
@@ -359,14 +371,17 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_INSTID:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		cnt++;
 		switch (cnt) {
 		case 1:
-			msg->timestamp = ((uint32_t) c);
+			//msg->timestamp = ((uint32_t) c);
+			BYTE_OF(msg->timestamp,0) = c;
 			break;
 		case 2:
-			msg->timestamp += ((uint32_t) c) << 8;
+			//msg->timestamp += ((uint32_t) c) << 8;
+			BYTE_OF(msg->timestamp,1) = c;
+			
 			status = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
 			cnt = 0;
 			break;
@@ -374,9 +389,10 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		
+		msg->Data[cnt] = c;
 		cnt++;
-		msg->Data[cnt - 1] = c;
 		if (cnt >= msg->Length - length) {
 			status = UAVTALK_PARSE_STATE_GOT_DATA;
 			cnt = 0;
@@ -427,7 +443,8 @@ void uavtalk_read(void) {
 		if (uavtalk_parse_char(c, &msg.u)) {
 			lflags.got_data=1;
 			lflags.uavtalk_active = 1; // будем слушать UAVtalk
-			lastMAVBeat = millis();
+			//lastMAVBeat = millis();
+			millis_plus(&lastMAVBeat, 0);
 
 			// consume msg
 			switch (msg.u.ObjID) {
@@ -537,8 +554,8 @@ void uavtalk_read(void) {
 			case GPSPOSITION_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_001:
-				osd_pos.lat			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
-				osd_pos.lon			= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
+				osd_pos.lat		= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
+				osd_pos.lon		= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_HEADING);
@@ -547,8 +564,8 @@ void uavtalk_read(void) {
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
-				osd_pos.lat			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
-				osd_pos.lon			= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
+				osd_pos.lat		= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
+				osd_pos.lon		= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
 				osd_satellites_visible	= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Heading));
@@ -591,7 +608,6 @@ void uavtalk_read(void) {
 
 			case BAROALTITUDE_OBJID_000:
 			case BAROSENSOR_OBJID_000:
-				//revo_baro_alt		= (int16_t) uavtalk_get_float(&msg.u, BAROALTITUDE_OBJ_ALTITUDE);
 				osd_alt_rel		= (int16_t) uavtalk_get_float(&msg.u, BAROALTITUDE_OBJ_ALTITUDE);
 				break;
 #if BAROSENSOR_OBJID_000 != BAROSENSOR_OBJID

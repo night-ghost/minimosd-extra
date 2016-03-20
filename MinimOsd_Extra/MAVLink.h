@@ -71,7 +71,9 @@ void read_mavlink(){
 
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
-            lastMAVBeat = millis();
+            //lastMAVBeat = millis();
+            millis_plus(&lastMAVBeat, 0);
+            
             lflags.mavlink_active = lflags.mavlink_on = lflags.got_data = 1;
 
             //handle msg
@@ -131,8 +133,8 @@ void read_mavlink(){
                 wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg.m);
                 wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg.m);
 #ifdef IS_PLANE
-                nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg.m);
-                nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg.m);
+                nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg.m); // for panTune only
+                nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg.m);// for panTune only
                 nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg.m);
                 alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg.m);
                 aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg.m);

@@ -1,9 +1,9 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
-#define USE_UAVTALK 1
+//#define USE_UAVTALK 1
 
-//#define DEBUG
+#define DEBUG
 
 // sets.model_type plane=0 copter=1
 
@@ -35,9 +35,7 @@
 // оно может читать PWM по прерываниям!
 #define PWM_PIN PD3 
 
-
-//#define WALKERA_TELEM RssiPin // telemetry output
-
+#define WALKERA_TELEM RssiPin // telemetry output
 
 //#define LEDPIN AmperagePin
 
