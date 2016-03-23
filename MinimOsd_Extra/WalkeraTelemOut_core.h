@@ -11,14 +11,12 @@ DevoMPacket WalkeraTelem::devoPacket = {DEVOM_SYNC_BYTE, 0};
 TimerSerial WalkeraTelem::DevoSerial(0, WALKERA_TELEM); // only tx and no RSSI in DEVO
 
 WalkeraTelem::WalkeraTelem(){
-//    devoPacket.header = DEVOM_SYNC_BYTE;
-
     DevoSerial.begin(38400);
 }
 
 
 
-long WalkeraTelem::gpsDdToDmsFormat(float ddm){
+long WalkeraTelem::gpsDdToDmsFormat(float &ddm){
     int deg = (int)ddm;
     float mm = (ddm - deg) * 60.0f;
 
@@ -47,6 +45,17 @@ void WalkeraTelem::sendTelemetry(){
 
 //    DevoSerial.print_P(PSTR("devo-m telem\n"));
 
+#if 1 // test
+
+	devoPacket.lat = 4567891;
+	devoPacket.lon = 5631284;
+
+	devoPacket.alt   = 4321;
+	devoPacket.speed = 765;
+	devoPacket.volt = osd_vbat_A;
+	devoPacket.temp = 1947;
+
+#else
 	devoPacket.lat = gpsDdToDmsFormat(osd_pos.lat);
 	devoPacket.lon = gpsDdToDmsFormat(osd_pos.lon);
 
@@ -54,18 +63,20 @@ void WalkeraTelem::sendTelemetry(){
 	devoPacket.speed = (int)(osd_groundspeed * (0.0194384f * 100.0f));  // * 100 for cm
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = temperature;
-
+#endif
 	devoPacket.crc8 = 0; // Init Checksum with zero Byte
 
-Serial.printf_P(PSTR("devo start "));
+
+
+//Serial.printf_P(PSTR("devo start "));
 
 	byte *b = (byte *)&devoPacket;
 	for (byte i = sizeof(devoPacket)-1; i !=0; i--) { // excluding CRC
-		DevoSerial.write(*b);
-Serial.printf_P(PSTR("%02x"),*b);
+		DevoSerial.write_S(*b);
+//Serial.printf_P(PSTR("%02x"),*b);
 		devoPacket.crc8 += *b++; // Add Checksum
 	}
-	DevoSerial.write(devoPacket.crc8); // Write Checksum to serial
-Serial.printf_P(PSTR(" crc=%02x\n"), devoPacket.crc8);
+	DevoSerial.write_S(devoPacket.crc8); // Write Checksum to serial
+//Serial.printf_P(PSTR(" crc=%02x\n"), devoPacket.crc8);
 }
 

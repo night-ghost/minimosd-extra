@@ -105,7 +105,8 @@ void writePanels(){
     }
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
-  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (tdistance > 50)){
+//  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (tdistance > 50)){
+  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (tdistance > 50)){
 
 #else
 #ifdef IS_PLANE
@@ -455,7 +456,7 @@ void panEff(point p){
                 if (iGlide > 0){
                     osd_printf_2(f4_0fc, glide, pgm_read_byte(&measure->high)); // аэродинамическое качество
                 }
-            }else if (osd_climb >= -0.05 && osd_pitch < 0) {
+            }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
                   osd.print_P(PSTR("\x20\x20\x90\x91")); //термик
             }else{
                 //we don't needs to clear!  osd.print_P(&strclear[7]);//      osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
@@ -503,7 +504,7 @@ void panRSSI(point p){
 // Staus  : done
 
 void panCALLSIGN(point p){
-    if((seconds % 60) < 2){
+    if((seconds % 64) < 2){
       osd.print( (char *)sets.OSD_CALL_SIGN);
     }else{
 // we don't needs to clear!    osd.print_P(&strclear[4]);
@@ -641,10 +642,13 @@ void check_warn()
     uint8_t wmask = 0;
     uint8_t bit, prev_warn;
 
-    int iAirspeed = osd_airspeed * pgm_read_float(&measure->converts);
 
- if (!lflags.one_sec_timer_switch) return;
+    if (!lflags.one_sec_timer_switch) return;
     lflags.one_sec_timer_switch=0;
+
+
+    int iAirspeed = osd_airspeed * pgm_read_float(&measure->converts);
+    int iVolt = osd_vbat_A/100.0; // in 0.1v as sets.battv is
 
 //1
  if ((osd_fix_type) < 2) 
@@ -658,8 +662,8 @@ void check_warn()
  if (sets.overspeed && iAirspeed > sets.overspeed) 
     wmask |= 4;
 
-//4
- if (sets.batt_warn_level != 0 && osd_vbat_A/1000.0 < (float)sets.battv/10.0 || (osd_battery_remaining_A < sets.batt_warn_level))
+//4    voltage limit set and less                   capacity limit set and less
+ if (sets.battv !=0 && (iVolt < sets.battv) || sets.batt_warn_level != 0 &&  (osd_battery_remaining_A < sets.batt_warn_level))
     wmask |= 8;
 
 //5
@@ -667,8 +671,10 @@ void check_warn()
  if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
     wmask |= 16;
 
+    int iVs = abs(vertical_speed) /10.0;
+
 //6
- if (sets.model_type==1 && sets.stall >0 && abs(vertical_speed) > sets.stall * 10 ) // copter - vertical speed
+ if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
     wmask |= 32;
     
  if(wmask == 0) 
@@ -869,9 +875,9 @@ void panHorizon(point p){
 // Staus  : done
 
 void panPitch(point p){
-//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
-    osd_printi_1(PSTR("%4i\x05\x07"),osd_pitch);
+    osd_printi_1(PSTR("%4i\x05\x07"),osd_att.pitch);
 }
 
 /* **************************************************************** */
@@ -882,7 +888,7 @@ void panPitch(point p){
 // Staus  : done
 
 void panRoll(point p){
-    osd_printi_1(PSTR("%4i\x05\x06"),osd_roll);
+    osd_printi_1(PSTR("%4i\x05\x06"),osd_att.roll);
 }
 
 /* **************************************************************** */
@@ -1367,11 +1373,14 @@ void showArrow(uint8_t rotate_arrow,uint8_t method){
 // used formula: y = m * x + n <=> y = tan(a) * x + n
 void showHorizon(byte start_col, byte start_row) {
     byte col, row;
-    int pitch_line, middle, hit, subval;
+    byte pitch_line;
+    int middle;
+    int8_t hit;
+    int subval;
     int roll;
     int line_set = LINE_SET_STRAIGHT__;
     int line_set_overflow = LINE_SET_STRAIGHT_O;
-    int subval_overflow = 9;
+    int8_t subval_overflow = 9;
 
 
 
@@ -1389,35 +1398,37 @@ void showHorizon(byte start_col, byte start_row) {
 
 
     // preset the line char attributes
-    roll = osd_roll;
+    roll = osd_att.roll;
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
 	roll = roll < 0 ? roll + 179 : roll;
-        if (abs(roll) > ANGLE_2) {
+	uint16_t a_roll=abs(roll);
+        if (a_roll > ANGLE_2) {
 	    line_set = LINE_SET_P___STAG_2;
 	    line_set_overflow = LINE_SET_P_O_STAG_2;
             subval_overflow = 7;
-	} else if (abs(roll) > ANGLE_1) {
+	} else if (a_roll > ANGLE_1) {
 	    line_set = LINE_SET_P___STAG_1;
 	    line_set_overflow = LINE_SET_P_O_STAG_1;
             subval_overflow = 8;
 	}
     } else {								// negative angle line chars
 	roll = roll > 90 ? roll - 179 : roll;
-        if (abs(roll) > ANGLE_2) {
+	uint16_t a_roll=abs(roll);
+        if (a_roll > ANGLE_2) {
 	    line_set = LINE_SET_N___STAG_2;
 	    line_set_overflow = LINE_SET_N_O_STAG_2;
             subval_overflow = 7;
-	} else if (abs(roll) > ANGLE_1) {
+	} else if (a_roll > ANGLE_1) {
 	    line_set = LINE_SET_N___STAG_1;
 	    line_set_overflow = LINE_SET_N_O_STAG_1;
             subval_overflow = 8;
 	}
     }
     
-    pitch_line = (int)round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;	// 90 total lines
+    pitch_line = (int)round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;	// 90 total lines
     for (col=1; col<=AH_COLS; col++) {
         middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
-        hit = (int)(tan(AH_ROLL_FACTOR * osd_roll) * middle) + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
+        hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
 	    subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
@@ -1444,10 +1455,10 @@ void showILS(byte start_col, byte start_row) {
     if(sets.model_type==0) { // plane
 
       //Vertical calculation
-        int currentAngleDisplacement = atan2(osd_alt_to_home, osd_home_distance) * 57.2957795 - 10;
+        int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
         //Calc current char position.
         //int numberOfPixels = CHAR_ROWS * AH_ROWS;
-        int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+        int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
         int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
         int8_t charPosition = linePosition / 9;
         uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
@@ -1762,6 +1773,8 @@ void panSetup(){
     int min, max;
     byte k;
 
+    float c_val;
+
     const Setup_screen *pscreen;
 
     pscreen = &screens[setup_screen];
@@ -1826,6 +1839,9 @@ void panSetup(){
 	    break;
 	}
 
+	if(i == setup_menu) c_val = v; 
+
+
 	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v);
     }
 
@@ -1865,18 +1881,21 @@ void panSetup(){
     type=pgm_read_byte((void *)&p->type);
     k=pgm_read_byte((void *)&p->k);
 
+
+    v=c_val;
+    
     switch (type){
 	case 'c':
     	    { 
-    	        int l=*((char *)pval);
-		v = l / (float)(k);
+//    	        int l=*((char *)pval);
+//		v = l / (float)(k);
 	    }
 	    goto as_byte;
 
         case 'b': // byte param
     	    { 
-    	        int l=*((byte *)pval);
-		v = l / (float)(k);
+//    	        int l=*((byte *)pval);
+//		v = l / (float)(k);
 	    }
 as_byte:
     	    size= 1;
@@ -1885,7 +1904,7 @@ as_byte:
 	    break;
 
         case 'f': // float param
-	    v=*((float *)pval);
+//	    v=*((float *)pval);
 	    size=4;
 	
 	    if(     diff>400) inc=1;
@@ -1897,7 +1916,7 @@ as_byte:
     }
 
 
-    float value_old = v;
+//    float value_old = v;
     bool press=false;
         
     
@@ -1912,7 +1931,7 @@ as_byte:
     } 
 
 
-    if(v != value_old) {
+    if(v != c_val) {
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
 
         switch (type){

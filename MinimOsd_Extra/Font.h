@@ -13,7 +13,7 @@ void uploadFont() {
     Serial.print_P(PSTR("RFF\n"));
 
     while(font_count < 256) { 
-        uint8_t incomingByte = Serial.read();
+        uint8_t incomingByte = Serial.read_S();
         switch(incomingByte){ // parse and decode mcm file
         case 0x0d: // carridge return, end of line
             //Serial.println("cr");

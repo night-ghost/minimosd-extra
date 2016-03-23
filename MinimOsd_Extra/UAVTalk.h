@@ -337,6 +337,10 @@ typedef struct __uavtalk_message {
 	uint16_t timestamp;
 	uint8_t Data[255];
 	uint8_t Crc;
+	// additional bytes for internal use
+	uint8_t state;
+	uint8_t cnt;
+	uint16_t f_length;
 } uavtalk_message_t;
 
 

@@ -147,9 +147,11 @@ static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 static int          dst_x,dst_y; // расстояние по осям - для радара
 
-int16_t             osd_roll = 0;                   // roll from DCM
-int16_t             osd_pitch = 0;                  // pitch from DCM
-int16_t             osd_yaw = 0;                    // yaw from DCM
+struct Att {
+    int16_t             pitch;                  // pitch from DCM
+    int16_t             roll;                   // roll from DCM
+    int16_t             yaw;                    // yaw from DCM
+} osd_att = {0,0,0};
 
 static int /* float*/  osd_heading = 0;                // ground course heading from GPS
 

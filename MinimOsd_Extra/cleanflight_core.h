@@ -19,7 +19,7 @@ static inline uint16_t mwii_read_uint(byte pos) {
 	return t;
 }
 
-static inline uint32_t mwii_read_ulong(byte pos) {
+static inline  uint32_t mwii_read_ulong(byte pos) {
 	uint32_t t;
 	
 	memcpy(&t, &msg.mwii.buf[msg.mwii.read_idx] + pos, sizeof(uint32_t));
@@ -125,11 +125,14 @@ void fontSerialRequest() {
 	serialize16(cindex);
 	tailSerialReply();	
 }
-*/
+
 
 uint8_t safeMode() {
 	return 1;	// XXX
 }
+*/
+
+
 
 // Font upload queue implementation.
 // Implement a window for curr + the previous 6 requests.
@@ -510,8 +513,8 @@ static inline void mwii_parse_data() {
 	  for(uint8_t i=0; i<EEPROM_SETTINGS; i++) serialize8(Settings[i]);
 	  tailSerialReply();
     }
-*/
-/*    if (cmd == OSD_WRITE_CMD) {
+
+    if (cmd == OSD_WRITE_CMD) {
       for(uint16_t en=0;en<EEPROM_SETTINGS; en++){
 	uint8_t inSetting = mwii_read_byte();
 	if (inSetting != Settings[en])
@@ -542,17 +545,9 @@ static inline void mwii_parse_data() {
     }
 
 */
-/*    if(cmd == OSD_RESET) {
-		//resetFunc(); // not a good practice to do jmp 0 ...
-    }
-    if(cmd == OSD_SERIAL_SPEED) {
-    
-    }
-  */                  
         break;
 
     case MSP_IDENT:
-//        MW_STATUS.version= mwii_read_byte();                             // MultiWii Firmware version
         apm_mav_system = mwii_get_byte();                                  // MultiWii Firmware version
         msg.mwii.modeMSPRequests &=~ REQ_MSP_IDENT;
 	break;
@@ -638,12 +633,12 @@ typedef struct {
 */
 //	r_struct((uint8_t*)&MW_ATT,6);
 	osd_heading = mwii_read_uint(offsetof(MW_ATTITUDE_t, Heading) );
-	//roll = MW_ATT.Angle[0], pitch = MW_ATT.Angle[1]
-	osd_pitch = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) );
-	osd_roll  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) );
-	osd_yaw   = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[2]) );
+//	osd_pitch = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) );
+//	osd_roll  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) );
+//	osd_yaw   = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[2]) );
+	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att));
 	break;
-  
+
 
     case MSP_ALTITUDE:
 /*
@@ -783,8 +778,8 @@ void mwii_read() {
 	
 	msg.mwii.state = IDLE;
 
-	while(Serial.available()) {
-		c = Serial.read();
+	while(Serial.available_S()) {
+		c = Serial.read_S();
 		extern void try_upload_font(byte c);
 
 		if (!lflags.mwii_active) try_upload_font(c);
@@ -833,7 +828,7 @@ void mwii_read() {
 			break;
 		}
 
-		if(!Serial.available())
+		if(!Serial.available_S())
 		    delayMicroseconds((1000000/TELEMETRY_SPEED*10));  // wait at least 1 byte
 	}
 }

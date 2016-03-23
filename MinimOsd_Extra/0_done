@@ -1,6 +1,0 @@
-support for new APM_Plane modes
-new parameters in Setup screen
-much more space optimizations
-preliminary support for AutoQuad MAVlink dialect
-preliminary support for CleanFlight/MWII protocol
-Walkera telemetry OUTPUT support

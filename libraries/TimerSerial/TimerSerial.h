@@ -36,9 +36,10 @@ public:
   // public methods
   TimerSerial(uint8_t receivePin, uint8_t transmitPin);
 
-  void begin(long speed);
+  static void begin(long speed);
 
-  uint8_t peek();
+  uint8_t peek(); //virtual
+  static size_t write_S(uint8_t byte);
 
   virtual size_t write(uint8_t byte);
   virtual uint8_t read();

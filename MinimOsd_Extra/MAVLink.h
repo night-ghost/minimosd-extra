@@ -63,8 +63,8 @@ void read_mavlink(){
 #endif
 
     //grabing data 
-    while(Serial.available()) {
-        uint8_t c = Serial.read();
+    while(Serial.available_S()) {
+        uint8_t c = Serial.read_S();
 //LED_BLINK;
 
 #ifdef DEBUG
@@ -125,10 +125,10 @@ void read_mavlink(){
                 break;
 
             case MAVLINK_MSG_ID_ATTITUDE:
-                osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
-                osd_roll  = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
-                osd_yaw   = ToDeg(mavlink_msg_attitude_get_yaw(&msg.m));
-//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+                osd_att.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
+                osd_att.roll  = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
+                osd_att.yaw   = ToDeg(mavlink_msg_attitude_get_yaw(&msg.m));
+//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 //LED_BLINK;
                 break;
 
@@ -199,7 +199,7 @@ packet.press_diff = press_diff;
                 break;
             }
         }
-        if(!Serial.available())
+        if(!Serial.available_S())
             delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
         //next one
     }

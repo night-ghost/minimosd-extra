@@ -48,14 +48,14 @@
 
 #pragma pack(push, 1)
 typedef struct {
-	uint8_t	header;					///< 0xAA for a valid packet
+	uint8_t	header;   //< 0xAA for a valid packet
 	int32_t lon;
 	int32_t lat;
 	int32_t alt;
 	int16_t speed;
 	int16_t temp;
 	int16_t volt;
-	uint8_t crc8;	///< CRC8
+	uint8_t crc8; ///< "CRC" - simple SUM
 } DevoMPacket;
 #pragma pack(pop)
 
@@ -65,7 +65,7 @@ class WalkeraTelem
 public:
 	WalkeraTelem();
 	static void sendTelemetry();
-	static long gpsDdToDmsFormat(float ddm);
+	static long gpsDdToDmsFormat(float &ddm);
 private:
 	static DevoMPacket devoPacket;
 	static TimerSerial DevoSerial;

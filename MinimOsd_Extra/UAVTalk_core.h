@@ -260,149 +260,149 @@ void uavtalk_send_gcstelemetrystats(void) {
 }
 */
 
-void NOINLINE set_crc(uavtalk_message_t *msg, byte c){
-    msg->Crc = CRC_VAL(msg->Crc ^ c);
+void NOINLINE set_crc(byte c){
+    msg.u.Crc = CRC_VAL(msg.u.Crc ^ c);
 }
 
 
-uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
-	static uint8_t status = UAVTALK_PARSE_STATE_WAIT_SYNC;
-	static uint8_t cnt = 0;
-	uint16_t length;
+static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 
-	switch (status) {
+	msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+	msg.u.cnt = 0;
+
+	switch (msg.u.state) {
 	case UAVTALK_PARSE_STATE_WAIT_SYNC:
 		if (c == UAVTALK_SYNC_VAL) {
-			status = UAVTALK_PARSE_STATE_GOT_SYNC;
+			msg.u.state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->Sync = c;
-			msg->Crc = 0;
-			set_crc(msg,c); //	msg->Crc = CRC_VAL(0 ^ c);
+			umsg->Crc = 0;
+			set_crc(c); //	msg->Crc = CRC_VAL(0 ^ c);
 			
-			length = HEADER_LEN;
+			msg.u.f_length = HEADER_LEN;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
-			status = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
-			msg->MsgType = c;
-			if(c & 0x80) length +=2; // timestamp too
-			cnt = 0;
+			msg.u.state = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
+			umsg->MsgType = c;
+			if(c & 0x80) msg.u.f_length +=2; // timestamp too
+			msg.u.cnt = 0;
 		} else {
-			status = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		cnt++;
-		if (cnt < 2) {
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		msg.u.cnt++;
+		if (msg.u.cnt < 2) {
 			//msg->Length = ((uint16_t) c);
-			BYTE_OF(msg->Length,0) = c;
+			BYTE_OF(umsg->Length,0) = c;
 		} else {
 			//msg->Length += ((uint16_t) c) << 8;
-			BYTE_OF(msg->Length,1) = c;
+			BYTE_OF(umsg->Length,1) = c;
 			
-                        if ((msg->Length < length) || (msg->Length > 255 + length)) {
+                        if ((umsg->Length < msg.u.f_length) || (umsg->Length > 255 + msg.u.f_length)) {
                                // Drop corrupted messages:
-                               // Minimal length is length
-                               // Maximum is length + 255 (Data) + 2 (Optional Instance Id)
+                               // Minimal length is msg.u.f_length
+                               // Maximum is msg.u.f_length + 255 (Data) + 2 (Optional Instance Id)
                                // As we are not parsing Instance Id, 255 is a hard maximum. 
-			       status = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			       msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
                         } else {
-			       status = UAVTALK_PARSE_STATE_GOT_LENGTH;
-			       cnt = 0;
+			       msg.u.state = UAVTALK_PARSE_STATE_GOT_LENGTH;
+			       msg.u.cnt = 0;
                         }
 		}
 		break;
 		
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		cnt++;
-		switch (cnt) {
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		msg.u.cnt++;
+		switch (msg.u.cnt) {
 		case 1:
 		case 2:
 		case 3:
-			BYTE_OF(msg->ObjID,cnt-1) = c;
+			BYTE_OF(umsg->ObjID,msg.u.cnt-1) = c;
 			break;
 		case 4:
 			//msg->ObjID += ((uint32_t) c) << 24;
-			BYTE_OF(msg->ObjID,3) = c;
+			BYTE_OF(umsg->ObjID,3) = c;
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
-			if (msg->Length == length) { // no data exists
-				status = UAVTALK_PARSE_STATE_GOT_DATA;
+			if (umsg->Length == msg.u.f_length) { // no data exists
+				msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
-				status = UAVTALK_PARSE_STATE_GOT_INSTID;
+				msg.u.state = UAVTALK_PARSE_STATE_GOT_INSTID;
                         }
 #else
-			status = UAVTALK_PARSE_STATE_GOT_OBJID;
+			msg.u.state = UAVTALK_PARSE_STATE_GOT_OBJID;
 #endif
-			cnt = 0;
+			msg.u.cnt = 0;
 			break;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		cnt++;
-		switch (cnt) {
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		msg.u.cnt++;
+		switch (msg.u.cnt) {
 		case 1:
 			//msg->InstID = ((uint32_t) c);
-			BYTE_OF(msg->InstID,0) = c;
+			BYTE_OF(umsg->InstID,0) = c;
 			break;
 		case 2:
 			//msg->InstID += ((uint32_t) c) << 8;
-			BYTE_OF(msg->InstID,1) = c;
+			BYTE_OF(umsg->InstID,1) = c;
 			
-			if (msg->Length == length) { // no data exists
-				status = UAVTALK_PARSE_STATE_GOT_DATA;
+			if (umsg->Length == msg.u.f_length) { // no data exists
+				msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
-			    if(msg->MsgType & 0x80)
-				status = UAVTALK_PARSE_STATE_GOT_INSTID; // will be timestamp
+			    if(umsg->MsgType & 0x80)
+				msg.u.state = UAVTALK_PARSE_STATE_GOT_INSTID; // will be timestamp
 			    else
-				status = UAVTALK_PARSE_STATE_GOT_TIMESTAMP; // no timestamp
+				msg.u.state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP; // no timestamp
 			}
-			cnt = 0;
+			msg.u.cnt = 0;
 			break;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_INSTID:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		cnt++;
-		switch (cnt) {
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		msg.u.cnt++;
+		switch (msg.u.cnt) {
 		case 1:
 			//msg->timestamp = ((uint32_t) c);
-			BYTE_OF(msg->timestamp,0) = c;
+			BYTE_OF(umsg->timestamp,0) = c;
 			break;
 		case 2:
 			//msg->timestamp += ((uint32_t) c) << 8;
-			BYTE_OF(msg->timestamp,1) = c;
+			BYTE_OF(umsg->timestamp,1) = c;
 			
-			status = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
-			cnt = 0;
+			msg.u.state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
+			msg.u.cnt = 0;
 			break;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
-		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
+		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		
-		msg->Data[cnt] = c;
-		cnt++;
-		if (cnt >= msg->Length - length) {
-			status = UAVTALK_PARSE_STATE_GOT_DATA;
-			cnt = 0;
+		umsg->Data[msg.u.cnt] = c;
+		msg.u.cnt++;
+		if (msg.u.cnt >= umsg->Length - msg.u.f_length) {
+			msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
+			msg.u.cnt = 0;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_DATA:
-		//status = UAVTALK_PARSE_STATE_GOT_CRC;
-		status = UAVTALK_PARSE_STATE_WAIT_SYNC;
+		//msg.u.state = UAVTALK_PARSE_STATE_GOT_CRC;
+		msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		//msg->Crc = c;
-		if (c == msg->Crc) {
-		    return msg->Length;
+		if (c == umsg->Crc) {
+		    return umsg->Length;
 		} else {
 #ifdef DEBUG
 		    // Update global packet drops counter
@@ -421,8 +421,8 @@ void uavtalk_read(void) {
     extern void try_upload_font(byte c);
 
 	// grabbing data
-	while (Serial.available()) {
-		uint8_t c = Serial.read();
+	while (Serial.available_S()) {
+		uint8_t c = Serial.read_S();
 		
 		// needed for MinimOSD upload, while no UAVTalk is established
 		if (!lflags.uavtalk_active) try_upload_font(c);
@@ -462,24 +462,24 @@ void uavtalk_read(void) {
 			case ATTITUDEACTUAL_OBJID_000:
 			case ATTITUDESTATE_OBJID_000:
 
-        			osd_roll		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_ROLL);
-        			osd_pitch		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_PITCH);
-        			osd_yaw			= uavtalk_get_float(ATTITUDEACTUAL_OBJ_YAW);
+        			osd_att.roll		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_ROLL);
+        			osd_att.pitch		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_PITCH);
+        			osd_att.yaw		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_YAW);
 //Serial.printf_P(PSTR("uav pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_pos.lat == 0) {
-                                    osd_heading = osd_yaw;
+                                    osd_heading = osd_att.yaw;
                                 }
 				break;
 #if ATTITUDESTATE_OBJID_000 != ATTITUDESTATE_OBJID
 			case ATTITUDESTATE_OBJID:
-        			osd_roll		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Roll));
-        			osd_pitch		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Pitch));
-        			osd_yaw			= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Yaw));
-//Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+        			osd_att.roll		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Roll));
+        			osd_att.pitch		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Pitch));
+        			osd_att.yaw		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Yaw));
+//Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_pos.lat == 0) {
-                                    osd_heading = osd_yaw;
+                                    osd_heading = osd_att.yaw;
                                 }
 				break;
 #endif
@@ -659,14 +659,8 @@ void uavtalk_read(void) {
 			
 		}
 
-		if(!Serial.available())
+		if(!Serial.available_S())
 		    delayMicroseconds((1000000/TELEMETRY_SPEED*10));  // wait at least 1 byte
 	}
 }
-
-
-//int uavtalk_state(void){
-//	return gcstelemetrystatus;
-//}
-
 

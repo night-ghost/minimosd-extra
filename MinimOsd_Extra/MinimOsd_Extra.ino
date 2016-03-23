@@ -122,8 +122,10 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
     } else {
 
         // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-        if(int_Timer /* && !New_PWM_Frame */){
-          PWM_IN = (int)(time - int_Timer);
+        uint32_t t= int_Timer; 
+        if( t /* && !New_PWM_Frame */){
+    	    time -= t;
+          PWM_IN = (int)(time);
           int_Timer = 0;
 
           New_PWM_Frame = true;
@@ -365,7 +367,7 @@ float avgRSSI(uint16_t d){
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
-//Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
     if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = -1;
@@ -460,7 +462,7 @@ case_4:
 
 // timers
 
-//Serial.printf_P(PSTR("on100ms e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("on100ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 
 }
@@ -469,7 +471,7 @@ case_4:
 void On20ms(){ // 50Hz
 
     if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
-//Serial.printf_P(PSTR("on20ms pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("on20ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 	int pwm=chan_raw[sets.pwm_src-1 + 5];
 	
@@ -489,7 +491,7 @@ void On20ms(){ // 50Hz
 
     }
 
-//Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 }
 
 
@@ -497,7 +499,7 @@ void On20ms(){ // 50Hz
 /* ******** functions used in main loop() ******** */
 void parseNewData(){
 
-//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
     setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
@@ -507,7 +509,7 @@ void parseNewData(){
 
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
 
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 }
 
