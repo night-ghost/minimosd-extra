@@ -17,7 +17,7 @@ MCU=atmega328p
 
 ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += GCS_MAVLink
-ARDUINO_LIBS += SoftwareSerial
+ARDUINO_LIBS += TimerSerial
 
 include /usr/share/arduino/Arduino.mk
 

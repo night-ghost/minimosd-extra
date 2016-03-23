@@ -21,8 +21,8 @@ static float        vertical_speed = 0; // calculated from osd_climb byy LPF 1/1
 
 static float        tdistance = 0; // track distance
 
-//static const char strclear[] PROGMEM ="\x20\x20\x20\x20\x20\x20\x20\x20";
-static const char strclear[] PROGMEM = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
+
+//static const char strclear[] PROGMEM = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
 
 
 static int          nav_roll = 0;  // Current desired roll in degrees, for panTune only
@@ -34,7 +34,7 @@ static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
 static uint8_t      wp_number = 0; // Current waypoint number
 
 #ifdef IS_PLANE
-static float	    alt_error = 0; // Current altitude error in meters
+static float        alt_error = 0; // Current altitude error in meters *10
 static float        aspd_error = 0; // Current airspeed error in meters/second
 static long         osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
@@ -47,26 +47,7 @@ static int /*float*/ xtrack_error = 0; // Current crosstrack error on x-y plane 
 
 static uint16_t     eph = 0;
 
-//static uint8_t      currentAutoPanel=255; //0 - Normal OSD; 1 - Flight summary; 2 - No mavlink data (pre-set = 255 to force osd.clear() after boot screen
-//static uint8_t      check_warning = 1;
-
 static uint16_t     chan_raw[8]; // значение каналов управления
-
-
-/* [ все переменные, связанные с метрикой, сделать PROGMEM и переключать указатель !
-static float        converts = 0; 
-static float        converth = 0;
-static uint16_t     distconv = 0;
-
-static uint8_t      spe = 0;
-static uint8_t      high = 0;
-static int16_t      temps = 0;
-
-static uint8_t      tempconv = 1;
-static uint16_t     tempconvAdd = 0;
-static byte         distchar = 0;
-static byte         climbchar = 0;
-*///]
 
 struct Measure {
     float        converts;
@@ -155,20 +136,20 @@ struct Coords {
 };
 
 static float        osd_climb = 0;
-Coords osd_pos = {0,0};			// current coordinates
+Coords              osd_pos = {0,0};			// current coordinates
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground
 static uint16_t     off_course;
-Coords osd_home = {0,0};	// home coordinates
+Coords              osd_home = {0,0};	// home coordinates
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
-static int dst_x,dst_y; // расстояние по осям - для радара
+static int          dst_x,dst_y; // расстояние по осям - для радара
 
-int16_t                osd_roll = 0;                   // roll from DCM
-int16_t                osd_pitch = 0;                  // pitch from DCM
-int16_t                osd_yaw = 0;                    // yaw from DCM
+int16_t             osd_roll = 0;                   // roll from DCM
+int16_t             osd_pitch = 0;                  // pitch from DCM
+int16_t             osd_yaw = 0;                    // yaw from DCM
 
 static int /* float*/  osd_heading = 0;                // ground course heading from GPS
 
@@ -188,6 +169,7 @@ static uint32_t     lastMAVBeat = 0;
 
 static uint8_t      apm_mav_system; 
 static uint8_t      apm_mav_component;
+static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
 
 #define MAX_PANELS 4
 static uint8_t panelN = 0; 
@@ -208,7 +190,7 @@ struct loc_flags {
     bool mavlink_on:1;		// флаг активности (сбрасывается по таймауту)
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
-    bool osd_clear:1;
+//    bool osd_clear:1;
     bool one_sec_timer_switch:1;
 
 //MAVLink session control
@@ -216,12 +198,14 @@ struct loc_flags {
 
     bool motor_armed:1;
     bool last_armed_status:1;
-    bool ma:1;
+    bool throttle_on:1;
     bool takeofftime:1;
 
     bool blinker:1;
 
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
+    bool mwii_active:1;    // got valid MWII packet - flag forever
+    
     bool mode_switch:1;
     bool sw_state:1;
     bool osd_got_home:1; // tels if got home position or not
@@ -235,4 +219,19 @@ uint16_t max_dly=0;
 #endif
 
 
+struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+
+// all bools in lflags exclude volatile
+volatile byte vsync_wait = 0;
+
+#ifdef PWM_PIN
+volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+volatile uint16_t      PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile unsigned long int_Timer = 0;         // set in the INT1
+#endif
+
+byte PWM_out_pin=0;
+
+
 #define GPS_MUL 10000000.0f
+

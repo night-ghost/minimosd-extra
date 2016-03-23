@@ -8,7 +8,8 @@
 #ifndef walkeratelemout_h
 #define walkeratelemout_h
 
-#include "SoftwareSerial.h"
+#include "TimerSerial.h"
+//#include "gSoftSerial.h"
 
 /*
  * DEVO-M Dataframe
@@ -48,14 +49,13 @@
 #pragma pack(push, 1)
 typedef struct {
 	uint8_t	header;					///< 0xAA for a valid packet
-//	    uint8_t	data[DEVOM_DATA_LENGTH];		///< ChannelData
 	int32_t lon;
 	int32_t lat;
 	int32_t alt;
 	int16_t speed;
 	int16_t temp;
 	int16_t volt;
-	uint8_t	crc8;	///< CRC8
+	uint8_t crc8;	///< CRC8
 } DevoMPacket;
 #pragma pack(pop)
 
@@ -68,7 +68,7 @@ public:
 	static long gpsDdToDmsFormat(float ddm);
 private:
 	static DevoMPacket devoPacket;
-	static SoftwareSerial DevoSerial;
+	static TimerSerial DevoSerial;
 };
 
 #include "WalkeraTelemOut_core.h"

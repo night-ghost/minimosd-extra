@@ -1,7 +1,8 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 
-//#define USE_UAVTALK 1
+#define USE_UAVTALK 1
+#define USE_MWII 1
 
 #define DEBUG
 
@@ -13,8 +14,8 @@
 
 
 #define VERSION "2.4"
-#define RELEASE_NUM 815
-#define RELEASE "r815DV"
+#define RELEASE_NUM 816
+#define RELEASE "r816DV"
 
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port

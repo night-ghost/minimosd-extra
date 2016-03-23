@@ -6,8 +6,13 @@
 #include "UAVTalk.h"
 #endif
 
+#if defined(USE_MWII)
+#include "cleanflight.h"
+#endif
+
 #define MAVLINK_EXTERNAL_RX_BUFFER 1
 #define m_mavlink_message 1
+
 
 
 union {
@@ -15,8 +20,10 @@ union {
 #if defined(USE_UAVTALK)
     uavtalk_message_t u;
 #endif
+#if defined(USE_MWII)
+    MWII_buffer mwii;
+#endif
 } msg;
-
 
 
 //mavlink_message_t *m_mavlink_buffer = &msg.mv.m;

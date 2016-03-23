@@ -3,12 +3,12 @@
 /* *********************** GENERAL FUNCTIONS ********************** */
 
 
-boolean inline is_on(point p){
+static boolean inline is_on(point p){
     //return p.x>=0 && p.y >=0 && p.y < 0x80;
     return p.y < 0x80;
 }
 
-boolean inline has_sign(point p){
+static boolean inline has_sign(point p){
     return !(p.x & 0x80);
 }
 
@@ -26,51 +26,10 @@ void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
 }
 
 void readSettings() {
-
-// считаем все кучно
-/*    uint8_t *p, *ee;
-    uint16_t i;
-
-    for(i=0, p=(byte *)&flags, ee=(byte *)(EEPROM_offs(flags)); i<sizeof(Flags); i++)
-	*p++ = (byte)eeprom_read_byte( ee++ );
-
-
-    for(i=0, p=(byte *)&sets,  ee=(byte *)(EEPROM_offs(sets));  i<sizeof(Settings); i++) // 512 размер остатка EEPROM так что байта для адреса мало
-	*p++ = (byte)eeprom_read_byte( ee++ );
-*/
-
     eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
     eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
-
 // сразу настроим системы измерения
-
-/* 
-    if (!flags.measure) { // метрическая система
-        converts = 3.6; 
-        converth = 1.0;
-        spe = 0x10;
-        high = 0x0c;
-        temps = 0xba;
-        tempconv = 10;
-        tempconvAdd = 0;
-        distchar = 0x1b;
-        distconv = 1000;
-        climbchar = 0x1a;
-    } else {
-        converts = 2.23;
-        converth = 3.28;
-        spe = 0x19;
-        high = 0x66;
-        temps = 0xbb;
-        tempconv = 18;
-        tempconvAdd = 3200;
-        distchar = 0x1c;
-        distconv = 5280;
-        climbchar = 0x1e;
-    }
-//*/
-
     if (flags.measure) 
 	measure = &imper;
     else
@@ -86,12 +45,9 @@ void readPanelSettings() {
     
     if(panelN==currentPanel) return;
     if(panelN>=MAX_PANELS) return; // не читаем мусор при переключении на служебные панели с верхними номерами
+
     currentPanel=panelN;
 
-
-/*    for(byte i=0; i<sizeof(Panel); i++) // читаем в пределах одного экрана - 128 байт, так что байтного цикла достаточно
-	((byte *)&panel)[i] = eeprom_read_byte( (byte *) (OffsetBITpanel * (int)panelN + i) );
-*/
     eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
 
 }
@@ -125,7 +81,6 @@ void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
 /* not use defaults - use config tool!
 
 void InitializeOSD() {
-
 
 }
 
@@ -161,11 +116,11 @@ void hex_dump(byte *p, int len) {
  int j;
  
  for(j=0;j<len; j+=8){
-    osd.write('|');
+    OSD::writeb('|');
     print_hex(j,8);
-    osd.write(' ');
+    OSD::writeb(' ');
     for(i=0; i<8; i++){
-	osd.write(' ');
+	OSD::writeb(' ');
 	print_hex(p[i+j],8);
     }
  }

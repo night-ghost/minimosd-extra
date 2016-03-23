@@ -28,10 +28,10 @@ namespace OSD
     {
 
 //*****************************************/		
-public const string VERSION ="r815 DV";
+public const string VERSION ="r816 DV";
 			
 	
-         //max 7456 datasheet pg 10
+        //max 7456 datasheet pg 10
         //pal  = 16r 30 char
         //ntsc = 13r 30 char
 public const int CHAR_W=12;
@@ -119,6 +119,8 @@ public const int npanel = 4; // количество панелей
 		bool RSSI_used=false; //  использование дополнительных ног
 		bool curr_used=false;
 		bool batt1_used=false;
+
+        string CurrentCOM;
 
         public OSD() {
 			
@@ -3504,6 +3506,7 @@ public const int npanel = 4; // количество панелей
             btnTLog.Text = tlog_run ? "Stop" : "Start";
 			
 			if(tlog_run){
+                CurrentCOM = CMB_ComPort.Text;
 				tlog_thread = new System.Threading.Thread(thread_proc);
 				tlog_thread.Start();
 			} else {
@@ -3527,7 +3530,7 @@ public const int npanel = 4; // количество панелей
                 try
                 {
 
-                    comPort.PortName = CMB_ComPort.Text;
+                    comPort.PortName = CurrentCOM;
                     comPort.BaudRate = 57600;
 
                     comPort.Open();

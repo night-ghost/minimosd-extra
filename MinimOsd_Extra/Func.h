@@ -1,7 +1,7 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
-inline boolean getBit(byte Reg, byte whichBit) {
+static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
@@ -9,14 +9,21 @@ inline boolean getBit(byte Reg, byte whichBit) {
 // чтение пакетов нужного протокола
 void getData(){
 //LED_BLINK;
-#if defined(USE_UAVTALK)
-    extern void uavtalk_read(void);
+#if defined(USE_UAVTALK) || defined(USE_MWII)
 
 //  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
-    if(lflags.mavlink_active || !lflags.uavtalk_active && lflags.blinker){
+    if(lflags.mavlink_active || !(lflags.uavtalk_active || lflags.mwii_active ) && (seconds % 3 == 0 )){
         read_mavlink();
-    } else {
+    } else if(lflags.uavtalk_active || !lflags.mwii_active && (seconds % 3 == 1 )){
+#if defined(USE_UAVTALK)
+	extern void uavtalk_read(void);
 	uavtalk_read();
+#endif
+    } else {
+#if defined(USE_MWII)
+	extern void mwii_read(void);
+	mwii_read();
+#endif
     }
 #else
     read_mavlink();
@@ -68,11 +75,22 @@ int grad_to_sect(int grad){
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
 }
 
+int grad_to_sect_p(int grad){
+    //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
+
+    while(grad < 0) grad +=360;
+    
+    return grad_to_sect(grad);
+}
+
+
+
+
 /*int grad_to_sect(float grad){
     return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 }*/
 
-void setHomeVars(OSD &osd)
+void setHomeVars()
 {
     float dstlon, dstlat;
     int bearing;
@@ -97,8 +115,7 @@ void setHomeVars(OSD &osd)
 
     lflags.last_armed_status = lflags.motor_armed;
 
-    if(!lflags.osd_got_home && osd_fix_type > 1 )
-	en=1;
+    // if(!lflags.osd_got_home && osd_fix_type > 1 ) en=1;
 
  #else // pure copter
   //Check disarm to arm switching.
@@ -108,13 +125,11 @@ void setHomeVars(OSD &osd)
 
   lflags.last_armed_status = lflags.motor_armed;
 
-  if(!lflags.osd_got_home && osd_fix_type > 1 )
-    en=1;
+  if(!lflags.osd_got_home && osd_fix_type > 1 ) en=1;
 
  #endif
 #else // not copter
  #ifdef IS_PLANE
-
 
     if(osd_throttle > 10 && takeoff_heading == -400)
 	takeoff_heading = osd_heading;
@@ -150,9 +165,6 @@ void setHomeVars(OSD &osd)
 	dst_y=(int)fabs(dstlon);
 
         //DIR to Home
-//        dstlon = (osd_home.lon - osd_pos.lon); //OffSet_X
-//        dstlat = (osd_home.lat - osd_pos.lat) / scaleLongDown; //OffSet Y
-        
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolute home direction
         
         if(bearing < 0) bearing += 360;//normalization
@@ -206,7 +218,7 @@ void setFdataVars()
     float time_1000 = time_lapse / 1000.0;
 
     //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home) tdistance += (osd_groundspeed * time_1000);
+    if(lflags.osd_got_home && lflags.motor_armed) tdistance += (osd_groundspeed * time_1000);
 
     //mah_used += (osd_curr_A * 10.0 * time_lapse / (3600.0 * 1000.0));
     mah_used += ((float)osd_curr_A * time_1000 / (3600.0 / 10.0));
@@ -256,13 +268,14 @@ void setFdataVars()
 #endif
 
     total_flight_time_milis += time_lapse;
-//    total_flight_time_seconds = total_flight_time_milis / 1000;
+    
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float dst=osd_home_distance;
     calc_max(max_home_distance, dst);
     //if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     calc_max(max_osd_airspeed, osd_airspeed);
-    //if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
+     //if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
+    calc_max(max_osd_groundspeed, osd_groundspeed);
     //if (osd_alt_rel > max_osd_home_alt) max_osd_home_alt = osd_alt_rel;
     calc_max(max_osd_home_alt, osd_alt_rel);
     //if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
@@ -282,21 +295,8 @@ void pan_toggle(){
     else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
 	ch_raw = chan_raw[sets.ch_toggle-1];
     else 
-        ch_raw = chan_raw[7];
+        ch_raw = chan_raw[7]; // в случае мусора - канал 8
 
-
-/* no more autoswitch - warnings always on
-
-  //If there is a warning but warnings disabled force switch to panel 0
-  if(lflags.canswitch == 0 && !is_on(panel.warn)){ 
-    if(panelN != sets.auto_screen_switch){
-      lflags.osd_clear = 1;
-    }
-    panelN = sets.auto_screen_switch; 
-
-  }  else{
-    //Flight mode switching
-*/
 
 //	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
     if (sets.ch_toggle == 4){
@@ -328,39 +328,12 @@ void pan_toggle(){
         }
       } else{ 			 //Rotation switch
         if (ch_raw > 1200) {
-/*
-    	    if(!lflags.sw_state) {// last state is off
-        	lflags.mode_switch=1; // установим флаг включения
-        	
-    	    }
-    	    
-            if (osd_switch_time < millis()){ // при надолго включенном канале переключаем каждые 0.5 сек
-                lflags.rotatePanel = 1;
-                osd_switch_time = millis() + 500;
-                
-                lflags.mode_switch=0; // больше не надо переключать
-            }
-            lflags.sw_state=1; // состояние
-        } else { // выключено
-    	    if(lflags.mode_switch){ // кратковременное переключение
-    		lflags.mode_switch=0;
-                lflags.rotatePanel = 1;
-    	    }
-            lflags.sw_state=0;
-        }
-*/
             if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
                 lflags.rotatePanel = 1;
                 //osd_switch_time = millis() + 500;
                 millis_plus(&osd_switch_time, 500);
             }
         } else { // выключено
-/*    	    if(lflags.mode_switch){ // кратковременное переключение
-    		lflags.mode_switch=0;
-                lflags.rotatePanel = 1;
-    	    }
-            lflags.sw_state=0;
-*/
         }
 
       }
@@ -374,20 +347,10 @@ void pan_toggle(){
     }
 //  }
   if(old_panel != panelN){
-        lflags.osd_clear = 1;
-    
 	readPanelSettings();
 	lflags.got_data=1; // redraw even no news
   }
-  
-  
-    //If there is a panel switch or a change in base panel then clear osd
-/*    if ((lflags.osd_clear == 1) || (currentAutoPanel != 0)){
-//      osd.clear();
-      lflags.osd_clear = 0;
-      currentAutoPanel = 0;
-    }
-*/
+
 }
 
 
@@ -395,3 +358,6 @@ float NOINLINE gps_norm(long f){
     return f / GPS_MUL;
 }
 
+static inline void unplugSlaves(){   //Unplug list of SPI
+    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+}

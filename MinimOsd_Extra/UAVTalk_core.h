@@ -133,28 +133,28 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 #endif
 
 
-static inline int8_t uavtalk_get_int8(uavtalk_message_t *msg, int pos) {
-	return msg->Data[pos];
+static inline int8_t uavtalk_get_int8(int pos) {
+	return msg.u.Data[pos];
 }
 
 
-static inline int16_t uavtalk_get_int16(uavtalk_message_t *msg, int pos) {
+static inline int16_t uavtalk_get_int16(int pos) {
 	int16_t i;
-	memcpy(&i, msg->Data+pos, sizeof(int16_t));
+	memcpy(&i, msg.u.Data+pos, sizeof(int16_t));
 	return i;
 }
 
 
-static inline int32_t uavtalk_get_int32(uavtalk_message_t *msg, int pos) {
+static inline int32_t uavtalk_get_int32(int pos) {
 	int32_t i;
-	memcpy(&i, msg->Data+pos, sizeof(int32_t));
+	memcpy(&i, msg.u.Data+pos, sizeof(int32_t));
 	return i;
 }
 
 
-static inline float uavtalk_get_float(uavtalk_message_t *msg, int pos) {
+static inline float uavtalk_get_float(int pos) {
 	float f;
-	memcpy(&f, msg->Data+pos, sizeof(float));
+	memcpy(&f, msg.u.Data+pos, sizeof(float));
 	return f;
 }
 
@@ -264,7 +264,6 @@ void NOINLINE set_crc(uavtalk_message_t *msg, byte c){
     msg->Crc = CRC_VAL(msg->Crc ^ c);
 }
 
-#define BYTE_OF(v,n) (((byte *)&(v))[n])
 
 uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 	static uint8_t status = UAVTALK_PARSE_STATE_WAIT_SYNC;
@@ -282,6 +281,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 			length = HEADER_LEN;
 		}
 		break;
+
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
 		set_crc(msg,c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
@@ -289,8 +289,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 			msg->MsgType = c;
 			if(c & 0x80) length +=2; // timestamp too
 			cnt = 0;
-		}
-		else {
+		} else {
 			status = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		}
 		break;
@@ -301,8 +300,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 		if (cnt < 2) {
 			//msg->Length = ((uint16_t) c);
 			BYTE_OF(msg->Length,0) = c;
-		}
-		else {
+		} else {
 			//msg->Length += ((uint16_t) c) << 8;
 			BYTE_OF(msg->Length,1) = c;
 			
@@ -420,22 +418,15 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 
 
 void uavtalk_read(void) {
-	
+    extern void try_upload_font(byte c);
+
 	// grabbing data
 	while (Serial.available()) {
 		uint8_t c = Serial.read();
 		
 		// needed for MinimOSD upload, while no UAVTalk is established
-		if (!lflags.uavtalk_active &&  millis() < 5000) {
-			if (c == '\n' || c == '\r') {
-				crlf_count++;
-			} else {
-				crlf_count = 0;
-			}
-			if (crlf_count == 3) {
-				uploadFont();
-			}
-		}
+		if (!lflags.uavtalk_active) try_upload_font(c);
+
 #ifdef DEBUG
     bytes_comes+=1;
 #endif
@@ -471,9 +462,9 @@ void uavtalk_read(void) {
 			case ATTITUDEACTUAL_OBJID_000:
 			case ATTITUDESTATE_OBJID_000:
 
-        			osd_roll		= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_ROLL);
-        			osd_pitch		= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_PITCH);
-        			osd_yaw			= uavtalk_get_float(&msg.u, ATTITUDEACTUAL_OBJ_YAW);
+        			osd_roll		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_ROLL);
+        			osd_pitch		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_PITCH);
+        			osd_yaw			= uavtalk_get_float(ATTITUDEACTUAL_OBJ_YAW);
 //Serial.printf_P(PSTR("uav pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_pos.lat == 0) {
@@ -482,9 +473,9 @@ void uavtalk_read(void) {
 				break;
 #if ATTITUDESTATE_OBJID_000 != ATTITUDESTATE_OBJID
 			case ATTITUDESTATE_OBJID:
-        			osd_roll		= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Roll));
-        			osd_pitch		= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Pitch));
-        			osd_yaw			= uavtalk_get_float(&msg.u, offsetof(AttitudeStateDataPacked, Yaw));
+        			osd_roll		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Roll));
+        			osd_pitch		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Pitch));
+        			osd_yaw			= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Yaw));
 //Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
                                 if (osd_pos.lat == 0) {
@@ -502,20 +493,20 @@ void uavtalk_read(void) {
 			case FLIGHTSTATUS_OBJID_004:
 			case FLIGHTSTATUS_OBJID_005:
 #endif
-        			lflags.motor_armed	= uavtalk_get_int8(&msg.u, FLIGHTSTATUS_OBJ_ARMED);
-        			osd_mode		= uavtalk_get_int8(&msg.u, FLIGHTSTATUS_OBJ_FLIGHTMODE);
+        			lflags.motor_armed	= uavtalk_get_int8(FLIGHTSTATUS_OBJ_ARMED);
+        			osd_mode		= uavtalk_get_int8(FLIGHTSTATUS_OBJ_FLIGHTMODE);
 				break;
 #if FLIGHTSTATUS_OBJID_000 != FLIGHTSTATUS_OBJID
 			case FLIGHTSTATUS_OBJID:
-        			lflags.motor_armed	= uavtalk_get_int8(&msg.u, offsetof(FlightStatusDataPacked, Armed));
-        			osd_mode		= uavtalk_get_int8(&msg.u, offsetof(FlightStatusDataPacked, FlightMode));
+        			lflags.motor_armed	= uavtalk_get_int8(offsetof(FlightStatusDataPacked, Armed));
+        			osd_mode		= uavtalk_get_int8(offsetof(FlightStatusDataPacked, FlightMode));
 				break;
 #endif
 
 			case MANUALCONTROLCOMMAND_OBJID_000:
 			case MANUALCONTROLCOMMAND_OBJID_001:
 			case MANUALCONTROLCOMMAND_OBJID_002:
-				osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(&msg.u, MANUALCONTROLCOMMAND_OBJ_THROTTLE));
+				osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE));
 				if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
 				// Channel mapping:
 				// 0   is Throttle
@@ -527,93 +518,93 @@ void uavtalk_read(void) {
                                 // In OPOSD:
                                 // chanx_raw     used for menu navigation (Roll/pitch)
                                 // osd_chanx_raw used for panel navigation (Accessory)
-                                chan_raw[2]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_1); // remap!
-				chan_raw[0]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_2);
-				chan_raw[1]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_3);
-				chan_raw[3]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_4);
-				chan_raw[4]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_5);
-				chan_raw[5]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_6);
-				chan_raw[6]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_7);
-				chan_raw[7]		= uavtalk_get_int16(&msg.u, MANUALCONTROLCOMMAND_OBJ_CHANNEL_8);
+                                chan_raw[2]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_1); // remap!
+				chan_raw[0]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_2);
+				chan_raw[1]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_3);
+				chan_raw[3]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_4);
+				chan_raw[4]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_5);
+				chan_raw[5]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_6);
+				chan_raw[6]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_7);
+				chan_raw[7]		= uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_8);
 				break;
 #if MANUALCONTROLCOMMAND_OBJID_000 != MANUALCONTROLCOMMAND_OBJID
 			case MANUALCONTROLCOMMAND_OBJID:
-				osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(&msg.u, offsetof(ManualControlCommandDataPacked, Throttle)));
+				osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(offsetof(ManualControlCommandDataPacked, Throttle)));
 				if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
-                                chan_raw[2]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[0])); // remap!
-				chan_raw[0]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[1]));
-				chan_raw[1]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[2]));
-				chan_raw[3]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[3]));
-				chan_raw[4]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[4]));
-				chan_raw[5]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[5]));
-				chan_raw[6]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[6]));
-				chan_raw[7]		= uavtalk_get_int16(&msg.u, offsetof(ManualControlCommandDataPacked, Channel[7]));
+                                chan_raw[2]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[0])); // remap!
+				chan_raw[0]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[1]));
+				chan_raw[1]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[2]));
+				chan_raw[3]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[3]));
+				chan_raw[4]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[4]));
+				chan_raw[5]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[5]));
+				chan_raw[6]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[6]));
+				chan_raw[7]		= uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[7]));
 				break;
 #endif
 
 			case GPSPOSITION_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_001:
-				osd_pos.lat		= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LAT));
-				osd_pos.lon		= gps_norm(uavtalk_get_int32(&msg.u, GPSPOSITION_OBJ_LON));
-				osd_satellites_visible	= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_SATELLITES);
-				osd_fix_type		= uavtalk_get_int8(&msg.u, GPSPOSITION_OBJ_STATUS);
-				osd_heading		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_HEADING);
-				osd_alt_gps		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_ALTITUDE);
-				osd_groundspeed		= uavtalk_get_float(&msg.u, GPSPOSITION_OBJ_GROUNDSPEED);
+				osd_pos.lat		= gps_norm(uavtalk_get_int32(GPSPOSITION_OBJ_LAT));
+				osd_pos.lon		= gps_norm(uavtalk_get_int32(GPSPOSITION_OBJ_LON));
+				osd_satellites_visible	= uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
+				osd_fix_type		= uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
+				osd_heading		= uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
+				osd_alt_gps		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
+				osd_groundspeed		= uavtalk_get_float(GPSPOSITION_OBJ_GROUNDSPEED);
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
-				osd_pos.lat		= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Latitude)));
-				osd_pos.lon		= gps_norm(uavtalk_get_int32(&msg.u, offsetof(GPSPositionSensorDataPacked, Longitude)));
-				osd_satellites_visible	= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Satellites));
-				osd_fix_type		= uavtalk_get_int8(&msg.u,  offsetof(GPSPositionSensorDataPacked, Status));
-				osd_heading		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Heading));
-				osd_alt_gps		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Altitude));
-				osd_groundspeed		= uavtalk_get_float(&msg.u, offsetof(GPSPositionSensorDataPacked, Groundspeed));
+				osd_pos.lat		= gps_norm(uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Latitude)));
+				osd_pos.lon		= gps_norm(uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Longitude)));
+				osd_satellites_visible	= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
+				osd_fix_type		= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
+				osd_heading		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
+				osd_alt_gps		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
+				osd_groundspeed		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Groundspeed));
 				break;
 #endif
 
 #if 0 // because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
 			case GPSTIME_OBJID:
-				osd_time_hour		= uavtalk_get_int8(&msg.u, GPSTIME_OBJ_HOUR);
-				osd_time_minute		= uavtalk_get_int8(&msg.u, GPSTIME_OBJ_MINUTE);
+				osd_time_hour		= uavtalk_get_int8(GPSTIME_OBJ_HOUR);
+				osd_time_minute		= uavtalk_get_int8(GPSTIME_OBJ_MINUTE);
 				break;
 #endif
 			case GPSVELOCITY_OBJID_000:
 			case GPSVELOCITYSENSOR_OBJID_000:
-				osd_climb		= -1.0 * uavtalk_get_float(&msg.u, GPSVELOCITY_OBJ_DOWN); 
+				osd_climb		= -1.0 * uavtalk_get_float(GPSVELOCITY_OBJ_DOWN); 
 				break;
 #if GPSVELOCITYSENSOR_OBJID_000 != GPSVELOCITYSENSOR_OBJID
 			case GPSVELOCITYSENSOR_OBJID:
-				osd_climb		= -1.0 * uavtalk_get_float(&msg.u, offsetof(GPSVelocitySensorDataPacked, Down));
+				osd_climb		= -1.0 * uavtalk_get_float(offsetof(GPSVelocitySensorDataPacked, Down));
 				break;
 #endif
 
 			case FLIGHTBATTERYSTATE_OBJID_000:
 			case FLIGHTBATTERYSTATE_OBJID_001:
-				osd_vbat_A		= uavtalk_get_float(&msg.u, FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
-				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(&msg.u, FLIGHTBATTERYSTATE_OBJ_CURRENT));
-//				osd_total_A		= (int16_t) uavtalk_get_float(&msg.u, FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
-				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(&msg.u, FLIGHTBATTERYSTATE_OBJ_ESTIMATED_FLIGHT_TIME);
+				osd_vbat_A		= uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
+				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CURRENT));
+//				osd_total_A		= (int16_t) uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
+				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_ESTIMATED_FLIGHT_TIME);
 				break;
 #if FLIGHTBATTERYSTATE_OBJID_000 != FLIGHTBATTERYSTATE_OBJID && FLIGHTBATTERYSTATE_OBJID_001 != FLIGHTBATTERYSTATE_OBJID
 			case FLIGHTBATTERYSTATE_OBJID:
-				osd_vbat_A		= uavtalk_get_float(&msg.u, offsetof(FlightBatteryStateDataPacked, Voltage));
-				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(&msg.u, offsetof(FlightBatteryStateDataPacked, Current));
-//				osd_total_A		= (int16_t) uavtalk_get_float(&msg.u, offsetof(FlightBatteryStateDataPacked, ConsumedEnergy));
-				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(&msg.u, offsetof(FlightBatteryStateDataPacked, EstimatedFlightTime));
+				osd_vbat_A		= uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Voltage));
+				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Current));
+//				osd_total_A		= (int16_t) uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, ConsumedEnergy));
+				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, EstimatedFlightTime));
 				break;
 #endif
 
 			case BAROALTITUDE_OBJID_000:
 			case BAROSENSOR_OBJID_000:
-				osd_alt_rel		= (int16_t) uavtalk_get_float(&msg.u, BAROALTITUDE_OBJ_ALTITUDE);
+				osd_alt_rel		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
 				break;
 #if BAROSENSOR_OBJID_000 != BAROSENSOR_OBJID
 			case BAROSENSOR_OBJID:
-				//revo_baro_alt		= (int16_t) uavtalk_get_float(&msg.u, BAROALTITUDE_OBJ_ALTITUDE);
-				osd_alt_rel		= (int16_t) uavtalk_get_float(&msg.u, offsetof(BaroSensorDataPacked, Altitude));
+				//revo_baro_alt		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
+				osd_alt_rel		= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
 				break;
 #endif
 
@@ -622,13 +613,13 @@ void uavtalk_read(void) {
 			case OPLINKSTATUS_OBJID_001:
 			case OPLINKSTATUS_OBJID_002:
 #endif
-				osd_rssi		= uavtalk_get_int8(&msg.u, OPLINKSTATUS_OBJ_RSSI);
-//				oplm_linkquality	= uavtalk_get_int8(&msg.u, OPLINKSTATUS_OBJ_LINKQUALITY);
+				osd_rssi		= uavtalk_get_int8(OPLINKSTATUS_OBJ_RSSI);
+//				oplm_linkquality	= uavtalk_get_int8(OPLINKSTATUS_OBJ_LINKQUALITY);
 				break;
 
 #if OPLINKSTATUS_OBJID_000 != OPLINKSTATUS_OBJID && OPLINKSTATUS_OBJID_002 != OPLINKSTATUS_OBJID
 			case OPLINKSTATUS_OBJID:
-				osd_rssi		= uavtalk_get_int8(&msg.u, offsetof(OPLinkStatusDataPacked, RSSI));
+				osd_rssi		= uavtalk_get_int8(offsetof(OPLinkStatusDataPacked, RSSI));
 				break;
 #endif
 
@@ -650,20 +641,20 @@ void uavtalk_read(void) {
 				// osd_airspeed = 0;               // air speed (only with pitot tube)
 				// etc.
 			case WAYPOINTACTIVE_OBJID:
-			    wp_number = uavtalk_get_int16(&msg.u, offsetof(WaypointActiveDataPacked, Index));
+			    wp_number = uavtalk_get_int16(offsetof(WaypointActiveDataPacked, Index));
 			    break;
 			    
 				// osd_airspeed = 0;               // air speed (only with pitot tube)
 			case AIRSPEEDSENSOR_OBJID:
-			    byte connected = uavtalk_get_int8(&msg.u, offsetof(AirspeedSensorDataPacked, SensorConnected));
+			    byte connected = uavtalk_get_int8(offsetof(AirspeedSensorDataPacked, SensorConnected));
 			    if(connected)
-				osd_airspeed = uavtalk_get_int16(&msg.u, offsetof(AirspeedSensorDataPacked, TrueAirspeed));
+				osd_airspeed = uavtalk_get_int16(offsetof(AirspeedSensorDataPacked, TrueAirspeed));
 			    break;
 			}
 			
 // мы подслушиваем разговор наземки и борта, и не вмешиваемся
 //			if (msg.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
-//				uavtalk_respond_object(&msg.u, UAVTALK_TYPE_ACK);
+//				uavtalk_respond_object(UAVTALK_TYPE_ACK);
 //			}
 			
 		}

@@ -4,7 +4,7 @@ An Open Source Arduino based OSD and Camera Control project.
 
 Program  : Minim-OSD 
 
-Version  : V8.11, 26 feb 2016
+Version  : V8.15, 26 feb 2016
 
 based on: minimOSD-extra by Sandro Benigno
 Coauthor(s):
@@ -45,11 +45,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* **********************************************/
 /* ***************** INCLUDES *******************/
 
-//#define membug 
-//#define FORCEINIT  // You should never use this unless you know what you are doing 
-
 // AVR Includes
-#include <SingleSerial.h>
+#include <SingleSerial.h> // MUST be first
 
 #include "compat.h"
 
@@ -68,35 +65,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 
-#ifdef membug
-#include "MemoryFree.h"
-#endif
-
 #include "ArduCam_Max7456.h"
 #include "Vars.h"
 
-
 #include "prototypes.h"
-
 
 
 // Objects and Serial definitions
 SingleSerialPort(Serial);
 
 OSD osd; //OSD object 
-
-struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
-
-// all bools in lflags
-volatile byte vsync_wait = 0;
-
-volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
-volatile uint16_t           PWM_IN;           // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
-volatile unsigned long int_Timer = 0;         // set in the INT1
-
-				//Bat_1 Bat_2 Current RSSI
-//const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
-byte PWM_out_pin=0;
 
 
 // program parts
@@ -105,6 +83,10 @@ byte PWM_out_pin=0;
 #include "protocols.h"
 #if defined(USE_UAVTALK)
 #include "UAVTalk_core.h"
+#endif
+
+#if defined(USE_MWII)
+#include "cleanflight_core.h"
 #endif
 
 #include "Config_Func.h"
@@ -119,33 +101,34 @@ byte PWM_out_pin=0;
  WalkeraTelem walkera;
 #endif
 
-
 /* **********************************************/
 
+// обработка прерывания по кадровому синхроимпульсу
 void isr_VSYNC(){
-    vsync_wait=0;
+    vsync_wait=0;	// единственное что нам надо - отметить его наличие
 }
 
 // PWM Measurement
 #if defined(PWM_PIN)
-void ReadINT_PIN() {
+void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
+    uint32_t time=micros(); // the 1st place to exclude jitter
 
-  // We will start to read when signal goes HIGH
-  if(digitalRead(PWM_PIN) == HIGH) {
+    // We will start to read when signal goes HIGH
+    if(digitalRead(PWM_PIN) == HIGH) {
 
-    // PWM Signal is HIGH, so measure it's length.
-    int_Timer = micros();
+        // PWM Signal is HIGH, so measure it's length.
+        int_Timer = time;
 
-  } else {
+    } else {
 
-    // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-    if(int_Timer && !New_PWM_Frame){
-      PWM_IN = (int)(micros() - int_Timer);
-      int_Timer = 0;
+        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
+        if(int_Timer /* && !New_PWM_Frame */){
+          PWM_IN = (int)(time - int_Timer);
+          int_Timer = 0;
 
-      New_PWM_Frame = true;
+          New_PWM_Frame = true;
+        }
     }
-  }
 }
 #endif
 
@@ -173,23 +156,21 @@ void setup()     {
     attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 #endif
 
-//    pinMode(RssiPin, OUTPUT); // доп вывод - выход
+    // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
+    TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );
 
-    //analogReference(DEFAULT);	// для работы с аналоговыми входами на полный диапазон питания
     analogReference(INTERNAL);  // INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
 
-//    wdt_enable(WDTO_2S);
+//    wdt_enable(WDTO_2S); - bootloader don't supports WDT
     
     adc_setup(); // do it some faster
 
 //    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
     attachInterrupt(INT0, isr_VSYNC, FALLING);
 
-
     Serial.begin(TELEMETRY_SPEED);
-    // setup mavlink port
-    mavlink_comm_0_port = &Serial;
-
+    
+    mavlink_comm_0_port = &Serial; // setup mavlink port
 
     // Prepare OSD for displaying 
     unplugSlaves();
@@ -246,7 +227,7 @@ void setup()     {
     
     delay_150();
 
-    osd.update();// Show bootloader bar
+    OSD::update();// Show bootloader bar
 
     delay(start_dly);
     Serial.flush();
@@ -258,7 +239,7 @@ void setup()     {
 #ifdef DEBUG
 /*    OSD::setPanel(0,0);
     hex_dump((byte *)&panel,0x70);
-    osd.update();
+    OSD::update();
     delay(10000); 
 */
 
@@ -268,7 +249,7 @@ void setup()     {
     osd.printf_P(PSTR("sets.pwm_src=%d sets.pwm_dst=%d pin=%d VoltagePin=%d"),sets.pwm_src, sets.pwm_dst, PWM_out_pin, VoltagePin);
 //    hex_dump((byte *)alt_pins, 8);
 
-    osd.update();
+    OSD::update();
     delay(10000); 
 */    
 #endif
@@ -310,14 +291,15 @@ void loop()
 
             lflags.got_data=1; // каждые полсекунды принудительно
 
+#ifdef WALKERA_TELEM
+	    walkera.sendTelemetry();
+#endif
+
             lflags.blinker = !lflags.blinker;
             if(lflags.blinker) {
                 seconds++;
 	        lflags.one_sec_timer_switch = 1; // for warnings
 
-#ifdef WALKERA_TELEM
-		walkera.sendTelemetry();
-#endif
 
 #ifdef DEBUG    
 		if(seconds % 60 == 30)
@@ -345,16 +327,18 @@ void loop()
     if(lflags.update_stat) { // если надо перерисовать экран
 	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
-	    osd.update();
+	    OSD::update();
 	    lflags.update_stat = 0;
         }
     }
 
+/* not used, let PWM data will be ALWAYS actual
     if(New_PWM_Frame){
 	New_PWM_Frame=false;
 
 	// data is in PWM_IN
     }
+*/
 
 #ifdef DEBUG    
     uint16_t dly=millis() - pt;
@@ -362,16 +346,19 @@ void loop()
     if(dly>max_dly)
 	max_dly=dly; // накопление максимального времени цикла
 #endif
+
+// measured max loop time = ~75ms
+
 }
 
 float avgRSSI(uint16_t d){
-    static uint8_t ind = 0;
+    static uint8_t ind = -1;
     static uint16_t RSSI_rawArray[8];
 
-    RSSI_rawArray[(ind++)%8] = d;
+    RSSI_rawArray[(++ind)%8] = d;
     d=0;
-    for (uint8_t i=0;i<8;i++)
-        d += RSSI_rawArray[i];
+    for (uint8_t i=8;i!=0;)
+        d += RSSI_rawArray[--i];
 
     return d/8.0;
 }
@@ -381,13 +368,14 @@ void On100ms(){ // периодические события, не связан�
 //Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
     if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
-        static uint8_t ind = 0;
+        static uint8_t ind = -1;
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
 
-        voltageRawArray[(ind++)%8] = analogRead(VoltagePin);
-        for (uint8_t i=0;i<8;i++)
-            voltageRaw += voltageRawArray[i];
+        voltageRawArray[(++ind)%8] = analogRead(VoltagePin);
+        for (uint8_t i=8;i!=0;)
+            voltageRaw += voltageRawArray[--i];
+            
         voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
 	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4;
@@ -403,13 +391,13 @@ void On100ms(){ // периодические события, не связан�
     }
 
     if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
-        static uint8_t ind = 0;
+        static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
 
-        voltageBRawArray[(ind++)%8] = analogRead(VidvoltagePin);
-        for (uint8_t i=0;i<8;i++)
-            voltageRaw += voltageBRawArray[i];
+        voltageBRawArray[(++ind)%8] = analogRead(VidvoltagePin);
+        for (uint8_t i=8;i!=0;)
+            voltageRaw += voltageBRawArray[--i];
         voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
@@ -427,13 +415,13 @@ void On100ms(){ // периодические события, не связан�
     }
 
     if(flags.useExtCurr){ //аналоговый ввод - ток
-        static uint8_t ind = 0;
+        static uint8_t ind = -1;
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
 
-        currentRawArray[(ind++)%8] = analogRead(AmperagePin);
-        for (uint8_t i=0;i<8;i++)
-            currentRaw += currentRawArray[i];
+        currentRawArray[(++ind)%8] = analogRead(AmperagePin);
+        for (uint8_t i=8;i!=0;)
+            currentRaw += currentRawArray[--i];
         osd_curr_A = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	lflags.got_data=1;
     }
@@ -477,7 +465,7 @@ case_4:
 
 }
 
-
+// loop time can be up to 75ms so 20ms is too optimistic 8)
 void On20ms(){ // 50Hz
 
     if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
@@ -502,7 +490,6 @@ void On20ms(){ // 50Hz
     }
 
 //Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
-
 }
 
 
@@ -514,17 +501,15 @@ void parseNewData(){
     setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
-    setHomeVars(osd);   // calculate and set Distance from home and Direction to home
+    setHomeVars();   // calculate and set Distance from home and Direction to home
 
     setFdataVars(); // накопление статистики и рекордов
+
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
 
 //Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 
 }
 
-inline void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
-}
 
 

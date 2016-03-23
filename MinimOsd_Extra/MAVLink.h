@@ -37,6 +37,22 @@ union {
 } msg;
 */
 
+/*      allow CLI to be started by hitting enter 3 times, if no
+        heartbeat packets have been received but not more than 3 seconds 
+*/
+void try_upload_font(byte c){
+    if (millis() < 3000) {
+        if (c == '\n' || c == '\r') {
+            crlf_count++;
+        } else {
+            crlf_count = 0;
+        }
+        if (crlf_count > 3) {
+            uploadFont();
+        }
+    }
+}
+
 void read_mavlink(){
     uint8_t      base_mode=0;
     mavlink_status_t status;
@@ -54,35 +70,23 @@ void read_mavlink(){
 #ifdef DEBUG
 	bytes_comes+=1;
 #endif
-
-/*      allow CLI to be started by hitting enter 3 times, if no
-        heartbeat packets have been received but not more than 3 seconds 
-*/
-        if (!lflags.mavlink_active && millis() < 3000) {
-            if (c == '\n' || c == '\r') {
-                crlf_count++;
-            } else {
-                crlf_count = 0;
-            }
-            if (crlf_count > 3) {
-                uploadFont();
-            }
-        }
+        if (!lflags.mavlink_active) try_upload_font(c);
 
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
             //lastMAVBeat = millis();
             millis_plus(&lastMAVBeat, 0);
-            
+
+//Serial.printf_P(PSTR("got id=%d"), msg.m.msgid);
             lflags.mavlink_active = lflags.mavlink_on = lflags.got_data = 1;
 
             //handle msg
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
-    //            lflags.mavbeat = 1;
                 apm_mav_system    = msg.m.sysid;
                 apm_mav_component = msg.m.compid;
-             //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg.m);
+             //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
+                osd_autopilot = mavlink_msg_heartbeat_get_autopilot(&msg.m);
                 osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
                 //Mode (arducoper armed/disarmed)
                 base_mode = mavlink_msg_heartbeat_get_base_mode(&msg.m);
@@ -98,7 +102,7 @@ void read_mavlink(){
                 if (!flags.useExtCurr)
                     osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg.m); //Battery current, in 10*milliamperes (1 = 10 milliampere)
 
-                    //osd_mode = apm_mav_component;//Debug
+                //osd_mode = apm_mav_component;//Debug
                 break;
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
@@ -123,7 +127,7 @@ void read_mavlink(){
             case MAVLINK_MSG_ID_ATTITUDE:
                 osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
                 osd_roll  = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
-                osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg.m));
+                osd_yaw   = ToDeg(mavlink_msg_attitude_get_yaw(&msg.m));
 //Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_pitch ); Serial.wait();
 //LED_BLINK;
                 break;
@@ -168,7 +172,7 @@ void read_mavlink(){
                 temperature = mavlink_msg_scaled_pressure_get_temperature(&msg.m);
                 break;
 
-#if 0
+#if 1
             case MAVLINK_MSG_ID_SCALED_PRESSURE2:
                 temperature = mavlink_msg_scaled_pressure2_get_temperature(&msg.m);
 /*

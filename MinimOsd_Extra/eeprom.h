@@ -11,6 +11,8 @@
 
 #define    EEPROM_offs(mem) offsetof(Eeprom, mem)
 
+#define    ID_of(mem) (offsetof(Panel, mem)/sizeof(Point))
+
 #define OSD_CALL_SIGN_TOTAL 8
 
 #pragma pack(push,1)
@@ -21,6 +23,7 @@ struct Point { // упакованные данные одной панели - 
 };
 
 typedef struct Point point;
+
 
 
 // 
@@ -176,5 +179,3 @@ struct Eeprom {
 //#if sizeof(struct Eeprom) > 1024
 //#error EEPROM overflow!
 //#endif
-
-

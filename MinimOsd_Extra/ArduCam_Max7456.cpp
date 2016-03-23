@@ -16,8 +16,8 @@
 extern Settings sets;
 extern Flags flags;
 
-uint8_t OSD::col, OSD::row, OSD::video_mode, OSD::video_center;
-uint8_t OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+uint8_t  OSD::col, OSD::row, OSD::video_mode, OSD::video_center;
+uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
 uint16_t OSD::bufpos;
 
 
@@ -161,7 +161,6 @@ void OSD::setMode(uint8_t themode){
  
     if(video_mode != mode){
 	video_mode = mode;
-//	hw_init();
         max7456_on();
         MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
         max7456_off();
@@ -194,8 +193,7 @@ void OSD::setBrightness()
 
 //------------------ Get Mode (PAL 0/NTSC 1) --------------------------------
 
-uint8_t OSD::getMode()
-{
+uint8_t OSD::getMode(){
   switch(video_mode){
 //    case MAX7456_MODE_MASK_NTCS:
 //      return 0;
@@ -208,15 +206,6 @@ uint8_t OSD::getMode()
   return 0;
 }
 
-//------------------ Get Center (PAL/NTSC) ----------------------------------
-
-inline uint8_t OSD::getCenter()
-{
-  return video_center; //first line for center panel
-}
-
-
-//-----------------
 
 void OSD::clear() {  // clear the screen
   max7456_on();
@@ -228,12 +217,12 @@ void OSD::clear() {  // clear the screen
 
 void NOINLINE OSD::calc_pos(){
   bufpos = row*30+col;
-
 }
 
 void OSD::setPanel(uint8_t st_col, uint8_t st_row){
   col = st_col & 0x7f; // col,row нужны для отработки перевода строки с сохранением колонки
   row = st_row & 0x7f; // в старших битах флаги, размер экрана все равно мелкий
+
   calc_pos();
 }
 
@@ -241,7 +230,7 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 //------------------ write ---------------------------------------------------
 
-size_t OSD::write(uint8_t c){
+void OSD::writeb(uint8_t c){
   
   if(c == '|'){
     row++;
@@ -249,22 +238,24 @@ size_t OSD::write(uint8_t c){
     calc_pos();
   } else {
     osdbuf[bufpos++] = c;
-  }
- 
-  return 1;
+  } 
+}
+
+size_t OSD::write(uint8_t c){
+    writeb(c);  
+    return 1;
 }
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
-    extern OSD osd;
+//    extern OSD osd;
     setPanel(x,y);
-    osd.write(c);
+    OSD::writeb(c);
 }
 
 
 
 /* для сравнения
-uint8_t spi_transfer(uint8_t data)
-{
+uint8_t spi_transfer(uint8_t data) {
   SPDR = data;                    // Start the transmission
   while (!(SPSR & (1<<SPIF)))     // Wait the end of the transmission
     ;
@@ -284,27 +275,27 @@ void OSD::update() {
 #define SET_HIGH()  *out |= bit
 */
 
- PORTD &= ~_BV(PD6); //  digitalWrite(MAX7456_SELECT,LOW); 
+    PORTD &= ~_BV(PD6); //  digitalWrite(MAX7456_SELECT,LOW); 
 
-  MAX_write(MAX7456_DMAH_reg, 0);
-  MAX_write(MAX7456_DMAL_reg, 0);
-  MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
+    MAX_write(MAX7456_DMAH_reg, 0);
+    MAX_write(MAX7456_DMAL_reg, 0);
+    MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
 
- PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
+    PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 
- for(; b < end_b; b++) {
-  PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
-  SPDR = *b;
-  *b=' ';		// обойдемся без memset
-  while (!(SPSR & (1<<SPIF))) ;
-  PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
- }
- PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
+    for(; b < end_b; b++) {
+      PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
+      SPDR = *b;
+      *b=' ';		// обойдемся без memset
+      while (!(SPSR & (1<<SPIF))) ;
+      PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
+    }
+    PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
 
- Spi.transfer(MAX7456_END_string);
- 
- PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
+    Spi.transfer(MAX7456_END_string);
+
+    PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 }
 
 
@@ -313,11 +304,10 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 {
   byte x;
   byte char_address_hi;
-  //byte char_address_lo;
   byte screen_char;
 
   char_address_hi = font_count;
-//  char_address_lo = 0;
+//  byte char_address_lo = 0;
 
     cli();
 
@@ -341,11 +331,12 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
     if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   }
 
+  sei();
+
   MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert);// turn on screen next vertical
 
   max7456_off();
 
-  sei();
 }
 
 //------------------ pure virtual ones (just overriding) ---------------------

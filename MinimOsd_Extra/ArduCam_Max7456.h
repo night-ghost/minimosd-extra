@@ -100,8 +100,8 @@ class OSD: public BetterStream
     static void setMode(uint8_t mode);
     static void setBrightness();
     static uint8_t getMode(void);
-    static inline uint8_t getCenter(void);
     static void update(void);
+    static void writeb(uint8_t c);
     virtual byte     available(void);
     virtual byte     read(void);
     virtual byte     peek(void);
@@ -111,6 +111,8 @@ class OSD: public BetterStream
     static void write_xy(uint8_t x, uint8_t y, uint8_t c);
     static void adjust();
     using BetterStream::write;
+
+    static inline uint8_t getCenter(){  return video_center; } //first line for center panel 
 
 //  private:
     static uint8_t col, row, video_mode, video_center;

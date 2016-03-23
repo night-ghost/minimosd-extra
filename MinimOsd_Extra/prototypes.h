@@ -7,7 +7,6 @@ void panLogo();
 void readPanelSettings();
 uint8_t checkPAL(uint8_t line);
 void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s );
-void unplugSlaves();
 void startPanels();
 void writePanels();
 void readSettings();
@@ -53,6 +52,7 @@ void showHorizon(byte start_col, byte start_row);
 void showILS(byte start_col, byte start_row);
 void showRADAR(byte center_col, byte center_line);
 void panSetup();
+void panRadarScale(Point p);
 
 void showArrow(uint8_t rotate_arrow,uint8_t method);
 

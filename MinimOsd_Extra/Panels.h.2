@@ -3,6 +3,44 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+void osd_write(byte c){
+    OSD::writeb(c);
+}
+
+void NOINLINE osd_setPanel(Point p){
+    OSD::setPanel(p.x,p.y);
+}
+
+void NOINLINE osd_setPanelSign(Point p, char c){
+    osd_setPanel(p);
+    if(has_sign(p)) osd_write(c);
+}
+
+static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
+//static const PROGMEM char f4_0fc[]="%4.0f%c";
+#define f4_0fc (&fmt_xtrack[3])
+
+float NOINLINE cnvGroundSpeed() { // вынос инварианта
+
+    return osd_groundspeed * pgm_read_float(&measure->converts);
+}
+
+
+void NOINLINE printTime(int t){
+    osd.printf_P(PSTR("%2i\x3a%02i"),((int)t/60)%60, (int)t%60);
+}
+
+void NOINLINE osd_printf_1(PGM_P fmt, float f){
+    osd.printf_P(fmt, f);
+}
+
+void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
+    osd.printf_P(fmt, f, c);
+}
+
+void NOINLINE osd_printi_1(PGM_P fmt, int f){
+    osd.printf_P(fmt, f);
+}
 
 typedef void (*fptr)();
 typedef void (*fPan_ptr)(Point p);
@@ -14,66 +52,59 @@ struct Panels_list {
 };
 
 
-//table - 546 bytes of flash economy
+//table - 510 bytes of flash economy
 
 const Panels_list PROGMEM panels_list[] = {
-    { ID_of(horizon),	panHorizon },
-    { ID_of(pitch),	panPitch },
-    { ID_of(roll),	panRoll },
-    { ID_of(batt_A),	panBatt_A },
-    { ID_of(batt_B),	panBatt_B },
-    { ID_of(GPS_sats),	panGPSats},
-    { ID_of(GPS),	panGPS },
-    { ID_of(GPS2),	panGPS2 },
-    { ID_of(batteryPercent),panBatteryPercent},
-    { ID_of(COG),	panCOG},
-    { ID_of(rose),	panRose},
-    { ID_of(heading),	panHeading},
-    { ID_of(Fdata),	panFdata},
-    { ID_of(homeDist),	panHomeDis},
-    { ID_of(homeDir), 	panHomeDir},
-    { ID_of(time),	panTime},
+    { &panel.horizon, 	panHorizon },
+    { &panel.pitch, 	panPitch },
+    { &panel.roll, 	panRoll },
+    { &panel.batt_A, 	panBatt_A },
+    { &panel.batt_B, 	panBatt_B },
+    { &panel.GPS_sats, 	panGPSats},
+    { &panel.GPS, 	panGPS },
+    { &panel.GPS2, 	panGPS2 },
+    { &panel.batteryPercent, panBatteryPercent},
+    { &panel.COG, 	panCOG},
+    { &panel.rose, 	panRose},
+    { &panel.heading, 	panHeading},
+    { &panel.Fdata, 	panFdata},
+    { &panel.homeDist, 	panHomeDis},
+    { &panel.homeDir,  	panHomeDir},
+    { &panel.time, 	panTime},
       
-    { ID_of(WP_dist),	panWPDis},
-    { ID_of(alt),	panAlt},
-    { ID_of(homeAlt),	panHomeAlt},
-    { ID_of(vel),	panVel},
-    { ID_of(airSpeed),	panAirSpeed},
-    { ID_of(throttle),	panThr},
-    { ID_of(FMod),	panFlightMode},
-    { ID_of(curr_A),	panCur_A},
-    { ID_of(windSpeed),	panWindSpeed},
-    { ID_of(climb),	panClimb},
-    { ID_of(tune),	panTune},
-    { ID_of(RSSI),	panRSSI},
-    { ID_of(eff),	panEff},
-    { ID_of(temp),	panTemp},
-    { ID_of(ch),	panCh},
-    { ID_of(distance),	panDistance},
-    { ID_of(RadarScale),panRadarScale },
-    { ID_of(callSign),	panCALLSIGN},
-    {0, 0}
+    { &panel.WP_dist, 	panWPDis},
+    { &panel.alt, 	panAlt},
+    { &panel.homeAlt, 	panHomeAlt},
+    { &panel.vel, 	panVel},
+    { &panel.airSpeed, 	panAirSpeed},
+    { &panel.throttle, 	panThr},
+    { &panel.FMod, 	panFlightMode},
+    { &panel.curr_A,	panCur_A},
+    { &panel.windSpeed,	panWindSpeed},
+    { &panel.climb, 	panClimb},
+    { &panel.tune, 	panTune},
+    { &panel.RSSI, 	panRSSI},
+    { &panel.eff, 	panEff},
+    { &panel.temp, 	panTemp},
+    { &panel.ch, 	panCh},
+    { &panel.distance, 	panDistance},
+    { &panel.RadarScale,panRadarScale },
+    { &panel.callSign, 	panCALLSIGN},
+    {0}
 };
-
-
-void NOINLINE osd_setPanel(Point p){
-    OSD::setPanel(p.x,p.y);
-}
 
 
 void print_all_panels() {
     const Panels_list *pl= panels_list;
 
     for(;;){
-	//Point *pp = (Point *)pgm_read_word(&pl->p);
-	byte n = pgm_read_byte(&pl->n);
-	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
-	if(f==0) break;
+	Point *pp = (Point *)pgm_read_word(&pl->p);
+	if(pp==0) break;
 	
-	//Point p = *pp;
-	Point p=((Point *)&panel)[n];
+	Point p = *pp;
 	
 	if(is_on(p)){
+	    fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->p);
 	    osd_setPanel(p);
 	    f(p);
 	}
@@ -119,7 +150,7 @@ void writePanels(){
 
     return; // no warn
 
-  } else{  //Normal osd panel
+  }  else{  //Normal osd panel
 
 //	OSD::setPanel(0,0);
 //	osd.printf_P("p=%d t=%d",panelN, sets.ch_toggle);
@@ -143,42 +174,6 @@ void writePanels(){
 
 }
 
-
-void osd_write(byte c){
-    OSD::writeb(c);
-}
-
-
-void NOINLINE osd_setPanelSign(Point p, char c){
-    osd_setPanel(p);
-    if(has_sign(p)) osd_write(c);
-}
-
-static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
-//static const PROGMEM char f4_0fc[]="%4.0f%c";
-#define f4_0fc (&fmt_xtrack[3])
-
-float NOINLINE cnvGroundSpeed() { // вынос инварианта
-
-    return osd_groundspeed * pgm_read_float(&measure->converts);
-}
-
-
-void NOINLINE printTime(int t){
-    osd.printf_P(PSTR("%2i\x3a%02i"),((int)t/60)%60, (int)t%60);
-}
-
-void NOINLINE osd_printf_1(PGM_P fmt, float f){
-    osd.printf_P(fmt, f);
-}
-
-void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
-    osd.printf_P(fmt, f, c);
-}
-
-void NOINLINE osd_printi_1(PGM_P fmt, int f){
-    osd.printf_P(fmt, f);
-}
 
 
 
@@ -428,8 +423,7 @@ void panEff(point p){
     	    if(has_sign(p))
 		osd_write(0x16);
             
-            int iEff=eff;
-            if (iEff > 0 && iEff <= 9999) { 
+            if (eff > 0.0 && eff <= 9999.0) { 
                   osd_printf_1(PSTR("%4.0f\x01"), eff);
             }else{
                 // we don't needs to clear!  osd.print_P(&strclear[7]);// osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
@@ -450,9 +444,8 @@ void panEff(point p){
 
             if (osd_climb < -0.05){
                 float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * pgm_read_float(&measure->converth);
-                int iGlide=glide;
-                if (iGlide > 9999) glide = 9999.0;
-                if (iGlide > 0){
+                if (glide > 9999.0) glide = 9999.0;
+                if (glide > -0.0){
                     osd_printf_2(f4_0fc, glide, pgm_read_byte(&measure->high)); // аэродинамическое качество
                 }
             }else if (osd_climb >= -0.05 && osd_pitch < 0) {
@@ -525,8 +518,9 @@ void panWindSpeed(point p){
 
     int /*float*/ dir = osd_winddirection;
 
-    if (dir < 0)  dir+=360;
-
+    if (dir < 0){
+        dir+=360;
+    }
     nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990; // комплиментарный фильтр 1/100 
     //filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
 
@@ -641,7 +635,6 @@ void check_warn()
     uint8_t wmask = 0;
     uint8_t bit, prev_warn;
 
-    int iAirspeed = osd_airspeed * pgm_read_float(&measure->converts);
 
  if (!lflags.one_sec_timer_switch) return;
     lflags.one_sec_timer_switch=0;
@@ -651,11 +644,11 @@ void check_warn()
     wmask |= 1;
 
 //2    
- if (sets.model_type==0 && iAirspeed < sets.stall && lflags.takeofftime == 1) // plane
+ if (sets.model_type==0 && osd_airspeed * pgm_read_float(&measure->converts) < sets.stall && lflags.takeofftime == 1) // plane
     wmask |= 2;
 
 //3    
- if (sets.overspeed && iAirspeed > sets.overspeed) 
+ if (sets.overspeed && (osd_airspeed * pgm_read_float(&measure->converts)) > (float)sets.overspeed) 
     wmask |= 4;
 
 //4
@@ -726,9 +719,37 @@ const char * const warn_str[] = {
 void panWarn(point p){
     osd_setPanel(p); // warn differs!
 
+    PGM_P w;
+
     check_warn();
 
-    PGM_P w;
+/*
+    switch(warning) {
+    case 1:
+        w=PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"); //No GPS fix!
+        break;
+    case 2:
+        w=PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"); // Stall!
+        break;
+    case 3:
+        w=PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"); //Over Speed!
+        break;
+    case 4:
+        w=PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"); //Battery Low!
+        break;
+    case 5:
+        w=PSTR("\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69\x20\x20"); //Low Rssi
+        break;
+    case 6:
+        w=PSTR("\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"); //Hi VSpeed!
+        break;
+    default:
+        w=strclear;// PSTR("\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20"); //Blank line
+    }
+    
+    osd.print_P(w);
+//*/
+
     w=warn_str[warning];
     if(w)
 	osd.print_P(w);
@@ -893,7 +914,7 @@ void panRoll(point p){
 // Staus  : done
 
 
-void NOINLINE printVolt(uint16_t v) {
+void printVolt(uint16_t v) {
     osd_printf_1(PSTR("%5.2f\x0D"), v/1000.0);
 }
 
@@ -925,6 +946,12 @@ void panBatt_B(point p){
 
     if(has_sign(p))
 	osd_write(0x26);
+
+/*************** This commented code is for the next ArduPlane Version
+    if(osd_battery_remaining_B > 100){
+        osd.printf(" %c%5.2f%c", 0xbc, (double)osd_vbat_B/1000.0, 0x0d);
+    else osd.printf("%c%5.2f%c%c", 0xbc, (double)osd_vbat_B/1000.0, 0x0d, osd_battery_pic_B);
+    */
 
     printVolt(osd_vbat_B);
 }
@@ -978,7 +1005,7 @@ void panGPSats(point p){
 // Staus  : done
 
 void NOINLINE print_GPS(PGM_P f){
-    if(osd_pos.lon || osd_pos.lat) // не выводим координат если нету
+    if(osd_pos.lon && osd_pos.lat) // не выводим координат если нету
 	osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
 }
 
@@ -1070,7 +1097,8 @@ void panRose(point p){
 
 
 int getTargetBearing(){
-    if (wp_target_bearing < 0) 	wp_target_bearing+=360;
+    if (wp_target_bearing < 0)
+	wp_target_bearing+=360;
 	
     return grad_to_sect(wp_target_bearing - osd_heading); //Convert to int 1-16 
 }
@@ -1139,14 +1167,42 @@ void panHomeDir(point p){
 // Size   : 1 x 2  (rows x chars)
 // Status : done
 
-//#ifdef IS_COPTER
+#if defined(USE_UAVTALK)
+const char PROGMEM u_mode00[] = "manu";    // MANUAL
+const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
+const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
+const char PROGMEM u_mode03[] = "stb3";    // STABILIZED3
+const char PROGMEM u_mode04[] = "stb4";    // STABILIZED4
+const char PROGMEM u_mode05[] = "stb5";    // STABILIZED5
+const char PROGMEM u_mode06[] = "stb6";    // STABILIZED6
+const char PROGMEM u_mode07[] = "posh";    // POSITIONHOLD
+const char PROGMEM u_mode08[] = "cl  ";    // COURSELOCK
+const char PROGMEM u_mode09[] = "posr";    // POSITIONROAM
+const char PROGMEM u_mode10[] = "hl  ";    // HOMELEASH
+const char PROGMEM u_mode11[] = "pa  ";    // ABSOLUTEPOSITION
+const char PROGMEM u_mode12[] = "rtl ";    // RETURNTOBASE
+const char PROGMEM u_mode13[] = "land";    // LAND
+const char PROGMEM u_mode14[] = "pp  ";    // PATHPLANNER
+const char PROGMEM u_mode15[] = "poi ";    // POI
+const char PROGMEM u_mode16[] = "ac  ";    // AUTOCRUISE
+const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
+
+char const * const mode_u_strings[] PROGMEM ={ 
+    u_mode00, u_mode01, u_mode02, u_mode03, u_mode04, 
+    u_mode05, u_mode06, u_mode07, u_mode08, u_mode09, 
+    u_mode10, u_mode11, u_mode12, u_mode13, u_mode14,
+    u_mode15, u_mode16, u_mode17
+};
+#endif
+
+#ifdef IS_COPTER
 const char PROGMEM s_mode00[] = "stab"; //Stabilize	0
 const char PROGMEM s_mode01[] = "acro"; //Acrobatic	1
 const char PROGMEM s_mode02[] = "alth"; //Alt Hold	2
 const char PROGMEM s_mode03[] = "auto"; //Auto		3
 const char PROGMEM s_mode04[] = "guid"; //Guided		4
 const char PROGMEM s_mode05[] = "loit"; //Loiter		5
-const char PROGMEM s_mode06[] = "rtl"; //Return to Launch 6
+const char PROGMEM s_mode06[] = "rtl "; //Return to Launch 6
 const char PROGMEM s_mode07[] = "circ"; //Circle		7
 const char PROGMEM s_mode08[] = "posh"; //Position Hold (Old) 8
 const char PROGMEM s_mode09[] = "land"; //Land		9
@@ -1158,7 +1214,6 @@ const char PROGMEM s_mode14[] = "flip"; //Flip		14
 const char PROGMEM s_mode15[] = "tune"; //Tune		15
 const char PROGMEM s_mode16[] = "hold"; //Position Hold (Earlier called Hybrid) 16
 
-#ifdef IS_COPTER
 char const * const mode_c_strings[] PROGMEM ={ 
     s_mode00, s_mode01, s_mode02, s_mode03, s_mode04, 
     s_mode05, s_mode06, s_mode07, s_mode08, s_mode09, 
@@ -1167,129 +1222,64 @@ char const * const mode_c_strings[] PROGMEM ={
 };
 #endif
 
-//#ifdef IS_PLANE
+#ifdef IS_PLANE
 const char PROGMEM p_mode01[] = "manu"; //Manual
 const char PROGMEM p_mode02[] = "circ"; //CIRCLE
 const char PROGMEM p_mode03[] = "stab"; //Stabilize
 const char PROGMEM p_mode04[] = "trai"; //Training
-//const char PROGMEM p_mode05[] = "acro"; //ACRO
+const char PROGMEM p_mode05[] = "acro"; //ACRO
 const char PROGMEM p_mode06[] = "fbwa"; //FLY_BY_WIRE_A
 const char PROGMEM p_mode07[] = "fbwb"; //FLY_BY_WIRE_B
 const char PROGMEM p_mode08[] = "cruz"; //Cruise
 const char PROGMEM p_mode09[] = "atun"; //autotune
-//const char PROGMEM p_mode10[] = "auto"; //AUTO
-//const char PROGMEM p_mode11[] = "rtl "; //Return to Launch
-//const char PROGMEM p_mode12[] = "loit"; //Loiter
+const char PROGMEM p_mode10[] = "auto"; //AUTO
+const char PROGMEM p_mode11[] = "rtl "; //Return to Launch
+const char PROGMEM p_mode12[] = "loit"; //Loiter
 const char PROGMEM p_mode13[] = "m_13"; 
 const char PROGMEM p_mode14[] = "m_14"; 
-//const char PROGMEM p_mode15[] = "guid"; //GUIDED
+const char PROGMEM p_mode15[] = "guid"; //GUIDED
 const char PROGMEM p_mode16[] = "init"; //initializing
-const char PROGMEM p_mode17[] = "qstb"; //quad-stabilize
-const char PROGMEM p_mode18[] = "qhov"; //quad-hover (alt-hold)
-const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
 
-#ifdef IS_PLANE
+
 const char * const mode_p_strings[] PROGMEM ={ 
-    p_mode01, p_mode02, p_mode03, p_mode04, s_mode01, 
-    p_mode06, p_mode07, p_mode08, p_mode09, s_mode03, 
-    s_mode06, s_mode05, p_mode13, p_mode14, s_mode04, 
-    p_mode16, p_mode17, p_mode18, p_mode19
+    p_mode01, p_mode02, p_mode03, p_mode04, p_mode05, 
+    p_mode06, p_mode07, p_mode08, p_mode09, p_mode10, 
+    p_mode11, p_mode12, p_mode13, p_mode14, p_mode15, p_mode16
 };
 
 #endif
-
-#if defined(USE_UAVTALK)
-//const char PROGMEM u_mode00[] = "manu";    // MANUAL
-const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
-const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
-const char PROGMEM u_mode03[] = "stb3";    // STABILIZED3
-const char PROGMEM u_mode04[] = "stb4";    // STABILIZED4
-const char PROGMEM u_mode05[] = "stb5";    // STABILIZED5
-const char PROGMEM u_mode06[] = "stb6";    // STABILIZED6
-//const char PROGMEM u_mode07[] = "posh";    // POSITIONHOLD
-const char PROGMEM u_mode08[] = "cl";    // COURSELOCK
-const char PROGMEM u_mode09[] = "posr";    // POSITIONROAM
-const char PROGMEM u_mode10[] = "hl";    // HOMELEASH
-const char PROGMEM u_mode11[] = "pa";    // ABSOLUTEPOSITION
-//const char PROGMEM u_mode12[] = "rtl ";    // RETURNTOBASE
-//const char PROGMEM u_mode13[] = "land";    // LAND
-const char PROGMEM u_mode14[] = "pp";    // PATHPLANNER
-const char PROGMEM u_mode15[] = "poi";    // POI
-//const char PROGMEM u_mode16[] = "ac  ";    // AUTOCRUISE
-const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
-
-char const * const mode_u_strings[] PROGMEM ={ 
-    p_mode01, u_mode01, u_mode02, u_mode03, u_mode04, 
-    u_mode05, u_mode06, s_mode08, u_mode08, u_mode09, 
-    u_mode10, u_mode11, s_mode06, s_mode09, u_mode14,
-    u_mode15, p_mode08, u_mode17
-};
-#endif
-
-const char PROGMEM aq_mode0[] = "arm";
-//const char PROGMEM aq_mode1[] = "manu";
-//const char PROGMEM aq_mode2[] = "alth";
-//const char PROGMEM aq_mode3[] = "posh";
-const char PROGMEM aq_mode4[] = "m_04";
-const char PROGMEM aq_mode5[] = "miss";
-const char PROGMEM aq_mode6[] = "m_06";
-const char PROGMEM aq_mode7[] = "m_07";
-const char PROGMEM aq_mode8[] = "init";
-
-char const * const mode_aq_strings[] PROGMEM ={ 
-    aq_mode0, p_mode01, s_mode02, s_mode08,
-    aq_mode4, aq_mode5, aq_mode6, aq_mode7,
-    aq_mode8, 
-};
-
-
 
 void panFlightMode(point p){
 
     if(has_sign(p))
         osd_write( 0x7F);
 
-    //PGM_P mode_str;
-    const void *ptr;
-    
+    PGM_P mode_str;
 #if defined(USE_UAVTALK)
     if(lflags.uavtalk_active) {
-	ptr = &mode_u_strings[osd_mode];
+	mode_str = (PGM_P)pgm_read_word(&mode_u_strings[osd_mode]);
     } else 
 #endif
     {
-
-        if(osd_autopilot == 14) { // autoquad
-	    int8_t bc;
-	    for(bc=7;bc>=0;) {
-		if(osd_mode & (1<<bc) ) break;
-		--bc;
-	    }
-	    if(bc<0) bc=8;
-
-	    ptr = &mode_aq_strings[bc];
-	} else {
-
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-            if(sets.model_type==0) {
-                ptr = &mode_p_strings[osd_mode];
-            } else {
-                ptr = &mode_c_strings[osd_mode];
-            }
+    if(sets.model_type==0) {
+	mode_str = (PGM_P)pgm_read_word(&mode_p_strings[osd_mode]);
+    } else {
+	mode_str = (PGM_P)pgm_read_word(&mode_c_strings[osd_mode]);
+    }
 
  #else
-            ptr = &mode_c_strings[osd_mode];
+	mode_str = (PGM_P)pgm_read_word(&mode_c_strings[osd_mode]);
  #endif    
 #else
  #ifdef IS_PLANE
-            ptr = &mode_p_strings[osd_mode];
+	mode_str = (PGM_P)pgm_read_word(&mode_p_strings[osd_mode]);
  #endif    
 #endif
-        }
     }
     
-    osd.print_P((PGM_P)pgm_read_word(ptr));
+    osd.print_P(mode_str);
 
     if(lflags.motor_armed)
         osd_write(0x86);
@@ -1313,21 +1303,16 @@ void showArrow(uint8_t rotate_arrow,uint8_t method){
 
     arrow_set1 += rotate_arrow * 2 - 2;
 
-    switch(method) {  
-    case 1:
+    if(method == 1) {     
 	printSpeed(osd_windspeed * pgm_read_float(&measure->converts));
 	osd.printf_P(PSTR("|%c%c%2.0f%c"), arrow_set1, arrow_set1 + 1, (nor_osd_windspeed * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
-	break;
-    
-    case 2:
+    } else if(method == 2) {
 	osd.printf_P(PSTR("%c%c%4i\x05"), arrow_set1, arrow_set1 + 1, off_course);
-	break;
 
-    default:
+    } else { 
 	/* osd.printf_P(PSTR("%c%c"),        arrow_set1, arrow_set1 + 1); */ 
 	//printArrow( arrow_set1); 
 	osd_write(arrow_set1); osd_write(arrow_set1+1);
-	break;
     }
 }
 
@@ -1449,8 +1434,8 @@ void showILS(byte start_col, byte start_row) {
         //int numberOfPixels = CHAR_ROWS * AH_ROWS;
         int totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
         int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
-        int8_t charPosition = linePosition / 9;
-        uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
+        int charPosition = linePosition / 9;
+        int selectedChar = 9 - (linePosition % 9) + 0xC7;
         if(charPosition >= 0 && charPosition <= CHAR_ROWS) {
           OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
           OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
@@ -1498,11 +1483,11 @@ void showILS(byte start_col, byte start_row) {
         else if(alt >= 44){
             //Copter is too high. Ground is way too low to show on panel, 
             //so show down arrow at the bottom
-            subval_char =0x2E; 
+            subval_char =0x2E; // 0xC8; C8 сейчас это совсем не стрелка
             start_row += 4;
         }
 
-//	start_col += AH_COLS / 2; // middle of horizon
+	start_col += AH_COLS / 2; // middle of horizon
 
         //Enough calculations. Let's show the result
         OSD::write_xy(start_col + AH_COLS / 2, start_row, subval_char);
@@ -1582,7 +1567,7 @@ void panRadarScale(Point p){
     float dd= radar_zoom * STEP_WIDTH * pgm_read_float(&measure->converth);
     
     if(radar_zoom >=40) // 10 000 
-        osd_printf_2(PSTR("%4.2f%c"), dd/1000.0, pgm_read_byte(&measure->distchar));
+        osd_printf_2(PSTR("%4.2f%c"), (float)(dd/1000.0), pgm_read_byte(&measure->distchar));
     else
         osd_printf_2(PSTR("%4.0f%c"), dd, pgm_read_byte(&measure->high));
 }
@@ -1610,6 +1595,24 @@ void panCh(point p){
 // Output : The settings menu
 // Size   : 3 x ?? (rows x chars)
 // Staus  : done
+
+/* параметры для руления
+
+    switch_mode    режим переключения экранов
+    OSD_BRIGHTNESS контраст надписей
+
+    float horiz_kRoll; // коэффициенты горизонта
+    float horiz_kPitch;
+
+    float horiz_kRoll_a; // коэффициенты горизонта для NTSC
+    float horiz_kPitch_a;
+
+    byte battBv; // мин значение батареи B
+
+    byte vert_offs; // сдвиг экрана по вертикали и горизонтали
+    byte horiz_offs;
+    
+*/
 
 
 struct Params {
@@ -1944,3 +1947,4 @@ as_byte:
     }
 
 }
+
