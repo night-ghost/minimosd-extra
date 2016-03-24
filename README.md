@@ -52,6 +52,9 @@ much more space optimizations
 
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
+
+If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
+
 /* RUSSIAN */
 
 Отрефакторил, убрав чудовищный расход памяти на хранение всех настроек всех возможных экранов сразу, также 
@@ -123,3 +126,5 @@ v816:
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
+
+Если вам понравился проект и вы хотите поддержать его дальнейшее развитие - вы можете это сделать [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
