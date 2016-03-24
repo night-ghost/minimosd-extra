@@ -157,7 +157,7 @@ static int /* float*/  osd_heading = 0;                // ground course heading 
 
 static float        osd_alt_rel = 0;                    // altitude - float from MAVlink!
 static long         osd_alt_gps = 0;                    // altitude GPS
-static float        osd_airspeed = 0;              // airspeed
+static float        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
 //static float        osd_windspeedz = 0;
 static int /*float*/        osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений

@@ -1248,7 +1248,32 @@ char const * const mode_aq_strings[] PROGMEM ={
     aq_mode8, 
 };
 
+#if defined(USE_MWII)
+/*
+    { 0, 1,  &msg.mwii.mode.armed},  0
+    { 1, 2, &msg.mwii.mode.stable},  1
+    { 2, 3, &msg.mwii.mode.horizon}, 2
+    { 3, 4, &msg.mwii.mode.baro},    3
+    { 5, 0, &msg.mwii.mode.mag},    
+    { 10,6, &msg.mwii.mode.gpshome}, 4 
+    { 11,7, &msg.mwii.mode.gpshold}, 5
+    { 19,0, &msg.mwii.mode.osd_switch}, 
+*/
 
+const char PROGMEM mw_mode1[] = "angl";
+const char PROGMEM mw_mode2[] = "hori";
+
+char const * const mode_mw_strings[] PROGMEM ={ 
+    s_mode01, // acro
+    mw_mode1, 
+    mw_mode2, 
+    s_mode02, // alth
+    s_mode06, // rtl
+    s_mode08, // posh
+};
+
+
+#endif
 
 void panFlightMode(point p){
 
@@ -1263,6 +1288,14 @@ void panFlightMode(point p){
 	ptr = &mode_u_strings[osd_mode];
     } else 
 #endif
+
+#if defined(USE_MWII)
+    if(lflags.mwii_active) {
+	ptr = &mode_mw_strings[osd_mode];
+    } else 
+#endif
+
+
     {
 
         if(osd_autopilot == 14) { // autoquad

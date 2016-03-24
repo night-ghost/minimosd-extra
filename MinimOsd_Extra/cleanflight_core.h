@@ -492,6 +492,50 @@ void handleRawRC() {
 }
 */
 
+struct Mwii_bits {
+    byte n;
+    byte mode;
+    uint32_t *v;
+};
+
+
+static const Mwii_bits PROGMEM bits[] ={
+    { 0, 1,  &msg.mwii.mode.armed},
+    { 1, 2, &msg.mwii.mode.stable},
+    { 2, 3, &msg.mwii.mode.horizon},
+    { 3, 4, &msg.mwii.mode.baro},
+    { 5, 0, &msg.mwii.mode.mag},
+    { 10,6, &msg.mwii.mode.gpshome},
+    { 11,7, &msg.mwii.mode.gpshold},
+    { 19,0, &msg.mwii.mode.osd_switch},
+};
+
+/*
+        msg.mwii.sensorActive & mode_horizon -> HORIZON
+        msg.mwii.sensorActive & mode_stable  -> angle
+        else                        -> acro
+*/
+void mwii_check_mode() {
+
+    byte mode=0;
+
+    const  Mwii_bits *bp=bits;
+    for(byte n = sizeof(bits)/sizeof(Mwii_bits);n!=0; n-- ){
+	uint32_t *v;
+	byte b = pgm_read_byte(&bp->mode);
+	if(!b) continue; // пропускаем не-режимы
+	
+	v= (uint32_t *)pgm_read_word(&bp->v);
+
+	if(*v & msg.mwii.sensorActive) osd_mode = b-1;
+	
+	
+	bp++;
+    }
+
+
+}
+
 // --------------------------------------------------------------------------------------
 // Here are decoded received commands from MultiWii
 static inline void mwii_parse_data() {
@@ -721,21 +765,6 @@ struct pid_ {
         */
         memset(&msg.mwii.mode, 0, sizeof(msg.mwii.mode));
 
-	struct Mwii_bits {
-	    byte n;
-	    uint32_t *v;
-	};
-	
-	static const Mwii_bits PROGMEM bits[] ={
-	    { 0, &msg.mwii.mode.armed},
-            { 1, &msg.mwii.mode.stable},
-	    { 2, &msg.mwii.mode.horizon},
-            { 3, &msg.mwii.mode.baro},
-            { 5, &msg.mwii.mode.mag},
-            { 10, &msg.mwii.mode.gpshome},
-            { 11, &msg.mwii.mode.gpshold},
-            { 19, &msg.mwii.mode.osd_switch},
-	};
 
         while(remaining > 0) {
           char c = mwii_get_byte();
@@ -743,7 +772,9 @@ struct pid_ {
           const  Mwii_bits *bp=bits;
           for(byte n = sizeof(bits)/sizeof(Mwii_bits);n!=0; n-- ){
         	uint32_t *v;
-        	if(c == pgm_read_byte(&bp->n) ) {
+        	byte b = pgm_read_byte(&bp->n);
+
+        	if(c == b) {
         	    v= (uint32_t *)pgm_read_word(&bp->v);
         	    *v |= bit;
         	}
@@ -755,6 +786,13 @@ struct pid_ {
           --remaining;
         }
         msg.mwii.modeMSPRequests &=~ REQ_MSP_BOX;
+        
+/*        
+        msg.mwii.sensorActive & mode_horizon -> HORIZON
+        msg.mwii.sensorActive & mode_stable  -> angle
+        else                        -> acro
+*/
+
     }
 
 }

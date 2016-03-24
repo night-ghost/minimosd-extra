@@ -30,10 +30,7 @@ void readSettings() {
     eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
 // сразу настроим системы измерения
-    if (flags.measure) 
-	measure = &imper;
-    else
-	measure = &metr;
+    measure = flags.measure ? &imper :  &metr;
 
 
 }

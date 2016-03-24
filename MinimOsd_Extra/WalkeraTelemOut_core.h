@@ -45,13 +45,13 @@ void WalkeraTelem::sendTelemetry(){
 
 //    DevoSerial.print_P(PSTR("devo-m telem\n"));
 
-#if 1 // test
+#if 0 // test
 
-	devoPacket.lat = 4567891;
-	devoPacket.lon = 5631284;
+	devoPacket.lat = 4567891; //0 45.6789
+	devoPacket.lon = 5631284; //0 56.3128
 
-	devoPacket.alt   = 4321;
-	devoPacket.speed = 765;
+	devoPacket.alt   = 4321; //43.2
+	devoPacket.speed = 765; // 14.7
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = 1947;
 
@@ -59,7 +59,7 @@ void WalkeraTelem::sendTelemetry(){
 	devoPacket.lat = gpsDdToDmsFormat(osd_pos.lat);
 	devoPacket.lon = gpsDdToDmsFormat(osd_pos.lon);
 
-	devoPacket.alt   = (int)(osd_alt_gps / 100.0f); // is already cm!
+	devoPacket.alt   = (int)(osd_alt_gps / 10.0f); // mm -> cm
 	devoPacket.speed = (int)(osd_groundspeed * (0.0194384f * 100.0f));  // * 100 for cm
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = temperature;

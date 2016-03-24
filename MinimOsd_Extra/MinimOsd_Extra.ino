@@ -125,10 +125,10 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
         uint32_t t= int_Timer; 
         if( t /* && !New_PWM_Frame */){
     	    time -= t;
-          PWM_IN = (int)(time);
-          int_Timer = 0;
+            PWM_IN = (int)(time);
+            int_Timer = 0;
 
-          New_PWM_Frame = true;
+            New_PWM_Frame = true;
         }
     }
 }
