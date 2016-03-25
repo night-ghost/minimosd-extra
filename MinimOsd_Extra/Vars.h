@@ -169,7 +169,7 @@ static uint8_t      osd_throttle = 0;               // throtle
 static byte         seconds; // это только для panCALLSIGN
 static uint32_t     lastMAVBeat = 0;
 
-static uint8_t      apm_mav_system; 
+static uint8_t      apm_mav_system = 0;
 static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
 

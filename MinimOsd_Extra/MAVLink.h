@@ -80,12 +80,19 @@ void read_mavlink(){
 //Serial.printf_P(PSTR("got id=%d"), msg.m.msgid);
             lflags.mavlink_active = lflags.mavlink_on = lflags.got_data = 1;
 
+	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
+		apm_mav_system && apm_mav_system != msg.m.sysid)        // another system
+		    break; // skip packet
+
             //handle msg
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
+                byte apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
+                if(apm_mav_type == 6) break; // GCS
+                
                 apm_mav_system    = msg.m.sysid;
                 apm_mav_component = msg.m.compid;
-             //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
+
                 osd_autopilot = mavlink_msg_heartbeat_get_autopilot(&msg.m);
                 osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
                 //Mode (arducoper armed/disarmed)
