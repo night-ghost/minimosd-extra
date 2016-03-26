@@ -36,18 +36,18 @@ Setup screen! Some parameters can be adjusted without computer - by RC
 
 v813:
 
-HUD borders can be turned off
-RADAR point can show track (3 points) - requires charset 2.4.1.2
-RSSI values now is 2 bytes and has no 255 limit
+* HUD borders can be turned off
+* RADAR point can show track (3 points) - requires charset 2.4.1.2
+* RSSI values now is 2 bytes and has no 255 limit
 
 v816:
 
-Walkera telemetry output (for DEVO RX705/RX707 receivers) now working!
-Support of CleanFlight/MWII protocol (untested)
-Support of AutoQuad's MAVlink dialect (untested)
-support for new APM_Plane modes for quad-plane
-new parameters in Setup screen
-much more space optimizations
+* Walkera telemetry output (for DEVO RX705/RX707 receivers) now working!
+* Support of CleanFlight/MWII protocol (untested)
+* Support of AutoQuad's MAVlink dialect (untested)
+* support for new APM_Plane modes for quad-plane
+* new parameters in Setup screen
+* much more space optimizations
 
 
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
@@ -111,20 +111,21 @@ http://forum.rcdesign.ru/f90/thread132831-195.html#post5602416 но через �
 
 
 v813:
-Рамка HUD может выключаться
-РАДАР обзавелся "следом" в 3 точки, требует свежего шрифта
-значения RSSI 2 байта - убрано ограничение в 255
+* Рамка HUD может выключаться
+* РАДАР обзавелся "следом" в 3 точки, требует свежего шрифта
+* значения RSSI 2 байта - убрано ограничение в 255
 
 v816:
 
-Трансляция MAVlink в телеметрию Walkera на выход (для DEVO RX705/RX707 receivers) работает!
-поддержка CleanFlight/MWII протокола (не тестировано)
-поддержка диалекта MAVlink от AutoQuad   (не тестировано)
-поддержка новых режимов APM_Plane (quad-plane)
-новые параметры на экране Настройки (Setup)
-дальнейшая оптимизация места чтобы это все впихнуть :)
+* Трансляция MAVlink в телеметрию Walkera на выход (для DEVO RX705/RX707 receivers) работает!
+* поддержка CleanFlight/MWII протокола (не тестировано)
+* поддержка диалекта MAVlink от AutoQuad   (не тестировано)
+* поддержка новых режимов APM_Plane (quad-plane)
+* новые параметры на экране Настройки (Setup)
+* дальнейшая оптимизация места чтобы это все впихнуть :)
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
 Если вам понравился проект и вы хотите поддержать его дальнейшее развитие - вы можете это сделать [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
+
