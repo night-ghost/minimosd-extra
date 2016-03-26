@@ -65,6 +65,7 @@ void read_mavlink(){
     //grabing data 
     while(Serial.available_S()) {
         uint8_t c = Serial.read_S();
+        byte apm_mav_type;
 //LED_BLINK;
 
 #ifdef DEBUG
@@ -87,7 +88,7 @@ void read_mavlink(){
             //handle msg
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
-                byte apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
+                apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
                 if(apm_mav_type == 6) break; // GCS
                 
                 apm_mav_system    = msg.m.sysid;
