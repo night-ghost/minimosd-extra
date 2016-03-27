@@ -9,8 +9,70 @@ static inline boolean getBit(byte Reg, byte whichBit) {
 // чтение пакетов нужного протокола
 void getData(){
 //LED_BLINK;
-#if defined(USE_UAVTALK) || defined(USE_MWII)
 
+    if(lflags.mavlink_active){
+	read_mavlink();
+#if defined(USE_UAVTALK)
+    } else if(lflags.uavtalk_active) {
+	extern void uavtalk_read(void);
+	uavtalk_read();
+#endif
+#if defined(USE_MWII)
+    } else if(lflags.mwii_active) {
+	extern void mwii_read(void);
+	mwii_read();
+#endif
+    } else {
+    
+	switch(seconds % 4){
+#if defined(AUTOBAUD)
+	case 1: {
+	    Serial.end();
+	    static uint32_t last_speed = TELEMETRY_SPEED;
+	
+	    uint8_t pulse=255;
+	    for(byte i=250; i!=0; i--){
+	        long t=pulseIn(PD0, 0, 2500);
+	        if(t==0 || t>255) continue;
+	        if(t<pulse) pulse=t;
+	    }
+	    long speed;
+	    if(pulse == 255)    	speed = last_speed; // no input at all
+	    else if(pulse < 11) 	speed =115200;
+	    else if(pulse < 19) 	speed = 57600;
+	    else if(pulse < 29) 	speed = 38400;
+	    else if(pulse < 40) 	speed = 28800;
+	    else if(pulse < 60) 	speed = 19200;
+	    else if(pulse < 150)	speed =  9600;
+	    else                        speed =  4800;
+	
+	    OSD::setPanel(3,6);
+	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
+	
+	    last_speed = speed;
+	    Serial.begin(speed);
+	    } break;
+#endif    
+	
+	
+#if defined(USE_UAVTALK)
+	case 2:
+	    extern void uavtalk_read(void);
+	    uavtalk_read();
+	    break;
+#endif
+#if defined(USE_MWII)
+	case 3:
+	    extern void mwii_read(void);
+	    mwii_read();
+	    break;
+#endif
+	default:
+	    read_mavlink();
+	    break;
+	}
+    }
+/*    
 //  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
     if(lflags.mavlink_active || !(lflags.uavtalk_active || lflags.mwii_active ) && (seconds % 3 == 0 )){
         read_mavlink();
@@ -28,6 +90,7 @@ void getData(){
 #else
     read_mavlink();
 #endif
+*/
 }
 
 

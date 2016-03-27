@@ -3531,8 +3531,10 @@ public const int npanel = 4; // количество панелей
                 {
 
                     comPort.PortName = CurrentCOM;
-                    comPort.BaudRate = 57600;
-
+                    //comPort.BaudRate = 57600;
+				comPort.BaudRate = 115200;
+				
+				
                     comPort.Open();
 				
 					comPort.DtrEnable = true;

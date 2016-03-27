@@ -49,6 +49,11 @@ v816:
 * new parameters in Setup screen
 * much more space optimizations
 
+v817:
+
+* Filtered out GCS messages translated by Plane 3.4+ and Copter 3.3+
+* Auto Baud Rate!
+
 
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
@@ -123,6 +128,11 @@ v816:
 * поддержка новых режимов APM_Plane (quad-plane)
 * новые параметры на экране Настройки (Setup)
 * дальнейшая оптимизация места чтобы это все впихнуть :)
+
+v817:
+
+* отфильтрованы сообщения с наземной станции, транслируемые версиями Plane 3.4+ и Copter 3.3+
+* автоматическое определение скорости последовательного порта!
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

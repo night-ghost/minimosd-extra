@@ -212,6 +212,7 @@ struct loc_flags {
     bool sw_state:1;
     bool osd_got_home:1; // tels if got home position or not
 
+    bool got_baud:1;
 };
 
 #ifdef DEBUG
