@@ -37,7 +37,7 @@
 // оно может читать PWM по прерываниям!
 #define PWM_PIN PD3 
 
-//#define WALKERA_TELEM RssiPin // telemetry output
+#define WALKERA_TELEM RssiPin // telemetry output
 
 //#define LEDPIN AmperagePin
 
