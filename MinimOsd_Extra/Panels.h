@@ -126,7 +126,7 @@ void writePanels(){
 //	osd.printf_P("p=%d t=%d",panelN, sets.ch_toggle);
 
     //Check for panel toggle
-    if(sets.ch_toggle > 0) pan_toggle(); // This must be first so you can always toggle
+//    if(sets.ch_toggle > 0) pan_toggle(); // This must be first so you can always toggle
 
     if(panelN < sets.n_screens){ // конфигурируемые юзером экраны
 	print_all_panels();

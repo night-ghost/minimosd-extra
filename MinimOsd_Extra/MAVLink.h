@@ -79,7 +79,7 @@ void read_mavlink(){
             millis_plus(&lastMAVBeat, 0);
 
 //Serial.printf_P(PSTR("got id=%d"), msg.m.msgid);
-            lflags.mavlink_active = lflags.mavlink_on = lflags.got_data = 1;
+            lflags.mavlink_active = lflags.got_data = 1;
 
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid)        // another system

@@ -189,7 +189,6 @@ struct loc_flags {
     bool canswitch:1;
 
     bool got_data:1;		// флаг получения пакета
-    bool mavlink_on:1;		// флаг активности (сбрасывается по таймауту)
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
 //    bool osd_clear:1;

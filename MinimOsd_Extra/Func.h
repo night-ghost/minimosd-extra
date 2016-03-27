@@ -1,9 +1,86 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+
+void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
+    *dst = millis() + inc;
+}
+
+
 static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
+
+void pan_toggle(){
+    byte old_panel=panelN;
+
+    uint16_t ch_raw;
+
+    if(sets.ch_toggle == 0) 
+	return;
+    else if(sets.ch_toggle == 1) 
+	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
+    else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
+	ch_raw = chan_raw[sets.ch_toggle-1];
+    else 
+        ch_raw = chan_raw[7]; // в случае мусора - канал 8
+
+
+//	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
+    if (sets.ch_toggle == 4){
+      if ((osd_mode != 6) && (osd_mode != 7)){
+        if (osd_off_switch != osd_mode){ 
+            osd_off_switch = osd_mode;
+            //osd_switch_time = millis();
+            millis_plus(&osd_switch_time, 0);
+            if (osd_off_switch == osd_switch_last){
+              lflags.rotatePanel = 1;
+            }
+        }
+        if ((millis() - osd_switch_time) > 2000){
+          osd_switch_last = osd_mode;
+        }
+      }
+    }
+    else  {
+      if (sets.switch_mode == 0){  //Switch mode by value
+        /*
+	    Зазор канала = диапазон изменения / (число экранов+1)
+	    текущий номер = приращение канала / зазор
+        */
+        int d = (1900-1100)/sets.n_screens;
+        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
+        //First panel
+        if ( panelN != n) {
+          panelN = n;
+        }
+      } else{ 			 //Rotation switch
+        if (ch_raw > 1200) {
+            if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
+                lflags.rotatePanel = 1;
+                //osd_switch_time = millis() + 500;
+                millis_plus(&osd_switch_time, 500);
+            }
+        } else { // выключено
+        }
+
+      }
+    }
+    if(lflags.rotatePanel == 1){
+	lflags.rotatePanel = 0;
+        panelN++;
+        if (panelN > sets.n_screens)
+            panelN = 0;
+
+    }
+//  }
+  if(old_panel != panelN){
+	readPanelSettings();
+	lflags.got_data=1; // redraw even no news
+  }
+
+}
+
 
 
 // чтение пакетов нужного протокола
@@ -28,28 +105,40 @@ void getData(){
 #if defined(AUTOBAUD)
 	case 1: {
 	    Serial.end();
-	    static uint32_t last_speed = TELEMETRY_SPEED;
+	    static uint8_t last_pulse = 15;
 	
 	    uint8_t pulse=255;
+	    
 	    for(byte i=250; i!=0; i--){
 	        long t=pulseIn(PD0, 0, 2500);
-	        if(t==0 || t>255) continue;
-	        if(t<pulse) pulse=t;
+	        if(t>255) continue;	     // too long - not single bit
+	        uint8_t tb = t;       // it less than 255 so convert to byte
+	        if(tb==0) continue;   // no pulse at all
+	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
 	    }
+	    
 	    long speed;
-	    if(pulse == 255)    	speed = last_speed; // no input at all
-	    else if(pulse < 11) 	speed =115200;
-	    else if(pulse < 19) 	speed = 57600;
-	    else if(pulse < 29) 	speed = 38400;
-	    else if(pulse < 40) 	speed = 28800;
-	    else if(pulse < 60) 	speed = 19200;
-	    else if(pulse < 150)	speed =  9600;
-	    else                        speed =  4800;
+	    
+	    if(pulse == 255)    pulse = last_pulse; // no input at all - use last
+	    else                last_pulse = pulse; // remember last correct time
 	
+	// F_CPU   / BAUD for 115200 is 138
+	// 1000000 / BAUD for 115200 is 8.68uS
+	//  so I has no idea about pulse times - thease simply measured
+	
+	    if(     pulse < 11) 	speed = 115200;
+	    else if(pulse < 19) 	speed =  57600;
+	    else if(pulse < 29) 	speed =  38400;
+	    else if(pulse < 40) 	speed =  28800;
+	    else if(pulse < 60) 	speed =  19200;
+	    else if(pulse < 150)	speed =   9600;
+	    else                        speed =   4800;
+
+#ifdef DEBUG
 	    OSD::setPanel(3,6);
 	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
-	
-	    last_speed = speed;
+#endif
+
 	    Serial.begin(speed);
 	    } break;
 #endif    
@@ -72,25 +161,20 @@ void getData(){
 	    break;
 	}
     }
-/*    
-//  слушаем по очереди до первого валидного пакета, по пришествию пакета слушать только подключенный протокол
-    if(lflags.mavlink_active || !(lflags.uavtalk_active || lflags.mwii_active ) && (seconds % 3 == 0 )){
-        read_mavlink();
-    } else if(lflags.uavtalk_active || !lflags.mwii_active && (seconds % 3 == 1 )){
-#if defined(USE_UAVTALK)
-	extern void uavtalk_read(void);
-	uavtalk_read();
-#endif
-    } else {
-#if defined(USE_MWII)
-	extern void mwii_read(void);
-	mwii_read();
-#endif
+    
+    if(lflags.got_data){ // были свежие данные - обработать, если данных не было давно - предупредить
+        lflags.got_data=0;
+
+        pan_toggle(); // проверить переключение экранов
+
+        parseNewData();
+
+//	LED_BLINK;
+
+        lflags.update_stat = 1; // пришли данные
+        vsync_wait = 1;         // надо перерисовать экран
+//LED_ON;
     }
-#else
-    read_mavlink();
-#endif
-*/
 }
 
 
@@ -249,11 +333,6 @@ void filter( float &dst, float val, const float k){ // комплиментар�
 }
 */
 
-void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
-    *dst = millis() + inc;
-}
-
-
 // вычисление нужных переменных
 // накопление статистики и рекордов
 void setFdataVars()
@@ -347,74 +426,6 @@ void setFdataVars()
 }
 
 
-
-void pan_toggle(){
-    byte old_panel=panelN;
-
-    uint16_t ch_raw;
-
-    if(sets.ch_toggle == 1) 
-	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
-    else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
-	ch_raw = chan_raw[sets.ch_toggle-1];
-    else 
-        ch_raw = chan_raw[7]; // в случае мусора - канал 8
-
-
-//	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
-    if (sets.ch_toggle == 4){
-      if ((osd_mode != 6) && (osd_mode != 7)){
-        if (osd_off_switch != osd_mode){ 
-            osd_off_switch = osd_mode;
-            //osd_switch_time = millis();
-            millis_plus(&osd_switch_time, 0);
-            if (osd_off_switch == osd_switch_last){
-              lflags.rotatePanel = 1;
-            }
-        }
-        if ((millis() - osd_switch_time) > 2000){
-          osd_switch_last = osd_mode;
-        }
-      }
-    }
-    else  {
-      if (sets.switch_mode == 0){  //Switch mode by value
-        /*
-	    Зазор канала = диапазон изменения / (число экранов+1)
-	    текущий номер = приращение канала / зазор
-        */
-        int d = (1900-1100)/sets.n_screens;
-        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
-        //First panel
-        if ( panelN != n) {
-          panelN = n;
-        }
-      } else{ 			 //Rotation switch
-        if (ch_raw > 1200) {
-            if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
-                lflags.rotatePanel = 1;
-                //osd_switch_time = millis() + 500;
-                millis_plus(&osd_switch_time, 500);
-            }
-        } else { // выключено
-        }
-
-      }
-    }
-    if(lflags.rotatePanel == 1){
-	lflags.rotatePanel = 0;
-        panelN++;
-        if (panelN > sets.n_screens)
-            panelN = 0;
-
-    }
-//  }
-  if(old_panel != panelN){
-	readPanelSettings();
-	lflags.got_data=1; // redraw even no news
-  }
-
-}
 
 
 float NOINLINE gps_norm(long f){
