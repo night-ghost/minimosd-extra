@@ -769,22 +769,27 @@ void panBatteryPercent(point p){
     PGM_P fmt1;
     PGM_P fmt2;
 
+    float val;
+    if (flags.OSD_BATT_SHOW_PERCENT)
+	val= (float)osd_battery_remaining_A/256*100;
+    else
+	val = (float)mah_used;
+
 //    if(has_sign(p))
     if(has_sign(p)) {
 	osd_write(0x88); // донышко батарейки не зависит от
 
-	fmt1=PSTR("%c%c\x8e%2.0f%%");
-        fmt2=PSTR("%c%c\x8e%4.0f\x01");
+	if (flags.OSD_BATT_SHOW_PERCENT)
+	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
+	else
+    	    osd_print_bat(PSTR("%c%c\x8e%4.0f\x01"), val);
     } else {
-	fmt1=PSTR("%2.0f%%");
-	fmt2=PSTR("%4.0f\x01");
+	if (flags.OSD_BATT_SHOW_PERCENT)
+	    osd_printf_1(PSTR("%2.0f%%"),val);
+	else
+	    osd_printf_1(PSTR("%4.0f\x01"),val);
     }
 
-
-	if (flags.OSD_BATT_SHOW_PERCENT)
-	    osd_printf_1(fmt1,  (float)osd_battery_remaining_A/256*100);
-	else
-	    osd_printf_1(fmt2, mah_used);
 
 
 }
@@ -942,6 +947,30 @@ void panBatt_B(point p){
 
 void panWaitMAVBeats(){
 
+#if 0 // testintg things
+    OSD::setPanel(3,3);
+    
+    showArrow(grad_to_sect(seconds),0);
+    osd.print(seconds);
+    osd.write('|');
+    
+    int rotate_arrow = grad_to_sect(seconds);
+    osd.print(rotate_arrow );
+    osd.write('|');
+
+    char arrow_set1 = 0x90;
+
+
+    while(rotate_arrow>16) rotate_arrow -= 16;
+    while(rotate_arrow<1)  rotate_arrow += 16;
+    
+//    rotate_arrow &= 0x0f;
+
+    arrow_set1 += rotate_arrow * 2 - 2;
+
+    osd.printf_P(PSTR("%x"),arrow_set1);
+#endif
+
     OSD::setPanel(5,9);
     osd.print_P(PSTR("No input data! "));
 
@@ -1076,8 +1105,8 @@ void panRose(point p){
 
 
 int getTargetBearing(){
-    if (wp_target_bearing < 0) 	wp_target_bearing+=360;
-	
+    if (wp_target_bearing < 0) wp_target_bearing+=360;
+
     return grad_to_sect(wp_target_bearing - osd_heading); //Convert to int 1-16 
 }
 
@@ -1351,6 +1380,8 @@ void showArrow(uint8_t rotate_arrow,uint8_t method){
 //    rotate_arrow &= 0x0f;
 
     arrow_set1 += rotate_arrow * 2 - 2;
+
+
 
     switch(method) {  
     case 1:
@@ -1831,6 +1862,9 @@ void panSetup(){
 	nm=(char *)pgm_read_word((void *)&p->name);
 
         osd.print_P(nm);
+        
+        //while(OSD::col < 19) osd_write(' ');
+        OSD::setPanel(19, SETUP_START_ROW + i);
 
 	if(i == setup_menu) {
 	    osd_write('>');

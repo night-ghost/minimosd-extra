@@ -4,6 +4,9 @@
 #else
 	#include "wiring.h"
 #endif
+
+#include "compat.h"
+
 #include "Spi.h"
 
 //---------- constructor ----------------------------------------------------
@@ -22,28 +25,26 @@ SPI::SPI()
 
 //------------------ mode ---------------------------------------------------
 
-void SPI::mode(byte config)
-{
+void SPI::mode(byte config){
   byte tmp;
 
   // enable SPI master with configuration byte specified
   SPCR = 0;
-  SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR);
+  SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR) | (1<<SPR0);
+  SPSR |= 1;
   tmp = SPSR;
   tmp = SPDR;
 }
 
 //------------------ transfer -----------------------------------------------
 
-byte SPI::transfer(byte value)
-{
+byte SPI::transfer(byte value){
   SPDR = value;
   while (!(SPSR & (1<<SPIF))) ;
   return SPDR;
 }
 
-byte SPI::transfer(byte value, byte period)
-{
+byte SPI::transfer(byte value, byte period){
   SPDR = value;
   if (period > 0) delayMicroseconds(period);
   while (!(SPSR & (1<<SPIF))) ;
@@ -54,3 +55,4 @@ byte SPI::transfer(byte value, byte period)
 //---------- preinstantiate SPI object --------------------------------------
 
 SPI Spi = SPI();
+

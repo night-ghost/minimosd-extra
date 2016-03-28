@@ -2230,47 +2230,44 @@ public const int npanel = 4; // количество панелей
                     comPort.BaudRate = 57600;
 
                     comPort.Open();
-
+				
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
-                    System.Threading.Thread.Sleep(2);
+                    System.Threading.Thread.Sleep(50);
 
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
 
-                    System.Threading.Thread.Sleep(2000);
+                    System.Threading.Thread.Sleep(1000);
 					
-					if(comPort.BytesToRead!=0)
-                    	comPort.ReadExisting();
+					while(comPort.BytesToRead!=0)
+                    	Console.WriteLine(comPort.ReadExisting());
 
                     comPort.WriteLine("");
                     comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
+                    //comPort.WriteLine("");
+                    //comPort.WriteLine("");
                     // comPort.WriteLine("");
 
                     int timeout = 0;
 
-                    while (comPort.BytesToRead == 0)
-                    {
-                        System.Threading.Thread.Sleep(500);
+                    while (comPort.BytesToRead == 0) {
+                        System.Threading.Thread.Sleep(100);
 						comPort.WriteLine("");
-                        Console.WriteLine("Waiting...");
+                        Console.WriteLine("Waiting... "+timeout.ToString());
                         timeout++;
 						Application.DoEvents();
 						
-                        if (timeout > 30)
-                        {
+                        if (timeout > 60) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
                             return;
                         }
                     }
                     string readFont = comPort.ReadLine();
-                    if (!readFont.Contains("Ready for Font") && !readFont.Contains("RFF"))
-                    {
-                        MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                    if (!readFont.Contains("RFF")) {
+                        MessageBox.Show("Error entering CharSet upload mode - invalid data: "+ readFont);
                         comPort.Close();
                         return;
                     }
@@ -2278,16 +2275,14 @@ public const int npanel = 4; // количество панелей
                 }
                 catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
 
-                using (var stream = ofd.OpenFile())
-                {
+                using (var stream = ofd.OpenFile()) {
 
                     BinaryReader br = new BinaryReader(stream);
                     StreamReader sr2 = new StreamReader(br.BaseStream);
 
                     string device = sr2.ReadLine();
                     
-                    if (device != "MAX7456")
-                    {
+                    if (device != "MAX7456"){
                         MessageBox.Show("Invalid MCM");
                         comPort.Close();
                         return;
@@ -2311,31 +2306,28 @@ public const int npanel = 4; // количество панелей
                             }
                             length -= read;
                             byte[] buffer = br.ReadBytes(read);
-							Console.WriteLine("write "+buffer.ToString () );
+							Console.WriteLine("write "+buffer.ToString() );
                             comPort.Write(buffer, 0, buffer.Length);
                             int timeout = 0;
 
-                            while (comPort.BytesToRead == 0 && read == 768)
-                            {
+                            while (comPort.BytesToRead == 0 && read == 768) {
                                 System.Threading.Thread.Sleep(10);
                                 timeout++;
 
-                                if (timeout > 100)
-                                {
+                                if (timeout > 100) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
                                     return;
                                 }
                             }
 
-                            comPort.ReadExisting();
-                            if (length < 1000)
-                            {
+                            string resp = comPort.ReadExisting(); //CDn
+							Console.WriteLine("responce "+resp );
+                            if (length < 1000) {
                                 lblFWModelType.Text = lblFWModelType.Text;
                             }
 
-                        }
-                        catch { 
+                        } catch { 
                             break; 
                         }
 
@@ -2344,13 +2336,11 @@ public const int npanel = 4; // количество панелей
                     comPort.WriteLine("\r\n");
                     //Wait for last char acknowledge
                     int t = 0;
-                    while (comPort.BytesToRead == 0)
-                    {
+                    while (comPort.BytesToRead == 0) {
                         System.Threading.Thread.Sleep(10);
                         t++;
 
-                        if (t > 10)
-                        {
+                        if (t > 10) {
                             MessageBox.Show("No end");
                             comPort.Close();
                             return;

@@ -40,18 +40,6 @@ union {
 /*      allow CLI to be started by hitting enter 3 times, if no
         heartbeat packets have been received but not more than 3 seconds 
 */
-void try_upload_font(byte c){
-    if (millis() < 3000) {
-        if (c == '\n' || c == '\r') {
-            crlf_count++;
-        } else {
-            crlf_count = 0;
-        }
-        if (crlf_count > 3) {
-            uploadFont();
-        }
-    }
-}
 
 void read_mavlink(){
     uint8_t      base_mode=0;
@@ -71,7 +59,7 @@ void read_mavlink(){
 #ifdef DEBUG
 	bytes_comes+=1;
 #endif
-        if (!lflags.mavlink_active) try_upload_font(c);
+//        if (!lflags.mavlink_active) try_upload_font(c);
 
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {

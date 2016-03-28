@@ -4,7 +4,7 @@
 #define USE_UAVTALK 1
 #define USE_MWII 1
 
-//#define DEBUG
+#define DEBUG
 
 // sets.model_type plane=0 copter=1
 
@@ -14,14 +14,14 @@
 
 
 #define VERSION "2.4"
-#define RELEASE_NUM 818
-#define RELEASE "r818DV"
+#define RELEASE_NUM 817
+#define RELEASE "r817DV"
 
 #define AUTOBAUD 1
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
 //#define TELEMETRY_SPEED  19200  // How fast our MAVLink telemetry is coming to Serial port
-#define BOOTTIME         1300   // Time in milliseconds that we show boot loading bar and wait user input
+#define BOOTTIME         1000   // Time in milliseconds that we show boot loading bar and wait user input
 
 
 // additional pins
@@ -37,7 +37,7 @@
 // оно может читать PWM по прерываниям!
 #define PWM_PIN PD3 
 
-//#define WALKERA_TELEM RssiPin // telemetry output
+#define WALKERA_TELEM RssiPin // telemetry output
 
 //#define LEDPIN AmperagePin
 
@@ -47,7 +47,7 @@
  #define LED_OFF digitalWrite(LEDPIN, LOW).
 #else
  #define LED_BLINK {}
- #define LED_ON {}
+ #define LED_ON {}.
  #define LED_OFF {}
 #endif
 

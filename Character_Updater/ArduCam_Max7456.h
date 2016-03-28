@@ -4,8 +4,15 @@
 
 /******* FROM DATASHEET *******/
 
+#include "compat.h"
+
+// pinout
 #define MAX7456_SELECT 6//SS
 #define MAX7456_VSYNC 2//INT0
+
+#define DATAOUT 11              // MOSI
+#define DATAIN  12              // MISO
+#define SPICLOCK  13            // sck
 
 #define NTSC 0
 #define PAL 1
@@ -22,18 +29,24 @@
 //MAX7456 reg write addresses
 #define MAX7456_VM0_reg   0x00
 #define MAX7456_VM1_reg   0x01
+
+#define MAX7456_HOS_reg   0x02 // horisontal offset
+#define MAX7456_VOS_reg   0x03 // vertical offset
+
 #define MAX7456_DMM_reg   0x04
 #define MAX7456_DMAH_reg  0x05
 #define MAX7456_DMAL_reg  0x06
 #define MAX7456_DMDI_reg  0x07
-#define MAX7456_OSDM_reg  0x0c //not used. Is to set mix
-#define MAX7456_OSDBL_reg 0x6c //black level
 
 //MAX7456 reg write addresses to recording NVM process
 #define MAX7456_CMM_reg   0x08
 #define MAX7456_CMAH_reg  0x09
 #define MAX7456_CMAL_reg  0x0a
 #define MAX7456_CMDI_reg  0x0b
+// sharpness
+#define MAX7456_OSDM_reg  0x0c //not used. Is to set mix
+#define MAX7456_OSDBL_reg 0x6c //black level
+
 
 //DMM commands
 #define MAX7456_CLEAR_display 0x04
@@ -53,7 +66,8 @@
 #define MAX7456_SYNC_autosync 0x10
 #define MAX7456_SYNC_internal 0x30
 #define MAX7456_SYNC_external 0x20
-//VM1 command modifiers
+
+//VM1 command modifiers - black level always 0
 #define MAX7456_WHITE_level_80 0x03
 #define MAX7456_WHITE_level_90 0x02
 #define MAX7456_WHITE_level_100 0x01
@@ -72,34 +86,42 @@
   #define MAX7456_screen_rows 0x0D
 #endif
 
+
+
 //------------------ the OSD class -----------------------------------------------
 
 class OSD: public BetterStream
 {
   public:
     OSD(void);
-    void init(void);
-    void clear(void);
-    void plug(void);
-    void setPanel(uint8_t start_col, uint8_t start_row);
-    void openPanel(void);
-    void closePanel(void);
-    void control(uint8_t ctrl);
-    void detectMode(void);
-    void setMode(int mode);
-    void setBrightness();
-    void openSingle(uint8_t x, uint8_t y);
-    int getMode(void);
-    int getCenter(void);
-    virtual int     available(void);
-    virtual int     read(void);
-    virtual int     peek(void);
+    static void init(void);
+    static void hw_init(void);
+    static void clear(void);
+    static void setPanel(uint8_t start_col, uint8_t start_row);
+    static void detectMode(void);
+    static void setMode(uint8_t mode);
+    static void setBrightness();
+    static uint8_t getMode(void);
+    static void update(void);
+    static void writeb(uint8_t c);
+    virtual byte     available(void);
+    virtual byte     read(void);
+    virtual byte     peek(void);
     virtual void    flush(void);
     virtual size_t write(uint8_t c);
-    void write_NVM(int font_count, uint8_t *character_bitmap);
+    static void write_NVM(int font_count, uint8_t *character_bitmap);
+    static void write_xy(uint8_t x, uint8_t y, uint8_t c);
+    static void adjust();
     using BetterStream::write;
-  private:
-    uint8_t start_col, start_row, col, row, video_mode, video_center;
+
+    static inline uint8_t getCenter(){  return video_center; } //first line for center panel 
+
+//  private:
+    static uint8_t col, row, video_mode, video_center;
+    static uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+    static uint16_t bufpos;
+    
+    static void NOINLINE calc_pos();
 };
 
 #endif

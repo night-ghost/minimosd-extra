@@ -232,7 +232,7 @@ void setup()     {
     OSD::update();// Show bootloader bar
 
     delay(start_dly);
-    Serial.flush();
+//    Serial.flush();
 
 #ifdef LEDPIN
     digitalWrite(LEDPIN, 0);  // turn off on init done
@@ -282,32 +282,30 @@ void loop()
         //timer_20ms = pt + 20;
         millis_plus(&timer_20ms, 20);
         On20ms();
+    }
+    if(pt > timer_100ms){
+        millis_plus(&timer_100ms, 100);
+	On100ms();
 
-	if(++count_100ms>5) {
-	    count_100ms=0;
-	    On100ms();
-
-	}
-	if(++count_1s>25) {
-	    count_1s=0;
-
-            lflags.got_data=1; // каждые полсекунды принудительно
+    }
+    if(pt > timer_500ms){
+	millis_plus(&timer_500ms, 500);
+        lflags.got_data=1; // каждые полсекунды принудительно
 
 #ifdef WALKERA_TELEM
-	    walkera.sendTelemetry();
+        walkera.sendTelemetry();
 #endif
 
-            lflags.blinker = !lflags.blinker;
-            if(lflags.blinker) {
-                seconds++;
-	        lflags.one_sec_timer_switch = 1; // for warnings
+        lflags.blinker = !lflags.blinker;
+        if(lflags.blinker) {
+            seconds++;
+            lflags.one_sec_timer_switch = 1; // for warnings
 
 
 #ifdef DEBUG    
-		if(seconds % 60 == 30)
-		    Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
+	    if(seconds % 60 == 30)
+	        Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
 #endif
-	    }
 	}
     }
 

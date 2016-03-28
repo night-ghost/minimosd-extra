@@ -299,7 +299,7 @@ void OSD::update() {
 }
 
 
-
+//*
 void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 {
   byte x;
@@ -309,7 +309,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   char_address_hi = font_count;
 //  byte char_address_lo = 0;
 
-    cli();
+//    cli();
 
   max7456_on();
   MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display);
@@ -317,7 +317,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   MAX_write(MAX7456_CMAH_reg, char_address_hi);// set start address high
 
   for(x = 0; x < NVM_ram_size; x++) {// write out 54 (out of 64) bytes of character to shadow ram
-    screen_char = character_bitmap[x];
+    screen_char = *character_bitmap++;
     MAX_write(MAX7456_CMAL_reg, x);// set start address low
     MAX_write(MAX7456_CMDI_reg, screen_char);
   }
@@ -331,14 +331,14 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
     if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   }
 
-  sei();
+//  sei();
 
   MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert);// turn on screen next vertical
 
   max7456_off();
 
 }
-
+//*/
 //------------------ pure virtual ones (just overriding) ---------------------
 
 byte  OSD::available(void){
@@ -353,3 +353,50 @@ byte  OSD::peek(void){
 void OSD::flush(void){
 }
 
+void delay_15(){
+    delay(15);
+}
+
+/*
+void OSD::write_NVM(int font_count, uint8_t *character_bitmap){
+  byte x;
+  byte screen_char;
+
+  byte char_address_hi = font_count;
+  byte char_address_lo = 0;
+ //Serial.println("write_new_screen");   
+
+  // disable display
+  max7456_on();
+
+//    cli();
+
+  MAX_write(MAX7456_VM0_reg,  MAX7456_DISABLE_display);
+  MAX_write(MAX7456_CMAH_reg, char_address_hi);  // set start address high
+
+//  delay_15();
+
+  for(x = 0; x < NVM_ram_size; x++) {	// write out 54 (out of 64) bytes of character to shadow ram
+    screen_char = *character_bitmap++;
+    MAX_write(MAX7456_CMAL_reg, x); 	// set start address low
+    MAX_write(MAX7456_CMDI_reg, screen_char);
+  }
+
+//    delay_15();
+  // transfer a 54 bytes from shadow ram to NVM
+  MAX_write(MAX7456_CMM_reg, WRITE_nvr);
+  
+  delay_15();
+  
+  // wait until bit 5 in the status register returns to 0 (12ms)
+  while (1) {
+      Spi.transfer(MAX7456_STAT_reg_read);
+      if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
+  } 
+
+//    sei();
+    
+  MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert); // turn on screen next vertical
+  max7456_off();
+}
+*/

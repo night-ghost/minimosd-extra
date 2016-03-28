@@ -425,7 +425,7 @@ void uavtalk_read(void) {
 		uint8_t c = Serial.read_S();
 		
 		// needed for MinimOSD upload, while no UAVTalk is established
-		if (!lflags.uavtalk_active) try_upload_font(c);
+//		if (!lflags.uavtalk_active) try_upload_font(c);
 
 #ifdef DEBUG
     bytes_comes+=1;

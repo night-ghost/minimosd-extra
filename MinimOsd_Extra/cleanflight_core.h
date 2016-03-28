@@ -820,7 +820,7 @@ void mwii_read() {
 		c = Serial.read_S();
 		extern void try_upload_font(byte c);
 
-		if (!lflags.mwii_active) try_upload_font(c);
+//		if (!lflags.mwii_active) try_upload_font(c);
 
 		switch(msg.mwii.state) {
 		case IDLE:

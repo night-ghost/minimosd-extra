@@ -100,21 +100,43 @@ void getData(){
 	mwii_read();
 #endif
     } else {
-    
+	if(millis()<5000 && Serial.available_S()) {
+	    byte c=Serial.read_S();
+
+//	    OSD::setPanel(1,1);
+
+            if (c == '\n' || c == '\r') {
+                crlf_count++;
+//osd.print_P(PSTR("cr|"));
+            } else {
+//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
+                crlf_count = 0;
+            }
+            if (crlf_count > 3) {
+//osd.print_P(PSTR("fonts!|"));
+                uploadFont();
+            }
+
+	    return;
+	}
+
 	switch(seconds % 4){
 #if defined(AUTOBAUD)
 	case 1: {
 	    Serial.end();
 	    static uint8_t last_pulse = 15;
+	    uint32_t pt = millis() + 100; // не более 0.1 секунды
 	
 	    uint8_t pulse=255;
 	    
 	    for(byte i=250; i!=0; i--){
-	        long t=pulseIn(PD0, 0, 2500);
+	        long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
 	        if(t>255) continue;	     // too long - not single bit
 	        uint8_t tb = t;       // it less than 255 so convert to byte
 	        if(tb==0) continue;   // no pulse at all
 	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
+	        
+	        if(millis()>pt) break; 
 	    }
 	    
 	    long speed;
@@ -157,6 +179,7 @@ void getData(){
 	    break;
 #endif
 	default:
+maybefonts:
 	    read_mavlink();
 	    break;
 	}

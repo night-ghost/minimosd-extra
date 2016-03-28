@@ -50,14 +50,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* **********************************************/
 /* ***************** INCLUDES *******************/
 
+#include "Config.h"
 //#define membug 
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
+#define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater " RELEASE
+
 
 // AVR Includes
-#include <FastSerial.h>
-#include <AP_Common.h>
-#include <AP_Math.h>
+#include <SingleSerial.h>
+//#include <AP_Common.h>
+//#include <AP_Math.h>
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -68,7 +71,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 #include <EEPROM.h>
-#include <SimpleTimer.h>
 #include <GCS_MAVLink.h>
 
 #ifdef membug
@@ -78,8 +80,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 // Configurations
 #include "OSD_Config.h"
 #include "ArduCam_Max7456.h"
-#include "OSD_Vars.h"
-#include "OSD_Func.h"
+#include "Vars.h"
+//#include "OSD_Func.h"
+
 
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
@@ -89,78 +92,67 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define MinimOSD
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
-#define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
+#define BOOTTIME         1000   // Time in milliseconds that we show boot loading bar and wait user input
 
 // Objects and Serial definitions
-FastSerialPort0(Serial);
+SingleSerialPort(Serial);
 OSD osd; //OSD object 
 
-SimpleTimer  mavlinkTimer;
 
+#include "Font.h"
+
+//SimpleTimer  mavlinkTimer;
+
+void delay_150(){
+    delay(150);
+}
+
+void isr_VSYNC(){
+    vsync_wait=0; // единственное что нам надо - отметить его наличие
+}
 
 /* **********************************************/
 /* ***************** SETUP() *******************/
 
 void setup() 
 {
-#ifdef ArduCAM328
-    pinMode(10, OUTPUT); // USB ArduCam Only
-#endif
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
 
     Serial.begin(TELEMETRY_SPEED);
     // setup mavlink port
     mavlink_comm_0_port = &Serial;
 
-#ifdef membug
-    Serial.println(freeMem());
-#endif
+    attachInterrupt(INT0, isr_VSYNC, FALLING);
+    
 
     // Prepare OSD for displaying 
     unplugSlaves();
     osd.init();
+    
+    osd.setMode(1);
 
-    // Start 
-    startPanels();
-    delay(500);
+    OSD::setPanel(5, 5);
+    osd.print_P(PSTR(OSD_VERSION));
 
-    // OSD debug for development (Shown at start)
-#ifdef membug
-    osd.setPanel(1,1);
-    osd.openPanel();
-    osd.printf("%i",freeMem()); 
-    osd.closePanel();
-#endif
+    delay_150();
 
-    // Just to easy up development things
-#ifdef FORCEINIT
-//    InitializeOSD();
-#endif
+    OSD::update();// Show bootloader bar
 
+    delay(2000);
 
-    // Check EEPROM to see if we have initialized it already or not
-    // also checks if we have new version that needs EEPROM reset
-//    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
-//        osd.setPanel(6,9);
-//        osd.openPanel();
-//        osd.printf_P(PSTR("Missing/Old Config")); 
-//        osd.closePanel();
-        //InitializeOSD();
-//    }
+    byte n=0;
+    OSD::setPanel(0, 0);
 
-    // Get correct panel settings from EEPROM
-//    readSettings();
-//    for(panel = 0; panel < npanels; panel++) readPanelSettings();
-//    panel = 0; //set panel to 0 to start in the first navigation screen
-    // Show bootloader bar
-//    loadBar();
+    for(byte j=16; j!=0; j--) {
+        for(byte i=16; i!=0; i--)   {
+              osd.write(n=='|'?' ':(byte)(n));
+              n++;
+        }
+        osd.write('|');
 
-    // Startup MAVLink timers  
-    mavlinkTimer.Set(&OnMavlinkTimer, 120);
+    }
 
-    // House cleaning, clear display and enable timers
- //   osd.clear();
- //   mavlinkTimer.Enable();
+    osd.update();
 
 } // END of setup();
 
@@ -174,41 +166,25 @@ void setup()
 void loop() 
 {
 
-    if(enable_mav_request == 1){//Request rate control
-        //osd.clear();
-        //osd.setPanel(3,10);
-        //osd.openPanel();
-        //osd.printf_P(PSTR("Requesting DataStreams...")); 
-        //osd.closePanel();
-        //for(int n = 0; n < 3; n++){
-        //    request_mavlink_rates();//Three times to certify it will be readed
-        //    delay(50);
-        //}
-        enable_mav_request = 0;
-        //delay(2000);
-        osd.clear();
-        waitingMAVBeats = 0;
-        lastMAVBeat = millis();//Preventing error from delay sensing
+    int crlf_count=0;
+
+    while(Serial.available() > 0) {
+        uint8_t c = Serial.read();
+
+        /* allow CLI to be started by hitting enter 3 times, if no
+        heartbeat packets have been received */
+            if (c == '\n' || c == '\r') {
+osd.print_P(PSTR("cr|"));
+                crlf_count++;
+            } else {
+osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
+                crlf_count = 0;
+            }
+            if (crlf_count == 3) {
+osd.print_P(PSTR("fonts!|"));
+                uploadFont();
+            }
     }
-
-    read_mavlink();
-    mavlinkTimer.Run();
-}
-
-/* *********************************************** */
-/* ******** functions used in main loop() ******** */
-void OnMavlinkTimer()
-{
-    setHeadingPatern();  // generate the heading patern
-
-    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
-    //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
-
-    setHomeVars(osd);   // calculate and set Distance from home and Direction to home
-    
- 
-    
-    setFdataVars();
 }
 
 

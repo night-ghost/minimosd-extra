@@ -113,8 +113,8 @@ static uint16_t      remaining_estimated_flight_time_seconds = 0;
 static uint8_t       osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
 
 static unsigned long timer_20ms = 0;
-static unsigned long timer_100ms = 0;
-static unsigned long timer_500ms = 0;
+byte count_100ms;
+byte count_1s;
 
 static unsigned long total_flight_time_milis = 0;
 //static uint16_t      total_flight_time_seconds = 0;
