@@ -54,6 +54,14 @@ v817:
 * Filtered out GCS messages translated by Plane 3.4+ and Copter 3.3+
 * Auto Baud Rate!
 
+v818
+
+* fixed bug with battery
+* fixed bug with time scale
+* fixed bug with font uploading (auto-baud makes it broken)
+
+* Character_Updater subproject now shares common codebase and can be used, also it can show current font
+* SPI speed is lowered to prevent glitches in charset
 
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
@@ -133,6 +141,15 @@ v817:
 
 * отфильтрованы сообщения с наземной станции, транслируемые версиями Plane 3.4+ и Copter 3.3+
 * автоматическое определение скорости последовательного порта!
+
+v818
+
+* исправлен баг с отображением батареи
+* исправлен баг с масштабом времени
+* восстановлена загрузка шрифтов (поломаная автоопределением скорости порта)
+
+* подпроект Character_Updater теперь использует те же вспомогательные файлы и может использоваться,  также он отображает загруженный шрифт
+* Скорость SPI уменьшена для предотвращения глюков при загрузке шрифтов
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
