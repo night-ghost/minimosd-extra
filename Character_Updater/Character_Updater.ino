@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define membug 
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
+#undef OSD_VERSION
 #define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater " RELEASE
 
 
@@ -70,18 +71,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #else
 #include "wiring.h"
 #endif
-#include <EEPROM.h>
+
+#include "prototypes.h"
+#include "compat.h"
+
 #include <GCS_MAVLink.h>
 
-#ifdef membug
-#include <MemoryFree.h>
-#endif
+
 
 // Configurations
-#include "OSD_Config.h"
 #include "ArduCam_Max7456.h"
 #include "Vars.h"
-//#include "OSD_Func.h"
+#include "Func.h"
 
 
 /* *************************************************/
@@ -143,7 +144,7 @@ void setup()
     byte n=0;
     OSD::setPanel(0, 0);
 
-    for(byte j=16; j!=0; j--) {
+    for(byte j=16; j!=0; j--) { // show full font
         for(byte i=16; i!=0; i--)   {
               osd.write(n=='|'?' ':(byte)(n));
               n++;
@@ -174,24 +175,17 @@ void loop()
         /* allow CLI to be started by hitting enter 3 times, if no
         heartbeat packets have been received */
             if (c == '\n' || c == '\r') {
-osd.print_P(PSTR("cr|"));
+//osd.print_P(PSTR("cr|"));
                 crlf_count++;
             } else {
-osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
+//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
                 crlf_count = 0;
             }
             if (crlf_count == 3) {
-osd.print_P(PSTR("fonts!|"));
+//osd.print_P(PSTR("fonts!|"));
                 uploadFont();
             }
     }
 }
 
 
-void unplugSlaves(){
-    //Unplug list of SPI
-#ifdef ArduCAM328
-    digitalWrite(10,  HIGH); // unplug USB HOST: ArduCam Only
-#endif
-    digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
-}

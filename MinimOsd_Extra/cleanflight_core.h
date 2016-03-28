@@ -517,7 +517,7 @@ static const Mwii_bits PROGMEM bits[] ={
 */
 void mwii_check_mode() {
 
-    byte mode=0;
+//    byte mode=0;
 
     const  Mwii_bits *bp=bits;
     for(byte n = sizeof(bits)/sizeof(Mwii_bits);n!=0; n-- ){

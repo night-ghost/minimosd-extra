@@ -179,7 +179,6 @@ void getData(){
 	    break;
 #endif
 	default:
-maybefonts:
 	    read_mavlink();
 	    break;
 	}
@@ -420,7 +419,7 @@ void setFdataVars()
   //Set max data
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-    if(sets.model_type == 0 && lflags.takeofftime == 1 || lflags.motor_armed){
+    if((sets.model_type == 0 && lflags.takeofftime == 1) || lflags.motor_armed){
  #else
     if (lflags.motor_armed)  {
  #endif

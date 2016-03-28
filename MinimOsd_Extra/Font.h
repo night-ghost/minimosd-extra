@@ -4,7 +4,7 @@ void uploadFont() {
     SPCR |= (1<<SPR0);
 
     uint8_t byte_count = 0;
-    byte bit_count;
+    byte bit_count=0;
 
     // move these local to prevent ram usage
     uint8_t character_bitmap[0x40];

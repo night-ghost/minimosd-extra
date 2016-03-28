@@ -261,7 +261,7 @@ void print_list(const Formats *f){
     const float *kp;
     const byte *c;
     
-    float val;
+    float val=0;
     
     for(;;){
 	fmt=(const char *)pgm_read_word(&f->fmt);
@@ -273,11 +273,12 @@ void print_list(const Formats *f){
 	c  = (byte *)pgm_read_word(&f->c);
 	
 	switch(t){
-	case 'f':
-	    val = * (float *)v;
-	    break;
 	case 'i':
 	    val = * (int *)v;
+	    break;
+	case 'f':
+	default:
+	    val = * (float *)v;
 	    break;
 	}
 	
@@ -663,7 +664,7 @@ void check_warn()
     wmask |= 4;
 
 //4    voltage limit set and less                   capacity limit set and less
- if (sets.battv !=0 && (iVolt < sets.battv) || sets.batt_warn_level != 0 &&  (osd_battery_remaining_A < sets.batt_warn_level))
+ if ( (sets.battv !=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (osd_battery_remaining_A < sets.batt_warn_level)) )
     wmask |= 8;
 
 //5
@@ -766,16 +767,13 @@ void osd_print_bat(PGM_P fmt, float f){
 
 void panBatteryPercent(point p){
 
-    PGM_P fmt1;
-    PGM_P fmt2;
-
     float val;
+
     if (flags.OSD_BATT_SHOW_PERCENT)
 	val= (float)osd_battery_remaining_A/256*100;
     else
 	val = (float)mah_used;
 
-//    if(has_sign(p))
     if(has_sign(p)) {
 	osd_write(0x88); // донышко батарейки не зависит от
 
@@ -1828,16 +1826,16 @@ void move_screen(char dir){
 void panSetup(){
 
     const Params *p;
-    float v;
+    float v = 0;
     byte size;
     byte type;
     float inc = 0;
-    byte col;
+    byte col = 0;
     char *nm;
     int min, max;
     byte k;
 
-    float c_val;
+    float c_val=0;
 
     const Setup_screen *pscreen;
 
@@ -1984,7 +1982,7 @@ as_byte:
 
 
 //    float value_old = v;
-    bool press=false;
+//    bool press=false;
         
     
     if(diff>100){
