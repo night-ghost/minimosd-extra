@@ -486,8 +486,6 @@ void On20ms(){ // 50Hz
 void parseNewData(){
 
 //Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-    setBatteryPic(osd_battery_remaining_A, osd_battery_pic_A);     // battery A remmaning picture
-//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
     setHomeVars();   // calculate and set Distance from home and Direction to home
 

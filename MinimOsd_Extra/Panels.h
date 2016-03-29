@@ -663,8 +663,11 @@ void check_warn()
  if (sets.overspeed && iAirspeed > sets.overspeed) 
     wmask |= 4;
 
+
+    int vbat = (osd_battery_remaining_A * 100  + max_battery_reading/2)/ max_battery_reading; // normalize to 100
+    
 //4    voltage limit set and less                   capacity limit set and less
- if ( (sets.battv !=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (osd_battery_remaining_A < sets.batt_warn_level)) )
+ if ( (sets.battv !=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
     wmask |= 8;
 
 //5
@@ -770,12 +773,15 @@ void panBatteryPercent(point p){
     float val;
 
     if (flags.OSD_BATT_SHOW_PERCENT)
-	val= (float)osd_battery_remaining_A/256*100;
+	val = (float)osd_battery_remaining_A/max_battery_reading*100;
     else
 	val = (float)mah_used;
 
     if(has_sign(p)) {
 	osd_write(0x88); // донышко батарейки не зависит от
+
+        setBatteryPic(byte(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
+//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
 	if (flags.OSD_BATT_SHOW_PERCENT)
 	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
