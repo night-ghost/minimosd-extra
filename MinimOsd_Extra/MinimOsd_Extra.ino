@@ -269,10 +269,8 @@ void setup()     {
 // As simple as possible.
 void loop() 
 {
-    //long pt=millis();
     unsigned long pt;
-    pt=millis();
-    //millis_plus(&pt, 0);
+    pt=millis();     //millis_plus(&pt, 0); much larger
 
     wdt_reset();
 
@@ -311,21 +309,6 @@ void loop()
 
     getData(); // получить данные с контроллера
 
-/*
-    if(lflags.got_data){ // были свежие данные - обработать, если данных не было давно - предупредить
-        lflags.got_data=0;
-
-        pan_toggle(); // проверить переключение экранов
-
-        parseNewData();
-
-//	LED_BLINK;
-
-        lflags.update_stat = 1; // пришли данные
-        vsync_wait = 1;	      // надо перерисовать экран
-//LED_ON;
-    }
-*/
 
     if(lflags.update_stat) { // если надо перерисовать экран
 	if(!vsync_wait){ // то делаем это только во время обратного хода
@@ -381,13 +364,14 @@ void On100ms(){ // периодические события, не связан�
             
         voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
-	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4;
+	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4; // комплиментарный фильтр 1/4
 	lflags.got_data=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
-	byte n=sets.battv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_A)/1000/n - 3.3) * (255.0 / (4.2 - 3.3));
+	byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
+	 //             voltage above limit in 0.1              max voltage above limit
+	int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
 	
-	if(v<0) osd_battery_remaining_A  = 0;
+	if(v<0)        osd_battery_remaining_A  = 0;
 	else if(v>255) osd_battery_remaining_A  = 255;
 	else           osd_battery_remaining_A  = v;
 
@@ -407,12 +391,13 @@ void On100ms(){ // периодические события, не связан�
 	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw)/4;
     
 // 	вычислить osd_battery_remaining_B по напряжению!
-	byte n=sets.battBv/10 / 3; // количество элементов в батарее
-	int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
+	byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
+//	int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
+	int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
 
-	if(v<0) osd_battery_remaining_B  = 0;
+	if(v<0)        osd_battery_remaining_B  = 0;
 	else if(v>255) osd_battery_remaining_B  = 255;
-	else	osd_battery_remaining_B  = v;
+	else           osd_battery_remaining_B  = v;
 	
 	lflags.got_data=1;
     }
