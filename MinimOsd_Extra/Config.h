@@ -14,8 +14,8 @@
 
 
 #define VERSION "2.4"
-#define RELEASE_NUM 818
-#define RELEASE "r818DV"
+#define RELEASE_NUM 819
+#define RELEASE "r819DV"
 
 #define AUTOBAUD 1
 
