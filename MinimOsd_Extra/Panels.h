@@ -768,12 +768,21 @@ void osd_print_bat(PGM_P fmt, float f){
     osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
 }
 
+byte guessMaxVolt(){
+    if(max_battery_reading >=95 && max_battery_reading <=100) 
+        return 100;
+
+    return 255;
+}
+
 void panBatteryPercent(point p){
 
     float val;
 
+    byte maxv = guessMaxVolt();
+
     if (flags.OSD_BATT_SHOW_PERCENT)
-	val = (float)osd_battery_remaining_A/max_battery_reading*100;
+	val = (float)osd_battery_remaining_A/maxv*100;
     else
 	val = (float)mah_used;
 

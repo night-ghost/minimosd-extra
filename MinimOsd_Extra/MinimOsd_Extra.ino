@@ -349,6 +349,7 @@ float avgRSSI(uint16_t d){
     return d/8.0;
 }
 
+
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
 //Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
@@ -364,7 +365,7 @@ void On100ms(){ // периодические события, не связан�
             
         voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
-	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw)/4; // комплиментарный фильтр 1/4
+	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
 	lflags.got_data=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
 	byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
@@ -388,11 +389,12 @@ void On100ms(){ // периодические события, не связан�
         voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
-	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw)/4;
+	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
     
 // 	вычислить osd_battery_remaining_B по напряжению!
 	byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
 //	int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
+
 	int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
 
 	if(v<0)        osd_battery_remaining_B  = 0;
@@ -410,7 +412,11 @@ void On100ms(){ // периодические события, не связан�
         currentRawArray[(++ind)%8] = analogRead(AmperagePin);
         for (uint8_t i=8;i!=0;)
             currentRaw += currentRawArray[--i];
-        osd_curr_A = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+        currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+
+	if(osd_curr_A ==0) osd_curr_A = currentRaw;
+	else               osd_curr_A = (osd_curr_A *3 + currentRaw +2)/4;
+
 	lflags.got_data=1;
     }
 
