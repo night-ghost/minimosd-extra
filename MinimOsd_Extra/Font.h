@@ -58,6 +58,8 @@ void uploadFont() {
             chk=0;
         }
     }
+    Serial.printf_P(PSTR("FD\n"));
+
 }
 
 

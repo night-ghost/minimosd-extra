@@ -167,6 +167,8 @@ void setup()     {
     
     adc_setup(); // do it some faster
 
+    OSD::update();// clear memory
+
 //    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
     attachInterrupt(INT0, isr_VSYNC, FALLING);
 
