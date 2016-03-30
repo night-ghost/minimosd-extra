@@ -634,7 +634,7 @@ void panAirSpeed(point p){
 
 /* **************************************************************** */
 
-#define WARNINGS 6
+#define WARNINGS 7
 
 uint8_t warning;
 
@@ -667,7 +667,7 @@ void check_warn()
     int vbat = (osd_battery_remaining_A * 100  + max_battery_reading/2)/ max_battery_reading; // normalize to 100
     
 //4    voltage limit set and less                   capacity limit set and less
- if ( (sets.battv !=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
+ if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
     wmask |= 8;
 
 //5
@@ -680,7 +680,14 @@ void check_warn()
 //6
  if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
     wmask |= 32;
-    
+
+    iVolt = osd_vbat_B/100.0; // in 0.1v as sets.battBv is
+
+//7    voltage limit set and less                   capacity limit set and less
+ if ( sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
+    wmask |= 64;
+
+
  if(wmask == 0) 
     warning = 0;
  else {
@@ -703,10 +710,6 @@ void check_warn()
     if(warning == prev_warn) warning = 0;
  }
 
-    if (wmask && sets.auto_screen_switch < 3)
-	lflags.canswitch = 0;
-    else 
-	lflags.canswitch = 1;
 }
 
 // Panel  : panWarn
@@ -722,6 +725,7 @@ const char PROGMEM w3[]="\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     //Ov
 const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
 const char PROGMEM w5[]="\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69";         //Low Rssi
 const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
+const char PROGMEM w7[]="Batt B low!"; //Battery Low!
 
 const char * const warn_str[] = {
     0, // 0
@@ -731,6 +735,7 @@ const char * const warn_str[] = {
     w4,
     w5,
     w6,
+    w7
 };
 
 void panWarn(point p){

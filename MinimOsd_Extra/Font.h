@@ -1,7 +1,7 @@
 
 void uploadFont() {
     
-    SPCR |= (1<<SPR0);
+    SPCR |= (1<<SPR0) | (1<<SPR1);
 
     uint8_t byte_count = 0;
     byte bit_count=0;

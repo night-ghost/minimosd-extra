@@ -178,6 +178,7 @@ void setup()     {
 
     // Prepare OSD for displaying 
     unplugSlaves();
+    OSD::update();// clear memory
 
     OSD::setPanel(5, 5);
     osd.print_P(PSTR(OSD_VERSION));
@@ -233,7 +234,7 @@ void setup()     {
 
     OSD::update();// Show bootloader bar
 
-    delay(start_dly);
+//    delay(start_dly);
 //    Serial.flush();
 
 #ifdef LEDPIN

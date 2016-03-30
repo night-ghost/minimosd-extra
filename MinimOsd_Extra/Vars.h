@@ -186,8 +186,6 @@ uint8_t crlf_count = 0;
 
 struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
-    bool canswitch:1;
-
     bool got_data:1;		// флаг получения пакета
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
@@ -221,7 +219,7 @@ uint16_t max_dly=0;
 #endif
 
 
-struct loc_flags lflags = {1,1,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
