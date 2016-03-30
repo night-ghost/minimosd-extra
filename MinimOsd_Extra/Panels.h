@@ -684,7 +684,7 @@ void check_warn()
     iVolt = osd_vbat_B/100.0; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
- if ( sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
+ if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
     wmask |= 64;
 
 

@@ -186,19 +186,6 @@ void setup()     {
     // Get correct settings from EEPROM
     readSettings();
 
-    // Check EEPROM to see if we have initialized it already or not
-    // also checks if we have new version that needs EEPROM reset
-    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
-        OSD::setPanel(1,1);
-        osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
-/*
-        osd.printf_P(PSTR("|vers %x sets %x"), (offsetof(Settings,CHK1_VERSION)), EEPROM_offs(sets) ); 
-        hex_dump((byte *)&sets,64);
-*/
-
-//        InitializeOSD(); нечего дефолтным значениям тут делать
-	start_dly=10000; // предупреждение кажем подольше
-    }
     
 #define REL_1 int(RELEASE_NUM/100)
 #define REL_2 int((RELEASE_NUM - REL_1*100 )/10) 
@@ -225,6 +212,21 @@ void setup()     {
 	}
     }
 
+    // Check EEPROM to see if we have initialized it already or not
+    // also checks if we have new version that needs EEPROM reset
+    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
+        OSD::setPanel(1,1);
+        osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
+/*
+        osd.printf_P(PSTR("|vers %x sets %x"), (offsetof(Settings,CHK1_VERSION)), EEPROM_offs(sets) ); 
+        hex_dump((byte *)&sets,64);
+*/
+
+//        InitializeOSD(); нечего дефолтным значениям тут делать
+	start_dly=10000; // предупреждение кажем подольше
+    }
+
+
     panelN = 0; //set panel to 0 to start in the first navigation screen
     readPanelSettings(); // Для первой панели. Для остальных - при переключении
 
@@ -234,8 +236,8 @@ void setup()     {
 
     OSD::update();// Show bootloader bar
 
-//    delay(start_dly);
-//    Serial.flush();
+//    delay(start_dly); у нас есть задержка на авто-бауд
+//    Serial.flush(); без него лучше шрифты грузятся
 
 #ifdef LEDPIN
     digitalWrite(LEDPIN, 0);  // turn off on init done
@@ -381,7 +383,9 @@ void On100ms(){ // периодические события, не связан�
 
     }
 
-    if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
+// flag useExtVbattB not used - will se to panel BattB
+//    if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
+    if(is_on(panel.batt_B) || sets.battBv!=0){ // меряем если есть панель или warning 
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
