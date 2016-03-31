@@ -63,6 +63,11 @@ v818
 * Character_Updater subproject now shares common codebase and can be used, also it can show current font
 * SPI speed is lowered to prevent glitches in charset
 
+v820
+
+* bugfixes
+* Charecter Updater HEX
+
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
 
@@ -151,6 +156,10 @@ v818
 * подпроект Character_Updater теперь использует те же вспомогательные файлы и может использоваться,  также он отображает загруженный шрифт
 * Скорость SPI уменьшена для предотвращения глюков при загрузке шрифтов
 
+v820
+
+* bugfixes
+* Charecter Updater HEX
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

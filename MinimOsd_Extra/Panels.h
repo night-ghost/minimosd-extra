@@ -759,7 +759,10 @@ void panWarn(point p){
 // Staus  : done
 
 void panThr(point p){
-    osd_printi_1(PSTR("%3.0i\x25"),osd_throttle);
+    if(has_sign(p)) 
+	osd_write(0x02); 
+
+    osd_printi_1(PSTR("%3.0i%%"), osd_throttle);
 }
 
 /* **************************************************************** */
@@ -786,10 +789,8 @@ void panBatteryPercent(point p){
 
     byte maxv = guessMaxVolt();
 
-    if (flags.OSD_BATT_SHOW_PERCENT)
-	val = (float)osd_battery_remaining_A/maxv*100;
-    else
-	val = (float)mah_used;
+    val = (float)osd_battery_remaining_A/maxv*100;
+
 
     if(has_sign(p)) {
 	osd_write(0x88); // донышко батарейки не зависит от
@@ -800,12 +801,12 @@ void panBatteryPercent(point p){
 	if (flags.OSD_BATT_SHOW_PERCENT)
 	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
 	else
-    	    osd_print_bat(PSTR("%c%c\x8e%4.0f\x01"), val);
+    	    osd_print_bat(PSTR("%c%c\x8e%4.0f\x01"), (float)mah_used);
     } else {
 	if (flags.OSD_BATT_SHOW_PERCENT)
 	    osd_printf_1(PSTR("%2.0f%%"),val);
 	else
-	    osd_printf_1(PSTR("%4.0f\x01"),val);
+	    osd_printf_1(PSTR("%4.0f\x01"),(float)mah_used);
     }
 
 

@@ -1,12 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="OSD.resx">
+  <MonoDevelop.Ide.Workbench ActiveDocument="OSD.Designer.cs">
     <Files>
       <File FileName="OSD.cs" Line="2310" Column="27" />
       <File FileName="osd_screen.cs" Line="391" Column="52" />
       <File FileName="ArduinoSTK.cs" Line="36" Column="1" />
       <File FileName="Panels.cs" Line="918" Column="72" />
-      <File FileName="OSD.Designer.cs" Line="550" Column="18" />
+      <File FileName="OSD.Designer.cs" Line="1632" Column="10" />
       <File FileName="config.cs" Line="256" Column="35" />
       <File FileName="Panel.cs" Line="1" Column="1" />
       <File FileName="Pos.cs" Line="1" Column="1" />
@@ -28,7 +28,7 @@
             <Node name="Resources" expanded="True" />
             <Node name="AboutBox1.cs" expanded="True" />
             <Node name="OSD.cs" expanded="True">
-              <Node name="OSD.resx" selected="True" />
+              <Node name="OSD.Designer.cs" selected="True" />
             </Node>
           </Node>
         </State>
