@@ -2,7 +2,7 @@
 #include "cleanflight_const.h"
 #include "cleanflight_types.h"
 
-static inline uint8_t mwii_get_byte()  {
+static  /*INLINE*/  inline uint8_t mwii_get_byte()  {
 	return msg.mwii.buf[msg.mwii.read_idx++];
 }
 
@@ -82,8 +82,8 @@ void s_struct_w(uint8_t *cb,uint8_t siz) {
 	headSerialReply(0);
 	while(siz--) *cb++ = mwii_get_byte();
 }
-*/
-/*
+
+
 int16_t nextCharToRequest() {
 	if(msg.mwii.nextCharToRequest != msg.mwii.lastCharToRequest) {	// Not at last char
 		if(msg.mwii.retransmitQueue & 0x02) {                // Missed char at curr-6. Need retransmit!
@@ -487,10 +487,6 @@ void handleRawRC() {
 }
 */
 
-/*static void set_bit(uint32_t *dst, byte bc){
-    *dst |= 1 << bc;
-}
-*/
 
 struct Mwii_bits {
     byte n;
@@ -515,11 +511,10 @@ static const Mwii_bits PROGMEM bits[] ={
         msg.mwii.sensorActive & mode_stable  -> angle
         else                        -> acro
 */
-void mwii_check_mode() {
-
-//    byte mode=0;
+static void mwii_check_mode() {
 
     const  Mwii_bits *bp=bits;
+
     for(byte n = sizeof(bits)/sizeof(Mwii_bits);n!=0; n-- ){
 	uint32_t *v;
 	byte b = pgm_read_byte(&bp->mode);
@@ -542,54 +537,11 @@ static inline void mwii_parse_data() {
     msg.mwii.read_idx = 0;
 
     lflags.mwii_active = true;
-    lflags.got_data=1;
-    millis_plus(&lastMAVBeat, 0);
+    set_data_got(); //millis_plus(&lastMAVBeat, 0);
 
 
     switch(msg.mwii.cmd) {
   
-    case MSP_OSD:
-//        uint8_t cmd = mwii_get_byte();
-    
-/*    if(cmd == OSD_READ_CMD) {
-	  headSerialReply(EEPROM_SETTINGS + 1);
-	  serialize8(cmd);
-	  for(uint8_t i=0; i<EEPROM_SETTINGS; i++) serialize8(Settings[i]);
-	  tailSerialReply();
-    }
-
-    if (cmd == OSD_WRITE_CMD) {
-      for(uint16_t en=0;en<EEPROM_SETTINGS; en++){
-	uint8_t inSetting = mwii_read_byte();
-	if (inSetting != Settings[en])
-		EEPROM.write(en,inSetting);
-	Settings[en] = inSetting;
-      }
-      readEEPROM();
-      setMspRequests();
-    }
-
-    if(cmd == OSD_GET_FONT) {
-      if(msg.mwii.size == 5) {
-            if(mwii_read_uint() == 7456) {
-              msg.mwii.nextCharToRequest = mwii_read_byte();
-              msg.mwii.lastCharToRequest = mwii_read_byte();
-              initFontMode();
-          }
-      }
-      else if(msg.mwii.size == 56) {
-        //for(uint8_t i = 0; i < 54; i++)
-        //  fontData[i] = mwii_read_byte();
-		r_struct((uint8_t*)&fontData,54);
-      
-		uint8_t c = mwii_read_byte();
-        MAX7456_writeNVM(c);
-	   //fontCharacterReceived(c);
-      }
-    }
-
-*/
-        break;
 
     case MSP_IDENT:
         apm_mav_system = mwii_get_byte();                                  // MultiWii Firmware version
@@ -655,8 +607,8 @@ typedef struct {
 
 	osd_fix_type       = mwii_read_byte(offsetof(GPS_t, fix) );
 	osd_satellites_visible = mwii_read_byte(offsetof(GPS_t, numSat) );
-	osd_pos.lat        = mwii_read_ulong(offsetof(GPS_t, latitude) );
-	osd_pos.lon        = mwii_read_ulong(offsetof(GPS_t, longitude) );
+	gps_norm(osd_pos.lat,mwii_read_ulong(offsetof(GPS_t, latitude) ));
+	gps_norm(osd_pos.lon,mwii_read_ulong(offsetof(GPS_t, longitude) ));
 	osd_alt_gps        = mwii_read_uint(offsetof(GPS_t, altitude) );
 	osd_groundspeed    = mwii_read_uint(offsetof(GPS_t, speed) );
 	osd_cog            = mwii_read_uint(offsetof(GPS_t, ground_course) );
@@ -802,7 +754,7 @@ struct pid_ {
 
 
 
-void mwii_read() {
+bool mwii_read() {
 	uint8_t c;
 
 	enum _serial_state {
@@ -814,39 +766,39 @@ void mwii_read() {
 		HEADER_CMD,
 	};
 	
-	msg.mwii.state = IDLE;
+//	msg.mwii.state = IDLE;
+
 
 	while(Serial.available_S()) {
 		c = Serial.read_S();
-		extern void try_upload_font(byte c);
 
-//		if (!lflags.mwii_active) try_upload_font(c);
+		byte state = msg.mwii.state;
 
-		switch(msg.mwii.state) {
+		switch(state) {
 		case IDLE:
-			msg.mwii.state = (c=='$') ? HEADER_START : IDLE;
+again:			state = (c=='$') ? HEADER_START : IDLE;
 			break;
 			
 		case HEADER_START:
-			msg.mwii.state = (c=='M') ? HEADER_M : IDLE;
+			state = (c=='M') ? HEADER_M : IDLE;
 			break;
 			
 		case HEADER_M:
-			msg.mwii.state = (c=='>') ? HEADER_ARROW : IDLE;
+			state = (c=='>') ? HEADER_ARROW : IDLE;
 			break;
 			
 		case HEADER_ARROW:
 			if (c > SERIALBUFFERSIZE) {  // now we are expecting the payload size
-				msg.mwii.state = IDLE;
+				state = IDLE;
 			} else {
+				state = HEADER_SIZE;
 				msg.mwii.size = c;
-				msg.mwii.state = HEADER_SIZE;
 				msg.mwii.crc = c;
 			}
 			break;
 			
 		case HEADER_SIZE:
-			msg.mwii.state = HEADER_CMD;
+			state = HEADER_CMD;
 			msg.mwii.cmd = c;
 			msg.mwii.crc ^= c;
 			msg.mwii.idx=0;
@@ -858,16 +810,21 @@ void mwii_read() {
 			if(msg.mwii.idx == msg.mwii.size) {// received checksum byte
 			    if(msg.mwii.crc == 0) {
 				mwii_parse_data(); // HERE!!!
-			    }
-			    msg.mwii.state = IDLE;
+				
+				return true;
+			    } else if(c=='$') goto again;
+			    
+			    state = IDLE;
 			} else
 			    msg.mwii.buf[msg.mwii.idx++]=c;
 			
 			break;
 		}
 
-		if(!Serial.available_S())
-		    delayMicroseconds((1000000/TELEMETRY_SPEED*10));  // wait at least 1 byte
+		msg.mwii.state = state;
+		delay_byte();
 	}
+	
+	return false;
 }
 

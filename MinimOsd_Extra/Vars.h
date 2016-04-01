@@ -160,7 +160,7 @@ static long         osd_alt_gps = 0;                    // altitude GPS
 static float        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
 //static float        osd_windspeedz = 0;
-static int /*float*/        osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
+static int /*float*/  osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
 
 static float        osd_groundspeed = 0;            // ground speed
 
@@ -172,6 +172,8 @@ static uint32_t     lastMAVBeat = 0;
 static uint8_t      apm_mav_system = 0;
 static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
+
+byte count01s;
 
 #define MAX_PANELS 4
 static uint8_t panelN = 0; 
@@ -189,11 +191,7 @@ struct loc_flags {
     bool got_data:1;		// флаг получения пакета
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool rotatePanel:1;
-//    bool osd_clear:1;
     bool one_sec_timer_switch:1;
-
-//MAVLink session control
-//    bool mavbeat:1;
 
     bool motor_armed:1;
     bool last_armed_status:1;
@@ -206,10 +204,16 @@ struct loc_flags {
     bool mwii_active:1;    // got valid MWII packet - flag forever
     
     bool mode_switch:1;
-    bool sw_state:1;
     bool osd_got_home:1; // tels if got home position or not
+    
+    bool flag_05s:1; // sets each 0.5s for setup
 
-    bool got_baud:1;
+//    bool osd_clear:1;
+//MAVLink session control
+//    bool mavbeat:1;
+//    bool sw_state:1;
+//    bool got_baud:1;
+//    bool got_protocol:1;
 };
 
 #ifdef DEBUG

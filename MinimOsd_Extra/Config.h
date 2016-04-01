@@ -1,22 +1,22 @@
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
-
-#define USE_UAVTALK 1
-#define USE_MWII 1
-
-//#define DEBUG
-
 // sets.model_type plane=0 copter=1
 
-// EEPROM Version number, incrementing this will erase/upload factory settings.
-// Only devs should increment this
+
+
+
+// EEPROM Version number, incrementing this will erase/upload factory settings. Only devs should increment this
 #define VER 79
 
 
+#define RELEASE_NUM 821
 #define VERSION "2.4"
-#define RELEASE_NUM 819
-#define RELEASE "r819DV"
 
+
+//#define DEBUG
+
+#define USE_UAVTALK 1
+#define USE_MWII 1
 #define AUTOBAUD 1
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
@@ -30,8 +30,6 @@
 #define AmperagePin A1
 #define RssiPin A3
 #define PWMrssiPin A3           // PWM RSSI uses same pin of analog RSSI A3
- 
-//AnalogShift=14
 
 // PD3 Int1 - перемычка PAL
 // оно может читать PWM по прерываниям!
@@ -39,12 +37,15 @@
 
 //#define WALKERA_TELEM RssiPin // telemetry output
 
+
 //#define LEDPIN AmperagePin
+
+/*      END of configuration */
 
 #ifdef LEDPIN
  #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
- #define LED_ON digitalWrite(LEDPIN, HIGH).
- #define LED_OFF digitalWrite(LEDPIN, LOW).
+ #define LED_ON digitalWrite(LEDPIN, HIGH)
+ #define LED_OFF digitalWrite(LEDPIN, LOW)
 #else
  #define LED_BLINK {}
  #define LED_ON {}
@@ -55,22 +56,21 @@
 
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-  #define OSD_VERSION "MinimOSD-Extra " VERSION "|uni " RELEASE
+  #define OSD_MODEL "uni"
  #else
-  #define OSD_VERSION "MinimOSD-Extra " VERSION "|Copter " RELEASE
+  #define OSD_MODEL "Copter"
  #endif
 #else
  #ifdef IS_PLANE
-  #define OSD_VERSION "MinimOSD-Extra " VERSION "|Plane " RELEASE
+  #define OSD_MODEL  "Plane"
  #else
-  #define OSD_VERSION "MinimOSD-Extra " VERSION "|" RELEASE
+  #define OSD_MODEL  "" 
  #endif
 #endif
 
 
 #define on 1
 #define off 0
-
 
 
 #define RC_NEUTRAL 1500     // PWM pulse width for center stick

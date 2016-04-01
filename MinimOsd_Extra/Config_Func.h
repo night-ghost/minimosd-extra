@@ -1,6 +1,5 @@
 
 /* ******************************************************************/
-/* *********************** GENERAL FUNCTIONS ********************** */
 
 
 static boolean inline is_on(point p){
@@ -13,30 +12,29 @@ static boolean inline has_sign(point p){
 }
 
 // чтение и запись мелких объектов
-void eeprom_read_len(byte *p, uint16_t e, uint16_t l){
-    for(;l>0; l--, e++) {
+static void eeprom_read_len(byte *p, uint16_t e, uint16_t l){
+    for(;l!=0; l--, e++) {
 	*p++ = (byte)eeprom_read_byte( (byte *)e );
     }
 }
 
-void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
-    for(;  l>0; l--, e++)
+static void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
+    for(;  l!=0; l--, e++)
 	eeprom_write_byte( (byte *)e, *p++ );
 
 }
 
-void readSettings() {
+static void readSettings() {
     eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
     eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
 // сразу настроим системы измерения
     measure = flags.measure ? &imper :  &metr;
 
-
 }
 
 // cчитать настройки текущей панели из EEPROM
-void readPanelSettings() {
+static void readPanelSettings() {
 
     static uint8_t currentPanel=255;
     
@@ -49,7 +47,7 @@ void readPanelSettings() {
 
 }
 
-uint8_t checkPAL(uint8_t line){
+static uint8_t checkPAL(uint8_t line){
     if(line >= osd.getCenter() && osd.getMode() == 0){
         line -= 3;	//Cutting lines offset after center if NTSC
     }
@@ -57,31 +55,6 @@ uint8_t checkPAL(uint8_t line){
 }
 
 
-/* не надо настройки менять изнутри!
-
-void updateSettings(byte panelu, byte panel_x, byte panel_y, byte panel_s ) {
-    if(panelN >= 1 && panelN <= npanel) {
-
-        writeEEPROM(panel_s, (6 * panelu) - 6 + 0);
-        if(panel_s != 0) {
-            writeEEPROM(panel_x, (6 * panelu) - 6 + 2);
-            writeEEPROM(panel_y, (6 * panelu) - 6 + 4);
-        }
-        osd.clear();
-        readSettings();
-
-	readPanelSettings();
-    } 
-}
-*/
-
-/* not use defaults - use config tool!
-
-void InitializeOSD() {
-
-}
-
-*/
 
 
 #ifdef DEBUG

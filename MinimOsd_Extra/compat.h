@@ -4,7 +4,9 @@
 typedef char prog_char;
 
 #define NOINLINE __attribute__ ((noinline))
+#define INLINE __attribute__ ((always_inline))
 #define WEAK __attribute__((weak))
+
 
 #define BYTE_OF(v,n) (((byte *)&(v))[n])
 

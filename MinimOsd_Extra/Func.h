@@ -11,7 +11,7 @@ static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
-void pan_toggle(){
+static void pan_toggle(){
     byte old_panel=panelN;
 
     uint16_t ch_raw;
@@ -82,127 +82,9 @@ void pan_toggle(){
 }
 
 
-
-// чтение пакетов нужного протокола
-void getData(){
-//LED_BLINK;
-
-    if(lflags.mavlink_active){
-	read_mavlink();
-#if defined(USE_UAVTALK)
-    } else if(lflags.uavtalk_active) {
-	extern void uavtalk_read(void);
-	uavtalk_read();
-#endif
-#if defined(USE_MWII)
-    } else if(lflags.mwii_active) {
-	extern void mwii_read(void);
-	mwii_read();
-#endif
-    } else {
-	if(millis()<5000 && Serial.available_S()) {
-	    byte c=Serial.read_S();
-
-//	    OSD::setPanel(1,1);
-
-            if (c == '\n' || c == '\r') {
-                crlf_count++;
-//osd.print_P(PSTR("cr|"));
-            } else {
-//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
-                crlf_count = 0;
-            }
-            if (crlf_count > 3) {
-//osd.print_P(PSTR("fonts!|"));
-                uploadFont();
-            }
-
-	    return;
-	}
-
-	switch(seconds % 4){
-#if defined(AUTOBAUD)
-	case 1: {
-	    Serial.end();
-	    static uint8_t last_pulse = 15;
-	    uint32_t pt = millis() + 100; // не более 0.1 секунды
-	
-	    uint8_t pulse=255;
-	    
-	    for(byte i=250; i!=0; i--){
-	        long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
-	        if(t>255) continue;	     // too long - not single bit
-	        uint8_t tb = t;       // it less than 255 so convert to byte
-	        if(tb==0) continue;   // no pulse at all
-	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
-	        
-	        if(millis()>pt) break; 
-	    }
-	    
-	    long speed;
-	    
-	    if(pulse == 255)    pulse = last_pulse; // no input at all - use last
-	    else                last_pulse = pulse; // remember last correct time
-	
-	// F_CPU   / BAUD for 115200 is 138
-	// 1000000 / BAUD for 115200 is 8.68uS
-	//  so I has no idea about pulse times - thease simply measured
-	
-	    if(     pulse < 11) 	speed = 115200;
-	    else if(pulse < 19) 	speed =  57600;
-	    else if(pulse < 29) 	speed =  38400;
-	    else if(pulse < 40) 	speed =  28800;
-	    else if(pulse < 60) 	speed =  19200;
-	    else if(pulse < 150)	speed =   9600;
-	    else                        speed =   4800;
-
-#ifdef DEBUG
-	    OSD::setPanel(3,6);
-	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
-#endif
-
-	    Serial.begin(speed);
-	    } break;
-#endif    
-	
-	
-#if defined(USE_UAVTALK)
-	case 2:
-	    extern void uavtalk_read(void);
-	    uavtalk_read();
-	    break;
-#endif
-#if defined(USE_MWII)
-	case 3:
-	    extern void mwii_read(void);
-	    mwii_read();
-	    break;
-#endif
-	default:
-	    read_mavlink();
-	    break;
-	}
-    }
-    
-    if(lflags.got_data){ // были свежие данные - обработать, если данных не было давно - предупредить
-        lflags.got_data=0;
-
-        pan_toggle(); // проверить переключение экранов
-
-        parseNewData();
-
-//	LED_BLINK;
-
-        lflags.update_stat = 1; // пришли данные
-        vsync_wait = 1;         // надо перерисовать экран
-//LED_ON;
-    }
-}
-
-
 //------------------ Battery Remaining Picture ----------------------------------
 
-char setBatteryPic(uint16_t bat_level,byte *bp)
+static char setBatteryPic(uint16_t bat_level,byte *bp)
 {
 
     if(bat_level>128) {
@@ -238,13 +120,13 @@ char setBatteryPic(uint16_t bat_level,byte *bp)
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
-int grad_to_sect(int grad){
+static int grad_to_sect(int grad){
     //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
     
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
 }
 
-int grad_to_sect_p(int grad){
+static int grad_to_sect_p(int grad){
     //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 
     while(grad < 0) grad +=360;
@@ -259,7 +141,7 @@ int grad_to_sect_p(int grad){
     return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 }*/
 
-void setHomeVars()
+static void setHomeVars()
 {
     float dstlon, dstlat;
     int bearing;
@@ -294,7 +176,7 @@ void setHomeVars()
 
   lflags.last_armed_status = lflags.motor_armed;
 
-  if(!lflags.osd_got_home && osd_fix_type > 1 ) en=1;
+  if(!lflags.osd_got_home && osd_fix_type > 2 ) en=1;
 
  #endif
 #else // not copter
@@ -305,8 +187,7 @@ void setHomeVars()
 
 
     if (lflags.motor_armed && !lflags.last_armed_status){ // plane can be armed too
-	//If motors armed, reset home in Arducopter version
-	lflags.osd_got_home = 0;
+	lflags.osd_got_home = 0;	//If motors armed, reset home in Arducopter version
 	takeoff_heading = osd_heading;
     }
 
@@ -349,11 +230,12 @@ void NOINLINE calc_max(float &dst, float &src){
 
 }
 
-/* +36 bytes :(
+/* +36 bytes :( */
+/*
 void filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
     dst = (val * k) + dst * (1.0 - k); 
 }
-*/
+//*/
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -365,7 +247,7 @@ void setFdataVars()
 
   //Moved from panel because warnings also need this var and panClimb could be off
     vertical_speed = (osd_climb * pgm_read_float(&measure->converth) ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
-//    filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60,  0.1); // комплиментарный фильтр 1/10
+    //filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60,  0.1); // комплиментарный фильтр 1/10
 
     if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
 	max_battery_reading = osd_battery_remaining_A;
@@ -397,7 +279,7 @@ void setFdataVars()
     if((sets.RSSI_raw % 2 == 0))  {
 	uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
 	bool rev=false;
-	
+
 	if(l > h) {
 	    l=h;
 	    h=sets.RSSI_low;
@@ -449,11 +331,172 @@ void setFdataVars()
 
 
 
-
-float NOINLINE gps_norm(long f){
-    return f / GPS_MUL;
+void NOINLINE gps_norm(float &dst, long f){
+    dst = f / GPS_MUL;
 }
 
-static inline void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+
+void NOINLINE set_data_got() {
+    millis_plus(&lastMAVBeat, 0);
+
+    lflags.got_data = 1;
 }
+
+
+void delay_byte(){
+    if(!Serial.available_S())
+        delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
+}
+
+
+static void parseNewData(){
+
+//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+    setHomeVars();   // calculate and set Distance from home and Direction to home
+
+    setFdataVars(); // накопление статистики и рекордов
+
+    writePanels();       // writing enabled panels (check OSD_Panels Tab)
+
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+}
+
+
+
+// чтение пакетов нужного протокола
+static void getData(){
+//LED_BLINK;
+
+    bool got=false;
+
+    if(lflags.mavlink_active){
+	read_mavlink();
+#if defined(USE_UAVTALK)
+    } else if(lflags.uavtalk_active) {
+	extern bool uavtalk_read(void);
+	uavtalk_read();
+#endif
+#if defined(USE_MWII)
+    } else if(lflags.mwii_active) {
+	extern bool mwii_read(void);
+	mwii_read();
+#endif
+    } else {
+	if(millis() < BOOTTIME){ // startup delay for fonts
+	    if(Serial.available_S()) {
+	        byte c=Serial.read_S();
+
+//		    OSD::setPanel(1,1);
+
+                if (c == '\n' || c == '\r') {
+                    crlf_count++;
+//osd.print_P(PSTR("cr|"));
+                } else {
+//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
+                    crlf_count = 0;
+                }
+
+                if (crlf_count > 3) {
+//osd.print_P(PSTR("fonts!|"));
+                    uploadFont();
+                }
+	    }
+	    return;
+	}
+
+
+//	switch(seconds % 4){
+	switch(count01s % 4){ 
+#if defined(AUTOBAUD)
+	case 1: {
+	    Serial.end();
+	    static uint8_t last_pulse = 15; // 57600 by default
+	    uint8_t pulse=255;
+
+	    { // isolate PT and SPEED
+		uint32_t pt = millis() + 100; // не более 0.1 секунды
+	
+	    
+	        for(byte i=250; i!=0; i--){
+	            long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
+	            if(millis()>pt) break; // not too long
+
+	            if(t>255) continue;	     // too long - not single bit
+	            uint8_t tb = t;       // it less than 255 so convert to byte
+	            if(tb==0) continue;   // no pulse at all
+	            if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
+	        }
+	    }
+	    
+	    long speed;
+	    
+	    if(pulse == 255)    pulse = last_pulse; // no input at all - use last
+	    else                last_pulse = pulse; // remember last correct time
+	
+	// F_CPU   / BAUD for 115200 is 138
+	// 1000000 / BAUD for 115200 is 8.68uS
+	//  so I has no idea about pulse times - thease simply measured
+	
+	    if(     pulse < 11) 	speed = 115200;
+	    else if(pulse < 19) 	speed =  57600;
+	    else if(pulse < 29) 	speed =  38400;
+	    else if(pulse < 40) 	speed =  28800;
+	    else if(pulse < 60) 	speed =  19200;
+	    else if(pulse < 150)	speed =   9600;
+	    else                        speed =   4800;
+
+#ifdef DEBUG
+	    OSD::setPanel(3,6);
+	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
+#endif
+	    Serial.begin(speed);
+	    } break;
+#endif    
+	
+	
+#if defined(USE_UAVTALK)
+	case 2:
+	    extern bool uavtalk_read(void);
+	    uavtalk_read();
+	    break;
+#endif
+#if defined(USE_MWII)
+	case 3:
+	    extern bool mwii_read(void);
+	    mwii_read();
+	    break;
+#endif
+	default:
+	    read_mavlink();
+	    break;
+	}
+    }
+
+
+    if(lflags.got_data){ // были свежие данные - обработать
+        lflags.got_data=0;
+
+        pan_toggle(); // проверить переключение экранов
+
+        parseNewData();
+
+//	LED_BLINK;
+
+        lflags.update_stat = 1; // пришли данные
+        vsync_wait = 1;         // надо перерисовать экран
+//LED_ON; // свечение диода во время ожидания перерисовки экрана
+    }
+
+    if(lflags.update_stat) { // если надо перерисовать экран
+	if(!vsync_wait){ // то делаем это только во время обратного хода
+//LED_OFF;
+	    OSD::update();
+	    lflags.update_stat = 0;
+        }
+    }
+
+
+}
+

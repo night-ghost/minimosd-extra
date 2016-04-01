@@ -308,7 +308,8 @@ typedef byte UAVObjMetadata;
 
 
 typedef enum {
-	UAVTALK_PARSE_STATE_WAIT_SYNC = 0,
+	UAVTALK_PARSE_STATE_NOINIT=0,
+	UAVTALK_PARSE_STATE_WAIT_SYNC,
 	UAVTALK_PARSE_STATE_GOT_SYNC,
 	UAVTALK_PARSE_STATE_GOT_MSG_TYPE,
 	UAVTALK_PARSE_STATE_GOT_LENGTH,
@@ -344,7 +345,7 @@ typedef struct __uavtalk_message {
 } uavtalk_message_t;
 
 
-void uavtalk_read(void);
+bool uavtalk_read(void);
 
 
 #endif /* UAVTALK_H_ */

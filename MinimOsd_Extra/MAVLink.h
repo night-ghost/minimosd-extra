@@ -41,7 +41,7 @@ union {
         heartbeat packets have been received but not more than 3 seconds 
 */
 
-void read_mavlink(){
+bool read_mavlink(){
     uint8_t      base_mode=0;
     mavlink_status_t status;
 
@@ -62,12 +62,12 @@ void read_mavlink(){
 //        if (!lflags.mavlink_active) try_upload_font(c);
 
         //trying to grab msg  Mavlink library patched and buffer is static
-        if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
-            //lastMAVBeat = millis();
-            millis_plus(&lastMAVBeat, 0);
+        if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status) && status.msg_received) {
+
+            set_data_got(); //lastMAVBeat = millis();
 
 //Serial.printf_P(PSTR("got id=%d"), msg.m.msgid);
-            lflags.mavlink_active = lflags.got_data = 1;
+            lflags.mavlink_active = 1;
 
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid)        // another system
@@ -103,8 +103,8 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
-                osd_pos.lat = gps_norm(mavlink_msg_gps_raw_int_get_lat(&msg.m));
-                osd_pos.lon = gps_norm(mavlink_msg_gps_raw_int_get_lon(&msg.m));
+                gps_norm(osd_pos.lat,mavlink_msg_gps_raw_int_get_lat(&msg.m));
+                gps_norm(osd_pos.lon,mavlink_msg_gps_raw_int_get_lon(&msg.m));
                 osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg.m);
                 osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg.m);
                 osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg.m);
@@ -187,21 +187,31 @@ packet.press_diff = press_diff;
                 //That shouldn't be because we may rely only on baro. So using vfr hud alt (testing)
                 //osd_alt_rel = (mavlink_msg_global_position_int_get_relative_alt(&msg.m)*0.001);
         
-                osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
+                osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
                 break; 
+/*
+case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
+            {
+                osd_rel_alt = mavlink_msg_global_position_int_get_relative_alt(&msg) ;   // alt above ground im MM
+                // uav.relative_alt = packet.relative_alt / 1000.0; //jmtune Altitude above ground in meters, expressed as * 1000 (millimeters)   // jmmods
+            }
+            break;
+*/
 #endif
             default:
                 //Do nothing
                 break;
             }
+            
+            return true;
         }
-        if(!Serial.available_S())
-            delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
-        //next one
+        delay_byte();
     }
 #ifdef DEBUG
     // Update global packet drops counter
     packet_drops += status.packet_rx_drop_count;
 #endif
+
+    return false;
 }
 

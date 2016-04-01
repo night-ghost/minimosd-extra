@@ -62,6 +62,7 @@ here is a lots of garbage but I don't want to waste the time for cleaning
 // End of imported defines from Multiwii Serial Protocol MultiWii_shared svn r1333
 // ---------------------------------------------------------------------------------------
 
+#define MSP_NONE 0
 
 // Private MSP for use with the GUI
 #define MSP_OSD                  220   //in message          starts epprom send to OSD GUI
@@ -110,7 +111,7 @@ struct MWII_mode {
 };
 
 struct MWII_buffer {
-        char buf[128];
+        char buf[SERIALBUFFERSIZE];
         byte idx;
         byte crc;
         byte size;

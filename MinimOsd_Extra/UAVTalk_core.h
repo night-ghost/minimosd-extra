@@ -267,13 +267,12 @@ void NOINLINE set_crc(byte c){
 
 static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 
-	msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
-	msg.u.cnt = 0;
+	byte state=msg.u.state;
 
-	switch (msg.u.state) {
+	switch (state) {
 	case UAVTALK_PARSE_STATE_WAIT_SYNC:
 		if (c == UAVTALK_SYNC_VAL) {
-			msg.u.state = UAVTALK_PARSE_STATE_GOT_SYNC;
+again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->Sync = c;
 			umsg->Crc = 0;
 			set_crc(c); //	msg->Crc = CRC_VAL(0 ^ c);
@@ -285,12 +284,14 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
-			msg.u.state = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
+			state = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
 			umsg->MsgType = c;
 			if(c & 0x80) msg.u.f_length +=2; // timestamp too
 			msg.u.cnt = 0;
 		} else {
-			msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			
+			if (c == UAVTALK_SYNC_VAL) goto again;
 		}
 		break;
 
@@ -309,9 +310,10 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
                                // Minimal length is msg.u.f_length
                                // Maximum is msg.u.f_length + 255 (Data) + 2 (Optional Instance Id)
                                // As we are not parsing Instance Id, 255 is a hard maximum. 
-			       msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			       state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+			       if (c == UAVTALK_SYNC_VAL) goto again;
                         } else {
-			       msg.u.state = UAVTALK_PARSE_STATE_GOT_LENGTH;
+			       state = UAVTALK_PARSE_STATE_GOT_LENGTH;
 			       msg.u.cnt = 0;
                         }
 		}
@@ -331,12 +333,12 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 			BYTE_OF(umsg->ObjID,3) = c;
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 			if (umsg->Length == msg.u.f_length) { // no data exists
-				msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
+				state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
-				msg.u.state = UAVTALK_PARSE_STATE_GOT_INSTID;
+				state = UAVTALK_PARSE_STATE_GOT_INSTID;
                         }
 #else
-			msg.u.state = UAVTALK_PARSE_STATE_GOT_OBJID;
+			state = UAVTALK_PARSE_STATE_GOT_OBJID;
 #endif
 			msg.u.cnt = 0;
 			break;
@@ -356,12 +358,12 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 			BYTE_OF(umsg->InstID,1) = c;
 			
 			if (umsg->Length == msg.u.f_length) { // no data exists
-				msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
+				state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
 			    if(umsg->MsgType & 0x80)
-				msg.u.state = UAVTALK_PARSE_STATE_GOT_INSTID; // will be timestamp
+				state = UAVTALK_PARSE_STATE_GOT_INSTID; // will be timestamp
 			    else
-				msg.u.state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP; // no timestamp
+				state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP; // no timestamp
 			}
 			msg.u.cnt = 0;
 			break;
@@ -380,7 +382,7 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 			//msg->timestamp += ((uint32_t) c) << 8;
 			BYTE_OF(umsg->timestamp,1) = c;
 			
-			msg.u.state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
+			state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
 			msg.u.cnt = 0;
 			break;
 		}
@@ -392,50 +394,48 @@ static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 		umsg->Data[msg.u.cnt] = c;
 		msg.u.cnt++;
 		if (msg.u.cnt >= umsg->Length - msg.u.f_length) {
-			msg.u.state = UAVTALK_PARSE_STATE_GOT_DATA;
+			state = UAVTALK_PARSE_STATE_GOT_DATA;
 			msg.u.cnt = 0;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_DATA:
 		//msg.u.state = UAVTALK_PARSE_STATE_GOT_CRC;
-		msg.u.state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+		state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		//msg->Crc = c;
 		if (c == umsg->Crc) {
+		    msg.u.state = state;
 		    return umsg->Length;
 		} else {
 #ifdef DEBUG
 		    // Update global packet drops counter
 	    	    packet_drops += 1;
 #endif
-		    return 0;
+		    if (c == UAVTALK_SYNC_VAL) goto again;
 		}
 		break;
 	}
+
+	msg.u.state = state;
 
 	return 0;
 }
 
 
-void uavtalk_read(void) {
-    extern void try_upload_font(byte c);
+bool uavtalk_read(void) {
 
 	// grabbing data
 	while (Serial.available_S()) {
 		uint8_t c = Serial.read_S();
 		
-		// needed for MinimOSD upload, while no UAVTalk is established
-//		if (!lflags.uavtalk_active) try_upload_font(c);
-
 #ifdef DEBUG
     bytes_comes+=1;
 #endif
 		// parse data to msg
 		if (uavtalk_parse_char(c, &msg.u)) {
-			lflags.got_data=1;
 			lflags.uavtalk_active = 1; // будем слушать UAVtalk
-			//lastMAVBeat = millis();
-			millis_plus(&lastMAVBeat, 0);
+
+			set_data_got(); //millis_plus(&lastMAVBeat, 0);
 
 			// consume msg
 			switch (msg.u.ObjID) {
@@ -545,8 +545,8 @@ void uavtalk_read(void) {
 			case GPSPOSITION_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_000:
 			case GPSPOSITIONSENSOR_OBJID_001:
-				osd_pos.lat		= gps_norm(uavtalk_get_int32(GPSPOSITION_OBJ_LAT));
-				osd_pos.lon		= gps_norm(uavtalk_get_int32(GPSPOSITION_OBJ_LON));
+				gps_norm(osd_pos.lat,uavtalk_get_int32(GPSPOSITION_OBJ_LAT));
+				gps_norm(osd_pos.lon,uavtalk_get_int32(GPSPOSITION_OBJ_LON));
 				osd_satellites_visible	= uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
@@ -555,8 +555,8 @@ void uavtalk_read(void) {
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
-				osd_pos.lat		= gps_norm(uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Latitude)));
-				osd_pos.lon		= gps_norm(uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Longitude)));
+				gps_norm(osd_pos.lat,uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Latitude)));
+				gps_norm(osd_pos.lon,uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Longitude)));
 				osd_satellites_visible	= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
@@ -657,10 +657,11 @@ void uavtalk_read(void) {
 //				uavtalk_respond_object(UAVTALK_TYPE_ACK);
 //			}
 			
+			return true;
 		}
-
-		if(!Serial.available_S())
-		    delayMicroseconds((1000000/TELEMETRY_SPEED*10));  // wait at least 1 byte
+		
+		delay_byte();
 	}
+	return false;
 }
 

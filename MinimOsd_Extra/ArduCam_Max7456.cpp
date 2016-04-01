@@ -27,8 +27,9 @@ OSD::OSD()
 
 //------------------ init ---------------------------------------------------
 void MAX_write(byte addr, byte data){
+    register byte d=data;
   SPI::transfer(addr);
-  SPI::transfer(data);
+  SPI::transfer(d);
 }
 
 byte MAX_read(byte addr){
@@ -36,13 +37,6 @@ byte MAX_read(byte addr){
   return SPI::transfer(0xff);
 }
 
-void max7456_off(){
-    digitalWrite(MAX7456_SELECT,HIGH);
-}
-
-void max7456_on(){
-    digitalWrite(MAX7456_SELECT,LOW);
-}
 
 void OSD::adjust(){
   max7456_on();
@@ -60,7 +54,7 @@ void OSD::hw_init(){
     max7456_on();
 
     //read black level register
-    byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read);//black level read register
+    byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read); //black level read register
   
     MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
     delay_150();
@@ -115,10 +109,12 @@ void OSD::detectMode()
         osdstat_r = MAX_read(MAX7456_STAT_reg_read);//status register
 
         if ((B00000001 & osdstat_r) != 0){ //PAL
-          setMode(1);  
+            setMode(1);  
+            flags.PAL_NTSC = 1; // remember in case of camera off
         }
         else if((B00000010 & osdstat_r) != 0){ //NTSC
-          setMode(0);
+            setMode(0);
+            flags.PAL_NTSC = 0; // remember in case of camera off
         }
         else if((B00000100 & osdstat_r) != 0){ //loss of sync
 //      setMode(1); // PAL without video 
@@ -129,15 +125,6 @@ no_auto:
               setMode(0);
         }
 
-
-    //If no signal was detected so it uses EEPROM config
-        else{
-/*      if (flags.PAL_NTSC) //NTSC
-          setMode(0);
-      else  //PAL
-          setMode(1);
-*/      
-	}
     }
 
     max7456_off();
@@ -281,15 +268,14 @@ void OSD::update() {
     MAX_write(MAX7456_DMAL_reg, 0);
     MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
-
     PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 
     for(; b < end_b; b++) {
-      PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
-      SPDR = *b;
-      *b=' ';		// обойдемся без memset
-      while (!(SPSR & (1<<SPIF))) ;
-      PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
+        PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
+        SPDR = *b;
+        *b=' ';		// обойдемся без memset
+        while (!(SPSR & (1<<SPIF))) ;
+        PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
     }
     PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
 
@@ -357,46 +343,3 @@ void delay_15(){
     delay(15);
 }
 
-/*
-void OSD::write_NVM(int font_count, uint8_t *character_bitmap){
-  byte x;
-  byte screen_char;
-
-  byte char_address_hi = font_count;
-  byte char_address_lo = 0;
- //Serial.println("write_new_screen");   
-
-  // disable display
-  max7456_on();
-
-//    cli();
-
-  MAX_write(MAX7456_VM0_reg,  MAX7456_DISABLE_display);
-  MAX_write(MAX7456_CMAH_reg, char_address_hi);  // set start address high
-
-//  delay_15();
-
-  for(x = 0; x < NVM_ram_size; x++) {	// write out 54 (out of 64) bytes of character to shadow ram
-    screen_char = *character_bitmap++;
-    MAX_write(MAX7456_CMAL_reg, x); 	// set start address low
-    MAX_write(MAX7456_CMDI_reg, screen_char);
-  }
-
-//    delay_15();
-  // transfer a 54 bytes from shadow ram to NVM
-  MAX_write(MAX7456_CMM_reg, WRITE_nvr);
-  
-  delay_15();
-  
-  // wait until bit 5 in the status register returns to 0 (12ms)
-  while (1) {
-      Spi.transfer(MAX7456_STAT_reg_read);
-      if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
-  } 
-
-//    sei();
-    
-  MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert); // turn on screen next vertical
-  max7456_off();
-}
-*/

@@ -78,6 +78,9 @@ OSD osd; //OSD object
 
 
 // program parts
+#include "adc_setup.h"
+#include "Font.h"
+#include "Config_Func.h"
 #include "Func.h"
 
 #include "protocols.h"
@@ -89,11 +92,8 @@ OSD osd; //OSD object
 #include "cleanflight_core.h"
 #endif
 
-#include "Config_Func.h"
 #include "Panels.h"
 #include "MAVLink.h"
-#include "Font.h"
-#include "adc_setup.h"
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
@@ -144,19 +144,13 @@ void delay_150(){
 void setup()     {
     wdt_disable(); 
 
-    int start_dly=BOOTTIME;
-
     pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
 
 #ifdef LEDPIN
     pinMode(LEDPIN,OUTPUT); // led
-    digitalWrite(LEDPIN, 1);  // turn on for full light
+    LED_ON; 		    // turn on for full light
 #endif
 
-#if defined(PWM_PIN)
-    pinMode(PWM_PIN, INPUT_PULLUP);
-    attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
-#endif
 
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
     TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );
@@ -181,10 +175,17 @@ void setup()     {
     OSD::update();// clear memory
 
     OSD::setPanel(5, 5);
-    osd.print_P(PSTR(OSD_VERSION));
-    
+    osd.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
+
     // Get correct settings from EEPROM
     readSettings();
+
+#if defined(PWM_PIN)
+    if(sets.ch_toggle == 1) { // only if used
+	pinMode(PWM_PIN, INPUT_PULLUP);
+	attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
+    }
+#endif
 
     
 #define REL_1 int(RELEASE_NUM/100)
@@ -223,7 +224,6 @@ void setup()     {
 */
 
 //        InitializeOSD(); нечего дефолтным значениям тут делать
-	start_dly=10000; // предупреждение кажем подольше
     }
 
 
@@ -239,9 +239,7 @@ void setup()     {
 //    delay(start_dly); у нас есть задержка на авто-бауд
 //    Serial.flush(); без него лучше шрифты грузятся
 
-#ifdef LEDPIN
-    digitalWrite(LEDPIN, 0);  // turn off on init done
-#endif
+    LED_OFF;  // turn off on init done
 
 #ifdef DEBUG
 /*    OSD::setPanel(0,0);
@@ -289,11 +287,16 @@ void loop()
     if(pt > timer_100ms){
         millis_plus(&timer_100ms, 100);
 	On100ms();
-
+	count01s++;
     }
     if(pt > timer_500ms){
 	millis_plus(&timer_500ms, 500);
         lflags.got_data=1; // каждые полсекунды принудительно
+	
+	lflags.flag_05s = 1;
+
+
+	count01s++;
 
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry();
@@ -312,16 +315,8 @@ void loop()
 	}
     }
 
-    getData(); // получить данные с контроллера
+    getData(); // получить и обработать данные с контроллера
 
-
-    if(lflags.update_stat) { // если надо перерисовать экран
-	if(!vsync_wait){ // то делаем это только во время обратного хода
-//LED_OFF;
-	    OSD::update();
-	    lflags.update_stat = 0;
-        }
-    }
 
 /* not used, let PWM data will be ALWAYS actual
     if(New_PWM_Frame){
@@ -493,22 +488,6 @@ void On20ms(){ // 50Hz
 //Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 }
 
-
-/* *********************************************** */
-/* ******** functions used in main loop() ******** */
-void parseNewData(){
-
-//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-    setHomeVars();   // calculate and set Distance from home and Direction to home
-
-    setFdataVars(); // накопление статистики и рекордов
-
-    writePanels();       // writing enabled panels (check OSD_Panels Tab)
-
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-}
 
 
 

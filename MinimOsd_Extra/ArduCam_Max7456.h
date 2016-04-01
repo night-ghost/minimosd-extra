@@ -122,5 +122,22 @@ class OSD: public BetterStream
     static void NOINLINE calc_pos();
 };
 
+
+static INLINE void max7456_off(){
+    //gitalWrite(MAX7456_SELECT,HIGH);
+    PORTD |= _BV(PD6);
+}
+
+static INLINE void max7456_on(){
+    //gitalWrite(MAX7456_SELECT,LOW);
+    PORTD &= ~_BV(PD6);
+}
+
+static INLINE void unplugSlaves(){   //Unplug list of SPI
+    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+}
+
+
+
 #endif
 

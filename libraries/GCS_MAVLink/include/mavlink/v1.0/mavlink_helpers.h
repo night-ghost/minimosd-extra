@@ -239,11 +239,13 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	    status->packet_rx_drop_count = 0;
 	case MAVLINK_PARSE_STATE_IDLE:
 		if (c == MAVLINK_STX) {
-			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
+do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 			rxmsg->len = 0;
 			rxmsg->magic = c;
 			mavlink_start_checksum(rxmsg);
-		}
+		} else
+		    goto lost_sync;
+		
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_STX:
@@ -257,7 +259,8 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 			status->buffer_overrun++;
 			status->parse_error++;
 			status->msg_received = 0;
-			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
+			//status->parse_state = MAVLINK_PARSE_STATE_IDLE;
+			goto lost_sync;
 		}
 		else
 		{
@@ -290,12 +293,9 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	case MAVLINK_PARSE_STATE_GOT_COMPID:
 		rxmsg->msgid = c;
 		mavlink_update_checksum(rxmsg, c);
-		if (rxmsg->len == 0)
-		{
+		if (rxmsg->len == 0) {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_PAYLOAD;
-		}
-		else
-		{
+		} else {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_MSGID;
 		}
 		break;
@@ -303,8 +303,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	case MAVLINK_PARSE_STATE_GOT_MSGID:
 		_MAV_PAYLOAD_NON_CONST(rxmsg)[status->packet_idx++] = (char)c;
 		mavlink_update_checksum(rxmsg, c);
-		if (status->packet_idx == rxmsg->len)
-		{
+		if (status->packet_idx == rxmsg->len) {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_PAYLOAD;
 		}
 		break;
@@ -318,16 +317,16 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 			// Check first checksum byte
 			status->parse_error++;
 			status->msg_received = 0;
-			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
-			if (c == MAVLINK_STX)
-			{
-				status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
-				rxmsg->len = 0;
-				mavlink_start_checksum(rxmsg);
+			if (c == MAVLINK_STX) {
+				//status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
+				//rxmsg->len = 0;
+				//mavlink_start_checksum(rxmsg);
+				goto do_ctx;
+			} else {
+				//status->parse_state = MAVLINK_PARSE_STATE_IDLE;
+				goto lost_sync;
 			}
-		}
-		else
-		{
+		} else {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_CRC1;
 			_MAV_PAYLOAD_NON_CONST(rxmsg)[status->packet_idx] = (char)c;
 		}
@@ -340,12 +339,15 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 
 			status->parse_error++;
 			status->msg_received = 0;
-			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
-			if (c == MAVLINK_STX)
-			{
-				status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
-				rxmsg->len = 0;
-				mavlink_start_checksum(rxmsg);
+			
+			if (c == MAVLINK_STX) {
+				//status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
+				//rxmsg->len = 0;
+				//mavlink_start_checksum(rxmsg);
+				goto do_ctx;
+			} else {
+				//status->parse_state = MAVLINK_PARSE_STATE_IDLE;
+				goto lost_sync;
 			}
 		} else {
 			// Successfully got message
@@ -360,8 +362,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 
 	bufferIndex++;
 	// If a message has been sucessfully decoded, check index
-	if (status->msg_received == 1)
-	{
+	if (status->msg_received) {
 		//while(status->current_seq != rxmsg->seq)
 		//{
 		//	status->packet_rx_drop_count++;
@@ -374,12 +375,17 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		status->packet_rx_success_count++;
 	}
 
+	status->parse_error = 0;
 	r_mavlink_status->current_rx_seq = status->current_rx_seq+1;
 	r_mavlink_status->packet_rx_success_count = status->packet_rx_success_count;
 	r_mavlink_status->packet_rx_drop_count = status->parse_error;
 	r_mavlink_status->buffer_overrun = status->buffer_overrun;
-	status->parse_error = 0;
-	return status->msg_received;
+	return (r_mavlink_status->msg_received = status->msg_received);
+	
+lost_sync:
+    status->parse_state=MAVLINK_PARSE_STATE_IDLE;
+    r_mavlink_status->msg_received = 0;
+    return true;
 }
 
 /**
