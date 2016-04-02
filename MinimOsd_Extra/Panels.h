@@ -66,16 +66,16 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method){
 
 
     switch(method) {  
-    case 1:
+    case 1:		// airspeed
 	printSpeed(osd_windspeed * pgm_read_float(&measure->converts));
 	osd.printf_P(PSTR("|%c%c%2.0f%c"), arrow_set1, arrow_set1 + 1, (nor_osd_windspeed * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
 	break;
     
-    case 2:
+    case 2:	//      course
 	osd.printf_P(PSTR("%c%c%4i\x05"), arrow_set1, arrow_set1 + 1, off_course);
 	break;
 
-    default:
+    default:		// just arrow
 	/* osd.printf_P(PSTR("%c%c"),        arrow_set1, arrow_set1 + 1); */ 
 	//printArrow( arrow_set1); 
 	osd_write(arrow_set1); osd_write(arrow_set1+1);
@@ -675,7 +675,7 @@ static void panWindSpeed(point p){
 
     if (dir < 0)  dir+=360;
 
-    nor_osd_windspeed = osd_windspeed * 0.010 + nor_osd_windspeed * 0.990; // комплиментарный фильтр 1/100 
+    nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
     //filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
 
 
@@ -1319,16 +1319,31 @@ char const * const mode_c_strings[] PROGMEM ={
 };
 #endif
 
-//#ifdef IS_PLANE
-const char PROGMEM p_mode01[] = "manu"; //Manual
-const char PROGMEM p_mode02[] = "circ"; //CIRCLE
-const char PROGMEM p_mode03[] = "stab"; //Stabilize
-const char PROGMEM p_mode04[] = "trai"; //Training
-//const char PROGMEM p_mode05[] = "acro"; //ACRO
-const char PROGMEM p_mode06[] = "fbwa"; //FLY_BY_WIRE_A
-const char PROGMEM p_mode07[] = "fbwb"; //FLY_BY_WIRE_B
-const char PROGMEM p_mode08[] = "cruz"; //Cruise
-const char PROGMEM p_mode09[] = "atun"; //autotune
+/*
+ MANUAL        = 0,
+    CIRCLE        = 1,
+    STABILIZE     = 2,
+    TRAINING      = 3,
+    ACRO          = 4,
+    FLY_BY_WIRE_A = 5,
+    FLY_BY_WIRE_B = 6,
+    CRUISE        = 7,
+    AUTOTUNE      = 8,
+    AUTO          = 10,
+    RTL           = 11,
+    LOITER        = 12,
+    GUIDED        = 15,
+    INITIALISING  = 16
+*/
+const char PROGMEM p_mode00[] = "manu"; //Manual
+const char PROGMEM p_mode01[] = "circ"; //CIRCLE
+const char PROGMEM p_mode02[] = "stab"; //Stabilize
+const char PROGMEM p_mode03[] = "trai"; //Training
+//const char PROGMEM p_mode04[] = "acro"; //ACRO
+const char PROGMEM p_mode05[] = "fbwa"; //FLY_BY_WIRE_A
+const char PROGMEM p_mode06[] = "fbwb"; //FLY_BY_WIRE_B
+const char PROGMEM p_mode07[] = "cruz"; //Cruise
+const char PROGMEM p_mode08[] = "atun"; //autotune
 //const char PROGMEM p_mode10[] = "auto"; //AUTO
 //const char PROGMEM p_mode11[] = "rtl "; //Return to Launch
 //const char PROGMEM p_mode12[] = "loit"; //Loiter
@@ -1342,10 +1357,10 @@ const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
 
 #ifdef IS_PLANE
 const char * const mode_p_strings[] PROGMEM ={ 
-    p_mode01, p_mode02, p_mode03, p_mode04, s_mode01, 
-    p_mode06, p_mode07, p_mode08, p_mode09, s_mode03, 
-    s_mode06, s_mode05, s_mode_n, s_mode_n, s_mode04, 
-    p_mode16, p_mode17, p_mode18, p_mode19
+    p_mode00, p_mode01, p_mode02, p_mode03, s_mode01, 
+    p_mode05, p_mode06, p_mode07, p_mode08, s_mode_n,
+    s_mode03, s_mode06, s_mode05, s_mode_n, s_mode_n, 
+    s_mode04, p_mode16, p_mode17, p_mode18, p_mode19
 };
 
 #endif
@@ -1371,10 +1386,10 @@ const char PROGMEM u_mode15[] = "poi";    // POI
 const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
 
 char const * const mode_u_strings[] PROGMEM ={ 
-    p_mode01, u_mode01, u_mode02, u_mode03, u_mode04, 
+    p_mode00, u_mode01, u_mode02, u_mode03, u_mode04, 
     u_mode05, u_mode06, s_mode08, u_mode08, u_mode09, 
     u_mode10, u_mode11, s_mode06, s_mode09, u_mode14,
-    u_mode15, p_mode08, u_mode17
+    u_mode15, p_mode07, u_mode17
 };
 #endif
 
@@ -1389,7 +1404,7 @@ const char PROGMEM aq_mode5[] = "miss";
 const char PROGMEM aq_mode8[] = "init";
 
 char const * const mode_aq_strings[] PROGMEM ={ 
-    aq_mode0, p_mode01, s_mode02, s_mode08,
+    aq_mode0, p_mode00, s_mode02, s_mode08,
     s_mode_n, aq_mode5, s_mode_n, s_mode_n,
     aq_mode8, 
 };

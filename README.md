@@ -77,6 +77,10 @@ v821
 * better UAVtalk & mwii syncronization
 * PWM_IN interrupt enabled only if used
 
+
+v822 
+* plane flight modes fixed
+
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
 
@@ -179,6 +183,9 @@ v821
 * починено отображение режима NTSC в конфигураторе
 * лучшая синхронизация протоколов UAVtalk & mwii - не проглатывается стартовый символ
 * прерывание PWM_IN разрешено только если используется
+
+v822 
+* plane flight modes fixed
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

@@ -583,15 +583,19 @@ bool uavtalk_read(void) {
 
 			case FLIGHTBATTERYSTATE_OBJID_000:
 			case FLIGHTBATTERYSTATE_OBJID_001:
-				osd_vbat_A		= uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
-				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CURRENT));
+				if(!flags.useExtVbattA)
+				    osd_vbat_A		= uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
+				if(!flags.useExtCurr)
+				    osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CURRENT));
 //				osd_total_A		= (int16_t) uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
 				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_ESTIMATED_FLIGHT_TIME);
 				break;
 #if FLIGHTBATTERYSTATE_OBJID_000 != FLIGHTBATTERYSTATE_OBJID && FLIGHTBATTERYSTATE_OBJID_001 != FLIGHTBATTERYSTATE_OBJID
 			case FLIGHTBATTERYSTATE_OBJID:
-				osd_vbat_A		= uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Voltage));
-				osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Current));
+				if(!flags.useExtVbattA)
+				    osd_vbat_A		= uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Voltage));
+				if(!flags.useExtCurr)
+				    osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Current));
 //				osd_total_A		= (int16_t) uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, ConsumedEnergy));
 				remaining_estimated_flight_time_seconds	= (int16_t) uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, EstimatedFlightTime));
 				break;
