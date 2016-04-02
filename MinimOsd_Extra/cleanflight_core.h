@@ -609,7 +609,7 @@ typedef struct {
 	osd_satellites_visible = mwii_read_byte(offsetof(GPS_t, numSat) );
 	gps_norm(osd_pos.lat,mwii_read_ulong(offsetof(GPS_t, latitude) ));
 	gps_norm(osd_pos.lon,mwii_read_ulong(offsetof(GPS_t, longitude) ));
-	osd_alt_gps        = mwii_read_uint(offsetof(GPS_t, altitude) );
+	osd_pos.alt        = mwii_read_uint(offsetof(GPS_t, altitude) );
 	osd_groundspeed    = mwii_read_uint(offsetof(GPS_t, speed) );
 	osd_cog            = mwii_read_uint(offsetof(GPS_t, ground_course) );
 	break;

@@ -62,11 +62,14 @@ bool read_mavlink(){
 //        if (!lflags.mavlink_active) try_upload_font(c);
 
         //trying to grab msg  Mavlink library patched and buffer is static
-        if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status) && status.msg_received) {
+        if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
 
             set_data_got(); //lastMAVBeat = millis();
 
-//Serial.printf_P(PSTR("got id=%d"), msg.m.msgid);
+#ifdef DEBUG
+Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
+#endif
+
             lflags.mavlink_active = 1;
 
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
@@ -102,7 +105,7 @@ bool read_mavlink(){
                 break;
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
-                osd_alt_gps = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
+                osd_pos.alt = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
                 gps_norm(osd_pos.lat,mavlink_msg_gps_raw_int_get_lat(&msg.m));
                 gps_norm(osd_pos.lon,mavlink_msg_gps_raw_int_get_lon(&msg.m));
                 osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg.m);
@@ -203,14 +206,15 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
                 break;
             }
             
-            return true;
+            //return true;
         }
         delay_byte();
-    }
 #ifdef DEBUG
     // Update global packet drops counter
     packet_drops += status.packet_rx_drop_count;
 #endif
+
+    }
 
     return false;
 }

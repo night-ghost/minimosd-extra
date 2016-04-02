@@ -550,7 +550,7 @@ bool uavtalk_read(void) {
 				osd_satellites_visible	= uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
-				osd_alt_gps		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
+				osd_pos.alt		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
 				osd_groundspeed		= uavtalk_get_float(GPSPOSITION_OBJ_GROUNDSPEED);
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
@@ -560,7 +560,7 @@ bool uavtalk_read(void) {
 				osd_satellites_visible	= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
-				osd_alt_gps		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
+				osd_pos.alt		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
 				osd_groundspeed		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Groundspeed));
 				break;
 #endif

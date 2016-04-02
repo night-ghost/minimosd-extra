@@ -6,7 +6,7 @@ using System.Threading;
 
 // Written by Michael Oborne
 
-namespace ArdupilotMega
+namespace ArdupilotMega 
 {
     public class ArduinoSTK : SerialPort
     {

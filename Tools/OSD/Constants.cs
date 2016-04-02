@@ -7,7 +7,7 @@ namespace OSD {
 		// Only devs should increment this
 		public const int VER = 79;
 
-		// EEPROM Storage addresses
+		// EEPROM Storage addresses 
 
 		// First of 8 panels
 		const int panCenter_XY = 0;

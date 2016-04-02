@@ -81,6 +81,11 @@ v821
 v822 
 * plane flight modes fixed
 
+v823
+* add new flag to all panels that turns on "alternate" mode for some panels
+* WindSpeed, Airspeed and Groundspeed in Alternate mode shows speed on m/s instead of km/h
+* new charset to show m/s
+
 ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
 
@@ -186,6 +191,11 @@ v821
 
 v822 
 * plane flight modes fixed
+
+v823
+* добавлен флаг "Альтернативный режим" ко всем панелям
+* Панели WindSpeed, Airspeed и Groundspeed в Альтернативном режиме отображают скорость в м/с вместо км/ч
+* новый чарсет для отображения m/s
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

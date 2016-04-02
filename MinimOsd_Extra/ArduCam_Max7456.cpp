@@ -208,7 +208,7 @@ void NOINLINE OSD::calc_pos(){
 
 void OSD::setPanel(uint8_t st_col, uint8_t st_row){
   col = st_col & 0x7f; // col,row нужны для отработки перевода строки с сохранением колонки
-  row = st_row & 0x7f; // в старших битах флаги, размер экрана все равно мелкий
+  row = st_row & 0x3f; // в старших битах флаги, размер экрана все равно мелкий
 
   calc_pos();
 }

@@ -316,12 +316,13 @@ namespace OSD {
 
             sp.Close();
 
-            return err;
+            return err; 
         }
 
         public void setEepromXY(Panel pan, bool enabled) {
+            int flag = pan.Altf==1?0x40:0;
             eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)(pan.x & 0x3f | (pan.sign == 0 ? 0x80 : 0)); // x
-            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)(enabled ? pan.y & 0x3f : pan.y | 0x80);
+            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)((enabled ? pan.y & 0x3f : pan.y | 0x80) | flag); // y
         }
 
         public Pos getEepromXY(Panel pan) {

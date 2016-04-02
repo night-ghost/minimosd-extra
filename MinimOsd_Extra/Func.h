@@ -153,7 +153,7 @@ static void setHomeVars()
  #ifdef IS_PLANE
     // copter & plane - differ by model_type
     if(sets.model_type == 0){  //plane
-	if(osd_throttle > 3 && takeoff_heading == -400)
+	if(osd_throttle > 50 && takeoff_heading == -400) 
 	    takeoff_heading = osd_heading;
 
 	if(!lflags.osd_got_home && osd_fix_type == 3 )
@@ -162,9 +162,10 @@ static void setHomeVars()
     
     if (lflags.motor_armed && !lflags.last_armed_status){
 	lflags.osd_got_home = 0;   //If motors armed, reset home
+	en=1;
+        lflags.last_armed_status = lflags.motor_armed; // only once
     }
 
-    lflags.last_armed_status = lflags.motor_armed;
 
     // if(!lflags.osd_got_home && osd_fix_type > 1 ) en=1;
 
@@ -200,7 +201,7 @@ static void setHomeVars()
 #endif
 
     if(en){
-        osd_home = osd_pos;
+        osd_home = osd_pos; // lat, lon & alt
 
         //osd_alt_cnt = 0;
         lflags.osd_got_home = 1;
@@ -253,6 +254,9 @@ void setFdataVars()
 	max_battery_reading = osd_battery_remaining_A;
 
 #ifdef IS_PLANE
+//                              Altitude above ground in meters, expressed as * 1000 (millimeters)
+// osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
+
     osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
 
     if (!lflags.takeofftime  && osd_alt_to_home > 5 && osd_throttle > 10){
@@ -337,7 +341,7 @@ void NOINLINE gps_norm(float &dst, long f){
 
 
 void NOINLINE set_data_got() {
-    millis_plus(&lastMAVBeat, 0);
+    lastMAVBeat = millis();
 
     lflags.got_data = 1;
 }
@@ -448,8 +452,8 @@ static void getData(){
 	    else                        speed =   4800;
 
 #ifdef DEBUG
-	    OSD::setPanel(3,6);
-	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
+//	    OSD::setPanel(3,6);
+//	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
 	    Serial.begin(speed);
 	    } break;

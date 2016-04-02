@@ -26,7 +26,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r818 DV";
+        public const string VERSION = "r823 DV";
 
 
         //max 7456 datasheet pg 10
@@ -218,50 +218,50 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, 0); // first!
 
-                pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY, -1);
-                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY, -1);
-                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY, -1);
-                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
-                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
-                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
-                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1);
-                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1);
+                //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY, -1, -1);
+                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY, -1, -1);
+                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY, -1, -1);
+                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1, -1);
+                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1, -1);
+                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1, -1);
+                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1, -1);
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, -1);
+                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, -1);
 
 
-                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
-                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, -1);
+                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0, -1);
+                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, -1, -1);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
-                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1);
-                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1);
-                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY, -1);
-                pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
+                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1, -1);
+                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1, -1);
+                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY, -1, -1);
+                pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1, -1);
 
-                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1);
-                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
-                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1);
-                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
-                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
+                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, -1);
+                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1, -1);
+                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0);
+                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, -1);
+                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1, -1);
 
-                pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1);
-                pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY, 1);
-                pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1);
-                pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
+                pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0);
+                pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY, 1, 0);
+                pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1, -1);
+                pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1, -1);
 
-                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1);
-                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1);
-                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY, -1);
-                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
-                pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
-                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
-                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1);
-                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY, -1);
-                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY, -1);
-                pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
-                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
-                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1);
+                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, 0);
+                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1, -1);
+                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY, -1, -1);
+                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1, -1);
+                pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1, -1);
+                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, -1);
+                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1, -1);
+                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY, -1, -1);
+                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY, -1, -1);
+                pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1, -1);
+                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, -1);
+                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, -1);
 
 
                 osd_functions_N = a;
@@ -531,9 +531,9 @@ namespace OSD {
 
             // ntsc and below the middle line
             if (thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked)) {
-                thing.show(thing.x, thing.y - 3, thing.sign);
+                thing.show(thing.x, thing.y - 3, thing.sign, thing.Altf);
             } else { // pal and no change
-                thing.show(thing.x, thing.y, thing.sign);
+                thing.show(thing.x, thing.y, thing.sign, thing.Altf);
             }
         }
 
@@ -851,8 +851,10 @@ namespace OSD {
                 err = conf.writeEEPROM(wr_start, wr_length);
                 if (err > 0)
                     MessageBox.Show("Failed to upload new Panel data");
-                else if (err == 0)
-                    MessageBox.Show("Done writing Panel data!");
+                else if (err == 0) {
+                    //MessageBox.Show("Done writing Panel data!");
+                    toolStripStatusLabel1.Text = "EEPROM write done";
+                }
             }
 
         }
@@ -983,7 +985,8 @@ namespace OSD {
                 MessageBox.Show("Failed to upload configuration data");
                 return 1;
             } else if (err == 0) {
-                MessageBox.Show("Done writing configuration data!");
+                //MessageBox.Show("Done writing configuration data!");
+                toolStripStatusLabel1.Text = "EEPROM write done";
                 return 0;
             }
             return -err;
@@ -1049,17 +1052,18 @@ namespace OSD {
                         if (pi.pos >= 0) {
                             TreeNode[] tnArray = this.scr[k].LIST_items.Nodes.Find(pi.name, true);
 
-                            if (tnArray.Length > 0)
+                            if (tnArray.Length > 0)                            {
                                 tnArray[0].Checked = (p.y < 0x80);
+                            }
 
+                            int flag = (p.y & 0x40)==0?0:1;
                             pi.x = (byte)Constrain(p.x & 0x7f, 0, SCREEN_W);
-                            pi.y = (byte)Constrain(p.y & 0x7f, 0, SCREEN_H);
+                            pi.y = (byte)Constrain(p.y & 0x3f, 0, SCREEN_H);
 
                             pi.sign = (p.x & 0x80) == 0 ? 1 : 0;
                             //scr[k].panelItems[a] = new Panel(pi.name, pi.show, p.x, p.y, pi.pos);
-
+                            pi.Altf =flag;
                         }
-
                     }
                 }
             }
@@ -1189,9 +1193,11 @@ namespace OSD {
 
                 pan.pal_ntsc = conf.eeprom.flags[pal_ntsc];
                 CHK_pal.Checked = pan.pal_ntsc;
-
+                
                 pan.mode_auto = conf.eeprom.flags[mode_auto];
                 CHK_auto.Checked = pan.mode_auto;
+
+                CHK_ntsc.Checked = !(pan.mode_auto || pan.pal_ntsc);
 
                 pan.flgTrack = conf.eeprom.flags[flgTrack];
                 pan.flgHUD = conf.eeprom.flags[flgHUD];
@@ -1313,6 +1319,7 @@ namespace OSD {
                 cbNscreens.SelectedIndex = pan.n_screens - 1;
             } catch (Exception ex) { }
 
+            toolStripStatusLabel1.Text="EEPROM read OK";
             Draw(panel_number = tN);
 
         }
@@ -1452,7 +1459,7 @@ namespace OSD {
                                 if (item != null) {
                                     TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
                                     if (tnArray.Length > 0)
-                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign);
+                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf);
                                 }
                             }
                         }
@@ -1566,8 +1573,13 @@ namespace OSD {
                                             //scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
                                             pi.x = int.Parse(strings[1]);
                                             pi.y = int.Parse(strings[2]);
+                                            pi.sign=1;
                                             try {
                                                 pi.sign = int.Parse(strings[4]);
+                                            } catch { }
+                                            pi.Altf=0;
+                                            try {
+                                                pi.Altf = int.Parse(strings[5]);
                                             } catch { }
 
                                             TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
@@ -1902,6 +1914,7 @@ namespace OSD {
                     byte[] bytes = br.ReadBytes(20000000);
                     int frameIndex = 0;
                     for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++) {
+                        Application.DoEvents();
                         message = "";
                         if (frameIndex < 20) {
                             while (bytes[byteIndex] == '\0')
@@ -2106,6 +2119,9 @@ namespace OSD {
         private void sub_updateCharset() {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             toolStripStatusLabel1.Text = "";
+
+            if (tlog_run)
+                tlog_thread.Abort();
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "mcm|*.mcm";
@@ -2628,7 +2644,7 @@ namespace OSD {
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
-                    //System.Threading.Thread.Sleep(2);
+                    System.Threading.Thread.Sleep(2);
 
                     comPort.DtrEnable = true;
                     comPort.RtsEnable = true;
@@ -2763,6 +2779,9 @@ namespace OSD {
         private bool UploadFirmware(string fileName) {
             if (string.IsNullOrEmpty(fileName))
                 return false;
+
+            if (tlog_run)
+                tlog_thread.Abort();
 
             byte[] FLASH;
             bool spuploadflash_flag = false;
@@ -3367,7 +3386,7 @@ namespace OSD {
                         message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
                         message += Environment.NewLine;
                         byteIndex++;
-                        Console.Write(message);
+                        //Console.Write(message);
 
                         if (bytes[byteIndex] == 0xFE) {
                             frameIndex++;
@@ -3376,8 +3395,14 @@ namespace OSD {
 
                         comPort.Write(bytes, frStart, frEnd - frStart);
                         np++;
-                        lblTLog.Text = np.ToString();
+                        try {
+                            lblTLog.Text = np.ToString();
+                        } catch {};
+
                         System.Threading.Thread.Sleep(200); // 5 frames/s
+
+                        while (comPort.BytesToRead != 0)
+                            Console.WriteLine(comPort.ReadExisting());
                     }
                 } catch {
                     continue;

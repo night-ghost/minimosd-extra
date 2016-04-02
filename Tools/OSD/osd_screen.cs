@@ -34,6 +34,7 @@ namespace OSD
         public System.Windows.Forms.NumericUpDown NUM_Y;
         public System.Windows.Forms.NumericUpDown NUM_X;
 		public System.Windows.Forms.CheckBox chkSign;
+        public System.Windows.Forms.CheckBox chkAlt;
 		
 		private int number;
 		private OSD osd;
@@ -62,6 +63,7 @@ namespace OSD
             this.NUM_X = new System.Windows.Forms.NumericUpDown();
 			this.pictureBox = new System.Windows.Forms.PictureBox();
 			this.chkSign = new System.Windows.Forms.CheckBox();
+            this.chkAlt = new System.Windows.Forms.CheckBox();
 			
 			this.tabPage.SuspendLayout();
 			this.groupBox.SuspendLayout();
@@ -111,6 +113,7 @@ namespace OSD
             this.groupBox.Controls.Add(this.NUM_Y);
             this.groupBox.Controls.Add(this.NUM_X);
 			this.groupBox.Controls.Add(this.chkSign);
+            this.groupBox.Controls.Add(this.chkAlt);
             this.groupBox.Location = new System.Drawing.Point(3, 258);
             this.groupBox.Name = "groupBox"+num;
             this.groupBox.Size = new System.Drawing.Size(169, 120);
@@ -120,7 +123,7 @@ namespace OSD
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 48);
+            this.label2.Location = new System.Drawing.Point(7, 43);
             this.label2.Name = "labela"+num;
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 3;
@@ -129,7 +132,7 @@ namespace OSD
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 20);
+            this.label1.Location = new System.Drawing.Point(7, 15);
             this.label1.Name = "labelb"+num;
             this.label1.Size = new System.Drawing.Size(14, 13);
             this.label1.TabIndex = 2;
@@ -137,7 +140,7 @@ namespace OSD
             // 
             // NUM_Y
             // 
-            this.NUM_Y.Location = new System.Drawing.Point(56, 46);
+            this.NUM_Y.Location = new System.Drawing.Point(56, 41);
             this.NUM_Y.Maximum = new decimal(new int[] {
             	15,
             	0,
@@ -150,7 +153,7 @@ namespace OSD
             // 
             // NUM_X
             // 
-            this.NUM_X.Location = new System.Drawing.Point(56, 20);
+            this.NUM_X.Location = new System.Drawing.Point(56, 15);
             this.NUM_X.Maximum = new decimal(new int[] {
             	29,
             	0,
@@ -191,14 +194,28 @@ namespace OSD
 			//
 			this.chkSign.AutoSize = true;
             this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkSign.Location = new System.Drawing.Point(10, 81);
+            this.chkSign.Location = new System.Drawing.Point(10, 76);
             this.chkSign.Name = "chkSign";
             this.chkSign.Size = new System.Drawing.Size(137, 17);
             this.chkSign.TabIndex = 4;
             this.chkSign.Text = "Show sign before value";
             this.chkSign.UseVisualStyleBackColor = true;
 			this.chkSign.CheckedChanged += new System.EventHandler(this.chkSign_CheckedChanged);
-			return 0;
+
+            // 
+            // chkAlt
+            //
+            this.chkAlt.AutoSize = true;
+            this.chkAlt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt.Location = new System.Drawing.Point(10, 91);
+            this.chkAlt.Name = "chkAlt";
+            this.chkAlt.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt.TabIndex = 4;
+            this.chkAlt.Text = "Alternative mode";
+            this.chkAlt.UseVisualStyleBackColor = true;
+            this.chkAlt.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+
+            return 0;
 		}
 		public int  last_init(){
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -325,6 +342,9 @@ namespace OSD
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
 					chkSign.Checked = thing.sign==1;
 					chkSign.Visible = thing.sign!=-1;
+
+                    chkAlt.Visible =thing.Altf !=-1;
+                    chkAlt.Checked = thing.Altf ==1;
 				}
 			}
 		}
@@ -343,6 +363,9 @@ namespace OSD
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
 					chkSign.Checked = thing.sign==1;
 					chkSign.Visible = thing.sign!=-1;
+
+                    chkAlt.Visible = thing.Altf != -1;
+                    chkAlt.Checked = thing.Altf == 1;
 				}
 			}
 		}
@@ -503,8 +526,25 @@ namespace OSD
 
 			osd.Draw(number);
         
+        }
+
+        private void chkAlt_CheckedChanged(object sender, EventArgs e) {
+
+            string item = osd.currentlyselected;
+
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    if (panelItems[a].Altf >= 0)
+                        panelItems[a].Altf = chkAlt.Checked ? 1 : 0;
+
+                }
+            }
+
+            osd.Draw(number);
+
         }		
 		
+
 	}
 }
 

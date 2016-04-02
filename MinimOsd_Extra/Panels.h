@@ -13,6 +13,9 @@ void osd_write(byte c){
     OSD::writeb(c);
 }
 
+void NOINLINE osd_nl(){
+    osd_write('|');
+}
 
 
 
@@ -44,15 +47,37 @@ static void NOINLINE osd_printi_1(PGM_P fmt, int f){
 }
 
 
-static void printSpeed(float s){
-    osd_printf_2(PSTR("%3.0f%c"),s,pgm_read_byte(&measure->spe));
+static void printSpeed(PGM_P fmt, float s, byte alt){
+    float k;
+    byte c;
+    
+    if(alt){
+	k=3.6;
+	c=0x18;
+    } else {
+	k=1;
+	c=pgm_read_byte(&measure->spe);
+    }
+    osd_printf_2(fmt,s/k,c);
 
 }
 
+static void printSpeed(float s, byte alt){
+    printSpeed(PSTR("%3.0f%c"), s, alt);
+}
+
+static void printSpeed(float s){
+    printSpeed(s, false);
+}
+
+
+void inline write_arrow(byte arrow_set1){
+    osd_write(arrow_set1); osd_write(arrow_set1+1);
+}
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-static void showArrow(uint8_t rotate_arrow,uint8_t method){
+static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
     char arrow_set1 = 0x90;
 
 
@@ -64,23 +89,29 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method){
     arrow_set1 += rotate_arrow * 2 - 2;
 
 
+    if(method==1) {
+	printSpeed(osd_windspeed * pgm_read_float(&measure->converts), alt);
+	osd_nl();
+    }
+
+    write_arrow(arrow_set1);
 
     switch(method) {  
     case 1:		// airspeed
-	printSpeed(osd_windspeed * pgm_read_float(&measure->converts));
-	osd.printf_P(PSTR("|%c%c%2.0f%c"), arrow_set1, arrow_set1 + 1, (nor_osd_windspeed * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
+	printSpeed(PSTR("%2.0f%c"), nor_osd_windspeed * pgm_read_float(&measure->converts), alt);
 	break;
     
     case 2:	//      course
-	osd.printf_P(PSTR("%c%c%4i\x05"), arrow_set1, arrow_set1 + 1, off_course);
+	osd.printf_P(PSTR("%4i\x05"), off_course);
 	break;
 
     default:		// just arrow
-	/* osd.printf_P(PSTR("%c%c"),        arrow_set1, arrow_set1 + 1); */ 
-	//printArrow( arrow_set1); 
-	osd_write(arrow_set1); osd_write(arrow_set1+1);
 	break;
     }
+}
+
+static void showArrow(uint8_t rotate_arrow,uint8_t method){
+    showArrow(rotate_arrow, method, false);
 }
 
 
@@ -441,7 +472,7 @@ static void print_list(const Formats *f){
 	
 	osd_printf_2(fmt,val,h);
 	
-	osd_write('|');
+	osd_nl();
 	f++;
     }
 }
@@ -600,7 +631,7 @@ static void panEff(point p){
                 }
             }
 	    if(has_sign(p))
-		osd_write(0x18);
+		osd_write(0xee);
 
             if (osd_climb < -0.05){
                 float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * pgm_read_float(&measure->converth);
@@ -679,7 +710,7 @@ static void panWindSpeed(point p){
     //filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
 
 
-    showArrow(grad_to_sect(dir - osd_heading),1); //print data to OSD
+    showArrow(grad_to_sect(dir - osd_heading),1, is_alt(p)); //print data to OSD
 }
 
 /* **************************************************************** */
@@ -703,7 +734,7 @@ static void panCur_A(point p){
 
 static void panAlt(point p){
 
-    printDist(osd_alt_gps/1000.0 * pgm_read_float(&measure->converth));
+    printDist(osd_pos.alt/1000.0 * pgm_read_float(&measure->converth));
 
 }
 
@@ -741,7 +772,7 @@ static void panHomeAlt(point p){
 
 static void panVel(point p){
 
-    printSpeed(cnvGroundSpeed());
+    printSpeed(cnvGroundSpeed(),is_alt(p));
 }
 
 /* **************************************************************** */
@@ -753,7 +784,7 @@ static void panVel(point p){
 
 static void panAirSpeed(point p){
 
-    printSpeed(osd_airspeed * pgm_read_float(&measure->converts));
+    printSpeed(osd_airspeed * pgm_read_float(&measure->converts), is_alt(p));
 }
 
 /* **************************************************************** */
@@ -983,7 +1014,7 @@ static void panHorizon(point p){
 	for(byte j=5; j!=0; j--) {
 	    for(byte i=14; i!=0; i--)
 		osd.write(' ');
-	    osd.write('|');
+	    osd_nl();
 	}
 */
     }
@@ -1072,11 +1103,11 @@ static void panWaitMAVBeats(){
     
     showArrow(grad_to_sect(seconds),0);
     osd.print(seconds);
-    osd.write('|');
+    osd_nl();
     
     int rotate_arrow = grad_to_sect(seconds);
     osd.print(rotate_arrow );
-    osd.write('|');
+    osd_nl();
 
     char arrow_set1 = 0x90;
 

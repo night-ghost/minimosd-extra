@@ -59,7 +59,7 @@ void WalkeraTelem::sendTelemetry(){
 	devoPacket.lat = gpsDdToDmsFormat(osd_pos.lat);
 	devoPacket.lon = gpsDdToDmsFormat(osd_pos.lon);
 
-	devoPacket.alt   = (int)(osd_alt_gps / 10.0f); // mm -> cm
+	devoPacket.alt   = (int)(osd_pos.alt / 10.0f); // mm -> cm
 	devoPacket.speed = (int)(osd_groundspeed * (0.0194384f * 100.0f));  // * 100 for cm
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = temperature;

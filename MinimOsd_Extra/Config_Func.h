@@ -11,6 +11,11 @@ static boolean inline has_sign(point p){
     return !(p.x & 0x80);
 }
 
+
+static boolean inline is_alt(point p){
+    return (p.y & 0x40);
+}
+
 // чтение и запись мелких объектов
 static void eeprom_read_len(byte *p, uint16_t e, uint16_t l){
     for(;l!=0; l--, e++) {
