@@ -72,6 +72,7 @@ struct Panel {
     point GPS2;         //#define panGPS2_XY = 70;    
     point RadarScale;	// 72
     point Fdata;	// 74
+    point baroAlt;      // 76
     //point curr_B;
     //point fdata;
 };

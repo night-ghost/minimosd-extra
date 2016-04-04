@@ -738,6 +738,31 @@ static void panAlt(point p){
 
 }
 
+/*
+static void panBaroAlt(point p){
+
+    printDist(osd_baro_alt/1000.0 * pgm_read_float(&measure->converth));
+
+}
+*/
+
+/* **************************************************************** */
+// Panel  : panHomeAlt
+// Needs  : X, Y locations
+// Output : Alt symbol and home altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+static void panHomeAlt(point p){
+
+    float v=osd_alt_to_home;
+    if(v==0) v = osd_alt_rel;
+    //printDist(osd_alt_rel * pgm_read_float(&measure->converth));
+    printDist(v * pgm_read_float(&measure->converth));
+}
+
+
+
 /* **************************************************************** */
 // Panel  : panClimb
 // Needs  : X, Y locations
@@ -749,19 +774,6 @@ static void panClimb(point p){
 
     osd_printf_2(f4_0fc, vertical_speed, pgm_read_byte(&measure->climbchar));
 }
-
-/* **************************************************************** */
-// Panel  : panHomeAlt
-// Needs  : X, Y locations
-// Output : Alt symbol and home altitude value in meters from MAVLink
-// Size   : 1 x 7Hea  (rows x chars)
-// Staus  : done
-
-static void panHomeAlt(point p){
-
-    printDist(osd_alt_rel * pgm_read_float(&measure->converth));
-}
-
 
 /* **************************************************************** */
 // Panel  : panVel
@@ -1942,7 +1954,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(time),		panTime, 	0 },
       
     { ID_of(WP_dist),		panWPDis,	0x5c },
-    { ID_of(alt),		panAlt, 	0x11 },
+    { ID_of(alt),		panAlt, 	0x11 }, // GPS Alt
+//    { ID_of(baroAlt),		panBaroAlt,	0x11 },
     { ID_of(homeAlt),		panHomeAlt, 	0x12 },
     { ID_of(vel),		panVel, 	0x14 },
     { ID_of(airSpeed),		panAirSpeed, 	0x13 },

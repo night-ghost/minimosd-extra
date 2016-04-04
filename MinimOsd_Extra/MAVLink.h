@@ -120,6 +120,7 @@ Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
                 osd_heading = mavlink_msg_vfr_hud_get_heading(&msg.m); // 0..360 deg, 0=north
                 osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg.m);
                 osd_alt_rel = mavlink_msg_vfr_hud_get_alt(&msg.m);
+                //osd_baro_alt = mavlink_msg_vfr_hud_get_alt(&msg.m);  //  Current altitude (MSL), in meters
                 osd_climb = mavlink_msg_vfr_hud_get_climb(&msg.m);
                 break;
 
@@ -185,12 +186,9 @@ packet.press_diff = press_diff;
 
 #ifdef IS_PLANE
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
-                //osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg.m)*0.001); 
-                //Commented because it seems that we only get relative alt when we have GPS lock.
-                //That shouldn't be because we may rely only on baro. So using vfr hud alt (testing)
-                //osd_alt_rel = (mavlink_msg_global_position_int_get_relative_alt(&msg.m)*0.001);
-        
-                osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
+    		// height of takeoff point
+                //osd_home_alt = osd_alt_rel*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
+                osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
                 break; 
 /*
 case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.

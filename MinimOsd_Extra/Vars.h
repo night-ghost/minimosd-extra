@@ -136,6 +136,8 @@ struct Coords {
     long alt; // altitude GPS
 };
 
+long osd_baro_alt; // altitude baro 
+
 static float        osd_climb = 0;
 Coords              osd_pos = {0,0};			// current coordinates
 

@@ -255,9 +255,9 @@ void setFdataVars()
 
 #ifdef IS_PLANE
 //                              Altitude above ground in meters, expressed as * 1000 (millimeters)
-// osd_home_alt = osd_alt_rel - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
+// osd_home_alt = osd_alt_rel*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
 
-    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0);
+//    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
 
     if (!lflags.takeofftime  && osd_alt_to_home > 5 && osd_throttle > 10){
 	lflags.takeofftime = 1;
@@ -322,13 +322,9 @@ void setFdataVars()
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float dst=osd_home_distance;
     calc_max(max_home_distance, dst);
-    //if (osd_airspeed > max_osd_airspeed) max_osd_airspeed = osd_airspeed;
     calc_max(max_osd_airspeed, osd_airspeed);
-     //if (osd_groundspeed > max_osd_groundspeed) max_osd_groundspeed = osd_groundspeed;
     calc_max(max_osd_groundspeed, osd_groundspeed);
-    //if (osd_alt_rel > max_osd_home_alt) max_osd_home_alt = osd_alt_rel;
     calc_max(max_osd_home_alt, osd_alt_rel);
-    //if (osd_windspeed > max_osd_windspeed) max_osd_windspeed = osd_windspeed;
     calc_max(max_osd_windspeed, osd_windspeed);
   }
 }
