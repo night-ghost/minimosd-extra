@@ -1,4 +1,22 @@
-# minimosd-extra
+# minimosd-extra (russian wil be in tail of this file)
+
+Quickstart Guide (c) Johnex
+----------------------
+1. Download the latest MinimOSD-Extra build here: https://github.com/night-ghost/minimosd-extra/osd_latest.zip
+2. Run the OSD_Config.exe
+3. Connect your MinimOSD to your pc making sure you are using an FTDI that has 5V and not 3.3V.
+4. After the usb driver is installed, select your COM port in OSD_Config.
+5. Click Options -> Update Firmware. Select the latest MinimOsd_Extra_Uni.8XXDV-release.hex file from the "FW & Char" folder.
+6. This firmware has a built in character set uploader, so just click Options -> Update CharSet. Select the latest character set MinimOSD_2.4.1.X.mcm from the "FW & Char" folder. Notice that this MimimOSD-Extra has a custom character set and must be updated if coming from another fork or the original, and some newer versions might require a new version, always check the "FW & Char" folder.
+7. Set your video mode to Auto if you have different cam types, or select NTSC or PAL if you have just 1 cam and you know it's type or had issues with Auto.
+8. Connect your OSD directly to a monitor or to a video transmitter so you can see the OSD output, making sure you don't forget to connect the antenna to the video transmitter before powering it on if you are using that. Click Options -> Load TLog. Select 2015-09-06 18-40-55.tlog from the "FW & Char" folder.
+9. Set up the screens as you want. Click "Save Tab to OSD" and then click "Start" to run a simulation so you can see how everything looks without having to set up a copter. If something is not right, click "Stop", do the changes, save the config again and click "Start" again to see the new changes.
+10. If you encounter that your screen is not centered, change the "Offsets", Left and Top from the config page. You can also move panels away from the edge if your screen gets cropped.
+
+
+
+Description
+
 
 * refactored a bit - now uses much less memory and can use less EEPROM
 
@@ -94,7 +112,28 @@ ATTENTION! this version is NOT compatible with original MinimOSD tools!
 
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
+
 /* RUSSIAN */
+
+БЫстрый старт
+
+
+1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/osd_latest.zip
+2. Запустите OSD_Config.exe
+3. Подключите MinimOSD на ваш компьютер, убедившись, что вы используете FTDI с напряжением 5V, а не 3.3V.
+4. После установки драйвера USB, выберите COM-порт в OSD_Config.
+5. Нажмите кнопку Options -> Update Firmware. Выберите последнюю версию файла MinimOsd_Extra_Uni.8XXDV-release.hex из папки "FW & Char".
+6. Эта прошивка имеет встроенный загрузчик знакогенератора, так что просто нажмите кнопку Options -> Renew CharSet. Выберите последний набор символов MinimOSD_2.4.1.X.mcm из папки "FW & Char". Обратите внимание на то, что этот MimimOSD-Extra имеет свой набор символов, и не будет работать с символами из других версий. Поэтому знакогенератор модуля должен быть обновлен, так что всегда проверяйте папку "FW & Char".
+7. Установите режим видео на Auto, если у вас одновременно различные типы камер, или выбрать NTSC или PAL, если у вас есть только один камера, и вы знаете ее тип.
+8. Подключите OSD непосредственно к монитору или видео передатчик, так чтобы увидеть вывод OSD, убедившись, что вы не забыли подключить антенну к видеопередатчику перед включением его. Нажмите кнопку Options -> Load TLOG. Выберите 2015-09-06 18-40-55.tlog из папки "FW & Char".
+9. Настройте экраны, как вы хотите. Нажмите кнопку "Save Tab to OSD", а затем нажмите кнопку "Start", чтобы запустить моделирование. Теперь вы сможете увидеть как все выглядит на самом деле без необходимости подключать коптер/самолет. Если что-то не так, нажмите кнопку "Stop", сделайте изменения, сохраните конфигурацию и нажмите кнопку "Пуск" снова, чтобы увидеть новые изменения.
+10. Если вы обнаружите, что ваш экран не по центру, то можете изменить "Offsets", слева и сверху, на вкладке конфигурации. Можно также перемещать панели подальше от края, если ваш экран обрезан.
+
+
+
+
+
+Описание отличий
 
 * Отрефакторил, убрав чудовищный расход памяти на хранение всех настроек всех возможных экранов сразу, также 
 убрал "регистры" флагов (и все с ними связанное) в пользу хранения вместе с координатами. Ну и по 
@@ -193,7 +232,7 @@ v821
 * прерывание PWM_IN разрешено только если используется
 
 v822 
-* plane flight modes fixed
+* исправлено отображение самолетных режимов
 
 v823
 * добавлен флаг "Альтернативный режим" ко всем панелям
