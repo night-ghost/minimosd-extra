@@ -1422,7 +1422,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 			
 			osd.setPanel(first_col, first_line);
 			
-	osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
+	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
               ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
                                       (int)((max_home_distance) * converth), chrHigh,
                                                  (int)(tdistance * converth), chrHigh,
@@ -1433,6 +1433,22 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 				return 0;
 		}
 		
+        public int panBaroAlt(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            if (sign == 1)//ArduCopter
+                osd.printf("%c%4.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
+            else
+                osd.printf("%4.0f%c", (double)(osd_alt * converth), altitudeChar);
+            return 0;
+        }
+
+        public int panMessage(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            osd.printf("This is a message from MavLink");
+            return 0;
+        }
     }
 }
 

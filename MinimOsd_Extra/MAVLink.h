@@ -199,6 +199,18 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
             break;
 */
 #endif
+
+	    case MAVLINK_MSG_ID_STATUSTEXT:
+                // mav_severity =  mavlink_msg_statustext_get_severity(&msg);
+                //if(SEVERITY_HIGH <= mav_severity) { // обрабатываем новое системное сообщение только высокой важности
+                {
+                    byte len = mavlink_msg_statustext_get_text(&msg.m, (char *)mav_message);
+                    mav_message[len]=0;
+		    mav_msg_ttl=seconds + 10;
+
+                }
+                break;
+
             default:
                 //Do nothing
                 break;

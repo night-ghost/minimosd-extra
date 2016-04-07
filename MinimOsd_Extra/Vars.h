@@ -189,6 +189,10 @@ static uint16_t     rssi = 0;     //normalized 0-100%
 
 uint8_t crlf_count = 0;
 
+byte mav_message[50]; // in MavLink also 50
+byte mav_msg_ttl;
+
+
 struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
     bool got_data:1;		// флаг получения пакета

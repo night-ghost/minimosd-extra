@@ -26,7 +26,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r823 DV";
+        public const string VERSION = "r825 DV";
 
 
         //max 7456 datasheet pg 10
@@ -262,6 +262,8 @@ namespace OSD {
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1, -1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, -1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, -1);
+                pi[a++] = new Panel("Message", pan.panMessage, 0, 5, panMessage_XY, -1, -1);
+                 //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
 
 
                 osd_functions_N = a;

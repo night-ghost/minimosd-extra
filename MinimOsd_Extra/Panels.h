@@ -1327,6 +1327,14 @@ static void panHomeDir(point p){
     showArrow(osd_home_direction,0);
 }
 
+static void panMessage(point p){
+    if(mav_msg_ttl < seconds)
+	osd.print((char *)mav_message);
+}
+
+
+
+
 /* **************************************************************** */
 // Panel  : panFlightMode 
 // Needs  : X, Y locations
@@ -1972,6 +1980,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(distance),		panDistance, 	0x8f },
     { ID_of(RadarScale),	panRadarScale, 	RADAR_CHAR  },
     { ID_of(callSign),		panCALLSIGN, 	0 },
+    { ID_of(message),		panMessage, 	0 },
     {0, 0}
 };
 
