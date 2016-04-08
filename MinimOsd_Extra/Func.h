@@ -408,7 +408,7 @@ static void getData(){
 
 
 //	switch(seconds % 4){
-	switch(count01s % 4){ 
+	switch(count05s % 4){ 
 #if defined(AUTOBAUD)
 	case 1: {
 	    Serial.end();

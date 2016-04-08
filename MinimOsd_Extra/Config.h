@@ -9,7 +9,7 @@
 #define VER 79
 
 
-#define RELEASE_NUM 825
+#define RELEASE_NUM 826
 #define VERSION "2.4"
 
 

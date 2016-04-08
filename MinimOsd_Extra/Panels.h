@@ -1328,8 +1328,78 @@ static void panHomeDir(point p){
 }
 
 static void panMessage(point p){
-    if(mav_msg_ttl < seconds)
-	osd.print((char *)mav_message);
+
+#define MAX_MSG_SIZE 27
+
+    if(mav_message[0] && mav_msg_ttl != seconds) {
+	char sign;
+
+        if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
+	else sign=0;
+	
+	byte len=mav_msg_len;
+	{
+	    char *cp = (char *)&mav_message[len];
+	    for(;;) {
+		byte c = *(--cp);
+		
+		if(c==0 || c==0x20){
+		    len--;
+		} else {
+		    cp[1]=0;
+		    break;
+		}
+	    }
+
+	}
+	
+	int8_t diff = MAX_MSG_SIZE - len;
+	if( diff > 0) { // less than screen
+	    OSD::setPanel(p.x + ((byte)diff)/2,p.y);
+	    if(sign) osd_write(sign);
+	    osd.print((char *)mav_message);
+
+
+//OSD::setPanel(p.x,p.y +1);
+//osd.printf_P(PSTR("diff=%d len=%d"), diff, len);
+
+	} else {
+	    if(sign) osd_write(sign);
+	    
+	    byte shf = count02s - mav_msg_shift; // count of 0.2s from message arrival
+	    byte tail = -diff;			 // number of off-screen chars
+	    int pos = shf % (tail*2);
+	    
+	    int8_t bpos=pos;
+	    
+	    if(bpos>tail) bpos=tail*2 - bpos;
+	
+	    if(!lflags.skip_inc && (pos==0 || pos==tail-1)) lflags.skip_inc++;
+	
+	    {
+	        char buf[MAX_MSG_SIZE+1];
+	        char *cp = (char *)&mav_message[pos];
+	        char *bp = buf;
+	    
+	        for(byte i=MAX_MSG_SIZE; i!=0; i--){
+		    byte c = *cp++;
+		    if(c==0) break;
+		    *bp++ = c;
+		}
+	        *bp=0;
+	    
+	    
+		osd.print(buf);
+	    }
+	
+//OSD::setPanel(p.x,p.y +1);
+//osd.printf_P(PSTR("pos=%d diff=%d len=%d"), pos, diff, len);
+
+	}
+//OSD::setPanel(p.x,p.y +1);
+//osd.printf_P(PSTR(" sev=%d"), mav_msg_severity);
+    } else
+	mav_message[0]=0; // no message
 }
 
 

@@ -287,7 +287,21 @@ void loop()
     if(pt > timer_100ms){
         millis_plus(&timer_100ms, 100);
 	On100ms();
-	count01s++;
+	
+	lflags.flag_01s = !lflags.flag_01s;
+	
+	if(lflags.flag_01s) {
+	
+	    if(lflags.skip_inc) {
+	        lflags.skip_inc++;
+	
+		if(lflags.skip_inc >=2)
+		    count02s++;
+	        
+	    } else 
+		count02s++;
+	}
+//	count01s++;
     }
     if(pt > timer_500ms){
 	millis_plus(&timer_500ms, 500);
@@ -295,8 +309,7 @@ void loop()
 	
 	lflags.flag_05s = 1;
 
-
-	count01s++;
+	count05s++;
 
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry();
@@ -475,7 +488,7 @@ void On20ms(){ // 50Hz
 
 //#define OUT_PORT(val) if (val == LOW) { *out &= ~bit; } else { *out |= bit; }
 #define SET_LOW()   *out &= ~bit
-#define SET_HIGH()  *out |= bit
+#define SET_HIGH()  *out |=  bit
 
 	noInterrupts();		// pulse widh disabled interrups for accuracy
 	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);

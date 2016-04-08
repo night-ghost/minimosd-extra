@@ -1446,7 +1446,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
         public int panMessage(int first_col, int first_line, int sign, int fAlt) {
             osd.setPanel(first_col, first_line);
 
-            osd.printf("This is a message from MavLink");
+            osd.printf("This a message via MavLink");
             return 0;
         }
     }

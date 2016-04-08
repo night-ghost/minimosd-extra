@@ -11,10 +11,37 @@ F_CPU = 16000000
 
 
 #nothing
-#OPT = -faggressive-loop-optimizations -fassociative-math -fauto-inc-dec  -fbranch-probabilities -fbranch-target-load-optimize -fbranch-target-load-optimize2 -fdelayed-branch 
-# -floop-strip-mine -foptimize-strlen -fpack-struct -freciprocal-math -freorder-blocks-and-partition -freorder-blocks-and-partition -fno-partial-inlining -fno-inline-small-functions
+#OPT = -faggressive-loop-optimizations -fauto-inc-dec  -fbranch-probabilities -fdelayed-branch 
+# -floop-strip-mine -foptimize-strlen -fpack-struct -freciprocal-math -freorder-blocks-and-partition -fno-partial-inlining -fno-inline-small-functions
 
-OPT = -floop-nest-optimize   -finline-functions-called-once -fearly-inlining -finline-small-functions -fmerge-all-constants -fmodulo-sched -fmodulo-sched-allow-regmoves -fgcse -fgcse-sm -fgcse-las -fgcse-after-reload -fdeclone-ctor-dtor -fconserve-stack -ftree-pre -ftree-partial-pre -fipa-pta -ftree-tail-merge -fivopts -fpredictive-commoning -ffast-math -fno-signed-zeros -frename-registers -fbranch-target-load-optimize -fbranch-target-load-optimize2 -fomit-frame-pointer -fno-optimize-sibling-calls 
+OPT  = -floop-nest-optimize   -floop-strip-mine
+OPT += -finline-functions-called-once 
+OPT += -fearly-inlining 
+OPT += -finline-small-functions -fauto-inc-dec
+OPT += -fmerge-all-constants -foptimize-strlen
+OPT += -fmodulo-sched 
+OPT += -fmodulo-sched-allow-regmoves -fassociative-math
+#OPT += -fgcse 
+#OPT += -fgcse-sm 
+#OPT += -fgcse-las 
+#OPT += -fgcse-after-reload 
+#OPT += -fdeclone-ctor-dtor 
+OPT += -fconserve-stack  -freorder-blocks-and-partition
+#OPT += -ftree-pre 
+#OPT += -ftree-partial-pre 
+#OPT += -fipa-pta 
+#OPT += -ftree-tail-merge 
+#OPT += -fivopts 
+#OPT += -fpredictive-commoning 
+OPT += -ffast-math 
+OPT += -fno-signed-zeros
+# -fdelayed-branch 
+#OPT += -frename-registers 
+#OPT += -fbranch-target-load-optimize 
+#OPT += -fbranch-target-load-optimize2 
+
+OPT += -fomit-frame-pointer 
+OPT += -fno-optimize-sibling-calls 
 #bad:  -ffloat-store  -maccumulate-args -fno-early-inlining 	
 
 

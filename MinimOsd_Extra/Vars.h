@@ -176,10 +176,11 @@ static uint8_t      apm_mav_system = 0;
 static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
 
-byte count01s;
+byte count05s=0;
+byte count02s=0;
 
 #define MAX_PANELS 4
-static uint8_t panelN = 0; 
+static uint8_t panelN = 0;
 
 
 //*************************************************************************************************************
@@ -189,9 +190,11 @@ static uint16_t     rssi = 0;     //normalized 0-100%
 
 uint8_t crlf_count = 0;
 
-byte mav_message[50]; // in MavLink also 50
+byte mav_message[52]; // in MavLink max isize is 50
 byte mav_msg_ttl;
-
+byte mav_msg_len;
+byte mav_msg_severity;
+byte mav_msg_shift;
 
 struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
@@ -214,6 +217,9 @@ struct loc_flags {
     bool osd_got_home:1; // tels if got home position or not
     
     bool flag_05s:1; // sets each 0.5s for setup
+    bool flag_01s:1;
+
+    int skip_inc:8;
 
 //    bool osd_clear:1;
 //MAVLink session control
