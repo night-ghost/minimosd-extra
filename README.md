@@ -2,7 +2,7 @@
 
 Quickstart Guide (c) Johnex
 ----------------------
-1. Download the latest MinimOSD-Extra build here: https://github.com/night-ghost/minimosd-extra/osd_latest.zip
+1. Download the latest MinimOSD-Extra build here: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip
 2. Run the OSD_Config.exe
 3. Connect your MinimOSD to your pc making sure you are using an FTDI that has 5V and not 3.3V.
 4. After the usb driver is installed, select your COM port in OSD_Config.
@@ -124,7 +124,7 @@ If you like this project and want to support further development - you can do it
 БЫстрый старт
 
 
-1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/osd_latest.zip
+1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip
 2. Запустите OSD_Config.exe
 3. Подключите MinimOSD на ваш компьютер, убедившись, что вы используете FTDI с напряжением 5V, а не 3.3V.
 4. После установки драйвера USB, выберите COM-порт в OSD_Config.
