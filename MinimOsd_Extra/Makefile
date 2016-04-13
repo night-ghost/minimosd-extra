@@ -10,39 +10,50 @@ VARIANT    = standard
 F_CPU = 16000000
 
 
-#nothing
-#OPT = -faggressive-loop-optimizations -fauto-inc-dec  -fbranch-probabilities -fdelayed-branch 
-# -floop-strip-mine -foptimize-strlen -fpack-struct -freciprocal-math -freorder-blocks-and-partition -fno-partial-inlining -fno-inline-small-functions
 
-OPT  = -floop-nest-optimize   -floop-strip-mine
+OPT  = -ffast-math 
+OPT += -floop-nest-optimize 
+OPT += -floop-strip-mine
 OPT += -finline-functions-called-once 
 OPT += -fearly-inlining 
 OPT += -finline-small-functions -fauto-inc-dec
 OPT += -fmerge-all-constants -foptimize-strlen
 OPT += -fmodulo-sched 
 OPT += -fmodulo-sched-allow-regmoves -fassociative-math
-#OPT += -fgcse 
-#OPT += -fgcse-sm 
-#OPT += -fgcse-las 
-#OPT += -fgcse-after-reload 
-#OPT += -fdeclone-ctor-dtor 
 OPT += -fconserve-stack  -freorder-blocks-and-partition
-#OPT += -ftree-pre 
-#OPT += -ftree-partial-pre 
-#OPT += -fipa-pta 
-#OPT += -ftree-tail-merge 
-#OPT += -fivopts 
-#OPT += -fpredictive-commoning 
-OPT += -ffast-math 
 OPT += -fno-signed-zeros
-# -fdelayed-branch 
-#OPT += -frename-registers 
+OPT += -fomit-frame-pointer 
+OPT += -fno-optimize-sibling-calls 
+OPT += -fgcse 
+OPT += -fgcse-sm 
+OPT += -fgcse-las 
+OPT += -fgcse-after-reload 
+OPT += -fdeclone-ctor-dtor 
+OPT += -ftree-pre 
+OPT += -ftree-partial-pre 
+OPT += -fipa-pta 
+OPT += -ftree-tail-merge 
+OPT += -fivopts 
+OPT += -fpredictive-commoning 
+OPT += -foptimize-strlen
+#OPT +=  -fdelayed-branch  not supported
+#OPT += -frename-registers  size more
 #OPT += -fbranch-target-load-optimize 
 #OPT += -fbranch-target-load-optimize2 
 
-OPT += -fomit-frame-pointer 
-OPT += -fno-optimize-sibling-calls 
-#bad:  -ffloat-store  -maccumulate-args -fno-early-inlining 	
+# OPT += -ffloat-store   much more
+#OPT += -maccumulate-args more size
+OPT += -fno-early-inlining 
+
+#nothing
+OPT += -faggressive-loop-optimizations 
+OPT += -fauto-inc-dec  
+OPT += -fbranch-probabilities 
+OPT +=  -floop-strip-mine 
+OPT +=  -fpack-struct 
+#OPT += -freciprocal-math 
+#OPT += -fno-partial-inlining 
+#OPT += -fno-inline-small-functions
 
 
 ARDUINO_HEADER = dummy_header.h

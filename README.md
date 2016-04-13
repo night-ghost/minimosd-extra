@@ -116,6 +116,17 @@ v826
 
 * MAVlink message scrolled if length more than screen width
 
+v827
+
+* new tLog parser which knows .tlog format and not allows to lose sync
+* thread-safe status in CT
+* optimized looptime
+* optimized memory usage
+* no more "show battery percentage" checkbox and flag - this can be configured per-screen via "alternate" mode
+* sensors to output arbitrary readings
+* new GeoFence warnings
+
+
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 
@@ -256,6 +267,17 @@ v825
 v826
 
 * MAVlink message двигается на экране если не влезает целиком
+
+
+v827
+
+* новый парсер tLog, который знает его формат и не позволяет OSD терять синхронизацию
+* thread-safe статус в конфигураторе
+* оптимизировано время цикла
+* оптимизирован расход памяти
+* удалены "show battery percentage" галка и флаг - теперь этот режим задается независимо для каждого экрана в свойствах панели
+* сенсоры для отображения произвольных значений в произвольном формате
+* новые предупреждения о сработке GeoFence
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

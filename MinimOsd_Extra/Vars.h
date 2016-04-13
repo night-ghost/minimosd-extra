@@ -7,7 +7,7 @@
 
  Flags flags; // битовые флаги из EEPROM
  Settings sets;	// настройки из EEPROM
- Panel panel; // элементы экрана из EEPROM
+// no more! Panel panel; // элементы экрана из EEPROM
 
 
 static float        max_home_distance = 0;
@@ -20,6 +20,7 @@ static float        nor_osd_windspeed = 0; // calculated from osd_windspeed by L
 static float        vertical_speed = 0; // calculated from osd_climb byy LPF 1/10
 
 static float        tdistance = 0; // track distance
+static float        mah_used = 0;  // consumed charge
 
 
 //static const char strclear[] PROGMEM = "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20";
@@ -30,8 +31,8 @@ static int          nav_pitch = 0; // Current desired pitch in degrees, for panT
 static int          nav_bearing = 0; // Current desired heading in degrees, for panTune only
 
 static int16_t      wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
-static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
-static uint8_t      wp_number = 0; // Current waypoint number
+static uint16_t     wp_dist = 0; 	// Distance to active MISSION in meters
+static uint8_t      wp_number = 0; 	// Current waypoint number
 
 #ifdef IS_PLANE
 static float        alt_error = 0; // Current altitude error in meters *10
@@ -96,7 +97,6 @@ static const struct Measure *measure; // переключаемая ссылка
 static uint16_t     osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static uint16_t     osd_vbat_B = 0;                 // voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
-static float        mah_used = 0;
 static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_remaining_B = 0;    // 0 to 100 <=> 0 to 1000
 
@@ -175,6 +175,7 @@ static uint32_t     lastMAVBeat = 0;
 static uint8_t      apm_mav_system = 0;
 static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
+static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
 byte count05s=0;
 byte count02s=0;
@@ -200,6 +201,10 @@ struct loc_flags {
     bool update_stat:1; 		// есть данные для показа
     bool got_data:1;		// флаг получения пакета
     bool mavlink_active:1; 	// флаг активности (навсегда)
+    bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
+    bool mwii_active:1;    // got valid MWII packet - flag forever
+    bool input_active:1;    // got ANY valid packet - flag forever
+    
     bool rotatePanel:1;
     bool one_sec_timer_switch:1;
 
@@ -210,8 +215,6 @@ struct loc_flags {
 
     bool blinker:1;
 
-    bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
-    bool mwii_active:1;    // got valid MWII packet - flag forever
     
     bool mode_switch:1;
     bool osd_got_home:1; // tels if got home position or not
@@ -219,7 +222,10 @@ struct loc_flags {
     bool flag_05s:1; // sets each 0.5s for setup
     bool flag_01s:1;
 
-    int skip_inc:8;
+    bool flgSensor1:1;  
+    bool flgSensor2:1;  
+    bool flgSensor3:1;  
+    bool flgSensor4:1;  
 
 //    bool osd_clear:1;
 //MAVLink session control
@@ -230,11 +236,16 @@ struct loc_flags {
 };
 
 #ifdef DEBUG
-int packet_drops = 0; // unused
+uint16_t packet_drops = 0; // used only in debug
+uint16_t packets_skip = 0;
+uint16_t packets_got = 0;
+
 long bytes_comes=0;
 uint16_t max_dly=0;
+volatile uint16_t lost_bytes;
 #endif
 
+byte skip_inc;
 
 struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
@@ -249,6 +260,9 @@ volatile unsigned long int_Timer = 0;         // set in the INT1
 
 byte PWM_out_pin=0;
 
+#if defined(USE_SENSORS)
+unsigned int sensorData[4];
+#endif
 
 #define GPS_MUL 10000000.0f
 

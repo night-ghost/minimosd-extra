@@ -94,7 +94,7 @@ namespace OSD
 //*************************		
         private byte temperatureChar = 0x1B;
         private byte bigDistanceChar = 0x1B;
-        private byte smallDistanceChar = 0x1B;
+        //private byte smallDistanceChar = 0x1B;
         private byte climbChar = 0x1A;
         private byte velocityChar = 0x10;
         private byte altitudeChar = 0x10;
@@ -119,7 +119,7 @@ namespace OSD
 				climbChar = 0x1A;
 				velocityChar = 0x10;
 				altitudeChar = 0x6D;
-				smallDistanceChar = 0x6D;
+				//smallDistanceChar = 0x6D;
 				chrHigh =0x0c;
 				chrSpe = 0x10;
 				break;
@@ -135,7 +135,7 @@ namespace OSD
 				climbChar = 0x1E;
 				velocityChar = 0x19;
 				altitudeChar = 0x66;
-				smallDistanceChar = 0x66;
+				//smallDistanceChar = 0x66;
 				chrHigh =0x66;
 				chrSpe = 0x19;
 				break;
@@ -146,19 +146,19 @@ namespace OSD
 
         static float osd_vbat = 11.61f;                   // voltage in milivolt
         static uint16_t osd_battery_remaining = 10;      // 0 to 100 <=> 0 to 1000
-        public bool  osd_battery_show_percentage = true;      // use remaining % or used mAh
-        static uint8_t osd_battery_pic = 0xb4;         // picture to show battery remaining
+       // public bool  osd_battery_show_percentage = true;      // use remaining % or used mAh
+        //static uint8_t osd_battery_pic = 0xb4;         // picture to show battery remaining
 
         static uint8_t chrSpe = 0;
         static uint8_t chrHigh = 0;
 
-        static uint16_t osd_mode = 100;                   // Navigation mode from RC AC2 = CH5, APM = CH8
-        static uint8_t osd_nav_mode = 4;               // Navigation mode from RC AC2 = CH5, APM = CH8
+        //static uint16_t osd_mode = 100;                   // Navigation mode from RC AC2 = CH5, APM = CH8
+        //static uint8_t osd_nav_mode = 4;               // Navigation mode from RC AC2 = CH5, APM = CH8
 
         static float osd_lat = -35.020938f;                    // latidude
         static float osd_lon = 117.883419f;                    // longitude
         static uint8_t osd_satellites_visible = 7;     // number of satelites
-        static uint8_t osd_fix_type = 3;               // GPS lock 0-1=no fix, 2=2D, 3=3D
+        //static uint8_t osd_fix_type = 3;               // GPS lock 0-1=no fix, 2=2D, 3=3D
         static int start_Time = 3785; 
 
         //static uint8_t osd_got_home = 0;               // tels if got home position or not
@@ -171,7 +171,7 @@ namespace OSD
         static int8_t osd_pitch = 0;                  // pitch form DCM
         static int8_t osd_roll = 0;                   // roll form DCM
         //static uint8_t osd_yaw = 0;                    // relative heading form DCM
-        static float osd_heading = 0;                // ground course heading from GPS
+        //static float osd_heading = 0;                // ground course heading from GPS
         static float osd_alt = 200;                    // altitude
         static float osd_groundspeed = 9;            // ground speed
         static float osd_airspeed = 10;            // air speed
@@ -608,7 +608,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-            if (Convert.ToBoolean(osd_battery_show_percentage))
+            if (fAlt==1)
             {
 				if(sign==1)
                   osd.printf("\x88%c%c\x8e%2.0i%%", 0x89, 0x89, 99);
@@ -1373,7 +1373,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
         }
 */
         //------------------ Battery Remaining Picture ----------------------------------
-
+/*
         public void setBatteryPic()
         {
             if (osd_battery_remaining <= 270)
@@ -1398,7 +1398,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             }
             else osd_battery_pic = 0xb9;
         }
-
+*/
         public int panRadarScale(int first_col, int first_line, int sign, int fAlt) {
 
 	    	osd.setPanel(first_col, first_line);
@@ -1447,6 +1447,71 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             osd.setPanel(first_col, first_line);
 
             osd.printf("This a message via MavLink");
+            return 0;
+        }
+
+        public int panSenor1(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            string fmt;
+
+            fmt = osd.convertChars(osd.txtFormat1.Text);
+            try {
+                fmt = fmt.Substring(0, Config.OSD_SENSOR_FORMAT_TOTAL);
+            } catch{
+            }
+
+            
+            osd.printf(fmt,  3.21);
+            
+
+            return 0;
+        }
+
+        public int panSenor2(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            string fmt;
+
+            fmt = osd.convertChars(osd.txtFormat2.Text);
+            try {
+                fmt = fmt.Substring(0, Config.OSD_SENSOR_FORMAT_TOTAL);
+            } catch {
+            }
+
+            osd.printf(fmt, 78.9);
+
+            return 0;
+        }
+
+        public int panSenor3(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            string fmt;
+
+            fmt = osd.convertChars(osd.txtFormat3.Text);
+            try {
+                fmt = fmt.Substring(0, Config.OSD_SENSOR_FORMAT_TOTAL);
+            } catch {
+            }
+
+            osd.printf(fmt, 4.56);
+
+            return 0;
+        }
+
+        public int panSenor4(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+            string fmt;
+
+            fmt = osd.convertChars(osd.txtFormat4.Text);
+            try {
+                fmt = fmt.Substring(0, Config.OSD_SENSOR_FORMAT_TOTAL);
+            } catch {
+            }
+
+            osd.printf(fmt, 9.87);
+
             return 0;
         }
     }

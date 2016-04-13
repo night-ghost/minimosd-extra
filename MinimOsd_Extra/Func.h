@@ -6,6 +6,14 @@ void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
     *dst = millis() + inc;
 }
 
+void NOINLINE long_plus(uint32_t *dst, uint16_t inc) {
+    *dst +=  inc;
+}
+
+int NOINLINE long_diff(uint32_t *l1, uint32_t *l2) {
+    return (int)(l1-l2);
+}
+
 
 static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
@@ -145,7 +153,6 @@ static void setHomeVars()
 {
     float dstlon, dstlat;
     int bearing;
-    byte en=0;
 
 
 
@@ -153,31 +160,30 @@ static void setHomeVars()
  #ifdef IS_PLANE
     // copter & plane - differ by model_type
     if(sets.model_type == 0){  //plane
-	if(osd_throttle > 50 && takeoff_heading == -400) 
+	if(osd_throttle > 50 && takeoff_heading == -400) // lock runway direction
 	    takeoff_heading = osd_heading;
-
-	if(!lflags.osd_got_home && osd_fix_type == 3 )
-	    en=1;
     }
-    
-    if (lflags.motor_armed && !lflags.last_armed_status){
-	lflags.osd_got_home = 0;   //If motors armed, reset home
-	en=1;
+
+    if (lflags.motor_armed && !lflags.last_armed_status ){ // on motors arm 
+	lflags.osd_got_home = 0;   			//    reset home: Хуже не будет, если ГПС был а при арме исчез то наф такой ГПС
+//	if(osd_fix_type>=3) {					//  if GPS fix OK
+//	    en=1;                			         // lock home position
+//	}  само сделается через пару строк
         lflags.last_armed_status = lflags.motor_armed; // only once
     }
 
-
-    // if(!lflags.osd_got_home && osd_fix_type > 1 ) en=1;
 
  #else // pure copter
   //Check disarm to arm switching.
   if (lflags.motor_armed && !lflags.last_armed_status){
     lflags.osd_got_home = 0;	//If motors armed, reset home 
+//    if(osd_fix_type>=3) {	//  if GPS fix OK
+//        en=1;                   // lock home position
+//    } само сделается через пару строк
+
+    lflags.last_armed_status = lflags.motor_armed; // only once
   }
 
-  lflags.last_armed_status = lflags.motor_armed;
-
-  if(!lflags.osd_got_home && osd_fix_type > 2 ) en=1;
 
  #endif
 #else // not copter
@@ -186,21 +192,17 @@ static void setHomeVars()
     if(osd_throttle > 10 && takeoff_heading == -400)
 	takeoff_heading = osd_heading;
 
-
     if (lflags.motor_armed && !lflags.last_armed_status){ // plane can be armed too
 	lflags.osd_got_home = 0;	//If motors armed, reset home in Arducopter version
 	takeoff_heading = osd_heading;
     }
 
     lflags.last_armed_status = lflags.motor_armed;
-
-    if(!lflags.osd_got_home && osd_fix_type == 3 )
-	en=1;
-  
+ 
  #endif
 #endif
 
-    if(en){
+    if(!lflags.osd_got_home && osd_fix_type >= 3 ) { // first home lock on GPS 3D fix - ну или если фикс пришел уже после арма
         osd_home = osd_pos; // lat, lon & alt
 
         //osd_alt_cnt = 0;
@@ -242,7 +244,8 @@ void filter( float &dst, float val, const float k){ // комплиментар�
 // накопление статистики и рекордов
 void setFdataVars()
 {
-    unsigned long time_lapse = millis() - runtime;
+    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+    
     //runtime = millis();
     millis_plus(&runtime, 0);
 
@@ -265,7 +268,7 @@ void setFdataVars()
     }
 #endif
 
-    float time_1000 = time_lapse / 1000.0;
+    float time_1000 = time_lapse / 1000.0; // in seconds
 
     //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
     if(lflags.osd_got_home && lflags.motor_armed) tdistance += (osd_groundspeed * time_1000);
@@ -317,7 +320,8 @@ void setFdataVars()
  #endif
 #endif
 
-    total_flight_time_milis += time_lapse;
+    //total_flight_time_milis += time_lapse;
+    long_plus(&total_flight_time_milis, time_lapse);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float dst=osd_home_distance;
@@ -340,27 +344,18 @@ void NOINLINE set_data_got() {
     lastMAVBeat = millis();
 
     lflags.got_data = 1;
+#ifdef DEBUG
+    if(!lflags.input_active){ // first got packet
+	max_dly=0;
+    }
+#endif
+    lflags.input_active=1;
 }
 
 
 void delay_byte(){
     if(!Serial.available_S())
         delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
-}
-
-
-static void parseNewData(){
-
-//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-    setHomeVars();   // calculate and set Distance from home and Direction to home
-
-    setFdataVars(); // накопление статистики и рекордов
-
-    writePanels();       // writing enabled panels (check OSD_Panels Tab)
-
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
 }
 
 
@@ -418,12 +413,10 @@ static void getData(){
 	    { // isolate PT and SPEED
 		uint32_t pt = millis() + 100; // не более 0.1 секунды
 	
-	    
 	        for(byte i=250; i!=0; i--){
-	            long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
 	            if(millis()>pt) break; // not too long
-
-	            if(t>255) continue;	     // too long - not single bit
+	            long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
+	            if(t>255) continue;   // too long - not single bit
 	            uint8_t tb = t;       // it less than 255 so convert to byte
 	            if(tb==0) continue;   // no pulse at all
 	            if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
@@ -451,6 +444,7 @@ static void getData(){
 //	    OSD::setPanel(3,6);
 //	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
+	    Serial.flush();
 	    Serial.begin(speed);
 	    } break;
 #endif    
@@ -473,30 +467,6 @@ static void getData(){
 	    break;
 	}
     }
-
-
-    if(lflags.got_data){ // были свежие данные - обработать
-        lflags.got_data=0;
-
-        pan_toggle(); // проверить переключение экранов
-
-        parseNewData();
-
-//	LED_BLINK;
-
-        lflags.update_stat = 1; // пришли данные
-        vsync_wait = 1;         // надо перерисовать экран
-//LED_ON; // свечение диода во время ожидания перерисовки экрана
-    }
-
-    if(lflags.update_stat) { // если надо перерисовать экран
-	if(!vsync_wait){ // то делаем это только во время обратного хода
-//LED_OFF;
-	    OSD::update();
-	    lflags.update_stat = 0;
-        }
-    }
-
 
 }
 

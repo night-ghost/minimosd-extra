@@ -247,6 +247,14 @@ void setup()     {
     OSD::update();
     delay(10000); 
 */
+/*
+    eeprom_read_len((byte *)&msg,  768,  128 );
+
+    OSD::setPanel(0,0);
+    hex_dump((byte *)&msg,0x70);
+    OSD::update();
+    delay(10000); 
+*/
 
 /*
     OSD::setPanel(0,0);
@@ -281,21 +289,21 @@ void loop()
 
     if(pt > timer_20ms){
         //timer_20ms = pt + 20;
-        millis_plus(&timer_20ms, 20);
+        long_plus(&timer_20ms, 20);
         On20ms();
     }
     if(pt > timer_100ms){
-        millis_plus(&timer_100ms, 100);
+        long_plus(&timer_100ms, 100);
 	On100ms();
 	
 	lflags.flag_01s = !lflags.flag_01s;
 	
 	if(lflags.flag_01s) {
 	
-	    if(lflags.skip_inc) {
-	        lflags.skip_inc++;
+	    if(skip_inc) {
+	        skip_inc++;
 	
-		if(lflags.skip_inc >=2)
+		if(skip_inc >=3)
 		    count02s++;
 	        
 	    } else 
@@ -304,7 +312,7 @@ void loop()
 //	count01s++;
     }
     if(pt > timer_500ms){
-	millis_plus(&timer_500ms, 500);
+	long_plus(&timer_500ms, 500);
         lflags.got_data=1; // каждые полсекунды принудительно
 	
 	lflags.flag_05s = 1;
@@ -321,14 +329,50 @@ void loop()
             lflags.one_sec_timer_switch = 1; // for warnings
 
 
-#ifdef DEBUG    
-	    if(seconds % 60 == 30)
-	        Serial.printf_P(PSTR("loop time = %dms\n"),max_dly);
+#ifdef DEBUG
+	    if(seconds % 60 == 0) {
+		extern volatile uint16_t lost_bytes;
+	        Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
+	        
+	    }
 #endif
 	}
     }
 
-    getData(); // получить и обработать данные с контроллера
+    getData(); // получить данные с контроллера
+
+
+    if(lflags.got_data){ // были свежие данные - обработать
+        lflags.got_data=0;
+
+//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+        pan_toggle(); // проверить переключение экранов
+
+
+        setHomeVars();   // calculate and set Distance from home and Direction to home
+
+        setFdataVars();  // накопление статистики и рекордов
+
+        writePanels();   // writing enabled panels (check OSD_Panels Tab)
+
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+//	LED_BLINK;
+
+        lflags.update_stat = 1; // пришли данные
+        vsync_wait = 1;         // надо перерисовать экран
+//LED_ON; // свечение диода во время ожидания перерисовки экрана
+    }
+
+    if(lflags.update_stat) { // если надо перерисовать экран
+	if(!vsync_wait){ // то делаем это только во время обратного хода
+//LED_OFF;
+	    OSD::update();
+	    lflags.update_stat = 0;
+        }
+    }
+
 
 
 /* not used, let PWM data will be ALWAYS actual
@@ -350,6 +394,18 @@ void loop()
 
 }
 
+#if defined(USE_SENSORS)
+ #define SENSOR1_ON lflags.flgSensor1
+ #define SENSOR2_ON lflags.flgSensor2
+ #define SENSOR3_ON lflags.flgSensor3
+ #define SENSOR4_ON lflags.flgSensor4
+#else
+ #define SENSOR1_ON 0
+ #define SENSOR2_ON 0
+ #define SENSOR3_ON 0
+ #define SENSOR4_ON 0
+#endif
+
 float avgRSSI(uint16_t d){
     static uint8_t ind = -1;
     static uint16_t RSSI_rawArray[8];
@@ -367,7 +423,7 @@ void On100ms(){ // периодические события, не связан�
 
 //Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
-    if(flags.useExtVbattA){ //аналоговый ввод - основное напряжение 
+    if(flags.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = -1;
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
@@ -375,25 +431,31 @@ void On100ms(){ // периодические события, не связан�
         voltageRawArray[(++ind)%8] = analogRead(VoltagePin);
         for (uint8_t i=8;i!=0;)
             voltageRaw += voltageRawArray[--i];
-            
-        voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
-	if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
-	else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
-	lflags.got_data=1;
-// 	вычислить osd_battery_remaining_A по напряжению!
-	byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
-	 //             voltage above limit in 0.1              max voltage above limit
-	int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
-	
-	if(v<0)        osd_battery_remaining_A  = 0;
-	else if(v>255) osd_battery_remaining_A  = 255;
-	else           osd_battery_remaining_A  = v;
 
+#if defined(USE_SENSORS)
+        sensorData[0] =  (sensorData[0]*7 + voltageRaw) /8;
+#endif
+        if( flags.useExtVbattA ) {
+        
+            voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
+	    else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
+	    lflags.got_data=1;
+// 	вычислить osd_battery_remaining_A по напряжению!
+	    byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
+	     //             voltage above limit in 0.1              max voltage above limit
+	    int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
+	
+	    if(v<0)        osd_battery_remaining_A  = 0;
+	    else if(v>255) osd_battery_remaining_A  = 255;
+	    else           osd_battery_remaining_A  = v;
+	}
     }
 
 // flag useExtVbattB not used - will se to panel BattB
 //    if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
-    if(is_on(panel.batt_B) || sets.battBv!=0){ // меряем если есть панель или warning 
+
+    if(flags.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
@@ -401,25 +463,29 @@ void On100ms(){ // периодические события, не связан�
         voltageBRawArray[(++ind)%8] = analogRead(VidvoltagePin);
         for (uint8_t i=8;i!=0;)
             voltageRaw += voltageBRawArray[--i];
-        voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
-	else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
+#if defined(USE_SENSORS)
+        sensorData[1] = (sensorData[1]*7 + voltageRaw) /8;
+#endif
+	if(flags.useExtVbattB){
+            voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+
+	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
+	    else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
     
-// 	вычислить osd_battery_remaining_B по напряжению!
-	byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
-//	int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
+// 		вычислить osd_battery_remaining_B по напряжению!
+	    byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
+//		int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
 
-	int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
+	    int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
 
-	if(v<0)        osd_battery_remaining_B  = 0;
-	else if(v>255) osd_battery_remaining_B  = 255;
-	else           osd_battery_remaining_B  = v;
-	
-	lflags.got_data=1;
+	    if(v<0)        osd_battery_remaining_B  = 0;
+	    else if(v>255) osd_battery_remaining_B  = 255;
+	    else           osd_battery_remaining_B  = v;
+	}
     }
 
-    if(flags.useExtCurr){ //аналоговый ввод - ток
+    if(flags.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
         static uint8_t ind = -1;
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
@@ -427,12 +493,16 @@ void On100ms(){ // периодические события, не связан�
         currentRawArray[(++ind)%8] = analogRead(AmperagePin);
         for (uint8_t i=8;i!=0;)
             currentRaw += currentRawArray[--i];
-        currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+#if defined(USE_SENSORS)
+        sensorData[2] = (sensorData[2]*7 + currentRaw) /8;
+#endif
+        if(flags.useExtCurr) {
+            currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	if(osd_curr_A ==0) osd_curr_A = currentRaw;
-	else               osd_curr_A = (osd_curr_A *3 + currentRaw +2)/4;
+	    if(osd_curr_A ==0) osd_curr_A = currentRaw;
+	    else               osd_curr_A = (osd_curr_A *3 + currentRaw +2)/4;
+	}
 
-	lflags.got_data=1;
     }
 
 
@@ -462,6 +532,11 @@ case_2:
 	    d = chan_raw[7]; // ch 8
 case_4:
 	    rssi_in = avgRSSI(d);
+
+#if defined(USE_SENSORS)
+	    if(SENSOR4_ON)
+		sensorData[3] = (sensorData[3]*7 + analogRead(RssiPin)) /8;
+#endif
 	    break;
 	}
     }
@@ -475,6 +550,7 @@ case_4:
 }
 
 // loop time can be up to 75ms so 20ms is too optimistic 8)
+// but mean looptime is 8..12ms so...
 void On20ms(){ // 50Hz
 
     if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
@@ -500,7 +576,5 @@ void On20ms(){ // 50Hz
 
 //Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 }
-
-
 
 

@@ -537,7 +537,7 @@ static inline void mwii_parse_data() {
     msg.mwii.read_idx = 0;
 
     lflags.mwii_active = true;
-    set_data_got(); //millis_plus(&lastMAVBeat, 0);
+    set_data_got(); 
 
 
     switch(msg.mwii.cmd) {

@@ -3,6 +3,9 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+// TODO включенность панелей проверять в цикле?
+// is_on(panel.batt_B)
+//  и сенсоры
 
 typedef void (*fptr)();
 
@@ -801,14 +804,15 @@ static void panAirSpeed(point p){
 
 /* **************************************************************** */
 
-#define WARNINGS 7
+#define WARNINGS 10
 
 uint8_t warning;
 
 static void check_warn()
 {
-    uint8_t wmask = 0;
-    uint8_t bit, prev_warn;
+    uint16_t wmask = 0;
+    uint16_t bit;
+    uint8_t prev_warn;
 
 
     if (!lflags.one_sec_timer_switch) return;
@@ -820,40 +824,52 @@ static void check_warn()
 
 //1
  if ((osd_fix_type) < 2) 
-    wmask |= 1;
+    wmask |= 1; //0
 
 //2    
  if (sets.model_type==0 && iAirspeed < sets.stall && lflags.takeofftime == 1) // plane
-    wmask |= 2;
+    wmask |= (1<<1);
 
 //3    
  if (sets.overspeed && iAirspeed > sets.overspeed) 
-    wmask |= 4;
+    wmask |= (1<<2);
 
 
     int vbat = (osd_battery_remaining_A * 100  + max_battery_reading/2)/ max_battery_reading; // normalize to 100
     
 //4    voltage limit set and less                   capacity limit set and less
  if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
-    wmask |= 8;
+    wmask |= (1<<3);
 
 //5
     // не сырое значение  
  if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
-    wmask |= 16;
+    wmask |= (1<<4);
 
     int iVs = abs(vertical_speed) /10.0;
 
 //6
  if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
-    wmask |= 32;
+    wmask |= (1<<5);
 
     iVolt = osd_vbat_B/100.0; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
  if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
-    wmask |= 64;
+    wmask |= (1<<6);
 
+
+//8
+ if(mav_fence_status == FENCE_BREACH_MINALT)
+    wmask |= (1<<7);
+
+//9
+ if(mav_fence_status == FENCE_BREACH_MAXALT)
+    wmask |= (1<<8);
+
+//10
+ if(mav_fence_status == FENCE_BREACH_BOUNDARY)
+    wmask |= (1<<9);
 
  if(wmask == 0) 
     warning = 0;
@@ -892,7 +908,10 @@ const char PROGMEM w3[]="\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     //Ov
 const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
 const char PROGMEM w5[]="\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69";         //Low Rssi
 const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
-const char PROGMEM w7[]="Batt B low!"; //Battery Low!
+const char PROGMEM w7[]="Batt B low!"; 
+const char PROGMEM w8[]="Fence Low!";
+const char PROGMEM w9[]="Fence High!";
+const char PROGMEM w10[]="Fence Far!";
 
 const char * const warn_str[] = {
     0, // 0
@@ -902,7 +921,10 @@ const char * const warn_str[] = {
     w4,
     w5,
     w6,
-    w7
+    w7,
+    w8,
+    w9,
+    w10
 };
 
 static void panWarn(point p){
@@ -962,12 +984,12 @@ static void panBatteryPercent(point p){
         setBatteryPic(byte(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
-	if (flags.OSD_BATT_SHOW_PERCENT)
+	if (is_alt(p))
 	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
 	else
     	    osd_print_bat(PSTR("%c%c\x8e%4.0f\x01"), (float)mah_used);
     } else {
-	if (flags.OSD_BATT_SHOW_PERCENT)
+	if (is_alt(p))
 	    osd_printf_1(PSTR("%2.0f%%"),val);
 	else
 	    osd_printf_1(PSTR("%4.0f\x01"),(float)mah_used);
@@ -1099,8 +1121,11 @@ static void panBatt_A(point p){
 // Staus  : done
 
 static void panBatt_B(point p){
-
-    printVolt(osd_vbat_B);
+    if(is_on(p)) {
+	flags.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
+        printVolt(osd_vbat_B);
+    } else
+        flags.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
 
 
@@ -1138,9 +1163,17 @@ static void panWaitMAVBeats(){
     osd.print_P(PSTR("No input data! "));
 
 #ifdef DEBUG
-    extern int packet_drops;
+    extern uint16_t packet_drops;
     extern long bytes_comes;
-    osd.printf_P(PSTR("||drops=%d bytes=%ld"),packet_drops, bytes_comes);
+    extern volatile uint16_t lost_bytes;
+    extern uint16_t packets_skip;
+    extern uint16_t packets_got;
+
+    OSD::setPanel(2,11);
+    osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
+    osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
+    
+    lflags.input_active=0;
 #endif
 }
 
@@ -1374,7 +1407,7 @@ static void panMessage(point p){
 	    
 	    if(bpos>tail) bpos=tail*2 - bpos;
 	
-	    if(!lflags.skip_inc && (pos==0 || pos==tail-1)) lflags.skip_inc++;
+	    if(!skip_inc && (pos==0 || pos==tail-1)) skip_inc++;
 	
 	    {
 	        char buf[MAX_MSG_SIZE+1];
@@ -1638,10 +1671,60 @@ static void panRadarScale(Point p){
 // Size   
 // Staus  : done
 
-void panCh(point p){
+static void panCh(point p){
     for(byte i=0; i<8;i++)
 	osd.printf_P(PSTR("C%d%5i|"), i+1, chan_raw[i] );
 }
+
+#if defined(USE_SENSORS)
+static void printSensor(byte n){
+
+    SensorInfo s;
+
+
+
+    eeprom_read_len((byte *)&s,  EEPROM_offs(sensors) + n * sizeof(SensorInfo),  sizeof(SensorInfo) );
+
+    float v=s.K * sensorData[n] + s.A;
+
+Serial.printf_P(PSTR("\n n=%d k=%f v=%d fmt=%s addr=%d sz=%d\n"),n,s.K,sensorData[n], s.format, EEPROM_offs(sensors) + n * sizeof(SensorInfo), sizeof(SensorInfo));
+
+    osd.printf(s.format,v);
+}
+
+static void panSensor1(point p) {
+    if(is_on(p)) {
+	lflags.flgSensor1=1;
+	printSensor(0);
+    } else
+	lflags.flgSensor1=0;
+    
+}
+
+static void panSensor2(point p) {
+    if(is_on(p)) {
+	lflags.flgSensor2=1;
+        printSensor(1);
+    } else
+	lflags.flgSensor2=0;
+}
+
+static void panSensor3(point p) {
+    if(is_on(p)) {
+	lflags.flgSensor3=1;
+        printSensor(2);
+    } else
+	lflags.flgSensor3=0;
+}
+
+static void panSensor4(point p) {
+    if(is_on(p)) {
+	lflags.flgSensor4=1;
+        printSensor(3);
+    } else
+	lflags.flgSensor4=0;
+}
+#endif
 
 
 /* **************************************************************** */
@@ -1679,8 +1762,17 @@ void renew(){
 
 void setup_horiz(){
 //Serial.printf_P(PSTR("horiz!\n")); Serial.wait();
-    showHorizon(8 + 1, 6);
+    showHorizon(8+1, 6);
 }
+
+#if defined(USE_SENSORS)
+void setup_sens() {
+    /*if(is_on(panel.sensor1))*/    panSensor1({8 , 6});
+    /*if(is_on(panel.sensor2))*/    panSensor2({8 , 7});
+    /*if(is_on(panel.sensor3))*/    panSensor3({8 , 8});
+    /*if(is_on(panel.sensor4))*/    panSensor4({8 , 9});
+}
+#endif
 
 // в нашем распоряжении 16 строк
 static const PROGMEM char n_sets[]        = "      OSD setup";
@@ -1703,6 +1795,16 @@ static const PROGMEM char n_k_RollPAL[]   = "Roll  in PAL";
 static const PROGMEM char n_k_PitchNTSC[] = "Pitch in NTSC";
 static const PROGMEM char n_k_RollNTSC[]  = "Roll  in NTSC";
 
+
+#if defined(USE_SENSORS)
+static const PROGMEM char n_sensors[]     = "   Pin Sensors";
+static const PROGMEM char n_k_sensor1[]   = "1 (V1) K";
+static const PROGMEM char n_a_sensor1[]   = "       A";
+static const PROGMEM char n_k_sensor2[]   = "2 (V2) K";
+static const PROGMEM char n_k_sensor3[]   = "3 (Current) K";
+static const PROGMEM char n_k_sensor4[]   = "4 (RSSI) K";
+#endif
+
 static const PROGMEM char f_float[]= "%.3f";
 static const PROGMEM char f_batt[] = "%3.1f\x76";
 static const PROGMEM char f_int[]  = "%.0f";
@@ -1710,17 +1812,15 @@ static const PROGMEM char f_int[]  = "%.0f";
 
 // первый экран настроек
 static const PROGMEM Params params1[] = { 
-	{n_sets,    0,   0,  0,           0, 0},        // header
-	{n_batt,   'b', 10, &sets.battv , 0, f_batt, 0, 255 },
-	{n_battB,  'b', 10, &sets.battBv, 0, f_batt, 0, 255 },
+	{n_sets,    0,   0,  0,                    0, 0},      // header
+	{n_batt,   'b', 10, &sets.battv ,          0, f_batt, 0, 255 },
+	{n_battB,  'b', 10, &sets.battBv,          0, f_batt, 0, 255 },
 
 	{n_stall,  'b', 1, &sets.stall,            0, f_int, 0, 255 },
 	{n_oversp, 'b', 1, &sets.overspeed,        0, f_int, 0, 255 },
 	{n_charge, 'b', 1, &sets.batt_warn_level,  0, f_int, 0, 255 },
 	{n_rssi,   'b', 1, &sets.rssi_warn_level , 0, f_int, 0, 255 },
 
-
-	
 	{n_screen,  0,  0,   0,                    0,     0}, // header
 	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 0, 3},
@@ -1730,17 +1830,37 @@ static const PROGMEM Params params1[] = {
 
 // второй экран - горизонт
 static const PROGMEM Params params2[] = { 
-	{n_horizon,     'h', 0,   0,                 0, 0}, // header with pal/ntsc string
-	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll, 0, f_float, -4, 4},
-	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch, 0, f_float, -4, 4},
-	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a, 0, f_float, -4, 4},
+	{n_horizon,     'h', 0,   0,                    0, 0}, // header with pal/ntsc string
+	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll,    0, f_float, -4, 4},
+	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch,   0, f_float, -4, 4},
+	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a,  0, f_float, -4, 4},
 	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float, -4, 4},
 };
 
+#if defined(USE_SENSORS)// третий экран - сенсоры
+
+#define SENSOR(n) ((SensorInfo *)(EEPROM_offs(sensors) + n * sizeof(SensorInfo)))
+
+static const PROGMEM Params params3[] = {
+	{n_sensors,     'h', 0,   0,                 0, 0}, // header with pal/ntsc string
+	{n_k_sensor1,   's', 1,   &SENSOR(0)->K, 0, f_float, -8000, 8000},
+	{n_a_sensor1,   's', 1,   &SENSOR(0)->A, 0, f_float, -100, 100},
+	{n_k_sensor2,   's', 1,   &SENSOR(1)->K, 0, f_float, -8000, 8000},
+	{n_a_sensor1,   's', 1,   &SENSOR(1)->A, 0, f_float, -100, 100},
+	{n_k_sensor3,   's', 1,   &SENSOR(2)->K, 0, f_float, -8000, 8000},
+	{n_a_sensor1,   's', 1,   &SENSOR(2)->A, 0, f_float, -100, 100},
+	{n_k_sensor4,   's', 1,   &SENSOR(3)->K, 0, f_float, -8000, 8000},
+	{n_a_sensor1,   's', 1,   &SENSOR(3)->A, 0, f_float, -100, 100},
+	
+};
+#endif
 
 static const PROGMEM Setup_screen screens[] = {
     {params1, (sizeof(params1)/sizeof(Params)), 0 },
     {params2, (sizeof(params2)/sizeof(Params)), setup_horiz },
+#if defined(USE_SENSORS)
+    {params3, (sizeof(params2)/sizeof(Params)), setup_sens },
+#endif
     {0,0} // end marker
 };
 
@@ -1866,9 +1986,17 @@ static void panSetup(){
 	    }
 	    break;
 	    
-        case 'f': // byte param
+        case 'f': // float param
 	    v=*((float *)(pgm_read_word((void *)&p->value) ));
 	    break;
+
+#if defined(USE_SENSORS)
+	case 's': //sensors in EEPROM
+	    uint16_t ptr=pgm_read_word((void *)&p->value);
+	    float f;
+	    eeprom_read_len((byte *)&f,  ptr,  sizeof(float) );
+	    break;
+#endif
 	}
 
 	if(i == setup_menu) c_val = v; 
@@ -1881,11 +2009,6 @@ static void panSetup(){
 
     if(tail) tail();
 
-/*    if (millis() > text_timer) {
-        //text_timer = millis() + 500; 
-        millis_plus(&text_timer,  500); // 2 раз в секунду
-    } else return;
-*/
     if(!lflags.flag_05s) return;
     lflags.flag_05s=0;
 
@@ -1938,6 +2061,7 @@ as_byte:
 	    else if(diff>150)	inc=1 /(float)k;
 	    break;
 
+	case 's': // sensors
         case 'f': // float param
 //	    v=*((float *)pval);
 	    size=4;
@@ -1981,12 +2105,20 @@ as_byte:
             case 'f': // float param
 	        *((float *)pval) = v;
 	        break;
+
+#if defined(USE_SENSORS)
+	    case 's': //sensors in EEPROM
+	        float f=v;
+	        eeprom_write_len((byte *)&f, (uint16_t)pval,  sizeof(float) );
+	        goto no_write;
+#endif
 	}
 
 
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
 //	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v); // updated value
-	
+
+no_write:
 	fptr cb = (fptr) pgm_read_word((void *)&p->cb);
 
 
@@ -2011,14 +2143,15 @@ struct Panels_list {
 
 #define RADAR_CHAR 0x1F // code of the radar symbol
 
-//table - 546 bytes of flash economy
+//table - 546 bytes of flash economy 
+// ids - max 127 so bit 0x80 is a flag of always call
 
 const Panels_list PROGMEM panels_list[] = {
     { ID_of(horizon),		panHorizon, 	0 },
     { ID_of(pitch),		panPitch, 	0  },
     { ID_of(roll),		panRoll, 	0  },
     { ID_of(batt_A),		panBatt_A, 	0xbc  },
-    { ID_of(batt_B),		panBatt_B, 	0x26  },
+    { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0  },
     { ID_of(GPS2),		panGPS2, 	0  },
@@ -2049,8 +2182,15 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(ch),		panCh, 		0 },
     { ID_of(distance),		panDistance, 	0x8f },
     { ID_of(RadarScale),	panRadarScale, 	RADAR_CHAR  },
+#if defined(USE_SENSORS)
+    { ID_of(sensor1) | 0x80,	panSensor1, 	0 },
+    { ID_of(sensor2) | 0x80,	panSensor2, 	0 },
+    { ID_of(sensor3) | 0x80,	panSensor3, 	0 },
+    { ID_of(sensor4) | 0x80,	panSensor4, 	0 },
+#endif
     { ID_of(callSign),		panCALLSIGN, 	0 },
     { ID_of(message),		panMessage, 	0 },
+    { ID_of(warn) | 0x80,       panWarn,	0 },
     {0, 0}
 };
 
@@ -2060,19 +2200,22 @@ static void print_all_panels() {
 
     for(;;){
 	//Point *pp = (Point *)pgm_read_word(&pl->p);
-	byte n = pgm_read_byte(&pl->n);
+	byte n = pgm_read_byte(&pl->n); // номер панели в массиве
 	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
 	if(f==0) break;
 	
 	//Point p = *pp;
-	Point p=((Point *)&panel)[n];
+	//Point p=((Point *)&panel)[n & 0x7f];// TODO читать непосредственно из EEPROM
+	point p = readPanel(n & 0x7f);
 	
+        osd_setPanel(p);
 	if(is_on(p)){
-	    osd_setPanel(p);
 	    if(has_sign(p)) {
 		byte s = pgm_read_byte(&pl->sign);
 		if(s) osd_write(s);
 	    }
+	    f(p);
+	} else if(n & 0x80) { // call even if not visible - w/o sign
 	    f(p);
 	}
 	pl++;
@@ -2125,11 +2268,11 @@ void writePanels(){
     //Check for panel toggle
 //    if(sets.ch_toggle > 0) pan_toggle(); // This must be first so you can always toggle
 
-    if(panelN < sets.n_screens){ // конфигурируемые юзером экраны
+    if(sets.n_screens==0 || panelN < sets.n_screens){ // конфигурируемые юзером экраны
 	print_all_panels();
     } else { 			// last panel
 
-	if(!lflags.motor_armed) { 
+	if(!lflags.motor_armed) {
 	    panSetup();			// Setup when not armed
 	    return; // no warnings
 	} // else clear screen
@@ -2137,7 +2280,7 @@ void writePanels(){
   }
 
 // show warnings even if screen is disabled
-    /* if(is_on(panel.warn)) */ panWarn(panel.warn); // this must be here so warnings are always checked
+    /* if(is_on(panel.warn)) */ //panWarn(panel.warn); // this must be here so warnings are always checked
 
 }
 

@@ -9,7 +9,7 @@
 #define VER 79
 
 
-#define RELEASE_NUM 826
+#define RELEASE_NUM 827
 #define VERSION "2.4"
 
 
@@ -18,9 +18,9 @@
 #define USE_UAVTALK 1
 #define USE_MWII 1
 #define AUTOBAUD 1
+#define USE_SENSORS 1
 
-#define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
-//#define TELEMETRY_SPEED  19200  // How fast our MAVLink telemetry is coming to Serial port
+#define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
 #define BOOTTIME         1300   // Time in milliseconds that we show boot loading bar and wait user input
 
 

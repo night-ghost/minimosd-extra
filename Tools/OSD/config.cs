@@ -94,6 +94,26 @@ namespace OSD {
         internal byte n_screens;
         internal uint16_t RSSI_16_low;
         internal uint16_t RSSI_16_high;
+
+    };
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct Sensors {
+        internal float sensor_K1; // коэффициенты сенсоров         
+        internal float sensor_A1; // добавка сенсоров  
+        internal fixed byte format1[Config.OSD_SENSOR_FORMAT_TOTAL + 1]; // формат печати
+        
+        internal float sensor_K2;
+        internal float sensor_A2; 
+        internal fixed byte format2[Config.OSD_SENSOR_FORMAT_TOTAL + 1];
+        
+        internal float sensor_K3;
+        internal float sensor_A3; 
+        internal fixed byte format3[Config.OSD_SENSOR_FORMAT_TOTAL + 1];
+
+        internal float sensor_K4;
+        internal float sensor_A4; 
+        internal fixed byte format4[Config.OSD_SENSOR_FORMAT_TOTAL + 1];
     };
 
     [StructLayout(LayoutKind.Explicit)]
@@ -108,6 +128,9 @@ namespace OSD {
         // прочие настройки
         [FieldOffset(OSD.Settings_offset + 4)]
         internal Settings sets;
+
+        [FieldOffset(OSD.Settings_offset + 256)]
+        internal Sensors sensors;
 
         // чтение-запись всего массива
         public byte[] data {
@@ -213,6 +236,126 @@ namespace OSD {
             }
         }
 
+
+        public string get_fixed(byte *ptr, int size) {
+
+                string s = "";
+                fixed (Settings* p = &(this.sets)) {
+                    for (int i = 0; i < size; i++) {
+                        s += Convert.ToChar(ptr[i]);
+                    }
+                }
+                return s;
+
+        }
+        
+
+        public void set_fixed(byte *ptr, int size, string s) {
+                fixed (Settings* p = &(this.sets)) {
+                    for (int i = 0; i < size; i++) {
+                        ptr[i] = 0;
+                    }
+                    for (int i = 0; i < s.Length && i < size; i++) {
+                        ptr[i] = Convert.ToByte(s[i]);
+                    }
+                }
+           
+        }
+
+       public string format1 {
+            get {
+                string s = "";
+                fixed (Sensors * p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        s += Convert.ToChar(p->format1[i]);
+                    }
+                }
+                return s;
+
+            }
+            set {
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL + 1; i++) {
+                        p->format1[i] = 0;
+                    }
+                    for (int i = 0; i < value.Length && i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        p->format1[i] = Convert.ToByte(value[i]);
+                    }
+                }
+            }
+        }
+
+       public string format2 {
+            get {
+                string s = "";
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        s += Convert.ToChar(p->format2[i]);
+                    }
+                }
+                return s;
+
+            }
+            set {
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL + 1; i++) {
+                        p->format2[i] = 0;
+                    }
+                    for (int i = 0; i < value.Length && i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        p->format2[i] = Convert.ToByte(value[i]);
+                    }
+                }
+            }
+        }
+
+       public string format3 {
+            get {
+                string s = "";
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        s += Convert.ToChar(p->format3[i]);
+                    }
+                }
+                return s;
+
+            }
+            set {
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL + 1; i++) {
+                        p->format3[i] = 0;
+                    }
+                    for (int i = 0; i < value.Length && i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        p->format3[i] = Convert.ToByte(value[i]);
+                    }
+                }
+            }
+        }
+
+       public string format4 {
+            get {
+                string s = "";
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        s += Convert.ToChar(p->format4[i]);
+                    }
+                }
+                return s;
+
+            }
+            set {
+                fixed (Sensors* p = &(this.sensors)) {
+                    for (int i = 0; i < Config.OSD_SENSOR_FORMAT_TOTAL + 1; i++) {
+                        p->format4[i] = 0;
+                    }
+                    for (int i = 0; i < value.Length && i < Config.OSD_SENSOR_FORMAT_TOTAL; i++) {
+                        p->format4[i] = Convert.ToByte(value[i]);
+                    }
+                }
+            }
+        }
+
+ 
+
         // очистка памяти до заводского состояния АТмеги
         public void clear() {
             fixed (EEPROM* p = &this) {
@@ -233,6 +376,7 @@ namespace OSD {
         public const int EEPROM_SIZE = 1024; // ATmega328
 
         public const int OSD_CALL_SIGN_TOTAL = 8; // длина позывного
+        public const int OSD_SENSOR_FORMAT_TOTAL = 15; // длина форматной строки, 4+4+16 = 24 байта на сенсор
 
         const int Settings_offset = OSD.Settings_offset; // 512 - половина
         const int OffsetBITpanel = OSD.OffsetBITpanel;

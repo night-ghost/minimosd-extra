@@ -435,7 +435,7 @@ bool uavtalk_read(void) {
 		if (uavtalk_parse_char(c, &msg.u)) {
 			lflags.uavtalk_active = 1; // будем слушать UAVtalk
 
-			set_data_got(); //millis_plus(&lastMAVBeat, 0);
+			set_data_got(); 
 
 			// consume msg
 			switch (msg.u.ObjID) {

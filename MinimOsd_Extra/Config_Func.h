@@ -48,8 +48,15 @@ static void readPanelSettings() {
 
     currentPanel=panelN;
 
-    eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
+//    eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
 
+}
+
+// rean one point from current screen
+static point readPanel(byte n) {
+    point p; //                     shift to current screen     selected point
+    eeprom_read_len((byte *)&p,  OffsetBITpanel * (int)panelN + n * sizeof(Point),  sizeof(Point) );
+    return p;
 }
 
 static uint8_t checkPAL(uint8_t line){

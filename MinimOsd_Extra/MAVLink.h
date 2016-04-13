@@ -67,23 +67,33 @@ bool read_mavlink(){
             set_data_got(); //lastMAVBeat = millis();
 
 #ifdef DEBUG
-Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
+//Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
 #endif
 
             lflags.mavlink_active = 1;
 
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
-		apm_mav_system && apm_mav_system != msg.m.sysid)        // another system
+		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
+#ifdef DEBUG
+	packets_skip+=1;
+	Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
+#endif
+
 		    break; // skip packet
+		}
+
+#ifdef DEBUG
+	packets_got+=1;
+#endif
 
             //handle msg
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
-                if(apm_mav_type == 6) break; // GCS
+                if(apm_mav_type == 6 || apm_mav_type == 5) break; // MAV_TYPE_GCS || MAV_TYPE_ANTENNA_TRACKER
                 
                 apm_mav_system    = msg.m.sysid;
-                apm_mav_component = msg.m.compid;
+                // apm_mav_component = msg.m.compid;
 
                 osd_autopilot = mavlink_msg_heartbeat_get_autopilot(&msg.m);
                 osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
@@ -222,6 +232,20 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
 		    mav_msg_shift = count02s;
                 }
                 break;
+
+/*
+typedef enum FENCE_BREACH{
+FENCE_BREACH_NONE=0,  No last fence breach | 
+FENCE_BREACH_MINALT=1,  Breached minimum altitude | 
+FENCE_BREACH_MAXALT=2,  Breached maximum altitude | 
+FENCE_BREACH_BOUNDARY=3,  Breached fence boundary | 
+FENCE_BREACH_ENUM_END=4,  | 
+} FENCE_BREACH;
+
+*/
+		case MAVLINK_MSG_ID_FENCE_STATUS:
+		mav_fence_status = mavlink_msg_fence_status_get_breach_type(&msg.m);
+		break;
 
             default:
                 //Do nothing

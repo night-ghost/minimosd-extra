@@ -51,6 +51,11 @@ namespace OSD {
 		const int panRadarScale_XY = 72;
 		const int panFdata_XY = 74;
         const int panMessage_XY = 76;
+        const int panSenor1_XY = 78;
+        const int panSenor2_XY = 80;
+        const int panSenor3_XY = 82;
+        const int panSenor4_XY = 84;
+
         // const int panBroAlt_XY = 76;
 		// const int panMavBeat_XY = 76;
     
@@ -81,7 +86,8 @@ namespace OSD {
 		public const int mode_auto              = 9;
         public const int flgHUD                 = 10;
         public const int flgTrack               = 11;
-	
+
+       	
 	}
 }
 

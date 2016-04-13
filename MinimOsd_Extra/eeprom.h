@@ -15,6 +15,8 @@
 
 #define OSD_CALL_SIGN_TOTAL 8
 
+#define SENSOR_FORMAT_LENGTH 15// 4+4+15+1 = 24 bytes/sensor
+
 #pragma pack(push,1)
 
 struct Point { // упакованные данные одной панели - координаты и флаги
@@ -72,7 +74,11 @@ struct Panel {
     point GPS2;         //#define panGPS2_XY = 70;    
     point RadarScale;	// 72
     point Fdata;	// 74
-    point message;     // 76
+    point message;      // 76
+    point sensor1;      // 78
+    point sensor2;      // 80
+    point sensor3;      // 82
+    point sensor4;      // 84
     //point baroAlt;     
     //point curr_B;
     //point fdata;
@@ -85,7 +91,7 @@ union _Panel {
 
 
 struct Flags { // 4 байта
-    bool OSD_BATT_SHOW_PERCENT:1;  	// 0
+    bool OSD_BATT_SHOW_PERCENT:1;  	// 0 - not used, use panel.alt instead
     bool measure:1;			// 1
     bool RADIO_ON:1;			// 2
     bool PAL_NTSC:1;			// 3
@@ -98,7 +104,7 @@ struct Flags { // 4 байта
     bool ils_on:1;	// 8
     
     bool mode_auto:1; 	// 9
-    bool flgHUD:1;      // 10
+    bool flgHUD:1;      // 10 - not used, use panel.alt instead
     bool flgTrack:1;    // 11
 };
 
@@ -134,11 +140,11 @@ struct Settings {
 
     byte CHK1_VERSION;
     byte CHK2_VERSION;
-
+//0x10
 // версия прошивки и символов, для отображения в конфигураторе - в прошивке не используется
     byte FW_VERSION[3];
     byte CS_VERSION[3];
-
+//0x16
 // new!
     float evBattA_koef;  // коэффициенты внешних измерений
     float evBattB_koef;
@@ -150,7 +156,7 @@ struct Settings {
 
     float horiz_kRoll_a; // коэффициенты горизонта для NTSC
     float horiz_kPitch_a;
-    
+// 0x36
     byte battBv; // мин значение батареи B по напряжению
     
     char vert_offs; // сдвиг экрана по вертикали и горизонтали
@@ -163,7 +169,21 @@ struct Settings {
     
     uint16_t RSSI_16_low;
     uint16_t RSSI_16_high;
+
+//0x45
 };
+
+union _Settings {
+    Settings sets;
+    byte _pad[256-4]; // место под расширение Settings, за вычетом флагов
+};
+
+struct SensorInfo {
+    float K;				// коэффициент
+    float A; 				// additional
+    char format[SENSOR_FORMAT_LENGTH+1]; // формат печати
+};
+
 
 
 
@@ -173,7 +193,9 @@ struct Eeprom {
 // 512
     _Flags flags; // 4 байта флагов
     
-    Settings sets; // и почти половина EEPROM под остальные настройки
+    _Settings sets; // и почти четверть EEPROM под остальные настройки
+//768
+    SensorInfo sensors[4];
 };
 
 #pragma pack(pop)

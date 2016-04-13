@@ -30,10 +30,9 @@ namespace OSD
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OSD));
-            
             this.CMB_ComPort = new System.Windows.Forms.ComboBox();
             this.BUT_ReadOSD = new System.Windows.Forms.Button();
-			this.BUT_WriteOSD = new System.Windows.Forms.Button();
+            this.BUT_WriteOSD = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -48,10 +47,10 @@ namespace OSD
             this.videoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_ntsc = new System.Windows.Forms.ToolStripMenuItem();
             this.CHK_pal = new System.Windows.Forms.ToolStripMenuItem();
-			this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
+            this.CHK_auto = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.resetEepromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetEepromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customBGPictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,12 +65,33 @@ namespace OSD
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label40 = new System.Windows.Forms.Label();
+            this.label39 = new System.Windows.Forms.Label();
+            this.label38 = new System.Windows.Forms.Label();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
+            this.txtFactor4 = new System.Windows.Forms.TextBox();
+            this.txtFormat4 = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.txtFactor3 = new System.Windows.Forms.TextBox();
+            this.txtFormat3 = new System.Windows.Forms.TextBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.txtFactor2 = new System.Windows.Forms.TextBox();
+            this.txtFormat2 = new System.Windows.Forms.TextBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.txtFactor1 = new System.Windows.Forms.TextBox();
+            this.txtFormat1 = new System.Windows.Forms.TextBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cbOutPin = new System.Windows.Forms.ComboBox();
             this.cbOutSource = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox15 = new System.Windows.Forms.GroupBox();
+            this.chkTrack = new System.Windows.Forms.CheckBox();
             this.groupBox16 = new System.Windows.Forms.GroupBox();
             this.label24 = new System.Windows.Forms.Label();
             this.txtPitchNtsc = new System.Windows.Forms.TextBox();
@@ -103,10 +123,7 @@ namespace OSD
             this.label13 = new System.Windows.Forms.Label();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
-            this.label12 = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.cbxWarningsAutoPanelSwitch = new System.Windows.Forms.ComboBox();
-            this.lblWarningsAutoPanelSwitch = new System.Windows.Forms.Label();
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -122,7 +139,7 @@ namespace OSD
             this.label18 = new System.Windows.Forms.Label();
             this.cbCurrentSoure = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
-            this.cbBattA_source = new System.Windows.Forms.ComboBox();			
+            this.cbBattA_source = new System.Windows.Forms.ComboBox();
             this.rbtBatterymAh = new System.Windows.Forms.RadioButton();
             this.rbtBatteryPercent = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
@@ -153,7 +170,6 @@ namespace OSD
             this.lblFWModelType = new System.Windows.Forms.Label();
             this.lblModelType = new System.Windows.Forms.Label();
             this.cbxModelType = new System.Windows.Forms.ComboBox();
-            
             this.lblPresentedCharset = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.lblLatestCharsetUploaded = new System.Windows.Forms.Label();
@@ -161,12 +177,11 @@ namespace OSD
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.cbxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
-            this.chkHUD = new System.Windows.Forms.CheckBox();
-            this.chkTrack = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
             this.tabPageConfig.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox15.SuspendLayout();
             this.groupBox16.SuspendLayout();
@@ -193,7 +208,7 @@ namespace OSD
             this.groupBox11.SuspendLayout();
             this.groupBox12.SuspendLayout();
             this.SuspendLayout();
-                        // 
+            // 
             // CMB_ComPort
             // 
             this.CMB_ComPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -250,9 +265,9 @@ namespace OSD
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            	this.fileToolStripMenuItem,
-            	this.videoModeToolStripMenuItem,
-            	this.optionsToolStripMenuItem,
+            this.fileToolStripMenuItem,
+            this.videoModeToolStripMenuItem,
+            this.optionsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -351,23 +366,23 @@ namespace OSD
             // 
             this.CHK_auto.Name = "CHK_auto";
             this.CHK_auto.Size = new System.Drawing.Size(111, 22);
-            this.CHK_auto.Text = "Auto";			
+            this.CHK_auto.Text = "Auto";
             this.CHK_auto.CheckStateChanged += new System.EventHandler(this.AUTOToolStripMenuItem_CheckStateChanged);
             this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            	this.checkBox1,
-				this.resetEepromToolStripMenuItem,
-            	this.updateFirmwareToolStripMenuItem,
-            	this.customBGPictureToolStripMenuItem,
-            	this.sendTLogToolStripMenuItem,
-            	this.updateFontToolStripMenuItem,
-            	this.updateCharsetDevToolStripMenuItem,
-            	this.updateCharsetcustomFwToolStripMenuItem,
-            	this.presentCustomCharsetToolStripMenuItem,
-            	this.setSketchesPathToolStripMenuItem,
+            this.checkBox1,
+            this.resetEepromToolStripMenuItem,
+            this.updateFirmwareToolStripMenuItem,
+            this.customBGPictureToolStripMenuItem,
+            this.sendTLogToolStripMenuItem,
+            this.updateFontToolStripMenuItem,
+            this.updateCharsetDevToolStripMenuItem,
+            this.updateCharsetcustomFwToolStripMenuItem,
+            this.presentCustomCharsetToolStripMenuItem,
+            this.setSketchesPathToolStripMenuItem,
             this.getFwFromOSDToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
@@ -486,22 +501,20 @@ namespace OSD
             // PANEL_tabs
             // 
             this.PANEL_tabs.Controls.Add(this.tabPageConfig);
-			for(int k=0;k<npanel;k++){
-            	this.PANEL_tabs.Controls.Add(this.scr[k].tabPage);
-			}
-            //this.PANEL_tabs.Controls.Add(this.tabPage2);
-            //this.PANEL_tabs.Controls.Add(this.tabPage3);
+            for (int k = 0; k < npanel; k++) {
+                this.PANEL_tabs.Controls.Add(this.scr[k].tabPage);
+            }
             this.PANEL_tabs.Location = new System.Drawing.Point(1, 96);
             this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
             this.PANEL_tabs.SelectedIndex = 0;
             this.PANEL_tabs.Size = new System.Drawing.Size(687, 407);
             this.PANEL_tabs.TabIndex = 0;
-			this.PANEL_tabs.Selected += new System.Windows.Forms.TabControlEventHandler(this.PANEL_tabs_Selected);
-            
+            this.PANEL_tabs.Selected += new System.Windows.Forms.TabControlEventHandler(this.PANEL_tabs_Selected);
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.groupBox2);
             this.tabPageConfig.Controls.Add(this.groupBox1);
             this.tabPageConfig.Controls.Add(this.groupBox15);
             this.tabPageConfig.Controls.Add(this.groupBox13);
@@ -521,15 +534,226 @@ namespace OSD
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.label40);
+            this.groupBox2.Controls.Add(this.label39);
+            this.groupBox2.Controls.Add(this.label38);
+            this.groupBox2.Controls.Add(this.label33);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.label37);
+            this.groupBox2.Controls.Add(this.txtFactor4);
+            this.groupBox2.Controls.Add(this.txtFormat4);
+            this.groupBox2.Controls.Add(this.label36);
+            this.groupBox2.Controls.Add(this.txtFactor3);
+            this.groupBox2.Controls.Add(this.txtFormat3);
+            this.groupBox2.Controls.Add(this.label35);
+            this.groupBox2.Controls.Add(this.txtFactor2);
+            this.groupBox2.Controls.Add(this.txtFormat2);
+            this.groupBox2.Controls.Add(this.label34);
+            this.groupBox2.Controls.Add(this.txtFactor1);
+            this.groupBox2.Controls.Add(this.txtFormat1);
+            this.groupBox2.Controls.Add(this.label32);
+            this.groupBox2.Controls.Add(this.label12);
+            this.groupBox2.Location = new System.Drawing.Point(6, 165);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(177, 142);
+            this.groupBox2.TabIndex = 14;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Sensors";
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(16, 19);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(22, 13);
+            this.label40.TabIndex = 28;
+            this.label40.Text = "Pin";
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(16, 116);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(32, 13);
+            this.label39.TabIndex = 27;
+            this.label39.Text = "RSSI";
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(15, 91);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(41, 13);
+            this.label38.TabIndex = 26;
+            this.label38.Text = "Current";
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(16, 65);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(20, 13);
+            this.label33.TabIndex = 25;
+            this.label33.Text = "V2";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(16, 40);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(20, 13);
+            this.label4.TabIndex = 24;
+            this.label4.Text = "V1";
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(3, 115);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(13, 13);
+            this.label37.TabIndex = 23;
+            this.label37.Text = "4";
+            // 
+            // txtFactor4
+            // 
+            this.txtFactor4.Location = new System.Drawing.Point(131, 113);
+            this.txtFactor4.Name = "txtFactor4";
+            this.txtFactor4.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor4.TabIndex = 22;
+            this.txtFactor4.Text = "1";
+            this.txtFactor4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            //this.txtFactor4.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
+            this.txtFactor4.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtFormat4
+            // 
+            this.txtFormat4.Location = new System.Drawing.Point(56, 113);
+            this.txtFormat4.MaxLength = 9;
+            this.txtFormat4.Name = "txtFormat4";
+            this.txtFormat4.ShortcutsEnabled = false;
+            this.txtFormat4.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat4.TabIndex = 21;
+            this.txtFormat4.Text = "gh%5.2fKM";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(3, 90);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(13, 13);
+            this.label36.TabIndex = 18;
+            this.label36.Text = "3";
+            // 
+            // txtFactor3
+            // 
+            this.txtFactor3.Location = new System.Drawing.Point(131, 88);
+            this.txtFactor3.Name = "txtFactor3";
+            this.txtFactor3.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor3.TabIndex = 17;
+            this.txtFactor3.Text = "1";
+            this.txtFactor3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            //this.txtFactor3.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
+            this.txtFactor3.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtFormat3
+            // 
+            this.txtFormat3.Location = new System.Drawing.Point(56, 88);
+            this.txtFormat3.MaxLength = 9;
+            this.txtFormat3.Name = "txtFormat3";
+            this.txtFormat3.ShortcutsEnabled = false;
+            this.txtFormat3.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat3.TabIndex = 16;
+            this.txtFormat3.Text = "ef%5.2f%%";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(3, 64);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(13, 13);
+            this.label35.TabIndex = 13;
+            this.label35.Text = "2";
+            // 
+            // txtFactor2
+            // 
+            this.txtFactor2.Location = new System.Drawing.Point(131, 62);
+            this.txtFactor2.Name = "txtFactor2";
+            this.txtFactor2.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor2.TabIndex = 12;
+            this.txtFactor2.Text = "10";
+            this.txtFactor2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            //this.txtFactor2.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
+            this.txtFactor2.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtFormat2
+            // 
+            this.txtFormat2.Location = new System.Drawing.Point(56, 62);
+            this.txtFormat2.MaxLength = 9;
+            this.txtFormat2.Name = "txtFormat2";
+            this.txtFormat2.ShortcutsEnabled = false;
+            this.txtFormat2.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat2.TabIndex = 11;
+            this.txtFormat2.Text = "cd%5.2fmv";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(3, 39);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(13, 13);
+            this.label34.TabIndex = 8;
+            this.label34.Text = "1";
+            // 
+            // txtFactor1
+            // 
+            this.txtFactor1.Location = new System.Drawing.Point(131, 37);
+            this.txtFactor1.Name = "txtFactor1";
+            this.txtFactor1.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor1.TabIndex = 7;
+            this.txtFactor1.Text = "10";
+            this.txtFactor1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            //this.txtFactor1.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
+            this.txtFactor1.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtFormat1
+            // 
+            this.txtFormat1.Location = new System.Drawing.Point(56, 37);
+            this.txtFormat1.MaxLength = 9;
+            this.txtFormat1.Name = "txtFormat1";
+            this.txtFormat1.ShortcutsEnabled = false;
+            this.txtFormat1.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat1.TabIndex = 6;
+            this.txtFormat1.Text = "ab%5.2f\\x10";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(133, 18);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(34, 13);
+            this.label32.TabIndex = 2;
+            this.label32.Text = "factor";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(72, 18);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(36, 13);
+            this.label12.TabIndex = 1;
+            this.label12.Text = "format";
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.cbOutPin);
             this.groupBox1.Controls.Add(this.cbOutSource);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(328, 306);
+            this.groupBox1.Location = new System.Drawing.Point(190, 54);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(156, 65);
+            this.groupBox1.Size = new System.Drawing.Size(129, 65);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Output";
@@ -539,14 +763,14 @@ namespace OSD
             this.cbOutPin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbOutPin.FormattingEnabled = true;
             this.cbOutPin.Items.AddRange(new object[] {
-			"none",
+            "none",
             "V_Bat1",
             "V_Bat2",
             "Current",
             "RSSI"});
-            this.cbOutPin.Location = new System.Drawing.Point(53, 36);
+            this.cbOutPin.Location = new System.Drawing.Point(48, 35);
             this.cbOutPin.Name = "cbOutPin";
-            this.cbOutPin.Size = new System.Drawing.Size(98, 21);
+            this.cbOutPin.Size = new System.Drawing.Size(77, 21);
             this.cbOutPin.TabIndex = 3;
             this.cbOutPin.SelectedIndexChanged += new System.EventHandler(this.cbOutPin_SelectedIndexChanged);
             // 
@@ -559,9 +783,9 @@ namespace OSD
             "Channel 6",
             "Channel 7",
             "Channel 8"});
-            this.cbOutSource.Location = new System.Drawing.Point(53, 11);
+            this.cbOutSource.Location = new System.Drawing.Point(48, 11);
             this.cbOutSource.Name = "cbOutSource";
-            this.cbOutSource.Size = new System.Drawing.Size(99, 21);
+            this.cbOutSource.Size = new System.Drawing.Size(78, 21);
             this.cbOutSource.TabIndex = 2;
             this.cbOutSource.SelectedIndexChanged += new System.EventHandler(this.cbOutSource_SelectedIndexChanged);
             // 
@@ -586,16 +810,26 @@ namespace OSD
             // groupBox15
             // 
             this.groupBox15.Controls.Add(this.chkTrack);
-            this.groupBox15.Controls.Add(this.chkHUD);
             this.groupBox15.Controls.Add(this.groupBox16);
             this.groupBox15.Controls.Add(this.chkILS);
             this.groupBox15.Controls.Add(this.chkRadar);
             this.groupBox15.Location = new System.Drawing.Point(490, 123);
             this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(181, 249);
+            this.groupBox15.Size = new System.Drawing.Size(181, 221);
             this.groupBox15.TabIndex = 12;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Horizon";
+            // 
+            // chkTrack
+            // 
+            this.chkTrack.AutoSize = true;
+            this.chkTrack.Location = new System.Drawing.Point(98, 24);
+            this.chkTrack.Name = "chkTrack";
+            this.chkTrack.Size = new System.Drawing.Size(72, 17);
+            this.chkTrack.TabIndex = 4;
+            this.chkTrack.Text = "with track";
+            this.chkTrack.UseVisualStyleBackColor = true;
+            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
             // 
             // groupBox16
             // 
@@ -609,9 +843,9 @@ namespace OSD
             this.groupBox16.Controls.Add(this.label22);
             this.groupBox16.Controls.Add(this.txtRollPal);
             this.groupBox16.Controls.Add(this.label21);
-            this.groupBox16.Location = new System.Drawing.Point(11, 99);
+            this.groupBox16.Location = new System.Drawing.Point(6, 99);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(161, 144);
+            this.groupBox16.Size = new System.Drawing.Size(169, 116);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "Angle adjust";
@@ -619,7 +853,7 @@ namespace OSD
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(9, 81);
+            this.label24.Location = new System.Drawing.Point(2, 73);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(65, 13);
             this.label24.TabIndex = 31;
@@ -627,18 +861,20 @@ namespace OSD
             // 
             // txtPitchNtsc
             // 
-            this.txtPitchNtsc.Location = new System.Drawing.Point(96, 118);
+            this.txtPitchNtsc.Location = new System.Drawing.Point(113, 90);
             this.txtPitchNtsc.Name = "txtPitchNtsc";
-            this.txtPitchNtsc.Size = new System.Drawing.Size(59, 20);
+            this.txtPitchNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtPitchNtsc.TabIndex = 30;
             this.txtPitchNtsc.Text = "1";
             this.txtPitchNtsc.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtPitchNtsc.TextChanged += new System.EventHandler(this.txtPitchNtsc_TextChanged);
+            //this.txtPitchNtsc.TextChanged += new System.EventHandler(this.txtPitchNtsc_TextChanged);
+            this.txtPitchNtsc.Leave += new System.EventHandler(this.txtPitchNtsc_TextChanged);
+            
             // 
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(59, 121);
+            this.label25.Location = new System.Drawing.Point(78, 93);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(31, 13);
             this.label25.TabIndex = 29;
@@ -646,18 +882,20 @@ namespace OSD
             // 
             // txtRollNtsc
             // 
-            this.txtRollNtsc.Location = new System.Drawing.Point(96, 96);
+            this.txtRollNtsc.Location = new System.Drawing.Point(113, 68);
             this.txtRollNtsc.Name = "txtRollNtsc";
-            this.txtRollNtsc.Size = new System.Drawing.Size(59, 20);
+            this.txtRollNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtRollNtsc.TabIndex = 28;
             this.txtRollNtsc.Text = "1";
             this.txtRollNtsc.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtRollNtsc.TextChanged += new System.EventHandler(this.txtRollNtsc_TextChanged);
+            //this.txtRollNtsc.TextChanged += new System.EventHandler(this.txtRollNtsc_TextChanged);
+            this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
+            
             // 
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(59, 99);
+            this.label26.Location = new System.Drawing.Point(78, 71);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(25, 13);
             this.label26.TabIndex = 27;
@@ -666,7 +904,7 @@ namespace OSD
             // label23
             // 
             this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(9, 19);
+            this.label23.Location = new System.Drawing.Point(2, 18);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(56, 13);
             this.label23.TabIndex = 26;
@@ -674,46 +912,52 @@ namespace OSD
             // 
             // txtPitchPal
             // 
-            this.txtPitchPal.Location = new System.Drawing.Point(96, 55);
+            this.txtPitchPal.Location = new System.Drawing.Point(113, 39);
             this.txtPitchPal.Name = "txtPitchPal";
-            this.txtPitchPal.Size = new System.Drawing.Size(59, 20);
+            this.txtPitchPal.Size = new System.Drawing.Size(50, 20);
             this.txtPitchPal.TabIndex = 25;
             this.txtPitchPal.Text = "1";
             this.txtPitchPal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtPitchPal.TextChanged += new System.EventHandler(this.txtPitchPal_TextChanged);
+            this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
+            this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
+            //this.txtPitchPal.TextChanged += new System.EventHandler(this.txtPitchPal_TextChanged);
+            this.txtPitchPal.Leave += new System.EventHandler(this.txtPitchPal_TextChanged); 
             // 
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(59, 58);
+            this.label22.Location = new System.Drawing.Point(78, 42);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 13);
             this.label22.TabIndex = 24;
             this.label22.Text = "Pitch";
+            
             // 
             // txtRollPal
             // 
-            this.txtRollPal.Location = new System.Drawing.Point(96, 33);
+            this.txtRollPal.Location = new System.Drawing.Point(113, 17);
             this.txtRollPal.Name = "txtRollPal";
-            this.txtRollPal.Size = new System.Drawing.Size(59, 20);
+            this.txtRollPal.Size = new System.Drawing.Size(50, 20);
             this.txtRollPal.TabIndex = 23;
             this.txtRollPal.Text = "1";
             this.txtRollPal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtRollPal.TextChanged += new System.EventHandler(this.txtRollPal_TextChanged);
+            //this.txtRollPal.TextChanged += new System.EventHandler(this.txtRollPal_TextChanged);
+            this.txtRollPal.Leave += new System.EventHandler(this.txtRollPal_TextChanged);
             // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(59, 36);
+            this.label21.Location = new System.Drawing.Point(78, 20);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(25, 13);
             this.label21.TabIndex = 22;
             this.label21.Text = "Roll";
+            
             // 
             // chkILS
             // 
             this.chkILS.AutoSize = true;
-            this.chkILS.Location = new System.Drawing.Point(9, 42);
+            this.chkILS.Location = new System.Drawing.Point(9, 54);
             this.chkILS.Name = "chkILS";
             this.chkILS.Size = new System.Drawing.Size(70, 17);
             this.chkILS.TabIndex = 1;
@@ -754,7 +998,8 @@ namespace OSD
             this.txtBattB_k.TabIndex = 23;
             this.txtBattB_k.Text = "1";
             this.txtBattB_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtBattB_k.TextChanged += new System.EventHandler(this.txtBattB_k_TextChanged);
+            //this.txtBattB_k.TextChanged += new System.EventHandler(this.txtBattB_k_TextChanged);
+            this.txtBattB_k.Leave += new System.EventHandler(this.txtBattB_k_TextChanged);
             // 
             // label28
             // 
@@ -807,16 +1052,16 @@ namespace OSD
             // 
             this.groupBox9.Controls.Add(this.cbNscreens);
             this.groupBox9.Controls.Add(this.label3);
-			this.groupBox9.Controls.Add(this.numHOS);
+            this.groupBox9.Controls.Add(this.numHOS);
             this.groupBox9.Controls.Add(this.numVOS);
             this.groupBox9.Controls.Add(this.label31);
             this.groupBox9.Controls.Add(this.label30);
             this.groupBox9.Controls.Add(this.label29);
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(169, 238);
+            this.groupBox9.Location = new System.Drawing.Point(190, 240);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(150, 138);
+            this.groupBox9.Size = new System.Drawing.Size(131, 138);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Screen";
@@ -826,13 +1071,14 @@ namespace OSD
             this.cbNscreens.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbNscreens.FormattingEnabled = true;
             this.cbNscreens.Items.AddRange(new object[] {
+            "0 - no switch",
             "1",
             "2",
             "3",
             "4"});
             this.cbNscreens.Location = new System.Drawing.Point(85, 109);
             this.cbNscreens.Name = "cbNscreens";
-            this.cbNscreens.Size = new System.Drawing.Size(56, 21);
+            this.cbNscreens.Size = new System.Drawing.Size(40, 21);
             this.cbNscreens.TabIndex = 10;
             this.cbNscreens.SelectedIndexChanged += new System.EventHandler(this.cbNscreens_SelectedIndexChanged);
             // 
@@ -844,8 +1090,8 @@ namespace OSD
             this.label3.Size = new System.Drawing.Size(77, 13);
             this.label3.TabIndex = 9;
             this.label3.Text = "Screens Count";
-			// 
-			// numHOS
+            // 
+            // numHOS
             // 
             this.numHOS.Location = new System.Drawing.Point(83, 69);
             this.numHOS.Maximum = new decimal(new int[] {
@@ -859,7 +1105,7 @@ namespace OSD
             0,
             -2147483648});
             this.numHOS.Name = "numHOS";
-            this.numHOS.Size = new System.Drawing.Size(58, 20);
+            this.numHOS.Size = new System.Drawing.Size(42, 20);
             this.numHOS.TabIndex = 8;
             this.numHOS.ValueChanged += new System.EventHandler(this.numHOS_ValueChanged);
             // 
@@ -877,21 +1123,21 @@ namespace OSD
             0,
             -2147483648});
             this.numVOS.Name = "numVOS";
-            this.numVOS.Size = new System.Drawing.Size(59, 20);
+            this.numVOS.Size = new System.Drawing.Size(43, 20);
             this.numVOS.TabIndex = 7;
-           this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
-			//
+            this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
+            // 
             // label31
-            //
+            // 
             this.label31.AutoSize = true;
             this.label31.Location = new System.Drawing.Point(51, 72);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(25, 13);
             this.label31.TabIndex = 6;
             this.label31.Text = "Left";
-            //
+            // 
             // label30
-            //
+            // 
             this.label30.AutoSize = true;
             this.label30.Location = new System.Drawing.Point(50, 50);
             this.label30.Name = "label30";
@@ -907,20 +1153,20 @@ namespace OSD
             this.label29.Size = new System.Drawing.Size(40, 13);
             this.label29.TabIndex = 4;
             this.label29.Text = "Offsets";
-            //			
+            // 
             // BRIGHTNESScomboBox
             // 
             this.BRIGHTNESScomboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.BRIGHTNESScomboBox.FormattingEnabled = true;
             this.BRIGHTNESScomboBox.Items.AddRange(new object[] {
-	            "Low",
-	            "Medium",
-	            "Medium High",
-            	"High"});
+            "Low",
+            "Medium",
+            "Medium High",
+            "High"});
             this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(66, 14);
             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
-            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(75, 21);
+            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(60, 21);
             this.BRIGHTNESScomboBox.TabIndex = 3;
             this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
             // 
@@ -936,78 +1182,49 @@ namespace OSD
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
-            this.groupBox8.Controls.Add(this.label12);
-            this.groupBox8.Location = new System.Drawing.Point(169, 108);
+            this.groupBox8.Location = new System.Drawing.Point(327, 303);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(150, 60);
+            this.groupBox8.Size = new System.Drawing.Size(157, 41);
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Call Sign";
+            
             // 
             // CALLSIGNmaskedText
             // 
             this.CALLSIGNmaskedText.AllowPromptAsInput = false;
             this.CALLSIGNmaskedText.AsciiOnly = true;
             this.CALLSIGNmaskedText.BeepOnError = true;
-            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(35, 26);
+            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(39, 15);
             this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
             this.CALLSIGNmaskedText.Mask = "CCCCCCCC";
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
-            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(102, 20);
+            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(109, 20);
             this.CALLSIGNmaskedText.TabIndex = 11;
-          
             this.CALLSIGNmaskedText.Validating += new System.ComponentModel.CancelEventHandler(this.CALLSIGNmaskedText_Validating);
             this.CALLSIGNmaskedText.Validated += new System.EventHandler(this.CALLSIGNmaskedText_Validated);
             // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(7, 11);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(48, 13);
-            this.label12.TabIndex = 2;
-            this.label12.Text = "Call Sign";
-            // 
             // groupBox7
             // 
-            this.groupBox7.Controls.Add(this.cbxWarningsAutoPanelSwitch);
-            this.groupBox7.Controls.Add(this.lblWarningsAutoPanelSwitch);
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(8, 232);
+            this.groupBox7.Location = new System.Drawing.Point(5, 310);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(150, 144);
+            this.groupBox7.Size = new System.Drawing.Size(179, 68);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
-            // 
-            // cbxWarningsAutoPanelSwitch
-            // 
-            this.cbxWarningsAutoPanelSwitch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxWarningsAutoPanelSwitch.FormattingEnabled = true;
-            this.cbxWarningsAutoPanelSwitch.Location = new System.Drawing.Point(7, 47);
-            this.cbxWarningsAutoPanelSwitch.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxWarningsAutoPanelSwitch.Name = "cbxWarningsAutoPanelSwitch";
-            this.cbxWarningsAutoPanelSwitch.Size = new System.Drawing.Size(120, 21);
-            this.cbxWarningsAutoPanelSwitch.TabIndex = 13;
-            this.cbxWarningsAutoPanelSwitch.SelectedIndexChanged += new System.EventHandler(this.cbxWarningsAutoPanelSwitch_SelectedIndexChanged);
-            // 
-            // lblWarningsAutoPanelSwitch
-            // 
-            this.lblWarningsAutoPanelSwitch.Location = new System.Drawing.Point(5, 16);
-            this.lblWarningsAutoPanelSwitch.Name = "lblWarningsAutoPanelSwitch";
-            this.lblWarningsAutoPanelSwitch.Size = new System.Drawing.Size(139, 29);
-            this.lblWarningsAutoPanelSwitch.TabIndex = 12;
-            this.lblWarningsAutoPanelSwitch.Text = "Warnings Auto Panel Switch:";
+            this.groupBox7.Text = "OSD Toggle Channel";
             // 
             // TOGGLE_BEH
             // 
             this.TOGGLE_BEH.AutoSize = true;
-            this.TOGGLE_BEH.Location = new System.Drawing.Point(7, 122);
+            this.TOGGLE_BEH.Location = new System.Drawing.Point(11, 48);
             this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2);
             this.TOGGLE_BEH.Name = "TOGGLE_BEH";
-            this.TOGGLE_BEH.Size = new System.Drawing.Size(115, 17);
+            this.TOGGLE_BEH.Size = new System.Drawing.Size(101, 17);
             this.TOGGLE_BEH.TabIndex = 10;
-            this.TOGGLE_BEH.Text = "Rotation Switching";
+            this.TOGGLE_BEH.Text = "Rotation Switch";
             this.TOGGLE_BEH.UseVisualStyleBackColor = true;
             this.TOGGLE_BEH.CheckedChanged += new System.EventHandler(this.TOGGLE_BEHChanged);
             // 
@@ -1016,39 +1233,39 @@ namespace OSD
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-	            "Disabled",
-				
-	            "Mode Switch",
-	            "Ch 5",
-	            "Ch 6",
-	            "Ch 7",
-	            "Ch 8",
+            "Disabled",
+            "Mode Switch",
+            "Ch 5",
+            "Ch 6",
+            "Ch 7",
+            "Ch 8",
             "External PWM"});
-            this.ONOFF_combo.Location = new System.Drawing.Point(7, 90);
+            this.ONOFF_combo.Location = new System.Drawing.Point(11, 20);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
-            this.ONOFF_combo.Size = new System.Drawing.Size(120, 21);
+            this.ONOFF_combo.Size = new System.Drawing.Size(157, 21);
             this.ONOFF_combo.TabIndex = 3;
             this.ONOFF_combo.SelectedIndexChanged += new System.EventHandler(this.ONOFF_combo_SelectedIndexChanged);
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(4, 75);
+            this.label11.Location = new System.Drawing.Point(5, 10);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(108, 13);
+            this.label11.Size = new System.Drawing.Size(0, 13);
             this.label11.TabIndex = 2;
-            this.label11.Text = "OSD Toggle Channel";
             // 
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.UNITS_combo);
             this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(169, 169);
+            this.groupBox6.Location = new System.Drawing.Point(190, 5);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(150, 57);
+            this.groupBox6.Size = new System.Drawing.Size(129, 46);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Units";
+            
             // 
             // UNITS_combo
             // 
@@ -1057,10 +1274,10 @@ namespace OSD
             this.UNITS_combo.Items.AddRange(new object[] {
             "Metric",
             "Imperial"});
-            this.UNITS_combo.Location = new System.Drawing.Point(35, 29);
+            this.UNITS_combo.Location = new System.Drawing.Point(40, 17);
             this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
-            this.UNITS_combo.Size = new System.Drawing.Size(102, 21);
+            this.UNITS_combo.Size = new System.Drawing.Size(86, 21);
             this.UNITS_combo.TabIndex = 3;
             this.UNITS_combo.SelectedIndexChanged += new System.EventHandler(this.UNITS_combo_SelectedIndexChanged);
             // 
@@ -1069,9 +1286,9 @@ namespace OSD
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(8, 13);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(31, 13);
+            this.label10.Size = new System.Drawing.Size(0, 13);
             this.label10.TabIndex = 2;
-            this.label10.Text = "Units";
+            
             // 
             // groupBox4
             // 
@@ -1101,7 +1318,8 @@ namespace OSD
             this.txtBattA_k.TabIndex = 23;
             this.txtBattA_k.Text = "1";
             this.txtBattA_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtBattA_k.TextChanged += new System.EventHandler(this.txtBattA_k_TextChanged);
+            //this.txtBattA_k.TextChanged += new System.EventHandler(this.txtBattA_k_TextChanged);
+            this.txtBattA_k.Leave += new System.EventHandler(this.txtBattA_k_TextChanged);
             // 
             // label27
             // 
@@ -1133,7 +1351,8 @@ namespace OSD
             this.txtCurr_k.TabIndex = 21;
             this.txtCurr_k.Text = "1";
             this.txtCurr_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtCurr_k.TextChanged += new System.EventHandler(this.txtCurr_k_TextChanged);
+            //this.txtCurr_k.TextChanged += new System.EventHandler(this.txtCurr_k_TextChanged);
+            this.txtCurr_k.Leave += new System.EventHandler(this.txtCurr_k_TextChanged);
             // 
             // label19
             // 
@@ -1197,11 +1416,11 @@ namespace OSD
             this.rbtBatterymAh.TabIndex = 15;
             this.rbtBatterymAh.Text = "Show used mAh";
             this.rbtBatterymAh.UseVisualStyleBackColor = true;
-            this.rbtBatterymAh.CheckedChanged += new System.EventHandler(this.rbtBatterymAh_CheckedChanged);
+            
             // 
             // rbtBatteryPercent
             // 
-            this.rbtBatteryPercent.AutoSize = true;
+/*            this.rbtBatteryPercent.AutoSize = true;
             this.rbtBatteryPercent.Checked = true;
             this.rbtBatteryPercent.Location = new System.Drawing.Point(6, 129);
             this.rbtBatteryPercent.Name = "rbtBatteryPercent";
@@ -1211,6 +1430,7 @@ namespace OSD
             this.rbtBatteryPercent.Text = "Show remaining %";
             this.rbtBatteryPercent.UseVisualStyleBackColor = true;
             this.rbtBatteryPercent.CheckedChanged += new System.EventHandler(this.rbtBatteryPercent_CheckedChanged);
+ */
             // 
             // label9
             // 
@@ -1265,16 +1485,16 @@ namespace OSD
             this.groupBox3.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(169, 5);
+            this.groupBox3.Location = new System.Drawing.Point(190, 131);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(150, 103);
+            this.groupBox3.Size = new System.Drawing.Size(131, 103);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             // 
             // OVERSPEED_label
             // 
             this.OVERSPEED_label.AutoSize = true;
-            this.OVERSPEED_label.Location = new System.Drawing.Point(9, 57);
+            this.OVERSPEED_label.Location = new System.Drawing.Point(8, 55);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
             this.OVERSPEED_label.Size = new System.Drawing.Size(93, 13);
             this.OVERSPEED_label.TabIndex = 4;
@@ -1282,22 +1502,22 @@ namespace OSD
             // 
             // OVERSPEED_numeric
             // 
-            this.OVERSPEED_numeric.Location = new System.Drawing.Point(38, 74);
+            this.OVERSPEED_numeric.Location = new System.Drawing.Point(37, 72);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.OVERSPEED_numeric.Name = "OVERSPEED_numeric";
-            this.OVERSPEED_numeric.Size = new System.Drawing.Size(99, 20);
+            this.OVERSPEED_numeric.Size = new System.Drawing.Size(88, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
+            this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
             // 
             // STALL_label
             // 
             this.STALL_label.AutoSize = true;
-            this.STALL_label.Location = new System.Drawing.Point(7, 12);
+            this.STALL_label.Location = new System.Drawing.Point(6, 10);
             this.STALL_label.Name = "STALL_label";
             this.STALL_label.Size = new System.Drawing.Size(95, 13);
             this.STALL_label.TabIndex = 2;
@@ -1305,7 +1525,7 @@ namespace OSD
             // 
             // STALL_numeric
             // 
-            this.STALL_numeric.Location = new System.Drawing.Point(36, 28);
+            this.STALL_numeric.Location = new System.Drawing.Point(35, 26);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -1330,30 +1550,33 @@ namespace OSD
             this.groupBoxRSSI.Controls.Add(this.lblRSSIMin);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
-            this.groupBoxRSSI.Location = new System.Drawing.Point(8, 5);
+            this.groupBoxRSSI.Location = new System.Drawing.Point(5, 3);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
-            this.groupBoxRSSI.Size = new System.Drawing.Size(150, 221);
+            this.groupBoxRSSI.Size = new System.Drawing.Size(179, 159);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
+            this.groupBoxRSSI.Text = "RSSI";
             // 
             // txtRSSI_k
-            //
-            this.txtRSSI_k.Location = new System.Drawing.Point(97, 194);
+            // 
+            this.txtRSSI_k.Location = new System.Drawing.Point(121, 128);
             this.txtRSSI_k.Name = "txtRSSI_k";
             this.txtRSSI_k.Size = new System.Drawing.Size(47, 20);
             this.txtRSSI_k.TabIndex = 23;
             this.txtRSSI_k.Text = "1";
             this.txtRSSI_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtRSSI_k.TextChanged += new System.EventHandler(this.txtRSSI_k_TextChanged);
-            //
+            //this.txtRSSI_k.TextChanged += new System.EventHandler(this.txtRSSI_k_TextChanged);
+            this.txtRSSI_k.Leave += new System.EventHandler(this.txtRSSI_k_TextChanged);
+            // 
             // label20
-            //
+            // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(9, 197);
+            this.label20.Location = new System.Drawing.Point(33, 131);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(82, 13);
             this.label20.TabIndex = 22;
             this.label20.Text = "Adjust pin value";
+            
             // 
             // cbxRSSIChannel
             // 
@@ -1364,36 +1587,37 @@ namespace OSD
             "Channel 8",
             "Pin RSSI analog",
             "Pin RSSI PWM"});
-            this.cbxRSSIChannel.Location = new System.Drawing.Point(9, 27);
+            this.cbxRSSIChannel.Location = new System.Drawing.Point(77, 9);
             this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
             this.cbxRSSIChannel.Name = "cbxRSSIChannel";
-            this.cbxRSSIChannel.Size = new System.Drawing.Size(118, 21);
+            this.cbxRSSIChannel.Size = new System.Drawing.Size(91, 21);
             this.cbxRSSIChannel.TabIndex = 13;
             this.cbxRSSIChannel.SelectedIndexChanged += new System.EventHandler(this.cbxRSSIChannel_SelectedIndexChanged);
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(6, 12);
+            this.label15.Location = new System.Drawing.Point(24, 12);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(76, 13);
+            this.label15.Size = new System.Drawing.Size(48, 13);
             this.label15.TabIndex = 12;
-            this.label15.Text = "RSSI channel:";
+            this.label15.Text = "channel:";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(5, 131);
+            this.label8.Location = new System.Drawing.Point(5, 89);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(121, 13);
+            this.label8.Size = new System.Drawing.Size(93, 13);
             this.label8.TabIndex = 11;
-            this.label8.Text = "RSSI Warning Level (%)";
+            this.label8.Text = "Warning Level (%)";
+            
             // 
             // RSSI_WARNnumeric
             // 
-            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(8, 147);
+            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(99, 85);
             this.RSSI_WARNnumeric.Name = "RSSI_WARNnumeric";
-            this.RSSI_WARNnumeric.Size = new System.Drawing.Size(91, 20);
+            this.RSSI_WARNnumeric.Size = new System.Drawing.Size(69, 20);
             this.RSSI_WARNnumeric.TabIndex = 10;
             this.RSSI_WARNnumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.RSSI_WARNnumeric.ValueChanged += new System.EventHandler(this.RSSI_WARNnumeric_ValueChanged);
@@ -1401,36 +1625,37 @@ namespace OSD
             // RSSI_RAW
             // 
             this.RSSI_RAW.AutoSize = true;
-            this.RSSI_RAW.Location = new System.Drawing.Point(8, 172);
+            this.RSSI_RAW.Location = new System.Drawing.Point(8, 106);
             this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2);
             this.RSSI_RAW.Name = "RSSI_RAW";
-            this.RSSI_RAW.Size = new System.Drawing.Size(112, 17);
+            this.RSSI_RAW.Size = new System.Drawing.Size(84, 17);
             this.RSSI_RAW.TabIndex = 9;
-            this.RSSI_RAW.Text = "RSSI Enable Raw";
+            this.RSSI_RAW.Text = "Enable Raw";
             this.RSSI_RAW.UseVisualStyleBackColor = true;
             this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // lblRSSIMax
             // 
             this.lblRSSIMax.AutoSize = true;
-            this.lblRSSIMax.Location = new System.Drawing.Point(5, 90);
+            this.lblRSSIMax.Location = new System.Drawing.Point(4, 65);
             this.lblRSSIMax.Name = "lblRSSIMax";
-            this.lblRSSIMax.Size = new System.Drawing.Size(85, 13);
+            this.lblRSSIMax.Size = new System.Drawing.Size(57, 13);
             this.lblRSSIMax.TabIndex = 3;
-            this.lblRSSIMax.Text = "RSSI Max Value";
+            this.lblRSSIMax.Text = "Max Value";
+            
             // 
             // lblRSSIMin
             // 
             this.lblRSSIMin.AutoSize = true;
-            this.lblRSSIMin.Location = new System.Drawing.Point(5, 51);
+            this.lblRSSIMin.Location = new System.Drawing.Point(4, 37);
             this.lblRSSIMin.Name = "lblRSSIMin";
-            this.lblRSSIMin.Size = new System.Drawing.Size(82, 13);
+            this.lblRSSIMin.Size = new System.Drawing.Size(54, 13);
             this.lblRSSIMin.TabIndex = 2;
-            this.lblRSSIMin.Text = "RSSI Min Value";
+            this.lblRSSIMin.Text = "Min Value";
             // 
             // RSSI_numeric_max
             // 
-            this.RSSI_numeric_max.Location = new System.Drawing.Point(8, 106);
+            this.RSSI_numeric_max.Location = new System.Drawing.Point(77, 61);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -1449,7 +1674,7 @@ namespace OSD
             // 
             // RSSI_numeric_min
             // 
-            this.RSSI_numeric_min.Location = new System.Drawing.Point(8, 67);
+            this.RSSI_numeric_min.Location = new System.Drawing.Point(77, 35);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -1528,7 +1753,6 @@ namespace OSD
             this.cbxModelType.Size = new System.Drawing.Size(126, 21);
             this.cbxModelType.TabIndex = 12;
             this.cbxModelType.SelectedIndexChanged += new System.EventHandler(this.cbxModelType_SelectedIndexChanged);
-         
             // 
             // lblPresentedCharset
             // 
@@ -1593,9 +1817,9 @@ namespace OSD
             this.cbxAutoUpdate.Text = "Check for updates at startup";
             this.cbxAutoUpdate.UseVisualStyleBackColor = true;
             this.cbxAutoUpdate.CheckedChanged += new System.EventHandler(this.cbxAutoUpdate_CheckedChanged);
-	    //
+            // 
             // cbxShowUpdateDialog
-	    //
+            // 
             this.cbxShowUpdateDialog.AutoSize = true;
             this.cbxShowUpdateDialog.Checked = true;
             this.cbxShowUpdateDialog.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -1606,32 +1830,10 @@ namespace OSD
             this.cbxShowUpdateDialog.Text = "Prompt for update at startup";
             this.cbxShowUpdateDialog.UseVisualStyleBackColor = true;
             this.cbxShowUpdateDialog.CheckedChanged += new System.EventHandler(this.cbxShowUpdateDialog_CheckedChanged);
-            // 
-            // chkHUD
-            // 
-            this.chkHUD.AutoSize = true;
-            this.chkHUD.Location = new System.Drawing.Point(9, 61);
-            this.chkHUD.Name = "chkHUD";
-            this.chkHUD.Size = new System.Drawing.Size(107, 17);
-            this.chkHUD.TabIndex = 3;
-            this.chkHUD.Text = "show HUD frame";
-            this.chkHUD.UseVisualStyleBackColor = true;
-            this.chkHUD.CheckedChanged += new System.EventHandler(this.chkHUD_CheckedChanged);
-            // 
-            // chkTrack
-            // 
-            this.chkTrack.AutoSize = true;
-            this.chkTrack.Location = new System.Drawing.Point(98, 24);
-            this.chkTrack.Name = "chkTrack";
-            this.chkTrack.Size = new System.Drawing.Size(72, 17);
-            this.chkTrack.TabIndex = 4;
-            this.chkTrack.Text = "with track";
-            this.chkTrack.UseVisualStyleBackColor = true;
-            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
 
-	    for(int k=0;k<npanel;k++){
-		this.scr[k].init();
-	    }
+            for(int k=0;k<npanel;k++){
+                this.scr[k].init();
+            }
             // 
             // OSD
             // 
@@ -1661,6 +1863,8 @@ namespace OSD
             this.menuStrip1.PerformLayout();
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox15.ResumeLayout(false);
@@ -1670,9 +1874,9 @@ namespace OSD
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinVoltB)).EndInit();
-			this.groupBox9.ResumeLayout(false);
+            this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.numHOS)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numHOS)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numVOS)).EndInit();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
@@ -1695,18 +1899,14 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).EndInit();
-
-	    for(int k=0;k<npanel;k++){
-		this.scr[k].last_init();
-	    }
-
+            for (int k = 0; k < npanel; k++) {
+                this.scr[k].last_init();
+            }
             this.grpTLog.ResumeLayout(false);
             this.grpTLog.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
             this.groupBox12.ResumeLayout(false);
-            
-
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1769,7 +1969,6 @@ namespace OSD
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown BATT_WARNnumeric;
         private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.Label label12;
         private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
         private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.ComboBox BRIGHTNESScomboBox;
@@ -1780,8 +1979,6 @@ namespace OSD
         private System.Windows.Forms.RadioButton rbtBatteryPercent;
         private System.Windows.Forms.Label lblModelType;
         private System.Windows.Forms.ComboBox cbxModelType;
-        private System.Windows.Forms.ComboBox cbxWarningsAutoPanelSwitch;
-        private System.Windows.Forms.Label lblWarningsAutoPanelSwitch;
         private System.Windows.Forms.Label lblFWModelType;
         
         private System.Windows.Forms.GroupBox grpTLog;
@@ -1848,7 +2045,26 @@ namespace OSD
         private System.Windows.Forms.ComboBox cbNscreens;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox chkTrack;
-        private System.Windows.Forms.CheckBox chkHUD;
+        private System.Windows.Forms.GroupBox groupBox2;
+        public System.Windows.Forms.TextBox txtFormat1;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label12;
+        public System.Windows.Forms.TextBox txtFactor1;
+        private System.Windows.Forms.Label label37;
+        public System.Windows.Forms.TextBox txtFactor4;
+        public System.Windows.Forms.TextBox txtFormat4;
+        private System.Windows.Forms.Label label36;
+        public System.Windows.Forms.TextBox txtFactor3;
+        public System.Windows.Forms.TextBox txtFormat3;
+        private System.Windows.Forms.Label label35;
+        public System.Windows.Forms.TextBox txtFactor2;
+        public System.Windows.Forms.TextBox txtFormat2;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Label label4;
     }
 	
 }

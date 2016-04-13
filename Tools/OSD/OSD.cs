@@ -1,6 +1,7 @@
 
 
 
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,10 +24,17 @@ using System.Threading;
 
 
 namespace OSD {
+
+    using uint32_t = System.UInt32;
+    using uint16_t = System.UInt16;
+    using uint8_t = System.Byte;
+    using int8_t = System.SByte;
+    //using boolean = System.Byte;
+
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r826 DV";
+        public const string VERSION = "r827 DV";
 
 
         //max 7456 datasheet pg 10
@@ -39,13 +47,56 @@ namespace OSD {
         public const int SCREEN_H = 16;
         public const int SCREEN_H_NTSC = 13;
 
-
+        public const int MAVLINK_MAX_PAYLOAD_LEN =255;
+        public const int MAVLINK_NUM_CHECKSUM_BYTES =2;
+        public const int MAVLINK_STX =254;
+        public const int X25_INIT_CRC = 0xffff;
 
         public enum ModelType {
             Plane = 0,
             Copter = 1,
             Unknown = 9
         };
+
+        public struct mavlink_message {
+            public uint16_t checksum; /// sent at end of packet
+            public uint8_t magic;   /// protocol magic marker
+            public uint8_t len;     /// Length of payload
+            public uint8_t seq;     /// Sequence of packet
+            public uint8_t sysid;   /// ID of message sender system/aircraft
+            public uint8_t compid;  /// ID of the message sender component
+            public uint8_t msgid;   /// ID of message in payload
+            public uint8_t[] payload; // MAVLINK_MAX_PAYLOAD_LEN + MAVLINK_NUM_CHECKSUM_BYTES
+        };
+
+        public enum mavlink_parse_state_t {
+            MAVLINK_PARSE_STATE_UNINIT=0,
+            MAVLINK_PARSE_STATE_IDLE,
+            MAVLINK_PARSE_STATE_GOT_STX,
+            MAVLINK_PARSE_STATE_GOT_SEQ,
+            MAVLINK_PARSE_STATE_GOT_LENGTH,
+            MAVLINK_PARSE_STATE_GOT_SYSID,
+            MAVLINK_PARSE_STATE_GOT_COMPID,
+            MAVLINK_PARSE_STATE_GOT_MSGID,
+            MAVLINK_PARSE_STATE_GOT_PAYLOAD,
+            MAVLINK_PARSE_STATE_GOT_CRC1
+        }; ///< The state machine for the comm parser
+
+        public struct mavlink_status {
+            public uint8_t msg_received;               /// Number of received messages
+            public uint8_t buffer_overrun;             /// Number of buffer overruns
+            public uint8_t parse_error;                /// Number of parse errors
+            public mavlink_parse_state_t parse_state;  /// Parsing state machine
+            public uint8_t packet_idx;                 /// Index in current packet
+            public uint8_t current_rx_seq;             /// Sequence number of last packet received
+            public uint8_t current_tx_seq;             /// Sequence number of last packet sent
+            public uint16_t packet_rx_success_count;   /// Received packets
+            public uint16_t packet_rx_drop_count;      /// Number of packet drops
+        };
+
+        public mavlink_status status = new mavlink_status() { msg_received=0, buffer_overrun=0, parse_error=0, parse_state=mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE, packet_idx= 0, current_rx_seq =0, current_tx_seq=0, packet_rx_success_count=0, packet_rx_drop_count =0 };
+
+        public mavlink_message rxmsg;
 
         public const int npanel = 4; // количество панелей 
 
@@ -128,6 +179,17 @@ namespace OSD {
                 var s = new osd_screen(i, this);
                 scr[i] = s;
             }
+
+            rxmsg.payload = new Byte[MAVLINK_MAX_PAYLOAD_LEN + MAVLINK_NUM_CHECKSUM_BYTES];
+            
+            status.packet_rx_drop_count = 0;
+            status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+            status.packet_idx = 0;
+            status.packet_rx_success_count = 0;
+            status.current_rx_seq = 0;
+            status.buffer_overrun = 0;
+            status.parse_error = 0;
+
 
             InitializeComponent();
 
@@ -263,6 +325,10 @@ namespace OSD {
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, -1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, -1);
                 pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, -1, -1);
+                pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1);
+                pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1);
+                pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1);
+                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, 1);
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
 
 
@@ -347,9 +413,9 @@ namespace OSD {
             //			cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude!=0);
             //			cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude!=0);
 
-            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
-                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
-            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)(pan.auto_screen_switch);
+//            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+//                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+//            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)(pan.auto_screen_switch);
 
             if (!pan.converts) {
                 UNITS_combo.SelectedIndex = 0; //metric
@@ -371,7 +437,7 @@ namespace OSD {
             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
             CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
-            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+//            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
             chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
             BATT_WARNnumeric.Value = pan.batt_warn_level;
@@ -583,8 +649,8 @@ namespace OSD {
 
             try {
                 //pan.setHeadingPatern();
-                pan.setBatteryPic();
-            } catch (Exception ex) {
+                //pan.setBatteryPic();
+            } catch  {
                 return;
             }
 
@@ -650,8 +716,8 @@ namespace OSD {
         private void OSD_Load(object sender, EventArgs e) {
             if (cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
-            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
-                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+//            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+//                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Text = this.Text + " " + strVersion + " - Pre-Release " + VERSION;
@@ -757,7 +823,7 @@ namespace OSD {
                 conf.eeprom.flags[mode_auto] = pan.mode_auto;
 
                 conf.eeprom.sets.OSD_BATT_WARN = pan.batt_warn_level;
-                conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
+         //       conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
                 conf.eeprom.sets.OSD_RSSI_WARN = pan.rssi_warn_level;
 
                 conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
@@ -805,6 +871,21 @@ namespace OSD {
                 conf.eeprom.sets.pwm_src = pan.pwm_src;
                 conf.eeprom.sets.pwm_dst = pan.pwm_dst;
                 conf.eeprom.sets.n_screens = pan.n_screens;
+
+                conf.eeprom.format1 = txtFormat1.Text; // no conversions!
+                conf.eeprom.format2 = txtFormat2.Text;
+                conf.eeprom.format3 = txtFormat3.Text;
+                conf.eeprom.format4 = txtFormat4.Text;
+
+                conf.eeprom.sensors.sensor_K1 = myConvert(txtFactor1.Text);
+                conf.eeprom.sensors.sensor_K2 = myConvert(txtFactor2.Text);
+                conf.eeprom.sensors.sensor_K3 = myConvert(txtFactor3.Text);
+                conf.eeprom.sensors.sensor_K4 = myConvert(txtFactor4.Text);
+
+                conf.eeprom.sensors.sensor_A1 = 0f; //myConvert(txtAdd1.Text);
+                conf.eeprom.sensors.sensor_A2 = 0f; // myConvert(txtAdd2.Text);
+                conf.eeprom.sensors.sensor_A3 = 0f; // myConvert(txtAdd3.Text);
+                conf.eeprom.sensors.sensor_A4 = 0f; // myConvert(txtAdd4.Text);
 
             } else if (panel_number >= 0 && panel_number < npanel) {
                 //First Panel 
@@ -935,7 +1016,7 @@ namespace OSD {
             conf.eeprom.flags[mode_auto] = pan.mode_auto;
 
             conf.eeprom.sets.OSD_BATT_WARN = pan.batt_warn_level;
-            conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
+            //conf.eeprom.flags[osd_battery_show_percentage] = pan.osd_battery_show_percentage;
             conf.eeprom.sets.OSD_RSSI_WARN = pan.rssi_warn_level;
 
             conf.eeprom.sets.OSD_BRIGHTNESS = pan.osd_brightness;
@@ -981,6 +1062,22 @@ namespace OSD {
             conf.eeprom.sets.pwm_src = 0;
             conf.eeprom.sets.pwm_dst = 0;
             conf.eeprom.sets.n_screens = 4;
+
+            conf.eeprom.format1 = txtFormat1.Text; // no conversions!
+            conf.eeprom.format2 = txtFormat2.Text;
+            conf.eeprom.format3 = txtFormat3.Text;
+            conf.eeprom.format4 = txtFormat4.Text;
+
+            conf.eeprom.sensors.sensor_K1 = (float)10;
+            conf.eeprom.sensors.sensor_K2 = (float)10;
+            conf.eeprom.sensors.sensor_K3 = (float)1;
+            conf.eeprom.sensors.sensor_K4 = (float)1;
+
+            conf.eeprom.sensors.sensor_A1 = (float)0;
+            conf.eeprom.sensors.sensor_A2 = (float)0;
+            conf.eeprom.sensors.sensor_A3 = (float)0;
+            conf.eeprom.sensors.sensor_A4 = (float)0;
+
 
             int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
             if (err > 0) {
@@ -1188,7 +1285,7 @@ namespace OSD {
                 }
 
                 pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch;
-                cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+                //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
                 pan.switch_mode = conf.eeprom.sets.switch_mode;
                 TOGGLE_BEH.Checked = pan.switch_mode != 0;
@@ -1205,7 +1302,7 @@ namespace OSD {
                 pan.flgHUD = conf.eeprom.flags[flgHUD];
 
                 chkTrack.Checked = pan.flgTrack;
-                chkHUD.Checked = pan.flgHUD;
+                //chkHUD.Checked = pan.flgHUD;
 
                 try {
                     pan.batt_warn_level = conf.eeprom.sets.OSD_BATT_WARN;
@@ -1214,8 +1311,8 @@ namespace OSD {
                     BATT_WARNnumeric.Value = 0;
                 }
 
-                pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
-                rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
+               // pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
+          //      rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
                 rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
 
                 pan.rssi_warn_level = conf.eeprom.sets.OSD_RSSI_WARN;
@@ -1308,18 +1405,42 @@ namespace OSD {
 
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
-            } catch (Exception ex) { }
+            } catch  { }
 
 
             try {
                 cbOutSource.SelectedIndex = pan.pwm_src;
                 cbOutPin.SelectedIndex = pan.pwm_dst;
-            } catch (Exception ex) { }
+            } catch  { }
 
             pan.n_screens = conf.eeprom.sets.n_screens;
             try {
-                cbNscreens.SelectedIndex = pan.n_screens - 1;
-            } catch (Exception ex) { }
+                cbNscreens.SelectedIndex = pan.n_screens ;
+            } catch  { }
+
+
+            if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A1)) {
+                txtFactor1.Text = Convert.ToString(conf.eeprom.sensors.sensor_K1);
+                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A1);
+                txtFormat1.Text = conf.eeprom.format1; // no conversions!
+            }
+
+            if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A2)) {
+                txtFactor2.Text = Convert.ToString(conf.eeprom.sensors.sensor_K2);
+                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A2);
+                txtFormat2.Text = conf.eeprom.format2;
+            }
+            if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A3)) {
+                txtFactor3.Text = Convert.ToString(conf.eeprom.sensors.sensor_K3);
+                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A3);
+                txtFormat3.Text = conf.eeprom.format3;
+            }
+            if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A4)) {
+                txtFactor4.Text = Convert.ToString(conf.eeprom.sensors.sensor_K4);
+                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A4);
+                txtFormat4.Text = conf.eeprom.format4;
+            }
+
 
             toolStripStatusLabel1.Text="EEPROM read OK";
             Draw(panel_number = tN);
@@ -1532,6 +1653,16 @@ namespace OSD {
                         //
                         sw.WriteLine("{0}\t{1}", "NSCREENS", pan.n_screens);
 
+                        sw.WriteLine("{0}\t{1}", "SFormat1", txtFormat1.Text);
+                        sw.WriteLine("{0}\t{1}", "SFormat2", txtFormat2.Text);
+                        sw.WriteLine("{0}\t{1}", "SFormat3", txtFormat3.Text);
+                        sw.WriteLine("{0}\t{1}", "SFormat4", txtFormat4.Text);
+
+                        sw.WriteLine("{0}\t{1}", "SFactor1", txtFactor1.Text);
+                        sw.WriteLine("{0}\t{1}", "SFactor2", txtFactor2.Text);
+                        sw.WriteLine("{0}\t{1}", "SFactor3", txtFactor3.Text);
+                        sw.WriteLine("{0}\t{1}", "SFactor4", txtFactor4.Text);
+
                         sw.Close();
                     }
                 } catch (Exception ex) {
@@ -1656,9 +1787,17 @@ namespace OSD {
                             else if (strings[0] == "NSCREENS") pan.n_screens = (byte)int.Parse(strings[1]);
                             else if (strings[0] == "flgHUD") pan.flgHUD = bool.Parse(strings[1]);
                             else if (strings[0] == "flgTrack") pan.flgTrack = bool.Parse(strings[1]);
+
+                            else if (strings[0] == "SFormat1") txtFormat1.Text = strings[1];
+                            else if (strings[0] == "SFormat2") txtFormat1.Text = strings[1];
+                            else if (strings[0] == "SFormat3") txtFormat1.Text = strings[1];
+                            else if (strings[0] == "SFormat4") txtFormat1.Text = strings[1];
+
+                            else if (strings[0] == "SFactor1") txtFactor1.Text = strings[1];
+                            else if (strings[0] == "SFactor2") txtFactor1.Text = strings[1];
+                            else if (strings[0] == "SFactor3") txtFactor1.Text = strings[1];
+                            else if (strings[0] == "SFactor4") txtFactor1.Text = strings[1];
                         }
-
-
 
                         //pan.model_type = (byte)cbxModelType.SelectedItem;
 
@@ -1719,13 +1858,13 @@ namespace OSD {
                         if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
-                        cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+                        //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
                         TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
 
                         CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
                         CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
-                        chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+                        //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
                         chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
                         BATT_WARNnumeric.Value = pan.batt_warn_level;
@@ -1772,11 +1911,11 @@ namespace OSD {
                         try {
                             cbOutSource.SelectedIndex = pan.pwm_src;
                             cbOutPin.SelectedIndex = pan.pwm_dst;
-                        } catch (Exception ex) { }
+                        } catch  { }
 
                         try {
-                            cbNscreens.SelectedIndex = pan.n_screens - 1;
-                        } catch (Exception ex) { }
+                            cbNscreens.SelectedIndex = pan.n_screens ;
+                        } catch  { }
 
                     }
                 } catch (Exception ex) {
@@ -1912,8 +2051,10 @@ namespace OSD {
 
             while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed) {
                 try {
+                    
+                    byte[] bytes = br.ReadBytes(20000000); // no more 20MB
+/*
                     string message = "";
-                    byte[] bytes = br.ReadBytes(20000000);
                     int frameIndex = 0;
                     for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++) {
                         Application.DoEvents();
@@ -1966,15 +2107,14 @@ namespace OSD {
                         }
 
                     }
-
-                    string str = System.Text.Encoding.UTF8.GetString(bytes);
+*/
+/*                    string str = System.Text.Encoding.UTF8.GetString(bytes);
                     str = str.Replace((char)0, '\0');
                     str = str.Replace("\0", "");
-                    //comPort.Write(bytes, 0, bytes.Length);
-
+*/
+  
                     tlog_data = bytes;
                     grpTLog.Enabled = true;
-                    //Console.Write(comPort.ReadExisting());
 
                 } catch { break; }
 
@@ -2414,7 +2554,7 @@ namespace OSD {
             AboutBox1 about = new AboutBox1();
             about.Show();
         }
-
+/*
         private void rbtBatteryPercent_CheckedChanged(object sender, EventArgs e) {
             pan.osd_battery_show_percentage = Convert.ToByte(rbtBatteryPercent.Checked) != 0;
             //Refresh battery percent presentation
@@ -2422,8 +2562,7 @@ namespace OSD {
             Draw(panel_number);
 
         }
-
-
+*/
 
 
 
@@ -2463,9 +2602,9 @@ namespace OSD {
             Panel2 = 1,
             //PanelOff = 2
         }
-
+/*
         private void cbxWarningsAutoPanelSwitch_SelectedIndexChanged(object sender, EventArgs e) {
-            pan.auto_screen_switch = (byte)(PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem;
+            pan.auto_screen_switch = (byte)0; // (PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem;
 
             //Get panel warnings check status
             Boolean isPanel1WarningChecked = false;
@@ -2480,7 +2619,7 @@ namespace OSD {
                 }
             }
 
-            /* no more auto-switch 
+   no more auto-switch 
                         switch ((PanelsAutoSwitch)cbxWarningsAutoPanelSwitch.SelectedItem)
                         {
                             case PanelsAutoSwitch.Panel1:
@@ -2492,10 +2631,10 @@ namespace OSD {
                                     MessageBox.Show("You have selected to auto switch to panel 2. " + Environment.NewLine + "However you didn't configured warnings on panel 2.", "Panel Auto Switch Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 break;
                         }
-            */
+            
 
         }
-
+*/
 
         private void cbxRSSIChannel_SelectedIndexChanged(object sender, EventArgs e) {
             SetRSSIValues();
@@ -2511,8 +2650,8 @@ namespace OSD {
             RSSI_numeric_max.Minimum = 0;
             RSSI_numeric_max.Maximum = 2047;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) { // analog 
-                lblRSSIMin.Text = "RSSI Min Value";
-                lblRSSIMax.Text = "RSSI Max Value";
+                lblRSSIMin.Text = "Min Value";
+                lblRSSIMax.Text = "Max Value";
                 /*
                 RSSI_numeric_min.Minimum = 0;
                 RSSI_numeric_min.Value=0;
@@ -2533,8 +2672,8 @@ namespace OSD {
                 }
                 */
             } else { // PWM 
-                lblRSSIMin.Text = "RSSI Min Value (pwm)";
-                lblRSSIMax.Text = "RSSI Max Value (pwm)";
+                lblRSSIMin.Text = "Min Val(pwm)";
+                lblRSSIMax.Text = "Max Val(pwm)";
 
                 /*RSSI_numeric_min.Maximum = 2000;
                 RSSI_numeric_min.Value = 2000;
@@ -3228,18 +3367,29 @@ namespace OSD {
         }
 
         private void txtRSSI_k_TextChanged(object sender, EventArgs e) {
-            pan.rssi_koef = float.Parse(txtRSSI_k.Text);
-            txtRSSI_k.Text = pan.rssi_koef.ToString();
+            string s = txtRSSI_k.Text;
+
+            //if(txtRSSI_k.Focused) return;
+
+            pan.rssi_koef = myConvert(s); 
+            if(txtRSSI_k.Text != pan.rssi_koef.ToString())
+                txtRSSI_k.Text = pan.rssi_koef.ToString();
         }
 
 
         private void txtCurr_k_TextChanged(object sender, EventArgs e) {
-            pan.Curr_koef = float.Parse(txtCurr_k.Text);
+            //if (txtCurr_k.Focused) return;
+
+            pan.Curr_koef = myConvert(txtCurr_k.Text);
+            if(txtCurr_k.Text != pan.Curr_koef.ToString())
             txtCurr_k.Text = pan.Curr_koef.ToString();
         }
 
         private void txtBattA_k_TextChanged(object sender, EventArgs e) {
-            pan.battA_koef = float.Parse(txtBattA_k.Text);
+            //if (txtBattA_k.Focused) return;
+
+            pan.battA_koef = myConvert(txtBattA_k.Text);
+            if(txtBattA_k.Text != pan.battA_koef.ToString())
             txtBattA_k.Text = pan.battA_koef.ToString();
         }
 
@@ -3268,28 +3418,39 @@ namespace OSD {
         }
 
         private void txtBattB_k_TextChanged(object sender, EventArgs e) {
-            pan.battB_koef = float.Parse(txtBattB_k.Text);
+            //if (txtBattB_k.Focused) return;
+            pan.battB_koef = myConvert(txtBattB_k.Text);
             txtBattB_k.Text = pan.battB_koef.ToString();
         }
 
         private void txtRollPal_TextChanged(object sender, EventArgs e) {
-            pan.roll_k = float.Parse(txtRollPal.Text);
-            txtRollPal.Text = pan.roll_k.ToString();
+            //if (txtRollPal.Focused) return;
+
+            pan.roll_k = myConvert(txtRollPal.Text);
+            if(txtRollPal.Text != pan.roll_k.ToString())
+                txtRollPal.Text = pan.roll_k.ToString();
         }
 
         private void txtPitchPal_TextChanged(object sender, EventArgs e) {
-            pan.pitch_k = float.Parse(txtPitchPal.Text);
-            txtPitchPal.Text = pan.pitch_k.ToString();
+            //if (txtPitchPal.Focused) return;
+
+            pan.pitch_k = myConvert(txtPitchPal.Text);
+            if(txtPitchPal.Text != pan.pitch_k.ToString())
+                txtPitchPal.Text = pan.pitch_k.ToString();
         }
 
         private void txtRollNtsc_TextChanged(object sender, EventArgs e) {
-            pan.roll_k_ntsc = float.Parse(txtRollNtsc.Text);
-            txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+            //if (txtRollNtsc.Focused) return;
+            pan.roll_k_ntsc = myConvert(txtRollNtsc.Text);
+            if(txtRollNtsc.Text != pan.roll_k_ntsc.ToString())
+                txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
         }
 
         private void txtPitchNtsc_TextChanged(object sender, EventArgs e) {
-            pan.pitch_k_ntsc = float.Parse(txtPitchNtsc.Text);
-            txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
+            //if (txtPitchNtsc.Focused) return;
+            pan.pitch_k_ntsc = myConvert(txtPitchNtsc.Text);
+            if(txtPitchNtsc.Text != pan.pitch_k_ntsc.ToString())
+                txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
         }
 
         private void chkRadar_CheckedChanged(object sender, EventArgs e) {
@@ -3299,6 +3460,204 @@ namespace OSD {
         private void chkILS_CheckedChanged(object sender, EventArgs e) {
             pan.flgILS = chkILS.Checked;
         }
+
+/*
+        static  void crc_accumulate(uint8_t data, ref uint16_t crcAccum){
+            //Accumulate one byte of data into the CRC
+            uint16_t tmp;
+
+            tmp = (uint16_t)(data ^ (uint8_t)(crcAccum & 0x00ff));
+            tmp ^= (uint16_t)((tmp<<4) & 0x00ff);
+            crcAccum = (uint16_t)((crcAccum>>8) ^ (tmp<<8) ^ (tmp <<3) ^ (tmp>>4));
+        }
+*/
+        public static ushort crc_accumulate(byte b, ref ushort crc)    {
+            unchecked        {
+                byte ch = (byte)(b ^ (byte)(crc & 0x00ff));
+                ch = (byte)(ch ^ (ch << 4));
+                crc = (ushort)((crc >> 8) ^ (ch << 8) ^ (ch << 3) ^ (ch >> 4));
+                return crc;
+            }
+        }
+        static  void crc_init(ref uint16_t crcAccum)
+        {
+                crcAccum = X25_INIT_CRC;
+        }
+
+        private void mavlink_start_checksum(ref mavlink_message msg){
+            crc_init(ref msg.checksum);
+        }
+
+        void mavlink_update_checksum(ref mavlink_message msg, uint8_t c){
+            crc_accumulate(c, ref msg.checksum);
+        }
+
+        private byte mavlink_parse_char(uint8_t c) {
+/*
+	default message crc function. You can override this per-system to
+	put this data in a different memory segment
+*/
+
+	        //mavlink_message_t* rxmsg = mavlink_get_channel_buffer(chan); ///< The currently decoded message
+	        //mavlink_status_t* status = mavlink_get_channel_status(chan); ///< The current decode status
+            
+	        int bufferIndex = 0;
+
+	        status.msg_received = 0;
+
+	        switch (status.parse_state) {
+	   
+
+	        case mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE:
+		        if (c == MAVLINK_STX) {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
+			        rxmsg.len = 0;
+        //			rxmsg->magic = c;
+			        mavlink_start_checksum(ref rxmsg);
+        //mavlink_comm_0_port->printf_P(PSTR("\n\ngot STX!"));
+                    return (byte)1;
+		        } else {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+		        }
+		        break;
+
+	        case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX:
+		        if (status.msg_received !=0
+        /* Support shorter buffers than the
+            default maximum packet size */
+				        ){
+			        status.buffer_overrun++;
+			        status.parse_error++;
+			        status.msg_received = 0;			        
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+		        }
+		        else
+		        {
+        //mavlink_comm_0_port->printf_P(PSTR(" got Length!"));
+
+			        // NOT counting STX, LENGTH, SEQ, SYSID, COMPID, MSGID, CRC1 and CRC2
+			        rxmsg.len = c;
+			        status.packet_idx = 0;
+			        mavlink_update_checksum(ref rxmsg, c);
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_LENGTH;
+		        }
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_LENGTH:
+        //mavlink_comm_0_port->printf_P(PSTR(" got Seq!"));
+
+		        rxmsg.seq = c;
+		        mavlink_update_checksum(ref rxmsg, c);
+                status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_SEQ;
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_SEQ:
+        //mavlink_comm_0_port->printf_P(PSTR(" got Sysid!"));
+
+		        rxmsg.sysid = c;
+		        mavlink_update_checksum(ref rxmsg, c);
+                status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_SYSID;
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_SYSID:
+        //mavlink_comm_0_port->printf_P(PSTR(" got Compid!"));
+
+		        rxmsg.compid = c;
+		        mavlink_update_checksum(ref rxmsg, c);
+                status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_COMPID;
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_COMPID:
+		        rxmsg.msgid = c;
+		        mavlink_update_checksum(ref rxmsg, c);
+		        if (rxmsg.len == 0) {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD;
+		        } else {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_MSGID;
+		        }
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_MSGID:
+                rxmsg.payload[status.packet_idx++] = (byte)c;
+		        mavlink_update_checksum(ref rxmsg, c);
+		        if (status.packet_idx == rxmsg.len) {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD;
+
+		        }
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD:
+
+		        if (false && c != (rxmsg.checksum & 0xFF)) {
+        //mavlink_comm_0_port->printf_P(PSTR("\n CRC1 err! want=%d got=%d"), rxmsg->checksum & 0xFF, c);
+			        // Check first checksum byte
+			        status.parse_error++;
+			        status.msg_received = 0;
+			        if (c == MAVLINK_STX) {
+                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
+                        rxmsg.len = 0;
+                        mavlink_start_checksum(ref rxmsg);
+
+                    } else {
+                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+			        }
+		        } else {
+ //  {
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_CRC1;
+                    rxmsg.payload[status.packet_idx] = (byte)c;
+		        }
+		        break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_CRC1:
+/*		        if (c != (rxmsg.checksum >> 8)) {
+			        // Check second checksum byte
+        //mavlink_comm_0_port->printf_P(PSTR("\nCRC2 err! want=%d got=%d"), rxmsg->checksum >> 8, c);
+
+			        status.parse_error++;
+			        status.msg_received = 0;
+			
+			        if (c == MAVLINK_STX) {
+                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
+                        rxmsg.len = 0;                        
+                        mavlink_start_checksum(ref rxmsg);
+                    } else {
+				        //status->parse_state = MAVLINK_PARSE_STATE_IDLE;     
+                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+			        }
+		        } else {
+//*/ {
+                  // Successfully got message
+			        status.msg_received = 1;
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+			        rxmsg.payload[status.packet_idx+1] = (byte)c;
+		        }
+		        break;
+	        }
+
+	        bufferIndex++;
+	        // If a message has been sucessfully decoded, check index
+	        if (status.msg_received!=0) {
+		        //while(status->current_seq != rxmsg->seq)
+		        //{
+		        //	status->packet_rx_drop_count++;
+		        //               status->current_seq++;
+		        //}
+		        status.current_rx_seq = rxmsg.seq;
+		        // Initial condition: If no packet has been received so far, drop count is undefined
+		        if (status.packet_rx_success_count == 0) status.packet_rx_drop_count = 0;
+		        // Count this packet as received
+		        status.packet_rx_success_count++;
+	        }
+
+	        //status.parse_error = 0;
+            status.current_rx_seq +=1;
+	        //status.packet_rx_success_count = status->packet_rx_success_count;
+	        status.packet_rx_drop_count = status.parse_error;
+	        //r_mavlink_status->buffer_overrun = status->buffer_overrun;
+
+	        return status.msg_received!=0?(byte)2:(byte)0;
+        }
+
 
         private void btnTLog_Click(object sender, EventArgs e) {
             tlog_run = !tlog_run;
@@ -3315,13 +3674,27 @@ namespace OSD {
             }
         }
 
+
+
         void thread_proc() {
             byte[] bytes = tlog_data;
-            int frStart;
-            int frEnd;
+            int frStart=0;
+            int frEnd=0;
             int frameIndex = 0;
             int np = 0;
+            int[] last_seq = new int[256];
             string message;
+
+
+            status.packet_rx_drop_count = 0;
+            status.parse_state =  mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+            status.packet_idx = 0;
+            status.packet_rx_success_count = 0;
+            status.current_rx_seq = 0;
+            status.buffer_overrun=0;
+            status.parse_error=0;
+
+            for(int i=0; i<256; i++) last_seq[i]=0xff;
 
             if (comPort.IsOpen)
                 comPort.Close();
@@ -3329,8 +3702,8 @@ namespace OSD {
             try {
 
                 comPort.PortName = CurrentCOM;
-                comPort.BaudRate = 57600;
-                //comPort.BaudRate = 115200;
+                //comPort.BaudRate = 57600;
+                comPort.BaudRate = 115200;
 
 
                 comPort.Open();
@@ -3344,64 +3717,59 @@ namespace OSD {
 
             while (true) {
                 np = 0;
+                int byteIndex;
                 try {
-                    for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++) {
+
+                    for (byteIndex = 8; byteIndex < bytes.Length; byteIndex++) {
                         if (comPort.BytesToRead != 0)
                             comPort.ReadExisting();
 
-                        frStart = byteIndex;
-                        message = "";
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        int length = (int)bytes[byteIndex];
-                        message += "Payload length: " + length.ToString();
-                        byteIndex++;
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "System ID: " + ((int)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                        message += "Message: ";
-                        for (int x = 0; x < length; x++) {
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += ((char)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                        }
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
-                        byteIndex++;
-                        while (bytes[byteIndex] == '\0')
-                            byteIndex++;
-                        message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
-                        message += Environment.NewLine;
-                        byteIndex++;
-                        //Console.Write(message);
+                        
+                        byte c = bytes[byteIndex];
 
-                        if (bytes[byteIndex] == 0xFE) {
+                        switch(mavlink_parse_char(c)){
+                        case 1: // got STX
+                            frStart= byteIndex;
+                            break;
+                        case 2: // got packet
                             frameIndex++;
+                            frEnd = byteIndex;
+
+                            comPort.Write(bytes, frStart, frEnd - frStart+1);
+                            
+                            if(((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
+                                byteIndex+=8; // пропустим таймстамп
+                            }
+                            last_seq[rxmsg.sysid] = rxmsg.seq;
+                            np++;
+                            try {
+                                this.Invoke((MethodInvoker)delegate {
+                                    lblTLog.Text = np.ToString(); // runs on UI thread
+                                });
+                                
+                            } catch {};
+
+                            System.Threading.Thread.Sleep(100); // 10 frames/s
+
+
+
+                            message = "";
+                            message += "Payload length: " + rxmsg.len.ToString();
+                            message += "Packet sequence: " + rxmsg.seq.ToString();
+                            message += "System ID: " + rxmsg.sysid.ToString();
+                            message += "Component ID: " + rxmsg.compid.ToString();
+                            message += "Message ID: " + rxmsg.msgid.ToString();
+                            message += "Message: ";
+                            for (int x = 0; x < rxmsg.len; x++) {
+                                message += rxmsg.payload[x].ToString();                                
+                            }
+                            message += "CRC1: " + rxmsg.seq.ToString();
+                            message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+                            message += Environment.NewLine;
+
+                            //Console.Write(message);
+                            break;
                         }
-                        frEnd = byteIndex;
-
-                        comPort.Write(bytes, frStart, frEnd - frStart);
-                        np++;
-                        try {
-                            lblTLog.Text = np.ToString();
-                        } catch {};
-
-                        System.Threading.Thread.Sleep(200); // 5 frames/s
 
                         while (comPort.BytesToRead != 0)
                             Console.WriteLine(comPort.ReadExisting());
@@ -3433,13 +3801,13 @@ namespace OSD {
 
 
         private void cbNscreens_SelectedIndexChanged(object sender, EventArgs e) {
-            pan.n_screens = (byte)(cbNscreens.SelectedIndex + 1);
+            pan.n_screens = (byte)(cbNscreens.SelectedIndex );
         }
 
-        private void chkHUD_CheckedChanged(object sender, EventArgs e) {
+/*        private void chkHUD_CheckedChanged(object sender, EventArgs e) {
             pan.flgHUD = chkHUD.Checked;
         }
-
+*/
         private void chkTrack_CheckedChanged(object sender, EventArgs e) {
             pan.flgTrack = chkTrack.Checked;
         }
@@ -3448,8 +3816,97 @@ namespace OSD {
 
         }
 
+        public string convertChars(string s){
+            string so="";
+            try {
+                for(int i=0; i<s.Length; i++) {
+                    char c = s[i];
+                    if(c=='\\'){
+                        i++;
+                        if(i==s.Length) break;
+                        switch(s[i]) {
+                        case 'n':
+                            so +="\n";
+                            break;
+                        case 'r':
+                            so +="\r";
+                            break;
+                        case 't':
+                            so +="\n";
+                            break;
+                            
+                        case '0': // octal string
+                        case '1': 
+                            string oct="";
+                            oct += s[i];
+                            i++;
+                            if(i==s.Length) break;
+                            oct += s[i];
+                            i++;
+                            if(i==s.Length) break;
+                            oct += s[i];
+                            so += Convert.ToByte(oct,8);
+                            break;
+    
+                        case 'x': // hex string
+                            string hex="";
+                            i++;
+                            if(i==s.Length) break;
+                            hex+=s[i];
+                            i++;
+                            if(i==s.Length) break;
+                            hex+=s[i];
+                            so += Convert.ToChar(Convert.ToByte(hex,16));
+                            break;
 
+                        }
+                    } else {
+                        so +=c;
+                    }
+                }
+                return so;
+            } catch{
+                return s;
+            }
+        }
 
+        float myConvert(string s) {
+            bool f = false;
+            double v = 0;
+            
+            
+            do {
+                try {
+                    v = Convert.ToDouble(s);
+                    f=true;
+                } catch {                    
+                };
+
+                if(!f) {
+                    string s1 = s.Replace('.', ',');
+                    try {
+                        v = Convert.ToDouble(s1);
+                        f = true;
+                    } catch {
+                    };
+                }
+                if (!f && s.Length!=0) s = s.Substring(0, s.Length - 1);
+            } while (!f && s != "");
+            
+            return (float)v;
+        }
+
+        //this.txtFactor1.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
+        private void txtFactor1_TextChanged(object sender, EventArgs e) {
+            //if (((System.Windows.Forms.TextBox)sender).Focused) return;
+
+            string s = ((System.Windows.Forms.TextBox)sender).Text;
+            float v=myConvert(s);
+
+            if(v==0) v=1;
+            if(s != v.ToString())
+                ((System.Windows.Forms.TextBox)sender).Text = v.ToString();
+        }
 
     }
 }
