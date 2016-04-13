@@ -65,7 +65,17 @@ namespace OSD
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.groupBox14 = new System.Windows.Forms.GroupBox();
+            this.txtCurr_k = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.cbCurrentSoure = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.txtSAdd4 = new System.Windows.Forms.TextBox();
+            this.txtSAdd3 = new System.Windows.Forms.TextBox();
+            this.txtSAdd2 = new System.Windows.Forms.TextBox();
+            this.txtSAdd1 = new System.Windows.Forms.TextBox();
+            this.label41 = new System.Windows.Forms.Label();
             this.label40 = new System.Windows.Forms.Label();
             this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
@@ -133,15 +143,8 @@ namespace OSD
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.txtBattA_k = new System.Windows.Forms.TextBox();
             this.label27 = new System.Windows.Forms.Label();
-            this.groupBox14 = new System.Windows.Forms.GroupBox();
-            this.txtCurr_k = new System.Windows.Forms.TextBox();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.cbCurrentSoure = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
             this.cbBattA_source = new System.Windows.Forms.ComboBox();
-            this.rbtBatterymAh = new System.Windows.Forms.RadioButton();
-            this.rbtBatteryPercent = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
             this.BATT_WARNnumeric = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
@@ -181,6 +184,7 @@ namespace OSD
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
             this.tabPageConfig.SuspendLayout();
+            this.groupBox14.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox15.SuspendLayout();
@@ -194,7 +198,6 @@ namespace OSD
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.groupBox14.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -514,6 +517,7 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.groupBox14);
             this.tabPageConfig.Controls.Add(this.groupBox2);
             this.tabPageConfig.Controls.Add(this.groupBox1);
             this.tabPageConfig.Controls.Add(this.groupBox15);
@@ -534,8 +538,67 @@ namespace OSD
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
             // 
+            // groupBox14
+            // 
+            this.groupBox14.Controls.Add(this.txtCurr_k);
+            this.groupBox14.Controls.Add(this.label19);
+            this.groupBox14.Controls.Add(this.label18);
+            this.groupBox14.Controls.Add(this.cbCurrentSoure);
+            this.groupBox14.Location = new System.Drawing.Point(325, 160);
+            this.groupBox14.Name = "groupBox14";
+            this.groupBox14.Size = new System.Drawing.Size(160, 83);
+            this.groupBox14.TabIndex = 20;
+            this.groupBox14.TabStop = false;
+            this.groupBox14.Text = "Current";
+            // 
+            // txtCurr_k
+            // 
+            this.txtCurr_k.Location = new System.Drawing.Point(100, 52);
+            this.txtCurr_k.Name = "txtCurr_k";
+            this.txtCurr_k.Size = new System.Drawing.Size(49, 20);
+            this.txtCurr_k.TabIndex = 21;
+            this.txtCurr_k.Text = "1";
+            this.txtCurr_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtCurr_k.Leave += new System.EventHandler(this.txtCurr_k_TextChanged);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(9, 55);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(82, 13);
+            this.label19.TabIndex = 20;
+            this.label19.Text = "Adjust pin value";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(7, 27);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(34, 13);
+            this.label18.TabIndex = 19;
+            this.label18.Text = "Input:";
+            // 
+            // cbCurrentSoure
+            // 
+            this.cbCurrentSoure.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbCurrentSoure.FormattingEnabled = true;
+            this.cbCurrentSoure.Items.AddRange(new object[] {
+            "Mavlink",
+            "Pin Current"});
+            this.cbCurrentSoure.Location = new System.Drawing.Point(51, 22);
+            this.cbCurrentSoure.Name = "cbCurrentSoure";
+            this.cbCurrentSoure.Size = new System.Drawing.Size(98, 21);
+            this.cbCurrentSoure.TabIndex = 18;
+            this.cbCurrentSoure.SelectedIndexChanged += new System.EventHandler(this.cbCurrentSoure_SelectedIndexChanged);
+            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.txtSAdd4);
+            this.groupBox2.Controls.Add(this.txtSAdd3);
+            this.groupBox2.Controls.Add(this.txtSAdd2);
+            this.groupBox2.Controls.Add(this.txtSAdd1);
+            this.groupBox2.Controls.Add(this.label41);
             this.groupBox2.Controls.Add(this.label40);
             this.groupBox2.Controls.Add(this.label39);
             this.groupBox2.Controls.Add(this.label38);
@@ -555,17 +618,66 @@ namespace OSD
             this.groupBox2.Controls.Add(this.txtFormat1);
             this.groupBox2.Controls.Add(this.label32);
             this.groupBox2.Controls.Add(this.label12);
-            this.groupBox2.Location = new System.Drawing.Point(6, 165);
+            this.groupBox2.Location = new System.Drawing.Point(5, 236);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(177, 142);
+            this.groupBox2.Size = new System.Drawing.Size(314, 142);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sensors";
             // 
+            // txtSAdd4
+            // 
+            this.txtSAdd4.Location = new System.Drawing.Point(249, 113);
+            this.txtSAdd4.Name = "txtSAdd4";
+            this.txtSAdd4.Size = new System.Drawing.Size(40, 20);
+            this.txtSAdd4.TabIndex = 33;
+            this.txtSAdd4.Text = "0";
+            this.txtSAdd4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtSAdd4.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtSAdd3
+            // 
+            this.txtSAdd3.Location = new System.Drawing.Point(249, 88);
+            this.txtSAdd3.Name = "txtSAdd3";
+            this.txtSAdd3.Size = new System.Drawing.Size(40, 20);
+            this.txtSAdd3.TabIndex = 32;
+            this.txtSAdd3.Text = "0";
+            this.txtSAdd3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtSAdd3.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtSAdd2
+            // 
+            this.txtSAdd2.Location = new System.Drawing.Point(249, 62);
+            this.txtSAdd2.Name = "txtSAdd2";
+            this.txtSAdd2.Size = new System.Drawing.Size(40, 20);
+            this.txtSAdd2.TabIndex = 31;
+            this.txtSAdd2.Text = "0";
+            this.txtSAdd2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtSAdd2.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // txtSAdd1
+            // 
+            this.txtSAdd1.Location = new System.Drawing.Point(249, 37);
+            this.txtSAdd1.Name = "txtSAdd1";
+            this.txtSAdd1.Size = new System.Drawing.Size(40, 20);
+            this.txtSAdd1.TabIndex = 30;
+            this.txtSAdd1.Text = "0";
+            this.txtSAdd1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtSAdd1.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(251, 18);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(25, 13);
+            this.label41.TabIndex = 29;
+            this.label41.Text = "add";
+            // 
             // label40
             // 
             this.label40.AutoSize = true;
-            this.label40.Location = new System.Drawing.Point(16, 19);
+            this.label40.Location = new System.Drawing.Point(26, 18);
             this.label40.Name = "label40";
             this.label40.Size = new System.Drawing.Size(22, 13);
             this.label40.TabIndex = 28;
@@ -574,7 +686,7 @@ namespace OSD
             // label39
             // 
             this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(16, 116);
+            this.label39.Location = new System.Drawing.Point(26, 115);
             this.label39.Name = "label39";
             this.label39.Size = new System.Drawing.Size(32, 13);
             this.label39.TabIndex = 27;
@@ -583,7 +695,7 @@ namespace OSD
             // label38
             // 
             this.label38.AutoSize = true;
-            this.label38.Location = new System.Drawing.Point(15, 91);
+            this.label38.Location = new System.Drawing.Point(25, 90);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(41, 13);
             this.label38.TabIndex = 26;
@@ -592,7 +704,7 @@ namespace OSD
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(16, 65);
+            this.label33.Location = new System.Drawing.Point(26, 64);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(20, 13);
             this.label33.TabIndex = 25;
@@ -601,7 +713,7 @@ namespace OSD
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 40);
+            this.label4.Location = new System.Drawing.Point(26, 39);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(20, 13);
             this.label4.TabIndex = 24;
@@ -610,7 +722,7 @@ namespace OSD
             // label37
             // 
             this.label37.AutoSize = true;
-            this.label37.Location = new System.Drawing.Point(3, 115);
+            this.label37.Location = new System.Drawing.Point(13, 114);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(13, 13);
             this.label37.TabIndex = 23;
@@ -618,9 +730,9 @@ namespace OSD
             // 
             // txtFactor4
             // 
-            this.txtFactor4.Location = new System.Drawing.Point(131, 113);
+            this.txtFactor4.Location = new System.Drawing.Point(196, 112);
             this.txtFactor4.Name = "txtFactor4";
-            this.txtFactor4.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor4.Size = new System.Drawing.Size(47, 20);
             this.txtFactor4.TabIndex = 22;
             this.txtFactor4.Text = "1";
             this.txtFactor4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -629,18 +741,18 @@ namespace OSD
             // 
             // txtFormat4
             // 
-            this.txtFormat4.Location = new System.Drawing.Point(56, 113);
+            this.txtFormat4.Location = new System.Drawing.Point(77, 112);
             this.txtFormat4.MaxLength = 9;
             this.txtFormat4.Name = "txtFormat4";
             this.txtFormat4.ShortcutsEnabled = false;
-            this.txtFormat4.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat4.Size = new System.Drawing.Size(112, 20);
             this.txtFormat4.TabIndex = 21;
             this.txtFormat4.Text = "gh%5.2fKM";
             // 
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(3, 90);
+            this.label36.Location = new System.Drawing.Point(13, 89);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(13, 13);
             this.label36.TabIndex = 18;
@@ -648,9 +760,9 @@ namespace OSD
             // 
             // txtFactor3
             // 
-            this.txtFactor3.Location = new System.Drawing.Point(131, 88);
+            this.txtFactor3.Location = new System.Drawing.Point(196, 87);
             this.txtFactor3.Name = "txtFactor3";
-            this.txtFactor3.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor3.Size = new System.Drawing.Size(47, 20);
             this.txtFactor3.TabIndex = 17;
             this.txtFactor3.Text = "1";
             this.txtFactor3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -659,18 +771,18 @@ namespace OSD
             // 
             // txtFormat3
             // 
-            this.txtFormat3.Location = new System.Drawing.Point(56, 88);
+            this.txtFormat3.Location = new System.Drawing.Point(77, 87);
             this.txtFormat3.MaxLength = 9;
             this.txtFormat3.Name = "txtFormat3";
             this.txtFormat3.ShortcutsEnabled = false;
-            this.txtFormat3.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat3.Size = new System.Drawing.Size(112, 20);
             this.txtFormat3.TabIndex = 16;
             this.txtFormat3.Text = "ef%5.2f%%";
             // 
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(3, 64);
+            this.label35.Location = new System.Drawing.Point(13, 63);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(13, 13);
             this.label35.TabIndex = 13;
@@ -678,9 +790,9 @@ namespace OSD
             // 
             // txtFactor2
             // 
-            this.txtFactor2.Location = new System.Drawing.Point(131, 62);
+            this.txtFactor2.Location = new System.Drawing.Point(196, 61);
             this.txtFactor2.Name = "txtFactor2";
-            this.txtFactor2.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor2.Size = new System.Drawing.Size(47, 20);
             this.txtFactor2.TabIndex = 12;
             this.txtFactor2.Text = "10";
             this.txtFactor2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -689,18 +801,18 @@ namespace OSD
             // 
             // txtFormat2
             // 
-            this.txtFormat2.Location = new System.Drawing.Point(56, 62);
+            this.txtFormat2.Location = new System.Drawing.Point(77, 61);
             this.txtFormat2.MaxLength = 9;
             this.txtFormat2.Name = "txtFormat2";
             this.txtFormat2.ShortcutsEnabled = false;
-            this.txtFormat2.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat2.Size = new System.Drawing.Size(112, 20);
             this.txtFormat2.TabIndex = 11;
             this.txtFormat2.Text = "cd%5.2fmv";
             // 
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(3, 39);
+            this.label34.Location = new System.Drawing.Point(13, 38);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(13, 13);
             this.label34.TabIndex = 8;
@@ -708,9 +820,9 @@ namespace OSD
             // 
             // txtFactor1
             // 
-            this.txtFactor1.Location = new System.Drawing.Point(131, 37);
+            this.txtFactor1.Location = new System.Drawing.Point(196, 36);
             this.txtFactor1.Name = "txtFactor1";
-            this.txtFactor1.Size = new System.Drawing.Size(40, 20);
+            this.txtFactor1.Size = new System.Drawing.Size(47, 20);
             this.txtFactor1.TabIndex = 7;
             this.txtFactor1.Text = "10";
             this.txtFactor1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -719,18 +831,18 @@ namespace OSD
             // 
             // txtFormat1
             // 
-            this.txtFormat1.Location = new System.Drawing.Point(56, 37);
+            this.txtFormat1.Location = new System.Drawing.Point(77, 36);
             this.txtFormat1.MaxLength = 9;
             this.txtFormat1.Name = "txtFormat1";
             this.txtFormat1.ShortcutsEnabled = false;
-            this.txtFormat1.Size = new System.Drawing.Size(72, 20);
+            this.txtFormat1.Size = new System.Drawing.Size(112, 20);
             this.txtFormat1.TabIndex = 6;
             this.txtFormat1.Text = "ab%5.2f\\x10";
             // 
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(133, 18);
+            this.label32.Location = new System.Drawing.Point(198, 17);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(34, 13);
             this.label32.TabIndex = 2;
@@ -739,7 +851,7 @@ namespace OSD
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(72, 18);
+            this.label12.Location = new System.Drawing.Point(93, 17);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(36, 13);
             this.label12.TabIndex = 1;
@@ -815,7 +927,7 @@ namespace OSD
             this.groupBox15.Controls.Add(this.chkRadar);
             this.groupBox15.Location = new System.Drawing.Point(490, 123);
             this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(181, 221);
+            this.groupBox15.Size = new System.Drawing.Size(181, 202);
             this.groupBox15.TabIndex = 12;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Horizon";
@@ -843,7 +955,7 @@ namespace OSD
             this.groupBox16.Controls.Add(this.label22);
             this.groupBox16.Controls.Add(this.txtRollPal);
             this.groupBox16.Controls.Add(this.label21);
-            this.groupBox16.Location = new System.Drawing.Point(6, 99);
+            this.groupBox16.Location = new System.Drawing.Point(6, 77);
             this.groupBox16.Name = "groupBox16";
             this.groupBox16.Size = new System.Drawing.Size(169, 116);
             this.groupBox16.TabIndex = 2;
@@ -1059,9 +1171,9 @@ namespace OSD
             this.groupBox9.Controls.Add(this.label29);
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(190, 240);
+            this.groupBox9.Location = new System.Drawing.Point(325, 247);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(131, 138);
+            this.groupBox9.Size = new System.Drawing.Size(160, 128);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Screen";
@@ -1076,16 +1188,16 @@ namespace OSD
             "2",
             "3",
             "4"});
-            this.cbNscreens.Location = new System.Drawing.Point(85, 109);
+            this.cbNscreens.Location = new System.Drawing.Point(83, 98);
             this.cbNscreens.Name = "cbNscreens";
-            this.cbNscreens.Size = new System.Drawing.Size(40, 21);
+            this.cbNscreens.Size = new System.Drawing.Size(66, 21);
             this.cbNscreens.TabIndex = 10;
             this.cbNscreens.SelectedIndexChanged += new System.EventHandler(this.cbNscreens_SelectedIndexChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(5, 112);
+            this.label3.Location = new System.Drawing.Point(3, 101);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 13);
             this.label3.TabIndex = 9;
@@ -1105,7 +1217,7 @@ namespace OSD
             0,
             -2147483648});
             this.numHOS.Name = "numHOS";
-            this.numHOS.Size = new System.Drawing.Size(42, 20);
+            this.numHOS.Size = new System.Drawing.Size(66, 20);
             this.numHOS.TabIndex = 8;
             this.numHOS.ValueChanged += new System.EventHandler(this.numHOS_ValueChanged);
             // 
@@ -1123,7 +1235,7 @@ namespace OSD
             0,
             -2147483648});
             this.numVOS.Name = "numVOS";
-            this.numVOS.Size = new System.Drawing.Size(43, 20);
+            this.numVOS.Size = new System.Drawing.Size(67, 20);
             this.numVOS.TabIndex = 7;
             this.numVOS.ValueChanged += new System.EventHandler(this.numVOS_ValueChanged);
             // 
@@ -1166,7 +1278,7 @@ namespace OSD
             this.BRIGHTNESScomboBox.Location = new System.Drawing.Point(66, 14);
             this.BRIGHTNESScomboBox.Margin = new System.Windows.Forms.Padding(2);
             this.BRIGHTNESScomboBox.Name = "BRIGHTNESScomboBox";
-            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(60, 21);
+            this.BRIGHTNESScomboBox.Size = new System.Drawing.Size(83, 21);
             this.BRIGHTNESScomboBox.TabIndex = 3;
             this.BRIGHTNESScomboBox.SelectedIndexChanged += new System.EventHandler(this.BRIGHTNESScomboBox_SelectedIndexChanged);
             // 
@@ -1182,9 +1294,9 @@ namespace OSD
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
-            this.groupBox8.Location = new System.Drawing.Point(327, 303);
+            this.groupBox8.Location = new System.Drawing.Point(490, 331);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(157, 41);
+            this.groupBox8.Size = new System.Drawing.Size(181, 41);
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Call Sign";
@@ -1195,7 +1307,7 @@ namespace OSD
             this.CALLSIGNmaskedText.AllowPromptAsInput = false;
             this.CALLSIGNmaskedText.AsciiOnly = true;
             this.CALLSIGNmaskedText.BeepOnError = true;
-            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(39, 15);
+            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(63, 14);
             this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
             this.CALLSIGNmaskedText.Mask = "CCCCCCCC";
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
@@ -1209,7 +1321,7 @@ namespace OSD
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
-            this.groupBox7.Location = new System.Drawing.Point(5, 310);
+            this.groupBox7.Location = new System.Drawing.Point(5, 5);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(179, 68);
             this.groupBox7.TabIndex = 8;
@@ -1294,25 +1406,24 @@ namespace OSD
             // 
             this.groupBox4.Controls.Add(this.txtBattA_k);
             this.groupBox4.Controls.Add(this.label27);
-            this.groupBox4.Controls.Add(this.groupBox14);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.cbBattA_source);
-            this.groupBox4.Controls.Add(this.rbtBatterymAh);
-            this.groupBox4.Controls.Add(this.rbtBatteryPercent);
+//            this.groupBox4.Controls.Add(this.rbtBatterymAh);
+//            this.groupBox4.Controls.Add(this.rbtBatteryPercent);
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
             this.groupBox4.Location = new System.Drawing.Point(325, 5);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(160, 291);
+            this.groupBox4.Size = new System.Drawing.Size(160, 155);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Battery A";
             // 
             // txtBattA_k
             // 
-            this.txtBattA_k.Location = new System.Drawing.Point(100, 176);
+            this.txtBattA_k.Location = new System.Drawing.Point(100, 126);
             this.txtBattA_k.Name = "txtBattA_k";
             this.txtBattA_k.Size = new System.Drawing.Size(49, 20);
             this.txtBattA_k.TabIndex = 23;
@@ -1324,28 +1435,15 @@ namespace OSD
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(9, 179);
+            this.label27.Location = new System.Drawing.Point(9, 129);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(82, 13);
             this.label27.TabIndex = 22;
             this.label27.Text = "Adjust pin value";
             // 
-            // groupBox14
-            // 
-            this.groupBox14.Controls.Add(this.txtCurr_k);
-            this.groupBox14.Controls.Add(this.label19);
-            this.groupBox14.Controls.Add(this.label18);
-            this.groupBox14.Controls.Add(this.cbCurrentSoure);
-            this.groupBox14.Location = new System.Drawing.Point(0, 207);
-            this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(159, 83);
-            this.groupBox14.TabIndex = 18;
-            this.groupBox14.TabStop = false;
-            this.groupBox14.Text = "Current";
-            // 
             // txtCurr_k
             // 
-            this.txtCurr_k.Location = new System.Drawing.Point(100, 52);
+/*            this.txtCurr_k.Location = new System.Drawing.Point(100, 52);
             this.txtCurr_k.Name = "txtCurr_k";
             this.txtCurr_k.Size = new System.Drawing.Size(49, 20);
             this.txtCurr_k.TabIndex = 21;
@@ -1384,6 +1482,7 @@ namespace OSD
             this.cbCurrentSoure.Size = new System.Drawing.Size(98, 21);
             this.cbCurrentSoure.TabIndex = 18;
             this.cbCurrentSoure.SelectedIndexChanged += new System.EventHandler(this.cbCurrentSoure_SelectedIndexChanged);
+  */
             // 
             // label17
             // 
@@ -1393,6 +1492,7 @@ namespace OSD
             this.label17.Size = new System.Drawing.Size(34, 13);
             this.label17.TabIndex = 17;
             this.label17.Text = "Input:";
+  
             // 
             // cbBattA_source
             // 
@@ -1406,31 +1506,6 @@ namespace OSD
             this.cbBattA_source.Size = new System.Drawing.Size(98, 21);
             this.cbBattA_source.TabIndex = 16;
             this.cbBattA_source.SelectedIndexChanged += new System.EventHandler(this.cbBattA_source_SelectedIndexChanged);
-            // 
-            // rbtBatterymAh
-            // 
-            this.rbtBatterymAh.AutoSize = true;
-            this.rbtBatterymAh.Location = new System.Drawing.Point(6, 144);
-            this.rbtBatterymAh.Name = "rbtBatterymAh";
-            this.rbtBatterymAh.Size = new System.Drawing.Size(102, 17);
-            this.rbtBatterymAh.TabIndex = 15;
-            this.rbtBatterymAh.Text = "Show used mAh";
-            this.rbtBatterymAh.UseVisualStyleBackColor = true;
-            
-            // 
-            // rbtBatteryPercent
-            // 
-/*            this.rbtBatteryPercent.AutoSize = true;
-            this.rbtBatteryPercent.Checked = true;
-            this.rbtBatteryPercent.Location = new System.Drawing.Point(6, 129);
-            this.rbtBatteryPercent.Name = "rbtBatteryPercent";
-            this.rbtBatteryPercent.Size = new System.Drawing.Size(111, 17);
-            this.rbtBatteryPercent.TabIndex = 14;
-            this.rbtBatteryPercent.TabStop = true;
-            this.rbtBatteryPercent.Text = "Show remaining %";
-            this.rbtBatteryPercent.UseVisualStyleBackColor = true;
-            this.rbtBatteryPercent.CheckedChanged += new System.EventHandler(this.rbtBatteryPercent_CheckedChanged);
- */
             // 
             // label9
             // 
@@ -1485,9 +1560,9 @@ namespace OSD
             this.groupBox3.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(190, 131);
+            this.groupBox3.Location = new System.Drawing.Point(190, 119);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(131, 103);
+            this.groupBox3.Size = new System.Drawing.Size(131, 115);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             // 
@@ -1550,7 +1625,7 @@ namespace OSD
             this.groupBoxRSSI.Controls.Add(this.lblRSSIMin);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
-            this.groupBoxRSSI.Location = new System.Drawing.Point(5, 3);
+            this.groupBoxRSSI.Location = new System.Drawing.Point(5, 75);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
             this.groupBoxRSSI.Size = new System.Drawing.Size(179, 159);
             this.groupBoxRSSI.TabIndex = 3;
@@ -1863,6 +1938,8 @@ namespace OSD
             this.menuStrip1.PerformLayout();
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
+            this.groupBox14.ResumeLayout(false);
+            this.groupBox14.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -1886,8 +1963,6 @@ namespace OSD
             this.groupBox6.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.groupBox14.ResumeLayout(false);
-            this.groupBox14.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).EndInit();
             this.groupBox3.ResumeLayout(false);
@@ -1975,8 +2050,8 @@ namespace OSD
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gettingStartedToolStripMenuItem;
-        private System.Windows.Forms.RadioButton rbtBatterymAh;
-        private System.Windows.Forms.RadioButton rbtBatteryPercent;
+//        private System.Windows.Forms.RadioButton rbtBatterymAh;
+//        private System.Windows.Forms.RadioButton rbtBatteryPercent;
         private System.Windows.Forms.Label lblModelType;
         private System.Windows.Forms.ComboBox cbxModelType;
         private System.Windows.Forms.Label lblFWModelType;
@@ -2003,11 +2078,6 @@ namespace OSD
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown numMinVoltB;
-        private System.Windows.Forms.GroupBox groupBox14;
-        private System.Windows.Forms.TextBox txtCurr_k;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.ComboBox cbCurrentSoure;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.ComboBox cbBattA_source;		
         private System.Windows.Forms.TextBox txtRSSI_k;
@@ -2065,6 +2135,16 @@ namespace OSD
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox groupBox14;
+        private System.Windows.Forms.TextBox txtCurr_k;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.ComboBox cbCurrentSoure;
+        public System.Windows.Forms.TextBox txtSAdd4;
+        public System.Windows.Forms.TextBox txtSAdd3;
+        public System.Windows.Forms.TextBox txtSAdd2;
+        public System.Windows.Forms.TextBox txtSAdd1;
+        private System.Windows.Forms.Label label41;
     }
 	
 }

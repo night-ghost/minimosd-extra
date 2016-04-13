@@ -882,10 +882,10 @@ namespace OSD {
                 conf.eeprom.sensors.sensor_K3 = myConvert(txtFactor3.Text);
                 conf.eeprom.sensors.sensor_K4 = myConvert(txtFactor4.Text);
 
-                conf.eeprom.sensors.sensor_A1 = 0f; //myConvert(txtAdd1.Text);
-                conf.eeprom.sensors.sensor_A2 = 0f; // myConvert(txtAdd2.Text);
-                conf.eeprom.sensors.sensor_A3 = 0f; // myConvert(txtAdd3.Text);
-                conf.eeprom.sensors.sensor_A4 = 0f; // myConvert(txtAdd4.Text);
+                conf.eeprom.sensors.sensor_A1 = myConvert(txtSAdd1.Text);
+                conf.eeprom.sensors.sensor_A2 = myConvert(txtSAdd2.Text);
+                conf.eeprom.sensors.sensor_A3 = myConvert(txtSAdd3.Text);
+                conf.eeprom.sensors.sensor_A4 = myConvert(txtSAdd4.Text);
 
             } else if (panel_number >= 0 && panel_number < npanel) {
                 //First Panel 
@@ -1313,7 +1313,7 @@ namespace OSD {
 
                // pan.osd_battery_show_percentage = conf.eeprom.flags[osd_battery_show_percentage];
           //      rbtBatteryPercent.Checked = pan.osd_battery_show_percentage;
-                rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
+//                rbtBatterymAh.Checked = !rbtBatteryPercent.Checked;
 
                 pan.rssi_warn_level = conf.eeprom.sets.OSD_RSSI_WARN;
                 try {
@@ -1421,23 +1421,23 @@ namespace OSD {
 
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A1)) {
                 txtFactor1.Text = Convert.ToString(conf.eeprom.sensors.sensor_K1);
-                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A1);
+                txtSAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A1);
                 txtFormat1.Text = conf.eeprom.format1; // no conversions!
             }
 
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A2)) {
                 txtFactor2.Text = Convert.ToString(conf.eeprom.sensors.sensor_K2);
-                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A2);
+                txtSAdd2.Text = Convert.ToString(conf.eeprom.sensors.sensor_A2);
                 txtFormat2.Text = conf.eeprom.format2;
             }
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A3)) {
                 txtFactor3.Text = Convert.ToString(conf.eeprom.sensors.sensor_K3);
-                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A3);
+                txtSAdd3.Text = Convert.ToString(conf.eeprom.sensors.sensor_A3);
                 txtFormat3.Text = conf.eeprom.format3;
             }
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A4)) {
                 txtFactor4.Text = Convert.ToString(conf.eeprom.sensors.sensor_K4);
-                //txtAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A4);
+                txtSAdd4.Text = Convert.ToString(conf.eeprom.sensors.sensor_A4);
                 txtFormat4.Text = conf.eeprom.format4;
             }
 
@@ -1663,6 +1663,11 @@ namespace OSD {
                         sw.WriteLine("{0}\t{1}", "SFactor3", txtFactor3.Text);
                         sw.WriteLine("{0}\t{1}", "SFactor4", txtFactor4.Text);
 
+                        sw.WriteLine("{0}\t{1}", "SAdd1", txtSAdd1.Text);
+                        sw.WriteLine("{0}\t{1}", "SAdd2", txtSAdd2.Text);
+                        sw.WriteLine("{0}\t{1}", "SAdd3", txtSAdd3.Text);
+                        sw.WriteLine("{0}\t{1}", "SAdd4", txtSAdd4.Text);
+
                         sw.Close();
                     }
                 } catch (Exception ex) {
@@ -1789,14 +1794,20 @@ namespace OSD {
                             else if (strings[0] == "flgTrack") pan.flgTrack = bool.Parse(strings[1]);
 
                             else if (strings[0] == "SFormat1") txtFormat1.Text = strings[1];
-                            else if (strings[0] == "SFormat2") txtFormat1.Text = strings[1];
-                            else if (strings[0] == "SFormat3") txtFormat1.Text = strings[1];
-                            else if (strings[0] == "SFormat4") txtFormat1.Text = strings[1];
+                            else if (strings[0] == "SFormat2") txtFormat2.Text = strings[1];
+                            else if (strings[0] == "SFormat3") txtFormat3.Text = strings[1];
+                            else if (strings[0] == "SFormat4") txtFormat4.Text = strings[1];
 
                             else if (strings[0] == "SFactor1") txtFactor1.Text = strings[1];
-                            else if (strings[0] == "SFactor2") txtFactor1.Text = strings[1];
-                            else if (strings[0] == "SFactor3") txtFactor1.Text = strings[1];
-                            else if (strings[0] == "SFactor4") txtFactor1.Text = strings[1];
+                            else if (strings[0] == "SFactor2") txtFactor2.Text = strings[1];
+                            else if (strings[0] == "SFactor3") txtFactor3.Text = strings[1];
+                            else if (strings[0] == "SFactor4") txtFactor4.Text = strings[1];
+
+                            else if (strings[0] == "SAdd1") txtSAdd1.Text = strings[1];
+                            else if (strings[0] == "SAdd2") txtSAdd2.Text = strings[1];
+                            else if (strings[0] == "SAdd3") txtSAdd3.Text = strings[1];
+                            else if (strings[0] == "SAdd4") txtSAdd4.Text = strings[1];
+
                         }
 
                         //pan.model_type = (byte)cbxModelType.SelectedItem;
@@ -3810,10 +3821,6 @@ namespace OSD {
 */
         private void chkTrack_CheckedChanged(object sender, EventArgs e) {
             pan.flgTrack = chkTrack.Checked;
-        }
-
-        private void rbtBatterymAh_CheckedChanged(object sender, EventArgs e) {
-
         }
 
         public string convertChars(string s){
