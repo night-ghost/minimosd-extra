@@ -1687,7 +1687,7 @@ static void printSensor(byte n){
 
     float v=s.K * sensorData[n] + s.A;
 
-Serial.printf_P(PSTR("\n n=%d k=%f v=%d fmt=%s addr=%d sz=%d\n"),n,s.K,sensorData[n], s.format, EEPROM_offs(sensors) + n * sizeof(SensorInfo), sizeof(SensorInfo));
+//Serial.printf_P(PSTR("\n n=%d k=%f v=%d fmt=%s addr=%d sz=%d\n"),n,s.K,sensorData[n], s.format, EEPROM_offs(sensors) + n * sizeof(SensorInfo), sizeof(SensorInfo));
 
     osd.printf(s.format,v);
 }
