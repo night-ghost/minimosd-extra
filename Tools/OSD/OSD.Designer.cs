@@ -742,7 +742,7 @@ namespace OSD
             // txtFormat4
             // 
             this.txtFormat4.Location = new System.Drawing.Point(77, 112);
-            this.txtFormat4.MaxLength = 9;
+            this.txtFormat4.MaxLength = 16;
             this.txtFormat4.Name = "txtFormat4";
             this.txtFormat4.ShortcutsEnabled = false;
             this.txtFormat4.Size = new System.Drawing.Size(112, 20);
@@ -772,7 +772,7 @@ namespace OSD
             // txtFormat3
             // 
             this.txtFormat3.Location = new System.Drawing.Point(77, 87);
-            this.txtFormat3.MaxLength = 9;
+            this.txtFormat3.MaxLength = 16;
             this.txtFormat3.Name = "txtFormat3";
             this.txtFormat3.ShortcutsEnabled = false;
             this.txtFormat3.Size = new System.Drawing.Size(112, 20);
@@ -802,7 +802,7 @@ namespace OSD
             // txtFormat2
             // 
             this.txtFormat2.Location = new System.Drawing.Point(77, 61);
-            this.txtFormat2.MaxLength = 9;
+            this.txtFormat2.MaxLength = 16;
             this.txtFormat2.Name = "txtFormat2";
             this.txtFormat2.ShortcutsEnabled = false;
             this.txtFormat2.Size = new System.Drawing.Size(112, 20);
@@ -832,7 +832,7 @@ namespace OSD
             // txtFormat1
             // 
             this.txtFormat1.Location = new System.Drawing.Point(77, 36);
-            this.txtFormat1.MaxLength = 9;
+            this.txtFormat1.MaxLength = 16;
             this.txtFormat1.Name = "txtFormat1";
             this.txtFormat1.ShortcutsEnabled = false;
             this.txtFormat1.Size = new System.Drawing.Size(112, 20);

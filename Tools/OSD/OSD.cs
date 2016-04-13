@@ -280,55 +280,55 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, 0); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, 0, "Show HUD frame"); // first!
 
-                //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY, -1, -1);
-                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY, -1, -1);
-                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY, -1, -1);
-                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1, -1);
-                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1, -1);
-                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1, -1);
-                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1, -1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, -1);
-                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, -1);
+                //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY, -1);
+                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY, -1);
+                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY, -1);
+                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
+                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
+                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
+                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1);
+                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1);
 
 
-                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0, -1);
-                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, -1, -1);
+                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
+                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, -1);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
-                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1, -1);
-                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1, -1);
-                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY, -1, -1);
-                pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1, -1);
+                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1);
+                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1);
+                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY, -1);
+                pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 
-                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, -1);
-                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1, -1);
-                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0);
-                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, -1);
-                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1, -1);
+                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1);
+                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
+                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1);
+                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
+                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
 
-                pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0);
-                pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY, 1, 0);
-                pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1, -1);
-                pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1, -1);
+                pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0, "Show in m/s");
+                pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY, 1, 0, "Show in m/s");
+                pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1);
+                pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
 
-                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, 0);
-                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1, -1);
-                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY, -1, -1);
-                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1, -1);
-                pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1, -1);
-                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, -1);
-                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1, -1);
-                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY, -1, -1);
-                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY, -1, -1);
-                pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1, -1);
-                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, -1);
-                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, -1);
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, -1, -1);
-                pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1);
-                pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1);
-                pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1);
-                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, 1);
+                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, 0, "Show in m/s");
+                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1);
+                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY, -1);
+                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
+                pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
+                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
+                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1);
+                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY, -1);
+                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY, -1);
+                pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
+                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
+                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1);
+                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, -1);
+                pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, 1, "PWM input");
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
 
 
@@ -376,6 +376,16 @@ namespace OSD {
                             } else if (thing.name == "GPS2") {
                                 tn.Checked = false;
                             } else if (thing.name == "Flight Data") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Sensor1") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Sensor2") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Sensor3") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Sensor4") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Radar Scale") {
                                 tn.Checked = false;
                             } else {
                                 tn.Checked = true;
@@ -756,6 +766,15 @@ namespace OSD {
             });
         }
 
+        private string cnv_limit(string s){
+            string fmt = convertChars(s);
+            try {
+                fmt = fmt.Substring(0, Config.OSD_SENSOR_FORMAT_TOTAL);
+            } catch {
+            }
+            return fmt;
+        }
+
         private void Sub_WriteOSD() {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
@@ -872,10 +891,12 @@ namespace OSD {
                 conf.eeprom.sets.pwm_dst = pan.pwm_dst;
                 conf.eeprom.sets.n_screens = pan.n_screens;
 
-                conf.eeprom.format1 = txtFormat1.Text; // no conversions!
-                conf.eeprom.format2 = txtFormat2.Text;
-                conf.eeprom.format3 = txtFormat3.Text;
-                conf.eeprom.format4 = txtFormat4.Text;
+
+
+                conf.eeprom.format1 = cnv_limit(txtFormat1.Text); 
+                conf.eeprom.format2 = cnv_limit(txtFormat2.Text);
+                conf.eeprom.format3 = cnv_limit(txtFormat3.Text);
+                conf.eeprom.format4 = cnv_limit(txtFormat4.Text);
 
                 conf.eeprom.sensors.sensor_K1 = myConvert(txtFactor1.Text);
                 conf.eeprom.sensors.sensor_K2 = myConvert(txtFactor2.Text);
@@ -1422,23 +1443,23 @@ namespace OSD {
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A1)) {
                 txtFactor1.Text = Convert.ToString(conf.eeprom.sensors.sensor_K1);
                 txtSAdd1.Text = Convert.ToString(conf.eeprom.sensors.sensor_A1);
-                txtFormat1.Text = conf.eeprom.format1; // no conversions!
+                txtFormat1.Text = myDecode(conf.eeprom.format1); // no conversions!
             }
 
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A2)) {
                 txtFactor2.Text = Convert.ToString(conf.eeprom.sensors.sensor_K2);
                 txtSAdd2.Text = Convert.ToString(conf.eeprom.sensors.sensor_A2);
-                txtFormat2.Text = conf.eeprom.format2;
+                txtFormat2.Text = myDecode(conf.eeprom.format2);
             }
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A3)) {
                 txtFactor3.Text = Convert.ToString(conf.eeprom.sensors.sensor_K3);
                 txtSAdd3.Text = Convert.ToString(conf.eeprom.sensors.sensor_A3);
-                txtFormat3.Text = conf.eeprom.format3;
+                txtFormat3.Text = myDecode(conf.eeprom.format3);
             }
             if (!float.IsNaN(conf.eeprom.sensors.sensor_K1) && !float.IsNaN(conf.eeprom.sensors.sensor_A4)) {
                 txtFactor4.Text = Convert.ToString(conf.eeprom.sensors.sensor_K4);
                 txtSAdd4.Text = Convert.ToString(conf.eeprom.sensors.sensor_A4);
-                txtFormat4.Text = conf.eeprom.format4;
+                txtFormat4.Text = myDecode(conf.eeprom.format4);
             }
 
 
@@ -3870,6 +3891,26 @@ namespace OSD {
                     } else {
                         so +=c;
                     }
+                }
+                return so;
+            } catch{
+                return s;
+            }
+        }
+
+        public string myDecode(string s){
+            string so="";
+            try {
+                for(int i=0; i<s.Length; i++) {
+                    char c = s[i];
+                    if(c==0) break;
+                    if(c<0x20 || c>=0x80) {
+                        string hex=Convert.ToString(c, 16);
+                        if (hex.Length % 2 != 0)
+                            hex = '0' + hex;
+                        so+="\\x" + hex;
+                    } else
+                        so+=c;
                 }
                 return so;
             } catch{
