@@ -3,24 +3,22 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
-// TODO включенность панелей проверять в цикле?
-// is_on(panel.batt_B)
-//  и сенсоры
-
 typedef void (*fptr)();
 
 void NOINLINE osd_setPanel(Point p){
     OSD::setPanel(p.x,p.y);
 }
 void osd_write(byte c){
-    OSD::writeb(c);
+    OSD::write_S(c);
 }
 
 void NOINLINE osd_nl(){
     osd_write('|');
 }
 
-
+void NOINLINE osd_blank(){
+    osd_write(' ');
+}
 
 
 static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
@@ -86,11 +84,8 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
 
     while(rotate_arrow>16) rotate_arrow -= 16;
     while(rotate_arrow<1)  rotate_arrow += 16;
-    
-//    rotate_arrow &= 0x0f;
 
     arrow_set1 += rotate_arrow * 2 - 2;
-
 
     if(method==1) {
 	printSpeed(osd_windspeed * pgm_read_float(&measure->converts), alt);
@@ -105,7 +100,8 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
 	break;
     
     case 2:	//      course
-	osd.printf_P(PSTR("%4i\x05"), off_course);
+	//osd.printf_P(PSTR("%4i\x05"), off_course);
+	osd_printi_1(PSTR("%4i\x05"), off_course);
 	break;
 
     default:		// just arrow
@@ -759,6 +755,7 @@ static void panBaroAlt(point p){
 static void panHomeAlt(point p){
 
     float v=osd_alt_to_home;
+    
     if(v==0) v = osd_alt_rel;
     //printDist(osd_alt_rel * pgm_read_float(&measure->converth));
     printDist(v * pgm_read_float(&measure->converth));
@@ -774,8 +771,10 @@ static void panHomeAlt(point p){
 // Staus  : done
 
 static void panClimb(point p){
-
-    osd_printf_2(f4_0fc, vertical_speed, pgm_read_byte(&measure->climbchar));
+    if(is_alt(p))
+	osd_printf_1("%4.2f%c", vertical_speed/60);
+    else
+        osd_printf_2(f4_0fc, vertical_speed, pgm_read_byte(&measure->climbchar));
 }
 
 /* **************************************************************** */
@@ -1047,7 +1046,7 @@ static void panHorizon(point p){
 /* we don't need to clear screen!
 	for(byte j=5; j!=0; j--) {
 	    for(byte i=14; i!=0; i--)
-		osd.write(' ');
+		osd_blank();
 	    osd_nl();
 	}
 */
@@ -1217,10 +1216,17 @@ static void panGPS(point p){
 
     PGM_P f;
 
-    if(has_sign(p))
-	f=PSTR("\x03%10.6f|\x04%10.6f");
-    else 
-	f=PSTR("%10.6f|%10.6f");
+    if(has_sign(p)){
+	if(is_alt(p))
+	    f=PSTR("\x03%9.5f|\x04%9.5f");
+	else
+	    f=PSTR("\x03%10.6f|\x04%10.6f");
+    }else {
+	if(is_alt(p))
+	    f=PSTR("%9.5f|%9.5f");
+	else
+	    f=PSTR("%10.6f|%10.6f");
+    }
 
     //osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
     print_GPS(f);
@@ -1237,10 +1243,17 @@ static void panGPS2(point p){
 
     PGM_P f;
 
-    if(has_sign(p))
-	f=PSTR("\x03%10.6f \x04%10.6f");
-    else
-    	f=PSTR("%10.6f %10.6f");
+    if(has_sign(p)){
+	if(is_alt(p))
+	    f=PSTR("\x03%9.5f \x04%9.5f");
+	else
+	    f=PSTR("\x03%10.6f \x04%10.6f");
+    } else {
+        if(is_alt(p))
+    	    f=PSTR("%9.5f %9.5f");
+    	else
+    	    f=PSTR("%10.6f %10.6f");
+    }
 
 //    osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
     print_GPS(f);
@@ -1337,7 +1350,10 @@ static void panWPDis(point p){
 
     byte h=pgm_read_byte(&measure->high);
 
-    osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,((float)wp_dist * pgm_read_float(&measure->converth)), h);
+    //osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,((float)wp_dist * pgm_read_float(&measure->converth)), h);
+    osd_printi_1(PSTR("%2i "), wp_number);
+    osd_printf_2(PSTR("%4.0f%c|"), ((float)wp_dist * pgm_read_float(&measure->converth)), h);
+    
     showArrow(getTargetBearing(), 0);
 
     if (osd_mode == 10){ // auto
@@ -1362,15 +1378,16 @@ static void panHomeDir(point p){
 
 static void panMessage(point p){
 
-#define MAX_MSG_SIZE 27
+#define MAX_MSG_SIZE 26
 
     if(mav_message[0] && mav_msg_ttl != seconds) {
 	char sign;
 
         if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
 	else sign=0;
-	
-	byte len=mav_msg_len;
+
+
+/*	byte len=mav_msg_len; 
 	{
 	    char *cp = (char *)&mav_message[len];
 	    for(;;) {
@@ -1385,46 +1402,40 @@ static void panMessage(point p){
 	    }
 
 	}
-	
-	int8_t diff = MAX_MSG_SIZE - len;
-	if( diff > 0) { // less than screen
-	    OSD::setPanel(p.x + ((byte)diff)/2,p.y);
-	    if(sign) osd_write(sign);
+*/
+	int8_t diff = MAX_MSG_SIZE - mav_msg_len; // can it fit to screen?
+	if( diff >= 0) { 		// yes! message less than screen
+	    OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
+	    if(has_sign(p) && sign) osd_write(sign);
 	    osd.print((char *)mav_message);
 
 
 //OSD::setPanel(p.x,p.y +1);
 //osd.printf_P(PSTR("diff=%d len=%d"), diff, len);
 
-	} else {
-	    if(sign) osd_write(sign);
+	} else {				// message don't fit - animate
+	    if(has_sign(p) && sign) osd_write(sign);
 	    
 	    byte shf = count02s - mav_msg_shift; // count of 0.2s from message arrival
 	    byte tail = -diff;			 // number of off-screen chars
-	    int pos = shf % (tail*2);
+	    int pos = shf % (tail*2); // pos moves in range -tail ... +tail (shifted up on tail)
 	    
-	    int8_t bpos=pos;
+	    int8_t bpos=pos;	// byte size pos
 	    
-	    if(bpos>tail) bpos=tail*2 - bpos;
+	    if(bpos>tail) bpos=tail*2 - bpos; // upper half - we move pos back
 	
-	    if(!skip_inc && (pos==0 || pos==tail-1)) skip_inc++;
-	
-	    {
-	        char buf[MAX_MSG_SIZE+1];
+	    if(!skip_inc && (pos==0 || pos==tail-1)) skip_inc++; // on ends we stop moving for some time
+
+	    {// let's print needed part of message
 	        char *cp = (char *)&mav_message[pos];
-	        char *bp = buf;
 	    
 	        for(byte i=MAX_MSG_SIZE; i!=0; i--){
 		    byte c = *cp++;
 		    if(c==0) break;
-		    *bp++ = c;
+		    osd_write(c);
 		}
-	        *bp=0;
-	    
-	    
-		osd.print(buf);
+		osd_blank();
 	    }
-	
 //OSD::setPanel(p.x,p.y +1);
 //osd.printf_P(PSTR("pos=%d diff=%d len=%d"), pos, diff, len);
 
@@ -1450,10 +1461,10 @@ const char PROGMEM s_mode00[] = "stab"; //Stabilize	0
 const char PROGMEM s_mode01[] = "acro"; //Acrobatic	1
 const char PROGMEM s_mode02[] = "alth"; //Alt Hold	2
 const char PROGMEM s_mode03[] = "auto"; //Auto		3
-const char PROGMEM s_mode04[] = "guid"; //Guided		4
-const char PROGMEM s_mode05[] = "loit"; //Loiter		5
-const char PROGMEM s_mode06[] = "rtl"; //Return to Launch 6
-const char PROGMEM s_mode07[] = "circ"; //Circle		7
+const char PROGMEM s_mode04[] = "guid"; //Guided	4
+const char PROGMEM s_mode05[] = "loit"; //Loiter	5
+const char PROGMEM s_mode06[] = "rtl";  //Return to Launch 6
+const char PROGMEM s_mode07[] = "circ"; //Circle	7
 const char PROGMEM s_mode08[] = "posh"; //Position Hold (Old) 8
 const char PROGMEM s_mode09[] = "land"; //Land		9
 const char PROGMEM s_mode10[] = "oflo"; //OF_Loiter 	10
@@ -1474,7 +1485,8 @@ char const * const mode_c_strings[] PROGMEM ={
 #endif
 
 /*
- MANUAL        = 0,
+plane modes
+    MANUAL        = 0,
     CIRCLE        = 1,
     STABILIZE     = 2,
     TRAINING      = 3,
@@ -1490,8 +1502,8 @@ char const * const mode_c_strings[] PROGMEM ={
     INITIALISING  = 16
 */
 const char PROGMEM p_mode00[] = "manu"; //Manual
-const char PROGMEM p_mode01[] = "circ"; //CIRCLE
-const char PROGMEM p_mode02[] = "stab"; //Stabilize
+//const char PROGMEM p_mode01[] = "circ"; //CIRCLE
+//const char PROGMEM p_mode02[] = "stab"; //Stabilize
 const char PROGMEM p_mode03[] = "trai"; //Training
 //const char PROGMEM p_mode04[] = "acro"; //ACRO
 const char PROGMEM p_mode05[] = "fbwa"; //FLY_BY_WIRE_A
@@ -1511,7 +1523,7 @@ const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
 
 #ifdef IS_PLANE
 const char * const mode_p_strings[] PROGMEM ={ 
-    p_mode00, p_mode01, p_mode02, p_mode03, s_mode01, 
+    p_mode00, s_mode07, s_mode00, p_mode03, s_mode01, 
     p_mode05, p_mode06, p_mode07, p_mode08, s_mode_n,
     s_mode03, s_mode06, s_mode05, s_mode_n, s_mode_n, 
     s_mode04, p_mode16, p_mode17, p_mode18, p_mode19
@@ -1607,7 +1619,6 @@ static void panFlightMode(point p){
     } else 
 #endif
 
-
     {
 
         if(osd_autopilot == 14) { // autoquad
@@ -1682,7 +1693,6 @@ static void printSensor(byte n){
     SensorInfo s;
 
 
-
     eeprom_read_len((byte *)&s,  EEPROM_offs(sensors) + n * sizeof(SensorInfo),  sizeof(SensorInfo) );
 
     float v=s.K * sensorData[n] + s.A;
@@ -1712,6 +1722,7 @@ static void panSensor2(point p) {
 static void panSensor3(point p) {
     if(is_on(p)) {
 	lflags.flgSensor3=1;
+	lflags.fPulseSensor3 = is_alt(p);
         printSensor(2);
     } else
 	lflags.flgSensor3=0;
@@ -1720,6 +1731,7 @@ static void panSensor3(point p) {
 static void panSensor4(point p) {
     if(is_on(p)) {
 	lflags.flgSensor4=1;
+	lflags.fPulseSensor4 = is_alt(p);
         printSensor(3);
     } else
 	lflags.flgSensor4=0;
@@ -1824,8 +1836,8 @@ static const PROGMEM Params params1[] = {
 	{n_screen,  0,  0,   0,                    0,     0}, // header
 	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
 	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 0, 3},
-	{n_horiz,  'c', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
-	{n_vert,   'c', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
+	{n_horiz,  'Z', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
+	{n_vert,   'z', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
 };
 
 // второй экран - горизонт
@@ -1842,7 +1854,7 @@ static const PROGMEM Params params2[] = {
 #define SENSOR(n) ((SensorInfo *)(EEPROM_offs(sensors) + n * sizeof(SensorInfo)))
 
 static const PROGMEM Params params3[] = {
-	{n_sensors,     'h', 0,   0,                 0, 0}, // header with pal/ntsc string
+	{n_sensors,     0,   0,   0,                 0, 0}, 
 	{n_k_sensor1,   's', 1,   &SENSOR(0)->K, 0, f_float, -8000, 8000},
 	{n_a_sensor1,   's', 1,   &SENSOR(0)->A, 0, f_float, -100, 100},
 	{n_k_sensor2,   's', 1,   &SENSOR(1)->K, 0, f_float, -8000, 8000},
@@ -1868,7 +1880,6 @@ static const PROGMEM Setup_screen screens[] = {
 
 static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
-//static uint32_t text_timer; // время прошлого входа в меню
 static uint16_t chan1_raw_middle, chan2_raw_middle; // запомненные при входе значения каналов 1 и 2
 static uint16_t /*chan3_raw_middle,*/ chan4_raw_middle; // запомненные при входе значения каналов 3 и 4
 const Params *params; // указатель на текущий набор параметров
@@ -1922,6 +1933,8 @@ static void panSetup(){
     int min, max;
     byte k;
 
+    int8_t offs=0;
+
     float c_val=0;
 
     const Setup_screen *pscreen;
@@ -1955,7 +1968,7 @@ static void panSetup(){
 	    osd_write('>');
 	    col=OSD::col;
 	} else {
-	    osd_write(' ');
+	    osd_blank();
 	}
 
 	type=pgm_read_byte((void *)&p->type);
@@ -1979,9 +1992,16 @@ static void panSetup(){
 	    }
 	    break;
 
+	case 'z': // vertical offs
+	    offs=0x10;
+	    goto as_char;
+	case 'Z': // horiz offs
+	    offs=0x20;
+	    goto as_char;
         case 'c': // signed byte param
+as_char:
 	    { 
-		int l = *((char *)(pgm_read_word((void *)&p->value) ) ) ;
+		int l = *((char *)(pgm_read_word((void *)&p->value) ) ) - offs;
 		v = l / (float)k;
 	    }
 	    break;
@@ -1995,6 +2015,7 @@ static void panSetup(){
 	    uint16_t ptr=pgm_read_word((void *)&p->value);
 	    float f;
 	    eeprom_read_len((byte *)&f,  ptr,  sizeof(float) );
+	    v=f;
 	    break;
 #endif
 	}
@@ -2027,14 +2048,17 @@ static void panSetup(){
 
     p = &params[setup_menu];
 
+    bool fNeg=false;
     int diff = ( chan1_raw_middle - chan_raw[0] );
-    if(diff<0) diff = -diff;
+    if(diff<0) {
+	diff = -diff;
+	fNeg=true;
+    }
 
     void *pval=(void *)pgm_read_word((void *)&p->value);
 
     min =(int)pgm_read_word((void *)&p->min);
     max =(int)pgm_read_word((void *)&p->max);
-
 
     type=pgm_read_byte((void *)&p->type);
     k=pgm_read_byte((void *)&p->k);
@@ -2043,6 +2067,8 @@ static void panSetup(){
     v=c_val;
     
     switch (type){
+	case 'z':
+	case 'Z':
 	case 'c':
     	    { 
 //    	        int l=*((char *)pval);
@@ -2081,25 +2107,32 @@ as_byte:
     
     if(diff>100){
 //if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
-	if(chan_raw[0] < chan1_raw_middle) v -= inc;
-	if(chan_raw[0] > chan1_raw_middle) v += inc;
+	if(fNeg) v += inc;
+	else     v -= inc;
 
         if(v<min) v=min;
         if(v>max) v=max;
-
-    } 
+    }
 
 
     if(v != c_val) {
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
+	int8_t cv=(char)(v * k);
 
         switch (type){
+    	    case 'Z':
+    		*((char *)pval) = cv + 0x20;
+    		break;
+    	    case 'z':
+    		*((char *)pval) = cv + 0x10;
+    		break;
+
 	    case 'c':
-		*((char *)pval) = (char)(v * k);
+		*((char *)pval) = cv;
 		break;
 
             case 'b': // byte param
-	        *((byte *)pval) = (byte)(v * k);
+	        *((byte *)pval) = (byte)(cv);
 	        break;
 	    
             case 'f': // float param
@@ -2135,7 +2168,6 @@ no_write:
 typedef void (*fPan_ptr)(Point p);
 
 struct Panels_list {
-    //Point *p;
     byte n;
     fPan_ptr f;
     byte sign;
@@ -2144,7 +2176,7 @@ struct Panels_list {
 #define RADAR_CHAR 0x1F // code of the radar symbol
 
 //table - 546 bytes of flash economy 
-// ids - max 127 so bit 0x80 is a flag of always call
+// ids - max 127 so bit 0x80 is a flag of "always call"
 
 const Panels_list PROGMEM panels_list[] = {
     { ID_of(horizon),		panHorizon, 	0 },
@@ -2190,7 +2222,7 @@ const Panels_list PROGMEM panels_list[] = {
 #endif
     { ID_of(callSign),		panCALLSIGN, 	0 },
     { ID_of(message),		panMessage, 	0 },
-    { ID_of(warn) | 0x80,       panWarn,	0 },
+    { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}
 };
 
@@ -2204,9 +2236,8 @@ static void print_all_panels() {
 	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
 	if(f==0) break;
 	
-	//Point p = *pp;
-	//Point p=((Point *)&panel)[n & 0x7f];// TODO читать непосредственно из EEPROM
-	point p = readPanel(n & 0x7f);
+	//Point p=((Point *)&panel)[n & 0x7f];
+	point p = readPanel(n & 0x7f);// читать непосредственно из EEPROM
 	
         osd_setPanel(p);
 	if(is_on(p)){
@@ -2239,7 +2270,7 @@ void writePanels(){
 
   //Base panel selection
   //No mavlink data available panel
-    if(pt > (lastMAVBeat + 2200)){
+    if(pt > (lastMAVBeat + 2500)){
         panWaitMAVBeats(); //Waiting for MAVBeats...
         return; // no warn
     }
@@ -2279,8 +2310,8 @@ void writePanels(){
     }
   }
 
-// show warnings even if screen is disabled
-    /* if(is_on(panel.warn)) */ //panWarn(panel.warn); // this must be here so warnings are always checked
+
+
 
 }
 

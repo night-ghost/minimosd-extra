@@ -151,6 +151,7 @@ void setup()     {
     LED_ON; 		    // turn on for full light
 #endif
 
+    Serial.begin(TELEMETRY_SPEED);
 
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
     TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );
@@ -166,7 +167,6 @@ void setup()     {
 //    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
     attachInterrupt(INT0, isr_VSYNC, FALLING);
 
-    Serial.begin(TELEMETRY_SPEED);
     
     mavlink_comm_0_port = &Serial; // setup mavlink port
 
@@ -175,7 +175,7 @@ void setup()     {
     OSD::update();// clear memory
 
     OSD::setPanel(5, 5);
-    osd.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
+    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
 
     // Get correct settings from EEPROM
     readSettings();
@@ -303,8 +303,10 @@ void loop()
 	    if(skip_inc) {
 	        skip_inc++;
 	
-		if(skip_inc >=3)
+		if(skip_inc >=3){
 		    count02s++;
+		    skip_inc=0; // we go again
+		}
 	        
 	    } else 
 		count02s++;
@@ -327,7 +329,6 @@ void loop()
         if(lflags.blinker) {
             seconds++;
             lflags.one_sec_timer_switch = 1; // for warnings
-
 
 #ifdef DEBUG
 	    if(seconds % 60 == 0) {
@@ -428,6 +429,7 @@ void On100ms(){ // периодические события, не связан�
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
 
+
         voltageRawArray[(++ind)%8] = analogRead(VoltagePin);
         for (uint8_t i=8;i!=0;)
             voltageRaw += voltageRawArray[--i];
@@ -490,7 +492,15 @@ void On100ms(){ // периодические события, не связан�
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
 
-        currentRawArray[(++ind)%8] = analogRead(AmperagePin);
+	uint16_t d;
+
+#if defined(USE_SENSORS)
+	if(lflags.fPulseSensor3)
+	    d=pulseIn(AmperagePin,HIGH,10000);
+	else
+#endif
+	    d=analogRead(AmperagePin);
+        currentRawArray[(++ind)%8] = d;
         for (uint8_t i=8;i!=0;)
             currentRaw += currentRawArray[--i];
 #if defined(USE_SENSORS)
@@ -534,8 +544,16 @@ case_4:
 	    rssi_in = avgRSSI(d);
 
 #if defined(USE_SENSORS)
-	    if(SENSOR4_ON)
-		sensorData[3] = (sensorData[3]*7 + analogRead(RssiPin)) /8;
+	    uint16_t d;
+
+	    if(SENSOR4_ON) {
+		if(lflags.fPulseSensor4)
+		    d=pulseIn(RssiPin,HIGH,10000);
+		else
+		    d=analogRead(RssiPin);
+		    
+		sensorData[3] = (sensorData[3]*7 + d) /8;
+	    }
 #endif
 	    break;
 	}

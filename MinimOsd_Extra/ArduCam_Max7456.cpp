@@ -28,8 +28,8 @@ OSD::OSD()
 //------------------ init ---------------------------------------------------
 void MAX_write(byte addr, byte data){
     register byte d=data;
-  SPI::transfer(addr);
-  SPI::transfer(d);
+    SPI::transfer(addr);
+    SPI::transfer(d);
 }
 
 byte MAX_read(byte addr){
@@ -44,8 +44,8 @@ void OSD::adjust(){
 
 //Serial.printf_P(PSTR("adjust bright=%d horiz=%d vert=%d\n"),sets.OSD_BRIGHTNESS,sets.horiz_offs, sets.vert_offs);
 
-  MAX_write(MAX7456_HOS_reg, 0x20 + sets.horiz_offs); // 0x20 default
-  MAX_write(MAX7456_VOS_reg, 0x10 + sets.vert_offs); // 0x10 default
+  MAX_write(MAX7456_HOS_reg, /* 0x20 + */  sets.horiz_offs); // 0x20 default - already shifted
+  MAX_write(MAX7456_VOS_reg, /* 0x10 + */  sets.vert_offs); // 0x10 default
 
   max7456_off();
 }
@@ -62,19 +62,14 @@ void OSD::hw_init(){
     //set black level
     MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
 
-
-
     MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
 
-    //setBrightness();
-  
   // define sync (auto,int,ext)
-//      MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display | video_mode);
-    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal); 
+    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal);  // first time on internal sync
 
     delay_150();
 
-    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
+    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync);  // and then switch to auto mode
 
  // max7456_off();
 
@@ -151,7 +146,6 @@ void OSD::setMode(uint8_t themode){
         max7456_on();
         MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
         max7456_off();
-
     }
 }
 
@@ -169,10 +163,12 @@ void OSD::setBrightness()
     uint8_t blevel = sets.OSD_BRIGHTNESS;
 
     if(blevel>3) blevel=0;
-    blevel=levels[blevel];
+    blevel=pgm_read_byte(&levels[blevel]);
 
-    // set all rows to same character white level, 90%
-    for (byte x = 0x0, a= 0x10; x < 0x10; x++) 
+Serial.printf(PSTR("\n\nSet bright to %d\n"),blevel);
+
+    // set all rows to same character white level
+    for (byte x = 0x0, a= 0x10 /*  RB0 register */; x < 0x10; x++) 
         MAX_write(a++, blevel);
 
 }
@@ -193,12 +189,13 @@ uint8_t OSD::getMode(){
   return 0;
 }
 
-
+/*
 void OSD::clear() {  // clear the screen
   max7456_on();
   MAX_write(MAX7456_DMM_reg, MAX7456_CLEAR_display);
   max7456_off();
 }
+*/
 
 //------------------ set panel -----------------------------------------------
 
@@ -217,11 +214,10 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 //------------------ write ---------------------------------------------------
 
-void OSD::writeb(uint8_t c){
+void OSD::write_S(uint8_t c){
   
   if(c == '|'){
     row++;
-    //bufpos = row*30+col;
     calc_pos();
   } else {
     osdbuf[bufpos++] = c;
@@ -229,14 +225,14 @@ void OSD::writeb(uint8_t c){
 }
 
 size_t OSD::write(uint8_t c){
-    writeb(c);  
+    write_S(c);  
     return 1;
 }
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
 //    extern OSD osd;
     setPanel(x,y);
-    OSD::writeb(c);
+    OSD::write_S(c);
 }
 
 
@@ -251,8 +247,8 @@ uint8_t spi_transfer(uint8_t data) {
 */
 
 void OSD::update() {
- uint8_t *b = osdbuf;
- uint8_t *end_b = b+sizeof(osdbuf);
+    uint8_t *b = osdbuf;
+    uint8_t *end_b = b+sizeof(osdbuf);
 /*
     uint8_t bit = digitalPinToBitMask(MAX7456_SELECT); // move calculations from critical section
     uint8_t port = digitalPinToPort(MAX7456_SELECT);
@@ -270,10 +266,10 @@ void OSD::update() {
 
     PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 
-    for(; b < end_b; b++) {
+    for(; b < end_b;) {
         PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
         SPDR = *b;
-        *b=' ';		// обойдемся без memset
+        *b++=' ';		// обойдемся без memset
         while (!(SPSR & (1<<SPIF))) ;
         PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
     }

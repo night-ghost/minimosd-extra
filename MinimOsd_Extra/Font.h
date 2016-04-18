@@ -11,7 +11,7 @@ static void uploadFont() {
 
     int font_count = 0;
 
-    osd.clear();
+    //osd.clear();
 
     Serial.print_P(PSTR("RFF\n"));
 

@@ -227,6 +227,9 @@ struct loc_flags {
     bool flgSensor3:1;  
     bool flgSensor4:1;  
 
+    bool fPulseSensor3:1;  
+    bool fPulseSensor4:1;  
+
 //    bool osd_clear:1;
 //MAVLink session control
 //    bool mavbeat:1;

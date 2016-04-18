@@ -224,10 +224,23 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
 */
 	    case MAVLINK_MSG_ID_STATUSTEXT:
                 mav_msg_severity = mavlink_msg_statustext_get_severity(&msg.m);
-                if(MAV_SEVERITY_INFO >= mav_msg_severity) { // обрабатываем новое системное сообщение            
+                if(MAV_SEVERITY_INFO >= mav_msg_severity) { // обрабатываем новое системное сообщение
                     byte len = mavlink_msg_statustext_get_text(&msg.m, (char *)mav_message);
                     mav_message[len]=0;
-		    mav_msg_ttl=seconds + 6;
+
+                    char *cp = (char *)&mav_message[len]; // remove tail spaces
+                    for(;;) {
+                        byte c = *(--cp);
+
+                        if(c==0 || c==0x20){
+                            len--;
+                        } else {
+                            cp[1]=0;
+                            break;
+                        }
+                    }
+
+		    mav_msg_ttl=seconds + 6;// time to show
 		    mav_msg_len = len;
 		    mav_msg_shift = count02s;
                 }
@@ -235,11 +248,11 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
 
 /*
 typedef enum FENCE_BREACH{
-FENCE_BREACH_NONE=0,  No last fence breach | 
-FENCE_BREACH_MINALT=1,  Breached minimum altitude | 
-FENCE_BREACH_MAXALT=2,  Breached maximum altitude | 
-FENCE_BREACH_BOUNDARY=3,  Breached fence boundary | 
-FENCE_BREACH_ENUM_END=4,  | 
+ FENCE_BREACH_NONE=0,  No last fence breach | 
+ FENCE_BREACH_MINALT=1,  Breached minimum altitude | 
+ FENCE_BREACH_MAXALT=2,  Breached maximum altitude | 
+ FENCE_BREACH_BOUNDARY=3,  Breached fence boundary | 
+ FENCE_BREACH_ENUM_END=4,  | 
 } FENCE_BREACH;
 
 */

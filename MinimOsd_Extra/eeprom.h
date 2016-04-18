@@ -80,8 +80,6 @@ struct Panel {
     point sensor3;      // 82
     point sensor4;      // 84
     //point baroAlt;     
-    //point curr_B;
-    //point fdata;
 };
 
 union _Panel {
@@ -93,12 +91,12 @@ union _Panel {
 struct Flags { // 4 байта
     bool OSD_BATT_SHOW_PERCENT:1;  	// 0 - not used, use panel.alt instead
     bool measure:1;			// 1
-    bool RADIO_ON:1;			// 2
+    bool RADIO_ON:1;			// 2 - not used
     bool PAL_NTSC:1;			// 3
     
 // new!
     bool useExtVbattA:1;// 4
-    bool useExtVbattB:1;// 5
+    bool useExtVbattB:1;// 5 - generated internally
     bool useExtCurr:1;	// 6
     bool radar_on:1;	// 7
     bool ils_on:1;	// 8
@@ -188,14 +186,14 @@ struct SensorInfo {
 
 
 struct Eeprom {
-    _Panel panels[4]; // сначала 4 экрана по 128 байт (64 панели возможно)
+    _Panel panels[4]; // сначала 4 экрана по 128 байт (64 панели возможно), читаются индивидуальные точки по мере необходимости
 
 // 512
     _Flags flags; // 4 байта флагов
     
-    _Settings sets; // и почти четверть EEPROM под остальные настройки
+    _Settings sets; // и почти четверть EEPROM под остальные настройки, считываемые в RAM при инициализации
 //768
-    SensorInfo sensors[4];
+    SensorInfo sensors[4]; // не считываемые настройки - читаются по необходимости
 };
 
 #pragma pack(pop)

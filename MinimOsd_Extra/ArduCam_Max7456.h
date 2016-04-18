@@ -101,7 +101,7 @@ class OSD: public BetterStream
     static void setBrightness();
     static uint8_t getMode(void);
     static void update(void);
-    static void writeb(uint8_t c);
+    static void write_S(uint8_t c);
     virtual byte     available(void);
     virtual byte     read(void);
     virtual byte     peek(void);

@@ -297,8 +297,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		msg.u.cnt++;
-		if (msg.u.cnt < 2) {
+		if (++msg.u.cnt < 2) {
 			//msg->Length = ((uint16_t) c);
 			BYTE_OF(umsg->Length,0) = c;
 		} else {
@@ -321,8 +320,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		msg.u.cnt++;
-		switch (msg.u.cnt) {
+		switch (++msg.u.cnt) {
 		case 1:
 		case 2:
 		case 3:
@@ -347,8 +345,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		msg.u.cnt++;
-		switch (msg.u.cnt) {
+		switch (++msg.u.cnt) {
 		case 1:
 			//msg->InstID = ((uint32_t) c);
 			BYTE_OF(umsg->InstID,0) = c;
@@ -391,8 +388,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		
-		umsg->Data[msg.u.cnt] = c;
-		msg.u.cnt++;
+		umsg->Data[msg.u.cnt++] = c;
 		if (msg.u.cnt >= umsg->Length - msg.u.f_length) {
 			state = UAVTALK_PARSE_STATE_GOT_DATA;
 			msg.u.cnt = 0;

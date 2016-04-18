@@ -758,16 +758,13 @@ bool mwii_read() {
 	uint8_t c;
 
 	enum _serial_state {
-		IDLE = 0,
-		HEADER_START,
-		HEADER_M,
-		HEADER_ARROW,
-		HEADER_SIZE,
-		HEADER_CMD,
+	    IDLE = 0,
+	    HEADER_START,
+	    HEADER_M,
+	    HEADER_ARROW,
+	    HEADER_SIZE,
+	    HEADER_CMD,
 	};
-	
-//	msg.mwii.state = IDLE;
-
 
 	while(Serial.available_S()) {
 		c = Serial.read_S();
