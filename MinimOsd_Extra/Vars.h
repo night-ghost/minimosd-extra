@@ -139,13 +139,13 @@ struct Coords {
 long osd_baro_alt; // altitude baro 
 
 static float        osd_climb = 0;
-Coords              osd_pos = {0,0};			// current coordinates
+Coords              osd_pos = {0,0,0};			// current coordinates
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog;                        // Course over ground
 static uint16_t     off_course;
-Coords              osd_home = {0,0};	// home coordinates
+Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
 static int          dst_x,dst_y; // расстояние по осям - для радара
@@ -211,7 +211,7 @@ struct loc_flags {
     bool motor_armed:1;
     bool last_armed_status:1;
     bool throttle_on:1;
-    bool takeofftime:1;
+    bool in_air:1;
 
     bool blinker:1;
 

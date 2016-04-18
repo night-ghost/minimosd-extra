@@ -732,8 +732,10 @@ static void panCur_A(point p){
 // Staus  : done
 
 static void panAlt(point p){
+    long v=osd_pos.alt;
+    if(is_alt(p)) v-=osd_home.alt;
 
-    printDist(osd_pos.alt/1000.0 * pgm_read_float(&measure->converth));
+    printDist(v/1000.0 * pgm_read_float(&measure->converth));
 
 }
 
@@ -826,7 +828,7 @@ static void check_warn()
     wmask |= 1; //0
 
 //2    
- if (sets.model_type==0 && iAirspeed < sets.stall && lflags.takeofftime == 1) // plane
+ if (sets.model_type==0 && iAirspeed < sets.stall && lflags.in_air ) // plane
     wmask |= (1<<1);
 
 //3    
@@ -2261,11 +2263,16 @@ void writePanels(){
     pt=millis();  // текущее время
 
 #ifdef IS_PLANE
-    if ((lflags.takeofftime == 1) && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 || osd_home_distance > 100)){
+    if (lflags.in_air  && (osd_alt_to_home > 10 || osd_groundspeed > 1 || osd_throttle > 1 )){
         landed = pt; // пока летаем постоянно обновляем это время
     }
+#ifdef IS_COPTER
+    else if(lflags.motor_armed) landed = pt; // запомнится время дизарма
 #endif
-
+#else // pure copter
+    
+	if(lflags.motor_armed) landed = pt; 
+#endif
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
 
   //Base panel selection
@@ -2277,7 +2284,8 @@ void writePanels(){
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
 //  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (tdistance > 50)){
-  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (tdistance > 50)){
+//  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (tdistance > 50)){
+  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && (tdistance > 5)){ // 10 seconds after disarm
 
 #else
 #ifdef IS_PLANE

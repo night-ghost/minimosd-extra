@@ -112,7 +112,7 @@ ISR(TIMER1_COMPA_vect) {
 size_t TimerSerial::write_S(uint8_t b){
     if (_tx_delay == 0) {
 //        setWriteError();
-        return 0;
+        return;
     }
 
     uint16_t delay = _tx_delay;
@@ -146,12 +146,12 @@ size_t TimerSerial::write_S(uint8_t b){
 
     TIMSK1 = 0; // выключить таймер
     TCCR1B = 0;
- 
-    return 1;
 }
 
 size_t TimerSerial::write(uint8_t b){
-    return write_S(b);
+    write_S(b);
+    return 1;
+
 }
 
 void TimerSerial::flush(){

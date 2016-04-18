@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r827 DV";
+        public const string VERSION = "r829 DV";
 
 
         //max 7456 datasheet pg 10
@@ -282,28 +282,28 @@ namespace OSD {
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
                 pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, 0, "Show HUD frame"); // first!
 
-                //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY, -1);
-                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY, -1);
-                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY, -1);
+                //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
+                pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
+                pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
                 pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1);
-                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1);
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)");
+                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)");
 
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
-                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, -1);
+                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
-                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1);
+                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
                 pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1);
-                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY, -1);
+                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY);
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 
-                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1);
+                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, 0, "Reset to 0 on arming");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
-                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1);
+                pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0 , "show in m/s");
                 pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
                 pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
 
@@ -313,18 +313,18 @@ namespace OSD {
                 pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
 
                 pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, 0, "Show in m/s");
-                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1);
-                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY, -1);
+                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
+                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY);
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
-                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1);
-                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY, -1);
-                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY, -1);
+                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
+                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
+                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY);
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
-                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1);
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, -1);
+                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY);
+                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1);
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");
@@ -1788,10 +1788,6 @@ namespace OSD {
                             else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
                             else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
                             else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1])); //we're not overwriting "eeprom" model type
-                            //                            else if (strings[0] == "Sign Air Speed") pan.sign_air_speed = byte.Parse(strings[1]);
-                            //                            else if (strings[0] == "Sign Ground  Speed") pan.sign_ground_speed = byte.Parse(strings[1]);
-                            //                            else if (strings[0] == "Sign Home Altitude") pan.sign_home_altitude = byte.Parse(strings[1]);
-                            //                            else if (strings[0] == "Sign MSL Altitude") pan.sign_msl_altitude = byte.Parse(strings[1]);
                             else if (strings[0] == "BattB") pan.battBv = byte.Parse(strings[1]);
                             else if (strings[0] == "rssi_k") pan.rssi_koef = float.Parse(strings[1]);
                             else if (strings[0] == "curr_k") pan.Curr_koef = float.Parse(strings[1]);
@@ -2601,6 +2597,8 @@ namespace OSD {
         public ModelType modelType = ModelType.Plane;
         private void cbxModelType_SelectedIndexChanged(object sender, EventArgs e) {
             modelType = (ModelType)cbxModelType.SelectedItem;
+            pan.model_type = (byte)modelType;
+
             if (UNITS_combo.SelectedIndex == 0) {
                 pan.converts = false; //metric
                 STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";

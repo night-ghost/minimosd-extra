@@ -262,8 +262,8 @@ void setFdataVars()
 
 //    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
 
-    if (!lflags.takeofftime  && osd_alt_to_home > 5 && osd_throttle > 10){
-	lflags.takeofftime = 1;
+    if (!lflags.in_air  && osd_alt_to_home > 5 && osd_throttle > 10){
+	lflags.in_air = 1; // взлетели!
 	tdistance = 0;
     }
 #endif
@@ -308,13 +308,13 @@ void setFdataVars()
   //Set max data
 #ifdef IS_COPTER
  #ifdef IS_PLANE
-    if((sets.model_type == 0 && lflags.takeofftime == 1) || lflags.motor_armed){
+    if((sets.model_type == 0 && lflags.in_air) || lflags.motor_armed){
  #else
     if (lflags.motor_armed)  {
  #endif
 #else
  #ifdef IS_PLANE
-  if (lflags.takeofftime == 1){
+  if (lflags.in_air){
  #else
     if(0){
  #endif

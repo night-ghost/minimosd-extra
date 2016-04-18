@@ -198,7 +198,7 @@ namespace OSD
             this.chkSign.Name = "chkSign";
             this.chkSign.Size = new System.Drawing.Size(137, 17);
             this.chkSign.TabIndex = 4;
-            this.chkSign.Text = "Show sign before value";
+            this.chkSign.Text = "Show icon before value";
             this.chkSign.UseVisualStyleBackColor = true;
 			this.chkSign.CheckedChanged += new System.EventHandler(this.chkSign_CheckedChanged);
 
@@ -345,6 +345,8 @@ namespace OSD
 
                     chkAlt.Visible =thing.Altf !=-1;
                     chkAlt.Checked = thing.Altf ==1;
+
+                    chkAlt.Text = thing.alt_text;
 				}
 			}
 		}

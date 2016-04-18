@@ -13,16 +13,18 @@ namespace OSD {
 		public int sign; // 0=no 1=yes -1=disabled
 		public Func<int,int,int,int,int>show;
         public int Altf;
+        public string alt_text;
 		//public TreeNode node;
 		
-		public Panel(String aname, Func<int,int,int,int,int>ashow, int ax, int ay, int apos, int  asign, int fAlt) {
+		public Panel(String aname, Func<int,int,int,int,int>ashow, int ax, int ay, int apos, int  asign=-1, int fAlt=-1, string text="") {
 			name = aname;
 			show = ashow;
 			x = ax;
 			y = ay;
 			pos = apos;
-			sign=asign;
+			sign = asign;
             Altf = fAlt;
+            alt_text=text;
 		}
 	}
 }

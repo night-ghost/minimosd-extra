@@ -407,10 +407,17 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             
-            if(sign==1)
-                osd.printf("%c%3.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
-			else
-                osd.printf("%3.0f%c",  (double)(osd_climb * converth), climbChar);
+            if(sign==1){
+                if(fAlt==1) 
+                    osd.printf("%c%4.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
+                else 
+                    osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
+			}else{
+                if (fAlt == 1) 
+                    osd.printf("%4.2f%c",  (double)(osd_climb * converth/60), 0x18);
+                else
+                    osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);
+            }
             
             return 0;
         }
@@ -911,10 +918,17 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-			if(sign==1)
-            	osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat,  0x04, (double)osd_lon);
-			else
-            	osd.printf("%10.6f|%10.6f",  (double)osd_lat,   (double)osd_lon);
+			if(sign==1) {
+                if(fAlt==1)
+                	osd.printf("%c%9.5f|%c%9.5f", 0x03, (double)osd_lat,  0x04, (double)osd_lon);
+                else
+                    osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+			} else {
+                if (fAlt==1)
+            	    osd.printf("%9.5f|%9.5f",  (double)osd_lat,   (double)osd_lon);
+                else
+                    osd.printf("%10.6f|%10.6f", (double)osd_lat, (double)osd_lon);
+            }
             return 0;
         }
 
@@ -929,11 +943,18 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-			if(sign==1)
-            	osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
-			else 
-				osd.printf("%10.6f %10.6f",  (double)osd_lat,  (double)osd_lon);
-            
+			if(sign==1){
+                if (fAlt==1)
+                	osd.printf("%c%9.5f %c%9.5f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+                else
+                    osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+
+			}else {
+                if (fAlt == 1)
+		    		osd.printf("%9.5f %9.5f",  (double)osd_lat,  (double)osd_lon);
+                else
+                    osd.printf("%10.6f %10.6f", (double)osd_lat, (double)osd_lon);
+            }
             return 0;
         }
 		
@@ -1446,6 +1467,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
         public int panMessage(int first_col, int first_line, int sign, int fAlt) {
             osd.setPanel(first_col, first_line);
 
+            if(sign==1)osd.printf("!");
             osd.printf("This a message via MavLink");
             return 0;
         }
