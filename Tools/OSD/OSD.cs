@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r829 DV";
+        public const string VERSION = "r829a DV";
 
 
         //max 7456 datasheet pg 10
@@ -1855,21 +1855,6 @@ namespace OSD {
                         RSSI_numeric_min.Value = 0;
                         RSSI_numeric_max.Value = 0;
                         RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
-                        if ((int)(pan.rssiraw_on / 2) == 0 || pan.rssiraw_on / 2 == 1){ // analog 
-                            /* RSSI_numeric_min.Minimum = 0;
-                            RSSI_numeric_min.Maximum = 255;
-                            RSSI_numeric_max.Minimum = 0;
-                            RSSI_numeric_max.Maximum = 255;
-                            RSSI_numeric_min.Value = pan.rssipersent;
-                            RSSI_numeric_max.Value = pan.rssical; */
-                        } else { // pwm 
-                            /*
-                            RSSI_numeric_min.Minimum = 900;
-                            RSSI_numeric_min.Maximum = 2000;
-                            RSSI_numeric_max.Minimum = 900;
-                            RSSI_numeric_max.Maximum = 2000; */
-                        }
-
                         try {
                             RSSI_numeric_min.Value = pan.rssipersent;
                         } catch {
@@ -2491,21 +2476,14 @@ namespace OSD {
         private void RSSI_numeric_min_ValueChanged(object sender, EventArgs e) {
             if (updatingRSSI)
                 return;
-            if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) {// analog 
-                pan.rssipersent = (UInt16)RSSI_numeric_min.Value;
-            } else {
-                pan.rssipersent = (UInt16)(RSSI_numeric_min.Value / 10); // pwm
-            }
+            
+            pan.rssipersent = (UInt16)RSSI_numeric_min.Value;
         }
 
         private void RSSI_numeric_max_ValueChanged(object sender, EventArgs e) {
             if (updatingRSSI)
                 return;
-            if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) {
-                pan.rssical = (UInt16)RSSI_numeric_max.Value;
-            } else {
-                pan.rssical = (UInt16)(RSSI_numeric_max.Value / 10);
-            }
+            pan.rssical = (UInt16)RSSI_numeric_max.Value;
         }
 
         private void OVERSPEED_numeric_ValueChanged(object sender, EventArgs e) {
@@ -2733,25 +2711,36 @@ namespace OSD {
         }
 
         private int rssi_decode(int v) {
-            switch (v / 2) {
-            case 4:
-                return 1;
-            case 1:
-                return 2;
-            case 2:
-                return 3;
-            }
-            return v / 2;
-        }
+            v /= 2; // turn off RAW flag
 
+            switch (v) {
+            case 0:
+                return 0;//  MAvlink
+            case 4:
+                return 1; // channel 8
+            case 1:
+                return 2; // pin analog
+            case 2:
+                return 3; // pin PWM
+            }
+            return v;
+        }
+        /* in firmware
+         0 - MAVlink
+         1 - analog
+         2 - pulse
+         4 - ch 8                         
+         */
         private int rssi_encode(int v) {
             switch (v) {
-            case 1:
-                return 8;
-            case 2:
-                return 2;
-            case 3:
-                return 4;
+            case 0:     // MAVlink
+                return 0 * 2;
+            case 1:     // channel 8
+                return 4 * 2;
+            case 2:     //  pin analog
+                return 1 * 2;
+            case 3:     //   pin PWM
+                return 2 * 2;
             }
             return 0;
         }
