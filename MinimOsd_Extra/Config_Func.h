@@ -98,11 +98,11 @@ void hex_dump(byte *p, int len) {
  int j;
  
  for(j=0;j<len; j+=8){
-    OSD::writeb('|');
+    OSD::write_S('|');
     print_hex(j,8);
-    OSD::writeb(' ');
+    OSD::write_S(' ');
     for(i=0; i<8; i++){
-	OSD::writeb(' ');
+	OSD::write_S(' ');
 	print_hex(p[i+j],8);
     }
  }
