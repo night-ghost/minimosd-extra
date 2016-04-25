@@ -714,7 +714,7 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line); 
 
-            if (fAlt==0)
+            if (fAlt==1)
             {
                 osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
                                   "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +

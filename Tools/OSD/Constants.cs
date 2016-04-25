@@ -72,7 +72,7 @@ namespace OSD {
 	    bool RADIO_ON:1;
 	    bool PAL_NTSC:1;
 */		
-		public const int osd_battery_show_percentage 	= 0;
+		public const int osd_switch_once 	    = 0;
 		public const int converts 				= 1;
 		public const int radio_on 				= 2;
 		public const int pal_ntsc				= 3;

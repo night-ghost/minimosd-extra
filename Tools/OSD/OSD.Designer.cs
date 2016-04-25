@@ -180,6 +180,7 @@ namespace OSD
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.cbxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
+            this.chkSwitchOnce = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -1030,8 +1031,6 @@ namespace OSD
             this.txtPitchPal.TabIndex = 25;
             this.txtPitchPal.Text = "1";
             this.txtPitchPal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
-            this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
             //this.txtPitchPal.TextChanged += new System.EventHandler(this.txtPitchPal_TextChanged);
             this.txtPitchPal.Leave += new System.EventHandler(this.txtPitchPal_TextChanged); 
             // 
@@ -1321,6 +1320,7 @@ namespace OSD
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
+            this.groupBox7.Controls.Add(this.chkSwitchOnce);
             this.groupBox7.Location = new System.Drawing.Point(5, 5);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(179, 68);
@@ -1909,6 +1909,16 @@ namespace OSD
             for(int k=0;k<npanel;k++){
                 this.scr[k].init();
             }
+	    //
+            // chkSwitchOnce
+            //
+            this.chkSwitchOnce.AutoSize = true;
+            this.chkSwitchOnce.Location = new System.Drawing.Point(116, 48);
+            this.chkSwitchOnce.Name = "chkSwitchOnce";
+            this.chkSwitchOnce.Size = new System.Drawing.Size(52, 17);
+            this.chkSwitchOnce.TabIndex = 11;
+            this.chkSwitchOnce.Text = "Once";
+            this.chkSwitchOnce.UseVisualStyleBackColor = true;
             // 
             // OSD
             // 
@@ -2145,7 +2155,8 @@ namespace OSD
         public System.Windows.Forms.TextBox txtSAdd2;
         public System.Windows.Forms.TextBox txtSAdd1;
         private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.CheckBox chkSwitchOnce;
     }
-	
+
 }
 

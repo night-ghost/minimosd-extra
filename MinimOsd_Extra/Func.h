@@ -51,7 +51,7 @@ static void pan_toggle(){
       }
     }
     else  {
-      if (sets.switch_mode == 0){  //Switch mode by value
+      if (!sets.switch_mode){  //Switch mode by value
         /*
 	    Зазор канала = диапазон изменения / (число экранов+1)
 	    текущий номер = приращение канала / зазор
@@ -63,15 +63,22 @@ static void pan_toggle(){
           panelN = n;
         }
       } else{ 			 //Rotation switch
-        if (ch_raw > 1200) {
-            if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
-                lflags.rotatePanel = 1;
-                //osd_switch_time = millis() + 500;
-                millis_plus(&osd_switch_time, 500);
+        if(flags.chkSwitchOnce) { // once at 1 -> 0
+            if (ch_raw > 1200) {
+                lflags.last_sw_ch = 1;
+            } else { // выключено
+                if(lflags.last_sw_ch) lflags.rotatePanel = 1;
+                lflags.last_sw_ch = 0;
             }
-        } else { // выключено
-        }
-
+        } else {
+            if (ch_raw > 1500) { // full on
+                if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
+                    lflags.rotatePanel = 1;
+                    //osd_switch_time = millis() + 500;
+                    millis_plus(&osd_switch_time, 500);
+                }
+            }
+        }// once
       }
     }
     if(lflags.rotatePanel == 1){

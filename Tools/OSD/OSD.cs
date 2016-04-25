@@ -34,8 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r829a DV";
-
+        public const string VERSION = "r831 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -908,6 +907,8 @@ namespace OSD {
                 conf.eeprom.sensors.sensor_A3 = myConvert(txtSAdd3.Text);
                 conf.eeprom.sensors.sensor_A4 = myConvert(txtSAdd4.Text);
 
+                conf.eeprom.flags[osd_switch_once] = chkSwitchOnce.Checked;
+
             } else if (panel_number >= 0 && panel_number < npanel) {
                 //First Panel 
 
@@ -1426,6 +1427,7 @@ namespace OSD {
 
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
+                chkSwitchOnce.Checked = conf.eeprom.flags[osd_switch_once];
             } catch  { }
 
 
@@ -1689,6 +1691,8 @@ namespace OSD {
                         sw.WriteLine("{0}\t{1}", "SAdd3", txtSAdd3.Text);
                         sw.WriteLine("{0}\t{1}", "SAdd4", txtSAdd4.Text);
 
+                        sw.WriteLine("{0}\t{1}", "flgOnce", chkSwitchOnce.Checked);
+                        
                         sw.Close();
                     }
                 } catch (Exception ex) {
@@ -1825,6 +1829,7 @@ namespace OSD {
                             else if (strings[0] == "SAdd3") txtSAdd3.Text = strings[1];
                             else if (strings[0] == "SAdd4") txtSAdd4.Text = strings[1];
 
+                            else if (strings[0] == "flgOnce") chkSwitchOnce.Checked = bool.Parse(strings[1]);
                         }
 
                         //pan.model_type = (byte)cbxModelType.SelectedItem;

@@ -89,11 +89,11 @@ union _Panel {
 
 
 struct Flags { // 4 байта
-    bool OSD_BATT_SHOW_PERCENT:1;  	// 0 - not used, use panel.alt instead
+    bool chkSwitchOnce:1;  		// 0 - instead of batt_percent
     bool measure:1;			// 1
     bool RADIO_ON:1;			// 2 - not used
     bool PAL_NTSC:1;			// 3
-    
+
 // new!
     bool useExtVbattA:1;// 4
     bool useExtVbattB:1;// 5 - generated internally
@@ -124,11 +124,11 @@ struct Settings {
     byte stall;
     byte battv; // уровень предупреждения по напряжению
     
-    byte switch_mode; // режим переключения: 0 значение, 1 по кругу
-    byte auto_screen_switch; // номер экрана куда переключаться при наличии сообщений
+    byte switch_mode; // режим переключения: 0 значение, 1 по кругу TODO move to flags
+    byte auto_screen_switch; // номер экрана куда переключаться при наличии сообщений TODO not used
     
-    byte RSSI_high;
-    byte RSSI_low; 
+    byte RSSI_high; // TODO not used
+    byte RSSI_low;  // TODO not used
     byte RSSI_raw;
     
     byte batt_warn_level; // уровень предупреждения по заряду
@@ -140,7 +140,7 @@ struct Settings {
     byte CHK2_VERSION;
 //0x10
 // версия прошивки и символов, для отображения в конфигураторе - в прошивке не используется
-    byte FW_VERSION[3];
+    byte FW_VERSION[3]; // TODO 4 bytes
     byte CS_VERSION[3];
 //0x16
 // new!

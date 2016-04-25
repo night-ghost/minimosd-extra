@@ -141,6 +141,8 @@ v830
 * fixed bug with HUD frame
 * fixed bootloader dependency of SingleSerial
 
+v831
+* screen switch in rotation mode can be done only once
 
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
@@ -309,6 +311,9 @@ v830
 * исправлен баг с отображением рамки горизонта (HUD frame)
 * исправлена зависимость от загрузчика библиотеки SingleSerial
 
+v831
+
+* переключение экранов в режиме "по кругу" может делаться только один раз
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

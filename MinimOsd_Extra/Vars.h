@@ -206,6 +206,7 @@ struct loc_flags {
     bool input_active:1;    // got ANY valid packet - flag forever
     
     bool rotatePanel:1;
+    bool last_sw_ch:1;
     bool one_sec_timer_switch:1;
 
     bool motor_armed:1;
@@ -222,14 +223,15 @@ struct loc_flags {
     bool flag_05s:1; // sets each 0.5s for setup
     bool flag_01s:1;
 
-    bool flgSensor1:1;  
-    bool flgSensor2:1;  
-    bool flgSensor3:1;  
-    bool flgSensor4:1;  
+    bool flgSensor1:1;
+    bool flgSensor2:1;
+    bool flgSensor3:1;
+    bool flgSensor4:1;
 
-    bool fPulseSensor3:1;  
-    bool fPulseSensor4:1;  
+    bool fPulseSensor3:1;
+    bool fPulseSensor4:1;
 
+    
 //    bool osd_clear:1;
 //MAVLink session control
 //    bool mavbeat:1;
