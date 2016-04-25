@@ -1038,7 +1038,7 @@ static void panHorizon(point p){
   
   // сначала нарисуем стрелочки.
 
-    if(flags.flgHUD) {
+    if(is_alt(p)) {
         osd.print_P(str_hud);
         osd.print_P(str_hud);
         osd.print_P(PSTR("\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|"));

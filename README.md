@@ -136,6 +136,11 @@ v829
 * Altitude panel can be reset to 0 on arming
 * new logic of flight results show
 
+v830
+
+* fixed bug with HUD frame
+* fixed bootloader dependency of SingleSerial
+
 
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
@@ -288,6 +293,22 @@ v827
 * удалены "show battery percentage" галка и флаг - теперь этот режим задается независимо для каждого экрана в свойствах панели
 * сенсоры для отображения произвольных значений в произвольном формате
 * новые предупреждения о сработке GeoFence
+
+v828
+
+* сенсоры могут работать в режиме PWM
+* некоторая оптимизация ресурсов
+
+v829
+
+* Высота может сбрасываться в 0 при арминге
+* новая логика отображения панели результатов полета
+
+v830
+
+* исправлен баг с отображением рамки горизонта (HUD frame)
+* исправлена зависимость от загрузчика библиотеки SingleSerial
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
