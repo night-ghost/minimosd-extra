@@ -144,6 +144,10 @@ v830
 v831
 * screen switch in rotation mode can be done only once
 
+v832
+
+* fixed bug with vertical speed in m/s
+
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 
@@ -314,6 +318,11 @@ v830
 v831
 
 * переключение экранов в режиме "по кругу" может делаться только один раз
+
+v832
+
+* исправлен баг с вертикальной скоростью в m/s
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

@@ -773,9 +773,16 @@ static void panHomeAlt(point p){
 // Staus  : done
 
 static void panClimb(point p){
-    if(is_alt(p))
-	osd_printf_1("%4.2f%c", vertical_speed/60);
-    else
+    if(is_alt(p)) {
+	float v=vertical_speed/60;
+	PGM_P fmt;
+	
+	if(abs(v)<10) 
+	    fmt=PSTR("%4.2f\x18");
+	else
+	    fmt=PSTR("%4.1f\x18");
+	osd_printf_1(fmt, v);
+    } else
         osd_printf_2(f4_0fc, vertical_speed, pgm_read_byte(&measure->climbchar));
 }
 
