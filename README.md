@@ -148,6 +148,19 @@ v832
 
 * fixed bug with vertical speed in m/s
 
+v833
+
+* fixed bug with negative vertical speed
+
+v834
+
+* fixed bug with flight results
+* fixed heading panel placement
+* heading panel now can have icon 
+* mavlink message scrolling can be turned off
+* fixed placement of time panel
+* time's semicolon is blinked
+
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 
@@ -322,6 +335,15 @@ v831
 v832
 
 * исправлен баг с вертикальной скоростью в m/s
+
+v834
+
+* исправлен баг с результатами полета
+* исправлено расположение панели heading
+* панель heading может иметь иконку
+* скролл сообщения mavlink может быть отключен
+* исправлено расположение панели time
+* двоеточие времени сделано мигающим
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

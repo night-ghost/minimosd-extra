@@ -10,6 +10,10 @@
 #include "cleanflight.h"
 #endif
 
+#if defined(USE_LTM)
+#include "LTM.h"
+#endif
+
 #define MAVLINK_EXTERNAL_RX_BUFFER 1
 #define m_mavlink_message 1
 
@@ -22,6 +26,9 @@ union {
 #endif
 #if defined(USE_MWII)
     MWII_buffer mwii;
+#endif
+#if defined(USE_LTM)
+    LTM ltm;
 #endif
 } msg;
 

@@ -211,6 +211,7 @@ struct loc_flags {
 
     bool motor_armed:1;
     bool last_armed_status:1;
+    bool was_armed:1;
     bool throttle_on:1;
     bool in_air:1;
 

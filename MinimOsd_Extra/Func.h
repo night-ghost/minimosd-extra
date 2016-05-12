@@ -19,6 +19,12 @@ static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
+void mav_message_start(byte len){
+    mav_msg_ttl=seconds + 6;// time to show
+    mav_msg_len = len;
+    mav_msg_shift = count02s;
+}
+
 static void pan_toggle(){
     byte old_panel=panelN;
 
@@ -90,11 +96,24 @@ static void pan_toggle(){
     }
 //  }
   if(old_panel != panelN){
-	readPanelSettings();
+//	readPanelSettings();
 	lflags.got_data=1; // redraw even no news
+	
+	static const char msg[] PROGMEM = "Screen 0";
+
+	const char *cp;
+	byte *wp;
+	for(cp=msg, wp=mav_message;*cp!=0;){
+	    *wp++=*cp++;
+	}
+	
+	mav_message[sizeof(msg)-2] += panelN;
+	
+	mav_message_start(sizeof(msg));
   }
 
 }
+
 
 
 //------------------ Battery Remaining Picture ----------------------------------
@@ -171,24 +190,24 @@ static void setHomeVars()
 	    takeoff_heading = osd_heading;
     }
 
-    if (lflags.motor_armed && !lflags.last_armed_status ){ // on motors arm 
+    if (lflags.motor_armed && !lflags.was_armed ){ // on motors arm 
 	lflags.osd_got_home = 0;   			//    reset home: Хуже не будет, если ГПС был а при арме исчез то наф такой ГПС
 //	if(osd_fix_type>=3) {					//  if GPS fix OK
 //	    en=1;                			         // lock home position
 //	}  само сделается через пару строк
-        lflags.last_armed_status = lflags.motor_armed; // only once
-    }
+        lflags.was_armed = lflags.motor_armed; // only once
+    } 
 
 
  #else // pure copter
   //Check disarm to arm switching.
-  if (lflags.motor_armed && !lflags.last_armed_status){
+  if (lflags.motor_armed && !lflags.was_armed){
     lflags.osd_got_home = 0;	//If motors armed, reset home 
 //    if(osd_fix_type>=3) {	//  if GPS fix OK
 //        en=1;                   // lock home position
 //    } само сделается через пару строк
 
-    lflags.last_armed_status = lflags.motor_armed; // only once
+    lflags.was_armed = lflags.motor_armed; // only once
   }
 
 
@@ -269,7 +288,7 @@ void setFdataVars()
 
 //    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
 
-    if (!lflags.in_air  && osd_alt_to_home > 5 && osd_throttle > 10){
+    if (!lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 10){
 	lflags.in_air = 1; // взлетели!
 	tdistance = 0;
     }

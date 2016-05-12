@@ -9,7 +9,7 @@
 #define VER 79
 
 
-#define RELEASE_NUM 833
+#define RELEASE_NUM 834
 #define VERSION "2.4"
 
 
@@ -17,6 +17,7 @@
 
 #define USE_UAVTALK 1
 #define USE_MWII 1
+//#define USE_LTM 1
 #define AUTOBAUD 1
 #define USE_SENSORS 1
 

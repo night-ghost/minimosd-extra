@@ -109,7 +109,7 @@ ISR(TIMER1_COMPA_vect) {
     TimerSerial::fInt = 1; // было прерывание
 }
 
-size_t TimerSerial::write_S(uint8_t b){
+void TimerSerial::write_S(uint8_t b){
     if (_tx_delay == 0) {
 //        setWriteError();
         return;

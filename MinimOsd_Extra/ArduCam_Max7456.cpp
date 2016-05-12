@@ -165,7 +165,9 @@ void OSD::setBrightness()
     if(blevel>3) blevel=0;
     blevel=pgm_read_byte(&levels[blevel]);
 
-Serial.printf(PSTR("\n\nSet bright to %d\n"),blevel);
+#ifdef DEBUG
+//Serial.printf(PSTR("\n\nSet bright to %d\n"),blevel);
+#endif
 
     // set all rows to same character white level
     for (byte x = 0x0, a= 0x10 /*  RB0 register */; x < 0x10; x++) 

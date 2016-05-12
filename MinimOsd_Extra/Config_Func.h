@@ -39,7 +39,7 @@ static void readSettings() {
 }
 
 // cчитать настройки текущей панели из EEPROM
-static void readPanelSettings() {
+/*static void readPanelSettings() {
 
     static uint8_t currentPanel=255;
     
@@ -51,7 +51,7 @@ static void readPanelSettings() {
 //    eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
 
 }
-
+*/
 // rean one point from current screen
 static point readPanel(byte n) {
     point p; //                     shift to current screen     selected point

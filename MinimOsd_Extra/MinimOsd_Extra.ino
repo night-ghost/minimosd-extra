@@ -233,7 +233,7 @@ void setup()     {
 
 
     panelN = 0; //set panel to 0 to start in the first navigation screen
-    readPanelSettings(); // Для первой панели. Для остальных - при переключении
+//    readPanelSettings(); // Для первой панели. Для остальных - при переключении
 
     osd.init();    // Start 
     

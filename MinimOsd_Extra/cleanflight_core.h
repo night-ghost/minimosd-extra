@@ -769,33 +769,37 @@ bool mwii_read() {
 	while(Serial.available_S()) {
 		c = Serial.read_S();
 
+#ifdef DEBUG
+	        bytes_comes+=1;
+#endif
+
 		byte state = msg.mwii.state;
 
-		switch(state) {
+		switch(state++) {
 		case IDLE:
-again:			state = (c=='$') ? HEADER_START : IDLE;
+again:			if(c!='$') state = IDLE;
 			break;
 			
 		case HEADER_START:
-			state = (c=='M') ? HEADER_M : IDLE;
+			if(c!='M') state =  IDLE;
 			break;
 			
 		case HEADER_M:
-			state = (c=='>') ? HEADER_ARROW : IDLE;
+			if(c!='>') state = IDLE;
 			break;
 			
 		case HEADER_ARROW:
 			if (c > SERIALBUFFERSIZE) {  // now we are expecting the payload size
 				state = IDLE;
 			} else {
-				state = HEADER_SIZE;
+				//state = HEADER_SIZE;
 				msg.mwii.size = c;
 				msg.mwii.crc = c;
 			}
 			break;
 			
 		case HEADER_SIZE:
-			state = HEADER_CMD;
+			//state = HEADER_CMD;
 			msg.mwii.cmd = c;
 			msg.mwii.crc ^= c;
 			msg.mwii.idx=0;
@@ -803,17 +807,26 @@ again:			state = (c=='$') ? HEADER_START : IDLE;
 			
 		case HEADER_CMD:
 			msg.mwii.crc ^= c;
+			state = HEADER_CMD;
 			
 			if(msg.mwii.idx == msg.mwii.size) {// received checksum byte
 			    if(msg.mwii.crc == 0) {
 				mwii_parse_data(); // HERE!!!
 				
 				return true;
-			    } else if(c=='$') goto again;
+			    } else {
+#ifdef DEBUG
+		    // Update global packet drops counter
+			        packet_drops += 1;
+#endif
+				if(c=='$') goto again;
+			    }
 			    
 			    state = IDLE;
-			} else
+			} else {
 			    msg.mwii.buf[msg.mwii.idx++]=c;
+			    
+			}
 			
 			break;
 		}

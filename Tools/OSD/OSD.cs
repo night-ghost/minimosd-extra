@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r831 DV";
+        public const string VERSION = "r834 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -293,11 +293,11 @@ namespace OSD {
 
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
-                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY);
+                pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
                 pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
                 pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1);
-                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 10, panWPDir_XY);
+                pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 9, panWPDir_XY);
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, 0, "Reset to 0 on arming");
@@ -323,7 +323,7 @@ namespace OSD {
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY);
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1);
+                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, 0, "Not scroll if not fit");
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");
@@ -376,13 +376,13 @@ namespace OSD {
                                 tn.Checked = false;
                             } else if (thing.name == "Flight Data") {
                                 tn.Checked = false;
-                            } else if (thing.name == "Sensor1") {
+                            } else if (thing.name == "Sensor 1") {
                                 tn.Checked = false;
-                            } else if (thing.name == "Sensor2") {
+                            } else if (thing.name == "Sensor 2") {
                                 tn.Checked = false;
-                            } else if (thing.name == "Sensor3") {
+                            } else if (thing.name == "Sensor 3") {
                                 tn.Checked = false;
-                            } else if (thing.name == "Sensor4") {
+                            } else if (thing.name == "Sensor 4") {
                                 tn.Checked = false;
                             } else if (thing.name == "Radar Scale") {
                                 tn.Checked = false;
@@ -2050,6 +2050,12 @@ namespace OSD {
             }
         }
 
+        private void stop_tlog(){
+            tlog_thread.Abort();
+            tlog_run = false;
+            btnTLog.Text = tlog_run ? "Stop" : "Start";
+        }
+
         private void sendTLogToolStripMenuItem_Click(object sender, EventArgs e) {
 
             OpenFileDialog ofd = new OpenFileDialog();
@@ -2149,7 +2155,7 @@ namespace OSD {
 
         private void OSD_FormClosed(object sender, FormClosedEventArgs e) {
             if (tlog_run)
-                tlog_thread.Abort();
+                stop_tlog();
 
             xmlconfig(true);
         }
@@ -2281,7 +2287,7 @@ namespace OSD {
             toolStripStatusLabel1.Text = "";
 
             if (tlog_run)
-                tlog_thread.Abort();
+                stop_tlog();
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "mcm|*.mcm";
@@ -2946,7 +2952,7 @@ namespace OSD {
                 return false;
 
             if (tlog_run)
-                tlog_thread.Abort();
+                stop_tlog();
 
             byte[] FLASH;
             bool spuploadflash_flag = false;

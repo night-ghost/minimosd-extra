@@ -246,7 +246,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
 
-            osd.printf("%c%c%4i%c", 0x94, 0x95, tr, 0x05);
+            osd.printf("%c%c%3i%c", 0x94, 0x95, tr, 0x05);
 
             
             return 0;
@@ -409,12 +409,12 @@ namespace OSD
             
             if(sign==1){
                 if(fAlt==1) 
-                    osd.printf("%c%4.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
+                    osd.printf("%c%5.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
                 else 
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
 			}else{
                 if (fAlt == 1) 
-                    osd.printf("%4.2f%c",  (double)(osd_climb * converth/60), 0x18);
+                    osd.printf("%5.2f%c",  (double)(osd_climb * converth/60), 0x18);
                 else
                     osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);
             }
@@ -969,7 +969,8 @@ namespace OSD
         public int panHeading(int first_col, int first_line, int sign, int fAlt)
         {
             osd.setPanel(first_col, first_line);
-            
+
+            if(sign!=0) osd.write(0xb0);
             //osd.printf("%004.0f%c", (double)osd_heading, 0x05);
             osd.printf("%3i%c", (Int16)2, 0x05);
             

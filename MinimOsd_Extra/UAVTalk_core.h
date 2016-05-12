@@ -425,7 +425,7 @@ bool uavtalk_read(void) {
 		uint8_t c = Serial.read_S();
 		
 #ifdef DEBUG
-    bytes_comes+=1;
+	        bytes_comes+=1;
 #endif
 		// parse data to msg
 		if (uavtalk_parse_char(c, &msg.u)) {
@@ -463,7 +463,7 @@ bool uavtalk_read(void) {
         			osd_att.yaw		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_YAW);
 //Serial.printf_P(PSTR("uav pitch=%f\n"), (float)osd_pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
-                                if (osd_pos.lat == 0) {
+                                if (*((long *)&osd_pos.lat) == 0) {
                                     osd_heading = osd_att.yaw;
                                 }
 				break;
@@ -474,7 +474,7 @@ bool uavtalk_read(void) {
         			osd_att.yaw		= uavtalk_get_float(offsetof(AttitudeStateDataPacked, Yaw));
 //Serial.printf_P(PSTR("uav2 pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
                                 // if we don't have a GPS, use Yaw for heading
-                                if (osd_pos.lat == 0) {
+                                if (*((long *)&osd_pos.lat) == 0) {
                                     osd_heading = osd_att.yaw;
                                 }
 				break;
