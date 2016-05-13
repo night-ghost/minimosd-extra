@@ -4,7 +4,10 @@ version(){
     cat MinimOsd_Extra/version.h | grep 'RELEASE_NUM' | awk '{print $3}'
 }
 
-[ -f MinimOsd_Extra/build-atmega328/MinimOsd_Extra.hex ] && mv MinimOsd_Extra/build-atmega328/MinimOsd_Extra.hex Released/FW\ &\ Char\MinimOsd_Extra_Uni.`version`DV-release.hex
+RELEASE='Released/FW_+_Char'
+BUILD='MinimOsd_Extra/build-atmega328'
+
+[ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.`version`DV-release.hex
 
 rm -rf MinimOsd_Extra/build-atmega328
 rm -f osd_latest.zip
