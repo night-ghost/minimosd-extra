@@ -5,28 +5,35 @@ extern struct loc_flags lflags;  // все булевые флаги кучей
 
 typedef void (*fptr)();
 
-void NOINLINE osd_setPanel(Point p){
+static void NOINLINE osd_setPanel(Point p){
     OSD::setPanel(p.x,p.y);
 }
 
-void NOINLINE osd_nl(){
+static void NOINLINE osd_nl(){
     OSD::write_S('|');
 }
 
-void NOINLINE osd_blank(){
+static void NOINLINE osd_blank(){
     OSD::write_S(' ');
 }
 
+static byte get_mhigh(){
+    return pgm_read_byte(&measure->high);
+}
 
 static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
 //static const PROGMEM char f4_0fc[]="%4.0f%c";
 #define f4_0fc (&fmt_xtrack[3])
 
-static float NOINLINE cnvGroundSpeed() { // вынос инварианта
+static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 
-    return osd_groundspeed * pgm_read_float(&measure->converts);
+    return osd_groundspeed * get_converts();
 }
 
+/*
+static int NOINLINE fp_div100(float *f){
+    return (int)f/100.0;
+}*/
 
 static void NOINLINE printTime(int t, byte blink){
     osd.printf_P(PSTR("%3i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
@@ -34,6 +41,10 @@ static void NOINLINE printTime(int t, byte blink){
 
 static void NOINLINE printTime(int t){
     printTime(t, 0);
+}
+
+static void NOINLINE printTimeCnv(uint32_t *t, byte blink){
+    printTime(*t/1000, blink);
 }
 
 static void NOINLINE osd_printf_1(PGM_P fmt, float f){
@@ -64,12 +75,24 @@ static void printSpeed(PGM_P fmt, float s, byte alt){
 
 }
 
+static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
+    printSpeed(fmt, *s * get_converts(), alt);
+}
+
 static void printSpeed(float s, byte alt){
     printSpeed(PSTR("%3.0f%c"), s, alt);
 }
 
+static void printSpeedCnv(float *s, byte alt){
+    printSpeedCnv(PSTR("%3.0f%c"), s, alt);
+}
+
 static void printSpeed(float s){
     printSpeed(s, false);
+}
+
+static void printSpeedCnv(float *s){
+    printSpeedCnv(s, false);
 }
 
 
@@ -89,7 +112,7 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
     arrow_set1 += rotate_arrow * 2 - 2;
 
     if(method==1) {
-	printSpeed(osd_windspeed * pgm_read_float(&measure->converts), alt);
+	printSpeedCnv(&osd_windspeed, alt);
 	osd_nl();
     }
 
@@ -97,7 +120,7 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
 
     switch(method) {  
     case 1:		// airspeed
-	printSpeed(PSTR("%2.0f%c"), nor_osd_windspeed * pgm_read_float(&measure->converts), alt);
+	printSpeedCnv(PSTR("%2.0f%c"), &nor_osd_windspeed, alt);
 	break;
     
     case 2:	//      course
@@ -207,7 +230,7 @@ static void showHorizon(byte start_col, byte start_row) {
 	}
     }
     
-    pitch_line = (int)round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;	// 90 total lines
+    pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines
     for (col=1; col<=AH_COLS; col++) {
         middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
         hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
@@ -275,7 +298,7 @@ static void showILS(byte start_col, byte start_row) {
 
         char subval_char = 0xCF;
 
-        char alt = (osd_alt_rel * pgm_read_float(&measure->converth) + 5) * 4.4; //44 possible position 5 rows times 9 chars
+        char alt = (osd_alt_rel * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
 
         if((alt < 44) && (alt > 0)){
             //We have 9 possible chars
@@ -402,12 +425,18 @@ static void panCOG(point p){
 }
 
 static void printDist(float d){
-      osd_printf_2(PSTR("%5.0f%c"), d, pgm_read_byte(&measure->high));
+      osd_printf_2(PSTR("%5.0f%c"), d, get_mhigh());
+}
+
+static void printDistCnv(float d){
+      printDist( d * get_converth());
 }
 
 
+
+
 static void printFullDist(float dd){
-    dd *= pgm_read_float(&measure->converth);
+    dd *= get_converth();
     if ((int)dd <= 9999) {
         printDist(dd);
     }else{
@@ -452,18 +481,9 @@ static void print_list(const Formats *f){
     
     float val=0;
 
-#ifdef DEBUG
-    Serial.printf_P(PSTR("print_list\n")); Serial.wait();
-#endif
-
-    
     for(;;){
 	fmt=(const char *)pgm_read_word(&f->fmt);
 	if(fmt==0) {
-	
-#ifdef DEBUG
-    Serial.printf_P(PSTR("list done!\n")); Serial.wait();
-#endif
 	    return;
 	}
 
@@ -478,12 +498,12 @@ static void print_list(const Formats *f){
 	    break;
 
 	case 'h':
-	    h=pgm_read_byte(&measure->high);
-	    k=pgm_read_float(&measure->converth);
+	    h=get_mhigh();
+	    k=get_converth();
 	    goto as_f;
 	case 's':
 	    h=pgm_read_byte(&measure->spe);
-	    k=pgm_read_float(&measure->converts);
+	    k=get_converts();
 	    goto as_f;
 
 	case 'f':
@@ -518,19 +538,18 @@ static void panFdata(point p){ // итоги полета
     static const char PROGMEM fmt5[]="\x04%10.6f";
 
     static const PROGMEM Formats fd[] = {
-	{fmt0, 'h',  &max_home_distance },
-	{fmt1, 'h',  &tdistance         },
+	{fmt0, 'h',  &max_home_distance   },
+	{fmt1, 'h',  &tdistance           },
 	{fmt2, 's',  &max_osd_groundspeed },
-	{fmt3, 'h',  &max_osd_home_alt   },
-	{fmt4, 'f',  &osd_pos.lat        },
-	{fmt5, 'f',  &osd_pos.lon        },
+	{fmt3, 'h',  &max_osd_home_alt    },
+	{fmt4, 'f',  &osd_pos.lat         },
+	{fmt5, 'f',  &osd_pos.lon         },
 	{0}
     };
 
-  OSD::setPanel(p.x, p.y); // this is absolutely needed!
+  OSD::write_xy(p.x, p.y, 0x08); // this is absolutely needed!
 
-  OSD::write_S(0x08);
-  printTime(total_flight_time_milis / 1000);
+  printTimeCnv(&total_flight_time_milis, 0);
 
 
 /*
@@ -602,9 +621,9 @@ static void panTune(point p){
     else
 	f=PSTR("%3.0f%c|");
 
-    float err = alt_error * pgm_read_float(&measure->converth);
+    float err = alt_error * get_converth();
 
-    osd_printf_2(f, -err, pgm_read_byte(&measure->high));
+    osd_printf_2(f, -err, get_mhigh());
     printSpeed(aspd_error / 100.0);
  #endif
 #endif
@@ -642,8 +661,16 @@ static void panEff(point p){
     
             if (osd_groundspeed != 0) {
         	//eff = (((float)osd_curr_A * 10.0 ) / cnvGroundSpeed())*0.1  + eff * 0.9;
+#if defined(USE_FILTER)
+        	filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0);
+#else
         	eff = (((float)osd_curr_A ) / cnvGroundSpeed())* (10.0 * 0.1) + eff * 0.9; // комплиментарный фильтр 1/10
-        	//filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, 0.1);
+        	//dst+=(val-dst)*k;
+        	//eff += ((((float)osd_curr_A ) / cnvGroundSpeed())* 10.0  - eff) * 0.1; // комплиментарный фильтр 1/10
+        	
+        	//float e0=(((float)osd_curr_A ) / cnvGroundSpeed())* 10.0;
+        	//eff += (e0  - eff) * 0.1; // комплиментарный фильтр 1/10
+#endif
 	    }
 	    
     	    if(has_sign(p))
@@ -670,11 +697,11 @@ static void panEff(point p){
 		OSD::write_S(0xee);
 
             if (osd_climb < -0.05){
-                float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * pgm_read_float(&measure->converth);
+                float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * get_converth();
                 int iGlide=glide;
                 if (iGlide > 9999) glide = 9999.0;
                 if (iGlide > 0){
-                    osd_printf_2(f4_0fc, glide, pgm_read_byte(&measure->high)); // аэродинамическое качество
+                    osd_printf_2(f4_0fc, glide, get_mhigh()); // аэродинамическое качество
                 }
             }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
                   osd.print_P(PSTR("\x20\x20\x90\x91")); //термик
@@ -688,8 +715,8 @@ static void panEff(point p){
       //Check takeoff just to prevent initial false readings
       if (lflags.motor_armed) {
         if(osd_battery_remaining_A != last_battery_reading && !lflags.uavtalk_active) {    // UAVtalk sends this itself
-            remaining_estimated_flight_time_seconds = ((float)osd_battery_remaining_A * total_flight_time_milis / 
-        					    (max_battery_reading - osd_battery_remaining_A)) / 1000;
+            remaining_estimated_flight_time_seconds = f_div1000((float)osd_battery_remaining_A * total_flight_time_milis / 
+        					    (max_battery_reading - osd_battery_remaining_A));
             last_battery_reading = osd_battery_remaining_A;
 	}
 	if(has_sign(p))
@@ -742,9 +769,13 @@ static void panWindSpeed(point p){
 
     if (dir < 0)  dir+=360;
 
-    nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
-    //filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
-
+#if defined(USE_FILTER)
+    filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
+#else
+    //nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
+    //dst+=(val-dst)*k;
+    nor_osd_windspeed += (osd_windspeed - nor_osd_windspeed) * 0.01; // комплиментарный фильтр 1/100 
+#endif
 
     showArrow(grad_to_sect(dir - osd_heading),1, is_alt(p)); //print data to OSD
 }
@@ -772,14 +803,15 @@ static void panAlt(point p){
     long v=osd_pos.alt;
     if(is_alt(p)) v-=osd_home.alt;
 
-    printDist(v/1000.0 * pgm_read_float(&measure->converth));
+//    printDistCnv(v/1000.0);
+    printDistCnv(f_div1000(v));
 
 }
 
 /*
 static void panBaroAlt(point p){
 
-    printDist(osd_baro_alt/1000.0 * pgm_read_float(&measure->converth));
+    printDistCnv(osd_baro_alt/1000.0);
 
 }
 */
@@ -795,9 +827,9 @@ static void panHomeAlt(point p){
 
     float v=osd_alt_to_home;
     
-    if(v==0) v = osd_alt_rel;
-    //printDist(osd_alt_rel * pgm_read_float(&measure->converth));
-    printDist(v * pgm_read_float(&measure->converth));
+    if((*(long *)&v)==0) v = osd_alt_rel;
+    //printDist(osd_alt_rel * get_converth();
+    printDistCnv(v);
 }
 
 
@@ -832,7 +864,7 @@ static void panClimb(point p){
 
 static void panVel(point p){
 
-    printSpeed(cnvGroundSpeed(),is_alt(p));
+    printSpeedCnv(&osd_groundspeed,is_alt(p));
 }
 
 /* **************************************************************** */
@@ -844,7 +876,7 @@ static void panVel(point p){
 
 static void panAirSpeed(point p){
 
-    printSpeed(osd_airspeed * pgm_read_float(&measure->converts), is_alt(p));
+    printSpeedCnv(&osd_airspeed, is_alt(p));
 }
 
 /* **************************************************************** */
@@ -864,8 +896,9 @@ static void check_warn()
     lflags.one_sec_timer_switch=0;
 
 
-    int iAirspeed = osd_airspeed * pgm_read_float(&measure->converts);
-    int iVolt = osd_vbat_A/100.0; // in 0.1v as sets.battv is
+    int iAirspeed = osd_airspeed * get_converts();
+    int iVolt = osd_vbat_A/100; // in 0.1v as sets.battv is
+
 
 //1
  if ((osd_fix_type) < 2) 
@@ -891,13 +924,13 @@ static void check_warn()
  if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
     wmask |= (1<<4);
 
-    int iVs = abs(vertical_speed) /10.0;
+    int iVs = (int)abs(vertical_speed) /10;
 
 //6
  if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
     wmask |= (1<<5);
 
-    iVolt = osd_vbat_B/100.0; // in 0.1v as sets.battBv is
+    iVolt = osd_vbat_B/100; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
  if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
@@ -1051,7 +1084,7 @@ static void panBatteryPercent(point p){
 
 static void panTime(point p){
 
-    printTime(total_flight_time_milis / 1000, is_alt(p)); // blink
+    printTimeCnv(&total_flight_time_milis, is_alt(p)); // blink
 }
 
 
@@ -1153,7 +1186,8 @@ static void panRoll(point p){
 
 
 static void NOINLINE printVolt(uint16_t v) {
-    osd_printf_1(PSTR("%5.2f\x0D"), v/1000.0);
+//    osd_printf_1(PSTR("%5.2f\x0D"), v/1000.0);
+    osd_printf_1(PSTR("%5.2f\x0D"), f_div1000(v));
 }
 
 static void panBatt_A(point p){
@@ -1401,16 +1435,16 @@ static void panWPDis(point p){
     if (xtrack_error < -999) xtrack_error = -999;
 
 
-    byte h=pgm_read_byte(&measure->high);
+    byte h=get_mhigh();
 
     //osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,((float)wp_dist * pgm_read_float(&measure->converth)), h);
     osd_printi_1(PSTR("%2i "), wp_number);
-    osd_printf_2(PSTR("%4.0f%c|"), ((float)wp_dist * pgm_read_float(&measure->converth)), h);
+    osd_printf_2(PSTR("%4.0f%c|"), ((float)wp_dist * get_converth()), h);
     
     showArrow(getTargetBearing(), 0);
 
     if (osd_mode == 10){ // auto
-        osd_printf_2(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * pgm_read_float(&measure->converth)), h);
+        osd_printf_2(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * get_converth()), h);
     }else{
     // we don't needs to clear!    osd.print_P(&strclear[4]);
     }
@@ -1721,12 +1755,12 @@ static void panFlightMode(point p){
 
 
 static void panRadarScale(Point p){
-    float dd= radar_zoom * STEP_WIDTH * pgm_read_float(&measure->converth);
+    float dd= radar_zoom * STEP_WIDTH * get_converth();
     
     if(radar_zoom >=40) // 10 000 
-        osd_printf_2(PSTR("%4.2f%c"), dd/1000.0, pgm_read_byte(&measure->distchar));
+        osd_printf_2(PSTR("%4.2f%c"), f_div1000(dd), pgm_read_byte(&measure->distchar));
     else
-        osd_printf_2(PSTR("%4.0f%c"), dd, pgm_read_byte(&measure->high));
+        osd_printf_2(PSTR("%4.0f%c"), dd, get_mhigh());
 }
 
 
@@ -1760,7 +1794,7 @@ static void printSensor(byte n){
     osd.printf(s.format,v);
 }
 
-static void panSensor1(point p) {
+static void NOINLINE panSensor1(point p) {
     if(is_on(p)) {
 	lflags.flgSensor1=1;
 	printSensor(0);
@@ -1769,7 +1803,7 @@ static void panSensor1(point p) {
     
 }
 
-static void panSensor2(point p) {
+static void NOINLINE panSensor2(point p) {
     if(is_on(p)) {
 	lflags.flgSensor2=1;
         printSensor(1);
@@ -1777,7 +1811,7 @@ static void panSensor2(point p) {
 	lflags.flgSensor2=0;
 }
 
-static void panSensor3(point p) {
+static void NOINLINE panSensor3(point p) {
     if(is_on(p)) {
 	lflags.flgSensor3=1;
 	lflags.fPulseSensor3 = is_alt(p);
@@ -1786,7 +1820,7 @@ static void panSensor3(point p) {
 	lflags.flgSensor3=0;
 }
 
-static void panSensor4(point p) {
+static void NOINLINE panSensor4(point p) {
     if(is_on(p)) {
 	lflags.flgSensor4=1;
 	lflags.fPulseSensor4 = is_alt(p);
@@ -2341,19 +2375,21 @@ void writePanels(){
 
   //Base panel selection
   //No mavlink data available panel
-    if(pt > (lastMAVBeat + 2500)){
+//    if(pt > (lastMAVBeat + 2500)){
+    if(time_since(&lastMAVBeat) > 2500){
         panWaitMAVBeats(); //Waiting for MAVBeats...
     }
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
 //  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (tdistance > 50)){
 //  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (tdistance > 50)){
-  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)tdistance > 5)){ // 10 seconds after disarm
+//  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)tdistance > 5)){ // 10 seconds after disarm
+  else if (!lflags.motor_armed && time_since(&landed) < 10000 && ((int)tdistance > 5)){ // 10 seconds after disarm
 
 #else
 #ifdef IS_PLANE
     //Only show flight summary 7 seconds after landing
-  else if ((pt - 7000) > landed && ((int)tdistance > 5)){
+  else if ( time_since(&landed) < 10000 && ((int)tdistance > 5)){
 #else
     else if(0) {
 #endif

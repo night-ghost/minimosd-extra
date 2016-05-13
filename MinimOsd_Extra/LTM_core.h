@@ -76,12 +76,9 @@ static inline void ltm_read_len(void *dst, byte pos, byte sz) {
 // --------------------------------------------------------------------------------------
 // Decoded received commands
 static void ltm_check() {
-    uint32_t dummy;
 
     lflags.ltm_active = true;
     set_data_got();
-
-    msg.ltm.readIndex = 0;
 
     switch(msg.ltm.cmd) {
     case LIGHTTELEMETRY_GFRAME:{
@@ -194,67 +191,73 @@ struct LTM_N {
 void read_ltm() {
     uint8_t c;
 
+    enum LTM_serial_state state;
 
 //    uavData.flagTelemetryOk = ((millis() - msg.ltm.last_packet) < 500) ? 1 : 0;
 
     while (Serial.available()) {
-        c = char(Serial.read());
+        state=msg.ltm.state;
+        c = Serial.read();
+
 again:
-        if (msg.ltm.state == IDLE) {
-            msg.ltm.state = (c == '$') ? HEADER_START1 : IDLE;
+        switch(state) {
+        case IDLE:
+            if(c == '$') state = HEADER_START1;
             //Serial.println("header $" );
-        }
-        else if (msg.ltm.state == HEADER_START1) {
-            msg.ltm.state = (c == 'T') ? HEADER_START2 : IDLE;
+            break;
+            
+        case HEADER_START1:
+            if(c == 'T') state = HEADER_START2;
+            else goto retry;
             //Serial.println("header T" );
-        }
-        else if (msg.ltm.state == HEADER_START2) {
+            break;
+            
+        case HEADER_START2:
+    	    byte l;
             switch (c) {
             case 'G':
-                msg.ltm.framelength = LIGHTTELEMETRY_GFRAMELENGTH;
-                msg.ltm.state = HEADER_MSGTYPE;
+                l = LIGHTTELEMETRY_GFRAMELENGTH;
                 break;
             case 'A':
-                msg.ltm.framelength = LIGHTTELEMETRY_AFRAMELENGTH;
-                msg.ltm.state = HEADER_MSGTYPE;
+                l = LIGHTTELEMETRY_AFRAMELENGTH;
                 break;
             case 'S':
-                msg.ltm.framelength = LIGHTTELEMETRY_SFRAMELENGTH;
-                msg.ltm.state = HEADER_MSGTYPE;
+                l = LIGHTTELEMETRY_SFRAMELENGTH;
                 break;
             case 'O':
-                msg.ltm.framelength = LIGHTTELEMETRY_OFRAMELENGTH;
-                msg.ltm.state = HEADER_MSGTYPE;
+                l = LIGHTTELEMETRY_OFRAMELENGTH;
                 break;
             case 'N':
-                msg.ltm.framelength = LIGHTTELEMETRY_NFRAMELENGTH;
-                msg.ltm.state = HEADER_MSGTYPE;
+                l = LIGHTTELEMETRY_NFRAMELENGTH;
                 break;
             default:
-                msg.ltm.state = IDLE;
+                goto retry;
             }
+            msg.ltm.framelength=l;
+            state = HEADER_MSGTYPE;
             msg.ltm.cmd = c;
             msg.ltm.receiverIndex = 0;
-        }
-        else if (msg.ltm.state == HEADER_MSGTYPE) {
-            if (msg.ltm.receiverIndex == 0) {
-                msg.ltm.rcvChecksum = c;
-            }
-            else {
-                msg.ltm.rcvChecksum ^= c;
-            }
+            msg.ltm.rcvChecksum = 0;
+            break;
+        
+        case HEADER_MSGTYPE:
+            msg.ltm.rcvChecksum ^= c;
+
             if (msg.ltm.receiverIndex == msg.ltm.framelength - 4) { // received checksum byte
-                msg.ltm.state = IDLE;
                 if (msg.ltm.rcvChecksum == 0) {
                     ltm_check();
-                }
-                else {                                                   // wrong checksum, drop packet
-		    goto again;
-                }
-            }
-            else msg.ltm.serialBuffer[msg.ltm.receiverIndex++] = c;
+                } else {
+retry:
+            	    state=IDLE;
+            	    goto again;                                                   // wrong checksum, drop packet
+            	}
+            }else  {
+        	msg.ltm.serialBuffer[msg.ltm.receiverIndex++] = c;
+    	    }
+            break;
         }
     }
+    msg.ltm.state = state;
 }
 
 

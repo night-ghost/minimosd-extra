@@ -173,9 +173,7 @@ void setup()     {
 
     OSD::update();// clear memory
 
-//    pinMode(MAX7456_VSYNC,INPUT_PULLUP); - in MAX7456.cpp
     attachInterrupt(INT0, isr_VSYNC, FALLING);
-
     
     mavlink_comm_0_port = &Serial; // setup mavlink port
 
@@ -243,7 +241,7 @@ void setup()     {
     
     delay_150();
 
-    OSD::update();// Show bootloader bar
+    OSD::update();// Show sign bar
 
 //    delay(start_dly); у нас есть задержка на авто-бауд
 //    Serial.flush(); без него лучше шрифты грузятся

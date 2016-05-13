@@ -6,6 +6,7 @@ void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
     *dst = millis() + inc;
 }
 
+
 void NOINLINE long_plus(uint32_t *dst, uint16_t inc) {
     *dst +=  inc;
 }
@@ -19,10 +20,27 @@ static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
-void mav_message_start(byte len){
+static float NOINLINE get_converth(){
+    return pgm_read_float(&measure->converth);
+}
+
+static float NOINLINE get_converts(){
+    return pgm_read_float(&measure->converts);
+}
+
+float NOINLINE f_div1000(float f){
+    return f/1000;
+}
+
+void NOINLINE mav_message_start(byte len){
     mav_msg_ttl=seconds + 6;// time to show
     mav_msg_len = len;
     mav_msg_shift = count02s;
+}
+
+uint16_t NOINLINE time_since(uint32_t *t){
+    return (uint16_t)(millis() - *t); // loop time no more 1000 ms
+
 }
 
 static void pan_toggle(){
@@ -46,12 +64,13 @@ static void pan_toggle(){
         if (osd_off_switch != osd_mode){ 
             osd_off_switch = osd_mode;
             //osd_switch_time = millis();
-            millis_plus(&osd_switch_time, 0);
+            millis_plus(&osd_switch_time,0);
             if (osd_off_switch == osd_switch_last){
               lflags.rotatePanel = 1;
             }
         }
-        if ((millis() - osd_switch_time) > 2000){
+//        if ((millis() - osd_switch_time) > 2000){
+        if ( time_since(&osd_switch_time) > 2000){
           osd_switch_last = osd_mode;
         }
       }
@@ -109,7 +128,7 @@ static void pan_toggle(){
 	
 	mav_message[sizeof(msg)-2] += panelN;
 	
-	mav_message_start(sizeof(msg));
+	mav_message_start(sizeof(msg)-1);
   }
 
 }
@@ -133,6 +152,7 @@ static char setBatteryPic(uint16_t bat_level,byte *bp)
 	}
     }
 
+#if 0
     // разбиваем участок 0..128 на 5 частей
   if(bat_level <= 26){
     *bp   = 0x8d;
@@ -148,13 +168,19 @@ static char setBatteryPic(uint16_t bat_level,byte *bp)
   }
   else 
     *bp   = 0x89;
+#else
+    byte n = bat_level / 26;
+    
+    *bp   = 0x8d - n;
+
+#endif
 
     return 0;
 }
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
-static int grad_to_sect(int grad){
+static int NOINLINE grad_to_sect(int grad){
     //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
     
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
@@ -169,6 +195,10 @@ static int grad_to_sect_p(int grad){
 }
 
 
+
+static float NOINLINE diff_coord(float &c1, float &c2){
+    return (c1 - c2) * 111319.5;
+}
 
 
 /*int grad_to_sect(float grad){
@@ -237,8 +267,12 @@ static void setHomeVars()
         float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
 
         //DST to Home
-        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
-        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
+
+//        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
+//        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
+        dstlat = diff_coord(osd_home.lat, osd_pos.lat);
+        dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
+        
         osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
 	dst_x=(int)fabs(dstlat);
 	dst_y=(int)fabs(dstlon);
@@ -246,9 +280,9 @@ static void setHomeVars()
         //DIR to Home
         bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolute home direction
         
-        if(bearing < 0) bearing += 360;//normalization
+//        if(bearing < 0) bearing += 360;//normalization
         bearing = bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-        if(bearing < 0) bearing += 360;//normalization
+        while(bearing < 0) bearing += 360;//normalization
 
         osd_home_direction = grad_to_sect(bearing); 
   }
@@ -259,25 +293,43 @@ void NOINLINE calc_max(float &dst, float &src){
 
 }
 
-/* +36 bytes :( */
-/*
-void filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
-    dst = (val * k) + dst * (1.0 - k); 
+
+
+//#define USE_FILTER 1 /* +36 bytes :( */
+
+#if defined(USE_FILTER)
+void NOINLINE filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
+    //dst = (val * k) + dst * (1.0 - k); 
+    //dst = val * k + dst - dst*k;
+    //dst = (val-dst)*k + dst;
+    dst+=(val-dst)*k;
 }
-//*/
+
+void inline filter( float &dst, float val){ // комплиментарный фильтр 1/10
+    filter(dst,val,0.1);
+}
+#endif
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
 void setFdataVars()
 {
-    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+//    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+    uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
     
     //runtime = millis();
-    millis_plus(&runtime, 0);
+    millis_plus(&runtime,0);
 
   //Moved from panel because warnings also need this var and panClimb could be off
-    vertical_speed = (osd_climb * pgm_read_float(&measure->converth) ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
-    //filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60,  0.1); // комплиментарный фильтр 1/10
+#if defined(USE_FILTER)
+    filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60); // комплиментарный фильтр 1/10
+#else
+    vertical_speed = (osd_climb * get_converth() ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
+    //dst+=(val-dst)*k;
+    //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+    //float vs=(osd_climb * get_converth() ) * 60;
+    // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+#endif
 
     if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
 	max_battery_reading = osd_battery_remaining_A;
@@ -294,7 +346,8 @@ void setFdataVars()
     }
 #endif
 
-    float time_1000 = time_lapse / 1000.0; // in seconds
+//    float time_1000 = time_lapse / 1000.0; // in seconds
+    float time_1000 = f_div1000(time_lapse); // in seconds
 
     //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
     if(lflags.osd_got_home && lflags.motor_armed) tdistance += (osd_groundspeed * time_1000);
@@ -367,7 +420,8 @@ void NOINLINE gps_norm(float &dst, long f){
 
 
 void NOINLINE set_data_got() {
-    lastMAVBeat = millis();
+    //lastMAVBeat = millis();
+    millis_plus(&lastMAVBeat, 0);
 
     lflags.got_data = 1;
 #ifdef DEBUG
@@ -379,7 +433,7 @@ void NOINLINE set_data_got() {
 }
 
 
-void delay_byte(){
+void NOINLINE delay_byte(){
     if(!Serial.available_S())
         delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
 }
