@@ -9,7 +9,6 @@
 #define VER 79
 
 
-#define RELEASE_NUM 834
 #define VERSION "2.4"
 
 
@@ -79,4 +78,5 @@
 
 
 #include "eeprom.h"
+#include "version.h"
 

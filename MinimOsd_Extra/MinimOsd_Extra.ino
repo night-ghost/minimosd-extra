@@ -97,6 +97,10 @@ OSD osd; //OSD object
 #include "cleanflight_core.h"
 #endif
 
+#if defined(USE_LTM)
+#include "LTM_core.h"
+#endif
+
 #include "Panels.h"
 #include "MAVLink.h"
 

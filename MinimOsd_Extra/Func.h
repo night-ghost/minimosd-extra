@@ -404,6 +404,11 @@ static void getData(){
 	extern bool mwii_read(void);
 	mwii_read();
 #endif
+#if defined(USE_LTM)
+    } else if(lflags.ltm_active) {
+	extern void read_ltm(void);
+	read_ltm();
+#endif
     } else {
 	if(millis() < BOOTTIME){ // startup delay for fonts
 	    if(Serial.available_S()) {
@@ -428,7 +433,7 @@ static void getData(){
 	}
 
 
-	switch(count05s % 4){ 
+	switch(count05s % 5){
 #if defined(AUTOBAUD)
 	case 1: {
 	    Serial.end();
@@ -487,7 +492,13 @@ static void getData(){
 	    mwii_read();
 	    break;
 #endif
-	default:
+#if defined(USE_LTM)
+	case 4:
+	    extern void read_ltm(void);
+	    read_ltm();
+	    break;
+#endif
+	default: // 0 and all not used
 	    read_mavlink();
 	    break;
 	}

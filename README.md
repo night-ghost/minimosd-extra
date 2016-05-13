@@ -161,6 +161,10 @@ v834
 * fixed placement of time panel
 * time's semicolon is blinked
 
+v835
+* blinking of time can be turned off
+* really fixed placement of time panel
+
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 
@@ -344,6 +348,10 @@ v834
 * скролл сообщения mavlink может быть отключен
 * исправлено расположение панели time
 * двоеточие времени сделано мигающим
+
+v835
+* мигание двоеточия времени может быть отключено
+* действительно исправлено расположение панели time
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

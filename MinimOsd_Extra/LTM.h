@@ -32,7 +32,7 @@
 #define LIGHTTELEMETRY_NFRAMELENGTH 10
 
 
-static enum LTM_serial_state {
+enum LTM_serial_state {
     IDLE,
     HEADER_START1,
     HEADER_START2,
@@ -40,17 +40,15 @@ static enum LTM_serial_state {
     HEADER_DATA
 };
 
-struct LTM {
+typedef struct _LTM {
     uint8_t serialBuffer[LIGHTTELEMETRY_GFRAMELENGTH - 4];
     uint8_t receiverIndex;
     uint8_t cmd;
     uint8_t rcvChecksum;
     uint8_t readIndex;
     uint8_t framelength;
-    uint8_t passed = 0;
-    LTM_serial_state state = IDLE;
-    uint32_t last_packet;
-};
+    enum LTM_serial_state state;
+} LTM;
 
 
 struct LTM_G {
@@ -70,7 +68,7 @@ struct LTM_A {
 
 struct LTM_S {
     uint16_t volt;
-    uint16_t batUsedCapacity
+    uint16_t batUsedCapacity;
     byte rssi;
     byte airspeed;
     byte armfsmode;

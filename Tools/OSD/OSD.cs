@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r834 DV";
+        public const string VERSION = "r835 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -313,7 +313,7 @@ namespace OSD {
 
                 pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, 0, "Show in m/s");
                 pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
-                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY);
+                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1,0,"Blinking semicolon");
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);

@@ -48,12 +48,9 @@ uint32_t ltmread_u32() {
 //static uint8_t msg.ltm.ok = 0;
 //static uint32_t msg.ltm.last_packet;
 
-static  /*INLINE*/  inline uint8_t mwii_get_byte()  {
-    return msg.mwii.buf[msg.mwii.read_idx++];
-}
 
 static inline uint8_t ltm_read_byte(byte pos)  {
-    return msg.mwii.buf[msg.mwii.read_idx + pos];
+    return msg.ltm.serialBuffer[pos];
 }
 
 
@@ -73,99 +70,132 @@ static inline  uint32_t ltm_read_ulong(byte pos) {
 }
 
 static inline void ltm_read_len(void *dst, byte pos, byte sz) {
-    
     memcpy(dst, &msg.ltm.serialBuffer + pos, sz);
 }
 
 // --------------------------------------------------------------------------------------
 // Decoded received commands
-void ltm_check() {
+static void ltm_check() {
     uint32_t dummy;
 
+    lflags.ltm_active = true;
+    set_data_got();
+
     msg.ltm.readIndex = 0;
-    msg.ltm.last_packet = millis();
 
     switch(msg.ltm.cmd) {
-    case LIGHTTELEMETRY_GFRAME:
-        uavData.gpsLatitude = (int32_t)ltmread_u32();
-        uavData.gpsLongitude = (int32_t)ltmread_u32();
-        uavData.gpsSpeed = ltmread_u8() * 100;            // LTM gives m/s, we expect cm/s
-        uavData.altitude = ((int32_t)ltmread_u32());      // altitude from cm to m.
-        uint8_t ltm_satsfix = ltmread_u8();
+    case LIGHTTELEMETRY_GFRAME:{
+        gps_norm(osd_pos.lat,ltm_read_ulong(offsetof(LTM_G, lat) ) );
+        gps_norm(osd_pos.lon,ltm_read_ulong(offsetof(LTM_G, lon) ) );
+        osd_pos.alt = ltm_read_ulong(offsetof(LTM_G, alt) );       // altitude from cm to m.
+        
+        osd_groundspeed  = ltm_read_byte(offsetof(LTM_G, speed) ) * 100; // LTM gives m/s, we expect cm/s
+        
+	uint8_t ltm_satsfix  = ltm_read_byte(offsetof(LTM_G, satsfix) );
 
-        uavData.gpsNumSat = (ltm_satsfix >> 2) & 0xFF;
-        uavData.gpsFix    = ((ltm_satsfix & 0b00000011) <= 1) ? 0 : 1;
+        osd_satellites_visible = (ltm_satsfix >> 2) & 0x3F;
+        osd_fix_type    = ltm_satsfix & 0b00000011;
 
-        // hpdate home distance and bearing
-        if (uavData.gpsFixHome) {
-            float rads = fabs((float)uavData.gpsHomeLatitude / 10000000.0f) * 0.0174532925f;
-            float scaleLongDown = cos(rads);
-            float dstlon, dstlat;
+	} break;
 
-            //DST to Home
-            dstlat = fabs(uavData.gpsHomeLatitude - uavData.gpsLatitude) * 1.113195f;
-            dstlon = fabs(uavData.gpsHomeLongitude - uavData.gpsLongitude) * 1.113195f * scaleLongDown;
-            uavData.gpsHomeDistance = sqrt(sq(dstlat) + sq(dstlon)) / 100.0;
-
-            //DIR to Home
-            dstlon = (uavData.gpsHomeLongitude - uavData.gpsLongitude); //OffSet_X
-            dstlat = (uavData.gpsHomeLatitude - uavData.gpsLatitude) * (1.0f / scaleLongDown); //OffSet Y
-
-            float bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolut home direction
-            if (bearing < 0) bearing += 360;//normalization
-            bearing = bearing - 180;//absolut return direction
-            if (bearing < 0) bearing += 360;//normalization
-            uavData.gpsHomeBearing = bearing;
+    case LIGHTTELEMETRY_AFRAME:{
+        osd_att.roll  = (int)(ltm_read_uint(offsetof(LTM_A, roll) )) * 10;
+        osd_att.pitch = (int)(ltm_read_uint(offsetof(LTM_A, pitch))) * 10;
+        osd_att.yaw   = (int)(ltm_read_uint(offsetof(LTM_A, heading)));
+        if (osd_att.yaw < 0 ) osd_att.yaw += 360; //convert from -180/180 to 0/360°
+        
+        if (*((long *)&osd_pos.lat) == 0) { // if no GPS use yaw as heading
+            osd_heading = osd_att.yaw;
         }
-        else {
-            uavData.gpsHomeBearing = 0;
-        }
-
-        msg.ltm.passed = 1;
-	break;
-
-    case LIGHTTELEMETRY_AFRAME:
-        uavData.anglePitch = (int16_t)ltmread_u16() * 10;
-        uavData.angleRoll = (int16_t)ltmread_u16() * 10 ;
-        uavData.heading = (int16_t)ltmread_u16();
-        if (uavData.heading < 0 ) uavData.heading = uavData.heading + 360; //convert from -180/180 to 0/360°
-        msg.ltm.passed = 1;
-	break;
+        
+	}break;
 	
-    case LIGHTTELEMETRY_SFRAME:
-        uavData.batVoltage = ltmread_u16();
-        uavData.batUsedCapacity = ltmread_u16();
-        uavData.rssi = ltmread_u8();
-        uavData.airspeed = ltmread_u8();
+    case LIGHTTELEMETRY_SFRAME: {
+        if(!flags.useExtVbattA){
+            osd_vbat_A = ltm_read_uint(offsetof(LTM_S, volt) );
+            osd_battery_remaining_A = ltm_read_uint(offsetof(LTM_S, batUsedCapacity) );
+        }
 
-        uint8_t ltm_armfsmode = ltmread_u8();
-        uavData.isArmed = (ltm_armfsmode & 0b00000001) ? 1 : 0;
-        uavData.isFailsafe = (ltm_armfsmode >> 1) & 0b00000001;
-        uavData.flightMode = (ltm_armfsmode >> 2) & 0b00111111;
+	osd_rssi = ltm_read_byte(offsetof(LTM_S, rssi) );
+        osd_airspeed = ltm_read_byte(offsetof(LTM_S, airspeed) );
 
-        uavData.batCellVoltage = detectBatteryCellVoltage(uavData.batVoltage);  // LTM does not have this info, calculate ourselves
-        uavData.batCurrent = calculateCurrentFromConsumedCapacity(uavData.batUsedCapacity);
-        break;
+        uint8_t ltm_armfsmode = ltm_read_byte(offsetof(LTM_S, armfsmode) );
+        
+        lflags.motor_armed = (ltm_armfsmode & 0b00000001) ? 1 : 0;
+        //uavData.isFailsafe = (ltm_armfsmode >> 1) & 0b00000001;
+        osd_mode = (ltm_armfsmode >> 2) & 0b00111111;
+
+    //    uavData.batCellVoltage = detectBatteryCellVoltage(uavData.batVoltage);  // LTM does not have this info, calculate ourselves
+    //    uavData.batCurrent = calculateCurrentFromConsumedCapacity(uavData.batUsedCapacity);
+        } break;
 
     case LIGHTTELEMETRY_OFRAME:
+    /* we don't needs this
         uavData.gpsHomeLatitude = (int32_t)ltmread_u32();
         uavData.gpsHomeLongitude = (int32_t)ltmread_u32();
         dummy = (int32_t)(ltmread_u32()) / 100.0f; // altitude from cm to m.
         dummy  = ltmread_u8();
         uavData.gpsFixHome = ltmread_u8();
-        msg.ltm.passed = 1;
+    */
         break;
 
     case LIGHTTELEMETRY_NFRAME:
+/*
+struct LTM_N {
+    byte gps_mode; //        None        PosHold       RTH       Mission
+    byte nav_mode;
+        "None",                 // 0
+        "RTH Start",            // 1
+        "RTH Enroute",          // 2
+        "PosHold infinite",     // 3
+        "PosHold timed",        // 4
+        "WP Enroute",           // 5
+        "Process next",         // 6
+        "Jump",                 // 7
+        "Start Land",           // 8
+        "Land in Progress",     // 9
+        "Landed",               // 10
+        "Settling before land", // 11
+        "Start descent",        // 12
+        "Critical GPS failure"  // 15(?)
+    byte action;
+        UNASSIGNED=0,
+        WAYPOINT,
+        POSHOLD_UNLIM,
+        POSHOLD_TIME,
+        RTH,
+        SET_POI,
+        JUMP,
+        SET_HEAD,
+        LAND
+    byte wpn;	target waypoint N
+    byte nav_error;
+        "Navigation system is working", // 0
+        "Next waypoint distance is more than the safety limit, aborting mission", //1
+        "GPS reception is compromised - pausing mission, COPTER IS ADRIFT!", //2
+        "Error while reading next waypoint from memory, aborting mission", //3
+        "Mission Finished" , //4
+        "Waiting for timed position hold", //5
+        "Invalid Jump target detected, aborting mission", //6
+        "Invalid Mission Step Action code detected, aborting mission", //7
+        "Waiting to reach return to home altitude", //8
+        "GPS fix lost, mission aborted - COPTER IS ADRIFT!", //9
+        "Copter is disarmed, navigation engine disabled", //10
+        "Landing is in progress, check attitude if possible" //11
+    byte flags;
+};
+*/
+	byte mode = ltm_read_byte(offsetof(LTM_N, gps_mode) );
+
         break;
     }
 }
 
-void readTelemetry() {
+void read_ltm() {
     uint8_t c;
 
 
-    uavData.flagTelemetryOk = ((millis() - msg.ltm.last_packet) < 500) ? 1 : 0;
+//    uavData.flagTelemetryOk = ((millis() - msg.ltm.last_packet) < 500) ? 1 : 0;
 
     while (Serial.available()) {
         c = char(Serial.read());
@@ -181,48 +211,48 @@ again:
         else if (msg.ltm.state == HEADER_START2) {
             switch (c) {
             case 'G':
-                LTMframelength = LIGHTTELEMETRY_GFRAMELENGTH;
+                msg.ltm.framelength = LIGHTTELEMETRY_GFRAMELENGTH;
                 msg.ltm.state = HEADER_MSGTYPE;
                 break;
             case 'A':
-                LTMframelength = LIGHTTELEMETRY_AFRAMELENGTH;
+                msg.ltm.framelength = LIGHTTELEMETRY_AFRAMELENGTH;
                 msg.ltm.state = HEADER_MSGTYPE;
                 break;
             case 'S':
-                LTMframelength = LIGHTTELEMETRY_SFRAMELENGTH;
+                msg.ltm.framelength = LIGHTTELEMETRY_SFRAMELENGTH;
                 msg.ltm.state = HEADER_MSGTYPE;
                 break;
             case 'O':
-                LTMframelength = LIGHTTELEMETRY_OFRAMELENGTH;
+                msg.ltm.framelength = LIGHTTELEMETRY_OFRAMELENGTH;
                 msg.ltm.state = HEADER_MSGTYPE;
                 break;
             case 'N':
-                LTMframelength = LIGHTTELEMETRY_NFRAMELENGTH;
+                msg.ltm.framelength = LIGHTTELEMETRY_NFRAMELENGTH;
                 msg.ltm.state = HEADER_MSGTYPE;
                 break;
             default:
                 msg.ltm.state = IDLE;
             }
-            msg.ltm.statecmd = c;
-            msg.ltm.statereceiverIndex = 0;
+            msg.ltm.cmd = c;
+            msg.ltm.receiverIndex = 0;
         }
         else if (msg.ltm.state == HEADER_MSGTYPE) {
-            if (msg.ltm.statereceiverIndex == 0) {
-                msg.ltm.statercvChecksum = c;
+            if (msg.ltm.receiverIndex == 0) {
+                msg.ltm.rcvChecksum = c;
             }
             else {
-                msg.ltm.statercvChecksum ^= c;
+                msg.ltm.rcvChecksum ^= c;
             }
-            if (msg.ltm.statereceiverIndex == msg.ltm.stateframelength - 4) { // received checksum byte
+            if (msg.ltm.receiverIndex == msg.ltm.framelength - 4) { // received checksum byte
                 msg.ltm.state = IDLE;
-                if (msg.ltm.statercvChecksum == 0) {
+                if (msg.ltm.rcvChecksum == 0) {
                     ltm_check();
                 }
                 else {                                                   // wrong checksum, drop packet
 		    goto again;
                 }
             }
-            else msg.ltm.stateserialBuffer[msg.ltm.statereceiverIndex++] = c;
+            else msg.ltm.serialBuffer[msg.ltm.receiverIndex++] = c;
         }
     }
 }

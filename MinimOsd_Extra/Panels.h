@@ -29,7 +29,7 @@ static float NOINLINE cnvGroundSpeed() { // вынос инварианта
 
 
 static void NOINLINE printTime(int t, byte blink){
-    osd.printf_P(PSTR("%2i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
+    osd.printf_P(PSTR("%3i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
 }
 
 static void NOINLINE printTime(int t){
@@ -1051,7 +1051,7 @@ static void panBatteryPercent(point p){
 
 static void panTime(point p){
 
-    printTime(total_flight_time_milis / 1000, 1); // blink
+    printTime(total_flight_time_milis / 1000, is_alt(p)); // blink
 }
 
 

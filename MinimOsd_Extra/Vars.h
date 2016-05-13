@@ -203,6 +203,7 @@ struct loc_flags {
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mwii_active:1;    // got valid MWII packet - flag forever
+    bool ltm_active:1;     // got valid LTM packet - flag forever
     bool input_active:1;    // got ANY valid packet - flag forever
     
     bool rotatePanel:1;
