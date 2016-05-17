@@ -2129,11 +2129,11 @@ as_char:
 
 
 
-    if (     (chan_raw[1] - 100) > chan2_raw_middle ){  move_menu(1);  return; } // переходы по строкам по верх-низ
-    else if ((chan_raw[1] + 100) < chan2_raw_middle ){  move_menu(-1); return; }
+    if ((chan_raw[1] - 150) > chan2_raw_middle ){  move_menu(1);    return; } // переходы по строкам по верх-низ
+    if ((chan_raw[1] + 150) < chan2_raw_middle ){  move_menu(-1);   return; }
 
-    if (     (chan_raw[3] - 100) > chan4_raw_middle ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
-    else if ((chan_raw[3] + 100) < chan4_raw_middle ){  move_screen(-1); return; }
+    if ((chan_raw[3] - 150) > chan4_raw_middle ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+    if ((chan_raw[3] + 150) < chan4_raw_middle ){  move_screen(-1); return; }
 
 
     OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром

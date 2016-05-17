@@ -170,6 +170,9 @@ v836
 
 If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
+v837
+
+* some code cleanup, recompiled with another GCC keys set
 
 /* RUSSIAN */
 
