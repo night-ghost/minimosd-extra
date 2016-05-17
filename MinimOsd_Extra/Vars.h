@@ -217,7 +217,7 @@ struct loc_flags {
     bool in_air:1;
 
     bool blinker:1;
-
+    bool flgMessage:1;
     
     bool mode_switch:1;
     bool osd_got_home:1; // tels if got home position or not

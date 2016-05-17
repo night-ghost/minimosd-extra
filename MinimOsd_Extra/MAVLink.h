@@ -243,7 +243,7 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
 		    //mav_msg_ttl=seconds + 6;// time to show
 		    //mav_msg_len = len;
 		    //mav_msg_shift = count02s;
-		    mav_message_start(len);
+		    mav_message_start(len, 6);
                 }
                 break;
 

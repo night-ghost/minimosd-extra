@@ -32,10 +32,12 @@ float NOINLINE f_div1000(float f){
     return f/1000;
 }
 
-void NOINLINE mav_message_start(byte len){
-    mav_msg_ttl=seconds + 6;// time to show
+void NOINLINE mav_message_start(byte len, byte time){
+    mav_msg_ttl=seconds + time;// time to show
     mav_msg_len = len;
     mav_msg_shift = count02s;
+    
+//    lflags.flgMessage=1;
 }
 
 uint16_t NOINLINE time_since(uint32_t *t){
@@ -122,13 +124,15 @@ static void pan_toggle(){
 
 	const char *cp;
 	byte *wp;
-	for(cp=msg, wp=mav_message;*cp!=0;){
-	    *wp++=*cp++;
+	for(cp=msg, wp=mav_message;;){
+	    byte c=pgm_read_byte(cp++);
+	    *wp++=c;
+	    if(c==0) break;
 	}
 	
 	mav_message[sizeof(msg)-2] += panelN;
 	
-	mav_message_start(sizeof(msg)-1);
+	mav_message_start(sizeof(msg)-1,3); // len, time
   }
 
 }

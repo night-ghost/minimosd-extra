@@ -173,6 +173,7 @@ If you like this project and want to support further development - you can do it
 v837
 
 * some code cleanup, recompiled with another GCC keys set
+* fixed bug with Message panel
 
 /* RUSSIAN */
 
@@ -361,6 +362,10 @@ v835
 
 v836
 * поддержка протокола телеметрии LTM (untested)
+
+v837
+* чистка кода, пересборка с другими ключами компиляции
+* исправлен баг с панелью Message
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

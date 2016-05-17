@@ -1467,7 +1467,8 @@ static void panMessage(point p){
 
 #define MAX_MSG_SIZE 26
 
-    if(mav_message[0] && mav_msg_ttl != seconds) {
+//  if(lflags.flgMessage) {
+    if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
 	char sign;
 
         if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
@@ -1534,8 +1535,11 @@ static void panMessage(point p){
 	}
 //OSD::setPanel(p.x,p.y +1);
 //osd.printf_P(PSTR(" sev=%d"), mav_msg_severity);
-    } else
+    } else {
 	mav_message[0]=0; // no message
+//	lflags.flgMessage=0;
+    }
+//  } // lflags.flgMessage
 }
 
 
