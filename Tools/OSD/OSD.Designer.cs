@@ -54,6 +54,7 @@ namespace OSD
             this.updateFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customBGPictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.connectComPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateCharsetcustomFwToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -382,6 +383,7 @@ namespace OSD
             this.updateFirmwareToolStripMenuItem,
             this.customBGPictureToolStripMenuItem,
             this.sendTLogToolStripMenuItem,
+            this.connectComPortToolStripMenuItem,
             this.updateFontToolStripMenuItem,
             this.updateCharsetDevToolStripMenuItem,
             this.updateCharsetcustomFwToolStripMenuItem,
@@ -434,6 +436,17 @@ namespace OSD
             this.sendTLogToolStripMenuItem.Text = "Load TLog.";
             this.sendTLogToolStripMenuItem.ToolTipText = "Load a Mavlink transmission log to play into the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
+
+            //
+            // connectComPortToolStripMenuItem
+            //
+            this.connectComPortToolStripMenuItem.Name = "connectComPortToolStripMenuItem";
+            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.connectComPortToolStripMenuItem.Text = "Connect to COM port";
+            this.connectComPortToolStripMenuItem.ToolTipText = "Transmit all data from selected port to OSD to test how it works";
+            this.connectComPortToolStripMenuItem.Click += new System.EventHandler(this.connectComPortToolStripMenuItem_Click);
+
+
             // 
             // updateFontToolStripMenuItem
             // 
@@ -2001,7 +2014,7 @@ namespace OSD
 
         
         private System.Windows.Forms.Button BUT_WriteOSD;
-        private System.Windows.Forms.ComboBox CMB_ComPort;
+        public System.Windows.Forms.ComboBox CMB_ComPort;
 
         private System.Windows.Forms.Button BUT_ReadOSD;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -2024,6 +2037,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem updateFirmwareToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem customBGPictureToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendTLogToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem connectComPortToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripMenuItem updateFontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;

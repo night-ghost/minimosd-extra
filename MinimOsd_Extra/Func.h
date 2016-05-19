@@ -126,7 +126,7 @@ static void pan_toggle(){
 	byte *wp;
 	for(cp=msg, wp=mav_message;;){
 	    byte c=pgm_read_byte(cp++);
-	    *wp++=c;
+	    *wp++ = c;
 	    if(c==0) break;
 	}
 	
@@ -282,10 +282,10 @@ static void setHomeVars()
 	dst_y=(int)fabs(dstlon);
 
         //DIR to Home
-        bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775); //absolute home direction
+        bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
         
 //        if(bearing < 0) bearing += 360;//normalization
-        bearing = bearing - 180 - osd_heading;//absolut return direction  //relative home direction
+        bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
         while(bearing < 0) bearing += 360;//normalization
 
         osd_home_direction = grad_to_sect(bearing); 
@@ -313,6 +313,10 @@ void inline filter( float &dst, float val){ // комплиментарный ф
     filter(dst,val,0.1);
 }
 #endif
+
+void NOINLINE float_add(float &dst, float val){
+    dst+=val;
+}
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -354,10 +358,10 @@ void setFdataVars()
     float time_1000 = f_div1000(time_lapse); // in seconds
 
     //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home && lflags.motor_armed) tdistance += (osd_groundspeed * time_1000);
+    if(lflags.osd_got_home && lflags.motor_armed) float_add(tdistance, osd_groundspeed * time_1000);
 
     //mah_used += (osd_curr_A * 10.0 * time_lapse / (3600.0 * 1000.0));
-    mah_used += ((float)osd_curr_A * time_1000 / (3600.0 / 10.0));
+    float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 
     uint16_t rssi_v = rssi_in;
 //    byte ch = sets.RSSI_raw / 2;

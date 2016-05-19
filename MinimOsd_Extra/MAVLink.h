@@ -54,20 +54,17 @@ bool read_mavlink(){
     while(Serial.available_S()) {
         uint8_t c = Serial.read_S();
         byte apm_mav_type;
-//LED_BLINK;
 
 #ifdef DEBUG
 	bytes_comes+=1;
 #endif
-//        if (!lflags.mavlink_active) try_upload_font(c);
-
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
 
             set_data_got(); //lastMAVBeat = millis();
 
 #ifdef DEBUG
-//Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
+//   Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
 #endif
 
             lflags.mavlink_active = 1;
@@ -75,10 +72,9 @@ bool read_mavlink(){
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
 #ifdef DEBUG
-	packets_skip+=1;
-	Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
+    packets_skip+=1;
+    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
-
 		    break; // skip packet
 		}
 
@@ -90,17 +86,33 @@ bool read_mavlink(){
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
-                if(apm_mav_type == 6 || apm_mav_type == 5) break; // MAV_TYPE_GCS || MAV_TYPE_ANTENNA_TRACKER
-                
-                apm_mav_system    = msg.m.sysid;
-                // apm_mav_component = msg.m.compid;
+                if(apm_mav_type == 6 || apm_mav_type == 5 || apm_mav_type == 26) { // MAV_TYPE_GCS || MAV_TYPE_ANTENNA_TRACKER || MAV_TYPE_GIMBAL
+#ifdef DEBUG
+    packets_skip+=1;
+    Serial.printf_P(PSTR("\nHEARTBEAT skip type=%d\n"), apm_mav_type);
+#endif
+		    break;
+
+                }
 
                 osd_autopilot = mavlink_msg_heartbeat_get_autopilot(&msg.m);
-                osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
                 //Mode (arducoper armed/disarmed)
                 base_mode = mavlink_msg_heartbeat_get_base_mode(&msg.m);
 
+
+#ifdef DEBUG
+	if(apm_mav_system  != msg.m.sysid){
+	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
+	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
+	}
+#endif
+
                 lflags.motor_armed = getBit(base_mode,7);
+
+                osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
+                apm_mav_system    = msg.m.sysid; // store ID to filter out alien messages
+                // apm_mav_component = msg.m.compid;
+
                 break;
                 
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -240,10 +252,7 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
                         }
                     }
 
-		    //mav_msg_ttl=seconds + 6;// time to show
-		    //mav_msg_len = len;
-		    //mav_msg_shift = count02s;
-		    mav_message_start(len, 6);
+		    mav_message_start(len, 6); // len, time to show
                 }
                 break;
 

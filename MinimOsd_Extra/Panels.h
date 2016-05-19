@@ -21,9 +21,9 @@ static byte get_mhigh(){
     return pgm_read_byte(&measure->high);
 }
 
-static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
+//static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
 //static const PROGMEM char f4_0fc[]="%4.0f%c";
-#define f4_0fc (&fmt_xtrack[3])
+//#define f4_0fc (&fmt_xtrack[3])
 
 static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 
@@ -52,7 +52,8 @@ static void NOINLINE osd_printf_1(PGM_P fmt, float f){
 }
 
 static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
-    osd.printf_P(fmt, f, c);
+    osd.printf_P(fmt, f);
+    OSD::write_S(c);
 }
 
 static void NOINLINE osd_printi_1(PGM_P fmt, int f){
@@ -80,11 +81,11 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
 }
 
 static void printSpeed(float s, byte alt){
-    printSpeed(PSTR("%3.0f%c"), s, alt);
+    printSpeed(PSTR("%3.0f"), s, alt);
 }
 
 static void printSpeedCnv(float *s, byte alt){
-    printSpeedCnv(PSTR("%3.0f%c"), s, alt);
+    printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
 
 static void printSpeed(float s){
@@ -120,7 +121,7 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
 
     switch(method) {  
     case 1:		// airspeed
-	printSpeedCnv(PSTR("%2.0f%c"), &nor_osd_windspeed, alt);
+	printSpeedCnv(PSTR("%2.0f"), &nor_osd_windspeed, alt);
 	break;
     
     case 2:	//      course
@@ -425,7 +426,7 @@ static void panCOG(point p){
 }
 
 static void printDist(float d){
-      osd_printf_2(PSTR("%5.0f%c"), d, get_mhigh());
+      osd_printf_2(PSTR("%5.0f"), d, get_mhigh());
 }
 
 static void printDistCnv(float d){
@@ -440,7 +441,7 @@ static void printFullDist(float dd){
     if ((int)dd <= 9999) {
         printDist(dd);
     }else{
-         osd_printf_2(PSTR("%5.2f%c"), (dd / pgm_read_word(&measure->distconv)), pgm_read_byte(&measure->distchar));
+         osd_printf_2(PSTR("%5.2f"), (dd / pgm_read_word(&measure->distconv)), pgm_read_byte(&measure->distchar));
     }
 }
 
@@ -530,10 +531,10 @@ as_f:
 
 static void panFdata(point p){ // итоги полета
 
-    static const char PROGMEM fmt0[]="|\x0B%5f%c";
-    static const char PROGMEM fmt1[]="\x8F%5f%c";
-    static const char PROGMEM fmt2[]="\x14%5f%c";
-    static const char PROGMEM fmt3[]="\x12%5f%c";
+    static const char PROGMEM fmt0[]="|\x0B%5f";
+    static const char PROGMEM fmt1[]="\x8F%5f";
+    static const char PROGMEM fmt2[]="\x14%5f";
+    static const char PROGMEM fmt3[]="\x12%5f";
     static const char PROGMEM fmt4[]="\x03%10.6f";
     static const char PROGMEM fmt5[]="\x04%10.6f";
 
@@ -585,9 +586,9 @@ static void panTune(point p){
     static const PROGMEM char fmt1[]="\x4E\x50%3.0f\x05";
     static const PROGMEM char fmt2[]="\x4E\x48%4.0f\x05";
     static const PROGMEM char fmt3[]="\x54\x42%6.1f\x05";
-    static const PROGMEM char fmt4[]="\x41\x45%5.1f%c";
+    static const PROGMEM char fmt4[]="\x41\x45%5.1f";
     static const PROGMEM char fmt5[]="\x58\x45%4.0f\x6D";
-    static const PROGMEM char fmt6[]="\x41\x45%5.1f%c";
+    static const PROGMEM char fmt6[]="\x41\x45%5.1f";
 
     static const PROGMEM Formats fd[] = {
 	{ fmt0, 'i', &nav_roll          },
@@ -617,14 +618,18 @@ static void panTune(point p){
     PGM_P f;
  #ifdef IS_PLANE
     if(has_sign(p)) 
-        f=PSTR("\x11%3.0f%c|\x15");
+        f=PSTR("\x11%3.0f");
     else
-	f=PSTR("%3.0f%c|");
+	f=PSTR("%3.0f");
 
     float err = alt_error * get_converth();
 
     osd_printf_2(f, -err, get_mhigh());
     printSpeed(aspd_error / 100.0);
+    
+    osd_nl();
+    
+    if(has_sign(p)) OSD::write_S(0x15);
  #endif
 #endif
 }
@@ -639,7 +644,7 @@ static void panTune(point p){
 // Staus  : done
 
 static void panTemp(point p){
-    osd_printf_2(PSTR("%5.1f%c"), ((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100), pgm_read_byte(&measure->temps));    
+    osd_printf_2(PSTR("%5.1f"), ((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100), pgm_read_byte(&measure->temps));    
 }
 
 /* **************************************************************** */
@@ -701,7 +706,7 @@ static void panEff(point p){
                 int iGlide=glide;
                 if (iGlide > 9999) glide = 9999.0;
                 if (iGlide > 0){
-                    osd_printf_2(f4_0fc, glide, get_mhigh()); // аэродинамическое качество
+                    osd_printf_2("%4.0f", glide, get_mhigh()); // аэродинамическое качество
                 }
             }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
                   osd.print_P(PSTR("\x20\x20\x90\x91")); //термик
@@ -852,7 +857,7 @@ static void panClimb(point p){
 	    fmt=PSTR("% 5.1f\x18");
 	osd_printf_1(fmt, v);
     } else
-        osd_printf_2(f4_0fc, vertical_speed, pgm_read_byte(&measure->climbchar));
+        osd_printf_2("%4.0f", vertical_speed, pgm_read_byte(&measure->climbchar));
 }
 
 /* **************************************************************** */
@@ -1119,11 +1124,20 @@ static void panHorizon(point p){
   // сначала нарисуем стрелочки.
 
     if(is_alt(p)) {
-        osd.print_P(str_hud);
+/*        osd.print_P(str_hud);
         osd.print_P(str_hud);
         osd.print_P(str_mid);
         osd.print_P(str_hud);
         osd.print_P(str_hud);
+*/
+	byte i;
+	for(i=5;i!=0; i--){ // 30 bytes of flash
+	    if(i==3) osd.print_P(str_mid);
+	    else     osd.print_P(str_hud);
+	    
+// GCC BUG	    osd.print_P(i==3 ? str_mid : str_hud);
+	}
+
     } else {
 /* we don't need to clear screen!
 	for(byte j=5; j!=0; j--) {
@@ -1137,10 +1151,8 @@ static void panHorizon(point p){
                       
     showHorizon(p.x + 1, p.y);
 
-
     if(flags.radar_on)
 	showRADAR(p.x+6, p.y+2);
-
 
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(p.x+6, p.y+2);
@@ -1439,12 +1451,13 @@ static void panWPDis(point p){
 
     //osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,((float)wp_dist * pgm_read_float(&measure->converth)), h);
     osd_printi_1(PSTR("%2i "), wp_number);
-    osd_printf_2(PSTR("%4.0f%c|"), ((float)wp_dist * get_converth()), h);
+    osd_printf_2(PSTR("%4.0f"), ((float)wp_dist * get_converth()), h);
+    osd_nl();
     
     showArrow(getTargetBearing(), 0);
 
     if (osd_mode == 10){ // auto
-        osd_printf_2(PSTR("\x20\x58\x65%4.0f%c"), (xtrack_error * get_converth()), h);
+        osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (xtrack_error * get_converth()), h);
     }else{
     // we don't needs to clear!    osd.print_P(&strclear[4]);
     }
@@ -1700,6 +1713,15 @@ char const * const mode_mw_strings[] PROGMEM ={
 
 static void panFlightMode(point p){
 
+#ifdef DEBUG
+    static byte old_mode = -1;
+    
+    if(osd_mode !=old_mode) {
+        Serial.printf_P(PSTR("mode changed from %d to %d\n"), old_mode, osd_mode);
+        old_mode = osd_mode;
+    }
+#endif
+
     //PGM_P mode_str;
     const char * const *ptr;
     
@@ -1762,12 +1784,10 @@ static void panRadarScale(Point p){
     float dd= radar_zoom * STEP_WIDTH * get_converth();
     
     if(radar_zoom >=40) // 10 000 
-        osd_printf_2(PSTR("%4.2f%c"), f_div1000(dd), pgm_read_byte(&measure->distchar));
+        osd_printf_2(PSTR("%4.2f"), f_div1000(dd), pgm_read_byte(&measure->distchar));
     else
-        osd_printf_2(PSTR("%4.0f%c"), dd, get_mhigh());
+        osd_printf_2(PSTR("%4.0f"), dd, get_mhigh());
 }
-
-
 
 
 
@@ -1785,9 +1805,7 @@ static void panCh(point p){
 
 #if defined(USE_SENSORS)
 static void printSensor(byte n){
-
     SensorInfo s;
-
 
     eeprom_read_len((byte *)&s,  EEPROM_offs(sensors) + n * sizeof(SensorInfo),  sizeof(SensorInfo) );
 
@@ -1869,21 +1887,20 @@ void renew(){
 
 
 void setup_horiz(){
-//Serial.printf_P(PSTR("horiz!\n")); Serial.wait();
     showHorizon(8+1, 6);
 }
 
 #if defined(USE_SENSORS)
 void setup_sens() {
-    /*if(is_on(panel.sensor1))*/    panSensor1({8 , 6});
-    /*if(is_on(panel.sensor2))*/    panSensor2({8 , 7});
-    /*if(is_on(panel.sensor3))*/    panSensor3({8 , 8});
-    /*if(is_on(panel.sensor4))*/    panSensor4({8 , 9});
+    /*if(is_on(panel.sensor1))*/ osd_nl();   panSensor1({8 , 6});
+    /*if(is_on(panel.sensor2))*/ osd_nl();   panSensor2({8 , 7});
+    /*if(is_on(panel.sensor3))*/ osd_nl();   panSensor3({8 , 8});
+    /*if(is_on(panel.sensor4))*/ osd_nl();   panSensor4({8 , 9});
 }
 #endif
 
 // в нашем распоряжении 16 строк
-static const PROGMEM char n_sets[]        = "      OSD setup";
+static const PROGMEM char n_sets[]        = "   OSD setup";
 static const PROGMEM char n_batt[]        = "Battery warning";
 static const PROGMEM char n_battB[]       = "Batt 2 warning";
 static const PROGMEM char n_stall[]       = "Stall warning";
@@ -1976,8 +1993,8 @@ static const PROGMEM Setup_screen screens[] = {
 
 static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
-static uint16_t chan1_raw_middle, chan2_raw_middle; // запомненные при входе значения каналов 1 и 2
-static uint16_t /*chan3_raw_middle,*/ chan4_raw_middle; // запомненные при входе значения каналов 3 и 4
+static uint16_t chan1_raw_middle=0, chan2_raw_middle=0; // запомненные при входе значения каналов 1 и 2
+static uint16_t /*chan3_raw_middle,*/ chan4_raw_middle=0; // запомненные при входе значения каналов 3 и 4
 const Params *params; // указатель на текущий набор параметров
 
 
@@ -2040,13 +2057,14 @@ static void panSetup(){
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
     size = pgm_read_byte((void *)&pscreen->size);
 
-    if (chan1_raw_middle == 0 && chan2_raw_middle == 0 && chan4_raw_middle == 0){
+    if (chan1_raw_middle < 1000)
         chan1_raw_middle = chan_raw[0];	// запомнить начальные значения  - центр джойстика - лево/право
+    
+    if(chan2_raw_middle < 1000) 
         chan2_raw_middle = chan_raw[1]; //                                                   верх-низ
-
+    
+    if(chan4_raw_middle < 1000)
         chan4_raw_middle = chan_raw[3];// запомнить начальные значения  - центр ВТОРОГО джойстика
-    }
-
 
 
     for(byte i=0; i < size; i++) {
@@ -2057,10 +2075,10 @@ static void panSetup(){
 
         osd.print_P(nm);
         
-        //while(OSD::col < 19) OSD::write_S(' ');
+        //            x    y
         OSD::setPanel(19, SETUP_START_ROW + i);
 
-	if(i == setup_menu) {
+	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
 	    col=OSD::col;
 	} else {
@@ -2132,6 +2150,8 @@ as_char:
     lflags.got_data=1;   // renew screen
 
 
+//Serial.printf_P(PSTR("ch1=%d mid=%d\n"), chan_raw[1], chan2_raw_middle);
+//Serial.printf_P(PSTR("ch3=%d mid=%d\n"), chan_raw[3], chan4_raw_middle);
 
     if ((chan_raw[1] - 150) > chan2_raw_middle ){  move_menu(1);    return; } // переходы по строкам по верх-низ
     if ((chan_raw[1] + 150) < chan2_raw_middle ){  move_menu(-1);   return; }
@@ -2157,27 +2177,16 @@ as_char:
     max =(int)pgm_read_word((void *)&p->max);
 
     type=pgm_read_byte((void *)&p->type);
-    k=pgm_read_byte((void *)&p->k);
+    k   =pgm_read_byte((void *)&p->k);
 
 
     v=c_val;
     
     switch (type){
-	case 'z':
-	case 'Z':
-	case 'c':
-    	    { 
-//    	        int l=*((char *)pval);
-//		v = l / (float)(k);
-	    }
-	    goto as_byte;
-
+	case 'z': // offset
+	case 'Z': // offset
+	case 'c': // char
         case 'b': // byte param
-    	    { 
-//    	        int l=*((byte *)pval);
-//		v = l / (float)(k);
-	    }
-as_byte:
     	    size= 1;
 	    if(     diff>300)	inc=10/(float)k;
 	    else if(diff>150)	inc=1 /(float)k;
@@ -2185,7 +2194,6 @@ as_byte:
 
 	case 's': // sensors
         case 'f': // float param
-//	    v=*((float *)pval);
 	    size=4;
 	
 	    if(     diff>400) inc=1;
@@ -2196,15 +2204,14 @@ as_byte:
 	    break;
     }
 
-
-//    float value_old = v;
-//    bool press=false;
-        
+    
     
     if(diff>100){
 //if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
-	if(fNeg) v += inc;
-	else     v -= inc;
+//	if(fNeg) v += inc;
+//	else     v -= inc;
+	if(fNeg) inc = -inc;
+	float_add(v, inc);
 
         if(v<min) v=min;
         if(v>max) v=max;
@@ -2245,15 +2252,9 @@ as_byte:
 
 
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
-//	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v); // updated value
 
 no_write:
 	fptr cb = (fptr) pgm_read_word((void *)&p->cb);
-
-
-//Serial.printf_P(PSTR("cb=%x\n"), (int)cb); Serial.wait();
-
-//Serial.printf_P(PSTR("sets.horiz_offs=%d\n"), sets.horiz_offs); 
 
 	if(cb) cb(); // show tail
     }
@@ -2399,16 +2400,7 @@ void writePanels(){
 #endif
 #endif
 
-#ifdef DEBUG
-    Serial.printf_P(PSTR("fdata\n")); Serial.wait();
-#endif
-
     panFdata({1,1});    //Flight summary panel
-
-#ifdef DEBUG
-    Serial.printf_P(PSTR("fdata done\n")); Serial.wait();
-#endif
-
 
   } else{  //Normal osd panel
 

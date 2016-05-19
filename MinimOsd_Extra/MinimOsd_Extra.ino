@@ -184,6 +184,10 @@ void setup()     {
     OSD::setPanel(5, 5);
     osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
 
+#ifdef DEBUG
+//    Serial.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
+#endif
+
     // Get correct settings from EEPROM
     readSettings();
 

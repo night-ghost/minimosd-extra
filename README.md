@@ -55,6 +55,9 @@ in http://forum.rcdesign.ru/f90/thread132831-195.html#post5602416 but on interru
 
 * Panel in CT can be dragged over any point, not only for the upper left corner
 
+If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SLUC8B3U7E7PS)
+
+
 v813:
 
 * HUD borders can be turned off
@@ -168,12 +171,17 @@ v835
 v836
 * support for LTM telemetry protocol (untested)
 
-If you like this project and want to support further development - you can do it! [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 v837
 
 * some code cleanup, recompiled with another GCC keys set
 * fixed bug with Message panel
+
+v838
+
+* filtered out MAVlink messages from gimbal
+* CT now can connect OSD' port to any another COM port (Options - Connect to COM port)
+* fixed strange bug with errorneos cursor movements on Setup screen
 
 /* RUSSIAN */
 
@@ -253,6 +261,8 @@ http://forum.rcdesign.ru/f90/thread132831-195.html#post5602416 но через �
 
 * панель в конфигураторе можно таскать за любую точку а не только за левый верхний угол
 
+
+Если вам понравился проект и вы хотите поддержать его дальнейшее развитие - вы можете это сделать [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 
 
 v813:
@@ -368,7 +378,12 @@ v837
 * исправлен баг с панелью Message
 
 
+v838
+
+* отфильтровываются сообщения MAVlink от подвеса
+* Конфигуратор может подать поток телеметрии на OSD с любого COM-порта
+* исправлен странный баг с самопроизвольным движением  курсора на экране настройки
+
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
-Если вам понравился проект и вы хотите поддержать его дальнейшее развитие - вы можете это сделать [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=F5UY65DJHF3TQ)
 

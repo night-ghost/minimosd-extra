@@ -146,7 +146,7 @@ namespace OSD {
         public osd_screen[] scr = new osd_screen[npanel];
 
 
-        SerialPort comPort = new SerialPort();
+        public SerialPort comPort = new SerialPort();
 
         Panels pan; // там в основном статика так что работает без создания экземпляра
 
@@ -163,6 +163,8 @@ namespace OSD {
         private bool tlog_run = false;
         public byte[] tlog_data;
         System.Threading.Thread tlog_thread;
+        public System.Threading.Thread com_thread;
+        public bool com_run=false;
 
         bool RSSI_used = false; //  использование дополнительных ног
         bool curr_used = false;
@@ -481,7 +483,7 @@ namespace OSD {
             chkILS.Checked = pan.flgILS;
         }
 
-        private string[] GetPortNames() {
+        public string[] GetPortNames() {
             string[] devs = new string[0];
 
             if (Directory.Exists("/dev/"))
@@ -950,7 +952,7 @@ namespace OSD {
                 if (err > 0)
                     MessageBox.Show("Failed to upload new configuration data");
                 else if (err == 0)
-                    MessageBox.Show("Done writing configuration data!");
+                    toolStripStatusLabel1.Text = "Done writing configuration data!";
 
             } else if (panel_number >= 0 && panel_number < npanel) {
                 err = conf.writeEEPROM(wr_start, wr_length);
@@ -2077,65 +2079,6 @@ namespace OSD {
                 try {
                     
                     byte[] bytes = br.ReadBytes(20000000); // no more 20MB
-/*
-                    string message = "";
-                    int frameIndex = 0;
-                    for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++) {
-                        Application.DoEvents();
-                        message = "";
-                        if (frameIndex < 20) {
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            int length = (int)bytes[byteIndex];
-                            message += "Payload length: " + length.ToString();
-                            byteIndex++;
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "Packet sequence: " + ((int)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "System ID: " + ((int)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "Component ID: " + ((int)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "Message ID: " + ((int)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                            message += "Message: ";
-                            for (int x = 0; x < length; x++) {
-                                while (bytes[byteIndex] == '\0')
-                                    byteIndex++;
-                                message += ((char)bytes[byteIndex]).ToString();
-                                byteIndex++;
-                            }
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "CRC1: " + ((int)bytes[byteIndex]).ToString();
-                            byteIndex++;
-                            while (bytes[byteIndex] == '\0')
-                                byteIndex++;
-                            message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
-                            message += Environment.NewLine;
-                            byteIndex++;
-                            Console.Write(message);
-                        } else {
-                            break;
-                        }
-
-                        if (bytes[byteIndex] == 0xFE) {
-                            frameIndex++;
-                        }
-
-                    }
-*/
-/*                    string str = System.Text.Encoding.UTF8.GetString(bytes);
-                    str = str.Replace((char)0, '\0');
-                    str = str.Replace("\0", "");
-*/
   
                     tlog_data = bytes;
                     grpTLog.Enabled = true;
@@ -2160,9 +2103,9 @@ namespace OSD {
             xmlconfig(true);
         }
 
-        private String arduinoIDEPath = "Arduino-1.6.5";
-        private String planeSketchPath = "ArduCAM_OSD";
-        private String copterSketchPath = "ArduCAM_OSD";
+        //private String arduinoIDEPath = "Arduino";
+        //private String planeSketchPath = "ArduCAM_OSD";
+        //private String copterSketchPath = "ArduCAM_OSD";
         private bool autoUpdate = false;
         private bool checkForUpdates = true;
 
@@ -2180,11 +2123,11 @@ namespace OSD {
 
                     xmlwriter.WriteElementString("Pal", CHK_pal.Checked.ToString());
 
-                    xmlwriter.WriteElementString("ArduinoIDEPath", arduinoIDEPath);
+                    //xmlwriter.WriteElementString("ArduinoIDEPath", arduinoIDEPath);
 
-                    xmlwriter.WriteElementString("PlaneSketchPath", planeSketchPath);
+                    //xmlwriter.WriteElementString("PlaneSketchPath", planeSketchPath);
 
-                    xmlwriter.WriteElementString("CopterSketchPath", copterSketchPath);
+                    //xmlwriter.WriteElementString("CopterSketchPath", copterSketchPath);
 
                     xmlwriter.WriteElementString("AutoUpdate", autoUpdate.ToString());
 
@@ -2212,15 +2155,15 @@ namespace OSD {
                                     //string temp2 = xmlreader.ReadString();
                                     //CHK_pal.Checked = (temp2 == "True");
                                     break;
-                                case "ArduinoIDEPath":
-                                    arduinoIDEPath = xmlreader.ReadString();
-                                    break;
-                                case "PlaneSketchPath":
-                                    planeSketchPath = xmlreader.ReadString();
-                                    break;
-                                case "CopterSketchPath":
-                                    copterSketchPath = xmlreader.ReadString();
-                                    break;
+                       //         case "ArduinoIDEPath":
+                       //             arduinoIDEPath = xmlreader.ReadString();
+                       //             break;
+                      //          case "PlaneSketchPath":
+                      //              planeSketchPath = xmlreader.ReadString();
+                      //              break;
+                      ///          case "CopterSketchPath":
+//copterSketchPath = xmlreader.ReadString();
+                       //             break;
                                 case "AutoUpdate":
                                     autoUpdate = (xmlreader.ReadString().ToUpper() == "TRUE");
                                     cbxShowUpdateDialog.Checked = !autoUpdate;
@@ -3732,8 +3675,8 @@ namespace OSD {
             try {
 
                 comPort.PortName = CurrentCOM;
-                //comPort.BaudRate = 57600;
-                comPort.BaudRate = 115200;
+                comPort.BaudRate = 57600;
+                //comPort.BaudRate = 115200;
 
 
                 comPort.Open();
@@ -3752,7 +3695,7 @@ namespace OSD {
 
                     for (byteIndex = 8; byteIndex < bytes.Length; byteIndex++) {
                         if (comPort.BytesToRead != 0)
-                            comPort.ReadExisting();
+                            Console.WriteLine( comPort.ReadExisting());
 
                         
                         byte c = bytes[byteIndex];
@@ -3952,6 +3895,14 @@ namespace OSD {
             if(v==0) v=1;
             if(s != v.ToString())
                 ((System.Windows.Forms.TextBox)sender).Text = v.ToString();
+        }
+
+        private void connectComPortToolStripMenuItem_Click(object sender, EventArgs e) {
+        //
+            frmComPort frm = new frmComPort(this);
+            //frm.Show();
+            frm.ShowInTaskbar =false;
+            frm.ShowDialog(); // modal
         }
 
     }
