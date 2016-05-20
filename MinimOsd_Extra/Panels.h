@@ -706,7 +706,7 @@ static void panEff(point p){
                 int iGlide=glide;
                 if (iGlide > 9999) glide = 9999.0;
                 if (iGlide > 0){
-                    osd_printf_2("%4.0f", glide, get_mhigh()); // аэродинамическое качество
+                    osd_printf_2(PSTR("%4.0f"), glide, get_mhigh()); // аэродинамическое качество
                 }
             }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
                   osd.print_P(PSTR("\x20\x20\x90\x91")); //термик
@@ -857,7 +857,7 @@ static void panClimb(point p){
 	    fmt=PSTR("% 5.1f\x18");
 	osd_printf_1(fmt, v);
     } else
-        osd_printf_2("%4.0f", vertical_speed, pgm_read_byte(&measure->climbchar));
+        osd_printf_2(PSTR("%4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
 }
 
 /* **************************************************************** */

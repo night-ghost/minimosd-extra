@@ -183,6 +183,10 @@ v838
 * CT now can connect OSD' port to any another COM port (Options - Connect to COM port)
 * fixed strange bug with errorneos cursor movements on Setup screen
 
+v839
+* fixed Vertical Speed panel broken in v838
+
+
 /* RUSSIAN */
 
 БЫстрый старт
@@ -383,6 +387,11 @@ v838
 * отфильтровываются сообщения MAVlink от подвеса
 * Конфигуратор может подать поток телеметрии на OSD с любого COM-порта
 * исправлен странный баг с самопроизвольным движением  курсора на экране настройки
+
+
+v839
+* исправлена вертикальная скорость, сломаная в v838
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
