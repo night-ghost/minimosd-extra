@@ -198,6 +198,8 @@ v840
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
+Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
+
 
 /* RUSSIAN */
 
@@ -416,3 +418,4 @@ v840
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
 
+Обсуждение - http://www.ykoctpa.ru/groups/eye-in-a-sky/forum/topic/minimosd-novaya-proshivka/
