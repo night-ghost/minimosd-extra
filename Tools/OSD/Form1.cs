@@ -64,28 +64,89 @@ namespace OSD {
                 parent.comPort.DtrEnable = true;
                 parent.comPort.RtsEnable = true;
 
-
-                comPort.PortName = cbComPort.Text;
-                comPort.BaudRate = 57600;
-
-                comPort.Open();
-
-
                 System.Threading.Thread.Sleep(100);
                 Application.DoEvents();
-                loop=true;
+ 
+                comPort.PortName = cbComPort.Text;
+                comPort.BaudRate = 57600;
+                //comPort.Encoding
 
-                while(loop){
-                    while (parent.comPort.BytesToRead != 0)
-                        Console.WriteLine(parent.comPort.ReadExisting());
+                try {
+                    comPort.Open();
+                } catch{}
 
-                    while (comPort.BytesToRead != 0)
-                        parent.comPort.Write(comPort.ReadExisting());
+                byte[] buffer=new byte[512];
+                int index=-1;
 
-                    Application.DoEvents();
+                if(parent.comPort.IsOpen && comPort.IsOpen) {
+                    loop=true;
+                    int np=0;
+                    string message;
 
+                    while(loop){
+                        while (parent.comPort.BytesToRead != 0)
+                            Console.WriteLine(parent.comPort.ReadExisting());
+
+                        System.Threading.Thread.Sleep(2);
+                        Application.DoEvents();
+/*
+                        while (comPort.BytesToRead != 0){
+                            string s=comPort.ReadExisting();
+                            parent.comPort.Write(s);
+                        }
+*/
+
+                        while(comPort.BytesToRead != 0 && loop) {
+
+                            byte c = (byte)comPort.ReadByte();
+
+                            if(index>=0) buffer[index++]=c;
+
+                            switch (parent.mavlink_parse_char(c)) {
+                            case 1: // got STX
+                                index=0;
+                                buffer[index++] = c; // store STX
+                                break;
+                            case 2: // got packet
+                                if(parent.comPort.BytesToWrite==0)
+                                    parent.comPort.Write(buffer, 0, index);
+                                index= -1;
+
+                                np++;
+                                try {
+                                    this.Invoke((MethodInvoker)delegate {
+                                        lblTLog.Text = np.ToString(); // runs on UI thread
+                                    });
+
+                                } catch { };
+
+                                message = "";
+                                message += "Payload length: " + parent.rxmsg.len.ToString();
+                                message += " Packet sequence: " + parent.rxmsg.seq.ToString();
+                                message += " System ID: " + parent.rxmsg.sysid.ToString();
+                                message += " Component ID: " + parent.rxmsg.compid.ToString();
+                                message += " Message ID: " + parent.rxmsg.msgid.ToString();
+                                message += " Message: ";
+                                for (int x = 0; x < parent.rxmsg.len; x++) {
+                                    message += parent.rxmsg.payload[x].ToString();
+                                }
+                                message += " CRC1: " + parent.rxmsg.seq.ToString();
+                                message += " CRC2: " + c.ToString();
+                                message += Environment.NewLine;
+
+                                //Console.Write(message);
+                                Application.DoEvents();
+                                break;
+                            } // switch
+                        } // while bytes_to_read
+                        Application.DoEvents();
+
+                    }// loop
+
+                } else { // if open
+                    btnStop_Click(sender, null);
                 }
-
+ 
                 comPort.Close();
                 parent.comPort.Close();
 

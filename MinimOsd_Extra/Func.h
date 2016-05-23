@@ -45,6 +45,10 @@ uint16_t NOINLINE time_since(uint32_t *t){
 
 }
 
+void inline reset_setup_data(){ // called on any screen change
+    memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
+}
+
 static void pan_toggle(){
     byte old_panel=panelN;
 
@@ -119,6 +123,9 @@ static void pan_toggle(){
   if(old_panel != panelN){
 //	readPanelSettings();
 	lflags.got_data=1; // redraw even no news
+	
+	//extern void reset_setup_data();
+	reset_setup_data();
 	
 	static const char msg[] PROGMEM = "Screen 0";
 
@@ -411,9 +418,9 @@ void setFdataVars()
     long_plus(&total_flight_time_milis, time_lapse);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
-    float dst=osd_home_distance;
+    float dst=osd_home_distance, aspd=osd_airspeed;
     calc_max(max_home_distance, dst);
-    calc_max(max_osd_airspeed, osd_airspeed);
+    calc_max(max_osd_airspeed, aspd);
     calc_max(max_osd_groundspeed, osd_groundspeed);
     calc_max(max_osd_home_alt, osd_alt_rel);
     calc_max(max_osd_windspeed, osd_windspeed);
@@ -428,8 +435,8 @@ void NOINLINE gps_norm(float &dst, long f){
 
 
 void NOINLINE set_data_got() {
-    //lastMAVBeat = millis();
-    millis_plus(&lastMAVBeat, 0);
+    lastMAVBeat = millis();
+    //millis_plus(&lastMAVBeat, 0);
 
     lflags.got_data = 1;
 #ifdef DEBUG

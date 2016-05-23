@@ -160,7 +160,7 @@ static int /* float*/  osd_heading = 0;                // ground course heading 
 
 static float        osd_alt_rel = 0;                    // altitude - float from MAVlink!
 
-static float        osd_airspeed = 0;                   // airspeed
+static int /* float */        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
 //static float        osd_windspeedz = 0;
 static int /*float*/  osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
@@ -270,6 +270,34 @@ byte PWM_out_pin=0;
 #if defined(USE_SENSORS)
 unsigned int sensorData[4];
 #endif
+
+// Setup screen 
+
+typedef void (*fptr)();
+
+struct Params {
+    PGM_P name; 	// наименование
+    char type;	// тип (f-float, b - byte etc)
+    byte k;		// коэффициент сдвига запятой
+    void *value;	// адрес самой переменной
+    fptr cb;	// callback для применения параметра
+    PGM_P fmt;	// формат печати параметра
+    int min;		// диапазон изменения параметра
+    int max;
+};
+
+struct Setup_screen {
+    const Params * const ptr;	// описатель экрана
+    byte size;		// его размер
+    fptr tail;	// функция отображения остального
+};
+
+static byte setup_menu=1; // номер строки меню
+static byte setup_screen=0; // номер экрана меню
+static uint16_t chan_raw_middle[3]; // запомненные при входе значения каналов
+
+const Params *params; // указатель на текущий набор параметров
+
 
 #define GPS_MUL 10000000.0f
 

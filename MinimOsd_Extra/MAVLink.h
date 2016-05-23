@@ -159,8 +159,8 @@ bool read_mavlink(){
                 wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg.m);
                 wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg.m);
 #ifdef IS_PLANE
-                nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg.m); // for panTune only
-                nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg.m);// for panTune only
+                nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg.m);   // for panTune only
+                nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg.m); // for panTune only
                 nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg.m);
                 alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg.m);
                 aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg.m);

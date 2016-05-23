@@ -187,6 +187,15 @@ v839
 * fixed Vertical Speed panel broken in v838
 
 
+v840
+* fixed "No data" compiler's bug
+* corrected panTune view
+* some "eye candy" in panEff
+* fixed panSetup bug an all
+* natural time scale in TLOG player
+* fixed CT bug with saving alternate function flag
+
+
 /* RUSSIAN */
 
 БЫстрый старт
@@ -391,6 +400,14 @@ v838
 
 v839
 * исправлена вертикальная скорость, сломаная в v838
+
+v840
+* Обойден баг компилятора, приводивший к "No data"
+* исправлен вид panTune 
+* некоторые красивости в panEff
+* полностью исправлен баг panSetup
+* естественный ход времени в плеере TLOG
+* исправлен баг конфигуратора с несохранением флага альтернативной функции
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

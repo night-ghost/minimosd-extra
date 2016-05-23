@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r835 DV";
+        public const string VERSION = "r840 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -1607,7 +1607,7 @@ namespace OSD {
                                 if (item != null) {
                                     TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
                                     if (tnArray.Length > 0)
-                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf);
+                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf);
                                 }
                             }
                         }
@@ -3465,7 +3465,7 @@ namespace OSD {
             crc_accumulate(c, ref msg.checksum);
         }
 
-        private byte mavlink_parse_char(uint8_t c) {
+        public byte mavlink_parse_char(uint8_t c) {
 /*
 	default message crc function. You can override this per-system to
 	put this data in a different memory segment
@@ -3649,111 +3649,7 @@ namespace OSD {
 
 
 
-        void thread_proc() {
-            byte[] bytes = tlog_data;
-            int frStart=0;
-            int frEnd=0;
-            int frameIndex = 0;
-            int np = 0;
-            int[] last_seq = new int[256];
-            string message;
-
-
-            status.packet_rx_drop_count = 0;
-            status.parse_state =  mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
-            status.packet_idx = 0;
-            status.packet_rx_success_count = 0;
-            status.current_rx_seq = 0;
-            status.buffer_overrun=0;
-            status.parse_error=0;
-
-            for(int i=0; i<256; i++) last_seq[i]=0xff;
-
-            if (comPort.IsOpen)
-                comPort.Close();
-
-            try {
-
-                comPort.PortName = CurrentCOM;
-                comPort.BaudRate = 57600;
-                //comPort.BaudRate = 115200;
-
-
-                comPort.Open();
-
-                comPort.DtrEnable = true;
-
-            } catch {
-                MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            while (true) {
-                np = 0;
-                int byteIndex;
-                try {
-
-                    for (byteIndex = 8; byteIndex < bytes.Length; byteIndex++) {
-                        if (comPort.BytesToRead != 0)
-                            Console.WriteLine( comPort.ReadExisting());
-
-                        
-                        byte c = bytes[byteIndex];
-
-                        switch(mavlink_parse_char(c)){
-                        case 1: // got STX
-                            frStart= byteIndex;
-                            break;
-                        case 2: // got packet
-                            frameIndex++;
-                            frEnd = byteIndex;
-
-                            comPort.Write(bytes, frStart, frEnd - frStart+1);
-                            
-                            if(((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
-                                byteIndex+=8; // пропустим таймстамп
-                            }
-                            last_seq[rxmsg.sysid] = rxmsg.seq;
-                            np++;
-                            try {
-                                this.Invoke((MethodInvoker)delegate {
-                                    lblTLog.Text = np.ToString(); // runs on UI thread
-                                });
-                                
-                            } catch {};
-
-                            System.Threading.Thread.Sleep(100); // 10 frames/s
-
-
-
-                            message = "";
-                            message += "Payload length: " + rxmsg.len.ToString();
-                            message += "Packet sequence: " + rxmsg.seq.ToString();
-                            message += "System ID: " + rxmsg.sysid.ToString();
-                            message += "Component ID: " + rxmsg.compid.ToString();
-                            message += "Message ID: " + rxmsg.msgid.ToString();
-                            message += "Message: ";
-                            for (int x = 0; x < rxmsg.len; x++) {
-                                message += rxmsg.payload[x].ToString();                                
-                            }
-                            message += "CRC1: " + rxmsg.seq.ToString();
-                            message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
-                            message += Environment.NewLine;
-
-                            //Console.Write(message);
-                            break;
-                        }
-
-                        while (comPort.BytesToRead != 0)
-                            Console.WriteLine(comPort.ReadExisting());
-                    }
-                } catch {
-                    continue;
-                }
-            }
-
-        }
-        private void numVOS_ValueChanged(object sender, EventArgs e) {
+         private void numVOS_ValueChanged(object sender, EventArgs e) {
             pan.vert_offs = (byte)(0x10 + numVOS.Value);
         }
 
@@ -3896,6 +3792,149 @@ namespace OSD {
             if(s != v.ToString())
                 ((System.Windows.Forms.TextBox)sender).Text = v.ToString();
         }
+
+        UInt64 get_timestamp(byte[] bytes, int ptr){
+            UInt64 time=0;
+            byte[] datearray=new Byte[8];
+            for (int i = 0; i <8; i++) {
+                datearray[i] = bytes[ptr + i];
+            }
+            Array.Reverse(datearray);
+            time = (ulong)BitConverter.ToInt64(datearray,0);
+            return time;
+        }
+
+        void thread_proc() {
+            byte[] bytes = tlog_data;
+            int frStart = 0;
+            int frEnd = 0;
+            int frameIndex = 0;
+            int np = 0;
+            int[] last_seq = new int[256];
+            string message;
+
+
+            status.packet_rx_drop_count = 0;
+            status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+            status.packet_idx = 0;
+            status.packet_rx_success_count = 0;
+            status.current_rx_seq = 0;
+            status.buffer_overrun = 0;
+            status.parse_error = 0;
+
+            for (int i = 0; i < 256; i++) last_seq[i] = 0xff;
+
+            if (comPort.IsOpen)
+                comPort.Close();
+
+            try {
+
+                comPort.PortName = CurrentCOM;
+                comPort.BaudRate = 57600;
+                //comPort.BaudRate = 115200;
+
+
+                comPort.Open();
+
+                comPort.DtrEnable = true;
+
+            } catch {
+                MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            while (true) {
+                np = 0;
+                UInt64 time, start_time;
+                DateTime localtime = DateTime.Now;
+                UInt64 stamp = (UInt64)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1000);
+
+                int byteIndex;
+                try {
+                    // MP writes as
+                    // byte[] datearray = BitConverter.GetBytes((UInt64)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1000));
+                    // Array.Reverse(datearray);
+                            
+                    time = start_time = get_timestamp(bytes, 0);
+                    for (byteIndex = 8; byteIndex < bytes.Length; byteIndex++) {
+                        if (comPort.BytesToRead != 0)
+                            Console.WriteLine(comPort.ReadExisting());
+
+
+                        byte c = bytes[byteIndex];
+
+                        switch (mavlink_parse_char(c)) {
+                        case 1: // got STX
+                            frStart = byteIndex;
+                            break;
+                        case 2: // got packet
+                            frameIndex++;
+                            frEnd = byteIndex;
+
+                            while(comPort.BytesToWrite!=0) // подождем передачи пакета
+                                System.Threading.Thread.Sleep(1); 
+
+                            comPort.Write(bytes, frStart, frEnd - frStart + 1);
+
+                            if (((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
+                                time = get_timestamp(bytes, byteIndex+1);  // skip parsed CRC2                              
+                                byteIndex += 8; // skip timestamp
+                            }
+                            last_seq[rxmsg.sysid] = rxmsg.seq;
+                            np++;
+                            try {
+                                this.Invoke((MethodInvoker)delegate {
+                                    lblTLog.Text = np.ToString(); // runs on UI thread
+                                });
+
+                            } catch { };
+
+                            double time_w = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+                            while(true){
+                                UInt64 diff_log=(time - start_time);
+                                UInt64 diff_real = ((UInt64)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1000)) - stamp; // если время лога опережает реальное - задерживаемся
+                                if(diff_log < diff_real) {
+                                    //Console.WriteLine("go");
+                                    break;
+                                }
+
+                                if (((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds - time_w) > 100) { // но не реже 10 раз в секунду
+                                    start_time=time; // ждали слишком долго, сместим метку времени в логе
+                                    break;
+                                } 
+                                //Console.WriteLine("wait");
+                                System.Threading.Thread.Sleep(1); 
+                            }
+
+
+                            message = "";
+                            message += "Payload length: " + rxmsg.len.ToString();
+                            message += "Packet sequence: " + rxmsg.seq.ToString();
+                            message += "System ID: " + rxmsg.sysid.ToString();
+                            message += "Component ID: " + rxmsg.compid.ToString();
+                            message += "Message ID: " + rxmsg.msgid.ToString();
+                            message += "Message: ";
+                            for (int x = 0; x < rxmsg.len; x++) {
+                                message += rxmsg.payload[x].ToString();
+                            }
+                            message += "CRC1: " + rxmsg.seq.ToString();
+                            message += "CRC2: " + ((int)bytes[byteIndex]).ToString();
+                            message += Environment.NewLine;
+
+                            //Console.Write(message);
+                            break;
+                        }
+
+                        while (comPort.BytesToRead != 0)
+                            Console.WriteLine(comPort.ReadExisting());
+                    }
+                } catch {
+                    continue;
+                }
+            }
+
+        }
+
 
         private void connectComPortToolStripMenuItem_Click(object sender, EventArgs e) {
         //

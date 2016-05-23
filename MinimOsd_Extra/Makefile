@@ -15,7 +15,7 @@ OPT  = -ffast-math
 #OPT += -floop-nest-optimize 
 OPT += -floop-strip-mine
 OPT += -finline-functions-called-once 
-OPT += -fearly-inlining 
+#OPT += -fearly-inlining 
 OPT += -finline-small-functions
 OPT += -fmerge-all-constants
 #OPT += -fmodulo-sched 
@@ -61,10 +61,11 @@ OPT += -fno-early-inlining
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
-CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT)
-CFLAGS_STD = -std=gnu11  -fno-exceptions  -Wl,--gc-sections -fno-threadsafe-statics $(OPT)
-#LDFLAGS = -lstdc++
+CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -Wl,--relax
+CFLAGS_STD = -std=gnu11  -fno-exceptions  -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -Wl,--relax 
+LDFLAGS = -Wl,--relax
 MCU=atmega328p
+
 
 ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += GCS_MAVLink

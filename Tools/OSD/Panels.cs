@@ -377,19 +377,19 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
 			if((OSD.ModelType)model_type==OSD.ModelType.Copter){
-				osd.printf_P(PSTR("\x4E\x52%2.0f\x05|\x4E\x50%2.0f\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), 
-				                         (nav_roll),
-                                                             (nav_pitch),
-                                                                               (nav_bearing),
-                                                                                            ((int)wp_target_bearing),
-                                                                                                           ((int)alt_error * converth), chrHigh,
-                                                                                                                           ((int)xtrack_error),
-																														            	 ((aspd_error / 100.0) * 1), chrSpe);
+				osd.printf_P(PSTR("NR%3.0f\x05|NP%3.0f\x05|NB%3.0i\x05|TB%5.1f\x05|AE%5.1f%c|XE%4.0f\x6D|AsE%5.1f%c"), 
+				                   (nav_roll),
+                                               (nav_pitch),
+                                                          (nav_bearing),
+                                                                      (wp_target_bearing),
+                                                                                   ((int)alt_error * converth), chrHigh,
+                                                                                             ((int)xtrack_error),
+																			               	              ((aspd_error / 100.0) * 1), chrSpe);
 			}else {
 				if(sign==1)
-            		osd.printf("%c%2.0f%c|%c%2.0f%c", 0x11, (alt_error * converth), chrHigh, 0x15, ((aspd_error / 100.0) * (converts?1:0) ), chrSpe);           
+            		osd.printf("%c%3.0f%c|%c%3.0f%c", 0x11, (alt_error * converth), chrHigh, 0x13, ((aspd_error / 100.0) * (converts?1:0) ), chrSpe);           
 				else			
-					osd.printf("%2.0f%c|%2.0f%c", (alt_error * converth), chrHigh, ((aspd_error / 100.0) * (converts?1:0) ), chrSpe);           
+					osd.printf("%3.0f%c|%3.0f%c", (alt_error * converth), chrHigh, ((aspd_error / 100.0) * (converts?1:0) ), chrSpe);           
 			}				
             
             return 0;
