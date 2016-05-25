@@ -195,6 +195,9 @@ v840
 * natural time scale in TLOG player
 * fixed CT bug with saving alternate function flag
 
+v841
+* "No GPS fix!" warning shown only when GPS is present
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -414,6 +417,9 @@ v840
 * естественный ход времени в плеере TLOG
 * исправлен баг конфигуратора с несохранением флага альтернативной функции
 
+
+v841
+* Предупреждение "No GPS fix!" отображается только при наличии GPS
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

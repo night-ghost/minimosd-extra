@@ -645,7 +645,7 @@ typedef struct {
 } MW_ALTTITUDE_t;
 */
 //	r_struct((uint8_t*)&MW_ALT,8);
-	osd_alt_rel = mwii_read_ulong(offsetof(MW_ALTTITUDE_t, Altitude) );
+	osd_alt_mav = mwii_read_ulong(offsetof(MW_ALTTITUDE_t, Altitude) );
 	osd_climb   = mwii_read_uint(offsetof(MW_ALTTITUDE_t,  Vario) );
 	break;
 

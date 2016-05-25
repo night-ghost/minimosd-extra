@@ -18,7 +18,7 @@
  * Length                : 20 Bytes
  * Syncbyte              : 0xAA
  * Payload with Checksum : 19 Bytes
- * Checksum              : crc8 accumulate uint8_t
+ * Checksum              : cs accumulate uint8_t
  *
  * 0xAA : byte 01 : <sync header>
  * 0xD7 : byte 02 : <gps longitude int32_t lowest byte>
@@ -39,7 +39,7 @@
  * 0x00 : byte 17 : <unknown value uint16_t highest byte>
  * 0x52 : byte 18 : <voltage in millivolts uint16_t lower byte>
  * 0x30 : byte 19 : <voltage in millivolts uint16_t upper byte>
- * 0x19 : byte 20 : <crc8 checksum over byte 1-19>
+ * 0x19 : byte 20 : <cs checksum over byte 1-19>
  *
  */
 
@@ -55,7 +55,7 @@ typedef struct {
 	int16_t speed;
 	int16_t temp;
 	int16_t volt;
-	uint8_t crc8; ///< "CRC" - simple SUM
+	uint8_t cs; ///< "CRC" - simple SUM
 } DevoMPacket;
 #pragma pack(pop)
 

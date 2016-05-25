@@ -4,10 +4,6 @@
 #define  PS_64  (1 << ADPS2) | (1 << ADPS1)
 #define  PS_128  (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)
 
-#include "adc.h"
-
-
-//measure *adcList;
 
 
 // see http://www.microsmart.co.za/technical/2014/03/01/advanced-arduino-adc/

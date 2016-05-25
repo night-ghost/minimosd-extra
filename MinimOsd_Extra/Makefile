@@ -12,20 +12,21 @@ F_CPU = 16000000
 
 
 OPT  = -ffast-math 
-#OPT += -floop-nest-optimize 
 OPT += -floop-strip-mine
 OPT += -finline-functions-called-once 
-#OPT += -fearly-inlining 
 OPT += -finline-small-functions
 OPT += -fmerge-all-constants
+OPT += -fomit-frame-pointer 
+OPT += -fno-optimize-sibling-calls 
+OPT += -fno-early-inlining 
 #OPT += -fmodulo-sched 
 #OPT += -fmodulo-sched-allow-regmoves 
 #OPT += -fassociative-math
 #OPT += -fconserve-stack
 #OPT += -freorder-blocks-and-partition
 #OPT += -fno-signed-zeros
-OPT += -fomit-frame-pointer 
-OPT += -fno-optimize-sibling-calls 
+#OPT += -fearly-inlining 
+#OPT += -floop-nest-optimize 
 #OPT += -fgcse 
 #OPT += -fgcse-sm 
 #OPT += -fgcse-las 
@@ -45,7 +46,6 @@ OPT += -fno-optimize-sibling-calls
 
 # OPT += -ffloat-store   much more
 #OPT += -maccumulate-args more size
-OPT += -fno-early-inlining 
 
 #nothing
 #OPT += -faggressive-loop-optimizations 
@@ -58,6 +58,7 @@ OPT += -fno-early-inlining
 #OPT += -fno-partial-inlining 
 #OPT += -fno-inline-small-functions
 
+#OPT += -v -save-temps # for GCC bugreport
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries

@@ -222,6 +222,7 @@ static void setHomeVars()
     int bearing;
 
 
+    if(osd_fix_type!=0) lflags.gps_active=1; // если что-то появилось то запомним что было
 
 #ifdef IS_COPTER
  #ifdef IS_PLANE
@@ -351,9 +352,9 @@ void setFdataVars()
 
 #ifdef IS_PLANE
 //                              Altitude above ground in meters, expressed as * 1000 (millimeters)
-// osd_home_alt = osd_alt_rel*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
+// osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
 
-//    osd_alt_to_home = (osd_alt_rel - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
+//    osd_alt_to_home = (osd_alt_mav - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
 
     if (!lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 10){
 	lflags.in_air = 1; // взлетели!
@@ -422,7 +423,7 @@ void setFdataVars()
     calc_max(max_home_distance, dst);
     calc_max(max_osd_airspeed, aspd);
     calc_max(max_osd_groundspeed, osd_groundspeed);
-    calc_max(max_osd_home_alt, osd_alt_rel);
+    calc_max(max_osd_home_alt, osd_alt_mav);
     calc_max(max_osd_windspeed, osd_windspeed);
   }
 }

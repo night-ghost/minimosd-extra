@@ -663,12 +663,12 @@ bool uavtalk_read(void) {
 
 			case BAROALTITUDE_OBJID_000:
 			case BAROSENSOR_OBJID_000:
-				osd_alt_rel		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
+				osd_alt_mav		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
 				break;
 #if BAROSENSOR_OBJID_000 != BAROSENSOR_OBJID
 			case BAROSENSOR_OBJID:
 				//revo_baro_alt		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
-				osd_alt_rel		= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
+				osd_alt_mav		= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
 				break;
 #endif
 

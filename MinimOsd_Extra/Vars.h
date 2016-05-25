@@ -158,7 +158,7 @@ struct Att {
 
 static int /* float*/  osd_heading = 0;                // ground course heading from GPS
 
-static float        osd_alt_rel = 0;                    // altitude - float from MAVlink!
+static float        osd_alt_mav = 0;                    // altitude - float from MAVlink!
 
 static int /* float */        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
@@ -233,7 +233,7 @@ struct loc_flags {
     bool fPulseSensor3:1;
     bool fPulseSensor4:1;
 
-    
+    bool gps_active; // было что-то с GPS
 //    bool osd_clear:1;
 //MAVLink session control
 //    bool mavbeat:1;

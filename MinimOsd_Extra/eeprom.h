@@ -66,12 +66,12 @@ struct Panel {
     point climb;           //#define panClimb_XY = 56;
     point tune;            //#define panTune_XY = 58;
 
-    point eff;   	//#define panEff_XY = 60;
-    point callSign;     //#define panCALLSIGN_XY = 62;
-    point ch;           //#define panCh_XY = 64;
-    point temp;         //#define panTemp_XY = 66;
-    point distance;     //#define panDistance_XY = 68;
-    point GPS2;         //#define panGPS2_XY = 70;    
+    point eff;   	//# define panEff_XY = 60;
+    point callSign;     // #define panCALLSIGN_XY = 62;
+    point ch;           // #define panCh_XY = 64;
+    point temp;         // #define panTemp_XY = 66;
+    point distance;     // #define panDistance_XY = 68;
+    point GPS2;         // #define panGPS2_XY = 70;    
     point RadarScale;	// 72
     point Fdata;	// 74
     point message;      // 76
@@ -79,7 +79,7 @@ struct Panel {
     point sensor2;      // 80
     point sensor3;      // 82
     point sensor4;      // 84
-    //point baroAlt;     
+    //point baroAlt;    // 86
 };
 
 union _Panel {

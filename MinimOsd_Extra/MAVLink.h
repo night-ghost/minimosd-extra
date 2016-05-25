@@ -136,12 +136,20 @@ bool read_mavlink(){
                 eph = mavlink_msg_gps_raw_int_get_eph(&msg.m);
                 break; 
 
-            case MAVLINK_MSG_ID_VFR_HUD:
+            case MAVLINK_MSG_ID_VFR_HUD: // todo copy at once
+/*
+float airspeed; ///< Current airspeed in m/s
+ float groundspeed; ///< Current ground speed in m/s
+ float alt; ///< Current altitude (MSL), in meters
+ float climb; ///< Current climb rate in meters/second
+ int16_t heading; ///< Current heading in degrees, in compass units (0..360, 0=north)
+ uint16_t throttle; ///< Current throttle setting in integer percent, 0 to 100
+*/
                 osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg.m);
                 osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg.m);
                 osd_heading = mavlink_msg_vfr_hud_get_heading(&msg.m); // 0..360 deg, 0=north
                 osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg.m);
-                osd_alt_rel = mavlink_msg_vfr_hud_get_alt(&msg.m);
+                osd_alt_mav = mavlink_msg_vfr_hud_get_alt(&msg.m);
                 //osd_baro_alt = mavlink_msg_vfr_hud_get_alt(&msg.m);  //  Current altitude (MSL), in meters
                 osd_climb = mavlink_msg_vfr_hud_get_climb(&msg.m);
                 break;
@@ -155,9 +163,17 @@ bool read_mavlink(){
                 break;
 
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+/*
+ float nav_roll; ///< Current desired roll in degrees
+ float nav_pitch; ///< Current desired pitch in degrees
+ float alt_error; ///< Current altitude error in meters
+ float aspd_error; ///< Current airspeed error in meters/second
+ float xtrack_error; ///< Current crosstrack error on x-y plane in meters
+ int16_t nav_bearing; ///< Current desired heading in degrees
+ int16_t target_bearing; ///< Bearing to current MISSION/target in degrees
+ uint16_t wp_dist; ///< Distance to active MISSION in meters
+*/
              //desired values
-                wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg.m);
-                wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg.m);
 #ifdef IS_PLANE
                 nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg.m);   // for panTune only
                 nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg.m); // for panTune only
@@ -165,6 +181,8 @@ bool read_mavlink(){
                 alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg.m);
                 aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg.m);
 #endif
+                wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg.m);
+                wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg.m);
                 xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg.m);
                 break;
 
@@ -209,7 +227,7 @@ packet.press_diff = press_diff;
 #ifdef IS_PLANE
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
     		// height of takeoff point
-                //osd_home_alt = osd_alt_rel*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
+                //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
                 osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
                 break; 
 /*

@@ -298,7 +298,7 @@ static void showILS(byte start_col, byte start_row) {
 
         char subval_char = 0xCF;
 
-        char alt = (osd_alt_rel * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
+        char alt = (osd_alt_mav * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
 
         if((alt < 44) && (alt > 0)){
             //We have 9 possible chars
@@ -838,8 +838,8 @@ static void panHomeAlt(point p){
 
     float v=osd_alt_to_home;
     
-    if((*(long *)&v)==0) v = osd_alt_rel;
-    //printDist(osd_alt_rel * get_converth();
+    if((*(long *)&v)==0) v = osd_alt_mav;
+    //printDist(osd_alt_mav * get_converth();
     printDistCnv(v);
 }
 
@@ -913,7 +913,7 @@ static void check_warn()
 
 
 //1
- if ((osd_fix_type) < 2) 
+ if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
     wmask |= 1; //0
 
 //2    
