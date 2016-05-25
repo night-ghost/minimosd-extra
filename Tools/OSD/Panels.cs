@@ -991,8 +991,8 @@ namespace OSD
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
 			if(sign==1)
-				osd.printf_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
-            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
+				osd.printf_P(PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
+            osd.printf_P(PSTR("\xc3\x81\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
            
             
             return 0;

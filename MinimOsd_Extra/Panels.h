@@ -1373,7 +1373,7 @@ static void panRose(point p){
     char *c=buf_show;
     uint8_t x;
 //  *c++=0xc3;
-    for(x=9; x != 0; x--){
+    for(x=10; x != 0; x--){
         *c++ = buf_Rule[start];
         if(++start >= 24) start = 0;
     }
@@ -1383,7 +1383,7 @@ static void panRose(point p){
 // Serial.printf_P(PSTR("Rose buf=%s\n"), buf_show);
 
     if(has_sign(p))
-	osd.print_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
+      osd.print_P(PSTR( "\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
     osd.printf_P(PSTR("\xc3%s\x87"), buf_show);
 
 }
