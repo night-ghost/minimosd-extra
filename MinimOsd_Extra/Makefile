@@ -60,6 +60,8 @@ OPT += -fno-early-inlining
 
 #OPT += -v -save-temps # for GCC bugreport
 
+OPT +=  -fno-caller-saves
+
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
 CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -Wl,--relax

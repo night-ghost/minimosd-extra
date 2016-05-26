@@ -813,7 +813,8 @@ again:			if(c!='$') state = IDLE;
 			    if(msg.mwii.crc == 0) {
 				mwii_parse_data(); // HERE!!!
 				
-				return true;
+				if(timeToScreen())  // если надо перерисовать экран
+				    return true;
 			    } else {
 #ifdef DEBUG
 		    // Update global packet drops counter

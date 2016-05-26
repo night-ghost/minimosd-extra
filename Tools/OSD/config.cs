@@ -464,9 +464,18 @@ namespace OSD {
         }
 
         public void setEepromXY(Panel pan, bool enabled) {
-            int flag = pan.Altf==1?0x40:0;
-            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)(pan.x & 0x3f | (pan.sign == 0 ? 0x80 : 0)); // x
-            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)((enabled ? pan.y & 0x3f : pan.y | 0x80) | flag); // y
+            int flag =  pan.Altf == 1 ? 0x40 : 0;
+            int flag2 = pan.Alt2 == 1 ? 0x20 : 0;
+            int flag3 = pan.Alt3 == 1 ? 0x10 : 0;
+            int flag4 = pan.Alt4 == 1 ? 0x40 : 0;
+
+            int fSign = pan.sign == 0 ? 0x80 : 0; // inverted
+
+            int y=pan.y & 0x0f;
+            int x=pan.x & 0x3f;
+
+            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)(x | fSign | flag4); // x
+            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)((enabled ? y : y | 0x80) | flag | flag2 | flag3); // y
         }
 
         public Pos getEepromXY(Panel pan) {

@@ -245,7 +245,9 @@ again:
 
             if (msg.ltm.receiverIndex == msg.ltm.framelength - 4) { // received checksum byte
                 if (msg.ltm.rcvChecksum == 0) {
-                    ltm_check();
+                    ltm_check();       // packet got OK
+                    if(timeToScreen())  // если надо перерисовать экран
+                        return;
                 } else {
 retry:
             	    state=IDLE;

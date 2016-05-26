@@ -44,10 +44,14 @@ union {
 bool read_mavlink(){
     uint8_t      base_mode=0;
     mavlink_status_t status;
+    byte cnt=0;
 
 #ifdef DEBUG
+    long mav_time = millis();
+
     // Update global packet drops counter
     status.packet_rx_drop_count = 0;
+
 #endif
 
     //grabing data 
@@ -82,6 +86,8 @@ bool read_mavlink(){
 	packets_got+=1;
 #endif
 
+	    cnt++;
+	    
             //handle msg
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
@@ -292,16 +298,28 @@ typedef enum FENCE_BREACH{
                 //Do nothing
                 break;
             }
-            
-            //return true;
+        //    if(cnt>8)	// no more than 8 in time
+    	    if(timeToScreen())  // если надо перерисовать экран
+                return true;
         }
         delay_byte();
+
 #ifdef DEBUG
     // Update global packet drops counter
     packet_drops += status.packet_rx_drop_count;
 #endif
 
     }
+
+#ifdef DEBUG
+    long dt = (millis() - mav_time) -2;
+    if(dt>0) {
+        mavlink_time += dt-2; 		// sum, 2ms when no stream
+	if(dt>mavlink_dt) mavlink_dt = dt; // and max
+    }
+    
+    if(cnt>mavlink_cnt) mavlink_cnt=cnt;
+#endif
 
     return false;
 }

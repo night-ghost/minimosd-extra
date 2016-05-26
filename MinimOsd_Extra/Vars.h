@@ -233,6 +233,7 @@ struct loc_flags {
     bool fPulseSensor3:1;
     bool fPulseSensor4:1;
 
+    bool show_screnN;
     bool gps_active; // было что-то с GPS
 //    bool osd_clear:1;
 //MAVLink session control
@@ -250,6 +251,9 @@ uint16_t packets_got = 0;
 long bytes_comes=0;
 uint16_t max_dly=0;
 volatile uint16_t lost_bytes;
+
+long mavlink_time=0, mavlink_dt=0;
+int mavlink_cnt=0;
 #endif
 
 byte skip_inc;

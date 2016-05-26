@@ -35,6 +35,9 @@ namespace OSD
         public System.Windows.Forms.NumericUpDown NUM_X;
 		public System.Windows.Forms.CheckBox chkSign;
         public System.Windows.Forms.CheckBox chkAlt;
+        public System.Windows.Forms.CheckBox chkAlt2;
+        public System.Windows.Forms.CheckBox chkAlt3;
+        public System.Windows.Forms.CheckBox chkAlt4;
 		
 		private int number;
 		private OSD osd;
@@ -64,6 +67,9 @@ namespace OSD
 			this.pictureBox = new System.Windows.Forms.PictureBox();
 			this.chkSign = new System.Windows.Forms.CheckBox();
             this.chkAlt = new System.Windows.Forms.CheckBox();
+            this.chkAlt2 = new System.Windows.Forms.CheckBox();
+            this.chkAlt3 = new System.Windows.Forms.CheckBox();
+            this.chkAlt4 = new System.Windows.Forms.CheckBox();
 			
 			this.tabPage.SuspendLayout();
 			this.groupBox.SuspendLayout();
@@ -84,7 +90,7 @@ namespace OSD
             this.tabPage.Name = "tabPage_"+num;
             this.tabPage.Size = new System.Drawing.Size(679, 381);
             this.tabPage.TabIndex = 0;
-            this.tabPage.Text = "Panel "+num;
+            this.tabPage.Text = "Screen "+num;
             this.tabPage.UseVisualStyleBackColor = true;
 			
 			this.rbtSortCategory.AutoSize = true;
@@ -114,16 +120,19 @@ namespace OSD
             this.groupBox.Controls.Add(this.NUM_X);
 			this.groupBox.Controls.Add(this.chkSign);
             this.groupBox.Controls.Add(this.chkAlt);
-            this.groupBox.Location = new System.Drawing.Point(3, 258);
+            this.groupBox.Controls.Add(this.chkAlt2);
+            this.groupBox.Controls.Add(this.chkAlt3);
+            this.groupBox.Controls.Add(this.chkAlt4);
+            this.groupBox.Location = new System.Drawing.Point(3, 229);
             this.groupBox.Name = "groupBox"+num;
-            this.groupBox.Size = new System.Drawing.Size(169, 120);
+            this.groupBox.Size = new System.Drawing.Size(169, 149);
             this.groupBox.TabIndex = 2;
             this.groupBox.TabStop = false;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 43);
+            this.label2.Location = new System.Drawing.Point(7, 41);
             this.label2.Name = "labela"+num;
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 3;
@@ -134,13 +143,13 @@ namespace OSD
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(7, 15);
             this.label1.Name = "labelb"+num;
-            this.label1.Size = new System.Drawing.Size(14, 13);
+            this.label1.Size = new System.Drawing.Size(14, 11);
             this.label1.TabIndex = 2;
             this.label1.Text = "X";
             // 
             // NUM_Y
             // 
-            this.NUM_Y.Location = new System.Drawing.Point(56, 41);
+            this.NUM_Y.Location = new System.Drawing.Point(56, 39);
             this.NUM_Y.Maximum = new decimal(new int[] {
             	15,
             	0,
@@ -153,7 +162,7 @@ namespace OSD
             // 
             // NUM_X
             // 
-            this.NUM_X.Location = new System.Drawing.Point(56, 15);
+            this.NUM_X.Location = new System.Drawing.Point(56, 13);
             this.NUM_X.Maximum = new decimal(new int[] {
             	29,
             	0,
@@ -171,7 +180,7 @@ namespace OSD
             // 
             this.LIST_items.Location = new System.Drawing.Point(3, 40);
             this.LIST_items.Name = "LIST_items";
-            this.LIST_items.Size = new System.Drawing.Size(169, 218);
+            this.LIST_items.Size = new System.Drawing.Size(169, 191);
             this.LIST_items.TabIndex = 5;
             this.LIST_items.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
             this.LIST_items.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -193,8 +202,8 @@ namespace OSD
 			// chkSign
 			//
 			this.chkSign.AutoSize = true;
-            this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkSign.Location = new System.Drawing.Point(10, 76);
+            //this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkSign.Location = new System.Drawing.Point(10, 64);
             this.chkSign.Name = "chkSign";
             this.chkSign.Size = new System.Drawing.Size(137, 17);
             this.chkSign.TabIndex = 4;
@@ -206,14 +215,58 @@ namespace OSD
             // chkAlt
             //
             this.chkAlt.AutoSize = true;
-            this.chkAlt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt.Location = new System.Drawing.Point(10, 91);
+            //this.chkAlt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt.Location = new System.Drawing.Point(10, 81);
             this.chkAlt.Name = "chkAlt";
             this.chkAlt.Size = new System.Drawing.Size(137, 17);
             this.chkAlt.TabIndex = 4;
             this.chkAlt.Text = "Alternative mode";
             this.chkAlt.UseVisualStyleBackColor = true;
             this.chkAlt.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt.Visible =false;
+
+            // 
+            // chkAlt2
+            //
+            this.chkAlt2.AutoSize = true;
+            //this.chkAlt2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt2.Location = new System.Drawing.Point(10, 98);
+            this.chkAlt2.Name = "chkAlt2";
+            this.chkAlt2.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt2.TabIndex = 4;
+            this.chkAlt2.Text = "Alternative mode2";
+            this.chkAlt2.UseVisualStyleBackColor = true;
+            this.chkAlt2.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt2.Visible = false;
+
+            // 
+            // chkAlt3
+            //
+            this.chkAlt3.AutoSize = true;
+            //this.chkAlt3.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt3.Location = new System.Drawing.Point(10, 113);
+            this.chkAlt3.Name = "chkAlt3";
+            this.chkAlt3.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt3.TabIndex = 4;
+            this.chkAlt3.Text = "Alternative mode3";
+            this.chkAlt3.UseVisualStyleBackColor = true;
+            this.chkAlt3.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt3.Visible = false;
+
+            // 
+            // chkAlt4
+            //
+            this.chkAlt4.AutoSize = true;
+            //this.chkAlt4.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt4.Location = new System.Drawing.Point(10, 128);
+            this.chkAlt4.Name = "chkAlt4";
+            this.chkAlt4.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt4.TabIndex = 4;
+            this.chkAlt4.Text = "Alternative mode4";
+            this.chkAlt4.UseVisualStyleBackColor = true;
+            this.chkAlt4.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt4.Visible = false;
+            
 
             return 0;
 		}
@@ -343,10 +396,22 @@ namespace OSD
 					chkSign.Checked = thing.sign==1;
 					chkSign.Visible = thing.sign!=-1;
 
-                    chkAlt.Visible =thing.Altf !=-1;
+                    chkAlt.Text = thing.alt_text;
+                    chkAlt.Visible = thing.Altf != -1;
                     chkAlt.Checked = thing.Altf ==1;
 
-                    chkAlt.Text = thing.alt_text;
+                    chkAlt2.Text = thing.alt2_text;
+                    chkAlt2.Visible = thing.Alt2 != -1;
+                    chkAlt2.Checked = thing.Alt2 == 1;
+
+                    chkAlt3.Text = thing.alt3_text;
+                    chkAlt3.Visible = thing.Alt3 != -1;
+                    chkAlt3.Checked = thing.Alt3 == 1;
+
+                    chkAlt4.Text = thing.alt4_text;
+                    chkAlt4.Visible = thing.Alt4 != -1;
+                    chkAlt4.Checked = thing.Alt4 == 1;
+
 				}
 			}
 		}
@@ -366,9 +431,23 @@ namespace OSD
 					chkSign.Checked = thing.sign==1;
 					chkSign.Visible = thing.sign!=-1;
 
+                    chkAlt.Text    = thing.alt_text;
                     chkAlt.Visible = thing.Altf != -1;
                     chkAlt.Checked = thing.Altf == 1;
-				}
+
+                    chkAlt2.Text = thing.alt2_text;
+                    chkAlt2.Visible = thing.Alt2 != -1;
+                    chkAlt2.Checked = thing.Alt2 == 1;
+
+                    chkAlt3.Text = thing.alt3_text;
+                    chkAlt3.Visible = thing.Alt3 != -1;
+                    chkAlt3.Checked = thing.Alt3 == 1;
+
+                    chkAlt4.Text = thing.alt4_text;
+                    chkAlt4.Visible = thing.Alt4 != -1;
+                    chkAlt4.Checked = thing.Alt4 == 1;
+
+                }
 			}
 		}
 		
@@ -538,6 +617,12 @@ namespace OSD
                 if (panelItems[a] != null && panelItems[a].name == item) {
                     if (panelItems[a].Altf >= 0)
                         panelItems[a].Altf = chkAlt.Checked ? 1 : 0;
+                    if (panelItems[a].Alt2 >= 0)
+                        panelItems[a].Alt2 = chkAlt2.Checked ? 1 : 0;
+                    if (panelItems[a].Alt3 >= 0)
+                        panelItems[a].Alt3 = chkAlt3.Checked ? 1 : 0;
+                    if (panelItems[a].Alt4 >= 0)
+                        panelItems[a].Alt4 = chkAlt4.Checked ? 1 : 0;
 
                 }
             }

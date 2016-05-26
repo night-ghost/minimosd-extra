@@ -20,11 +20,11 @@ static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
-static float NOINLINE get_converth(){
+float NOINLINE get_converth(){
     return pgm_read_float(&measure->converth);
 }
 
-static float NOINLINE get_converts(){
+float NOINLINE get_converts(){
     return pgm_read_float(&measure->converts);
 }
 
@@ -45,7 +45,7 @@ uint16_t NOINLINE time_since(uint32_t *t){
 
 }
 
-void inline reset_setup_data(){ // called on any screen change
+static void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 
@@ -191,7 +191,7 @@ static char setBatteryPic(uint16_t bat_level,byte *bp)
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
-static int NOINLINE grad_to_sect(int grad){
+int NOINLINE grad_to_sect(int grad){
     //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
     
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
@@ -207,7 +207,7 @@ static int grad_to_sect_p(int grad){
 
 
 
-static float NOINLINE diff_coord(float &c1, float &c2){
+float NOINLINE diff_coord(float &c1, float &c2){
     return (c1 - c2) * 111319.5;
 }
 
@@ -576,3 +576,6 @@ static void getData(){
 
 }
 
+bool NOINLINE timeToScreen(){
+    return lflags.update_stat && !vsync_wait;
+}
