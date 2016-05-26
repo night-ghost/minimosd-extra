@@ -232,6 +232,22 @@ namespace OSD
         public uint8_t tr = 0;
         static float temperature = 23.5f;
 
+        public bool is_alt(int f){
+            return (f & 1)!=0;
+        }
+
+        public bool is_alt2(int f) {
+            return (f & 2) != 0;
+        }
+
+        public bool is_alt3(int f) {
+            return (f & 4) != 0;
+        }
+
+        public bool is_alt4(int f) {
+            return (f & 8) != 0;
+        }
+
         /******* PANELS - DEFINITION *******/
 
         /* **************************************************************** */
@@ -408,12 +424,12 @@ namespace OSD
             
             
             if(sign==1){
-                if(fAlt==1) 
+                if(is_alt(fAlt)) 
                     osd.printf("%c%5.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
                 else 
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
 			}else{
-                if (fAlt == 1) 
+                if (is_alt(fAlt)) 
                     osd.printf("%5.2f%c",  (double)(osd_climb * converth/60), 0x18);
                 else
                     osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);
@@ -435,7 +451,7 @@ namespace OSD
             byte c;
             float k;
 
-            if (fAlt == 1) {
+            if (is_alt(fAlt)) {
                 c = 0x18; //m/s
                 k = 3.6f;
             } else {
@@ -558,7 +574,7 @@ namespace OSD
             byte c;
             float k;
 
-            if (fAlt == 1) {
+            if (is_alt(fAlt)) {
                 c = 0x18; //m/s
                 k = 3.6f;
             } else {
@@ -588,7 +604,7 @@ namespace OSD
             byte c;
             float k;
 
-            if(fAlt==1) {
+            if (is_alt(fAlt)) {
                 c = 0x18; //m/s
                 k=3.6f;                
             }else{
@@ -614,8 +630,8 @@ namespace OSD
         public int panBatteryPercent(int first_col, int first_line, int sign, int fAlt)
         {
             osd.setPanel(first_col, first_line);
-            
-            if (fAlt==1)
+
+            if (is_alt(fAlt))
             {
 				if(sign==1)
                   osd.printf("\x88%c%c\x8e%2.0i%%", 0x89, 0x89, 99);
@@ -712,9 +728,9 @@ namespace OSD
 
         public int panHorizon(int first_col, int first_line, int sign, int fAlt)
         {
-            osd.setPanel(first_col, first_line); 
+            osd.setPanel(first_col, first_line);
 
-            if (fAlt==1)
+            if (is_alt(fAlt))
             {
                 osd.printf_P(PSTR("\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
                                   "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
@@ -731,11 +747,12 @@ namespace OSD
             
             }
 
-			if(osd.conf.eeprom.flags[OSD.radar_on]) {
+//			if(osd.conf.eeprom.flags[OSD.radar_on]) {
+			if(is_alt3(fAlt)) {
 				osd.setPanel(first_col+7, first_line+3);
 				osd.printf_P(PSTR("\xb7"));
 
-                if (flgTrack) {
+                if (is_alt4(fAlt)) {
                     osd.setPanel(first_col + 8, first_line + 3);
                     osd.printf_P(PSTR("\x24"));
                     osd.setPanel(first_col + 9, first_line + 3);
@@ -919,12 +936,34 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
 			if(sign==1) {
-                if(fAlt==1)
+                if (is_alt2(fAlt)){
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -=i;
+                    i = (int)lon; lon -= i;
+
+                    if (is_alt(fAlt))
+                        osd.printf("%c%05d|%c%05d", 0x03, (int)(lat * 100000.0), 0x04, (int)(lon * 100000.0));
+                    else
+                        osd.printf("%c%06d|%c%06d", 0x03, (int)(lat * 1000000.0), 0x04, (int)(lon * 1000000.0));
+                }else if (is_alt(fAlt))
                 	osd.printf("%c%9.5f|%c%9.5f", 0x03, (double)osd_lat,  0x04, (double)osd_lon);
                 else
                     osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
 			} else {
-                if (fAlt==1)
+                if (is_alt2(fAlt)){
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -= i;
+                    i = (int)lon; lon -= i;
+                    
+
+                    if (is_alt(fAlt))
+                        osd.printf("%05d|%05d", (int)(lat* 100000.0), (int)(lon* 100000.0));
+                    else
+                        osd.printf("%06d|%06d", (int)(lat * 1000000.0), (int)(lon * 1000000.0));
+
+                } else if (is_alt(fAlt))
             	    osd.printf("%9.5f|%9.5f",  (double)osd_lat,   (double)osd_lon);
                 else
                     osd.printf("%10.6f|%10.6f", (double)osd_lat, (double)osd_lon);
@@ -944,13 +983,13 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
 			if(sign==1){
-                if (fAlt==1)
+                if (is_alt(fAlt))
                 	osd.printf("%c%9.5f %c%9.5f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
                 else
                     osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
 
 			}else {
-                if (fAlt == 1)
+                if (is_alt(fAlt))
 		    		osd.printf("%9.5f %9.5f",  (double)osd_lat,  (double)osd_lon);
                 else
                     osd.printf("%10.6f %10.6f", (double)osd_lat, (double)osd_lon);
@@ -1054,9 +1093,9 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
-            {
-                osd.printf("%c%c",  0xA4, 0xA5);
-            }
+            
+            osd.printf("%c%c",  0xA4, 0xA5);
+            
             
             return 0;
         }

@@ -657,7 +657,8 @@ bool uavtalk_read(void) {
 //				uavtalk_respond_object(UAVTALK_TYPE_ACK);
 //			}
 			
-			return true;
+			if(timeToScreen())  // если надо перерисовать экран
+			    return true;
 		}
 		
 		delay_byte();

@@ -16,14 +16,18 @@ static boolean inline is_alt(point p){
     return (p.y & 0x40);
 }
 
+static boolean inline is_alt2(point p){
+    return (p.y & 0x20);
+}
+
 // чтение и запись мелких объектов
-static void eeprom_read_len(byte *p, uint16_t e, uint16_t l){
+static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
     for(;l!=0; l--, e++) {
 	*p++ = (byte)eeprom_read_byte( (byte *)e );
     }
 }
 
-static void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
+static NOINLINE void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
     for(;  l!=0; l--, e++)
 	eeprom_write_byte( (byte *)e, *p++ );
 
@@ -59,7 +63,7 @@ static point readPanel(byte n) {
     return p;
 }
 
-static uint8_t checkPAL(uint8_t line){
+static NOINLINE uint8_t checkPAL(uint8_t line){
     if(line >= osd.getCenter() && osd.getMode() == 0){
         line -= 3;	//Cutting lines offset after center if NTSC
     }

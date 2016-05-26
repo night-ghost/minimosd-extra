@@ -945,6 +945,7 @@ namespace OSD
             this.groupBox15.TabIndex = 12;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Horizon";
+            
             // 
             // chkTrack
             // 
@@ -956,6 +957,7 @@ namespace OSD
             this.chkTrack.Text = "with track";
             this.chkTrack.UseVisualStyleBackColor = true;
             this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
+            this.chkTrack.Visible =false ;
             // 
             // groupBox16
             // 
@@ -1088,6 +1090,8 @@ namespace OSD
             this.chkILS.Text = "show ILS";
             this.chkILS.UseVisualStyleBackColor = true;
             this.chkILS.CheckedChanged += new System.EventHandler(this.chkILS_CheckedChanged);
+            this.chkILS.Visible =false ;
+
             // 
             // chkRadar
             // 
@@ -1099,6 +1103,7 @@ namespace OSD
             this.chkRadar.Text = "show Radar";
             this.chkRadar.UseVisualStyleBackColor = true;
             this.chkRadar.CheckedChanged += new System.EventHandler(this.chkRadar_CheckedChanged);
+            this.chkRadar.Visible =false;
             // 
             // groupBox13
             // 

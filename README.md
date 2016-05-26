@@ -198,6 +198,14 @@ v840
 v841
 * "No GPS fix!" warning shown only when GPS is present
 
+v842
+* one good man from GCC team told me two "secret" (not mentioned in GCC --help) optimization flags so we now has ~1Kbyte of free space!
+* thanks above - added 2nd, 3rd and 4th alternate checkboxes to each panel
+* thanks above - all Horizon settings moved to Horison panel flags so it now can be setted per screen.
+* modified FlightResults logics for plane
+* all distances can be more than 99km
+* gps coords can display only fractional part of coords
+* fixed the screen sticking on a large data stream
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -420,6 +428,16 @@ v840
 
 v841
 * Предупреждение "No GPS fix!" отображается только при наличии GPS
+
+
+v842
+* один хороший человек из команды GCC подсказал два "секретных" (не упомянутых в GCC --help) флага оптимизации, что освободило  ~1Kbyte памяти!
+* благодаря этому добавлены 2-й, 3-й и 4-й флаги для каждой панели
+* благодаря этому все настройки авиагоризонта перемещены в флаги панели Horizon, и могут быть настроены поэкранно
+* изменена логика показа результатов полета для самолета
+* все расстояния могут быть больше чем 99км
+* Панель gps координат может отображать только дробную часть координат
+* исправлено залипание экрана на больших скоростях данных
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

@@ -1,0 +1,8 @@
+* one good man from GCC team told me two "secret" (not mentioned in GCC --help) optimization flags so we now has ~1Kbyte of free space!
+* thanks above - added 2nd, 3rd and 4th alternate checkboxes to each panel
+* thanks above - all Horizon settings moved to Horison panel flags so it now can be setted per screen.
+
+* modified FlightResults logics for plane
+* all distances can be more than 99km
+* gps coords can display only fractional part of coords
+* fixed the screen sticking on a large data stream

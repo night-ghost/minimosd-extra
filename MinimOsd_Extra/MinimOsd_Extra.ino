@@ -299,6 +299,51 @@ void loop()
 
     wdt_reset();
 
+
+    getData(); // получить данные с контроллера
+
+    if(lflags.update_stat) { // если надо перерисовать экран
+	if(!vsync_wait){ // то делаем это только во время обратного хода
+//LED_OFF;
+	    OSD::update();
+	    lflags.update_stat = 0;
+        }
+    } else {
+    
+        if(lflags.got_data){ // были свежие данные - обработать
+            lflags.got_data=0;
+
+//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+            pan_toggle(); // проверить переключение экранов
+
+            setHomeVars();   // calculate and set Distance from home and Direction to home
+
+            setFdataVars();  // накопление статистики и рекордов
+
+            writePanels();   // writing enabled panels (check OSD_Panels Tab)
+
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+
+//	LED_BLINK;
+
+            lflags.update_stat = 1; // пришли данные
+            vsync_wait = 1;         // надо перерисовать экран
+//LED_ON; // свечение диода во время ожидания перерисовки экрана
+        }
+    }
+
+
+
+
+/* not used, let PWM data will be ALWAYS actual
+    if(New_PWM_Frame){
+	New_PWM_Frame=false;
+
+	// data is in PWM_IN
+    }
+*/
+
 //LED_BLINK;
 
     if(pt > timer_20ms){
@@ -354,49 +399,6 @@ void loop()
 	}
     }
 
-    getData(); // получить данные с контроллера
-
-
-    if(lflags.got_data){ // были свежие данные - обработать
-        lflags.got_data=0;
-
-//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-        pan_toggle(); // проверить переключение экранов
-
-
-        setHomeVars();   // calculate and set Distance from home and Direction to home
-
-        setFdataVars();  // накопление статистики и рекордов
-
-        writePanels();   // writing enabled panels (check OSD_Panels Tab)
-
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-//	LED_BLINK;
-
-        lflags.update_stat = 1; // пришли данные
-        vsync_wait = 1;         // надо перерисовать экран
-//LED_ON; // свечение диода во время ожидания перерисовки экрана
-    }
-
-    if(lflags.update_stat) { // если надо перерисовать экран
-	if(!vsync_wait){ // то делаем это только во время обратного хода
-//LED_OFF;
-	    OSD::update();
-	    lflags.update_stat = 0;
-        }
-    }
-
-
-
-/* not used, let PWM data will be ALWAYS actual
-    if(New_PWM_Frame){
-	New_PWM_Frame=false;
-
-	// data is in PWM_IN
-    }
-*/
 
 #ifdef DEBUG    
     uint16_t dly=millis() - pt;

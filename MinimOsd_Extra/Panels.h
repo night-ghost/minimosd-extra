@@ -16,7 +16,7 @@ static void NOINLINE osd_blank(){
     OSD::write_S(' ');
 }
 
-static byte get_mhigh(){
+static /*NOINLINE*/ byte get_mhigh(){
     return pgm_read_byte(&measure->high);
 }
 
@@ -79,7 +79,7 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
     printSpeed(fmt, *s * get_converts(), alt);
 }
 
-static void printSpeed(float s, byte alt){
+static NOINLINE void printSpeed(float s, byte alt){
     printSpeed(PSTR("%3.0f"), s, alt);
 }
 
@@ -87,11 +87,11 @@ static void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
 
-static void printSpeed(float s){
+static NOINLINE void printSpeed(float s){
     printSpeed(s, false);
 }
 
-static void printSpeedCnv(float *s){
+static NOINLINE void printSpeedCnv(float *s){
     printSpeedCnv(s, false);
 }
 
@@ -102,7 +102,7 @@ void inline write_arrow(byte arrow_set1){
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
+static void NOINLINE showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
     char arrow_set1 = 0x90;
 
 
@@ -133,7 +133,7 @@ static void showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
     }
 }
 
-static void showArrow(uint8_t rotate_arrow,uint8_t method){
+static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
     showArrow(rotate_arrow, method, false);
 }
 
@@ -342,7 +342,7 @@ static void showILS(byte start_col, byte start_row) {
 
 static int radar_zoom;
 
-byte radar_char(){
+byte NOINLINE radar_char(){
 // символы квадрика с ориентацией
     static const byte arr[] PROGMEM = {0xb0, 0xb1, 0xb4, 0xb5, 0xb6, 0xb7, 0x7b, 0x7d };
 
@@ -424,23 +424,30 @@ static void panCOG(point p){
     showArrow(grad_to_sect(off_course),2); // use off_course as global
 }
 
-static void printDist(float d){
+static void NOINLINE printDist(float d){
       osd_printf_2(PSTR("%5.0f"), d, get_mhigh());
 }
 
-static void printDistCnv(float d){
+static void NOINLINE printDistCnv(float d){
       printDist( d * get_converth());
 }
 
 
 
 
-static void printFullDist(float dd){
+static NOINLINE void printFullDist(float dd){
     dd *= get_converth();
-    if ((int)dd <= 9999) {
+    if ((int)dd <= 9999) { // in meters
         printDist(dd);
-    }else{
-         osd_printf_2(PSTR("%5.2f"), (dd / pgm_read_word(&measure->distconv)), pgm_read_byte(&measure->distchar));
+    }else{ // in kilometers
+	dd = dd / pgm_read_word(&measure->distconv);
+	PGM_P fmt;
+	if((int)dd<99)
+	    fmt = PSTR("%5.2f");
+        else
+            fmt = PSTR("%5.1f");
+
+        osd_printf_2(fmt, dd, pgm_read_byte(&measure->distchar));
     }
 }
 
@@ -470,7 +477,7 @@ struct Formats {
 };
 
 
-static void print_list(const Formats *f){
+static NOINLINE void print_list(const Formats *f){
     PGM_P fmt;
     byte t;
     char m;
@@ -1048,11 +1055,11 @@ static void panThr(point p){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
-static void osd_print_bat(PGM_P fmt, float f){
+static NOINLINE void osd_print_bat(PGM_P fmt, float f){
     osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
 }
 
-static byte guessMaxVolt(){
+static /*NOINLINE */ byte guessMaxVolt(){
     if(max_battery_reading >=95 && max_battery_reading <=100) 
         return 100;
 
@@ -1230,7 +1237,11 @@ static void panWaitMAVBeats(){
     
 #endif
 
+#ifdef DEBUG
+    OSD::setPanel(5,3);
+#else
     OSD::setPanel(5,7);
+#endif
     osd.print_P(PSTR("No input data! "));
 
 #ifdef DEBUG
@@ -1240,10 +1251,12 @@ static void panWaitMAVBeats(){
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
 
-    OSD::setPanel(2,9);
+    OSD::setPanel(2,5);
     osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
     osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
+
+    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
     
     lflags.input_active=0;
 #endif
@@ -1281,14 +1294,72 @@ static void panGPSats(point p){
 // Staus  : done
 
 static void NOINLINE print_GPS(PGM_P f){
-    if(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat)) // не выводим координат если нету
-	osd.printf_P(f, osd_pos.lat, osd_pos.lon);
+    osd.printf_P(f, osd_pos.lat, osd_pos.lon);
 }
+
+static long NOINLINE coord_frac(float &f, byte fLow){
+    f=abs(f);
+    
+    return (f-(int)f) * (fLow?100000.0:1000000.0);
+}
+
+static void NOINLINE print_GPS_frac(PGM_P f, byte fLow){
+
+    osd.printf_P(f, coord_frac(osd_pos.lat, fLow), coord_frac(osd_pos.lon, fLow));
+}
+
+static const PROGMEM char gps_f0[]="%06ld|%06ld";
+static const PROGMEM char gps_f1[]="%05ld|%05ld";
+static const PROGMEM char gps_f2[]="\x03%06ld|\x04%06ld";
+static const PROGMEM char gps_f3[]="\x03%05ld|\x04%05ld";
+
+static const PROGMEM char gps_f4[]="%10.6f|%10.6f";
+static const PROGMEM char gps_f5[]="%9.5f|%9.5f";
+static const PROGMEM char gps_f6[]="\x03%10.6f|\x04%10.6f";
+static const PROGMEM char gps_f7[]="\x03%9.5f|\x04%9.5f";
+
+static const PROGMEM char * const gps_fmt[]= {
+    gps_f0, gps_f1, gps_f2, gps_f3
+};
+
+static const PROGMEM char * const gps_fmtF[]= {
+    gps_f4, gps_f5, gps_f6, gps_f7
+};
 
 static void panGPS(point p){
 
-    PGM_P f;
 
+
+    PGM_P f;
+    if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
+
+    byte fLow=is_alt(p)?1:0;
+
+    byte idx= fLow | (has_sign(p)?2:0);
+
+    if(is_alt2(p)){ // fractional
+/*
+        if(has_sign(p)){
+    	
+	    if(is_alt(p)){
+		fLow=1;
+	        f=PSTR("\x03%05ld|\x04%05ld");
+	    }else
+	        f=PSTR("\x03%06ld|\x04%06ld");
+        }else {
+	    if(is_alt(p)){
+	        fLow=1;
+	        f=PSTR("%05ld|%05ld");
+	    }else
+	        f=PSTR("%06ld|%06ld");
+        }
+*/
+	f=(const char *)pgm_read_word(&gps_fmt[idx]);
+	print_GPS_frac(f, fLow);
+	return;
+    } 
+
+/*
     if(has_sign(p)){
 	if(is_alt(p))
 	    f=PSTR("\x03%9.5f|\x04%9.5f");
@@ -1300,8 +1371,9 @@ static void panGPS(point p){
 	else
 	    f=PSTR("%10.6f|%10.6f");
     }
+*/
+    f=(const char *)pgm_read_word(&gps_fmtF[idx]);
 
-    //osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
     print_GPS(f);
 }
 
@@ -1981,7 +2053,7 @@ void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 */
-static void move_menu(char dir){
+static NOINLINE void move_menu(char dir){
 
     const Setup_screen *pscreen;
 
@@ -2000,7 +2072,7 @@ again:
     lflags.got_data=1; // renew screen
 }
 
-void move_screen(char dir){
+static void move_screen(char dir){
 
     setup_menu=1;
 
@@ -2337,11 +2409,14 @@ void writePanels(){
     pt=millis();  // текущее время
 
 #ifdef IS_PLANE
-    if (lflags.in_air  && ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
-        landed = pt; // пока летаем постоянно обновляем это время
+
+// в универсальном случае если выбран планер
+    if(sets.model_type == 0 /* plane */  && lflags.motor_armed  && lflags.in_air  &&
+      ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
+        landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
     }
 #ifdef IS_COPTER
-      else if (!lflags.motor_armed && lflags.last_armed_status ){ // on motors disarm.
+      else if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
 	landed = pt; // запомнится время дизарма
     }
     

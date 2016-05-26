@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r840 DV";
+        public const string VERSION = "r842 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -281,7 +281,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, 0, "Show HUD frame"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, 0, "Show HUD frame", 0, "Show ILS", 1, "Show Radar", 0 , "  with track"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -290,8 +290,8 @@ namespace OSD {
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)");
-                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)");
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
+                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
 
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
@@ -600,6 +600,9 @@ namespace OSD {
             printf(format, args);
         }
 
+        private int getAlt(Panel p){
+            return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0);
+        }
 
         public void drawNode(TreeNode tn) {
             Panel thing = (Panel)tn.Tag;
@@ -610,9 +613,9 @@ namespace OSD {
 
             // ntsc and below the middle line
             if (thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked)) {
-                thing.show(thing.x, thing.y - 3, thing.sign, thing.Altf);
+                thing.show(thing.x, thing.y - 3, thing.sign, getAlt(thing));
             } else { // pal and no change
-                thing.show(thing.x, thing.y, thing.sign, thing.Altf);
+                thing.show(thing.x, thing.y, thing.sign, getAlt(thing));
             }
         }
 
@@ -1179,13 +1182,15 @@ namespace OSD {
                                 tnArray[0].Checked = (p.y < 0x80);
                             }
 
-                            int flag = (p.y & 0x40)==0?0:1;
-                            pi.x = (byte)Constrain(p.x & 0x7f, 0, SCREEN_W);
-                            pi.y = (byte)Constrain(p.y & 0x3f, 0, SCREEN_H);
+                            pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
+                            pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
+                            pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                            pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
+                            pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            pi.sign = (p.x & 0x80) == 0 ? 1 : 0;
-                            //scr[k].panelItems[a] = new Panel(pi.name, pi.show, p.x, p.y, pi.pos);
-                            pi.Altf =flag;
+                            pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
+                            pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            
                         }
                     }
                 }
@@ -1607,7 +1612,7 @@ namespace OSD {
                                 if (item != null) {
                                     TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
                                     if (tnArray.Length > 0)
-                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf);
+                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf, item.Alt2, item.Alt3, item.Alt4);
                                 }
                             }
                         }
@@ -1745,6 +1750,21 @@ namespace OSD {
                                             pi.Altf=0;
                                             try {
                                                 pi.Altf = int.Parse(strings[5]);
+                                            } catch { }
+
+                                            pi.Alt2 = 0;
+                                            try {
+                                                pi.Alt2 = int.Parse(strings[6]);
+                                            } catch { }
+
+                                            pi.Alt3 = 0;
+                                            try {
+                                                pi.Alt3 = int.Parse(strings[7]);
+                                            } catch { }
+
+                                            pi.Alt4 = 0;
+                                            try {
+                                                pi.Alt4 = int.Parse(strings[8]);
                                             } catch { }
 
                                             TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
@@ -3641,9 +3661,13 @@ namespace OSD {
                 tlog_thread = new System.Threading.Thread(thread_proc);
                 tlog_thread.Start();
             } else {
-                tlog_thread.Abort();
-                if (comPort.IsOpen)
-                    comPort.Close();
+                try {
+                    tlog_thread.Abort();
+                } catch {};
+                try {
+                    if (comPort.IsOpen)
+                        comPort.Close();
+                } catch {};
             }
         }
 
