@@ -934,7 +934,9 @@ namespace OSD
         public int panGPS(int first_col, int first_line, int sign, int fAlt)
         {
             osd.setPanel(first_col, first_line);
-            
+
+            char div = is_alt3(fAlt)?' ':'|';
+
 			if(sign==1) {
                 if (is_alt2(fAlt)){
                     int i;
@@ -943,13 +945,13 @@ namespace OSD
                     i = (int)lon; lon -= i;
 
                     if (is_alt(fAlt))
-                        osd.printf("%c%05d|%c%05d", 0x03, (int)(lat * 100000.0), 0x04, (int)(lon * 100000.0));
+                        osd.printf("%c%05d%c%c%05d", 0x03, (int)(lat * 100000.0),div, 0x04, (int)(lon * 100000.0));
                     else
-                        osd.printf("%c%06d|%c%06d", 0x03, (int)(lat * 1000000.0), 0x04, (int)(lon * 1000000.0));
+                        osd.printf("%c%06d%c%c%06d", 0x03, (int)(lat * 1000000.0), div, 0x04, (int)(lon * 1000000.0));
                 }else if (is_alt(fAlt))
-                	osd.printf("%c%9.5f|%c%9.5f", 0x03, (double)osd_lat,  0x04, (double)osd_lon);
+                    osd.printf("%c%9.5f%c%c%9.5f", 0x03, (double)osd_lat, div, 0x04, (double)osd_lon);
                 else
-                    osd.printf("%c%10.6f|%c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+                    osd.printf("%c%10.6f%c%c%10.6f", 0x03, (double)osd_lat, div, 0x04, (double)osd_lon);
 			} else {
                 if (is_alt2(fAlt)){
                     int i;
@@ -959,14 +961,14 @@ namespace OSD
                     
 
                     if (is_alt(fAlt))
-                        osd.printf("%05d|%05d", (int)(lat* 100000.0), (int)(lon* 100000.0));
+                        osd.printf("%05d%c%05d", (int)(lat * 100000.0), div, (int)(lon * 100000.0));
                     else
-                        osd.printf("%06d|%06d", (int)(lat * 1000000.0), (int)(lon * 1000000.0));
+                        osd.printf("%06d%c%06d", (int)(lat * 1000000.0), div, (int)(lon * 1000000.0));
 
                 } else if (is_alt(fAlt))
-            	    osd.printf("%9.5f|%9.5f",  (double)osd_lat,   (double)osd_lon);
+                    osd.printf("%9.5f%c%9.5f", (double)osd_lat, div, (double)osd_lon);
                 else
-                    osd.printf("%10.6f|%10.6f", (double)osd_lat, (double)osd_lon);
+                    osd.printf("%10.6f%c%10.6f", (double)osd_lat, div, (double)osd_lon);
             }
             return 0;
         }
@@ -977,26 +979,47 @@ namespace OSD
         // Output : one row numeric value of current GPS location with LAT/LON symbols as on first char
         // Size   : 1 x 25  (rows x chars)
         // Staus  : done
-
+/*
         public int panGPS2(int first_col, int first_line, int sign, int fAlt)
         {
             osd.setPanel(first_col, first_line);
-            
-			if(sign==1){
-                if (is_alt(fAlt))
-                	osd.printf("%c%9.5f %c%9.5f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+
+            if (sign == 1) {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -= i;
+                    i = (int)lon; lon -= i;
+
+                    if (is_alt(fAlt))
+                        osd.printf("%c%05d %c%05d", 0x03, (int)(lat * 100000.0), 0x04, (int)(lon * 100000.0));
+                    else
+                        osd.printf("%c%06d %c%06d", 0x03, (int)(lat * 1000000.0), 0x04, (int)(lon * 1000000.0));
+                } else if (is_alt(fAlt))
+                    osd.printf("%c%9.5f %c%9.5f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
                 else
                     osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
+            } else {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -= i;
+                    i = (int)lon; lon -= i;
 
-			}else {
-                if (is_alt(fAlt))
-		    		osd.printf("%9.5f %9.5f",  (double)osd_lat,  (double)osd_lon);
+
+                    if (is_alt(fAlt))
+                        osd.printf("%05d %05d", (int)(lat * 100000.0), (int)(lon * 100000.0));
+                    else
+                        osd.printf("%06d %06d", (int)(lat * 1000000.0), (int)(lon * 1000000.0));
+
+                } else if (is_alt(fAlt))
+                    osd.printf("%9.5f %9.5f", (double)osd_lat, (double)osd_lon);
                 else
                     osd.printf("%10.6f %10.6f", (double)osd_lat, (double)osd_lon);
             }
             return 0;
         }
-		
+*/		
 		
         /* **************************************************************** */
         // Panel  : panHeading

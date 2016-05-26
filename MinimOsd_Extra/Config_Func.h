@@ -20,6 +20,14 @@ static boolean inline is_alt2(point p){
     return (p.y & 0x20);
 }
 
+static boolean inline is_alt3(point p){
+    return (p.y & 0x10);
+}
+
+static boolean inline is_alt4(point p){
+    return (p.x & 0x40);
+}
+
 // чтение и запись мелких объектов
 static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
     for(;l!=0; l--, e++) {

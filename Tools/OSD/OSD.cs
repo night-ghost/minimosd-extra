@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r842 DV";
+        public const string VERSION = "r843 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -290,9 +290,8 @@ namespace OSD {
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
-                pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
-
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
+        //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
@@ -325,7 +324,7 @@ namespace OSD {
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY);
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, 0, "Not scroll if not fit");
+                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, 0, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");

@@ -1293,8 +1293,8 @@ static void panGPSats(point p){
 // Size   : 2 x 12  (rows x chars)
 // Staus  : done
 
-static void NOINLINE print_GPS(PGM_P f){
-    osd.printf_P(f, osd_pos.lat, osd_pos.lon);
+static void NOINLINE print_GPS(PGM_P f, byte div){
+    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
 }
 
 static long NOINLINE coord_frac(float &f, byte fLow){
@@ -1303,20 +1303,20 @@ static long NOINLINE coord_frac(float &f, byte fLow){
     return (f-(int)f) * (fLow?100000.0:1000000.0);
 }
 
-static void NOINLINE print_GPS_frac(PGM_P f, byte fLow){
+static void NOINLINE print_GPS_frac(PGM_P f, byte fLow, byte div){
 
-    osd.printf_P(f, coord_frac(osd_pos.lat, fLow), coord_frac(osd_pos.lon, fLow));
+    osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
 }
 
-static const PROGMEM char gps_f0[]="%06ld|%06ld";
-static const PROGMEM char gps_f1[]="%05ld|%05ld";
-static const PROGMEM char gps_f2[]="\x03%06ld|\x04%06ld";
-static const PROGMEM char gps_f3[]="\x03%05ld|\x04%05ld";
+static const PROGMEM char gps_f0[]="%06ld%c%06ld";
+static const PROGMEM char gps_f1[]="%05ld%c%05ld";
+static const PROGMEM char gps_f2[]="\x03%06ld%c\x04%06ld";
+static const PROGMEM char gps_f3[]="\x03%05ld%c\x04%05ld";
 
-static const PROGMEM char gps_f4[]="%10.6f|%10.6f";
-static const PROGMEM char gps_f5[]="%9.5f|%9.5f";
-static const PROGMEM char gps_f6[]="\x03%10.6f|\x04%10.6f";
-static const PROGMEM char gps_f7[]="\x03%9.5f|\x04%9.5f";
+static const PROGMEM char gps_f4[]="%10.6f%c%10.6f";
+static const PROGMEM char gps_f5[]="%9.5f%c%9.5f";
+static const PROGMEM char gps_f6[]="\x03%10.6f%c\x04%10.6f";
+static const PROGMEM char gps_f7[]="\x03%9.5f%c\x04%9.5f";
 
 static const PROGMEM char * const gps_fmt[]= {
     gps_f0, gps_f1, gps_f2, gps_f3
@@ -1332,6 +1332,8 @@ static void panGPS(point p){
 
     PGM_P f;
     if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
+
+    byte div=is_alt3(p)?' ':'|';
 
     byte fLow=is_alt(p)?1:0;
 
@@ -1355,7 +1357,7 @@ static void panGPS(point p){
         }
 */
 	f=(const char *)pgm_read_word(&gps_fmt[idx]);
-	print_GPS_frac(f, fLow);
+	print_GPS_frac(f, fLow, div);
 	return;
     } 
 
@@ -1374,7 +1376,7 @@ static void panGPS(point p){
 */
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
 
-    print_GPS(f);
+    print_GPS(f,div);
 }
 
 /* **************************************************************** */
@@ -1383,7 +1385,7 @@ static void panGPS(point p){
 // Output : one row numeric value of current GPS location with LAT/LON symbols as on first char
 // Size   : 1 x 25  (rows x chars)
 // Staus  : done
-
+/*
 static void panGPS2(point p){
 
     PGM_P f;
@@ -1404,6 +1406,7 @@ static void panGPS2(point p){
     print_GPS(f);
 
 }
+*/
 
 /* **************************************************************** */
 // Panel  : panHeading
@@ -1528,6 +1531,8 @@ static void panHomeDir(point p){
 static void panMessage(point p){
 
 #define MAX_MSG_SIZE 26
+
+//    lflags.show_screnN = !is_alt2(p);
 
 //  if(lflags.flgMessage) {
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
@@ -2335,7 +2340,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0  },
-    { ID_of(GPS2),		panGPS2, 	0  },
+//    { ID_of(GPS2),		panGPS2, 	0  },
     { ID_of(batteryPercent),	panBatteryPercent, 0 },
     { ID_of(COG),		panCOG, 	0 },
 //10
