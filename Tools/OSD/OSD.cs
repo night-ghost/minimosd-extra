@@ -1181,14 +1181,19 @@ namespace OSD {
                                 tnArray[0].Checked = (p.y < 0x80);
                             }
 
-                            pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
-                            pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
-                            pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                            if(pi.Altf!=-1)
+                                pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
+                            if (pi.Alt2 != -1)
+                                pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
+                            if (pi.Alt3 != -1)
+                                pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
-                            pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            if (pi.sign != -1)
+                                pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
+                            if (pi.Alt3 != -1)
+                                pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
                             
                         }
                     }
@@ -2695,6 +2700,8 @@ namespace OSD {
                 return 2; // pin analog
             case 2:
                 return 3; // pin PWM
+            case 3:
+                return 4;  // 3DR modem RSSI
             }
             return v;
         }
@@ -2702,6 +2709,7 @@ namespace OSD {
          0 - MAVlink
          1 - analog
          2 - pulse
+         3 - 3DR modem RSSI
          4 - ch 8                         
          */
         private int rssi_encode(int v) {
@@ -2714,6 +2722,8 @@ namespace OSD {
                 return 1 * 2;
             case 3:     //   pin PWM
                 return 2 * 2;
+            case 4:     // 3DR modem RSSI
+                return 3 * 2; 
             }
             return 0;
         }

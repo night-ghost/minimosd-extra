@@ -50,20 +50,7 @@ static void readSettings() {
 
 }
 
-// cчитать настройки текущей панели из EEPROM
-/*static void readPanelSettings() {
 
-    static uint8_t currentPanel=255;
-    
-    if(panelN==currentPanel) return;
-    if(panelN>=MAX_PANELS) return; // не читаем мусор при переключении на служебные панели с верхними номерами
-
-    currentPanel=panelN;
-
-//    eeprom_read_len((byte *)&panel,  OffsetBITpanel * (int)panelN,  sizeof(Panel) );
-
-}
-*/
 // rean one point from current screen
 static point readPanel(byte n) {
     point p; //                     shift to current screen     selected point

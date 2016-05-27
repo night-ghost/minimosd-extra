@@ -216,6 +216,10 @@ float NOINLINE diff_coord(float &c1, float &c2){
     return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 }*/
 
+static float distance(float x, float y){
+    return sqrt(sq(x) + sq(y));
+}
+
 static void setHomeVars()
 {
     float dstlon, dstlat;
@@ -285,7 +289,8 @@ static void setHomeVars()
         dstlat = diff_coord(osd_home.lat, osd_pos.lat);
         dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
         
-        osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+        //osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+        osd_home_distance = distance(dstlat, dstlon);
 	dst_x=(int)fabs(dstlat);
 	dst_y=(int)fabs(dstlon);
 
@@ -338,7 +343,7 @@ void setFdataVars()
 
   //Moved from panel because warnings also need this var and panClimb could be off
 #if defined(USE_FILTER)
-    filter(vertical_speed, (osd_climb * pgm_read_float(&measure->converth) ) *  60); // комплиментарный фильтр 1/10
+    filter(vertical_speed, (osd_climb * get_converth() ) *  60); // комплиментарный фильтр 1/10
 #else
     vertical_speed = (osd_climb * get_converth() ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
     //dst+=(val-dst)*k;
@@ -358,15 +363,15 @@ void setFdataVars()
 
     if (!lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 10){
 	lflags.in_air = 1; // взлетели!
-	tdistance = 0;
+	trip_distance = 0;
     }
 #endif
 
 //    float time_1000 = time_lapse / 1000.0; // in seconds
     float time_1000 = f_div1000(time_lapse); // in seconds
 
-    //if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home && lflags.motor_armed) float_add(tdistance, osd_groundspeed * time_1000);
+    //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
+    if(lflags.osd_got_home && lflags.motor_armed) float_add(trip_distance, osd_groundspeed * time_1000);
 
     //mah_used += (osd_curr_A * 10.0 * time_lapse / (3600.0 * 1000.0));
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
@@ -419,12 +424,19 @@ void setFdataVars()
     long_plus(&total_flight_time_milis, time_lapse);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
-    float dst=osd_home_distance, aspd=osd_airspeed;
-    calc_max(max_home_distance, dst);
-    calc_max(max_osd_airspeed, aspd);
+    float f=osd_home_distance;
+    calc_max(max_home_distance, f);
+    f=osd_airspeed;
+    calc_max(max_osd_airspeed, f);
     calc_max(max_osd_groundspeed, osd_groundspeed);
     calc_max(max_osd_home_alt, osd_alt_mav);
     calc_max(max_osd_windspeed, osd_windspeed);
+
+    f=osd_curr_A;
+    calc_max(max_osd_curr_A, f);
+    calc_max(max_osd_climb, osd_climb);
+    f=-osd_climb;
+    calc_max(min_osd_climb, f);
   }
 }
 

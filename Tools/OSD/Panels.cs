@@ -105,6 +105,8 @@ namespace OSD
         private float tempconvAdd = 0;
 //        private float distconv = 1000;
 		
+        private int vs_ms=0;
+
         public void do_converts () {
 			switch(converts) { 
 			case false:
@@ -424,15 +426,21 @@ namespace OSD
             
             
             if(sign==1){
-                if(is_alt(fAlt)) 
+                if(is_alt(fAlt)) {
+                    vs_ms=1;
                     osd.printf("%c%5.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
-                else 
+                } else {
+                    vs_ms = 0;
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
+                }
 			}else{
-                if (is_alt(fAlt)) 
+                if (is_alt(fAlt)) {
+                    vs_ms = 1;
                     osd.printf("%5.2f%c",  (double)(osd_climb * converth/60), 0x18);
-                else
+                } else {
+                    vs_ms = 0;
                     osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);
+                }
             }
             
             return 0;
@@ -1503,17 +1511,21 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
                   max_osd_home_alt = 24.7,
                   osd_lat = 45.45,
                   osd_lon = 46.46;
-			
+
+              byte ch_climb = (vs_ms != 0 ? (byte)(0x18) : (byte)climbChar);
 			osd.setPanel(first_col, first_line);
 			
-	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
+	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|\x03%10.6f|\x04%10.6f"),
               ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
                                       (int)((max_home_distance) * converth), chrHigh,
                                                  (int)(tdistance * converth), chrHigh,
                                                         (int)(max_osd_groundspeed * convertspeed),chrSpe,
-                                                                    (int)(max_osd_home_alt * converth), chrHigh,
-                                                                              osd_lat,
-                                                                                        osd_lon);
+                                                                            (int)(max_osd_home_alt * converth), chrHigh,
+                                                                                   54.3,ch_climb,
+                                                                                                24.7,ch_climb,
+                                                                                                                47,
+                                                                                                                       osd_lat,
+                                                                                                                                     osd_lon);
 				return 0;
 		}
 		

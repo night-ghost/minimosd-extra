@@ -241,8 +241,7 @@ void setup()     {
     }
 
 
-    panelN = 0; //set panel to 0 to start in the first navigation screen
-//    readPanelSettings(); // Для первой панели. Для остальных - при переключении
+//    panelN = 0; //set panel to 0 to start in the first navigation screen
 
     osd.init();    // Start 
     
@@ -553,7 +552,11 @@ case_2:
 	case 0:
 	    d=osd_rssi;	// mavlink
 	    goto case_4;
-	 
+	
+	case 3: // 3dr modem rssi
+	    d=telem_rssi;
+	    goto case_4;
+	
 	case 4:
 	    d = chan_raw[7]; // ch 8
 case_4:

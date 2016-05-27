@@ -20,19 +20,10 @@ static /*NOINLINE*/ byte get_mhigh(){
     return pgm_read_byte(&measure->high);
 }
 
-//static const PROGMEM char fmt_xtrack[]="\x20\x58\x65%4.0f%c";
-//static const PROGMEM char f4_0fc[]="%4.0f%c";
-//#define f4_0fc (&fmt_xtrack[3])
-
 static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 
     return osd_groundspeed * get_converts();
 }
-
-/*
-static int NOINLINE fp_div100(float *f){
-    return (int)f/100.0;
-}*/
 
 static void NOINLINE printTime(int t, byte blink){
     osd.printf_P(PSTR("%3i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
@@ -288,14 +279,6 @@ static void showILS(byte start_col, byte start_row) {
         //Show line on panel center because horizon line can be
         //high or low depending on pitch attitude
 
-	// cls
-/*	osd.print_P(PSTR("\x20|"
-			 "\x20|"
-			 "\x20|"
-			 "\x20|"
-			 "\x20"));
-*/
-
         char subval_char = 0xCF;
 
         char alt = (osd_alt_mav * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
@@ -442,7 +425,7 @@ static NOINLINE void printFullDist(float dd){
     }else{ // in kilometers
 	dd = dd / pgm_read_word(&measure->distconv);
 	PGM_P fmt;
-	if((int)dd<99)
+	if((int)dd<=99)
 	    fmt = PSTR("%5.2f");
         else
             fmt = PSTR("%5.1f");
@@ -459,7 +442,7 @@ static NOINLINE void printFullDist(float dd){
 // Staus  : done
 
 static void panDistance(point p){
-    printFullDist(tdistance);
+    printFullDist(trip_distance);
 }
 
 /* **************************************************************** */
@@ -514,6 +497,21 @@ static NOINLINE void print_list(const Formats *f){
 	    k=get_converts();
 	    goto as_f;
 
+	case 'a': // current
+	    k=1/100.0;
+	    h='A';
+	    goto as_f;
+
+	case 'v': // vertical speed
+	    k=get_converth();
+	    if(lflags.vs_ms) {
+	        h = 0x18;
+	    } else {
+	        h=pgm_read_byte(&measure->climbchar);
+	        k*=60;
+	    }
+	    goto as_f;
+
 	case 'f':
 	default:
 	    k=1;
@@ -538,18 +536,25 @@ as_f:
 
 static void panFdata(point p){ // итоги полета
 
-    static const char PROGMEM fmt0[]="|\x0B%5f";
-    static const char PROGMEM fmt1[]="\x8F%5f";
-    static const char PROGMEM fmt2[]="\x14%5f";
-    static const char PROGMEM fmt3[]="\x12%5f";
+    static const char PROGMEM fmt0[]="|\x0B%7.2f";
+    static const char PROGMEM fmt1[]="\x8F%6.1f";
+    static const char PROGMEM fmt2[]="\x14%6.1f";
+    static const char PROGMEM fmt3[]="\x12%6.1f";
     static const char PROGMEM fmt4[]="\x03%10.6f";
     static const char PROGMEM fmt5[]="\x04%10.6f";
 
+    static const char PROGMEM fmt6[]="\x90\x91%7.2f";
+    static const char PROGMEM fmt7[]="\xA0\xA1%7.2f";
+    static const char PROGMEM fmt8[]="\xBD%6.1f";
+
     static const PROGMEM Formats fd[] = {
 	{fmt0, 'h',  &max_home_distance   },
-	{fmt1, 'h',  &tdistance           },
+	{fmt1, 'h',  &trip_distance           },
 	{fmt2, 's',  &max_osd_groundspeed },
 	{fmt3, 'h',  &max_osd_home_alt    },
+	{fmt6, 'v',  &max_osd_climb       },
+	{fmt7, 'v',  &min_osd_climb       },
+	{fmt8, 'a',  &max_osd_curr_A      },
 	{fmt4, 'f',  &osd_pos.lat         },
 	{fmt5, 'f',  &osd_pos.lon         },
 	{0}
@@ -565,7 +570,7 @@ static void panFdata(point p){ // итоги полета
 
   osd.printf_P(PSTR("|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
 		      (int)((max_home_distance) * pgm_read_float(&measure->converth)), h,
-		                 (int)(tdistance * pgm_read_float(&measure->converth)), h,
+		                 (int)(trip_distance * pgm_read_float(&measure->converth)), h,
 		                	(int)(max_osd_groundspeed * pgm_read_float(&measure->converts)),pgm_read_byte(&measure->spe),
 		                		    (int)(max_osd_home_alt * pgm_read_float(&measure->converth)), h,
 		                			      osd_pos.lat, 
@@ -705,13 +710,13 @@ static void panEff(point p){
             if ((osd_throttle < 1)){ // запоминаем высоту и путь при выключенном газе
                 if (lflags.throttle_on) {
                   palt = osd_alt_to_home;
-                  ddistance = tdistance;
+                  ddistance = trip_distance;
                   lflags.throttle_on = 0;
                 }
             }
 
             if (osd_climb < -0.05){
-                float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (tdistance - ddistance)) * get_converth();
+                float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (trip_distance - ddistance)) * get_converth();
                 int iGlide=glide;
                 if (iGlide > 9999) glide = 9999.0;
                 if (iGlide > 0){
@@ -768,8 +773,6 @@ static void panRSSI(point p){
 static void panCALLSIGN(point p){
     if((seconds % 64) < 2){
       osd.print( (char *)sets.OSD_CALL_SIGN);
-    }else{
-// we don't needs to clear!    osd.print_P(&strclear[4]);
     }
 }
 
@@ -818,12 +821,14 @@ static void panCur_A(point p){
 // Staus  : done
 
 static void panAlt(point p){
+
     long v=osd_pos.alt;
     if(is_alt(p)) v-=osd_home.alt;
+//    if(!lflags.gps_active) // если нет GPS то покажем барометрическую
+//	v=osd_alt_mav;
 
 //    printDistCnv(v/1000.0);
     printDistCnv(f_div1000(v));
-
 }
 
 /*
@@ -861,16 +866,18 @@ static void panHomeAlt(point p){
 
 static void panClimb(point p){
     if(is_alt(p)) { 	// in m/s
-	float v= vertical_speed/60;
+	lflags.vs_ms=1;
 	PGM_P fmt;
-	
+	float v= vertical_speed/60; // multiplied by filter in func.h
 	if(abs((int)v)<10)
 	    fmt=PSTR("% 5.2f\x18");
 	else
 	    fmt=PSTR("% 5.1f\x18");
 	osd_printf_1(fmt, v);
-    } else
+    } else {
+	lflags.vs_ms=0;
         osd_printf_2(PSTR("%4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
+    }
 }
 
 /* **************************************************************** */
@@ -1161,7 +1168,7 @@ static void panHorizon(point p){
     }
 
     //Show ground level on  HUD
-    if(flags.ils_on)
+    if(flags.ils_on && lflags.motor_armed)
 	showILS(p.x, p.y);
 
 }
@@ -1237,12 +1244,8 @@ static void panWaitMAVBeats(){
     
 #endif
 
-#ifdef DEBUG
     OSD::setPanel(5,3);
-#else
-    OSD::setPanel(5,7);
-#endif
-    osd.print_P(PSTR("No input data! "));
+    osd.print_P(PSTR("No input data! ||"));
 
 #ifdef DEBUG
     extern uint16_t packet_drops;
@@ -1251,7 +1254,7 @@ static void panWaitMAVBeats(){
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
 
-    OSD::setPanel(2,5);
+    OSD::setPanel(6,5);
     osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
     osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
@@ -1259,6 +1262,8 @@ static void panWaitMAVBeats(){
     osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
     
     lflags.input_active=0;
+#else
+    panFdata({3,5});
 #endif
 }
 
@@ -1293,20 +1298,13 @@ static void panGPSats(point p){
 // Size   : 2 x 12  (rows x chars)
 // Staus  : done
 
-static void NOINLINE print_GPS(PGM_P f, byte div){
-    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
-}
 
 static long NOINLINE coord_frac(float &f, byte fLow){
-    f=abs(f);
+    float v=abs(f);
     
-    return (f-(int)f) * (fLow?100000.0:1000000.0);
+    return (v-(int)v) * (fLow?100000.0:1000000.0);
 }
 
-static void NOINLINE print_GPS_frac(PGM_P f, byte fLow, byte div){
-
-    osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
-}
 
 static const PROGMEM char gps_f0[]="%06ld%c%06ld";
 static const PROGMEM char gps_f1[]="%05ld%c%05ld";
@@ -1327,8 +1325,6 @@ static const PROGMEM char * const gps_fmtF[]= {
 };
 
 static void panGPS(point p){
-
-
 
     PGM_P f;
     if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
@@ -1357,7 +1353,8 @@ static void panGPS(point p){
         }
 */
 	f=(const char *)pgm_read_word(&gps_fmt[idx]);
-	print_GPS_frac(f, fLow, div);
+        osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
+
 	return;
     } 
 
@@ -1376,7 +1373,7 @@ static void panGPS(point p){
 */
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
 
-    print_GPS(f,div);
+    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
 }
 
 /* **************************************************************** */
@@ -2445,15 +2442,15 @@ void writePanels(){
     }
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
-//  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (tdistance > 50)){
-//  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (tdistance > 50)){
-//  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)tdistance > 5)){ // 10 seconds after disarm
-  else if (!lflags.motor_armed && time_since(&landed) < 10000 && ((int)tdistance > 5)){ // 10 seconds after disarm
+//  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
+//  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
+//  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
+  else if (!lflags.motor_armed && time_since(&landed) < 10000 && ((int)trip_distance > 5)){ // 10 seconds after disarm
 
 #else
 #ifdef IS_PLANE
     //Only show flight summary 7 seconds after landing
-  else if ( time_since(&landed) < 10000 && ((int)tdistance > 5)){
+  else if ( time_since(&landed) < 10000 && ((int)trip_distance > 5)){
 #else
     else if(0) {
 #endif

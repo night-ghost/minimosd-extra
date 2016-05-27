@@ -1679,7 +1679,8 @@ namespace OSD
             "Mavlink RSSI",
             "Channel 8",
             "Pin RSSI analog",
-            "Pin RSSI PWM"});
+            "Pin RSSI PWM",
+            "3DR modem RSSI"});
             this.cbxRSSIChannel.Location = new System.Drawing.Point(77, 9);
             this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
             this.cbxRSSIChannel.Name = "cbxRSSIChannel";
@@ -1690,11 +1691,11 @@ namespace OSD
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(24, 12);
+            this.label15.Location = new System.Drawing.Point(34, 12);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(48, 13);
             this.label15.TabIndex = 12;
-            this.label15.Text = "channel:";
+            this.label15.Text = "source: ";
             // 
             // label8
             // 

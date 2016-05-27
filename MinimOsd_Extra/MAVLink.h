@@ -133,13 +133,21 @@ bool read_mavlink(){
                 break;
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
-                osd_pos.alt = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
                 gps_norm(osd_pos.lat,mavlink_msg_gps_raw_int_get_lat(&msg.m));
                 gps_norm(osd_pos.lon,mavlink_msg_gps_raw_int_get_lon(&msg.m));
                 osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg.m);
                 osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg.m);
+                if(osd_fix_type>0)
+                    osd_pos.alt = mavlink_msg_gps_raw_int_get_alt(&msg.m);  // *1000
+                else
+                    osd_pos.alt=osd_alt_mav * 1000;
                 osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg.m);
                 eph = mavlink_msg_gps_raw_int_get_eph(&msg.m);
+
+#ifdef DEBUG
+Serial.printf_P(PSTR("MAVLINK_MSG_ID_GPS_RAW_INT fix=%d\n"), osd_fix_type);
+#endif
+
                 break; 
 
             case MAVLINK_MSG_ID_VFR_HUD: // todo copy at once
@@ -152,13 +160,33 @@ float airspeed; ///< Current airspeed in m/s
  uint16_t throttle; ///< Current throttle setting in integer percent, 0 to 100
 */
                 osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg.m);
-                osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg.m);
+                if(osd_fix_type>0)
+                    osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg.m);
+                else
+                    osd_groundspeed = loc_speed;
                 osd_heading = mavlink_msg_vfr_hud_get_heading(&msg.m); // 0..360 deg, 0=north
                 osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg.m);
-                osd_alt_mav = mavlink_msg_vfr_hud_get_alt(&msg.m);
-                //osd_baro_alt = mavlink_msg_vfr_hud_get_alt(&msg.m);  //  Current altitude (MSL), in meters
+                osd_alt_mav = mavlink_msg_vfr_hud_get_alt(&msg.m);  //  Current altitude (MSL), in meters
                 osd_climb = mavlink_msg_vfr_hud_get_climb(&msg.m);
                 break;
+
+/*
+	    case MAVLINK_MSG_ID_LOCAL_POSITION_NED: { // speed for no-GPS setups
+		    float vx = mavlink_msg_local_position_ned_get_vx(&msg.m);
+		    float vy = mavlink_msg_local_position_ned_get_vy(&msg.m);
+		    loc_speed = distance(vx, vy);
+Serial.printf_P(PSTR("MAVLINK_MSG_ID_LOCAL_POSITION_NED x=%f y=%f\n"),vx,vy);
+		}break;
+//*/
+/*
+	    case MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE: {
+		float vx=mavlink_msg_vision_speed_estimate_get_x(&msg.m);
+		float vy=mavlink_msg_vision_speed_estimate_get_y(&msg.m);
+Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
+		loc_speed = distance(vx, vy);
+	    } break;
+*/	    
+
 
             case MAVLINK_MSG_ID_ATTITUDE:
                 osd_att.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
@@ -230,12 +258,15 @@ packet.press_diff = press_diff;
                 break;
 #endif
 
-#ifdef IS_PLANE
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
-    		// height of takeoff point
-                //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
-                osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
-                break; 
+//#ifdef IS_PLANE
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: {
+                    // height of takeoff point
+                    //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
+                    osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
+		    int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m);
+		    int16_t vy = mavlink_msg_global_position_int_get_vx(&msg.m);
+		    loc_speed = distance(vx, vy) / 100;
+                } break; 
 /*
 case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
             {
@@ -244,7 +275,7 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
             }
             break;
 */
-#endif
+//#endif
 
 /*
     MAV_SEVERITY_EMERGENCY=0,  System is unusable. This is a "panic" condition. | 
@@ -294,6 +325,24 @@ typedef enum FENCE_BREACH{
 		mav_fence_status = mavlink_msg_fence_status_get_breach_type(&msg.m);
 		break;
 
+		case MAVLINK_MSG_ID_RADIO: {// 3dr telemetry status
+/*
+typedef struct __mavlink_radio_t
+{
+ uint16_t rxerrors; ///< receive errors
+ uint16_t fixed; ///< count of error corrected packets
+ uint8_t rssi; ///< local signal strength
+ uint8_t remrssi; ///< remote signal strength
+ uint8_t txbuf; ///< how full the tx buffer is as a percentage
+ uint8_t noise; ///< background noise level
+ uint8_t remnoise; ///< remote background noise level
+*/
+		    byte rssi    = mavlink_msg_radio_get_rssi(&msg.m);
+		    byte remrssi = mavlink_msg_radio_get_remrssi(&msg.m);
+		    telem_rssi = remrssi > rssi ? rssi : remrssi;
+
+		} break;
+		
             default:
                 //Do nothing
                 break;

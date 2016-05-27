@@ -397,19 +397,19 @@ namespace OSD
 					chkSign.Visible = thing.sign!=-1;
 
                     chkAlt.Text = thing.alt_text;
-                    chkAlt.Visible = thing.Altf != -1;
+                    chkAlt.Visible = thing.Altf != -1 && thing.alt_text!="";
                     chkAlt.Checked = thing.Altf ==1;
 
                     chkAlt2.Text = thing.alt2_text;
-                    chkAlt2.Visible = thing.Alt2 != -1;
+                    chkAlt2.Visible = thing.Alt2 != -1 && thing.alt2_text != "";
                     chkAlt2.Checked = thing.Alt2 == 1;
 
                     chkAlt3.Text = thing.alt3_text;
-                    chkAlt3.Visible = thing.Alt3 != -1;
+                    chkAlt3.Visible = thing.Alt3 != -1 && thing.alt3_text != "";
                     chkAlt3.Checked = thing.Alt3 == 1;
 
                     chkAlt4.Text = thing.alt4_text;
-                    chkAlt4.Visible = thing.Alt4 != -1;
+                    chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
                     chkAlt4.Checked = thing.Alt4 == 1;
 
 				}
