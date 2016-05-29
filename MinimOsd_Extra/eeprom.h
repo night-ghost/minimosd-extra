@@ -80,6 +80,7 @@ struct Panel {
     point sensor3;      // 82
     point sensor4;      // 84
     //point baroAlt;    // 86
+    point hdop;         // #define panGPSHDOP_XY = 86; 
 };
 
 union _Panel {

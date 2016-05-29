@@ -20,7 +20,8 @@ namespace OSD {
 		const int panGPS_XY = 14;
 
 		const int panRose_XY = 16;
-		const int panHeading_XY = 18;
+        const int panGPSHDOP_XY = 86;
+        const int panHeading_XY = 18;
 		const int panHomeDir_XY = 20;
 		const int panHomeDis_XY = 22;
 		const int panWPDir_XY = 24;
