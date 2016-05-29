@@ -206,6 +206,13 @@ v842
 * all distances can be more than 99km
 * gps coords can display only fractional part of coords
 * fixed the screen sticking on a large data stream
+* removed panGPS2, added flag to panGPS "Display in row" instead
+
+v843
+* 3DR modem RSSI can be used as RSSI source
+* additional fields in flight results - current, vertical speed up & down
+* support for GPS-less setup: Alt and Groundspeed works without GPS
+* flight data shown on "no input data" screen - for setup on ground station
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -438,6 +445,14 @@ v842
 * все расстояния могут быть больше чем 99км
 * Панель gps координат может отображать только дробную часть координат
 * исправлено залипание экрана на больших скоростях данных
+* Удалена панель GPS2, вместо нее у панели GPS сделан флаг "Показывать в строке" ("Display in row")
+
+
+v843
+* RSSI от 3DR модема может использоваться как источинк RSSI
+* дополнительные значения в результатах полета - ток и скорости подъема/снижения
+* поддержка аппаратов без GPS: панели высоты и скорости работают и без GPS
+* Результаты полета отображаются на экране "no input data" - например для использования OSD на наземной станции
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

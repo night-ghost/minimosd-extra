@@ -7,7 +7,6 @@
 
  Flags flags; // битовые флаги из EEPROM
  Settings sets;	// настройки из EEPROM
-// no more! Panel panel; // элементы экрана из EEPROM
 
 
 static float        max_home_distance = 0;
@@ -15,11 +14,14 @@ static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
 static float        max_osd_home_alt = 0;
 static float        max_osd_windspeed = 0;
+static float        max_osd_curr_A = 0;                 // max Battery A current
+static float        max_osd_climb=0;
+static float        min_osd_climb=0;
 
 static float        nor_osd_windspeed = 0; // calculated from osd_windspeed by LPF 1/100
-static float        vertical_speed = 0; // calculated from osd_climb byy LPF 1/10
+static float        vertical_speed = 0; // calculated from osd_climb by LPF 1/10
 
-static float        tdistance = 0; // track distance
+static float        trip_distance = 0; // track distance
 static float        mah_used = 0;  // consumed charge
 
 
@@ -136,7 +138,7 @@ struct Coords {
     long alt; // altitude GPS
 };
 
-long osd_baro_alt; // altitude baro 
+//long osd_baro_alt; // altitude baro 
 
 static float        osd_climb = 0;
 Coords              osd_pos = {0,0,0};			// current coordinates
@@ -166,6 +168,7 @@ static float        osd_windspeed = 0;
 static int /*float*/  osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
 
 static float        osd_groundspeed = 0;            // ground speed
+static float        loc_speed=0;    // local speed
 
 static uint8_t      osd_throttle = 0;               // throtle
 
@@ -181,13 +184,15 @@ byte count05s=0;
 byte count02s=0;
 
 #define MAX_PANELS 4
-static uint8_t panelN = 0;
+static uint8_t panelN = STARTUP_SCREEN;
 
 
 //*************************************************************************************************************
 static uint8_t      osd_rssi = 0; // raw value from mavlink
+static uint8_t      telem_rssi = 0; // telemetry modem RSSI raw value
 static uint16_t     rssi_in = 0;  // temp readed value after sliding average
 static uint16_t     rssi = 0;     //normalized 0-100%
+
 
 uint8_t crlf_count = 0;
 
@@ -235,6 +240,7 @@ struct loc_flags {
 
     bool show_screnN;
     bool gps_active; // было что-то с GPS
+    bool vs_ms; // vertical speed in m/s;
 //    bool osd_clear:1;
 //MAVLink session control
 //    bool mavbeat:1;
