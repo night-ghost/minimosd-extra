@@ -214,6 +214,16 @@ v843
 * support for GPS-less setup: Alt and Groundspeed works without GPS
 * flight data shown on "no input data" screen - for setup on ground station
 
+
+v844
+* new panel for HDOP
+* new panel for channel status - 5 steps
+
+
+v845
+* fixed bug in ChannelStatus panel
+* CT clears message after 10s
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -453,6 +463,17 @@ v843
 * дополнительные значения в результатах полета - ток и скорости подъема/снижения
 * поддержка аппаратов без GPS: панели высоты и скорости работают и без GPS
 * Результаты полета отображаются на экране "no input data" - например для использования OSD на наземной станции
+
+
+v844
+* новая панель  HDOP
+* новая панель "channel status" - 5 позиций
+
+
+v845
+* исправлен баг в панели ChannelStatus
+* CT очищает сообщение через 10 секунд
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

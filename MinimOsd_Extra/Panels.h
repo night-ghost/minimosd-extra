@@ -1276,17 +1276,24 @@ static void panWaitMAVBeats(){
 // Staus  : done
 
 static void panGPSats(point p){
-
-    byte gps_str = 0x86;
-
-    if (osd_fix_type == 2) gps_str = 0x1f;
-    if (osd_fix_type == 3) gps_str = 0x0f;
-
+    char *state[] = { "\x0f\x20\x20", "\x20\x20\x20", "2d\x0f", "3d\x0f" };
+    uint8_t idx = 0;
+    
     if ((eph >= 200) && lflags.blinker)
-       gps_str = 0x20;
-
+    {
+        idx = 1;
+    }
+    if (osd_fix_type == 2)
+    {
+      idx = 2;
+    }
+    if (osd_fix_type == 3)
+    {
+      idx = 3;
+    }
+    
     if(has_sign(p))
-      osd.printf_P(PSTR("%2i%c"), osd_satellites_visible, gps_str);
+      osd.printf_P(PSTR("%s\x20%2i"), state[idx], osd_satellites_visible);
      else
       osd.printf_P(PSTR("%2i"), osd_satellites_visible);
 	    //OSD::write_S(gps_str);
@@ -1421,21 +1428,6 @@ static void panHeading(point p){
     }
 
     osd_printi_1(PSTR("%3i\x05"), osd_heading);
-}
-
-/* **************************************************************** */
-// Panel  : panGPShdop
-// Needs  : X, Y locations
-// Output : GPS HDOP value
-// Size   : 1 x 5  (rows x chars)
-// Staus  : done
-
-static void panGPSHDOP(point p){
-    if(has_sign(p))
-      osd.printf_P(PSTR("%5.1f%c"), eph, 0x2a);
-    else
-      osd.printf_P(PSTR("%5.1f"), eph);
-
 }
 
 /* **************************************************************** */
@@ -1921,6 +1913,53 @@ static void NOINLINE panSensor4(point p) {
 }
 #endif
 
+/* **************************************************************** */
+// Panel  : panHdop
+// Needs  : X, Y locations
+// Output : GPS HDOP value
+// Size   : 1 x 5  (rows x chars)
+// Staus  : done
+
+static void panHdop(point p){
+    if(has_sign(p))
+      osd_printf_1(PSTR("\x2a\x20%5.1f"), eph * 0.1);
+    else
+      osd_printf_1(PSTR("%5.1f"), eph * 0.1);
+
+}
+
+static const char PROGMEM sts_0[]="Off";
+static const char PROGMEM sts_1[]="Low";
+static const char PROGMEM sts_2[]="Mid";
+static const char PROGMEM sts_3[]="Hi!";
+static const char PROGMEM sts_4[]="On!";
+
+static const char PROGMEM  * const sts_arr[]={
+    sts_0, sts_1, sts_2, sts_3, sts_4
+};
+
+static void panState(point p) {
+    byte ch = get_alt_num(p) + 4;
+
+    if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
+
+    // 1000 - 2000 
+    // 1200
+    // 1400
+    // 1600
+    // 1800
+    int v=chan_raw[ch];
+    byte n;
+    
+    if(v<1000) n=0;
+    else {
+  n=( v - 1000)/200;
+  if(n>4) n=4;
+    }
+
+    osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
+}
+
 
 /* **************************************************************** */
 // Panel  : panSetup
@@ -2360,7 +2399,6 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(COG),		panCOG, 	0 },
 //10
     { ID_of(rose),		panRose, 	0 },
-    { ID_of(hdop),    panGPSHDOP, 0 },
     { ID_of(heading),		panHeading, 	0 },
     { ID_of(Fdata),		panFdata, 	0 },
     { ID_of(homeDist),		panHomeDis, 	0x0b },
@@ -2385,6 +2423,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(ch),		panCh, 		0 },
     { ID_of(distance),		panDistance, 	0x8f },
     { ID_of(RadarScale),	panRadarScale, 	RADAR_CHAR  },
+    { ID_of(Hdop),    panHdop,  0  },
+    { ID_of(State),    panState,   0  },
 #if defined(USE_SENSORS)
     { ID_of(sensor1) | 0x80,	panSensor1, 	0 },
     { ID_of(sensor2) | 0x80,	panSensor2, 	0 },

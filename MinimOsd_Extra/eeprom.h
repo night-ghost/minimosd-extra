@@ -79,7 +79,6 @@ struct Panel {
     point sensor2;      // 80
     point sensor3;      // 82
     point sensor4;      // 84
-    //point baroAlt;    // 86
     point Hdop;         // 86
     point State;         // 88
 };
@@ -100,12 +99,12 @@ struct Flags { // 4 байта
     bool useExtVbattA:1;// 4
     bool useExtVbattB:1;// 5 - generated internally
     bool useExtCurr:1;	// 6
-    bool radar_on:1;	// 7
-    bool ils_on:1;	// 8
+    bool radar_on:1;	// 7 - not used, use panel.alt3 instead
+    bool ils_on:1;	// 8 - not used, use panel.alt4 instead
     
     bool mode_auto:1; 	// 9
     bool flgHUD:1;      // 10 - not used, use panel.alt instead
-    bool flgTrack:1;    // 11
+    bool flgTrack:1;    // 11 - not used, use panel.al2
 };
 
 union _Flags {

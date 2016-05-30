@@ -492,6 +492,7 @@ static void getData(){
 	read_ltm();
 #endif
     } else {
+/*
 	if(millis() < BOOTTIME){ // startup delay for fonts
 	    if(Serial.available_S()) {
 	        byte c=Serial.read_S();
@@ -513,7 +514,7 @@ static void getData(){
 	    }
 	    return;
 	}
-
+*/
 
 	switch(count05s % 5){
 #if defined(AUTOBAUD)

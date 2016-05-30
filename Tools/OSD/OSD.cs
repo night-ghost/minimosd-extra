@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r843 DV";
+        public const string VERSION = "r845 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -288,11 +288,10 @@ namespace OSD {
                 pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
                 pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
-                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
+                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 23, 12, panGPSats_XY, 1);
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
                 pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
-                pi[a++] = new Panel("GPS HDOP", pan.panGPSHDOP, 23, 12, panGPSHDOP_XY, 1);
-                //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
+        //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
@@ -305,7 +304,7 @@ namespace OSD {
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, 0, "Reset to 0 on arming");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0 , "show in m/s");
-                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
+                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, 0, "Show in %");
                 pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
 
                 pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0, "Show in m/s");
@@ -331,6 +330,8 @@ namespace OSD {
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, 1, "PWM input");
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
+                pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
+                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, -2, "Select channel");
 
 
                 osd_functions_N = a;
@@ -600,7 +601,7 @@ namespace OSD {
             printf(format, args);
         }
 
-        private int getAlt(Panel p){
+        public int getAlt(Panel p){
             return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0);
         }
 
@@ -777,6 +778,31 @@ namespace OSD {
             } catch {
             }
             return fmt;
+        }
+
+
+        private System.Threading.Thread clear_thread=null ;
+        
+        private  void clear_thread_proc(){
+            System.Threading.Thread.Sleep(10000); 
+            
+            try {
+                this.Invoke((MethodInvoker)delegate {
+                    toolStripStatusLabel1.Text = "";
+                });
+
+            } catch { };
+            clear_thread=null;
+        }
+
+
+        private void start_clear_timeout(){
+            if(clear_thread!=null) clear_thread.Abort();
+
+            clear_thread = new System.Threading.Thread(clear_thread_proc);
+            clear_thread.Start();
+   
+            
         }
 
         private void Sub_WriteOSD() {
@@ -966,6 +992,7 @@ namespace OSD {
                     toolStripStatusLabel1.Text = "EEPROM write done";
                 }
             }
+            start_clear_timeout();
 
         }
 
@@ -1113,6 +1140,7 @@ namespace OSD {
             } else if (err == 0) {
                 //MessageBox.Show("Done writing configuration data!");
                 toolStripStatusLabel1.Text = "EEPROM write done";
+                start_clear_timeout();
                 return 0;
             }
             return -err;
@@ -1182,19 +1210,26 @@ namespace OSD {
                                 tnArray[0].Checked = (p.y < 0x80);
                             }
 
-                            if(pi.Altf!=-1)
-                                pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
-                            if (pi.Alt2 != -1)
-                                pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
-                            if (pi.Alt3 != -1)
-                                pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                            if (pi.sign >= 0)
+                                pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
+
+                            if (pi.Altf == -2) {
+                                pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;                            
+                                pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;                            
+                                pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            } else {
+                                if(pi.Altf >=0)
+                                    pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
+                                if (pi.Alt2 >= 0)
+                                    pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
+                                if (pi.Alt3 >= 0)
+                                    pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                                if (pi.Alt3 >= 0)
+                                    pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            }
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            if (pi.sign != -1)
-                                pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
-                            if (pi.Alt3 != -1)
-                                pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
                             
                         }
                     }
@@ -1478,6 +1513,7 @@ namespace OSD {
 
 
             toolStripStatusLabel1.Text="EEPROM read OK";
+            start_clear_timeout();
             Draw(panel_number = tN);
 
         }
@@ -2004,6 +2040,7 @@ namespace OSD {
                     FLASH = readIntelHEXv2(new StreamReader(ofd.FileName));
                 } catch {
                     MessageBox.Show("Bad Hex File");
+                    start_clear_timeout();
                     return;
                 }
 
@@ -2044,7 +2081,7 @@ namespace OSD {
 
                     toolStripStatusLabel1.Text = "Done";
 
-                    MessageBox.Show("Done!");
+                    //MessageBox.Show("Done!");
                 } else {
                     MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
                                 "Error",
@@ -2115,7 +2152,8 @@ namespace OSD {
 
             try {
                 toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-                toolStripStatusLabel1.Text = "";
+                //toolStripStatusLabel1.Text = "";
+                start_clear_timeout();
 
                 //comPort.Close();
             } catch { }
@@ -2332,6 +2370,7 @@ namespace OSD {
                         if (timeout > 60) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
@@ -2339,6 +2378,7 @@ namespace OSD {
                     if (!readFont.Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data: " + readFont);
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2385,6 +2425,7 @@ namespace OSD {
                                 if (timeout > 100) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return;
                                 }
                             }
@@ -2411,6 +2452,7 @@ namespace OSD {
 
                         if (t > 10) {
                             MessageBox.Show("No end");
+                            start_clear_timeout();
                             comPort.Close();
                             return;
                         }
@@ -2445,6 +2487,7 @@ namespace OSD {
                 conf.WriteCharsetVersion(fileVersion, false);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
                 toolStripStatusLabel1.Text = "CharSet Done!!!";
+                start_clear_timeout();
             }
         }
 
@@ -2813,12 +2856,14 @@ namespace OSD {
                         if (timeout > 6) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
                     if (!comPort.ReadLine().Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2834,6 +2879,7 @@ namespace OSD {
                     if (device != "MAX7456") {
                         MessageBox.Show("Invalid MCM");
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2862,6 +2908,7 @@ namespace OSD {
                                 if (timeout > 10) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return;
                                 }
                             }
@@ -2887,6 +2934,7 @@ namespace OSD {
                         if (t > 10) {
                             MessageBox.Show("No end");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
@@ -2917,6 +2965,7 @@ namespace OSD {
 
                 conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+                start_clear_timeout();
             }
         }
 
@@ -2975,6 +3024,7 @@ namespace OSD {
                             MessageBoxIcon.Warning);
                 toolStripStatusLabel1.Text = "Failed";
             }
+            start_clear_timeout();
             return true;
         }
 
@@ -3044,12 +3094,15 @@ namespace OSD {
                         if (timeout > 6) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return false;
                         }
                     }
                     if (!comPort.ReadLine().Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                        start_clear_timeout();
                         comPort.Close();
+                        start_clear_timeout();
                         return false;
                     }
 
@@ -3065,6 +3118,7 @@ namespace OSD {
                     if (device != "MAX7456") {
                         MessageBox.Show("Invalid MCM");
                         comPort.Close();
+                        start_clear_timeout();
                         return false;
                     }
 
@@ -3093,7 +3147,9 @@ namespace OSD {
                                 if (timeout > 10) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return false;
+                                    
                                 }
                             }
 
@@ -3118,6 +3174,7 @@ namespace OSD {
                         if (t > 10) {
                             MessageBox.Show("No end");
                             comPort.Close();
+                            start_clear_timeout();
                             return false;
                         }
 
@@ -3150,6 +3207,7 @@ namespace OSD {
 
                 conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+                start_clear_timeout();
             }
             return true;
         }
@@ -3237,6 +3295,7 @@ namespace OSD {
             else
                 MessageBox.Show("Wrong ModelType!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
+            start_clear_timeout();
         }
 
 
@@ -3289,6 +3348,7 @@ namespace OSD {
                 }
 
             }
+            start_clear_timeout();
             sp.Close();
         }
 

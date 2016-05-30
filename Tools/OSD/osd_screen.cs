@@ -38,6 +38,8 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt2;
         public System.Windows.Forms.CheckBox chkAlt3;
         public System.Windows.Forms.CheckBox chkAlt4;
+        public System.Windows.Forms.ComboBox cbNumber;
+        public System.Windows.Forms.Label labNumber;
 		
 		private int number;
 		private OSD osd;
@@ -70,6 +72,8 @@ namespace OSD
             this.chkAlt2 = new System.Windows.Forms.CheckBox();
             this.chkAlt3 = new System.Windows.Forms.CheckBox();
             this.chkAlt4 = new System.Windows.Forms.CheckBox();
+            this.cbNumber = new System.Windows.Forms.ComboBox();
+            this.labNumber = new System.Windows.Forms.Label();
 			
 			this.tabPage.SuspendLayout();
 			this.groupBox.SuspendLayout();
@@ -123,6 +127,8 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt2);
             this.groupBox.Controls.Add(this.chkAlt3);
             this.groupBox.Controls.Add(this.chkAlt4);
+            this.groupBox.Controls.Add(this.cbNumber);
+            this.groupBox.Controls.Add(this.labNumber);
             this.groupBox.Location = new System.Drawing.Point(3, 229);
             this.groupBox.Name = "groupBox"+num;
             this.groupBox.Size = new System.Drawing.Size(169, 149);
@@ -266,8 +272,36 @@ namespace OSD
             this.chkAlt4.UseVisualStyleBackColor = true;
             this.chkAlt4.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
             this.chkAlt4.Visible = false;
-            
 
+            this.cbNumber.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbNumber.FormattingEnabled = true;
+            this.cbNumber.Items.AddRange(new object[] {
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            });
+            this.cbNumber.Location = new System.Drawing.Point(10, 98);
+            this.cbNumber.Name = "cbNumber";
+            this.cbNumber.Size = new System.Drawing.Size(137, 17);
+            this.cbNumber.TabIndex = 18;
+            this.cbNumber.SelectedIndexChanged += new System.EventHandler(this.cbNumber_SelectedIndexChanged);
+            this.cbNumber.Visible =false;
+            // 
+            // labNumber
+            // 
+            this.labNumber.AutoSize = true;
+            this.labNumber.Location = new System.Drawing.Point(10, 81);
+            this.labNumber.Name = "labeln"+num;
+            this.labNumber.Size = new System.Drawing.Size(14, 11);
+            this.labNumber.TabIndex = 2;
+            this.labNumber.Text = "";
+            this.labNumber.Visible =false ;
+            
             return 0;
 		}
 		public int  last_init(){
@@ -382,6 +416,43 @@ namespace OSD
 					osd.Draw(number); });
 		}
 		
+        private void adjust(Panel thing){
+            chkSign.Checked = thing.sign == 1;
+            chkSign.Visible = thing.sign != -1;
+
+            if (thing.Altf == -2) {
+                int n = osd.getAlt(thing)/2;
+                cbNumber.SelectedIndex =n;
+                cbNumber.Visible = true;
+                chkAlt.Visible = false;
+                chkAlt2.Visible = false;
+                chkAlt3.Visible = false;
+                chkAlt4.Visible = false;
+                cbNumber.Text = n.ToString();
+                labNumber.Text = thing.alt_text;
+                labNumber.Visible = true;
+
+            } else {
+                labNumber.Visible = false;
+                cbNumber.Visible = false;
+
+                chkAlt.Text = thing.alt_text;
+                chkAlt.Visible = thing.Altf != -1 && thing.alt_text != "";
+                chkAlt.Checked = thing.Altf == 1;
+
+                chkAlt2.Text = thing.alt2_text;
+                chkAlt2.Visible = thing.Alt2 != -1 && thing.alt2_text != "";
+                chkAlt2.Checked = thing.Alt2 == 1;
+
+                chkAlt3.Text = thing.alt3_text;
+                chkAlt3.Visible = thing.Alt3 != -1 && thing.alt3_text != "";
+                chkAlt3.Checked = thing.Alt3 == 1;
+
+                chkAlt4.Text = thing.alt4_text;
+                chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
+                chkAlt4.Checked = thing.Alt4 == 1;
+            }
+        }
 
         private void treeView1_AfterSelect (object sender, TreeViewEventArgs e) {
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
@@ -393,25 +464,8 @@ namespace OSD
 				if(thing!=null && thing.name==e.Node.Text) {
 					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
-					chkSign.Checked = thing.sign==1;
-					chkSign.Visible = thing.sign!=-1;
 
-                    chkAlt.Text = thing.alt_text;
-                    chkAlt.Visible = thing.Altf != -1 && thing.alt_text!="";
-                    chkAlt.Checked = thing.Altf ==1;
-
-                    chkAlt2.Text = thing.alt2_text;
-                    chkAlt2.Visible = thing.Alt2 != -1 && thing.alt2_text != "";
-                    chkAlt2.Checked = thing.Alt2 == 1;
-
-                    chkAlt3.Text = thing.alt3_text;
-                    chkAlt3.Visible = thing.Alt3 != -1 && thing.alt3_text != "";
-                    chkAlt3.Checked = thing.Alt3 == 1;
-
-                    chkAlt4.Text = thing.alt4_text;
-                    chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
-                    chkAlt4.Checked = thing.Alt4 == 1;
-
+                    adjust(thing);
 				}
 			}
 		}
@@ -428,25 +482,8 @@ namespace OSD
 				if(thing!=null && thing.name==e.Node.Text) {
 					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
 					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
-					chkSign.Checked = thing.sign==1;
-					chkSign.Visible = thing.sign!=-1;
 
-                    chkAlt.Text    = thing.alt_text;
-                    chkAlt.Visible = thing.Altf != -1;
-                    chkAlt.Checked = thing.Altf == 1;
-
-                    chkAlt2.Text = thing.alt2_text;
-                    chkAlt2.Visible = thing.Alt2 != -1;
-                    chkAlt2.Checked = thing.Alt2 == 1;
-
-                    chkAlt3.Text = thing.alt3_text;
-                    chkAlt3.Visible = thing.Alt3 != -1;
-                    chkAlt3.Checked = thing.Alt3 == 1;
-
-                    chkAlt4.Text = thing.alt4_text;
-                    chkAlt4.Visible = thing.Alt4 != -1;
-                    chkAlt4.Checked = thing.Alt4 == 1;
-
+                    adjust(thing);
                 }
 			}
 		}
@@ -630,7 +667,22 @@ namespace OSD
             osd.Draw(number);
 
         }		
-		
+	
+	    private void cbNumber_SelectedIndexChanged(object sender, EventArgs e) {
+            string item = osd.currentlyselected;
+            
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    int n=cbNumber.SelectedIndex;
+                    
+                    
+                    panelItems[a].Alt2 = (n & 1) != 0 ? 1 : 0;
+                    panelItems[a].Alt3 = (n & 2) != 0 ? 1 : 0;
+                    panelItems[a].Alt4 = (n & 4) != 0 ? 1 : 0;
+                }
+            }
+            osd.Draw(number);
+        }	
 
 	}
 }
