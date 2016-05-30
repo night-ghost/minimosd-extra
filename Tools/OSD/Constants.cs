@@ -20,8 +20,7 @@ namespace OSD {
 		const int panGPS_XY = 14;
 
 		const int panRose_XY = 16;
-        const int panGPSHDOP_XY = 86;
-        const int panHeading_XY = 18;
+		const int panHeading_XY = 18;
 		const int panHomeDir_XY = 20;
 		const int panHomeDis_XY = 22;
 		const int panWPDir_XY = 24;
@@ -56,9 +55,9 @@ namespace OSD {
         const int panSenor2_XY = 80;
         const int panSenor3_XY = 82;
         const int panSenor4_XY = 84;
+        const int panHdop_XY = 86;
+        const int panState_XY = 88;
 
-        // const int panBroAlt_XY = 76;
-		// const int panMavBeat_XY = 76;
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана
 

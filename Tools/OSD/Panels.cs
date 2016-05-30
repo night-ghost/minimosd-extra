@@ -160,7 +160,6 @@ namespace OSD
         static float osd_lat = -35.020938f;                    // latidude
         static float osd_lon = 117.883419f;                    // longitude
         static uint8_t osd_satellites_visible = 7;     // number of satelites
-        static float osd_gps_hdop = 16;     // number of satelites
         //static uint8_t osd_fix_type = 3;               // GPS lock 0-1=no fix, 2=2D, 3=3D
         static int start_Time = 3785; 
 
@@ -340,9 +339,9 @@ namespace OSD
         osd.setPanel(first_col, first_line);
         
         if(sign==1)
-        	osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
+        	osd.printf("\x17 30:05");
 		else
-			osd.printf("%4.0f%c",  eff, 0x01);
+			osd.printf(" 30:05");
         
         
          return 0;
@@ -704,10 +703,12 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
+            osd_home_distance=123;
+
 			if(sign==1)
-            	osd.printf("%c%5.0f%c", 0x0B, (double)(osd_home_distance * converth), bigDistanceChar);
-			else 
-				osd.printf("%5.0f%c",  (double)(osd_home_distance * converth), bigDistanceChar);
+                osd.write(0x0B);
+            
+            osd.printf("%4.1f%c", (double)(osd_home_distance * converth)/100, bigDistanceChar);
             
             return 0;
         }
@@ -926,29 +927,10 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-            	osd.printf("%2i%c", osd_satellites_visible, 0x86);
+            	osd.printf("\x0f\x20\x20%2i", osd_satellites_visible);
 			else 
 				osd.printf("%2i",  osd_satellites_visible);
             
-            return 0;
-        }
-
-        /* **************************************************************** */
-        // Panel  : panGPSHDOP
-        // Needs  : X, Y locations
-        // Output : 1 symbol and HDOP value
-        // Size   : 1 x 5  (rows x chars)
-        // Staus  : done
-
-        public int panGPSHDOP(int first_col, int first_line, int sign, int fAlt)
-        {
-            osd.setPanel(first_col, first_line);
-
-            if (sign == 1)
-                osd.printf("%5.1f%c", (osd_gps_hdop * .1), 0x2a);
-            else
-                osd.printf("%5.1f", (osd_gps_hdop * .1));
-
             return 0;
         }
 
@@ -1081,8 +1063,8 @@ namespace OSD
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
 			if(sign==1)
-				osd.printf_P(PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
-            osd.printf_P(PSTR("\xc3\x81\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
+				osd.printf_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
+            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
            
             
             return 0;
@@ -1631,6 +1613,34 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
             return 0;
         }
+
+        public int panHdop(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+            if (sign == 1)
+                osd.printf("\x2a\x20");
+            osd.printf("%2.1f", 1.6);
+
+            return 0;
+        }
+
+        public int[] state_values = new int[4];
+
+        public int panState(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            // fAlt  - напрямую номер канала
+            // значения 
+            // Off
+            // Low
+            // Mid
+            // Hi!
+            // On!
+
+            if (sign == 1) osd.printf("C%d ",fAlt/2 + 5);
+            osd.printf("Off");
+            return 0;
+        }
+
     }
 }
 

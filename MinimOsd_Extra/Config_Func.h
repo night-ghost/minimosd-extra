@@ -28,6 +28,10 @@ static boolean inline is_alt4(point p){
     return (p.x & 0x40);
 }
 
+byte get_alt_num(point p){
+    return (is_alt2(p)?1:0) | (is_alt3(p)?2:0) | (is_alt4(p)?4:0);
+}
+
 // чтение и запись мелких объектов
 static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
     for(;l!=0; l--, e++) {
