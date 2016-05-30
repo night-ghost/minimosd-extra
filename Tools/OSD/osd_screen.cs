@@ -421,7 +421,8 @@ namespace OSD
             chkSign.Visible = thing.sign != -1;
 
             if (thing.Altf == -2) {
-                int n = osd.getAlt(thing);
+                int n = osd.getAlt(thing)/2;
+                cbNumber.SelectedIndex =n;
                 cbNumber.Visible = true;
                 chkAlt.Visible = false;
                 chkAlt2.Visible = false;

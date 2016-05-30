@@ -1210,19 +1210,26 @@ namespace OSD {
                                 tnArray[0].Checked = (p.y < 0x80);
                             }
 
-                            if(pi.Altf >=0)
-                                pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
-                            if (pi.Alt2 >= 0)
-                                pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
-                            if (pi.Alt3 >= 0)
-                                pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                            if (pi.sign >= 0)
+                                pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
+
+                            if (pi.Altf == -2) {
+                                pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;                            
+                                pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;                            
+                                pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            } else {
+                                if(pi.Altf >=0)
+                                    pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
+                                if (pi.Alt2 >= 0)
+                                    pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
+                                if (pi.Alt3 >= 0)
+                                    pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
+                                if (pi.Alt3 >= 0)
+                                    pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                            }
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            if (pi.sign >= 0)
-                                pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
-                            if (pi.Alt3 >= 0)
-                                pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
                             
                         }
                     }
