@@ -249,7 +249,7 @@ void setup()     {
 
     OSD::update();// Show sign bar
 
-//    delay(start_dly); у нас есть задержка на авто-бауд
+//    delay(2000); // у нас есть задержка на авто-бауд
 //    Serial.flush(); без него лучше шрифты грузятся
 
     LED_OFF;  // turn off on init done
@@ -298,6 +298,26 @@ void loop()
 
     wdt_reset();
 
+
+    if(pt < BOOTTIME){ // startup delay for fonts
+            if(Serial.available_S()) {
+                byte c=Serial.read_S();
+
+                if (c == '\n' || c == '\r') {
+                    crlf_count++;
+//osd.print_P(PSTR("cr|"));
+                } else {
+//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
+                    crlf_count = 0;
+                }
+
+                if (crlf_count > 3) {
+//osd.print_P(PSTR("fonts!|"));
+                    uploadFont();
+                }
+            }
+            return;
+    }
 
     getData(); // получить данные с контроллера
 

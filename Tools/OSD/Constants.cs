@@ -55,9 +55,9 @@ namespace OSD {
         const int panSenor2_XY = 80;
         const int panSenor3_XY = 82;
         const int panSenor4_XY = 84;
+        const int panHdop_XY = 86;
+        const int panState_XY = 88;
 
-        // const int panBroAlt_XY = 76;
-		// const int panMavBeat_XY = 76;
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана
 

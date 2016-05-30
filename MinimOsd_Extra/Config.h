@@ -13,11 +13,11 @@
 
 
 //#define DEBUG
-#define STARTUP_SCREEN 2
+#define STARTUP_SCREEN 0
 
 #define USE_UAVTALK 1
 #define USE_MWII 1
-#define USE_LTM 1
+//#define USE_LTM 1
 #define AUTOBAUD 1
 #define USE_SENSORS 1
 

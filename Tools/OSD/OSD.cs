@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r843 DV";
+        public const string VERSION = "r844 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -330,6 +330,8 @@ namespace OSD {
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, 1, "PWM input");
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
+                pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
+                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, -2, "Select channel");
 
 
                 osd_functions_N = a;
@@ -599,7 +601,7 @@ namespace OSD {
             printf(format, args);
         }
 
-        private int getAlt(Panel p){
+        public int getAlt(Panel p){
             return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0);
         }
 
@@ -1181,18 +1183,18 @@ namespace OSD {
                                 tnArray[0].Checked = (p.y < 0x80);
                             }
 
-                            if(pi.Altf!=-1)
+                            if(pi.Altf >=0)
                                 pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
-                            if (pi.Alt2 != -1)
+                            if (pi.Alt2 >= 0)
                                 pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
-                            if (pi.Alt3 != -1)
+                            if (pi.Alt3 >= 0)
                                 pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            if (pi.sign != -1)
+                            if (pi.sign >= 0)
                                 pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
-                            if (pi.Alt3 != -1)
+                            if (pi.Alt3 >= 0)
                                 pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
                             
                         }

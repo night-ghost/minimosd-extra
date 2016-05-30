@@ -425,10 +425,12 @@ static NOINLINE void printFullDist(float dd){
     }else{ // in kilometers
 	dd = dd / pgm_read_word(&measure->distconv);
 	PGM_P fmt;
-	if((int)dd<=99)
-	    fmt = PSTR("%5.2f");
+	if((int)dd<=9)
+	    fmt = PSTR("%4.2f");
+	else if((int)dd<=99)
+	    fmt = PSTR("%4.1f");
         else
-            fmt = PSTR("%5.1f");
+            fmt = PSTR("%4.0f");
 
         osd_printf_2(fmt, dd, pgm_read_byte(&measure->distchar));
     }
@@ -444,212 +446,6 @@ static NOINLINE void printFullDist(float dd){
 static void panDistance(point p){
     printFullDist(trip_distance);
 }
-
-/* **************************************************************** */
-// Panel  : panFdata
-// Needs  : X, Y locations
-// Output : 
-// Size   : 
-// Staus  : done
-
-struct Formats {
-    PGM_P fmt;
-    char t;
-    void *v;
-    char m;
-};
-
-
-static NOINLINE void print_list(const Formats *f){
-    PGM_P fmt;
-    byte t;
-    char m;
-    float *v;
-    float k;
-    const byte *c;
-    char h;
-    
-    float val=0;
-
-    for(;;){
-	fmt=(const char *)pgm_read_word(&f->fmt);
-	if(fmt==0) {
-	    return;
-	}
-
-	t  = pgm_read_byte(&f->t);
-	v  = (float *)pgm_read_word(&f->v);
-
-	h=' ';
-
-	switch(t){
-	case 'i':
-	    val = * (int *)v;
-	    break;
-
-	case 'h':
-	    h=get_mhigh();
-	    k=get_converth();
-	    goto as_f;
-
-	case 's':
-	    h=pgm_read_byte(&measure->spe);
-	    k=get_converts();
-	    goto as_f;
-
-	case 'a': // current
-	    k=1/100.0;
-	    h='A';
-	    goto as_f;
-
-	case 'v': // vertical speed
-	    k=get_converth();
-	    if(lflags.vs_ms) {
-	        h = 0x18;
-	    } else {
-	        h=pgm_read_byte(&measure->climbchar);
-	        k*=60;
-	    }
-	    goto as_f;
-
-	case 'f':
-	default:
-	    k=1;
-as_f:
-	    val = ( * (float *)v ) * k;
-	    break;
-	}
-
-
-#ifdef DEBUG
-//    Serial.printf_P(PSTR("list fmt=%S val=%f k=%f h=%d\n"),fmt,val, k,h);
-#endif
-
-	osd_printf_2(fmt,val,h);
-
-	osd_nl();
-	f++;
-    }
-
-
-}
-
-static void panFdata(point p){ // итоги полета
-
-    static const char PROGMEM fmt0[]="|\x0B%7.2f";
-    static const char PROGMEM fmt1[]="\x8F%6.1f";
-    static const char PROGMEM fmt2[]="\x14%6.1f";
-    static const char PROGMEM fmt3[]="\x12%6.1f";
-    static const char PROGMEM fmt4[]="\x03%10.6f";
-    static const char PROGMEM fmt5[]="\x04%10.6f";
-
-    static const char PROGMEM fmt6[]="\x90\x91%7.2f";
-    static const char PROGMEM fmt7[]="\xA0\xA1%7.2f";
-    static const char PROGMEM fmt8[]="\xBD%6.1f";
-
-    static const PROGMEM Formats fd[] = {
-	{fmt0, 'h',  &max_home_distance   },
-	{fmt1, 'h',  &trip_distance           },
-	{fmt2, 's',  &max_osd_groundspeed },
-	{fmt3, 'h',  &max_osd_home_alt    },
-	{fmt6, 'v',  &max_osd_climb       },
-	{fmt7, 'v',  &min_osd_climb       },
-	{fmt8, 'a',  &max_osd_curr_A      },
-	{fmt4, 'f',  &osd_pos.lat         },
-	{fmt5, 'f',  &osd_pos.lon         },
-	{0}
-    };
-
-  OSD::write_xy(p.x, p.y, 0x08); // this is absolutely needed!
-
-  printTimeCnv(&total_flight_time_milis, 0);
-
-
-/*
-  byte h=pgm_read_byte(&measure->high);
-
-  osd.printf_P(PSTR("|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
-		      (int)((max_home_distance) * pgm_read_float(&measure->converth)), h,
-		                 (int)(trip_distance * pgm_read_float(&measure->converth)), h,
-		                	(int)(max_osd_groundspeed * pgm_read_float(&measure->converts)),pgm_read_byte(&measure->spe),
-		                		    (int)(max_osd_home_alt * pgm_read_float(&measure->converth)), h,
-		                			      osd_pos.lat, 
-		                			    		osd_pos.lon);
-//*/
-
-
-
-    print_list(fd);
-
-}
-
-
-//* **************************************************************** */
-// Panel  : panTune
-// Needs  : X, Y locations
-// Output : Current symbol and altitude value in meters from MAVLink
-// Size   : 1 x 7Hea  (rows x chars)
-// Staus  : done
-    
-static void panTune(point p){
-/*
-    copter's panel has much more usefull info so plane should be wiped out
-
-*/
-
-#ifdef IS_COPTER
-    static const PROGMEM char fmt0[]="nR%3.0f\x05"; // separate format & header loses 30 bytes
-    static const PROGMEM char fmt1[]="nP%3.0f\x05";
-    static const PROGMEM char fmt2[]="nH%3.0f\x05";
-    static const PROGMEM char fmt3[]="TB%5.1f\x05";
-    static const PROGMEM char fmt4[]="AE%5.1f";
-    static const PROGMEM char fmt5[]="XE%4.0f\x6D";
-    static const PROGMEM char fmt6[]="AsE%5.1f";
-
-    static const PROGMEM Formats fd[] = {
-	{ fmt0, 'i', &nav_roll          },
-	{ fmt1, 'i', &nav_pitch         },
-	{ fmt2, 'i', &nav_bearing       },
-	{ fmt3, 'i', &wp_target_bearing },
-	{ fmt4, 'h', &alt_error         },
-	{ fmt5, 'i', &xtrack_error      },
-	{ fmt6, 's', &aspd_error        },
-	{ 0 }
-    };
-
-
-    print_list(fd);
-
-/*
-        osd.printf_P(PSTR("\x4E\x52%2.0i\x05|\x4E\x50%2.0i\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), 
-        			(nav_roll), 
-			    			(nav_pitch), 
-			    					     (nav_bearing),  
-			    								(wp_target_bearing), 
-			    							    			cnvAltError(), pgm_read_byte(&measure->high), 
-			    							    		    			((float)xtrack_error), 
-			    							    		    					((aspd_error / 100.0) * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
-*/
-#else
-
-
-    PGM_P f;
- #ifdef IS_PLANE
-    if(has_sign(p)) 
-	OSD::write_S(0x11);
-    
-    float err = alt_error * get_converth();
-
-    osd_printf_2(PSTR("%3.0f|"), -err, get_mhigh());
-    
-//    osd_nl();
-    if(has_sign(p)) 
-        OSD::write_S(0x13);
-    printSpeed(aspd_error / 100.0);
- #endif
-#endif
-}
-
 
 
 /* **************************************************************** */
@@ -1206,12 +1002,10 @@ static void panRoll(point p){
 
 
 static void NOINLINE printVolt(uint16_t v) {
-//    osd_printf_1(PSTR("%5.2f\x0D"), v/1000.0);
     osd_printf_1(PSTR("%5.2f\x0D"), f_div1000(v));
 }
 
 static void panBatt_A(point p){
-
     printVolt(osd_vbat_A);
 }
 
@@ -1234,38 +1028,6 @@ static void panBatt_B(point p){
 
 
 
-//------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
-
-static void panWaitMAVBeats(){
-
-#if 0 // testintg things
-
-    OSD::setPanel(3,3);
-    
-#endif
-
-    OSD::setPanel(5,3);
-    osd.print_P(PSTR("No input data! ||"));
-
-#ifdef DEBUG
-    extern uint16_t packet_drops;
-    extern long bytes_comes;
-    extern volatile uint16_t lost_bytes;
-    extern uint16_t packets_skip;
-    extern uint16_t packets_got;
-
-    OSD::setPanel(6,5);
-    osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
-    osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
-    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
-
-    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
-    
-    lflags.input_active=0;
-#else
-    panFdata({3,5});
-#endif
-}
 
 
 /* **************************************************************** */
@@ -1324,6 +1086,11 @@ static const PROGMEM char * const gps_fmtF[]= {
     gps_f4, gps_f5, gps_f6, gps_f7
 };
 
+
+static void NOINLINE print_gps(PGM_P f, byte div){
+    osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
+}
+
 static void panGPS(point p){
 
     PGM_P f;
@@ -1336,74 +1103,257 @@ static void panGPS(point p){
     byte idx= fLow | (has_sign(p)?2:0);
 
     if(is_alt2(p)){ // fractional
-/*
-        if(has_sign(p)){
-    	
-	    if(is_alt(p)){
-		fLow=1;
-	        f=PSTR("\x03%05ld|\x04%05ld");
-	    }else
-	        f=PSTR("\x03%06ld|\x04%06ld");
-        }else {
-	    if(is_alt(p)){
-	        fLow=1;
-	        f=PSTR("%05ld|%05ld");
-	    }else
-	        f=PSTR("%06ld|%06ld");
-        }
-*/
 	f=(const char *)pgm_read_word(&gps_fmt[idx]);
         osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
-
 	return;
     } 
 
-/*
-    if(has_sign(p)){
-	if(is_alt(p))
-	    f=PSTR("\x03%9.5f|\x04%9.5f");
-	else
-	    f=PSTR("\x03%10.6f|\x04%10.6f");
-    }else {
-	if(is_alt(p))
-	    f=PSTR("%9.5f|%9.5f");
-	else
-	    f=PSTR("%10.6f|%10.6f");
-    }
-*/
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
-
-    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
+//    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
+    print_gps(f,div);
 }
+
 
 /* **************************************************************** */
-// Panel  : panGPS2
+// Panel  : panFdata
 // Needs  : X, Y locations
-// Output : one row numeric value of current GPS location with LAT/LON symbols as on first char
-// Size   : 1 x 25  (rows x chars)
+// Output : 
+// Size   : 
 // Staus  : done
-/*
-static void panGPS2(point p){
 
-    PGM_P f;
+struct Formats {
+    PGM_P fmt;
+    char t;
+    void *v;
+    char m;
+};
 
-    if(has_sign(p)){
-	if(is_alt(p))
-	    f=PSTR("\x03%9.5f \x04%9.5f");
-	else
-	    f=PSTR("\x03%10.6f \x04%10.6f");
-    } else {
-        if(is_alt(p))
-    	    f=PSTR("%9.5f %9.5f");
-    	else
-    	    f=PSTR("%10.6f %10.6f");
+
+static NOINLINE void print_list(const Formats *f){
+    PGM_P fmt;
+    byte t;
+    char m;
+    float *v;
+    float k;
+    const byte *c;
+    char h;
+    
+    float val=0;
+
+    for(;;){
+	fmt=(const char *)pgm_read_word(&f->fmt);
+	if(fmt==0) {
+	    return;
+	}
+
+	t  = pgm_read_byte(&f->t);
+	v  = (float *)pgm_read_word(&f->v);
+
+	h=' ';
+
+	switch(t){
+	case 'i':
+	    val = * (int *)v;
+	    break;
+
+	case 'h':
+	    h=get_mhigh();
+	    k=get_converth();
+	    goto as_f;
+
+	case 's':
+	    h=pgm_read_byte(&measure->spe);
+	    k=get_converts();
+	    goto as_f;
+
+	case 'a': // current
+	    k=1/100.0;
+	    h='A';
+	    goto as_f;
+
+	case 'v': // vertical speed
+	    k=get_converth();
+	    if(lflags.vs_ms) {
+	        h = 0x18;
+	    } else {
+	        h=pgm_read_byte(&measure->climbchar);
+	        k*=60;
+	    }
+	    goto as_f;
+
+	case 'f':
+	default:
+	    k=1;
+as_f:
+	    val = ( * (float *)v ) * k;
+	    break;
+	}
+
+
+#ifdef DEBUG
+//    Serial.printf_P(PSTR("list fmt=%S val=%f k=%f h=%d\n"),fmt,val, k,h);
+#endif
+
+	osd_printf_2(fmt,val,h);
+
+	osd_nl();
+	f++;
     }
 
-//    osd.printf_P(f, (double)osd_pos.lat, (double)osd_pos.lon);
-    print_GPS(f);
 
 }
+
+static void panFdata(point p){ // итоги полета
+
+    static const char PROGMEM fmt0[]="|\x0B%7.2f";
+    static const char PROGMEM fmt1[]="\x8F%6.1f";
+    static const char PROGMEM fmt2[]="\x14%6.1f";
+    static const char PROGMEM fmt3[]="\x12%6.1f";
+//    static const char PROGMEM fmt4[]="\x03%10.6f";
+//    static const char PROGMEM fmt5[]="\x04%10.6f";
+
+    static const char PROGMEM fmt6[]="\x90\x91%7.2f";
+    static const char PROGMEM fmt7[]="\xA0\xA1%7.2f";
+    static const char PROGMEM fmt8[]="\xBD%6.1f";
+
+    static const PROGMEM Formats fd[] = {
+	{fmt0, 'h',  &max_home_distance   },
+	{fmt1, 'h',  &trip_distance           },
+	{fmt2, 's',  &max_osd_groundspeed },
+	{fmt3, 'h',  &max_osd_home_alt    },
+	{fmt6, 'v',  &max_osd_climb       },
+	{fmt7, 'v',  &min_osd_climb       },
+	{fmt8, 'a',  &max_osd_curr_A      },
+//	{fmt4, 'f',  &osd_pos.lat         },
+//	{fmt5, 'f',  &osd_pos.lon         },
+	{0}
+    };
+
+  OSD::write_xy(p.x, p.y, 0x08); // this is absolutely needed!
+
+  printTimeCnv(&total_flight_time_milis, 0);
+
+
+/*
+  byte h=pgm_read_byte(&measure->high);
+
+  osd.printf_P(PSTR("|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x03%10.6f|\x04%10.6f"),
+		      (int)((max_home_distance) * pgm_read_float(&measure->converth)), h,
+		                 (int)(trip_distance * pgm_read_float(&measure->converth)), h,
+		                	(int)(max_osd_groundspeed * pgm_read_float(&measure->converts)),pgm_read_byte(&measure->spe),
+		                		    (int)(max_osd_home_alt * pgm_read_float(&measure->converth)), h,
+		                			      osd_pos.lat, 
+		                			    		osd_pos.lon);
+//*/
+
+
+
+    print_list(fd);
+
+    print_gps(gps_f2,'|');
+}
+
+
+//* **************************************************************** */
+// Panel  : panTune
+// Needs  : X, Y locations
+// Output : Current symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+    
+static void panTune(point p){
+/*
+    copter's panel has much more usefull info so plane should be wiped out
+
 */
+
+#ifdef IS_COPTER
+    static const PROGMEM char fmt0[]="nR%3.0f\x05"; // separate format & header loses 30 bytes
+    static const PROGMEM char fmt1[]="nP%3.0f\x05";
+    static const PROGMEM char fmt2[]="nH%3.0f\x05";
+    static const PROGMEM char fmt3[]="TB%5.1f\x05";
+    static const PROGMEM char fmt4[]="AE%5.1f";
+    static const PROGMEM char fmt5[]="XE%4.0f\x6D";
+    static const PROGMEM char fmt6[]="AsE%5.1f";
+
+    static const PROGMEM Formats fd[] = {
+	{ fmt0, 'i', &nav_roll          },
+	{ fmt1, 'i', &nav_pitch         },
+	{ fmt2, 'i', &nav_bearing       },
+	{ fmt3, 'i', &wp_target_bearing },
+	{ fmt4, 'h', &alt_error         },
+	{ fmt5, 'i', &xtrack_error      },
+	{ fmt6, 's', &aspd_error        },
+	{ 0 }
+    };
+
+
+    print_list(fd);
+
+/*
+        osd.printf_P(PSTR("\x4E\x52%2.0i\x05|\x4E\x50%2.0i\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), 
+        			(nav_roll), 
+			    			(nav_pitch), 
+			    					     (nav_bearing),  
+			    								(wp_target_bearing), 
+			    							    			cnvAltError(), pgm_read_byte(&measure->high), 
+			    							    		    			((float)xtrack_error), 
+			    							    		    					((aspd_error / 100.0) * pgm_read_float(&measure->converts)), pgm_read_byte(&measure->spe));
+*/
+#else
+
+
+    PGM_P f;
+ #ifdef IS_PLANE
+    if(has_sign(p)) 
+	OSD::write_S(0x11);
+    
+    float err = alt_error * get_converth();
+
+    osd_printf_2(PSTR("%3.0f|"), -err, get_mhigh());
+    
+//    osd_nl();
+    if(has_sign(p)) 
+        OSD::write_S(0x13);
+    printSpeed(aspd_error / 100.0);
+ #endif
+#endif
+}
+
+
+//------------------ Panel: Waiting for MAVLink HeartBeats -------------------------------
+
+static void panWaitMAVBeats(){
+
+#if 0 // testintg things
+
+    OSD::setPanel(3,3);
+    
+#endif
+
+    OSD::setPanel(5,3);
+    osd.print_P(PSTR("No input data! ||"));
+
+#ifdef DEBUG
+    extern uint16_t packet_drops;
+    extern long bytes_comes;
+    extern volatile uint16_t lost_bytes;
+    extern uint16_t packets_skip;
+    extern uint16_t packets_got;
+
+    OSD::setPanel(6,5);
+    osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
+    osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
+    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
+
+    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
+    
+    lflags.input_active=0;
+#else
+    panFdata({3,5});
+#endif
+}
+
 
 /* **************************************************************** */
 // Panel  : panHeading
@@ -1498,7 +1448,6 @@ static void panWPDis(point p){
 
     byte h=get_mhigh();
 
-    //osd.printf_P(PSTR("%2i %4.0f%c|"), wp_number,((float)wp_dist * pgm_read_float(&measure->converth)), h);
     osd_printi_1(PSTR("%2i "), wp_number);
     osd_printf_2(PSTR("%4.0f"), ((float)wp_dist * get_converth()), h);
     osd_nl();
@@ -1507,8 +1456,6 @@ static void panWPDis(point p){
 
     if (osd_mode == 10){ // auto
         osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (xtrack_error * get_converth()), h);
-    }else{
-    // we don't needs to clear!    osd.print_P(&strclear[4]);
     }
 }
 
@@ -1531,30 +1478,12 @@ static void panMessage(point p){
 
 //    lflags.show_screnN = !is_alt2(p);
 
-//  if(lflags.flgMessage) {
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
 	char sign;
 
         if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
 	else sign=0;
 
-
-/*	byte len=mav_msg_len; 
-	{
-	    char *cp = (char *)&mav_message[len];
-	    for(;;) {
-		byte c = *(--cp);
-		
-		if(c==0 || c==0x20){
-		    len--;
-		} else {
-		    cp[1]=0;
-		    break;
-		}
-	    }
-
-	}
-*/
 	int8_t diff = MAX_MSG_SIZE - mav_msg_len; // can it fit to screen?
 	if( diff >= 0) { 		// yes! message less than screen
 	    OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
@@ -1903,6 +1832,42 @@ static void NOINLINE panSensor4(point p) {
 }
 #endif
 
+
+static void panHdop(point p) {
+    osd_printi_1(PSTR("%3i"),eph);
+}
+
+static const char PROGMEM sts_0[]="Off";
+static const char PROGMEM sts_1[]="Low";
+static const char PROGMEM sts_2[]="Mid";
+static const char PROGMEM sts_3[]="Hi!";
+static const char PROGMEM sts_4[]="On!";
+
+static const char PROGMEM  * const sts_arr[]={
+    sts_0, sts_1, sts_2, sts_3, sts_4
+};
+
+static void panState(point p) {
+    byte ch = get_alt_num(p) + 4;
+
+    if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
+
+    // 1000 - 2000 
+    // 1200
+    // 1400
+    // 1600
+    // 1800
+    int v=chan_raw[ch];
+    byte n;
+    
+    if(v<1000) n=0;
+    else {
+	n=( v - 1000)/200;
+	if(n>5) n=5;
+    }
+
+    osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
+}
 
 /* **************************************************************** */
 // Panel  : panSetup
@@ -2366,6 +2331,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(ch),		panCh, 		0 },
     { ID_of(distance),		panDistance, 	0x8f },
     { ID_of(RadarScale),	panRadarScale, 	RADAR_CHAR  },
+    { ID_of(Hdop),		panHdop, 	0x1f  },
+    { ID_of(State),		panState, 	0  },
 #if defined(USE_SENSORS)
     { ID_of(sensor1) | 0x80,	panSensor1, 	0 },
     { ID_of(sensor2) | 0x80,	panSensor2, 	0 },

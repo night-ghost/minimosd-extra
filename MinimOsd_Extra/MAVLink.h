@@ -342,6 +342,25 @@ typedef struct __mavlink_radio_t
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
 
 		} break;
+
+		case MAVLINK_MSG_ID_RADIO_STATUS: {// 3dr telemetry status
+/*
+typedef struct __mavlink_radio_status_t
+{
+ uint16_t rxerrors; ///< receive errors
+ uint16_t fixed; ///< count of error corrected packets
+ uint8_t rssi; ///< local signal strength
+ uint8_t remrssi; ///< remote signal strength
+ uint8_t txbuf; ///< how full the tx buffer is as a percentage
+ uint8_t noise; ///< background noise level
+ uint8_t remnoise; ///< remote background noise level
+} mavlink_radio_status_t;
+*/
+		    byte rssi    = mavlink_msg_radio_status_get_rssi(&msg.m);
+		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
+		    telem_rssi = remrssi > rssi ? rssi : remrssi;
+
+		} break;
 		
             default:
                 //Do nothing

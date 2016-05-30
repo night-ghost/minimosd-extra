@@ -339,9 +339,9 @@ namespace OSD
         osd.setPanel(first_col, first_line);
         
         if(sign==1)
-        	osd.printf("%c%4.0f%c", 0x16, eff, 0x01);
+        	osd.printf("\x17 30:05");
 		else
-			osd.printf("%4.0f%c",  eff, 0x01);
+			osd.printf(" 30:05");
         
         
          return 0;
@@ -703,10 +703,12 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
+            osd_home_distance=123;
+
 			if(sign==1)
-            	osd.printf("%c%5.0f%c", 0x0B, (double)(osd_home_distance * converth), bigDistanceChar);
-			else 
-				osd.printf("%5.0f%c",  (double)(osd_home_distance * converth), bigDistanceChar);
+                osd.write(0x0B);
+            
+            osd.printf("%4.1f%c", (double)(osd_home_distance * converth)/100, bigDistanceChar);
             
             return 0;
         }
@@ -1611,6 +1613,34 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
             return 0;
         }
+
+        public int panHdop(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+            if (sign == 1) osd.write(0x1f);
+
+            osd.printf("%3d", 12);
+
+            return 0;
+        }
+
+        public int[] state_values = new int[4];
+
+        public int panState(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            // fAlt  - напрямую номер канала
+            // значения 
+            // Off
+            // Low
+            // Mid
+            // Hi!
+            // On!
+
+            if (sign == 1) osd.printf("C%d ",fAlt/2 + 5);
+            osd.printf("Off");
+            return 0;
+        }
+
     }
 }
 
