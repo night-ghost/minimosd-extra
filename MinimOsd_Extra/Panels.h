@@ -1863,7 +1863,7 @@ static void panState(point p) {
     if(v<1000) n=0;
     else {
 	n=( v - 1000)/200;
-	if(n>5) n=5;
+	if(n>4) n=4;
     }
 
     osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));

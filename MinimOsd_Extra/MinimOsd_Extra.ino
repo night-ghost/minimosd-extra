@@ -26,7 +26,10 @@ Project receives Donations from:
  Richard Healey
  Lauri Andler
  Esteban Dozsa
- 
+ William Studley
+
+Figures, harm the development of an idiotic question:
+ MachVoluM
 
 
 This program is free software: you can redistribute it and/or modify
@@ -321,20 +324,22 @@ void loop()
 
     getData(); // получить данные с контроллера
 
+    if(lflags.got_data)
+	pan_toggle(); // проверить переключение экранов
+
     if(lflags.update_stat) { // если надо перерисовать экран
 	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
 	    OSD::update();
 	    lflags.update_stat = 0;
         }
-    } else {
-    
+    } /*else*/ {
+
         if(lflags.got_data){ // были свежие данные - обработать
             lflags.got_data=0;
 
 //Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
-            pan_toggle(); // проверить переключение экранов
 
             setHomeVars();   // calculate and set Distance from home and Direction to home
 
@@ -351,6 +356,7 @@ void loop()
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
         }
     }
+
 
 
 

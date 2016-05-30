@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r844 DV";
+        public const string VERSION = "r845 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -780,6 +780,31 @@ namespace OSD {
             return fmt;
         }
 
+
+        private System.Threading.Thread clear_thread=null ;
+        
+        private  void clear_thread_proc(){
+            System.Threading.Thread.Sleep(10000); 
+            
+            try {
+                this.Invoke((MethodInvoker)delegate {
+                    toolStripStatusLabel1.Text = "";
+                });
+
+            } catch { };
+            clear_thread=null;
+        }
+
+
+        private void start_clear_timeout(){
+            if(clear_thread!=null) clear_thread.Abort();
+
+            clear_thread = new System.Threading.Thread(clear_thread_proc);
+            clear_thread.Start();
+   
+            
+        }
+
         private void Sub_WriteOSD() {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
@@ -967,6 +992,7 @@ namespace OSD {
                     toolStripStatusLabel1.Text = "EEPROM write done";
                 }
             }
+            start_clear_timeout();
 
         }
 
@@ -1114,6 +1140,7 @@ namespace OSD {
             } else if (err == 0) {
                 //MessageBox.Show("Done writing configuration data!");
                 toolStripStatusLabel1.Text = "EEPROM write done";
+                start_clear_timeout();
                 return 0;
             }
             return -err;
@@ -1479,6 +1506,7 @@ namespace OSD {
 
 
             toolStripStatusLabel1.Text="EEPROM read OK";
+            start_clear_timeout();
             Draw(panel_number = tN);
 
         }
@@ -2005,6 +2033,7 @@ namespace OSD {
                     FLASH = readIntelHEXv2(new StreamReader(ofd.FileName));
                 } catch {
                     MessageBox.Show("Bad Hex File");
+                    start_clear_timeout();
                     return;
                 }
 
@@ -2045,7 +2074,7 @@ namespace OSD {
 
                     toolStripStatusLabel1.Text = "Done";
 
-                    MessageBox.Show("Done!");
+                    //MessageBox.Show("Done!");
                 } else {
                     MessageBox.Show("Upload failed. Lost sync. Try using Arduino to upload instead",
                                 "Error",
@@ -2116,7 +2145,8 @@ namespace OSD {
 
             try {
                 toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-                toolStripStatusLabel1.Text = "";
+                //toolStripStatusLabel1.Text = "";
+                start_clear_timeout();
 
                 //comPort.Close();
             } catch { }
@@ -2333,6 +2363,7 @@ namespace OSD {
                         if (timeout > 60) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
@@ -2340,6 +2371,7 @@ namespace OSD {
                     if (!readFont.Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data: " + readFont);
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2386,6 +2418,7 @@ namespace OSD {
                                 if (timeout > 100) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return;
                                 }
                             }
@@ -2412,6 +2445,7 @@ namespace OSD {
 
                         if (t > 10) {
                             MessageBox.Show("No end");
+                            start_clear_timeout();
                             comPort.Close();
                             return;
                         }
@@ -2446,6 +2480,7 @@ namespace OSD {
                 conf.WriteCharsetVersion(fileVersion, false);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
                 toolStripStatusLabel1.Text = "CharSet Done!!!";
+                start_clear_timeout();
             }
         }
 
@@ -2814,12 +2849,14 @@ namespace OSD {
                         if (timeout > 6) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
                     if (!comPort.ReadLine().Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2835,6 +2872,7 @@ namespace OSD {
                     if (device != "MAX7456") {
                         MessageBox.Show("Invalid MCM");
                         comPort.Close();
+                        start_clear_timeout();
                         return;
                     }
 
@@ -2863,6 +2901,7 @@ namespace OSD {
                                 if (timeout > 10) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return;
                                 }
                             }
@@ -2888,6 +2927,7 @@ namespace OSD {
                         if (t > 10) {
                             MessageBox.Show("No end");
                             comPort.Close();
+                            start_clear_timeout();
                             return;
                         }
                     }
@@ -2918,6 +2958,7 @@ namespace OSD {
 
                 conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+                start_clear_timeout();
             }
         }
 
@@ -2976,6 +3017,7 @@ namespace OSD {
                             MessageBoxIcon.Warning);
                 toolStripStatusLabel1.Text = "Failed";
             }
+            start_clear_timeout();
             return true;
         }
 
@@ -3045,12 +3087,15 @@ namespace OSD {
                         if (timeout > 6) {
                             MessageBox.Show("Error entering font mode - No Data");
                             comPort.Close();
+                            start_clear_timeout();
                             return false;
                         }
                     }
                     if (!comPort.ReadLine().Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data");
+                        start_clear_timeout();
                         comPort.Close();
+                        start_clear_timeout();
                         return false;
                     }
 
@@ -3066,6 +3111,7 @@ namespace OSD {
                     if (device != "MAX7456") {
                         MessageBox.Show("Invalid MCM");
                         comPort.Close();
+                        start_clear_timeout();
                         return false;
                     }
 
@@ -3094,7 +3140,9 @@ namespace OSD {
                                 if (timeout > 10) {
                                     MessageBox.Show("CharSet upload failed - no response");
                                     comPort.Close();
+                                    start_clear_timeout();
                                     return false;
+                                    
                                 }
                             }
 
@@ -3119,6 +3167,7 @@ namespace OSD {
                         if (t > 10) {
                             MessageBox.Show("No end");
                             comPort.Close();
+                            start_clear_timeout();
                             return false;
                         }
 
@@ -3151,6 +3200,7 @@ namespace OSD {
 
                 conf.WriteCharsetVersion(fileVersion);
                 lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+                start_clear_timeout();
             }
             return true;
         }
@@ -3238,6 +3288,7 @@ namespace OSD {
             else
                 MessageBox.Show("Wrong ModelType!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
+            start_clear_timeout();
         }
 
 
@@ -3290,6 +3341,7 @@ namespace OSD {
                 }
 
             }
+            start_clear_timeout();
             sp.Close();
         }
 
