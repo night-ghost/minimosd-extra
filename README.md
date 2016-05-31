@@ -224,6 +224,12 @@ v845
 * fixed bug in ChannelStatus panel
 * CT clears message after 10s
 
+v846
+
+* panRose's scale ("icon") can be placed below
+* panRose can be even size to be centered with HUD - reqires font 2.4.1.4. sacrificed characters @, ~, `
+
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -474,6 +480,11 @@ v845
 * исправлен баг в панели ChannelStatus
 * CT очищает сообщение через 10 секунд
 
+v846
+
+* Шкала ("иконка") панели компаса (panRose) может располагаться снизу
+* Сама панель panRose может быть четного размера дабы центрироваться относительно авиагоризонта. Требует загрузки шрифта 2.4.1.4. 
+ Пожертвованы символы @, ~, `
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

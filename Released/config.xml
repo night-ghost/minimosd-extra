@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <Config>
-  <comport>/dev/ttyUSB2</comport>
+  <comport>COM5</comport>
   <Pal>True</Pal>
-  <ArduinoIDEPath>Arduino-1.6.5</ArduinoIDEPath>
-  <PlaneSketchPath>ArduCAM_OSD</PlaneSketchPath>
-  <CopterSketchPath>ArduCAM_OSD</CopterSketchPath>
   <AutoUpdate>False</AutoUpdate>
   <CheckForUpdates>True</CheckForUpdates>
 </Config>

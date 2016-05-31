@@ -222,8 +222,13 @@ void OSD::write_S(uint8_t c){
     row++;
     calc_pos();
   } else {
-    osdbuf[bufpos++] = c;
+    //osdbuf[bufpos++] = c;
+    write_raw(c);
   } 
+}
+
+void OSD::write_raw(uint8_t c){
+    osdbuf[bufpos++] = c;
 }
 
 size_t OSD::write(uint8_t c){

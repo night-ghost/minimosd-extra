@@ -1395,7 +1395,7 @@ static void panRose(point p){
     char *c=buf_show;
     uint8_t x;
 //  *c++=0xc3;
-    for(x=9; x != 0; x--){
+    for(x=(is_alt2(p)?10:9); x != 0; x--){
         *c++ = buf_Rule[start];
         if(++start >= 24) start = 0;
     }
@@ -1404,10 +1404,21 @@ static void panRose(point p){
 
 // Serial.printf_P(PSTR("Rose buf=%s\n"), buf_show);
 
-    if(has_sign(p))
-	osd.print_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
+    if(has_sign(p) && !is_alt(p)){
+        if (is_alt2(p))
+            osd.printf_P(PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
+        else
+            osd.print_P(PSTR( "\x20\xc8\xc8\xc8\xc8\x7e\xc8\xc8\xc8\xc8\x20|"));
+    }
     osd.printf_P(PSTR("\xc3%s\x87"), buf_show);
-
+    if(has_sign(p) && is_alt(p)){
+        if (is_alt2(p)) {
+            osd.printf_P(PSTR("|\x20\x20\x20\x24\xcb"));
+            osd.write_raw(0x7c);
+            osd.printf_P(PSTR("\x40\xcb\x24\x20\x20\x20|"));
+        } else
+            osd.print_P(PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce\x20"));
+    }
 }
 
 
