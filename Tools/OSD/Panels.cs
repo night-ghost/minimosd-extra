@@ -160,6 +160,7 @@ namespace OSD
         static float osd_lat = -35.020938f;                    // latidude
         static float osd_lon = 117.883419f;                    // longitude
         static uint8_t osd_satellites_visible = 7;     // number of satelites
+        static float osd_gps_hdop = 16;     // number of satelites
         //static uint8_t osd_fix_type = 3;               // GPS lock 0-1=no fix, 2=2D, 3=3D
         static int start_Time = 3785; 
 
@@ -642,14 +643,14 @@ namespace OSD
             if (is_alt(fAlt))
             {
 				if(sign==1)
-                  osd.printf("\x88%c%c\x8e%2.0i%%", 0x89, 0x89, 99);
+                  osd.printf("\x88%c%c\x8e%3.0i%%", 0x89, 0x89, 99);
 				else
-					osd.printf("%3.0i%c",  osd_battery_remaining, 0x25);
+					osd.printf("%3.0i%c",  99, 0x25);
             }
             else
             {
 				if(sign==1)
-                  osd.printf("\x88%c%c\x8e%4.0f\x01", 0x89,0x89, 99);
+                  osd.printf("\x88%c%c\x8e%4.0f\x01", 0x89,0x89, 978);
 				else
                    osd.printf("%4.0f\x01", 978);
             }
@@ -927,7 +928,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-            	osd.printf("%c%2i", 0x2a, osd_satellites_visible);
+            	osd.printf("%s%2i", "\x0f\x20\x20", osd_satellites_visible);
 			else 
 				osd.printf("%2i",  osd_satellites_visible);
             
@@ -1063,8 +1064,8 @@ namespace OSD
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
 			if(sign==1)
-				osd.printf_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
-            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
+				osd.printf_P(PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
+            osd.printf_P(PSTR("\xc3\x81\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
            
             
             return 0;
@@ -1616,10 +1617,10 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
         public int panHdop(int first_col, int first_line, int sign, int fAlt) {
             osd.setPanel(first_col, first_line);
-            if (sign == 1) osd.write(0x1f);
-
-            osd.printf("%3d", 12);
-
+            if (sign == 1)
+                osd.printf("%s%5.1f", "\x2a\x20", (osd_gps_hdop * .1));
+            else
+                osd.printf("%5.1f", (osd_gps_hdop * .1));
             return 0;
         }
 

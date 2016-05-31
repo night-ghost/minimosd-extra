@@ -288,7 +288,7 @@ namespace OSD {
                 pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
                 pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
-                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
+                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 23, 12, panGPSats_XY, 1);
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
                 pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
         //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
@@ -304,7 +304,7 @@ namespace OSD {
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, 0, "Reset to 0 on arming");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0 , "show in m/s");
-                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
+                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, 0, "Show in %");
                 pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
 
                 pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0, "Show in m/s");
