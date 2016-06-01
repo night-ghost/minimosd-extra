@@ -1,5 +1,4 @@
 
-//uint8_t checkPAL(uint8_t line);
 
 void startPanels();
 void writePanels();

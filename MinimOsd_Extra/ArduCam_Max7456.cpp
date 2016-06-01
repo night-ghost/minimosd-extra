@@ -16,7 +16,7 @@
 extern Settings sets;
 extern Flags flags;
 
-uint8_t  OSD::col, OSD::row, OSD::video_mode, OSD::video_center;
+uint8_t  OSD::col, OSD::row, OSD::video_mode;
 uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
 uint16_t OSD::bufpos;
 
@@ -88,6 +88,10 @@ void OSD::init()
     hw_init();
 }
 
+void delay_15(){
+    delay(15);
+}
+
 //------------------ Detect Mode (PAL/NTSC) ---------------------------------
 
 void OSD::detectMode()
@@ -133,11 +137,9 @@ void OSD::setMode(uint8_t themode){
     switch(themode){
     case 0:
         mode = MAX7456_MODE_MASK_NTCS;
-        video_center = MAX7456_CENTER_NTSC;
         break;
     case 1:
         mode = MAX7456_MODE_MASK_PAL;
-        video_center = MAX7456_CENTER_PAL;
         break;
     }
  
@@ -206,10 +208,14 @@ void NOINLINE OSD::calc_pos(){
 }
 
 void OSD::setPanel(uint8_t st_col, uint8_t st_row){
-  col = st_col & 0x3f; // col,row нужны для отработки перевода строки с сохранением колонки
-  row = st_row & 0x0f; // в старших битах флаги, размер экрана все равно мелкий
+    col = st_col & 0x3f; // col,row нужны для отработки перевода строки с сохранением колонки
+    row = st_row & 0x0f; // в старших битах флаги, размер экрана все равно мелкий
 
-  calc_pos();
+
+    if(getMode()==0 && row >6) // ntsc after middle
+	row-=3;
+
+    calc_pos();
 }
 
 
@@ -227,17 +233,16 @@ void OSD::write_S(uint8_t c){
   } 
 }
 
-void OSD::write_raw(uint8_t c){
+void OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
     osdbuf[bufpos++] = c;
 }
 
 size_t OSD::write(uint8_t c){
-    write_S(c);  
+    write_S(c);
     return 1;
 }
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
-//    extern OSD osd;
     setPanel(x,y);
     OSD::write_S(c);
 }
@@ -342,7 +347,4 @@ byte  OSD::peek(void){
 void OSD::flush(void){
 }
 
-void delay_15(){
-    delay(15);
-}
 

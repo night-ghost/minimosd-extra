@@ -229,6 +229,13 @@ v846
 * panRose's scale ("icon") can be placed below
 * panRose can be even size to be centered with HUD - reqires font 2.4.1.4. sacrificed characters @, ~, `
 
+v847
+* fixed NTSC inconsistency with the CT
+* removed % from panRSSI in CT
+* added ability to exclude MAVlink from build
+* all telemetry protocol's files moved to 'protocols' folder
+* fixed panel size for all distances
+* fixed GPS icon for RTK modules
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -485,6 +492,16 @@ v846
 * Шкала ("иконка") панели компаса (panRose) может располагаться снизу
 * Сама панель panRose может быть четного размера дабы центрироваться относительно авиагоризонта. Требует загрузки шрифта 2.4.1.4. 
  Пожертвованы символы @, ~, `
+
+v847
+* исправлено несоответствие с конфигуратором в режиме NTSC
+* удален знак % из panRSSI в конфигураторе
+* добавлена возможность исключить MAVlink при сборке
+* все файлы телеметрийных протоколов перемещены в папку 'protocols'
+* исправлен размер панели для всех расстояний
+* исправлена иконка GPS для модулей с поддержкой RTK
+
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

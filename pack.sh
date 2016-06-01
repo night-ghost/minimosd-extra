@@ -7,9 +7,9 @@ version(){
 RELEASE='Released/FW_+_Char'
 BUILD='MinimOsd_Extra/build-atmega328'
 
-[ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.`version`DV-release.hex
+#[ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.`version`DV-release.hex
 
-rm -rf MinimOsd_Extra/build-atmega328
+rm -rf $BUILD
 rm -f osd_latest.zip
 zip -r osd_latest.zip Released
 

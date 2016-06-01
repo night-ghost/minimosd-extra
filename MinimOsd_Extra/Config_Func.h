@@ -62,13 +62,14 @@ static point readPanel(byte n) {
     return p;
 }
 
+/*
 static NOINLINE uint8_t checkPAL(uint8_t line){
     if(line >= osd.getCenter() && osd.getMode() == 0){
         line -= 3;	//Cutting lines offset after center if NTSC
     }
     return line;
 }
-
+*/
 
 
 

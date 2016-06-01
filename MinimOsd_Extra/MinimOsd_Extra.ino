@@ -96,19 +96,21 @@ OSD osd; //OSD object
 
 #include "protocols.h"
 #if defined(USE_UAVTALK)
-#include "UAVTalk_core.h"
+#include "protocols/UAVTalk_core.h"
 #endif
 
 #if defined(USE_MWII)
-#include "cleanflight_core.h"
+#include "protocols/cleanflight_core.h"
 #endif
 
 #if defined(USE_LTM)
-#include "LTM_core.h"
+#include "protocols/LTM_core.h"
 #endif
 
 #include "Panels.h"
-#include "MAVLink.h"
+#if defined(USE_MAVLINK)
+#include "protocols/MAVLink.h"
+#endif
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
@@ -180,8 +182,10 @@ void setup()     {
     OSD::update();// clear memory
 
     attachInterrupt(INT0, isr_VSYNC, FALLING);
-    
+
+#if defined(USE_MAVLINK)
     mavlink_comm_0_port = &Serial; // setup mavlink port
+#endif
 
     // Prepare OSD for displaying 
     unplugSlaves();

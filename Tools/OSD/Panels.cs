@@ -359,9 +359,9 @@ namespace OSD
  	        osd.setPanel(first_col, first_line);
  	        
  	        if(sign==1)
- 	            osd.printf("%c%3i%c", 0x09, osd_rssi, 0x25);
+ 	            osd.printf("%c%3i", 0x09, osd_rssi);
  	        else
-            	osd.printf("%3i%c", osd_rssi, 0x25);
+            	osd.printf("%3i", osd_rssi);
  	        return 0;
  	    }
 
@@ -927,7 +927,10 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-            	osd.printf("%c%2i", 0x2a, osd_satellites_visible);
+                if (is_alt(fAlt))
+                    osd.printf("%2i\x2a", osd_satellites_visible);
+                else
+            	    osd.printf("%c%2i", 0x2a, osd_satellites_visible);
 			else 
 				osd.printf("%2i",  osd_satellites_visible);
             
@@ -983,53 +986,7 @@ namespace OSD
             return 0;
         }
 
-        /* **************************************************************** */
-        // Panel  : panGPS2
-        // Needs  : X, Y locations
-        // Output : one row numeric value of current GPS location with LAT/LON symbols as on first char
-        // Size   : 1 x 25  (rows x chars)
-        // Staus  : done
-/*
-        public int panGPS2(int first_col, int first_line, int sign, int fAlt)
-        {
-            osd.setPanel(first_col, first_line);
 
-            if (sign == 1) {
-                if (is_alt2(fAlt)) {
-                    int i;
-                    double lat = abs(osd_lat), lon = abs(osd_lon);
-                    i = (int)lat; lat -= i;
-                    i = (int)lon; lon -= i;
-
-                    if (is_alt(fAlt))
-                        osd.printf("%c%05d %c%05d", 0x03, (int)(lat * 100000.0), 0x04, (int)(lon * 100000.0));
-                    else
-                        osd.printf("%c%06d %c%06d", 0x03, (int)(lat * 1000000.0), 0x04, (int)(lon * 1000000.0));
-                } else if (is_alt(fAlt))
-                    osd.printf("%c%9.5f %c%9.5f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
-                else
-                    osd.printf("%c%10.6f %c%10.6f", 0x03, (double)osd_lat, 0x04, (double)osd_lon);
-            } else {
-                if (is_alt2(fAlt)) {
-                    int i;
-                    double lat = abs(osd_lat), lon = abs(osd_lon);
-                    i = (int)lat; lat -= i;
-                    i = (int)lon; lon -= i;
-
-
-                    if (is_alt(fAlt))
-                        osd.printf("%05d %05d", (int)(lat * 100000.0), (int)(lon * 100000.0));
-                    else
-                        osd.printf("%06d %06d", (int)(lat * 1000000.0), (int)(lon * 1000000.0));
-
-                } else if (is_alt(fAlt))
-                    osd.printf("%9.5f %9.5f", (double)osd_lat, (double)osd_lon);
-                else
-                    osd.printf("%10.6f %10.6f", (double)osd_lat, (double)osd_lon);
-            }
-            return 0;
-        }
-*/		
 		
         /* **************************************************************** */
         // Panel  : panHeading
@@ -1062,30 +1019,27 @@ namespace OSD
             
             //osd_heading  = osd_yaw;
             //if(osd_yaw < 0) osd_heading = 360 + osd_yaw;
-			if(sign==1)
-				osd.printf_P(PSTR( "\x20\xc7\xc7\xc7\xc7\x2e\xc7\xc7\xc7\xc7\x20|"));
-            osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
+			if(sign==1 && !is_alt(fAlt))
+                if (is_alt2(fAlt))
+                    osd.printf_P(PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|"));
+                else
+				    osd.printf_P(PSTR( "\x20\xc8\xc8\xc8\xc8\x7e\xc8\xc8\xc8\xc8\x20|"));
+
+            if (is_alt2(fAlt))
+                osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x81\x87"));
+            else
+                osd.printf_P(PSTR("\xc3\x80\x81\x80\x82\x80\x81\x80\x81\x80\x87"));
+            if (sign == 1 && is_alt(fAlt))
+                if (is_alt2(fAlt)) {
+                    osd.printf_P(PSTR("|\x20\x20\x20\x24\xcb"));
+                    osd.write_raw(0x7c);                    
+                    osd.printf_P(PSTR("\x40\xcb\x24\x20\x20\x20|"));
+                }
+                else
+                    osd.printf_P(PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce\x20|"));
            
             
             return 0;
-        }
-
-
-        /* **************************************************************** */
-        // Panel  : panBoot
-        // Needs  : X, Y locations
-        // Output : Booting up text and empty bar after that
-        // Size   : 1 x 21  (rows x chars)
-        // Staus  : done
-
-        public int panBoot(int first_col, int first_line, int sign, int fAlt)
-        {
-            osd.setPanel(first_col, first_line);
-            
-            osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3"));
-            
-            return 0;
-
         }
 
 		

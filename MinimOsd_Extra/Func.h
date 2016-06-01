@@ -474,8 +474,12 @@ static void getData(){
 
     bool got=false;
 
+#if defined(USE_MAVLINK)
     if(lflags.mavlink_active){
 	read_mavlink();
+#else
+    if(0){
+#endif
 #if defined(USE_UAVTALK)
     } else if(lflags.uavtalk_active) {
 	extern bool uavtalk_read(void);
@@ -492,30 +496,6 @@ static void getData(){
 	read_ltm();
 #endif
     } else {
-/*
-	if(millis() < BOOTTIME){ // startup delay for fonts
-	    if(Serial.available_S()) {
-	        byte c=Serial.read_S();
-
-//		    OSD::setPanel(1,1);
-
-                if (c == '\n' || c == '\r') {
-                    crlf_count++;
-//osd.print_P(PSTR("cr|"));
-                } else {
-//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
-                    crlf_count = 0;
-                }
-
-                if (crlf_count > 3) {
-//osd.print_P(PSTR("fonts!|"));
-                    uploadFont();
-                }
-	    }
-	    return;
-	}
-*/
-
 	switch(count05s % 5){
 #if defined(AUTOBAUD)
 	case 1: {
@@ -582,7 +562,9 @@ static void getData(){
 	    break;
 #endif
 	default: // 0 and all not used
+#if defined(USE_MAVLINK)
 	    read_mavlink();
+#endif
 	    break;
 	}
     }

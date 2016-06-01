@@ -1,3 +1,5 @@
+#ifndef COMPAT2_H
+#define COMPAT2_H
 enum ap_var_type {
     AP_PARAM_NONE    = 0,
     AP_PARAM_INT8,
@@ -9,3 +11,4 @@ enum ap_var_type {
     AP_PARAM_MATRIX3F,
     AP_PARAM_GROUP
 };
+#endif

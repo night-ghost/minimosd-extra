@@ -419,9 +419,12 @@ static void NOINLINE printDistCnv(float d){
 
 
 static NOINLINE void printFullDist(float dd){
+
     dd *= get_converth();
     if ((int)dd <= 9999) { // in meters
-        printDist(dd);
+    //    printDist(dd);
+	osd_printf_2(PSTR("%4.0f"), dd, get_mhigh());
+
     }else{ // in kilometers
 	dd = dd / pgm_read_word(&measure->distconv);
 	PGM_P fmt;
@@ -556,7 +559,7 @@ static void panEff(point p){
 
 static void panRSSI(point p){
 
-    osd_printi_1(PSTR("%3i\x25"), rssi);
+    osd_printi_1(PSTR("%3i"), rssi);
 }
 
 /* **************************************************************** */
@@ -758,7 +761,7 @@ static void check_warn()
  if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
     wmask |= (1<<6);
 
-
+#if defined(USE_MAVLINK)
 //8
  if(mav_fence_status == FENCE_BREACH_MINALT)
     wmask |= (1<<7);
@@ -770,6 +773,7 @@ static void check_warn()
 //10
  if(mav_fence_status == FENCE_BREACH_BOUNDARY)
     wmask |= (1<<9);
+#endif
 
  if(wmask == 0) 
     warning = 0;
@@ -1042,15 +1046,19 @@ static void panGPSats(point p){
     byte gps_str = 0x2a;
 
     if (osd_fix_type == 2) gps_str = 0x1f;
-    if (osd_fix_type == 3) gps_str = 0x0f;
+    if (osd_fix_type >= 3) gps_str = 0x0f;
 
     if ((eph >= 200) && lflags.blinker)
        gps_str = 0x20;
 
-    if(has_sign(p))
+    if(has_sign(p) && !is_alt(p))
 	OSD::write_S(gps_str);
 
     osd_printi_1(PSTR("%2i"), osd_satellites_visible);
+    
+    if(has_sign(p) && is_alt(p))
+	OSD::write_S(gps_str);
+
 }
 
 /* **************************************************************** */
@@ -1094,11 +1102,12 @@ static void NOINLINE print_gps(PGM_P f, byte div){
 static void panGPS(point p){
 
     PGM_P f;
+    
     if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
 
-    byte div=is_alt3(p)?' ':'|';
+    byte div = is_alt3(p)?' ':'|'; // row or column
 
-    byte fLow=is_alt(p)?1:0;
+    byte fLow= is_alt(p)?1:0;      // low precision
 
     byte idx= fLow | (has_sign(p)?2:0);
 
@@ -1490,10 +1499,12 @@ static void panMessage(point p){
 //    lflags.show_screnN = !is_alt2(p);
 
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
-	char sign;
+	char sign=0;
 
+#if defined(USE_MAVLINK)
         if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
-	else sign=0;
+#endif
+
 
 	int8_t diff = MAX_MSG_SIZE - mav_msg_len; // can it fit to screen?
 	if( diff >= 0) { 		// yes! message less than screen

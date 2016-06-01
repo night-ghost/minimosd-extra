@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r845 DV";
+        public const string VERSION = "r847 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -243,8 +243,8 @@ namespace OSD {
                 image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H * CHAR_H);
 
                 for (int k = 0; k < npanel; k++) {
-                    scr[panel_number].NUM_X.Maximum = SCREEN_W - 1;
-                    scr[panel_number].NUM_Y.Maximum = SCREEN_H - 1;
+                    scr[k].NUM_X.Maximum = SCREEN_W - 1;
+                    scr[k].NUM_Y.Maximum = SCREEN_H - 1;
                 }
 
             } else {
@@ -254,8 +254,8 @@ namespace OSD {
 
                 image = new Bitmap(SCREEN_W * CHAR_W, SCREEN_H_NTSC * CHAR_H);
                 for (int k = 0; k < npanel; k++) {
-                    scr[panel_number].NUM_X.Maximum = SCREEN_W - 1;
-                    scr[panel_number].NUM_Y.Maximum = SCREEN_H - 1;
+                    scr[k].NUM_X.Maximum = SCREEN_W - 1;
+                    scr[k].NUM_Y.Maximum = SCREEN_H - 1;
                 }
             }
 
@@ -288,12 +288,12 @@ namespace OSD {
                 pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
                 pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
-                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1);
+                pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1,0,"Icon in tail");
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
                 pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
         //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, 0, "use less precision (5 digits)", 0, "Show only fractional");
 
-                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0);
+                pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0,0,"Marker below rose", 0, "Even panel length");
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
                 pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
@@ -557,6 +557,13 @@ namespace OSD {
                 print_row = 0;
                 return;
             }
+            write_raw(ch);
+        }
+
+        public void write_raw(int ch) {
+            write_raw((char)ch);
+        }
+        public void write_raw(char ch) {
             try {
                 // draw red boxs
                 if (selectedrectangle) {
@@ -582,7 +589,6 @@ namespace OSD {
             }
             print_row++;
         }
-
 
         public void update_used_pins() {
 
