@@ -41,7 +41,7 @@ TimerSerial::TimerSerial(uint8_t rxPin, uint8_t txPin) {
 
   // First write, then set output. If we do this the other way around,
   // the pin would be output low for a short while before switching to
-  // output hihg. Now, it is input with pullup for a short while, which
+  // output high. Now, it is input with pullup for a short while, which
   // is fine. With inverse logic, either order is fine.
   digitalWrite(txPin, HIGH);
   pinMode(txPin, OUTPUT);
@@ -62,16 +62,22 @@ void TimerSerial::begin(long speed){
     byte div=1;
 
     switch(speed) {
-    case 38400:
-	div=1;
+    case 115200:
 	prescaler= (1<<CS10); // prescaler = 8, 2MHz, T=0.5
-	_tx_delay = 419; 
-	return;
+	div=1;
+	break; // ~138
     
     case 57600:
 	prescaler= (1<<CS10); // prescaler = 8, 2MHz, T=0.5
 	div=1;
-	break;
+	break; // 278
+
+    case 38400:
+	div=1;
+	prescaler= (1<<CS10); // prescaler = 8, 2MHz, T=0.5
+	_tx_delay = 419; // 416 calced
+	return;
+    
 	
     case 19200:
     case 9600:

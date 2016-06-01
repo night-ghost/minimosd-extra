@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r847 DV";
+        public const string VERSION = "r848 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -304,7 +304,7 @@ namespace OSD {
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, 0, "Reset to 0 on arming");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, 0 , "show in m/s");
-                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1);
+                pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, 0, "Show percent, not used mAH");
                 pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
 
                 pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, 0, "Show in m/s");

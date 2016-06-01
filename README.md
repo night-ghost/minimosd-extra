@@ -237,6 +237,9 @@ v847
 * fixed panel size for all distances
 * fixed GPS icon for RTK modules
 
+v848
+* fixed bug with BatteryPercent in percent mode
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -501,6 +504,9 @@ v847
 * исправлен размер панели для всех расстояний
 * исправлена иконка GPS для модулей с поддержкой RTK
 
+
+v848
+* исправлен баг с отсутствием галки у панели BatteryPercent
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
