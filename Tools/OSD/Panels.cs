@@ -1595,6 +1595,14 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             return 0;
         }
 
+        public int panScale(int first_col, int first_line, int sign, int fAlt) {
+            osd.setPanel(first_col, first_line);
+
+            
+            if (sign == 1) osd.printf("%d",fAlt/2 + 5);
+            osd.printf("\x80\x81\x80\x80\x80");
+            return 0;
+        }
     }
 }
 
