@@ -240,6 +240,9 @@ v847
 v848
 * fixed bug with BatteryPercent in percent mode
 
+v849
+* new panel "channel scale" - graphical version of ChannelStatus
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -508,6 +511,8 @@ v847
 v848
 * исправлен баг с отсутствием галки у панели BatteryPercent
 
+v849
+* новая панель Шкала "channel scale" - графическое представление панели Статус Канала
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

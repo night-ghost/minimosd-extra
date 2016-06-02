@@ -81,6 +81,7 @@ struct Panel {
     point sensor4;      // 84
     point Hdop;         // 86;
     point State;        // 88;
+    point Scale;        // 90;
 
 };
 
