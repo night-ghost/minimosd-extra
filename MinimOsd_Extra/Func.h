@@ -534,7 +534,7 @@ static void getData(){
 	    else                        speed =   4800;
 
 #ifdef DEBUG
-	    OSD::setPanel(3,6);
+	    OSD::setPanel(3,2);
 	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
 	    Serial.flush();
