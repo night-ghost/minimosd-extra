@@ -1259,7 +1259,7 @@ static void panFdata(point p){ // итоги полета
 
     print_list(fd);
 
-    print_gps(gps_f2,'|');
+    print_gps(gps_f6,'|');
 }
 
 
@@ -1715,15 +1715,6 @@ char const * const mode_mw_strings[] PROGMEM ={
 
 static void panFlightMode(point p){
 
-#ifdef DEBUG
-    static byte old_mode = -1;
-    
-    if(osd_mode !=old_mode) {
-        Serial.printf_P(PSTR("mode changed from %d to %d\n"), old_mode, osd_mode);
-        old_mode = osd_mode;
-    }
-#endif
-
     //PGM_P mode_str;
     const char * const *ptr;
     
@@ -1869,7 +1860,7 @@ static const char PROGMEM  * const sts_arr[]={
     sts_0, sts_1, sts_2, sts_3, sts_4
 };
 
-static byte NOINLINE get_chan_pos(byte ch){
+static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     // 1000 - 2000 
     // 1200
     // 1400
@@ -1877,13 +1868,17 @@ static byte NOINLINE get_chan_pos(byte ch){
     // 1800
     int v=chan_raw[ch];
     byte n;
+    const int low =(fExt?900:1000);
+    const int high=(fExt?2100:2000);
     
-    if(v<1000) n=0;
+    
+    if(v<low) n=0;
     else {
-	n=( v - 1000)/200;
+	n=( v - low)/((high-low)/5);
 	if(n>4) n=4;
     }
 
+    return n;
 }
 
 static void panState(point p) {
@@ -1902,12 +1897,38 @@ static void panScale(point p) {
     if(has_sign(p)) osd_printi_1(PSTR("%i"),ch+1);
 
     byte n = get_chan_pos(ch);
+    byte c;
 
     for(byte i=0;i<5;i++){
-	byte c=0x80;
+	c=0x80;
 	if(i==n) c=0x81;
 	osd.write_S(c);
     }
+}
+
+static void panEScale(point p) {
+    byte ch = get_alt_num(p) + 4;
+
+    if(has_sign(p)) osd_printi_1(PSTR("%i"),ch+1);
+
+    byte n = get_chan_pos(ch,1);
+    byte c;
+
+    for(byte i=0;i<5;i++){
+	c=0x80;
+	if(i==n) c=0x81;
+	osd.write_S(c);
+    }
+}
+
+static void panCValue(point p) {
+    byte ch = get_alt_num(p) + 4;
+
+    if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
+
+//Serial.printf_P(PSTR(""),
+    osd_printi_1(PSTR("%4d"),chan_raw[ch]);
+
 }
 
 /*
@@ -2379,6 +2400,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(Hdop),		panHdop, 	0x1f  },
     { ID_of(State),		panState, 	0  },
     { ID_of(Scale),		panScale, 	0  },
+    { ID_of(EScale),		panScale, 	0  },
+    { ID_of(CValue),		panCValue, 	0  },
 #if defined(USE_SENSORS)
     { ID_of(sensor1) | 0x80,	panSensor1, 	0 },
     { ID_of(sensor2) | 0x80,	panSensor2, 	0 },

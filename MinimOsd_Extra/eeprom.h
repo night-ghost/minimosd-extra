@@ -79,9 +79,11 @@ struct Panel {
     point sensor2;      // 80
     point sensor3;      // 82
     point sensor4;      // 84
-    point Hdop;         // 86;
-    point State;        // 88;
-    point Scale;        // 90;
+    point Hdop;         // 86
+    point State;        // 88
+    point Scale;        // 90
+    point EScale;       // 92
+    point CValue;       // 94
 
 };
 
