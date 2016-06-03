@@ -14,4 +14,4 @@ Be sure that bough side of MinimOSD is powered. Otherwise it will not take.
 Click on "Options" menu and choose "Update charset".
 
 The charset file is located in Config. Tool directory. (.mcm)
-MinimOSD will show the version of your charset on boot (current is 2.4.1.1)
+MinimOSD will show the version of your charset on boot (current is 2.4.1.4)

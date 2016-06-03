@@ -15,7 +15,7 @@ waypoint, etc)
 
 SR1\_EXTRA1, 5 ( 5hz for attitude and simulation state)
 
-SR1\_EXTRA2, 2 ( 2hz for VFR\_Hud data )
+SR1\_EXTRA2, 10 ( 10hz for VFR\_Hud data )
 
 SR1\_EXTRA3, 3 ( 3hz for AHRS, Hardware Status, Wind )
 
@@ -32,7 +32,7 @@ SR0\_EXT\_STAT, 2
 
 SR0\_EXTRA1, 5
 
-SR0\_EXTRA2, 2
+SR0\_EXTRA2, 10
 
 SR0\_EXTRA3, 3
 

@@ -11,5 +11,5 @@ Her is how it looks:
 [url]
 
 And here is its forum: 
-
-
+English: http://www.rcgroups.com/forums/showthread.php?t=2591835
+Russian: http://www.ykoctpa.ru/groups/eye-in-a-sky/forum/topic/minimosd-novaya-proshivka/

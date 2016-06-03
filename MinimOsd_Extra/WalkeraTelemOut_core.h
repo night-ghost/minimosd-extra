@@ -55,8 +55,6 @@ void WalkeraTelem::sendTelemetry(){
 
 	devoPacket.cs = 0; // Init Checksum with zero Byte
 
-
-
 //Serial.printf_P(PSTR("devo start "));
 
 	byte *b = (byte *)&devoPacket;

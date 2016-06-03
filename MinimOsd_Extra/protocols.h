@@ -41,5 +41,5 @@ union {
 
 #if defined(USE_MAVLINK)
 #define  m_mavlink_buffer (&msg.m)
-#include "GCS_MAVLink.h"
+#include "../GCS_MAVLink/GCS_MAVLink.h"
 #endif

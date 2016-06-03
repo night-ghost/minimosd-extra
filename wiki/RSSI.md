@@ -1,4 +1,4 @@
-1./OSD can get RSSI from 4 available sources: MAVlink, RC channel 8 and from pin "RSSI", available on some boards, in analog or PWM form.
+1./OSD can get RSSI from 5 available sources: MAVlink, RC channel 8, 3DR modems and from pin "RSSI", available on some boards, in analog or PWM form.
 
 To use RSSI via MAVlink You need to enable this function in APM. Go to MP than look for it in advanced parameters.
 

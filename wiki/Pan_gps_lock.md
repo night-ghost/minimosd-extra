@@ -2,11 +2,19 @@
 
 This panel shows a symbol that has two states.
 
+0./
+Space: no GPS
+
 1./
-Lock opened: Means No GPS lock (APM does not have valid GPS coordinates)
+star: Means GPS has no lock (APM does not have valid GPS coordinates)
+
+1./
+Flat radar: Means  GPS has 2d lock (APM has valid GPS coordinates)
 
 2./
-Lock closed: Means GPS is locked (APM has valid GPS coordinates and altitude)
+3d radar: Means GPS has 3d lock (APM has valid GPS coordinates and altitude)
+
+if HDOP greater than 200 then GPS icon will blink
 
 # This panel has a warning assigned #
 

@@ -4,7 +4,6 @@ You can choose from 3 different ways of switching.
 
 Also if you don't need this function you can turn it off.
 
-http://gabek.dyndns.org:28/wiki/5.PNG
 
 1./ By mode switch:
 
@@ -27,7 +26,6 @@ Every position of your N position switch is assigned to a screen. Screen 1 is on
 Switching by a momentary switch:
 For this you need a momentary switch (like trainer switch) assigned to the channel you set in Config. Tool "OSD Toggle Channel" drop-down menu. And check the "Rotation Switching" check-box.
 
-http://gabek.dyndns.org:28/wiki/6.PNG
 
 You select any channel you want to use from 5 to 8, than check Rotation Switching check-box.
 

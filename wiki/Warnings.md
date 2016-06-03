@@ -14,11 +14,15 @@ Available warnings:
 
 - Battery volt
 
+- Battery 2 volt
+
 - Battery Percent
 
 - RSSI
 
 - vertical speed
+
+- GeoFence triggering
 
 Warnings always shown even you are on "Off" screen, but you can select position of Panel "Warnings" on each screen.
 

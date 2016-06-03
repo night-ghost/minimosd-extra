@@ -4,7 +4,6 @@
 
 Click to "Panel 1" than enable all the functions you need by checking or unchecking on the left. After you chouse everything you need place tham wherever you want on the screen.
 
-http://gabek.dyndns.org:28/wiki/4.PNG
 
 When you are ready click "Save current tab to" button, so new settings are written to your MinimOSD.
 

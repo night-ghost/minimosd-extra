@@ -95,6 +95,7 @@ OSD osd; //OSD object
 #include "Func.h"
 
 #include "protocols.h"
+
 #if defined(USE_UAVTALK)
 #include "protocols/UAVTalk_core.h"
 #endif

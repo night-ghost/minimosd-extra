@@ -80,6 +80,8 @@
 #define UAVObjInstanceUpdated(x,y) 0
 #define UAVObjReadOnly(x) 0
 
+typedef long int32_t;
+
 static inline byte FlightTelemetryStatsHandle() { return 0; }
 
 typedef byte UAVObjHandle;
