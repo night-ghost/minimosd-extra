@@ -41,6 +41,23 @@ namespace OSD {
             Alt4 = fAlt4;
             alt4_text = text4;
         }
+
+        public void copyFrom(Panel other) {
+            name = other.name;
+            x = other.x;
+            y = other.y;
+            pos = other.pos;
+            sign = other.sign;
+            show = other.show;
+            Altf = other.Altf;
+            alt_text = other.alt_text;
+            Alt2 = other.Alt2;
+            alt2_text = other.alt2_text;
+            Alt3 = other.Alt3;
+            alt3_text = other.alt3_text;
+            Alt4 = other.Alt4;
+            alt4_text = other.alt4_text;
+        }
 	}
 }
 

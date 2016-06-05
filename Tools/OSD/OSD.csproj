@@ -93,6 +93,12 @@
     <Compile Include="ArduinoSTK.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CopyScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CopyScreen.Designer.cs">
+      <DependentUpon>CopyScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,6 +120,9 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CopyScreen.resx">
+      <DependentUpon>CopyScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

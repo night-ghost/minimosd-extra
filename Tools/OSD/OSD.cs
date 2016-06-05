@@ -742,6 +742,14 @@ namespace OSD {
         string currentVersion = "";
 
         private void OSD_Load(object sender, EventArgs e) {
+            for (int k = 0; k < npanel; k++) {
+                PANEL_tabs.Controls.Add(scr[k].tabPage);
+                scr[k].init();
+                scr[k].last_init();
+            }
+            BUT_CopyScreen.Visible = false;
+            BUT_ClearScreen.Visible = false;
+
             if (cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
 //            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
@@ -1824,7 +1832,8 @@ namespace OSD {
                                             TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
                                             if (tnArray.Length > 0)
                                                 tnArray[0].Checked = (strings[3] == "True");
-                                        } catch {
+                                        } catch (Exception ex) {
+                                            MessageBox.Show("Error reading file: " + ex.Message);
                                         }
                                     }
                                 }
@@ -3437,9 +3446,13 @@ namespace OSD {
                 currentlyselected = "";
 
                 Draw(k - 1);
-            } else
+                BUT_CopyScreen.Visible = true;
+                BUT_ClearScreen.Visible = true;
+            } else {
                 panel_number = -1;
-
+                BUT_CopyScreen.Visible = false;
+                BUT_ClearScreen.Visible = false;
+            }
         }
 
         private void txtRSSI_k_TextChanged(object sender, EventArgs e) {
@@ -4049,6 +4062,23 @@ namespace OSD {
             //frm.Show();
             frm.ShowInTaskbar =false;
             frm.ShowDialog(); // modal
+        }
+
+        private void BUT_CopyScreen_Click(object sender, EventArgs e)
+        {
+            CopyScreen frm = new CopyScreen(PANEL_tabs.SelectedIndex);
+            frm.ShowInTaskbar = false;
+            DialogResult res = frm.ShowDialog(); // modal
+            if (res == DialogResult.OK) {
+                int screen = frm.Selection;
+                scr[PANEL_tabs.SelectedIndex-1].copyFrom(scr[screen-1]);
+                Draw(panel_number);
+            }
+
+        }
+
+        private void BUT_ClearScreen_Click(object sender, EventArgs e) {
+            scr[PANEL_tabs.SelectedIndex - 1].clearScreen();
         }
 
     }

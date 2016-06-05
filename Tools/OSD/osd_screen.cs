@@ -316,8 +316,26 @@ namespace OSD
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();			
 			return 0;
 		}
-		
-		        //Controls if it's a populate process or user input
+
+        public void copyFrom(osd_screen other) {
+            for (int i = 0; i < other.panelItems.Length; i++) {
+                if (panelItems[i] != null && other.panelItems[i] != null) { 
+                    panelItems[i].copyFrom(other.panelItems[i]);
+                }
+            }
+            var e1 = LIST_items.Nodes.GetEnumerator();
+            var e2 = other.LIST_items.Nodes.GetEnumerator();
+            while (e1.MoveNext() && e2.MoveNext()) {
+                ((TreeNode)e1.Current).Checked = ((TreeNode)e2.Current).Checked;
+            }
+        }
+
+        public void clearScreen() {
+            foreach (TreeNode node in LIST_items.Nodes) {
+                node.Checked = false;
+            }
+        }
+        //Controls if it's a populate process or user input
         private Boolean AutomaticCheck = true;
         private void rbtSortAlphabetic_CheckedChanged(object sender, EventArgs e)
         {

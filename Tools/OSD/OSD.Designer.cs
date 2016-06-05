@@ -138,6 +138,7 @@ namespace OSD
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.chkSwitchOnce = new System.Windows.Forms.CheckBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.UNITS_combo = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -181,7 +182,8 @@ namespace OSD
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.cbxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
-            this.chkSwitchOnce = new System.Windows.Forms.CheckBox();
+            this.BUT_CopyScreen = new System.Windows.Forms.Button();
+            this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -290,7 +292,7 @@ namespace OSD
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveToFileToolStripMenuItem
@@ -298,7 +300,7 @@ namespace OSD
             this.saveToFileToolStripMenuItem.Image = global::OSD.Properties.Resources.saveHS;
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
             this.saveToFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.saveToFileToolStripMenuItem.Text = "Save OSD file...";
             this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
@@ -307,32 +309,32 @@ namespace OSD
             this.loadFromFileToolStripMenuItem.Image = global::OSD.Properties.Resources.openHS;
             this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
             this.loadFromFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.loadFromFileToolStripMenuItem.Text = "Open OSD File...";
             this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromFileToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(203, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(199, 6);
             // 
             // loadDefaultsToolStripMenuItem
             // 
             this.loadDefaultsToolStripMenuItem.Name = "loadDefaultsToolStripMenuItem";
-            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.loadDefaultsToolStripMenuItem.Text = "Load Defaults";
             this.loadDefaultsToolStripMenuItem.Click += new System.EventHandler(this.loadDefaultsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(199, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -343,14 +345,14 @@ namespace OSD
             this.CHK_pal,
             this.CHK_auto});
             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
-            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
+            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
             this.videoModeToolStripMenuItem.Text = "Video Mode";
             // 
             // CHK_ntsc
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(104, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -361,7 +363,7 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(104, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -370,7 +372,7 @@ namespace OSD
             // CHK_auto
             // 
             this.CHK_auto.Name = "CHK_auto";
-            this.CHK_auto.Size = new System.Drawing.Size(111, 22);
+            this.CHK_auto.Size = new System.Drawing.Size(104, 22);
             this.CHK_auto.Text = "Auto";
             this.CHK_auto.CheckStateChanged += new System.EventHandler(this.AUTOToolStripMenuItem_CheckStateChanged);
             this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
@@ -393,7 +395,7 @@ namespace OSD
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // checkBox1
@@ -402,14 +404,14 @@ namespace OSD
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(233, 22);
+            this.checkBox1.Size = new System.Drawing.Size(231, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // resetEepromToolStripMenuItem
             // 
             this.resetEepromToolStripMenuItem.Name = "resetEepromToolStripMenuItem";
-            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.resetEepromToolStripMenuItem.Text = "Reset EEPROM";
             this.resetEepromToolStripMenuItem.ToolTipText = "Initialize EEPROM with default values";
             this.resetEepromToolStripMenuItem.Click += new System.EventHandler(this.BUT_ResetOSD_EEPROM_click);
@@ -417,7 +419,7 @@ namespace OSD
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -425,33 +427,30 @@ namespace OSD
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.sendTLogToolStripMenuItem.Text = "Load TLog.";
             this.sendTLogToolStripMenuItem.ToolTipText = "Load a Mavlink transmission log to play into the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
-
-            //
+            // 
             // connectComPortToolStripMenuItem
-            //
+            // 
             this.connectComPortToolStripMenuItem.Name = "connectComPortToolStripMenuItem";
-            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.connectComPortToolStripMenuItem.Text = "Connect to COM port";
             this.connectComPortToolStripMenuItem.ToolTipText = "Transmit all data from selected port to OSD to test how it works";
             this.connectComPortToolStripMenuItem.Click += new System.EventHandler(this.connectComPortToolStripMenuItem_Click);
-
-
             // 
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
@@ -459,7 +458,7 @@ namespace OSD
             // updateCharsetDevToolStripMenuItem
             // 
             this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
-            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
             this.updateCharsetDevToolStripMenuItem.Visible = false;
             this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
@@ -467,7 +466,7 @@ namespace OSD
             // updateCharsetcustomFwToolStripMenuItem
             // 
             this.updateCharsetcustomFwToolStripMenuItem.Name = "updateCharsetcustomFwToolStripMenuItem";
-            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.updateCharsetcustomFwToolStripMenuItem.Text = "Update Charset (custom fw)...";
             this.updateCharsetcustomFwToolStripMenuItem.Visible = false;
             this.updateCharsetcustomFwToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetcustomFwToolStripMenuItem_Click);
@@ -475,19 +474,19 @@ namespace OSD
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // setSketchesPathToolStripMenuItem
             // 
             this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
-            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             // 
             // getFwFromOSDToolStripMenuItem
             // 
             this.getFwFromOSDToolStripMenuItem.Name = "getFwFromOSDToolStripMenuItem";
-            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.getFwFromOSDToolStripMenuItem.Text = "GetFwFromOSD...";
             this.getFwFromOSDToolStripMenuItem.Visible = false;
             this.getFwFromOSDToolStripMenuItem.Click += new System.EventHandler(this.getFwFromOSDToolStripMenuItem_Click);
@@ -498,29 +497,26 @@ namespace OSD
             this.gettingStartedToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // gettingStartedToolStripMenuItem
             // 
             this.gettingStartedToolStripMenuItem.Name = "gettingStartedToolStripMenuItem";
-            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.gettingStartedToolStripMenuItem.Text = "Getting started";
             this.gettingStartedToolStripMenuItem.Click += new System.EventHandler(this.gettingStartedToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem.Text = "About ";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // PANEL_tabs
             // 
             this.PANEL_tabs.Controls.Add(this.tabPageConfig);
-            for (int k = 0; k < npanel; k++) {
-                this.PANEL_tabs.Controls.Add(this.scr[k].tabPage);
-            }
             this.PANEL_tabs.Location = new System.Drawing.Point(1, 96);
             this.PANEL_tabs.Margin = new System.Windows.Forms.Padding(2);
             this.PANEL_tabs.Name = "PANEL_tabs";
@@ -750,7 +746,6 @@ namespace OSD
             this.txtFactor4.TabIndex = 22;
             this.txtFactor4.Text = "1";
             this.txtFactor4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtFactor4.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
             this.txtFactor4.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtFormat4
@@ -780,7 +775,6 @@ namespace OSD
             this.txtFactor3.TabIndex = 17;
             this.txtFactor3.Text = "1";
             this.txtFactor3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtFactor3.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
             this.txtFactor3.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtFormat3
@@ -810,7 +804,6 @@ namespace OSD
             this.txtFactor2.TabIndex = 12;
             this.txtFactor2.Text = "10";
             this.txtFactor2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtFactor2.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
             this.txtFactor2.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtFormat2
@@ -840,7 +833,6 @@ namespace OSD
             this.txtFactor1.TabIndex = 7;
             this.txtFactor1.Text = "10";
             this.txtFactor1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtFactor1.TextChanged += new System.EventHandler(this.txtFactor1_TextChanged);
             this.txtFactor1.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtFormat1
@@ -945,7 +937,6 @@ namespace OSD
             this.groupBox15.TabIndex = 12;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Horizon";
-            
             // 
             // chkTrack
             // 
@@ -956,8 +947,8 @@ namespace OSD
             this.chkTrack.TabIndex = 4;
             this.chkTrack.Text = "with track";
             this.chkTrack.UseVisualStyleBackColor = true;
+            this.chkTrack.Visible = false;
             this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
-            this.chkTrack.Visible =false ;
             // 
             // groupBox16
             // 
@@ -995,9 +986,7 @@ namespace OSD
             this.txtPitchNtsc.TabIndex = 30;
             this.txtPitchNtsc.Text = "1";
             this.txtPitchNtsc.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtPitchNtsc.TextChanged += new System.EventHandler(this.txtPitchNtsc_TextChanged);
             this.txtPitchNtsc.Leave += new System.EventHandler(this.txtPitchNtsc_TextChanged);
-            
             // 
             // label25
             // 
@@ -1016,9 +1005,7 @@ namespace OSD
             this.txtRollNtsc.TabIndex = 28;
             this.txtRollNtsc.Text = "1";
             this.txtRollNtsc.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtRollNtsc.TextChanged += new System.EventHandler(this.txtRollNtsc_TextChanged);
             this.txtRollNtsc.Leave += new System.EventHandler(this.txtRollNtsc_TextChanged);
-            
             // 
             // label26
             // 
@@ -1046,8 +1033,7 @@ namespace OSD
             this.txtPitchPal.TabIndex = 25;
             this.txtPitchPal.Text = "1";
             this.txtPitchPal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtPitchPal.TextChanged += new System.EventHandler(this.txtPitchPal_TextChanged);
-            this.txtPitchPal.Leave += new System.EventHandler(this.txtPitchPal_TextChanged); 
+            this.txtPitchPal.Leave += new System.EventHandler(this.txtPitchPal_TextChanged);
             // 
             // label22
             // 
@@ -1057,7 +1043,6 @@ namespace OSD
             this.label22.Size = new System.Drawing.Size(31, 13);
             this.label22.TabIndex = 24;
             this.label22.Text = "Pitch";
-            
             // 
             // txtRollPal
             // 
@@ -1067,7 +1052,6 @@ namespace OSD
             this.txtRollPal.TabIndex = 23;
             this.txtRollPal.Text = "1";
             this.txtRollPal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtRollPal.TextChanged += new System.EventHandler(this.txtRollPal_TextChanged);
             this.txtRollPal.Leave += new System.EventHandler(this.txtRollPal_TextChanged);
             // 
             // label21
@@ -1078,7 +1062,6 @@ namespace OSD
             this.label21.Size = new System.Drawing.Size(25, 13);
             this.label21.TabIndex = 22;
             this.label21.Text = "Roll";
-            
             // 
             // chkILS
             // 
@@ -1089,9 +1072,8 @@ namespace OSD
             this.chkILS.TabIndex = 1;
             this.chkILS.Text = "show ILS";
             this.chkILS.UseVisualStyleBackColor = true;
+            this.chkILS.Visible = false;
             this.chkILS.CheckedChanged += new System.EventHandler(this.chkILS_CheckedChanged);
-            this.chkILS.Visible =false ;
-
             // 
             // chkRadar
             // 
@@ -1102,8 +1084,8 @@ namespace OSD
             this.chkRadar.TabIndex = 0;
             this.chkRadar.Text = "show Radar";
             this.chkRadar.UseVisualStyleBackColor = true;
+            this.chkRadar.Visible = false;
             this.chkRadar.CheckedChanged += new System.EventHandler(this.chkRadar_CheckedChanged);
-            this.chkRadar.Visible =false;
             // 
             // groupBox13
             // 
@@ -1127,7 +1109,6 @@ namespace OSD
             this.txtBattB_k.TabIndex = 23;
             this.txtBattB_k.Text = "1";
             this.txtBattB_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtBattB_k.TextChanged += new System.EventHandler(this.txtBattB_k_TextChanged);
             this.txtBattB_k.Leave += new System.EventHandler(this.txtBattB_k_TextChanged);
             // 
             // label28
@@ -1317,7 +1298,6 @@ namespace OSD
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Call Sign";
-            
             // 
             // CALLSIGNmaskedText
             // 
@@ -1385,6 +1365,16 @@ namespace OSD
             this.label11.Size = new System.Drawing.Size(0, 13);
             this.label11.TabIndex = 2;
             // 
+            // chkSwitchOnce
+            // 
+            this.chkSwitchOnce.AutoSize = true;
+            this.chkSwitchOnce.Location = new System.Drawing.Point(116, 48);
+            this.chkSwitchOnce.Name = "chkSwitchOnce";
+            this.chkSwitchOnce.Size = new System.Drawing.Size(52, 17);
+            this.chkSwitchOnce.TabIndex = 11;
+            this.chkSwitchOnce.Text = "Once";
+            this.chkSwitchOnce.UseVisualStyleBackColor = true;
+            // 
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.UNITS_combo);
@@ -1395,7 +1385,6 @@ namespace OSD
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Units";
-            
             // 
             // UNITS_combo
             // 
@@ -1418,7 +1407,6 @@ namespace OSD
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(0, 13);
             this.label10.TabIndex = 2;
-            
             // 
             // groupBox4
             // 
@@ -1426,8 +1414,6 @@ namespace OSD
             this.groupBox4.Controls.Add(this.label27);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.cbBattA_source);
-//            this.groupBox4.Controls.Add(this.rbtBatterymAh);
-//            this.groupBox4.Controls.Add(this.rbtBatteryPercent);
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
@@ -1447,7 +1433,6 @@ namespace OSD
             this.txtBattA_k.TabIndex = 23;
             this.txtBattA_k.Text = "1";
             this.txtBattA_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtBattA_k.TextChanged += new System.EventHandler(this.txtBattA_k_TextChanged);
             this.txtBattA_k.Leave += new System.EventHandler(this.txtBattA_k_TextChanged);
             // 
             // label27
@@ -1459,49 +1444,6 @@ namespace OSD
             this.label27.TabIndex = 22;
             this.label27.Text = "Adjust pin value";
             // 
-            // txtCurr_k
-            // 
-/*            this.txtCurr_k.Location = new System.Drawing.Point(100, 52);
-            this.txtCurr_k.Name = "txtCurr_k";
-            this.txtCurr_k.Size = new System.Drawing.Size(49, 20);
-            this.txtCurr_k.TabIndex = 21;
-            this.txtCurr_k.Text = "1";
-            this.txtCurr_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtCurr_k.TextChanged += new System.EventHandler(this.txtCurr_k_TextChanged);
-            this.txtCurr_k.Leave += new System.EventHandler(this.txtCurr_k_TextChanged);
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(9, 55);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(82, 13);
-            this.label19.TabIndex = 20;
-            this.label19.Text = "Adjust pin value";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(7, 27);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(34, 13);
-            this.label18.TabIndex = 19;
-            this.label18.Text = "Input:";
-            // 
-            // cbCurrentSoure
-            // 
-            this.cbCurrentSoure.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbCurrentSoure.FormattingEnabled = true;
-            this.cbCurrentSoure.Items.AddRange(new object[] {
-            "Mavlink",
-            "Pin Current"});
-            this.cbCurrentSoure.Location = new System.Drawing.Point(51, 22);
-            this.cbCurrentSoure.Name = "cbCurrentSoure";
-            this.cbCurrentSoure.Size = new System.Drawing.Size(98, 21);
-            this.cbCurrentSoure.TabIndex = 18;
-            this.cbCurrentSoure.SelectedIndexChanged += new System.EventHandler(this.cbCurrentSoure_SelectedIndexChanged);
-  */
-            // 
             // label17
             // 
             this.label17.AutoSize = true;
@@ -1510,7 +1452,6 @@ namespace OSD
             this.label17.Size = new System.Drawing.Size(34, 13);
             this.label17.TabIndex = 17;
             this.label17.Text = "Input:";
-  
             // 
             // cbBattA_source
             // 
@@ -1658,7 +1599,6 @@ namespace OSD
             this.txtRSSI_k.TabIndex = 23;
             this.txtRSSI_k.Text = "1";
             this.txtRSSI_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //this.txtRSSI_k.TextChanged += new System.EventHandler(this.txtRSSI_k_TextChanged);
             this.txtRSSI_k.Leave += new System.EventHandler(this.txtRSSI_k_TextChanged);
             // 
             // label20
@@ -1669,7 +1609,6 @@ namespace OSD
             this.label20.Size = new System.Drawing.Size(82, 13);
             this.label20.TabIndex = 22;
             this.label20.Text = "Adjust pin value";
-            
             // 
             // cbxRSSIChannel
             // 
@@ -1693,7 +1632,7 @@ namespace OSD
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(34, 12);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(48, 13);
+            this.label15.Size = new System.Drawing.Size(45, 13);
             this.label15.TabIndex = 12;
             this.label15.Text = "source: ";
             // 
@@ -1705,7 +1644,6 @@ namespace OSD
             this.label8.Size = new System.Drawing.Size(93, 13);
             this.label8.TabIndex = 11;
             this.label8.Text = "Warning Level (%)";
-            
             // 
             // RSSI_WARNnumeric
             // 
@@ -1736,7 +1674,6 @@ namespace OSD
             this.lblRSSIMax.Size = new System.Drawing.Size(57, 13);
             this.lblRSSIMax.TabIndex = 3;
             this.lblRSSIMax.Text = "Max Value";
-            
             // 
             // lblRSSIMin
             // 
@@ -1924,26 +1861,36 @@ namespace OSD
             this.cbxShowUpdateDialog.Text = "Prompt for update at startup";
             this.cbxShowUpdateDialog.UseVisualStyleBackColor = true;
             this.cbxShowUpdateDialog.CheckedChanged += new System.EventHandler(this.cbxShowUpdateDialog_CheckedChanged);
-
-            for(int k=0;k<npanel;k++){
-                this.scr[k].init();
-            }
-	    //
-            // chkSwitchOnce
-            //
-            this.chkSwitchOnce.AutoSize = true;
-            this.chkSwitchOnce.Location = new System.Drawing.Point(116, 48);
-            this.chkSwitchOnce.Name = "chkSwitchOnce";
-            this.chkSwitchOnce.Size = new System.Drawing.Size(52, 17);
-            this.chkSwitchOnce.TabIndex = 11;
-            this.chkSwitchOnce.Text = "Once";
-            this.chkSwitchOnce.UseVisualStyleBackColor = true;
+            // 
+            // BUT_CopyScreen
+            // 
+            this.BUT_CopyScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BUT_CopyScreen.Location = new System.Drawing.Point(142, 508);
+            this.BUT_CopyScreen.Name = "BUT_CopyScreen";
+            this.BUT_CopyScreen.Size = new System.Drawing.Size(100, 23);
+            this.BUT_CopyScreen.TabIndex = 20;
+            this.BUT_CopyScreen.Text = "Copy from Screen";
+            this.BUT_CopyScreen.UseVisualStyleBackColor = true;
+            this.BUT_CopyScreen.Click += new System.EventHandler(this.BUT_CopyScreen_Click);
+            // 
+            // BUT_ClearScreen
+            // 
+            this.BUT_ClearScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BUT_ClearScreen.Location = new System.Drawing.Point(26, 508);
+            this.BUT_ClearScreen.Name = "BUT_ClearScreen";
+            this.BUT_ClearScreen.Size = new System.Drawing.Size(100, 23);
+            this.BUT_ClearScreen.TabIndex = 20;
+            this.BUT_ClearScreen.Text = "Clear Screen";
+            this.BUT_ClearScreen.UseVisualStyleBackColor = true;
+            this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 558);
+            this.Controls.Add(this.BUT_ClearScreen);
+            this.Controls.Add(this.BUT_CopyScreen);
             this.Controls.Add(this.groupBox12);
             this.Controls.Add(this.groupBox11);
             this.Controls.Add(this.grpTLog);
@@ -2003,9 +1950,6 @@ namespace OSD
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_WARNnumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_max)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSSI_numeric_min)).EndInit();
-            for (int k = 0; k < npanel; k++) {
-                this.scr[k].last_init();
-            }
             this.grpTLog.ResumeLayout(false);
             this.grpTLog.PerformLayout();
             this.groupBox11.ResumeLayout(false);
@@ -2176,6 +2120,8 @@ namespace OSD
         public System.Windows.Forms.TextBox txtSAdd1;
         private System.Windows.Forms.Label label41;
         private System.Windows.Forms.CheckBox chkSwitchOnce;
+        private System.Windows.Forms.Button BUT_CopyScreen;
+        private System.Windows.Forms.Button BUT_ClearScreen;
     }
 
 }
