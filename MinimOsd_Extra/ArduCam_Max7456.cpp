@@ -138,7 +138,7 @@ void OSD::setMode(uint8_t themode){
     case 0:
         mode = MAX7456_MODE_MASK_NTCS;
         break;
-    case 1:
+    default:
         mode = MAX7456_MODE_MASK_PAL;
         break;
     }

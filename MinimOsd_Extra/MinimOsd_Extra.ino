@@ -27,6 +27,8 @@ Project receives Donations from:
  Lauri Andler
  Esteban Dozsa
  William Studley
+ Tony Yeung 
+ Marc J MERLIN 
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -108,10 +110,13 @@ OSD osd; //OSD object
 #include "protocols/LTM_core.h"
 #endif
 
-#include "Panels.h"
 #if defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
+BetterStream *mavlink_comm_0_port;
 #endif
+
+#include "Panels.h"
+
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
@@ -567,10 +572,14 @@ void On100ms(){ // периодические события, не связан�
 
         unsigned int d;
 
-	switch(ch) {
+#ifdef DEBUG 
+Serial.printf_P(PSTR("\n RSSI ch=%d telem_rssi=%d\n"), ch, telem_rssi ); Serial.wait();
+#endif
+
+        switch(ch) {
         case 1:
-    	    d = analogRead(RssiPin);
-    	    goto case_2;
+            d = analogRead(RssiPin);
+            goto case_2;
 
         case 2:
             d = pulseIn(RssiPin,HIGH, 20000);

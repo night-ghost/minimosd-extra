@@ -6,6 +6,8 @@ all protocol files from KV_Team_OSD project
 
 here is a lots of garbage but I don't want to waste the time for cleaning
 
+news in https://github.com/ShikOfTheRa/scarab-osd/tree/master/MW_OSD
+
 */
 
 

@@ -11,14 +11,15 @@ void request_mavlink_rates()
 {
     const uint8_t  maxStreams = 6;
     
-    const uint8_t MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
+    const uint8_t MAVStreams[maxStreams] = {
+        MAV_DATA_STREAM_RAW_SENSORS,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
         MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
         MAV_DATA_STREAM_EXTRA2};
 
-    const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
+    const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x10, 0x02};
     for (int i=0; i < maxStreams; i++) {
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
             apm_mav_system, apm_mav_component,
@@ -322,7 +323,7 @@ typedef enum FENCE_BREACH{
 
 */
 		case MAVLINK_MSG_ID_FENCE_STATUS:
-		mav_fence_status = mavlink_msg_fence_status_get_breach_type(&msg.m);
+		    mav_fence_status = mavlink_msg_fence_status_get_breach_type(&msg.m);
 		break;
 
 		case MAVLINK_MSG_ID_RADIO: {// 3dr telemetry status
@@ -340,6 +341,10 @@ typedef struct __mavlink_radio_t
 		    byte rssi    = mavlink_msg_radio_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
+
+#ifdef DEBUG
+Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n"), rssi, remrssi);
+#endif
 
 		} break;
 
@@ -359,6 +364,9 @@ typedef struct __mavlink_radio_status_t
 		    byte rssi    = mavlink_msg_radio_status_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
+#ifdef DEBUG
+Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
+#endif
 
 		} break;
 		
@@ -366,7 +374,6 @@ typedef struct __mavlink_radio_status_t
                 //Do nothing
                 break;
             }
-        //    if(cnt>8)	// no more than 8 in time
     	    if(timeToScreen())  // если надо перерисовать экран
                 return true;
         }

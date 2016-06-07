@@ -25,7 +25,7 @@ static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
     return osd_groundspeed * get_converts();
 }
 
-static void NOINLINE printTime(int t, byte blink){
+static void NOINLINE printTime(uint16_t t, byte blink){
     osd.printf_P(PSTR("%3i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
 }
 
@@ -1141,10 +1141,8 @@ struct Formats {
 static NOINLINE void print_list(const Formats *f){
     PGM_P fmt;
     byte t;
-    char m;
     float *v;
     float k;
-    const byte *c;
     char h;
     
     float val=0;
@@ -1443,7 +1441,7 @@ static int getTargetBearing(){
 // Output : 2 symbols that are combined as one arrow, shows direction to next waypoint
 // Size   : 1 x 2  (rows x chars)
 // Staus  : not ready
-
+/*
 static void panWPDir(point p){
     if(wp_number > 0 ){
    
@@ -1452,7 +1450,7 @@ static void panWPDir(point p){
 	showArrow(getTargetBearing(),0);
     }
 }
-
+*/
 /* **************************************************************** */
 // Panel  : panWPDis
 // Needs  : X, Y locations
@@ -2400,7 +2398,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(Hdop),		panHdop, 	0x1f  },
     { ID_of(State),		panState, 	0  },
     { ID_of(Scale),		panScale, 	0  },
-    { ID_of(EScale),		panScale, 	0  },
+    { ID_of(EScale),		panEScale, 	0  },
     { ID_of(CValue),		panCValue, 	0  },
 #if defined(USE_SENSORS)
     { ID_of(sensor1) | 0x80,	panSensor1, 	0 },

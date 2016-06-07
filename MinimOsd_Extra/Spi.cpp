@@ -26,13 +26,12 @@ SPI::SPI()
 //------------------ mode ---------------------------------------------------
 
 void SPI::mode(byte config){
-  volatile byte tmp;
 
   // enable SPI master with configuration byte specified
   SPCR = 0;
   SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR) /* | (1<<SPR0) */ ;
   SPSR |= 1;
-  tmp = SPSR;
+  volatile byte tmp = SPSR;
   tmp = SPDR;
 }
 
