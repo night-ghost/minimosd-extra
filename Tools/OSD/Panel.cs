@@ -5,7 +5,8 @@ namespace OSD {
 
     public enum UI_Mode {
         UI_Checkbox = 0,
-        UI_Combo = 1
+        UI_Combo,
+        UI_Combo_Cb
     };
 
     // проще и лучше чем эти туплы :)

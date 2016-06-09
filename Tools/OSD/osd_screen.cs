@@ -285,8 +285,8 @@ namespace OSD
             "11",
             "12",
             });
-            this.cbNumber.Location = new System.Drawing.Point(10, 98);
-            this.cbNumber.Name = "cbNumber";
+            this.cbNumber.Location = new System.Drawing.Point(10, 113);
+            this.cbNumber.Name = "cbNumber" ;
             this.cbNumber.Size = new System.Drawing.Size(137, 17);
             this.cbNumber.TabIndex = 18;
             this.cbNumber.SelectedIndexChanged += new System.EventHandler(this.cbNumber_SelectedIndexChanged);
@@ -295,8 +295,8 @@ namespace OSD
             // labNumber
             // 
             this.labNumber.AutoSize = true;
-            this.labNumber.Location = new System.Drawing.Point(10, 81);
-            this.labNumber.Name = "labeln"+num;
+            this.labNumber.Location = new System.Drawing.Point(10, 98);
+            this.labNumber.Name = "labeln";
             this.labNumber.Size = new System.Drawing.Size(14, 11);
             this.labNumber.TabIndex = 2;
             this.labNumber.Text = "";
@@ -435,11 +435,14 @@ namespace OSD
 		}
 		
         private void adjust(Panel thing){
+            int n;
+
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = thing.sign != -1;
 
-            if (thing.ui_mode == UI_Mode.UI_Combo) {
-                int n = osd.getAlt(thing)/2;
+            switch(thing.ui_mode){ 
+            case UI_Mode.UI_Combo:
+                n = osd.getAlt(thing)/2;
                 cbNumber.SelectedIndex =n;
                 cbNumber.Visible = true;
                 chkAlt.Visible = false;
@@ -449,8 +452,24 @@ namespace OSD
                 cbNumber.Text = n.ToString();
                 labNumber.Text = thing.alt_text;
                 labNumber.Visible = true;
+                break;
+            case UI_Mode.UI_Combo_Cb:
+                n = osd.getAlt(thing)/2;
+                cbNumber.SelectedIndex =n;
+                cbNumber.Visible = true;
+                chkAlt.Visible = true;
+                chkAlt2.Visible = false;
+                chkAlt3.Visible = false;
+                chkAlt4.Visible = false;
+                cbNumber.Text = n.ToString();
+                
+                labNumber.Text = thing.alt_text;
+                chkAlt.Text = thing.alt2_text;
+                labNumber.Visible = true;
+                break;
 
-            } else {
+            case UI_Mode.UI_Checkbox:
+            default:
                 labNumber.Visible = false;
                 cbNumber.Visible = false;
 
@@ -469,6 +488,7 @@ namespace OSD
                 chkAlt4.Text = thing.alt4_text;
                 chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
                 chkAlt4.Checked = thing.Alt4 == 1;
+                break;
             }
         }
 

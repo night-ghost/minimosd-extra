@@ -246,6 +246,9 @@ v849
 v850
 * new palel "Channel value" that only shows raw value for selected channel
 
+v851
+* panel "Channel scale" now has an ability to use extended PWM range (thanks to Tonyyng)
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -519,6 +522,9 @@ v849
 
 v850
 * новая панель "Channel value" которая отображает значение для выбранного канала
+
+v851
+* панель "Channel scale" обзавелась возможностью работать в расширенном диапазоне PWM (thanks to Tonyyng)
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

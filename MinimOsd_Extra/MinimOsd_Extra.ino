@@ -4,7 +4,7 @@ An Open Source Arduino based OSD and Camera Control project.
 
 Program  : Minim-OSD 
 
-Version  : V8.39, 20 may 2016
+Version  : V8.51, 09 june 2016
 
 based on: minimOSD-extra by Sandro Benigno
 Coauthor(s):

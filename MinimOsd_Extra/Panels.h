@@ -1866,8 +1866,8 @@ static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     // 1800
     int v=chan_raw[ch];
     byte n;
-    const int low =(fExt?900:1000);
-    const int high=(fExt?2100:2000);
+    const int low =(fExt?800:1000);
+    const int high=(fExt?2200:2000);
     
     
     if(v<low) n=0;
@@ -1884,7 +1884,7 @@ static void panState(point p) {
 
     if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
 
-    byte n = get_chan_pos(ch);
+    byte n = get_chan_pos(ch, is_alt(p));
 
     osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
 }
@@ -1904,20 +1904,6 @@ static void panScale(point p) {
     }
 }
 
-static void panEScale(point p) {
-    byte ch = get_alt_num(p) + 4;
-
-    if(has_sign(p)) osd_printi_1(PSTR("%i"),ch+1);
-
-    byte n = get_chan_pos(ch,1);
-    byte c;
-
-    for(byte i=0;i<5;i++){
-	c=0x80;
-	if(i==n) c=0x81;
-	osd.write_S(c);
-    }
-}
 
 static void panCValue(point p) {
     byte ch = get_alt_num(p) + 4;
@@ -2398,7 +2384,6 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(Hdop),		panHdop, 	0x1f  },
     { ID_of(State),		panState, 	0  },
     { ID_of(Scale),		panScale, 	0  },
-    { ID_of(EScale),		panEScale, 	0  },
     { ID_of(CValue),		panCValue, 	0  },
 #if defined(USE_SENSORS)
     { ID_of(sensor1) | 0x80,	panSensor1, 	0 },
