@@ -1235,12 +1235,16 @@ namespace OSD {
                             if (pi.sign >= 0)
                                 pi.sign = (p.x & 0x80) == 0 ? 1 : 0; // inverted
 
-                            if (pi.ui_mode == UI_Mode.UI_Combo) {
-                                // pi.Altf = (p.y & 0x40) == 0 ? 0 : 1; // TODO -TY - is this right?
+                            switch(pi.ui_mode) {
+                            case UI_Mode.UI_Combo:
+                            case UI_Mode.UI_Combo_Cb:
+                                if (pi.Altf >= 0)
+                                    pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
                                 pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;                            
                                 pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;                            
                                 pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
-                            } else {
+                                break;
+                            case UI_Mode.UI_Checkbox:
                                 if(pi.Altf >=0)
                                     pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
                                 if (pi.Alt2 >= 0)
@@ -1249,6 +1253,7 @@ namespace OSD {
                                     pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
                                 if (pi.Alt3 >= 0)
                                     pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                                break;
                             }
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
