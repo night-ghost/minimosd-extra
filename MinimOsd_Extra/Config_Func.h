@@ -62,6 +62,19 @@ static point readPanel(byte n) {
     return p;
 }
 
+static void print_eeprom_string(byte n){
+    for(byte i=0;i<128;i++){
+	c=eeprom_read_byte( (byte *)( EEPROM_offs(strings) + i) );
+	if(c==0){ // end of string
+	    if(n==0) return; // we now printing? if yes then string is over
+	    n--; // strings to skip
+	}
+	if(n==0) // owr string!
+	    OSD::write_S(c);
+    }
+
+}
+
 /*
 static NOINLINE uint8_t checkPAL(uint8_t line){
     if(line >= osd.getCenter() && osd.getMode() == 0){
