@@ -438,7 +438,7 @@ namespace OSD
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = thing.sign != -1;
 
-            if (thing.Altf == -2) {
+            if (thing.ui_mode == UI_Mode.UI_Combo) {
                 int n = osd.getAlt(thing)/2;
                 cbNumber.SelectedIndex =n;
                 cbNumber.Visible = true;

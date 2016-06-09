@@ -2,10 +2,15 @@ using System;
 using System.Windows.Forms;
 
 namespace OSD {
-	
-	// проще и лучше чем эти туплы :)
-	
-	[Serializable]// "Pitch", pan.panPitch, 22, 10, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR
+
+    public enum UI_Mode {
+        UI_Checkbox = 0,
+        UI_Combo = 1
+    };
+
+    // проще и лучше чем эти туплы :)
+
+    [Serializable]// "Pitch", pan.panPitch, 22, 10, panPitch_en_ADDR, panPitch_x_ADDR, panPitch_y_ADDR
 	public class Panel { 
 		public string name;
 		public int x, y;
@@ -20,12 +25,12 @@ namespace OSD {
         public string alt3_text;
         public int Alt4;
         public string alt4_text;
+        public UI_Mode ui_mode;
 
 
+        //public TreeNode node;
 
-		//public TreeNode node;
-
-        public Panel(String aname, Func<int, int, int, int, int> ashow, int ax, int ay, int apos, int asign = -1, int fAlt = -1, string text = "", int fAlt2 = -1, string text2 = "", int fAlt3 = -1, string text3 = "", int fAlt4 = -1, string text4 = "") {
+        public Panel(String aname, Func<int, int, int, int, int> ashow, int ax, int ay, int apos, int asign = -1, UI_Mode uim = UI_Mode.UI_Checkbox, int fAlt = -1, string text = "", int fAlt2 = -1, string text2 = "", int fAlt3 = -1, string text3 = "", int fAlt4 = -1, string text4 = "") {
 			name = aname;
 			show = ashow;
 			x = ax;
@@ -40,6 +45,7 @@ namespace OSD {
             alt3_text = text3;
             Alt4 = fAlt4;
             alt4_text = text4;
+            ui_mode = uim;
         }
 
         public void copyFrom(Panel other) {
@@ -57,6 +63,7 @@ namespace OSD {
             alt3_text = other.alt3_text;
             Alt4 = other.Alt4;
             alt4_text = other.alt4_text;
+            ui_mode = other.ui_mode;
         }
 	}
 }
