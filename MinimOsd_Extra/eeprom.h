@@ -178,10 +178,14 @@ struct Settings {
 
 union _Settings {
     Settings sets;
-    byte _pad[256-4]; // место под расширение Settings, за вычетом флагов
+    byte _pad[128-4]; // место под расширение Settings, за вычетом флагов 
 };
 
-struct SensorInfo {
+struct Strings {
+    byte strings[128];
+};
+
+struct SensorInfo { // 24 bytes
     float K;				// коэффициент
     float A; 				// additional
     char format[SENSOR_FORMAT_LENGTH+1]; // формат печати
@@ -197,6 +201,8 @@ struct Eeprom {
     _Flags flags; // 4 байта флагов
     
     _Settings sets; // и почти четверть EEPROM под остальные настройки, считываемые в RAM при инициализации
+    Strings strings; // strings from CT in one BLOB
+
 //768
     SensorInfo sensors[4]; // не считываемые настройки - читаются по необходимости
 };
