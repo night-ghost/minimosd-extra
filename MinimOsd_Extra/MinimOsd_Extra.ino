@@ -341,9 +341,6 @@ void loop()
 
     getData(); // получить данные с контроллера
 
-    if(lflags.got_data)
-	pan_toggle(); // проверить переключение экранов
-
 //    if(update_stat) { // если надо перерисовать экран
 //	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
@@ -353,31 +350,32 @@ void loop()
 //    } 
 
 
-      if(lflags.got_data){ // были свежие данные - обработать
+    if(lflags.got_data){ // были свежие данные - обработать
 
-	    vsync_wait=1; // будем ждать прерывания
-	    lflags.need_redraw=1;
-            lflags.got_data=0; // данные обработаны
-//Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
+	pan_toggle(); // проверить переключение экранов
 
+	vsync_wait=1; // будем ждать прерывания
+	lflags.need_redraw=1;
 
-            setHomeVars();   // calculate and set Distance from home and Direction to home
+        lflags.got_data=0; // данные обработаны
 
-            setFdataVars();  // накопление статистики и рекордов
-	    
-	    if(lflags.need_redraw && !vsync_wait) { // сразу после прерывания
-                lflags.need_redraw=0; // экран перерисован
-                writePanels();   // writing enabled panels (check OSD_Panels Tab)
+        setHomeVars();   // calculate and set Distance from home and Direction to home
+
+        setFdataVars();  // накопление статистики и рекордов
+    }
+
+    if(lflags.need_redraw && !vsync_wait) { // сразу после прерывания
+        lflags.need_redraw=0; // экран перерисован
+        writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
 //Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 //	LED_BLINK;
 
-	        update_stat = 1; // пришли данные, надо перерисовать экран
-	    }
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
-//        }
+	update_stat = 1; // пришли данные, надо перерисовать экран
     }
+
 
 
 
