@@ -138,7 +138,7 @@ namespace OSD
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 41);
+            this.label2.Location = new System.Drawing.Point(65, 15);
             this.label2.Name = "labela"+num;
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 3;
@@ -155,27 +155,27 @@ namespace OSD
             // 
             // NUM_Y
             // 
-            this.NUM_Y.Location = new System.Drawing.Point(56, 39);
+            this.NUM_Y.Location = new System.Drawing.Point(86, 13);
             this.NUM_Y.Maximum = new decimal(new int[] {
             	15,
             	0,
             	0,
             	0});
             this.NUM_Y.Name = "NUM_Y"+num;
-            this.NUM_Y.Size = new System.Drawing.Size(91, 20);
+            this.NUM_Y.Size = new System.Drawing.Size(35, 20);
             this.NUM_Y.TabIndex = 1;
             this.NUM_Y.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
             // 
             // NUM_X
             // 
-            this.NUM_X.Location = new System.Drawing.Point(56, 13);
+            this.NUM_X.Location = new System.Drawing.Point(26, 13);
             this.NUM_X.Maximum = new decimal(new int[] {
             	29,
             	0,
             	0,
             	0});
             this.NUM_X.Name = "NUM_X"+num;
-            this.NUM_X.Size = new System.Drawing.Size(91, 20);
+            this.NUM_X.Size = new System.Drawing.Size(35, 20);
             this.NUM_X.TabIndex = 0;
             this.NUM_X.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);			
 			
@@ -209,7 +209,7 @@ namespace OSD
 			//
 			this.chkSign.AutoSize = true;
             //this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkSign.Location = new System.Drawing.Point(10, 64);
+            this.chkSign.Location = new System.Drawing.Point(10, 38);
             this.chkSign.Name = "chkSign";
             this.chkSign.Size = new System.Drawing.Size(137, 17);
             this.chkSign.TabIndex = 4;
@@ -222,7 +222,7 @@ namespace OSD
             //
             this.chkAlt.AutoSize = true;
             //this.chkAlt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt.Location = new System.Drawing.Point(10, 81);
+            this.chkAlt.Location = new System.Drawing.Point(10, 55);
             this.chkAlt.Name = "chkAlt";
             this.chkAlt.Size = new System.Drawing.Size(137, 17);
             this.chkAlt.TabIndex = 4;
@@ -236,7 +236,7 @@ namespace OSD
             //
             this.chkAlt2.AutoSize = true;
             //this.chkAlt2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt2.Location = new System.Drawing.Point(10, 98);
+            this.chkAlt2.Location = new System.Drawing.Point(10, 72);
             this.chkAlt2.Name = "chkAlt2";
             this.chkAlt2.Size = new System.Drawing.Size(137, 17);
             this.chkAlt2.TabIndex = 4;
@@ -250,7 +250,7 @@ namespace OSD
             //
             this.chkAlt3.AutoSize = true;
             //this.chkAlt3.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt3.Location = new System.Drawing.Point(10, 113);
+            this.chkAlt3.Location = new System.Drawing.Point(10, 89);
             this.chkAlt3.Name = "chkAlt3";
             this.chkAlt3.Size = new System.Drawing.Size(137, 17);
             this.chkAlt3.TabIndex = 4;
@@ -264,7 +264,7 @@ namespace OSD
             //
             this.chkAlt4.AutoSize = true;
             //this.chkAlt4.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt4.Location = new System.Drawing.Point(10, 128);
+            this.chkAlt4.Location = new System.Drawing.Point(10, 106);
             this.chkAlt4.Name = "chkAlt4";
             this.chkAlt4.Size = new System.Drawing.Size(137, 17);
             this.chkAlt4.TabIndex = 4;
@@ -285,7 +285,7 @@ namespace OSD
             "11",
             "12",
             });
-            this.cbNumber.Location = new System.Drawing.Point(10, 113);
+            this.cbNumber.Location = new System.Drawing.Point(10, 89);
             this.cbNumber.Name = "cbNumber" ;
             this.cbNumber.Size = new System.Drawing.Size(137, 17);
             this.cbNumber.TabIndex = 18;
@@ -295,7 +295,7 @@ namespace OSD
             // labNumber
             // 
             this.labNumber.AutoSize = true;
-            this.labNumber.Location = new System.Drawing.Point(10, 98);
+            this.labNumber.Location = new System.Drawing.Point(10, 72);
             this.labNumber.Name = "labeln";
             this.labNumber.Size = new System.Drawing.Size(14, 11);
             this.labNumber.TabIndex = 2;
