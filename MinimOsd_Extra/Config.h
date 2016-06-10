@@ -21,6 +21,8 @@
 //#define USE_LTM 1
 #define AUTOBAUD 1
 #define USE_SENSORS 1
+//#define MAVLINK_CONFIG 1
+
 
 #define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
 

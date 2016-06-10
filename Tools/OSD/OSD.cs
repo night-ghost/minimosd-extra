@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r851 DV";
+        public const string VERSION = "r852 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -320,7 +320,7 @@ namespace OSD {
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
                 pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
                 pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
-                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 11, panTemp_XY);
+                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY);
@@ -331,8 +331,8 @@ namespace OSD {
                 pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
                 pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
-                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
-                pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1,"Extended range (800-2200)");
+                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
+                pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
                 pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
 
 

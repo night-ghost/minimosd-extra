@@ -29,8 +29,9 @@ void SPI::mode(byte config){
 
   // enable SPI master with configuration byte specified
   SPCR = 0;
+  //      no interrupt      SPI enable master
   SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR) /* | (1<<SPR0) */ ;
-  SPSR |= 1;
+  SPSR |= 1;			// SPI2X: Double SPI Speed Bit
   volatile byte tmp = SPSR;
   tmp = SPDR;
 }

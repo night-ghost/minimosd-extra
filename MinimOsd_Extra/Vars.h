@@ -180,6 +180,11 @@ static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
+#ifdef MAVLINK_CONFIG
+static byte         mav_gcs_id=0;
+static uint16_t     last_seq_n=0;
+#endif
+
 byte count05s=0;
 byte count02s=0;
 

@@ -249,6 +249,12 @@ v850
 v851
 * panel "Channel scale" now has an ability to use extended PWM range (thanks to Tonyyng)
 
+v582
+* panel "Channel status" got extended PWM range too
+* screen update moved to ISR so OSD now is completely snow-free
+* first try to support EEPROM streengs
+* first try to make config via MAVlink
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -525,6 +531,14 @@ v850
 
 v851
 * панель "Channel scale" обзавелась возможностью работать в расширенном диапазоне PWM (thanks to Tonyyng)
+
+
+v582
+* панель "Channel status" тоже может работать с расширенным диапазоном PWM
+* обновление экрана перенесено в процедуру обработки прерывания и теперь полностью избавлено от "снега"
+* первая попытка поддержки строк в EEPROM
+* первая попытка поддержки конфигурации через MAVlink
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

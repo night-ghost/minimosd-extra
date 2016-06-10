@@ -64,7 +64,7 @@ static point readPanel(byte n) {
 
 static void print_eeprom_string(byte n){
     for(byte i=0;i<128;i++){
-	c=eeprom_read_byte( (byte *)( EEPROM_offs(strings) + i) );
+	byte c=eeprom_read_byte( (byte *)( EEPROM_offs(strings) + i) );
 	if(c==0){ // end of string
 	    if(n==0) return; // we now printing? if yes then string is over
 	    n--; // strings to skip
@@ -74,6 +74,29 @@ static void print_eeprom_string(byte n){
     }
 
 }
+
+#ifdef MAVLINK_CONFIG
+
+struct Mav_conf { // needs to fit in 253 bytes
+    byte magick[4];
+    byte cmd;		// command
+    byte id;		// number of 128-bytes block
+    byte data[128];
+    byte crc; 		// may be
+};
+
+static void parse_osd_packet(byte *p){
+    struct Mav_conf *c = (struct Mav_conf *)p;
+    if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
+	switch(c->cmd){
+	case 'w':
+	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  128 );
+	    break;
+	}
+    }
+
+}
+#endif
 
 /*
 static NOINLINE uint8_t checkPAL(uint8_t line){

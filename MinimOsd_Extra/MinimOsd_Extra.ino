@@ -128,7 +128,14 @@ BetterStream *mavlink_comm_0_port;
 
 // обработка прерывания по кадровому синхроимпульсу
 void isr_VSYNC(){
-    vsync_wait=0;	// единственное что нам надо - отметить его наличие
+//    vsync_wait=0;	// единственное что нам надо - отметить его наличие
+
+    if(lflags.update_stat) { // there is data for screen
+        sei(); 			// enable other interrupts 
+        OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
+    
+	lflags.update_stat = 0;
+    }
 }
 
 // PWM Measurement
@@ -337,15 +344,16 @@ void loop()
     if(lflags.got_data)
 	pan_toggle(); // проверить переключение экранов
 
-    if(lflags.update_stat) { // если надо перерисовать экран
-	if(!vsync_wait){ // то делаем это только во время обратного хода
+//    if(lflags.update_stat) { // если надо перерисовать экран
+//	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
-	    OSD::update();
-	    lflags.update_stat = 0;
-        }
-    } /*else*/ {
+//          OSD::update(); in interrupt
+//          lflags.update_stat = 0;
+//        }
+//    } 
+    /*else*/ {
 
-        if(lflags.got_data){ // были свежие данные - обработать
+//        if(lflags.got_data){ // были свежие данные - обработать
             lflags.got_data=0;
 
 //Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
@@ -362,9 +370,9 @@ void loop()
 //	LED_BLINK;
 
             lflags.update_stat = 1; // пришли данные
-            vsync_wait = 1;         // надо перерисовать экран
+//            vsync_wait = 1;         // надо перерисовать экран
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
-        }
+//        }
     }
 
 

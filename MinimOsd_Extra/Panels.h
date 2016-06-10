@@ -1894,7 +1894,7 @@ static void panScale(point p) {
 
     if(has_sign(p)) osd_printi_1(PSTR("%i"),ch+1);
 
-    byte n = get_chan_pos(ch);
+    byte n = get_chan_pos(ch, is_alt(p));
     byte c;
 
     for(byte i=0;i<5;i++){
