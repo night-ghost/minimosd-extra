@@ -354,20 +354,23 @@ void loop()
 
 	pan_toggle(); // проверить переключение экранов
 
-	vsync_wait=1; // будем ждать прерывания
-	lflags.need_redraw=1;
+	if(!lflags.need_redraw) {
+	    lflags.need_redraw=1;
+	    vsync_wait=1; // будем ждать прерывания
+	}
 
         lflags.got_data=0; // данные обработаны
+    }
 
+    if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания
+        lflags.need_redraw=0; // экран перерисован
         setHomeVars();   // calculate and set Distance from home and Direction to home
 
         setFdataVars();  // накопление статистики и рекордов
-    }
 
-    if(lflags.need_redraw && !vsync_wait) { // сразу после прерывания
-        lflags.need_redraw=0; // экран перерисован
         writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
+//	vsync_wait=1;
 //Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 //	LED_BLINK;

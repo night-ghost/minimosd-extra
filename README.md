@@ -256,6 +256,7 @@ v582
 * first try to make config via MAVlink
 * 852a - fixed bug with flickering panels
 * 852b - fixed framerate bug
+* 852c - again fixed framerate bug
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 

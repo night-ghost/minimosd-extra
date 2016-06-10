@@ -399,7 +399,7 @@ Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi
                 //Do nothing
                 break;
             }
-    	    if(timeToScreen())  // если надо перерисовать экран 
+    	//    if(timeToScreen())  // если надо перерисовать экран 
                 return true; // задержка на прием одного 64-байт пакета 8.8мс а кадрового гасящего - 1.6мс
         }
         delay_byte();
