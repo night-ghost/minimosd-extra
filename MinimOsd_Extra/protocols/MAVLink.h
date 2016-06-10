@@ -74,18 +74,34 @@ bool read_mavlink(){
 
             lflags.mavlink_active = 1;
 
+#ifdef MAVLINK_CONFIG
+	    if(msg.m.msgid == MAVLINK_MSG_ID_ENCAPSULATED_DATA && 
+	       msg.m.sysid == mav_gcs_id &&
+	       msg.m.compid == MAV_COMP_ID_CAMERA ) { // stole this ID
+		uint16_t n=mavlink_msg_encapsulated_data_get_seqnr(&msg.m);
+		if(n!=last_seq_n) {
+		    last_seq_n = n;
+        	    parse_osd_packet(((byte *)&msg.m) + sizeof(uint16_t) ); // direct access to message buffer - no memory for copy
+        	}
+
+	    // mavlink_msg_encapsulated_data_get_data
+	       
+	    }
+#endif
+
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
 #ifdef DEBUG
     packets_skip+=1;
     Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
-		    break; // skip packet
+		    break; // skip packet and exit 
 		}
 
 #ifdef DEBUG
 	packets_got+=1;
 #endif
+
 
 	    cnt++;
 	    
@@ -93,7 +109,15 @@ bool read_mavlink(){
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
-                if(apm_mav_type == 6 || apm_mav_type == 5 || apm_mav_type == 26) { // MAV_TYPE_GCS || MAV_TYPE_ANTENNA_TRACKER || MAV_TYPE_GIMBAL
+                if(apm_mav_type == 26) { // MAV_TYPE_GCS
+#ifdef MAVLINK_CONFIG
+            	    mav_gcs_id = msg.m.sysid; // store GCS ID
+            	    last_seq_n = 0; // reset sequence
+#endif
+            	    goto skip_packet;
+                }
+                if(apm_mav_type == 5 || apm_mav_type == 26 ) { //  MAV_TYPE_ANTENNA_TRACKER || MAV_TYPE_GIMBAL
+skip_packet:
 #ifdef DEBUG
     packets_skip+=1;
     Serial.printf_P(PSTR("\nHEARTBEAT skip type=%d\n"), apm_mav_type);
@@ -101,6 +125,7 @@ bool read_mavlink(){
 		    break;
 
                 }
+
 
                 osd_autopilot = mavlink_msg_heartbeat_get_autopilot(&msg.m);
                 //Mode (arducoper armed/disarmed)
@@ -374,8 +399,8 @@ Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi
                 //Do nothing
                 break;
             }
-    	    if(timeToScreen())  // если надо перерисовать экран
-                return true;
+    	    if(timeToScreen())  // если надо перерисовать экран 
+                return true; // задержка на прием одного 64-байт пакета 8.8мс а кадрового гасящего - 1.6мс
         }
         delay_byte();
 

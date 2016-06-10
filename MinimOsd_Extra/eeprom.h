@@ -185,6 +185,10 @@ struct Strings {
     byte strings[128];
 };
 
+#define PANSTATE_STR_ID 0
+#define PANSTATE_STR_NO 5
+
+
 struct SensorInfo { // 24 bytes
     float K;				// коэффициент
     float A; 				// additional

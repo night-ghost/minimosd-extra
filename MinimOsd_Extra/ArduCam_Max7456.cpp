@@ -270,6 +270,11 @@ void OSD::update() {
 #define SET_HIGH()  *out |= bit
 */
 
+/*
+    wee need to transfer 480 bytes, SPI speed set to 8 MHz so one byte goes in 1uS and all transfer will ends up in ~500uS
+    
+*/
+
     PORTD &= ~_BV(PD6); //  digitalWrite(MAX7456_SELECT,LOW); 
 
     MAX_write(MAX7456_DMAH_reg, 0);

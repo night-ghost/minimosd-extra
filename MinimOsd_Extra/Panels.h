@@ -1848,6 +1848,7 @@ static void panHdop(point p) {
     osd_printi_1(PSTR("%3i"),eph);
 }
 
+/*
 static const char PROGMEM sts_0[]="Off";
 static const char PROGMEM sts_1[]="Low";
 static const char PROGMEM sts_2[]="Mid";
@@ -1857,6 +1858,7 @@ static const char PROGMEM sts_4[]="On!";
 static const char PROGMEM  * const sts_arr[]={
     sts_0, sts_1, sts_2, sts_3, sts_4
 };
+*/
 
 static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     // 1000 - 2000 
@@ -1886,7 +1888,8 @@ static void panState(point p) {
 
     byte n = get_chan_pos(ch, is_alt(p));
 
-    osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
+//    osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
+    print_eeprom_string(PANSTATE_STR_ID + n);
 }
 
 static void panScale(point p) {
@@ -1894,7 +1897,7 @@ static void panScale(point p) {
 
     if(has_sign(p)) osd_printi_1(PSTR("%i"),ch+1);
 
-    byte n = get_chan_pos(ch);
+    byte n = get_chan_pos(ch, is_alt(p));
     byte c;
 
     for(byte i=0;i<5;i++){

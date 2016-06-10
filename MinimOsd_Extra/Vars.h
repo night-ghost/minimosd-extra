@@ -180,6 +180,11 @@ static uint8_t      apm_mav_component;
 static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
+#ifdef MAVLINK_CONFIG
+static byte         mav_gcs_id=0;
+static uint16_t     last_seq_n=0;
+#endif
+
 byte count05s=0;
 byte count02s=0;
 
@@ -202,9 +207,12 @@ byte mav_msg_len;
 byte mav_msg_severity;
 byte mav_msg_shift;
 
+volatile byte update_stat=0;
+
 struct loc_flags {
-    bool update_stat:1; 		// есть данные для показа
+//    bool update_stat:1; 		// есть данные для показа
     bool got_data:1;		// флаг получения пакета
+    bool need_redraw:1;         // надо перерисовать экран
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mwii_active:1;    // got valid MWII packet - flag forever
