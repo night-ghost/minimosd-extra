@@ -254,6 +254,7 @@ v582
 * screen update moved to ISR so OSD now is completely snow-free
 * first try to support EEPROM streengs
 * first try to make config via MAVlink
+* 852a - fixed bug with flickering panels
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -538,7 +539,7 @@ v582
 * обновление экрана перенесено в процедуру обработки прерывания и теперь полностью избавлено от "снега"
 * первая попытка поддержки строк в EEPROM
 * первая попытка поддержки конфигурации через MAVlink
-
+* 852a - fixed bug with flickering panels
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

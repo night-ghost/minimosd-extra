@@ -128,13 +128,13 @@ BetterStream *mavlink_comm_0_port;
 
 // обработка прерывания по кадровому синхроимпульсу
 void isr_VSYNC(){
-//    vsync_wait=0;	// единственное что нам надо - отметить его наличие
+    vsync_wait=0;	// единственное что нам надо - отметить его наличие
 
-    if(lflags.update_stat) { // there is data for screen
+    if(update_stat) { // there is data for screen
         sei(); 			// enable other interrupts 
         OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
     
-	lflags.update_stat = 0;
+	update_stat = 0;
     }
 }
 
@@ -344,33 +344,37 @@ void loop()
     if(lflags.got_data)
 	pan_toggle(); // проверить переключение экранов
 
-//    if(lflags.update_stat) { // если надо перерисовать экран
+//    if(update_stat) { // если надо перерисовать экран
 //	if(!vsync_wait){ // то делаем это только во время обратного хода
 //LED_OFF;
 //          OSD::update(); in interrupt
 //          lflags.update_stat = 0;
 //        }
 //    } 
-    /*else*/ {
 
-//        if(lflags.got_data){ // были свежие данные - обработать
-            lflags.got_data=0;
 
+      if(lflags.got_data){ // были свежие данные - обработать
+
+	    vsync_wait=1; // будем ждать прерывания
+	    lflags.need_redraw=1;
+            lflags.got_data=0; // данные обработаны
 //Serial.printf_P(PSTR("parseNewData pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 
             setHomeVars();   // calculate and set Distance from home and Direction to home
 
             setFdataVars();  // накопление статистики и рекордов
-
-            writePanels();   // writing enabled panels (check OSD_Panels Tab)
+	    
+	    if(lflags.need_redraw && !vsync_wait) { // сразу после прерывания
+                lflags.need_redraw=0; // экран перерисован
+                writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
 //Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 //	LED_BLINK;
 
-            lflags.update_stat = 1; // пришли данные
-//            vsync_wait = 1;         // надо перерисовать экран
+	        update_stat = 1; // пришли данные, надо перерисовать экран
+	    }
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
 //        }
     }

@@ -572,5 +572,5 @@ static void getData(){
 }
 
 bool NOINLINE timeToScreen(){
-    return lflags.update_stat && !vsync_wait;
+    return lflags.need_redraw && !vsync_wait;
 }

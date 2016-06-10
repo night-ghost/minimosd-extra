@@ -207,9 +207,12 @@ byte mav_msg_len;
 byte mav_msg_severity;
 byte mav_msg_shift;
 
+volatile byte update_stat=0;
+
 struct loc_flags {
-    bool update_stat:1; 		// есть данные для показа
+//    bool update_stat:1; 		// есть данные для показа
     bool got_data:1;		// флаг получения пакета
+    bool need_redraw:1;         // надо перерисовать экран
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mwii_active:1;    // got valid MWII packet - flag forever
