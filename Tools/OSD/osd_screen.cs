@@ -40,6 +40,8 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt4;
         public System.Windows.Forms.ComboBox cbNumber;
         public System.Windows.Forms.Label labNumber;
+        public System.Windows.Forms.Label labStrings;
+        public System.Windows.Forms.TextBox txtStrings;
 		
 		private int number;
 		private OSD osd;
@@ -74,6 +76,8 @@ namespace OSD
             this.chkAlt4 = new System.Windows.Forms.CheckBox();
             this.cbNumber = new System.Windows.Forms.ComboBox();
             this.labNumber = new System.Windows.Forms.Label();
+            this.labStrings = new System.Windows.Forms.Label();
+            this.txtStrings = new System.Windows.Forms.TextBox();
 			
 			this.tabPage.SuspendLayout();
 			this.groupBox.SuspendLayout();
@@ -129,6 +133,8 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt4);
             this.groupBox.Controls.Add(this.cbNumber);
             this.groupBox.Controls.Add(this.labNumber);
+            this.groupBox.Controls.Add(this.labStrings);
+            this.groupBox.Controls.Add(this.txtStrings);
             this.groupBox.Location = new System.Drawing.Point(3, 229);
             this.groupBox.Name = "groupBox"+num;
             this.groupBox.Size = new System.Drawing.Size(169, 149);
@@ -138,16 +144,16 @@ namespace OSD
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 41);
+            this.label2.Location = new System.Drawing.Point(80, 12);
             this.label2.Name = "labela"+num;
-            this.label2.Size = new System.Drawing.Size(14, 13);
+            this.label2.Size = new System.Drawing.Size(14, 11);
             this.label2.TabIndex = 3;
             this.label2.Text = "Y";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 15);
+            this.label1.Location = new System.Drawing.Point(10, 12);
             this.label1.Name = "labelb"+num;
             this.label1.Size = new System.Drawing.Size(14, 11);
             this.label1.TabIndex = 2;
@@ -155,27 +161,27 @@ namespace OSD
             // 
             // NUM_Y
             // 
-            this.NUM_Y.Location = new System.Drawing.Point(56, 39);
+            this.NUM_Y.Location = new System.Drawing.Point(96, 10);
             this.NUM_Y.Maximum = new decimal(new int[] {
             	15,
             	0,
             	0,
             	0});
             this.NUM_Y.Name = "NUM_Y"+num;
-            this.NUM_Y.Size = new System.Drawing.Size(91, 20);
+            this.NUM_Y.Size = new System.Drawing.Size(44, 20);
             this.NUM_Y.TabIndex = 1;
             this.NUM_Y.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
             // 
             // NUM_X
             // 
-            this.NUM_X.Location = new System.Drawing.Point(56, 13);
+            this.NUM_X.Location = new System.Drawing.Point(30, 10);
             this.NUM_X.Maximum = new decimal(new int[] {
             	29,
             	0,
             	0,
             	0});
             this.NUM_X.Name = "NUM_X"+num;
-            this.NUM_X.Size = new System.Drawing.Size(91, 20);
+            this.NUM_X.Size = new System.Drawing.Size(44, 20);
             this.NUM_X.TabIndex = 0;
             this.NUM_X.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);			
 			
@@ -209,7 +215,7 @@ namespace OSD
 			//
 			this.chkSign.AutoSize = true;
             //this.chkSign.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkSign.Location = new System.Drawing.Point(10, 64);
+            this.chkSign.Location = new System.Drawing.Point(10, 34);
             this.chkSign.Name = "chkSign";
             this.chkSign.Size = new System.Drawing.Size(137, 17);
             this.chkSign.TabIndex = 4;
@@ -222,7 +228,7 @@ namespace OSD
             //
             this.chkAlt.AutoSize = true;
             //this.chkAlt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt.Location = new System.Drawing.Point(10, 81);
+            this.chkAlt.Location = new System.Drawing.Point(10, 51);
             this.chkAlt.Name = "chkAlt";
             this.chkAlt.Size = new System.Drawing.Size(137, 17);
             this.chkAlt.TabIndex = 4;
@@ -236,7 +242,7 @@ namespace OSD
             //
             this.chkAlt2.AutoSize = true;
             //this.chkAlt2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt2.Location = new System.Drawing.Point(10, 98);
+            this.chkAlt2.Location = new System.Drawing.Point(10, 68);
             this.chkAlt2.Name = "chkAlt2";
             this.chkAlt2.Size = new System.Drawing.Size(137, 17);
             this.chkAlt2.TabIndex = 4;
@@ -250,7 +256,7 @@ namespace OSD
             //
             this.chkAlt3.AutoSize = true;
             //this.chkAlt3.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt3.Location = new System.Drawing.Point(10, 113);
+            this.chkAlt3.Location = new System.Drawing.Point(10, 83);
             this.chkAlt3.Name = "chkAlt3";
             this.chkAlt3.Size = new System.Drawing.Size(137, 17);
             this.chkAlt3.TabIndex = 4;
@@ -264,7 +270,7 @@ namespace OSD
             //
             this.chkAlt4.AutoSize = true;
             //this.chkAlt4.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlt4.Location = new System.Drawing.Point(10, 128);
+            this.chkAlt4.Location = new System.Drawing.Point(10, 98);
             this.chkAlt4.Name = "chkAlt4";
             this.chkAlt4.Size = new System.Drawing.Size(137, 17);
             this.chkAlt4.TabIndex = 4;
@@ -272,6 +278,8 @@ namespace OSD
             this.chkAlt4.UseVisualStyleBackColor = true;
             this.chkAlt4.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
             this.chkAlt4.Visible = false;
+
+            //128
 
             this.cbNumber.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbNumber.FormattingEnabled = true;
@@ -285,7 +293,7 @@ namespace OSD
             "11",
             "12",
             });
-            this.cbNumber.Location = new System.Drawing.Point(10, 113);
+            this.cbNumber.Location = new System.Drawing.Point(10, 85);
             this.cbNumber.Name = "cbNumber" ;
             this.cbNumber.Size = new System.Drawing.Size(137, 17);
             this.cbNumber.TabIndex = 18;
@@ -295,13 +303,35 @@ namespace OSD
             // labNumber
             // 
             this.labNumber.AutoSize = true;
-            this.labNumber.Location = new System.Drawing.Point(10, 98);
+            this.labNumber.Location = new System.Drawing.Point(10, 70);
             this.labNumber.Name = "labeln";
             this.labNumber.Size = new System.Drawing.Size(14, 11);
             this.labNumber.TabIndex = 2;
             this.labNumber.Text = "";
             this.labNumber.Visible =false ;
-            
+
+            // 
+            // labStrings
+            // 
+            this.labStrings.AutoSize = true;
+            this.labStrings.Location = new System.Drawing.Point(10, 109);
+            this.labStrings.Name = "labels";
+            this.labStrings.Size = new System.Drawing.Size(14, 11);
+            this.labStrings.TabIndex = 3;
+            this.labStrings.Text = "Strings";
+            this.labStrings.Visible = false;
+
+            // 
+            // txtStrings
+            //           
+            this.txtStrings.Location = new System.Drawing.Point(10, 124);
+            this.txtStrings.Name = "txtStrings";
+            this.txtStrings.Size = new System.Drawing.Size(137, 20);
+            this.txtStrings.TabIndex = 4;
+            this.txtStrings.Text = "";
+            this.txtStrings.Visible = false;
+            this.txtStrings.Leave += new System.EventHandler(this.txtStrings_TextChanged);
+
             return 0;
 		}
 		public int  last_init(){
@@ -440,6 +470,9 @@ namespace OSD
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = thing.sign != -1;
 
+            labStrings.Visible=false;
+            txtStrings.Visible = false;
+
             switch(thing.ui_mode){ 
             case UI_Mode.UI_Combo:
                 n = osd.getAlt(thing)/2;
@@ -453,7 +486,16 @@ namespace OSD
                 labNumber.Text = thing.alt_text;
                 labNumber.Visible = true;
                 break;
+
+            case  UI_Mode.UI_Combo_Cb_Strings:
+                labStrings.Visible=true;
+                txtStrings.Visible = true;
+                txtStrings.Text = thing.strings;
+                goto as_combo_cb;
+                //labStrings
+                
             case UI_Mode.UI_Combo_Cb:
+as_combo_cb:
                 n = osd.getAlt(thing)/2;
                 cbNumber.SelectedIndex =n;
                 cbNumber.Visible = true;
@@ -717,6 +759,21 @@ namespace OSD
                     panelItems[a].Alt2 = (n & 1) != 0 ? 1 : 0;
                     panelItems[a].Alt3 = (n & 2) != 0 ? 1 : 0;
                     panelItems[a].Alt4 = (n & 4) != 0 ? 1 : 0;
+                }
+            }
+            osd.Draw(number);
+        }	
+
+        private void txtStrings_TextChanged(object sender, EventArgs e) {
+            string item = osd.currentlyselected;
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    string s = txtStrings.Text ;
+                    int n=panelItems[a].string_count;
+                    if(n>0) {
+                        panelItems[a].strings =s;
+                        osd.updatePanelStrings(panelItems[a].string_id,n, s);
+                    }
                 }
             }
             osd.Draw(number);

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r852 DV";
+        public const string VERSION = "r853 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -50,6 +50,8 @@ namespace OSD {
         public const int MAVLINK_NUM_CHECKSUM_BYTES =2;
         public const int MAVLINK_STX =254;
         public const int X25_INIT_CRC = 0xffff;
+
+        public const int NUM_PWM_Channels = 8;
 
         public enum ModelType {
             Plane = 0,
@@ -102,7 +104,7 @@ namespace OSD {
         /*------------------------------------------------*/
         public int panel_number = 0;
 
-        const Int16 toggle_offset = 3;
+        const Int16 toggle_offset = 2;
         public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
         /// <summary>
         /// the un-scaled font render image
@@ -172,9 +174,14 @@ namespace OSD {
 
         string CurrentCOM;
 
+        public string[] StringArray = new string[128];
+
+        public OSD osdx;
+
         public OSD() {
 
             conf = new Config(this); // конфиг по умолчанию
+            osdx=this;
 
             for (int i = 0; i < npanel; i++) {
                 var s = new osd_screen(i, this);
@@ -331,10 +338,11 @@ namespace OSD {
                 pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                  //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
                 pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
-                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
+                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb_Strings, 0, "Select channel", -1, "Extended range (800-2200)", str_id: 0, str_count: 5, strings: "Off|Low|Mid|Hi!|On!" );
                 pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
-                pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
 
+                pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
+    
 
                 osd_functions_N = a;
                 //make backup in case EEPROM needs reset to default
@@ -449,10 +457,17 @@ namespace OSD {
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
-            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9)
+            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels+1)
                 ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+                /*
+                 0 -> 2 = disabled
+                 1 -> 3 = Ext PWM
+                 2 -> 4 = mode
+                 3 -> 5 = Ch N
+                 4...
+                 */
             else
-                ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
+                ONOFF_combo.SelectedIndex = 0; //reject garbage from the read file
 
             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
             CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
@@ -626,11 +641,13 @@ namespace OSD {
 
             processingpanel = thing.name;
 
+            updatePanelStrings(thing.string_id,thing.string_count, thing.strings);// renew before draw
+
             // ntsc and below the middle line
             if (thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked)) {
-                thing.show(thing.x, thing.y - 3, thing.sign, getAlt(thing));
+                thing.show(thing.x, thing.y - 3, thing.sign, getAlt(thing), thing);
             } else { // pal and no change
-                thing.show(thing.x, thing.y, thing.sign, getAlt(thing));
+                thing.show(thing.x, thing.y, thing.sign, getAlt(thing), thing);
             }
         }
 
@@ -983,13 +1000,15 @@ namespace OSD {
                     foreach (var pan in scr[panel_number].panelItems) {
                         if ((pan != null) && ((pan.name == str)) && pan.pos != -1) {
                             TreeNode[] trArray = scr[panel_number].LIST_items.Nodes.Find(str, true);
+                            if(pan.string_count!=0)
+                                updatePanelStrings(pan.string_id, pan.string_count, pan.strings);// renew before draw
                             conf.setEepromXY(pan, trArray[0].Checked);
 
                             //Console.WriteLine(str);
                         }
                     }
-                }
-
+                }                
+                               
             }
 
             if (wr_length == 0) {
@@ -1007,6 +1026,20 @@ namespace OSD {
 
             } else if (panel_number >= 0 && panel_number < npanel) {
                 err = conf.writeEEPROM(wr_start, wr_length);
+                if(err==0) { // write all strings on each panel change
+                    string[] tmp = new string[128];
+                    tmp=conf.eeprom.strings;
+                    bool write=false;
+                    for(int i=0; i<128;i++){
+                        if(tmp[i] != StringArray[i])
+                            write=true;
+                    }
+                    if(write) {
+                        conf.eeprom.strings = StringArray;
+                        err = conf.writeEEPROM(Strings_offst, Config.Settings_size);
+                    }
+                }
+
                 if (err > 0)
                     MessageBox.Show("Failed to upload new Panel data");
                 else if (err == 0) {
@@ -1217,9 +1250,12 @@ namespace OSD {
             //				MessageBox.Show("Done downloading data!");
             //			} 
 
+            StringArray = conf.eeprom.strings; // read strings for panels
+
             int tN = panel_number;
             for (int k = 0; k < npanel; k++) {
                 panel_number = k;
+                
                 for (int a = 0; a < scr[k].panelItems.Length; a++) {
                     if (this.scr[k].panelItems[a] != null) {
                         var pi = scr[k].panelItems[a];
@@ -1238,6 +1274,7 @@ namespace OSD {
                             switch(pi.ui_mode) {
                             case UI_Mode.UI_Combo:
                             case UI_Mode.UI_Combo_Cb:
+                            case UI_Mode.UI_Combo_Cb_Strings:
                                 if (pi.Altf >= 0)
                                     pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
                                 pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;                            
@@ -1258,7 +1295,21 @@ namespace OSD {
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
                             pi.y = (byte)Constrain(p.y & 0x0f, 0, SCREEN_H);
 
-                            
+                            if(pi.string_count!=0 ){
+                                string s="";
+                                int len=0;
+                                for(int i=pi.string_id; i<pi.string_id +pi.string_count ; i++){
+                                    if(s.Length>0) s+="|";
+                                    try {
+                                        s += myDecode(StringArray[i]);
+                                    }catch{};
+                                    try { // no add if null
+                                        len +=StringArray[i].Length;
+                                    } catch {};
+                                }
+                                if(len>0) // не заполнять если вообще пусто
+                                    pi.strings = s;
+                            }
                         }
                     }
                 }
@@ -1681,7 +1732,7 @@ namespace OSD {
                                 if (item != null) {
                                     TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
                                     if (tnArray.Length > 0)
-                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf, item.Alt2, item.Alt3, item.Alt4);
+                                        sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf, item.Alt2, item.Alt3, item.Alt4, item.strings);
                                 }
                             }
                         }
@@ -1821,6 +1872,12 @@ namespace OSD {
                                             int.TryParse(strings[7], out pi.Alt3);
                                             int.TryParse(strings[8], out pi.Alt4);
 
+                                            try {
+                                                if(pi.string_count >0){
+                                                    pi.strings =strings[9];
+                                                    updatePanelStrings(pi.string_id, pi.string_count, pi.strings );
+                                                }
+                                            } catch{};
                                             TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
                                             if (tnArray.Length > 0)
                                                 tnArray[0].Checked = (strings[3] == "True");
@@ -1950,7 +2007,8 @@ namespace OSD {
 
                         cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
 
-                        if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < 9) ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+                        if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels+1) 
+                             ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
                         else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
 
                         //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
@@ -4071,6 +4129,21 @@ namespace OSD {
 
         private void BUT_ClearScreen_Click(object sender, EventArgs e) {
             scr[PANEL_tabs.SelectedIndex - 1].clearScreen();
+        }
+
+        public void updatePanelStrings(int str_id, int str_count, string str) {
+            str = convertChars(str);
+            string[] s=str.Split('|');
+
+            for(int p=0; p<str_count;p++){
+                string v="";
+                try {
+                    v=s[p];
+                } catch{};
+
+                StringArray[str_id+p] = v;
+            }
+        
         }
 
     }

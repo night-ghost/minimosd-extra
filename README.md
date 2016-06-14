@@ -258,6 +258,9 @@ v582
 * 852b - fixed framerate bug
 * 852c - again fixed framerate bug
 
+v853
+* strings now are working! And Channel State panel uses first 5 of them
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -542,6 +545,9 @@ v582
 * первая попытка поддержки строк в EEPROM
 * первая попытка поддержки конфигурации через MAVlink
 * 852a - fixed bug with flickering panels
+
+v853
+* Строки работают! И панель Channel State использует первые 5 из них
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

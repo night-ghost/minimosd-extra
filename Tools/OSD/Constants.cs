@@ -65,6 +65,7 @@ namespace OSD {
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана
 
 		public const int Settings_offset = 512; // 4 экрана всего
+        public const int Strings_offst = Settings_offset + Config.Settings_size;
 		//
 		
 		

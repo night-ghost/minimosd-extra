@@ -84,3 +84,13 @@
 #include "eeprom.h"
 #include "version.h"
 
+
+#ifdef DEBUG
+  #define DBG_PRINTLN(x)     { Serial.print_P(PSTR(x)); Serial.println(); /* Serial.flush(); */ }
+  #define DBG_PRINTVARLN(x)  { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.println(x); /* Serial.flush(); */ }
+  #define DBG_PRINTVAR(x)    { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.print(x); Serial.print(" ");  }
+#else
+  #define DBG_PRINTLN(x)     {}
+  #define DBG_PRINTVAR(x)    {}
+  #define DBG_PRINTVARLN(x)  {}
+#endif

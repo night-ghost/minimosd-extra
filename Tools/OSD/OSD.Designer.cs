@@ -1343,13 +1343,19 @@ namespace OSD
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Disabled",
+            "Disabled", // 0
+            "External PWM",
             "Mode Switch",
             "Ch 5",
             "Ch 6",
             "Ch 7",
             "Ch 8",
-            "External PWM"});
+/*            "Ch 9",
+            "Ch 10",
+            "Ch 11",
+            "Ch 12",
+ */
+            });
             this.ONOFF_combo.Location = new System.Drawing.Point(11, 20);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
@@ -1887,7 +1893,8 @@ namespace OSD
             // OSD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            //this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(688, 558);
             this.Controls.Add(this.BUT_ClearScreen);
             this.Controls.Add(this.BUT_CopyScreen);

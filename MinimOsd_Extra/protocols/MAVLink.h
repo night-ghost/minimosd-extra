@@ -261,6 +261,11 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 chan_raw[7] = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg.m);
                 osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg.m);
                 break;
+/*
+	    case MAVLINK_MSG_ID_RC_CHANNELS: // 1-18 but in not sent :(
+		break;
+*/
+
 
             case MAVLINK_MSG_ID_WIND:
                 osd_winddirection = mavlink_msg_wind_get_direction(&msg.m); // 0..360 deg, 0=north

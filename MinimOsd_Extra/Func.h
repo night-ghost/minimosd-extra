@@ -54,9 +54,9 @@ static void pan_toggle(){
 
     uint16_t ch_raw;
 
-    if(sets.ch_toggle == 0) 
+    if(sets.ch_toggle <= 2) // disabled
 	return;
-    else if(sets.ch_toggle == 1) 
+    else if(sets.ch_toggle == 3) 
 	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
     else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
 	ch_raw = chan_raw[sets.ch_toggle-1];

@@ -586,7 +586,7 @@ void On100ms(){ // периодические события, не связан�
         unsigned int d;
 
 #ifdef DEBUG 
-Serial.printf_P(PSTR("\n RSSI ch=%d telem_rssi=%d\n"), ch, telem_rssi ); Serial.wait();
+//Serial.printf_P(PSTR("\n RSSI ch=%d telem_rssi=%d\n"), ch, telem_rssi ); Serial.wait();
 #endif
 
         switch(ch) {

@@ -116,6 +116,12 @@ namespace OSD {
         internal fixed byte format4[Config.OSD_SENSOR_FORMAT_TOTAL + 1];
     };
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct Strings {
+        internal fixed byte str[256];        
+    };
+
+
     [StructLayout(LayoutKind.Explicit)]
     internal unsafe struct EEPROM {
         [FieldOffset(0)]
@@ -129,8 +135,12 @@ namespace OSD {
         [FieldOffset(OSD.Settings_offset + 4)]
         internal Settings sets;
 
-        [FieldOffset(OSD.Settings_offset + 256)]
+        [FieldOffset(OSD.Settings_offset + 128)]        
         internal Sensors sensors;
+
+
+        [FieldOffset(OSD.Settings_offset + Config.Settings_size )]
+        internal Strings strs;
 
         // чтение-запись всего массива
         public byte[] data {
@@ -354,7 +364,50 @@ namespace OSD {
             }
         }
 
- 
+       public string[] strings {
+           get {
+               string[] ss=new string[128];
+               string s = "";
+               int n=0;
+               fixed (Strings * p = &(this.strs)) {
+                   for (int i = 0; i < Config.Strings_size && n<128 ; i++) {
+                       byte b = p->str[i];
+                       if(b!=0 && b!=255)
+                            s += Convert.ToChar(b);
+                       else {
+                            ss[n++]=s;
+                            s="";
+                       }
+                   }
+               }
+               return ss;
+
+           }
+           set {
+               fixed (Strings* p = &(this.strs)) { // fill 0
+                    for (int i = 0; i < 128; i++) {
+                        p->str[i] = 0;
+                    }
+               }
+
+               int cnt=0;
+               for(int k=0; k<value.Length ; k++) {
+                   string s=value[k];
+                   fixed (Strings* p = &(this.strs)) {
+                       int len=0;
+                       try {
+                           len=s.Length;
+                       } catch {};
+                       for (int i = 0; i < len && cnt < Config.Strings_size; i++) {
+                            p->str[cnt++] = Convert.ToByte(s[i]);
+                        }
+                       if (cnt >= Config.Strings_size) break;
+                       p->str[cnt++]=0; // close string by 0
+                   }
+               }
+           }
+       }
+
 
         // очистка памяти до заводского состояния АТмеги
         public void clear() {
@@ -380,7 +433,8 @@ namespace OSD {
 
         const int Settings_offset = OSD.Settings_offset; // 512 - половина
         const int OffsetBITpanel = OSD.OffsetBITpanel;
-        public const int Settings_size = EEPROM_SIZE - Settings_offset; //512; //sizeof(Settings) + 4 - остаток
+        public const int Settings_size = 256; // EEPROM_SIZE - Settings_offset; //512; //sizeof(Settings) + 4 - остаток        
+        public const int Strings_size = 256;
 
         internal EEPROM eeprom;
 
@@ -423,7 +477,9 @@ namespace OSD {
                 fail = true;
             }
 
-            sp.Close();
+            try {
+                sp.Close();
+            } catch{};
 
             return fail;
         }

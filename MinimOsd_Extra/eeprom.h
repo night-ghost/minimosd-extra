@@ -181,13 +181,6 @@ union _Settings {
     byte _pad[128-4]; // место под расширение Settings, за вычетом флагов 
 };
 
-struct Strings {
-    byte strings[128];
-};
-
-#define PANSTATE_STR_ID 0
-#define PANSTATE_STR_NO 5
-
 
 struct SensorInfo { // 24 bytes
     float K;				// коэффициент
@@ -197,6 +190,19 @@ struct SensorInfo { // 24 bytes
 
 
 
+union _SensorInfo {
+    SensorInfo sensors[4];
+    byte _pad[128];
+};
+
+
+struct Strings {
+    byte strings[256];
+};
+
+#define PANSTATE_STR_ID 0
+#define PANSTATE_STR_NO 5
+
 
 struct Eeprom {
     _Panel panels[4]; // сначала 4 экрана по 128 байт (64 панели возможно), читаются индивидуальные точки по мере необходимости
@@ -204,11 +210,12 @@ struct Eeprom {
 // 512
     _Flags flags; // 4 байта флагов
     
-    _Settings sets; // и почти четверть EEPROM под остальные настройки, считываемые в RAM при инициализации
-    Strings strings; // strings from CT in one BLOB
+    _Settings sets; // и до 124 байт EEPROM под остальные настройки, считываемые в RAM при инициализации
+    _SensorInfo sensors; // не считываемые настройки - читаются по необходимости
 
 //768
-    SensorInfo sensors[4]; // не считываемые настройки - читаются по необходимости
+    Strings strings; // strings from CT in one BLOB
+    
 };
 
 #pragma pack(pop)

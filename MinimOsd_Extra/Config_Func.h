@@ -63,12 +63,23 @@ static point readPanel(byte n) {
 }
 
 static void print_eeprom_string(byte n){
+
+DBG_PRINTVARLN(n);
+DBG_PRINTVARLN(EEPROM_offs(strings));
+
     for(byte i=0;i<128;i++){
 	byte c=eeprom_read_byte( (byte *)( EEPROM_offs(strings) + i) );
-	if(c==0xFF) break; // clear EEPROM
+DBG_PRINTVARLN(c);
+	if(c==0xFF) {
+DBG_PRINTLN("exit on FF "); DBG_PRINTVARLN(i);
+	    break; // clear EEPROM
+	}
 	if(c==0){ // end of string
-	    if(n==0) return; // we now printing? if yes then string is over
+	    if(n==0) {  // we now printing?
+		return; //   if yes then string is over
+	    }
 	    n--; // strings to skip
+DBG_PRINTVARLN(n);
 	}
 	if(n==0) // our string!
 	    OSD::write_S(c);
