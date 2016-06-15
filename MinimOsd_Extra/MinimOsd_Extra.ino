@@ -129,6 +129,8 @@ BetterStream *mavlink_comm_0_port;
 // обработка прерывания по кадровому синхроимпульсу
 void isr_VSYNC(){
     vsync_wait=0;	// единственное что нам надо - отметить его наличие
+    
+    vsync_count++; // считаем кадровые прерывания
 
     if(update_stat) { // there is data for screen
         sei(); 			// enable other interrupts 
@@ -436,6 +438,12 @@ void loop()
         if(lflags.blinker) {
             seconds++;
             lflags.one_sec_timer_switch = 1; // for warnings
+
+	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
+		osd.init();    // restart MAX7456
+	    }
+	    vsync_count=0;
+
 
 #ifdef DEBUG
 	    if(seconds % 60 == 0) {

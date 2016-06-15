@@ -119,7 +119,7 @@ namespace OSD {
                                     });
 
                                 } catch { };
-
+/*
                                 message = "";
                                 message += "Payload length: " + parent.rxmsg.len.ToString();
                                 message += " Packet sequence: " + parent.rxmsg.seq.ToString();
@@ -135,6 +135,7 @@ namespace OSD {
                                 message += Environment.NewLine;
 
                                 //Console.Write(message);
+ */
                                 Application.DoEvents();
                                 break;
                             } // switch

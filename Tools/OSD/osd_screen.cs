@@ -662,26 +662,11 @@ as_combo_cb:
 				li.Focus();
 				li.SelectedNode = tnArray[0]; // выберем этот элемент в списке
 
-/*				
-				foreach(var thing in osd.scr[osd.panel_number].panelItems) {
-					if(thing!=null) {
-						if(thing.name==name) {
-				// левый верхний угол нашей фигуры thing.x, thing.y
-							clickX = ansW - thing.x; //запомним куда ткнули
-							clickY = ansH - thing.y;
-							break; 
-						}
-					}
-				}
-				
-*/
-//				/*
 				Panel thing=(Panel)tnArray[0].Tag;
 			// левый верхний угол нашей фигуры thing.x, thing.y
 				clickX = ansW - thing.x; //запомним куда ткнули
 				clickY = ansH - thing.y;				
-//*/				
-				//LIST_items.SelectedIndex = LIST_items.Items.IndexOf(usedPostion[ansW][ansH]);
+
 				return name;
 			}
 

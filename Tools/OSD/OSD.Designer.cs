@@ -59,7 +59,7 @@ namespace OSD
             this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateCharsetcustomFwToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setSketchesPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MavlinkModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getFwFromOSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gettingStartedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -390,7 +390,7 @@ namespace OSD
             this.updateCharsetDevToolStripMenuItem,
             this.updateCharsetcustomFwToolStripMenuItem,
             this.presentCustomCharsetToolStripMenuItem,
-            this.setSketchesPathToolStripMenuItem,
+            this.MavlinkModeMenuItem,
             this.getFwFromOSDToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
@@ -478,10 +478,16 @@ namespace OSD
             this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
-            // setSketchesPathToolStripMenuItem
+            // MavlinkModeMenuItem
             // 
-            this.setSketchesPathToolStripMenuItem.Name = "setSketchesPathToolStripMenuItem";
-            this.setSketchesPathToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.MavlinkModeMenuItem.Name = "MavlinkModeMenuItem";
+            this.MavlinkModeMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.MavlinkModeMenuItem.Text = "MAVlink mode";
+            this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
+            this.MavlinkModeMenuItem.Checked = true;
+            this.MavlinkModeMenuItem.CheckOnClick = true;
+            this.MavlinkModeMenuItem.CheckState = System.Windows.Forms.CheckState.Unchecked;
+
             // 
             // getFwFromOSDToolStripMenuItem
             // 
@@ -2039,7 +2045,7 @@ namespace OSD
         
         private System.Windows.Forms.GroupBox grpTLog;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.ToolStripMenuItem setSketchesPathToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MavlinkModeMenuItem;
         private System.Windows.Forms.ComboBox cbxRSSIChannel;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ToolStripMenuItem presentCustomCharsetToolStripMenuItem;

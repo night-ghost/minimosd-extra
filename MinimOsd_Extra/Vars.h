@@ -246,9 +246,11 @@ struct loc_flags {
     bool fPulseSensor3:1;
     bool fPulseSensor4:1;
 
-    bool show_screnN;
-    bool gps_active; // было что-то с GPS
-    bool vs_ms; // vertical speed in m/s;
+    bool show_screnN:1;
+    bool gps_active:1; // было что-то с GPS
+    bool vs_ms:1; // vertical speed in m/s;
+    bool was_mav_config:1; // was EEPROM write via MAVlink
+    
 //    bool osd_clear:1;
 //MAVLink session control
 //    bool mavbeat:1;
@@ -316,6 +318,7 @@ static uint16_t chan_raw_middle[3]; // запомненные при входе 
 
 const Params *params; // указатель на текущий набор параметров
 
+volatile static uint16_t vsync_count;
 
 #define GPS_MUL 10000000.0f
 

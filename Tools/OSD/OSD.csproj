@@ -105,6 +105,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="mavlink.cs" />
+    <Compile Include="MavlinkCRC.cs" />
     <Compile Include="MavlinkOther.cs" />
     <Compile Include="mcm.cs" />
     <Compile Include="OSD.cs">

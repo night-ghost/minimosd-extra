@@ -75,13 +75,20 @@ bool read_mavlink(){
             lflags.mavlink_active = 1;
 
 #ifdef MAVLINK_CONFIG
+DBG_PRINTVARLN(msg.m.msgid);
+DBG_PRINTVARLN(msg.m.sysid);
+DBG_PRINTVARLN(msg.m.compid);
+
 	    if(msg.m.msgid == MAVLINK_MSG_ID_ENCAPSULATED_DATA && 
 	       msg.m.sysid == mav_gcs_id &&
 	       msg.m.compid == MAV_COMP_ID_CAMERA ) { // stole this ID
-		uint16_t n=mavlink_msg_encapsulated_data_get_seqnr(&msg.m);
-		if(n!=last_seq_n) {
-		    last_seq_n = n;
-        	    parse_osd_packet(((byte *)&msg.m) + sizeof(uint16_t) ); // direct access to message buffer - no memory for copy
+		uint16_t seq=mavlink_msg_encapsulated_data_get_seqnr(&msg.m);
+
+DBG_PRINTVARLN(seq);
+
+		if(seq!=last_seq_n) {
+		    last_seq_n = seq;
+        	    parse_osd_packet(((byte *)&msg.m) + sizeof(uint16_t)+8 ); // direct access to message buffer - no memory for copy
         	}
 
 	    // mavlink_msg_encapsulated_data_get_data
@@ -109,9 +116,12 @@ bool read_mavlink(){
             switch(msg.m.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
-                if(apm_mav_type == 26) { // MAV_TYPE_GCS
+                if(apm_mav_type == 6) { // MAV_TYPE_GCS
 #ifdef MAVLINK_CONFIG
+DBG_PRINTLN("GCS heartbeat!");
+
             	    mav_gcs_id = msg.m.sysid; // store GCS ID
+DBG_PRINTVARLN(mav_gcs_id);            	    
             	    last_seq_n = 0; // reset sequence
 #endif
             	    goto skip_packet;

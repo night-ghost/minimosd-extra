@@ -176,7 +176,7 @@ MAVLINK_HELPER void mavlink_start_checksum(mavlink_message_t* msg)
 	crc_init(&msg->checksum);
 }
 
-MAVLINK_HELPER void mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
+MAVLINK_HELPER void NOINLINE mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
 {
 	crc_accumulate(c, &msg->checksum);
 }
@@ -215,6 +215,9 @@ MAVLINK_HELPER void mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
  *
  * @endcode
  */
+ 
+//#define MAV_DEBUG 1
+ 
 MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_message_t* r_message, mavlink_status_t* r_mavlink_status)
 {
         /*
@@ -223,8 +226,8 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 	*/
 #if MAVLINK_CRC_EXTRA
 #ifndef MAVLINK_MESSAGE_CRC
-	static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
-#define MAVLINK_MESSAGE_CRC(msgid) mavlink_message_crcs[msgid]
+	static const uint8_t PROGMEM mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
+#define MAVLINK_MESSAGE_CRC(msgid) pgm_read_byte(&mavlink_message_crcs[msgid])
 #endif
 #endif
 
@@ -243,7 +246,9 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 			rxmsg->len = 0;
 //			rxmsg->magic = c;
 			mavlink_start_checksum(rxmsg);
-//mavlink_comm_0_port->printf_P(PSTR("\n\ngot STX!"));
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR("\n\ngot STX!"));
+#endif
 		} else
 		    goto lost_sync;
 		
@@ -265,7 +270,9 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 		}
 		else
 		{
-//mavlink_comm_0_port->printf_P(PSTR(" got Length!"));
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got Length!"));
+#endif
 
 			// NOT counting STX, LENGTH, SEQ, SYSID, COMPID, MSGID, CRC1 and CRC2
 			rxmsg->len = c;
@@ -276,24 +283,27 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_LENGTH:
-//mavlink_comm_0_port->printf_P(PSTR(" got Seq!"));
-
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got Seq!"));
+#endif
 		rxmsg->seq = c;
 		mavlink_update_checksum(rxmsg, c);
 		status->parse_state = MAVLINK_PARSE_STATE_GOT_SEQ;
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_SEQ:
-//mavlink_comm_0_port->printf_P(PSTR(" got Sysid!"));
-
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got Sysid!"));
+#endif
 		rxmsg->sysid = c;
 		mavlink_update_checksum(rxmsg, c);
 		status->parse_state = MAVLINK_PARSE_STATE_GOT_SYSID;
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_SYSID:
-//mavlink_comm_0_port->printf_P(PSTR(" got Compid!"));
-
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got Compid!"));
+#endif
 		rxmsg->compid = c;
 		mavlink_update_checksum(rxmsg, c);
 		status->parse_state = MAVLINK_PARSE_STATE_GOT_COMPID;
@@ -307,8 +317,9 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 		} else {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_MSGID;
 		}
-//mavlink_comm_0_port->printf_P(PSTR(" got Msgid!"));
-
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got Msgid!"));
+#endif
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_MSGID:
@@ -316,17 +327,24 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 		mavlink_update_checksum(rxmsg, c);
 		if (status->packet_idx == rxmsg->len) {
 			status->parse_state = MAVLINK_PARSE_STATE_GOT_PAYLOAD;
-//mavlink_comm_0_port->printf_P(PSTR(" got payload!"));
-
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR(" got payload!"));
+#endif
 		}
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_PAYLOAD:
 #if MAVLINK_CRC_EXTRA
 		mavlink_update_checksum(rxmsg, MAVLINK_MESSAGE_CRC(rxmsg->msgid));
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR("\nCRC updated by %d msg_id=%d\n"), MAVLINK_MESSAGE_CRC(rxmsg->msgid), rxmsg->msgid);
+#endif
+
 #endif
 		if (c != (rxmsg->checksum & 0xFF)) {
-//mavlink_comm_0_port->printf_P(PSTR("\nCRC1! want=%d got=%d\n"), rxmsg->checksum & 0xFF, c);
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR("\nCRC1! want=%d got=%d\n"), rxmsg->checksum & 0xFF, c);
+#endif
 			// Check first checksum byte
 			status->parse_error++;
 			status->msg_received = 0;
@@ -348,7 +366,9 @@ do_ctx:			status->parse_state = MAVLINK_PARSE_STATE_GOT_STX;
 	case MAVLINK_PARSE_STATE_GOT_CRC1:
 		if (c != (rxmsg->checksum >> 8)) {
 			// Check second checksum byte
-//mavlink_comm_0_port->printf_P(PSTR("\nCRC2! want=%d got=%d\n"), rxmsg->checksum >> 8, c);
+#ifdef MAV_DEBUG
+mavlink_comm_0_port->printf_P(PSTR("\nCRC2! want=%d got=%d\n"), rxmsg->checksum >> 8, c);
+#endif
 
 			status->parse_error++;
 			status->msg_received = 0;

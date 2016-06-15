@@ -63,15 +63,9 @@ static point readPanel(byte n) {
 }
 
 static void print_eeprom_string(byte n){
-
-DBG_PRINTVARLN(n);
-DBG_PRINTVARLN(EEPROM_offs(strings));
-
     for(byte i=0;i<128;i++){
 	byte c=eeprom_read_byte( (byte *)( EEPROM_offs(strings) + i) );
-DBG_PRINTVARLN(c);
 	if(c==0xFF) {
-DBG_PRINTLN("exit on FF "); DBG_PRINTVARLN(i);
 	    break; // clear EEPROM
 	}
 	if(c==0){ // end of string
@@ -79,7 +73,6 @@ DBG_PRINTLN("exit on FF "); DBG_PRINTVARLN(i);
 		return; //   if yes then string is over
 	    }
 	    n--; // strings to skip
-DBG_PRINTVARLN(n);
 	}
 	if(n==0) // our string!
 	    OSD::write_S(c);
@@ -90,20 +83,53 @@ DBG_PRINTVARLN(n);
 #ifdef MAVLINK_CONFIG
 
 struct Mav_conf { // needs to fit in 253 bytes
-    byte magick[4];
+    byte magick[4]; // = 0xee 'O' 'S' 'D'
     byte cmd;		// command
     byte id;		// number of 128-bytes block
+    byte len;		// real length
     byte data[128];
     byte crc; 		// may be
 };
 
 static void parse_osd_packet(byte *p){
     struct Mav_conf *c = (struct Mav_conf *)p;
+
+
+DBG_PRINTVARLN(c->magick[0]);
+DBG_PRINTVARLN(c->magick[1]);
+DBG_PRINTVARLN(c->magick[2]);
+DBG_PRINTVARLN(c->magick[3]);
+
+DBG_PRINTVARLN(c->cmd);
+
+DBG_PRINTVARLN(c->id);
+DBG_PRINTVARLN(c->len);
+
     if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
 	switch(c->cmd){
 	case 'w':
-	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  128 );
+DBG_PRINTLN("EEPROM write!");
+	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  c->len );
+	    lflags.was_mav_config=1;
 	    break;
+	
+	
+	case 'b':
+	    if(c->len==0 && lflags.was_mav_config) {
+DBG_PRINTLN("Reeboot!");
+	        __asm__ __volatile__ (    // Jump to RST vector
+	            "clr r30\n"
+	            "clr r31\n"
+	            "ijmp\n"
+	        );
+	    } else {
+DBG_PRINTVARLN(c->cmd);
+DBG_PRINTVARLN(c->len);
+DBG_PRINTVARLN(lflags.was_mav_config);
+	    }
+	    break;
+	default:
+DBG_PRINTVARLN(c->cmd);
 	}
     }
 
