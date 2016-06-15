@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r855 DV";
+        public const string VERSION = "r856 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -3512,7 +3512,7 @@ namespace OSD {
             if (hdr.Length > 1) {
                 int k = int.Parse(hdr[1]);
                 currentlyselected = "";
-
+                scr[k-1].deselect();
                 Draw(k - 1);
                 BUT_CopyScreen.Visible = true;
                 BUT_ClearScreen.Visible = true;

@@ -267,6 +267,9 @@ v854
 v855
 * write configuration via MAVlink is now working! But only on recent verions of ArduPilot which translates GCS messages to output
 
+v856
+*fixed bug with panel's properties visibility
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -561,7 +564,8 @@ v854
 v855
 * запись конфигурации через MAVlink теперь работает! Но только на старших версиях ArduPilot которые транслируют команды с наземной станции на выход
 
-
+v856
+* исправлен баг с видимостью свойств панели
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

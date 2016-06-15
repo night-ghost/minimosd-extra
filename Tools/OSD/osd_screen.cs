@@ -625,11 +625,15 @@ as_combo_cb:
 		}
 		
 
+        public void deselect(){
+            groupBox.Visible = false;
+        }
         
 
         private void pictureBox1_MouseDown (object sender, MouseEventArgs e) {
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
+                groupBox.Visible = osd.currentlyselected!="";
 			});
 			
 
