@@ -269,6 +269,7 @@ v855
 
 v856
 *fixed bug with panel's properties visibility
+* 856a - fixed bug with incorrect restoring panel's flags
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 

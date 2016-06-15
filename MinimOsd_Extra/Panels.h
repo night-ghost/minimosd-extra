@@ -163,7 +163,8 @@ static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
 
 #define ANGLE_1			9			// angle above we switch to line set 1
 #define ANGLE_2			25			// angle above we switch to line set 2
-
+#define ANGLE_DOT               50                      // angle above we switch to dots
+#define ANGLE_VERT              80                      // angle above we switch to vertical lines
 
 // Calculate and show artificial horizon
 // used formula: y = m * x + n <=> y = tan(a) * x + n
@@ -198,24 +199,36 @@ static void showHorizon(byte start_col, byte start_row) {
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
 	roll = roll < 0 ? roll + 179 : roll;
 	uint16_t a_roll=abs(roll);
-        if (a_roll > ANGLE_2) {
-	    line_set = LINE_SET_P___STAG_2;
+	if(       a_roll > ANGLE_VERT) {
+	    line_set =          0xc1;
+	    subval_overflow = 0;
+	} else if( a_roll > ANGLE_DOT) {
+	    line_set =          0x24;
+	    subval_overflow = 0;
+	} else if( a_roll > ANGLE_2) {
+	    line_set =          LINE_SET_P___STAG_2;
 	    line_set_overflow = LINE_SET_P_O_STAG_2;
             subval_overflow = 7;
-	} else if (a_roll > ANGLE_1) {
-	    line_set = LINE_SET_P___STAG_1;
+	} else if( a_roll > ANGLE_1) {
+	    line_set =          LINE_SET_P___STAG_1;
 	    line_set_overflow = LINE_SET_P_O_STAG_1;
             subval_overflow = 8;
 	}
     } else {								// negative angle line chars
 	roll = roll > 90 ? roll - 179 : roll;
 	uint16_t a_roll=abs(roll);
-        if (a_roll > ANGLE_2) {
-	    line_set = LINE_SET_N___STAG_2;
+	if(        a_roll > ANGLE_VERT) {
+	    line_set =          0xc1;
+	    subval_overflow = 0;
+	} else if( a_roll > ANGLE_DOT) {
+	    line_set =          0x24;
+	    subval_overflow = 0;
+        } else if( a_roll > ANGLE_2) {
+	    line_set =          LINE_SET_N___STAG_2;
 	    line_set_overflow = LINE_SET_N_O_STAG_2;
             subval_overflow = 7;
-	} else if (a_roll > ANGLE_1) {
-	    line_set = LINE_SET_N___STAG_1;
+	} else if( a_roll > ANGLE_1) {
+	    line_set =          LINE_SET_N___STAG_1;
 	    line_set_overflow = LINE_SET_N_O_STAG_1;
             subval_overflow = 8;
 	}
@@ -224,10 +237,15 @@ static void showHorizon(byte start_col, byte start_row) {
     pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines
     for (col=1; col<=AH_COLS; col++) {
         middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
-        hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
+        
+        hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+        
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
-	    subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
+	    if(subval_overflow) // adjusted lines
+	        subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
+	    else
+		subval = 0; // raw chars
 	    
 	    // print the line char
             OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 1, line_set + subval);
@@ -1848,17 +1866,6 @@ static void panHdop(point p) {
     osd_printi_1(PSTR("%3i"),eph);
 }
 
-/*
-static const char PROGMEM sts_0[]="Off";
-static const char PROGMEM sts_1[]="Low";
-static const char PROGMEM sts_2[]="Mid";
-static const char PROGMEM sts_3[]="Hi!";
-static const char PROGMEM sts_4[]="On!";
-
-static const char PROGMEM  * const sts_arr[]={
-    sts_0, sts_1, sts_2, sts_3, sts_4
-};
-*/
 
 static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     // 1000 - 2000 
@@ -1866,10 +1873,11 @@ static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     // 1400
     // 1600
     // 1800
-    int v=chan_raw[ch];
+    const uint16_t v=chan_raw[ch];
+    
     byte n;
-    const int low =(fExt?800:1000);
-    const int high=(fExt?2200:2000);
+    const uint16_t low =(fExt?800:1000);
+    const uint16_t high=(fExt?2200:2000);
     
     
     if(v<low) n=0;
@@ -1888,7 +1896,6 @@ static void panState(point p) {
 
     byte n = get_chan_pos(ch, is_alt(p));
 
-//    osd.print_P((PGM_P)pgm_read_word(&sts_arr[n]));
     print_eeprom_string(PANSTATE_STR_ID + n);
 }
 
@@ -1913,14 +1920,10 @@ static void panCValue(point p) {
 
     if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
 
-//Serial.printf_P(PSTR(""),
     osd_printi_1(PSTR("%4d"),chan_raw[ch]);
 
 }
 
-/*
-const int panState_XY = 88;
-*/
 
 /* **************************************************************** */
 // Panel  : panSetup

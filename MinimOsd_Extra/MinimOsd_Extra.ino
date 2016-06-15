@@ -327,14 +327,11 @@ void loop()
 
                 if (c == '\n' || c == '\r') {
                     crlf_count++;
-//osd.print_P(PSTR("cr|"));
                 } else {
-//osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
                     crlf_count = 0;
                 }
 
                 if (crlf_count > 3) {
-//osd.print_P(PSTR("fonts!|"));
                     uploadFont();
                 }
             }
@@ -342,15 +339,6 @@ void loop()
     }
 
     getData(); // получить данные с контроллера
-
-//    if(update_stat) { // если надо перерисовать экран
-//	if(!vsync_wait){ // то делаем это только во время обратного хода
-//LED_OFF;
-//          OSD::update(); in interrupt
-//          lflags.update_stat = 0;
-//        }
-//    } 
-
 
     if(lflags.got_data){ // были свежие данные - обработать
 
@@ -380,10 +368,6 @@ void loop()
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
 	update_stat = 1; // пришли данные, надо перерисовать экран
     }
-
-
-
-
 
 
 /* not used, let PWM data will be ALWAYS actual

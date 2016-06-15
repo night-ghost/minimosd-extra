@@ -94,21 +94,9 @@ struct Mav_conf { // needs to fit in 253 bytes
 static void parse_osd_packet(byte *p){
     struct Mav_conf *c = (struct Mav_conf *)p;
 
-
-DBG_PRINTVARLN(c->magick[0]);
-DBG_PRINTVARLN(c->magick[1]);
-DBG_PRINTVARLN(c->magick[2]);
-DBG_PRINTVARLN(c->magick[3]);
-
-DBG_PRINTVARLN(c->cmd);
-
-DBG_PRINTVARLN(c->id);
-DBG_PRINTVARLN(c->len);
-
     if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
 	switch(c->cmd){
 	case 'w':
-DBG_PRINTLN("EEPROM write!");
 	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  c->len );
 	    lflags.was_mav_config=1;
 	    break;
@@ -116,20 +104,15 @@ DBG_PRINTLN("EEPROM write!");
 	
 	case 'b':
 	    if(c->len==0 && lflags.was_mav_config) {
-DBG_PRINTLN("Reeboot!");
 	        __asm__ __volatile__ (    // Jump to RST vector
 	            "clr r30\n"
 	            "clr r31\n"
 	            "ijmp\n"
 	        );
-	    } else {
-DBG_PRINTVARLN(c->cmd);
-DBG_PRINTVARLN(c->len);
-DBG_PRINTVARLN(lflags.was_mav_config);
 	    }
 	    break;
 	default:
-DBG_PRINTVARLN(c->cmd);
+	    break;
 	}
     }
 

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r856 DV";
+        public const string VERSION = "r856a DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -291,7 +291,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0, "Show ILS", 1, "Show Radar", 0 , "  with track"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0, "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -1250,7 +1250,7 @@ namespace OSD {
 
             if (fail)
                 return;
-
+            scr[panel_number].deselect();
 
             //Verify EEPROM version
             if (conf.eeprom.sets.CHK1_VERSION != VER) { // no match
@@ -1272,7 +1272,8 @@ namespace OSD {
             int tN = panel_number;
             for (int k = 0; k < npanel; k++) {
                 panel_number = k;
-                
+                scr[k].fReenter =true;
+
                 for (int a = 0; a < scr[k].panelItems.Length; a++) {
                     if (this.scr[k].panelItems[a] != null) {
                         var pi = scr[k].panelItems[a];
@@ -1330,6 +1331,7 @@ namespace OSD {
                         }
                     }
                 }
+                scr[k].fReenter = false;
             }
 
             try {

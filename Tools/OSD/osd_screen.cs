@@ -49,7 +49,8 @@ namespace OSD
 		private int clickX, clickY;
 		
 		private bool mousedown;
-		
+		public bool fReenter=false;
+
 		public osd_screen (int num, OSD aosd)
 		{
 			number=num;
@@ -466,9 +467,10 @@ namespace OSD
 		
         private void adjust(Panel thing){
             int n;
+            fReenter =true;
 
             chkSign.Checked = thing.sign == 1;
-            chkSign.Visible = thing.sign != -1;
+            chkSign.Visible = (thing.sign >= 0);
 
             labStrings.Visible=false;
             txtStrings.Visible = false;
@@ -532,6 +534,7 @@ as_combo_cb:
                 chkAlt4.Checked = thing.Alt4 == 1;
                 break;
             }
+            fReenter = false;
         }
 
         private void treeView1_AfterSelect (object sender, TreeViewEventArgs e) {
@@ -718,6 +721,7 @@ as_combo_cb:
         private void chkAlt_CheckedChanged(object sender, EventArgs e) {
 
             string item = osd.currentlyselected;
+            if(fReenter) return;
 
             for (int a = 0; a < panelItems.Length; a++) {
                 if (panelItems[a] != null && panelItems[a].name == item) {
