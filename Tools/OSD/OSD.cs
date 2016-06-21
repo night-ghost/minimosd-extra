@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r856a DV";
+        public const string VERSION = "r857 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char

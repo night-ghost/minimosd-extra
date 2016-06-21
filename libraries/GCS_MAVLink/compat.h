@@ -12,3 +12,5 @@ enum ap_var_type {
     AP_PARAM_GROUP
 };
 #endif
+
+#define NOINLINE __attribute__ ((noinline))

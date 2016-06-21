@@ -28,6 +28,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
             this.lblTLog = new System.Windows.Forms.Label();
+            this.chkRaw = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // cbComPort
@@ -81,11 +82,23 @@
             this.lblTLog.Size = new System.Drawing.Size(0, 13);
             this.lblTLog.TabIndex = 4;
             // 
+            // chkRaw
+            // 
+            this.chkRaw.AutoSize = true;
+            this.chkRaw.Location = new System.Drawing.Point(231, 12);
+            this.chkRaw.Name = "chkRaw";
+            this.chkRaw.Size = new System.Drawing.Size(48, 17);
+            this.chkRaw.TabIndex = 5;
+            this.chkRaw.Text = "Raw";
+            this.chkRaw.UseVisualStyleBackColor = true;
+            this.chkRaw.CheckedChanged += new System.EventHandler(this.chkRaw_CheckedChanged);
+            // 
             // frmComPort
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 112);
+            this.Controls.Add(this.chkRaw);
             this.Controls.Add(this.lblTLog);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.label1);
@@ -107,5 +120,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Label lblTLog;
+        private System.Windows.Forms.CheckBox chkRaw;
     }
 }

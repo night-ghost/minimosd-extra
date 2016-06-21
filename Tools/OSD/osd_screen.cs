@@ -541,6 +541,7 @@ as_combo_cb:
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
+            adjustGroupbox();
 			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
@@ -559,6 +560,7 @@ as_combo_cb:
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
+            adjustGroupbox();
 			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
@@ -632,11 +634,14 @@ as_combo_cb:
             groupBox.Visible = false;
         }
         
+        void adjustGroupbox (){
+            groupBox.Visible = osd.currentlyselected != "";
+        }
 
         private void pictureBox1_MouseDown (object sender, MouseEventArgs e) {
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
-                groupBox.Visible = osd.currentlyselected!="";
+                adjustGroupbox();
 			});
 			
 

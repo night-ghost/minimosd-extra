@@ -271,6 +271,12 @@ v856
 *fixed bug with panel's properties visibility
 * 856a - fixed bug with incorrect restoring panel's flags
 
+v857
+* fixed bug with panel selection in CT
+* complementary filter of panEff changed from 1/10 to 1/100
+* a try to change Horizon behavior for large banks (>70grad)
+* minor fixes
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -567,6 +573,12 @@ v855
 
 v856
 * исправлен баг с видимостью свойств панели
+
+v857
+* исправлен баг с выбором панели в конфигураторе
+* комплиментарный фильтр панели panEff изменен с 1/10 на 1/100
+* попытка изменить поведение горизонта для больших кренов (>70grad)
+* мелкие изменения
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

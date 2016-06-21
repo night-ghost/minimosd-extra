@@ -65,26 +65,25 @@ static void printSpeed(PGM_P fmt, float s, byte alt){
     osd_printf_2(fmt,s/k,c);
 
 }
+static NOINLINE void printSpeed(float f, byte alt){
+    printSpeed(PSTR("%3.0f"), f, alt);
+}
+static NOINLINE void printSpeed(float f){
+    printSpeed(f, false);
+}
+
 
 static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
     printSpeed(fmt, *s * get_converts(), alt);
 }
-
-static NOINLINE void printSpeed(float s, byte alt){
-    printSpeed(PSTR("%3.0f"), s, alt);
-}
-
 static void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
-
-static NOINLINE void printSpeed(float s){
-    printSpeed(s, false);
-}
-
 static NOINLINE void printSpeedCnv(float *s){
     printSpeedCnv(s, false);
 }
+
+
 
 
 void inline write_arrow(byte arrow_set1){
@@ -163,7 +162,7 @@ static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
 
 #define ANGLE_1			9			// angle above we switch to line set 1
 #define ANGLE_2			25			// angle above we switch to line set 2
-#define ANGLE_DOT               50                      // angle above we switch to dots
+#define ANGLE_DOT               70 // 50                      // angle above we switch to dots
 #define ANGLE_VERT              80                      // angle above we switch to vertical lines
 
 // Calculate and show artificial horizon
@@ -234,7 +233,9 @@ static void showHorizon(byte start_col, byte start_row) {
 	}
     }
     
-    pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines
+    pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+    
+    // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1; col<=AH_COLS; col++) {
         middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
         
@@ -251,7 +252,7 @@ static void showHorizon(byte start_col, byte start_row) {
             OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 1, line_set + subval);
 	    
 	    // check if we have to print an overflow line char
-	    if (subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
+	    if ( subval && subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
                 OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 2, line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
 	    }
         }
@@ -493,16 +494,21 @@ static void panEff(point p){
 
     if(sets.model_type==0){ // plane
 #ifdef IS_PLANE
-        if (osd_throttle >= 1){
+        if (osd_throttle > 1){		// motor is working
           if (!lflags.throttle_on) 
               lflags.throttle_on = 1;
     
             if (osd_groundspeed != 0) {
         	//eff = (((float)osd_curr_A * 10.0 ) / cnvGroundSpeed())*0.1  + eff * 0.9;
+#define EFF_FILTER 0.01
+
 #if defined(USE_FILTER)
-        	filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0);
+        	filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
 #else
-        	eff = (((float)osd_curr_A ) / cnvGroundSpeed())* (10.0 * 0.1) + eff * 0.9; // комплиментарный фильтр 1/10
+
+// скорость у нас км/ч, ток в ма, получаем ма/км * ч = ма*ч / км, то есть сколько ма/ч надо затратить на километр полета
+
+        	eff = (((float)osd_curr_A ) / cnvGroundSpeed())* (10.0 * EFF_FILTER) + eff * (1-EFF_FILTER); // комплиментарный фильтр 1/10
         	//dst+=(val-dst)*k;
         	//eff += ((((float)osd_curr_A ) / cnvGroundSpeed())* 10.0  - eff) * 0.1; // комплиментарный фильтр 1/10
         	
@@ -511,26 +517,23 @@ static void panEff(point p){
 #endif
 	    }
 	    
-    	    if(has_sign(p))
-		OSD::write_S(0x16);
-            
             int iEff=eff;
-            if (iEff > 0 && iEff <= 9999) { 
-                  osd_printf_1(PSTR("%4.0f\x01"), eff);
-            }else{
-                // we don't needs to clear!  osd.print_P(&strclear[7]);// osd.print_P(PSTR("\x20\x20\x20\x20\x20"));
-        	// thus saves 78 bytes
+            if (iEff > 0 && iEff <= 9999) {
+                if(has_sign(p))
+		    OSD::write_S(0x16);
+            
+                osd_printf_1(PSTR("%4.0f\x01"), eff);
             }
 
-        }else{
+        }else{	// free fly
 
-            if ((osd_throttle < 1)){ // запоминаем высоту и путь при выключенном газе
+        //    if ((osd_throttle < 1)){ // запоминаем высоту и путь выключения газа
                 if (lflags.throttle_on) {
                   palt = osd_alt_to_home;
                   ddistance = trip_distance;
                   lflags.throttle_on = 0;
                 }
-            }
+        //    }
 
             if (osd_climb < -0.05){
                 float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (trip_distance - ddistance)) * get_converth();
@@ -1477,20 +1480,20 @@ static void panWPDir(point p){
 // Staus  : OK
 
 static void panWPDis(point p){
-
-    if (xtrack_error > 999)  xtrack_error = 999;
-    if (xtrack_error < -999) xtrack_error = -999;
-
-
-    byte h=get_mhigh();
-
-    osd_printi_1(PSTR("%2i "), wp_number);
-    osd_printf_2(PSTR("%4.0f"), ((float)wp_dist * get_converth()), h);
-    osd_nl();
-    
-    showArrow(getTargetBearing(), 0);
-
     if (osd_mode == 10){ // auto
+
+        if (xtrack_error > 999)  xtrack_error = 999;
+        if (xtrack_error < -999) xtrack_error = -999;
+
+
+        byte h=get_mhigh();
+
+        osd_printi_1(PSTR("%2i "), wp_number);
+        osd_printf_2(PSTR("%4.0f"), ((float)wp_dist * get_converth()), h);
+        osd_nl();
+    
+        showArrow(getTargetBearing(), 0);
+
         osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (xtrack_error * get_converth()), h);
     }
 }

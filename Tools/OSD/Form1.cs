@@ -23,6 +23,7 @@ namespace OSD {
         public OSD parent;
         private SerialPort comPort = new SerialPort();
         private bool loop=false;
+        private bool flgRaw=false;
 
         public frmComPort(OSD form) {
             parent=form;
@@ -99,6 +100,12 @@ namespace OSD {
                         while(comPort.BytesToRead != 0 && loop) {
 
                             byte c = (byte)comPort.ReadByte();
+                            byte[] ba = new byte[2];
+
+                            if(flgRaw) {
+                                ba[0]=c;
+                                parent.comPort.Write(ba,0,1);
+                            } 
 
                             if(index>=0) buffer[index++]=c;
 
@@ -108,8 +115,10 @@ namespace OSD {
                                 buffer[index++] = c; // store STX
                                 break;
                             case 2: // got packet
-                                if(parent.comPort.BytesToWrite==0)
-                                    parent.comPort.Write(buffer, 0, index);
+                                if(!flgRaw) {
+                                    if(parent.comPort.BytesToWrite==0) // skip packet on buffer overrun
+                                        parent.comPort.Write(buffer, 0, index);
+                                }
                                 index= -1;
 
                                 np++;
@@ -119,23 +128,7 @@ namespace OSD {
                                     });
 
                                 } catch { };
-/*
-                                message = "";
-                                message += "Payload length: " + parent.rxmsg.len.ToString();
-                                message += " Packet sequence: " + parent.rxmsg.seq.ToString();
-                                message += " System ID: " + parent.rxmsg.sysid.ToString();
-                                message += " Component ID: " + parent.rxmsg.compid.ToString();
-                                message += " Message ID: " + parent.rxmsg.msgid.ToString();
-                                message += " Message: ";
-                                for (int x = 0; x < parent.rxmsg.len; x++) {
-                                    message += parent.rxmsg.payload[x].ToString();
-                                }
-                                message += " CRC1: " + parent.rxmsg.seq.ToString();
-                                message += " CRC2: " + c.ToString();
-                                message += Environment.NewLine;
 
-                                //Console.Write(message);
- */
                                 Application.DoEvents();
                                 break;
                             } // switch
@@ -167,12 +160,20 @@ namespace OSD {
         private void btnStop_Click(object sender, EventArgs e) {
             btnStop.Enabled = false;
             btnStart.Enabled = true;
-            loop=false;
+            loop=false;         
+
+            parent.com_run = false;           
+ 
+            try {
+                parent.comPort.Close();
+            } catch{}
+
+            try {
+                comPort.Close();
+            } catch { }
 
             if (parent.com_run)
                 parent.com_thread.Abort();
-
-            parent.com_run = false;            
         }
         private void frmComPort_FormClosing(object sender, FormClosingEventArgs e) {
             try {
@@ -203,6 +204,10 @@ namespace OSD {
             try {
                 cbComPort.Text = s;
             } catch { }
+        }
+
+        private void chkRaw_CheckedChanged(object sender, EventArgs e) {
+            flgRaw = chkRaw.Checked ;
         }
     }
 }
