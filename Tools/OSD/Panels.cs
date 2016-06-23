@@ -769,9 +769,29 @@ namespace OSD
                     osd.printf_P(PSTR("\x24"));
                     osd.setPanel(first_col + 9, first_line + 4);
                     osd.printf_P(PSTR("\x24"));
+
+
                 }
 			}				
 			
+            if(is_alt2(fAlt)) { // ILS
+                if ((OSD.ModelType)model_type == OSD.ModelType.Copter) {
+                    osd.setPanel(first_col + 6, first_line + 3);
+                    osd.printf_P(PSTR("\xc8"));
+                } else {
+                    osd.setPanel(first_col+1, first_line + 3);
+                    osd.printf_P(PSTR("\xc8"));
+                    osd.setPanel(first_col + 12, first_line + 3);
+                    osd.printf_P(PSTR("\xc8"));
+
+                    osd.setPanel(first_col + 6, first_line );
+                    osd.printf_P(PSTR("\xc0"));
+                    osd.setPanel(first_col + 6, first_line+4);
+                    osd.printf_P(PSTR("\xc0"));
+                }
+
+            }
+
 			osd_roll=10;
 			osd_pitch=-6;
 			

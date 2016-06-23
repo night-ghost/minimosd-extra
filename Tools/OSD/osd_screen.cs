@@ -465,9 +465,14 @@ namespace OSD
 					osd.Draw(number); });
 		}
 		
-        private void adjust(Panel thing){
+        private void showPanelControls(Panel thing){
             int n;
             fReenter =true;
+
+            adjustGroupbox();
+
+            NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
+            NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
 
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = (thing.sign >= 0);
@@ -541,15 +546,12 @@ as_combo_cb:
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
-            adjustGroupbox();
+            
 			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
-				if(thing!=null && thing.name==e.Node.Text) {
-					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
-					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
-
-                    adjust(thing);
+                if (thing != null && thing.name == osd.currentlyselected) {					
+                    showPanelControls(thing);
 				}
 			}
 		}
@@ -560,15 +562,12 @@ as_combo_cb:
 			//string item = ((CheckedListBox)sender).SelectedItem.ToString();
 
 			osd.currentlyselected = e.Node.Text;
-            adjustGroupbox();
+            
 			osd.Draw(number);
 
 			foreach(var thing in panelItems) {
-				if(thing!=null && thing.name==e.Node.Text) {
-					NUM_X.Value = Constrain(thing.x, 0, osd.get_basesize().Width - 1);
-					NUM_Y.Value = Constrain(thing.y, 0, OSD.SCREEN_H - 1);
-
-                    adjust(thing);
+                if (thing != null && thing.name == osd.currentlyselected) {
+                    showPanelControls(thing);
                 }
 			}
 		}

@@ -50,8 +50,8 @@ namespace OSD {
         internal byte switch_mode;		// режим переключения: 0 значение, 1 по кругу
         internal byte auto_screen_switch;
 
-        internal byte OSD_RSSI_HIGH;
-        internal byte OSD_RSSI_LOW;
+        internal uint16_t autoswitch_times;
+        
         internal byte OSD_RSSI_RAW;
         internal byte OSD_BATT_WARN;
 

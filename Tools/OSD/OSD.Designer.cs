@@ -29,6 +29,7 @@ namespace OSD
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OSD));
             this.CMB_ComPort = new System.Windows.Forms.ComboBox();
             this.BUT_ReadOSD = new System.Windows.Forms.Button();
@@ -66,6 +67,9 @@ namespace OSD
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.chkILS = new System.Windows.Forms.CheckBox();
+            this.chkTrack = new System.Windows.Forms.CheckBox();
+            this.chkRadar = new System.Windows.Forms.CheckBox();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.txtCurr_k = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
@@ -101,8 +105,6 @@ namespace OSD
             this.cbOutSource = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.groupBox15 = new System.Windows.Forms.GroupBox();
-            this.chkTrack = new System.Windows.Forms.CheckBox();
             this.groupBox16 = new System.Windows.Forms.GroupBox();
             this.label24 = new System.Windows.Forms.Label();
             this.txtPitchNtsc = new System.Windows.Forms.TextBox();
@@ -114,8 +116,6 @@ namespace OSD
             this.label22 = new System.Windows.Forms.Label();
             this.txtRollPal = new System.Windows.Forms.TextBox();
             this.label21 = new System.Windows.Forms.Label();
-            this.chkILS = new System.Windows.Forms.CheckBox();
-            this.chkRadar = new System.Windows.Forms.CheckBox();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.txtBattB_k = new System.Windows.Forms.TextBox();
             this.label28 = new System.Windows.Forms.Label();
@@ -135,6 +135,12 @@ namespace OSD
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.txtTime3 = new System.Windows.Forms.TextBox();
+            this.txtTime2 = new System.Windows.Forms.TextBox();
+            this.txtTime1 = new System.Windows.Forms.TextBox();
+            this.txtTime0 = new System.Windows.Forms.TextBox();
+            this.lblTimes = new System.Windows.Forms.Label();
+            this.chkDiap = new System.Windows.Forms.CheckBox();
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -184,6 +190,7 @@ namespace OSD
             this.cbxShowUpdateDialog = new System.Windows.Forms.CheckBox();
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
+            this.hint = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -191,7 +198,6 @@ namespace OSD
             this.groupBox14.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.groupBox15.SuspendLayout();
             this.groupBox16.SuspendLayout();
             this.groupBox13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinVoltB)).BeginInit();
@@ -292,7 +298,7 @@ namespace OSD
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveToFileToolStripMenuItem
@@ -300,7 +306,7 @@ namespace OSD
             this.saveToFileToolStripMenuItem.Image = global::OSD.Properties.Resources.saveHS;
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
             this.saveToFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.saveToFileToolStripMenuItem.Text = "Save OSD file...";
             this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
@@ -309,32 +315,32 @@ namespace OSD
             this.loadFromFileToolStripMenuItem.Image = global::OSD.Properties.Resources.openHS;
             this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
             this.loadFromFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.loadFromFileToolStripMenuItem.Text = "Open OSD File...";
             this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromFileToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(203, 6);
             // 
             // loadDefaultsToolStripMenuItem
             // 
             this.loadDefaultsToolStripMenuItem.Name = "loadDefaultsToolStripMenuItem";
-            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.loadDefaultsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.loadDefaultsToolStripMenuItem.Text = "Load Defaults";
             this.loadDefaultsToolStripMenuItem.Click += new System.EventHandler(this.loadDefaultsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(199, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -345,14 +351,14 @@ namespace OSD
             this.CHK_pal,
             this.CHK_auto});
             this.videoModeToolStripMenuItem.Name = "videoModeToolStripMenuItem";
-            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.videoModeToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
             this.videoModeToolStripMenuItem.Text = "Video Mode";
             // 
             // CHK_ntsc
             // 
             this.CHK_ntsc.CheckOnClick = true;
             this.CHK_ntsc.Name = "CHK_ntsc";
-            this.CHK_ntsc.Size = new System.Drawing.Size(104, 22);
+            this.CHK_ntsc.Size = new System.Drawing.Size(111, 22);
             this.CHK_ntsc.Text = "NTSC";
             this.CHK_ntsc.CheckStateChanged += new System.EventHandler(this.nTSCToolStripMenuItem_CheckStateChanged);
             this.CHK_ntsc.Click += new System.EventHandler(this.CHK_ntsc_Click);
@@ -363,7 +369,7 @@ namespace OSD
             this.CHK_pal.CheckOnClick = true;
             this.CHK_pal.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CHK_pal.Name = "CHK_pal";
-            this.CHK_pal.Size = new System.Drawing.Size(104, 22);
+            this.CHK_pal.Size = new System.Drawing.Size(111, 22);
             this.CHK_pal.Text = "PAL";
             this.CHK_pal.CheckedChanged += new System.EventHandler(this.CHK_pal_CheckedChanged);
             this.CHK_pal.CheckStateChanged += new System.EventHandler(this.pALToolStripMenuItem_CheckStateChanged);
@@ -372,7 +378,7 @@ namespace OSD
             // CHK_auto
             // 
             this.CHK_auto.Name = "CHK_auto";
-            this.CHK_auto.Size = new System.Drawing.Size(104, 22);
+            this.CHK_auto.Size = new System.Drawing.Size(111, 22);
             this.CHK_auto.Text = "Auto";
             this.CHK_auto.CheckStateChanged += new System.EventHandler(this.AUTOToolStripMenuItem_CheckStateChanged);
             this.CHK_auto.Click += new System.EventHandler(this.CHK_auto_Click);
@@ -395,7 +401,7 @@ namespace OSD
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // checkBox1
@@ -404,14 +410,14 @@ namespace OSD
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(231, 22);
+            this.checkBox1.Size = new System.Drawing.Size(233, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // resetEepromToolStripMenuItem
             // 
             this.resetEepromToolStripMenuItem.Name = "resetEepromToolStripMenuItem";
-            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.resetEepromToolStripMenuItem.Text = "Reset EEPROM";
             this.resetEepromToolStripMenuItem.ToolTipText = "Initialize EEPROM with default values";
             this.resetEepromToolStripMenuItem.Click += new System.EventHandler(this.BUT_ResetOSD_EEPROM_click);
@@ -419,7 +425,7 @@ namespace OSD
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -427,14 +433,14 @@ namespace OSD
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.sendTLogToolStripMenuItem.Text = "Load TLog.";
             this.sendTLogToolStripMenuItem.ToolTipText = "Load a Mavlink transmission log to play into the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
@@ -442,7 +448,7 @@ namespace OSD
             // connectComPortToolStripMenuItem
             // 
             this.connectComPortToolStripMenuItem.Name = "connectComPortToolStripMenuItem";
-            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.connectComPortToolStripMenuItem.Text = "Connect to COM port";
             this.connectComPortToolStripMenuItem.ToolTipText = "Transmit all data from selected port to OSD to test how it works";
             this.connectComPortToolStripMenuItem.Click += new System.EventHandler(this.connectComPortToolStripMenuItem_Click);
@@ -450,7 +456,7 @@ namespace OSD
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
@@ -458,7 +464,7 @@ namespace OSD
             // updateCharsetDevToolStripMenuItem
             // 
             this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
-            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
             this.updateCharsetDevToolStripMenuItem.Visible = false;
             this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
@@ -466,7 +472,7 @@ namespace OSD
             // updateCharsetcustomFwToolStripMenuItem
             // 
             this.updateCharsetcustomFwToolStripMenuItem.Name = "updateCharsetcustomFwToolStripMenuItem";
-            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateCharsetcustomFwToolStripMenuItem.Text = "Update Charset (custom fw)...";
             this.updateCharsetcustomFwToolStripMenuItem.Visible = false;
             this.updateCharsetcustomFwToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetcustomFwToolStripMenuItem_Click);
@@ -474,25 +480,22 @@ namespace OSD
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
             // MavlinkModeMenuItem
             // 
+            this.MavlinkModeMenuItem.CheckOnClick = true;
             this.MavlinkModeMenuItem.Name = "MavlinkModeMenuItem";
-            this.MavlinkModeMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.MavlinkModeMenuItem.Size = new System.Drawing.Size(233, 22);
             this.MavlinkModeMenuItem.Text = "MAVlink mode";
             this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
-            this.MavlinkModeMenuItem.Checked = true;
-            this.MavlinkModeMenuItem.CheckOnClick = true;
-            this.MavlinkModeMenuItem.CheckState = System.Windows.Forms.CheckState.Unchecked;
-
             // 
             // getFwFromOSDToolStripMenuItem
             // 
             this.getFwFromOSDToolStripMenuItem.Name = "getFwFromOSDToolStripMenuItem";
-            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.getFwFromOSDToolStripMenuItem.Text = "GetFwFromOSD...";
             this.getFwFromOSDToolStripMenuItem.Visible = false;
             this.getFwFromOSDToolStripMenuItem.Click += new System.EventHandler(this.getFwFromOSDToolStripMenuItem_Click);
@@ -503,20 +506,20 @@ namespace OSD
             this.gettingStartedToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // gettingStartedToolStripMenuItem
             // 
             this.gettingStartedToolStripMenuItem.Name = "gettingStartedToolStripMenuItem";
-            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gettingStartedToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.gettingStartedToolStripMenuItem.Text = "Getting started";
             this.gettingStartedToolStripMenuItem.Click += new System.EventHandler(this.gettingStartedToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.aboutToolStripMenuItem.Text = "About ";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -533,10 +536,13 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.chkILS);
+            this.tabPageConfig.Controls.Add(this.chkTrack);
+            this.tabPageConfig.Controls.Add(this.chkRadar);
             this.tabPageConfig.Controls.Add(this.groupBox14);
             this.tabPageConfig.Controls.Add(this.groupBox2);
             this.tabPageConfig.Controls.Add(this.groupBox1);
-            this.tabPageConfig.Controls.Add(this.groupBox15);
+            this.tabPageConfig.Controls.Add(this.groupBox16);
             this.tabPageConfig.Controls.Add(this.groupBox13);
             this.tabPageConfig.Controls.Add(this.groupBox9);
             this.tabPageConfig.Controls.Add(this.groupBox8);
@@ -553,6 +559,42 @@ namespace OSD
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
+            // 
+            // chkILS
+            // 
+            this.chkILS.AutoSize = true;
+            this.chkILS.Location = new System.Drawing.Point(490, 307);
+            this.chkILS.Name = "chkILS";
+            this.chkILS.Size = new System.Drawing.Size(70, 17);
+            this.chkILS.TabIndex = 1;
+            this.chkILS.Text = "show ILS";
+            this.chkILS.UseVisualStyleBackColor = true;
+            this.chkILS.Visible = false;
+            this.chkILS.CheckedChanged += new System.EventHandler(this.chkILS_CheckedChanged);
+            // 
+            // chkTrack
+            // 
+            this.chkTrack.AutoSize = true;
+            this.chkTrack.Location = new System.Drawing.Point(578, 307);
+            this.chkTrack.Name = "chkTrack";
+            this.chkTrack.Size = new System.Drawing.Size(72, 17);
+            this.chkTrack.TabIndex = 4;
+            this.chkTrack.Text = "with track";
+            this.chkTrack.UseVisualStyleBackColor = true;
+            this.chkTrack.Visible = false;
+            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
+            // 
+            // chkRadar
+            // 
+            this.chkRadar.AutoSize = true;
+            this.chkRadar.Location = new System.Drawing.Point(489, 294);
+            this.chkRadar.Name = "chkRadar";
+            this.chkRadar.Size = new System.Drawing.Size(83, 17);
+            this.chkRadar.TabIndex = 0;
+            this.chkRadar.Text = "show Radar";
+            this.chkRadar.UseVisualStyleBackColor = true;
+            this.chkRadar.Visible = false;
+            this.chkRadar.CheckedChanged += new System.EventHandler(this.chkRadar_CheckedChanged);
             // 
             // groupBox14
             // 
@@ -575,6 +617,7 @@ namespace OSD
             this.txtCurr_k.TabIndex = 21;
             this.txtCurr_k.Text = "1";
             this.txtCurr_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.txtCurr_k, "Factor to fine tuning");
             this.txtCurr_k.Leave += new System.EventHandler(this.txtCurr_k_TextChanged);
             // 
             // label19
@@ -636,7 +679,7 @@ namespace OSD
             this.groupBox2.Controls.Add(this.label12);
             this.groupBox2.Location = new System.Drawing.Point(5, 236);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(314, 142);
+            this.groupBox2.Size = new System.Drawing.Size(316, 142);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sensors";
@@ -877,7 +920,7 @@ namespace OSD
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(190, 54);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(129, 65);
+            this.groupBox1.Size = new System.Drawing.Size(131, 63);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Output";
@@ -931,31 +974,6 @@ namespace OSD
             this.label1.TabIndex = 0;
             this.label1.Text = "Source";
             // 
-            // groupBox15
-            // 
-            this.groupBox15.Controls.Add(this.chkTrack);
-            this.groupBox15.Controls.Add(this.groupBox16);
-            this.groupBox15.Controls.Add(this.chkILS);
-            this.groupBox15.Controls.Add(this.chkRadar);
-            this.groupBox15.Location = new System.Drawing.Point(490, 123);
-            this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(181, 202);
-            this.groupBox15.TabIndex = 12;
-            this.groupBox15.TabStop = false;
-            this.groupBox15.Text = "Horizon";
-            // 
-            // chkTrack
-            // 
-            this.chkTrack.AutoSize = true;
-            this.chkTrack.Location = new System.Drawing.Point(98, 24);
-            this.chkTrack.Name = "chkTrack";
-            this.chkTrack.Size = new System.Drawing.Size(72, 17);
-            this.chkTrack.TabIndex = 4;
-            this.chkTrack.Text = "with track";
-            this.chkTrack.UseVisualStyleBackColor = true;
-            this.chkTrack.Visible = false;
-            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
-            // 
             // groupBox16
             // 
             this.groupBox16.Controls.Add(this.label24);
@@ -968,12 +986,12 @@ namespace OSD
             this.groupBox16.Controls.Add(this.label22);
             this.groupBox16.Controls.Add(this.txtRollPal);
             this.groupBox16.Controls.Add(this.label21);
-            this.groupBox16.Location = new System.Drawing.Point(6, 77);
+            this.groupBox16.Location = new System.Drawing.Point(6, 119);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(169, 116);
+            this.groupBox16.Size = new System.Drawing.Size(178, 116);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
-            this.groupBox16.Text = "Angle adjust";
+            this.groupBox16.Text = "Horizon Angle adjust";
             // 
             // label24
             // 
@@ -1069,30 +1087,6 @@ namespace OSD
             this.label21.TabIndex = 22;
             this.label21.Text = "Roll";
             // 
-            // chkILS
-            // 
-            this.chkILS.AutoSize = true;
-            this.chkILS.Location = new System.Drawing.Point(9, 54);
-            this.chkILS.Name = "chkILS";
-            this.chkILS.Size = new System.Drawing.Size(70, 17);
-            this.chkILS.TabIndex = 1;
-            this.chkILS.Text = "show ILS";
-            this.chkILS.UseVisualStyleBackColor = true;
-            this.chkILS.Visible = false;
-            this.chkILS.CheckedChanged += new System.EventHandler(this.chkILS_CheckedChanged);
-            // 
-            // chkRadar
-            // 
-            this.chkRadar.AutoSize = true;
-            this.chkRadar.Location = new System.Drawing.Point(9, 22);
-            this.chkRadar.Name = "chkRadar";
-            this.chkRadar.Size = new System.Drawing.Size(83, 17);
-            this.chkRadar.TabIndex = 0;
-            this.chkRadar.Text = "show Radar";
-            this.chkRadar.UseVisualStyleBackColor = true;
-            this.chkRadar.Visible = false;
-            this.chkRadar.CheckedChanged += new System.EventHandler(this.chkRadar_CheckedChanged);
-            // 
             // groupBox13
             // 
             this.groupBox13.Controls.Add(this.txtBattB_k);
@@ -1115,6 +1109,7 @@ namespace OSD
             this.txtBattB_k.TabIndex = 23;
             this.txtBattB_k.Text = "1";
             this.txtBattB_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.txtBattB_k, "Factor to fine tuning");
             this.txtBattB_k.Leave += new System.EventHandler(this.txtBattB_k_TextChanged);
             // 
             // label28
@@ -1140,9 +1135,9 @@ namespace OSD
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(6, 44);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(118, 13);
+            this.label6.Size = new System.Drawing.Size(147, 13);
             this.label6.TabIndex = 4;
-            this.label6.Text = "Min. Battery Voltage (V)";
+            this.label6.Text = "Warn Min. Battery Voltage (V)";
             // 
             // numMinVoltB
             // 
@@ -1162,6 +1157,7 @@ namespace OSD
             this.numMinVoltB.Size = new System.Drawing.Size(91, 20);
             this.numMinVoltB.TabIndex = 3;
             this.numMinVoltB.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.numMinVoltB, "Warning level, 0 to turn off");
             this.numMinVoltB.ValueChanged += new System.EventHandler(this.numMinVoltB_ValueChanged);
             // 
             // groupBox9
@@ -1321,16 +1317,85 @@ namespace OSD
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.txtTime3);
+            this.groupBox7.Controls.Add(this.txtTime2);
+            this.groupBox7.Controls.Add(this.txtTime1);
+            this.groupBox7.Controls.Add(this.txtTime0);
+            this.groupBox7.Controls.Add(this.lblTimes);
+            this.groupBox7.Controls.Add(this.chkDiap);
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
             this.groupBox7.Controls.Add(this.label11);
             this.groupBox7.Controls.Add(this.chkSwitchOnce);
             this.groupBox7.Location = new System.Drawing.Point(5, 5);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(179, 68);
+            this.groupBox7.Size = new System.Drawing.Size(179, 112);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "OSD Toggle Channel";
+            // 
+            // txtTime3
+            // 
+            this.txtTime3.Location = new System.Drawing.Point(125, 84);
+            this.txtTime3.Name = "txtTime3";
+            this.txtTime3.Size = new System.Drawing.Size(32, 20);
+            this.txtTime3.TabIndex = 32;
+            this.txtTime3.Text = "1";
+            this.txtTime3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtTime3.Visible = false;
+            // 
+            // txtTime2
+            // 
+            this.txtTime2.Location = new System.Drawing.Point(87, 84);
+            this.txtTime2.Name = "txtTime2";
+            this.txtTime2.Size = new System.Drawing.Size(32, 20);
+            this.txtTime2.TabIndex = 31;
+            this.txtTime2.Text = "1";
+            this.txtTime2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtTime2.Visible = false;
+            // 
+            // txtTime1
+            // 
+            this.txtTime1.Location = new System.Drawing.Point(49, 84);
+            this.txtTime1.Name = "txtTime1";
+            this.txtTime1.Size = new System.Drawing.Size(32, 20);
+            this.txtTime1.TabIndex = 30;
+            this.txtTime1.Text = "1";
+            this.txtTime1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtTime1.Visible = false;
+            // 
+            // txtTime0
+            // 
+            this.txtTime0.Location = new System.Drawing.Point(11, 84);
+            this.txtTime0.Name = "txtTime0";
+            this.txtTime0.Size = new System.Drawing.Size(32, 20);
+            this.txtTime0.TabIndex = 29;
+            this.txtTime0.Text = "1";
+            this.txtTime0.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.txtTime0, "Time to show screen. If 0 then this screen will not be in auto-switch and will be" +
+        " available by manual switching");
+            this.txtTime0.Visible = false;
+            // 
+            // lblTimes
+            // 
+            this.lblTimes.AutoSize = true;
+            this.lblTimes.Location = new System.Drawing.Point(13, 68);
+            this.lblTimes.Name = "lblTimes";
+            this.lblTimes.Size = new System.Drawing.Size(142, 13);
+            this.lblTimes.TabIndex = 13;
+            this.lblTimes.Text = "Auto-switch times per screen";
+            this.lblTimes.Visible = false;
+            // 
+            // chkDiap
+            // 
+            this.chkDiap.AutoSize = true;
+            this.chkDiap.Location = new System.Drawing.Point(107, 22);
+            this.chkDiap.Name = "chkDiap";
+            this.chkDiap.Size = new System.Drawing.Size(61, 17);
+            this.chkDiap.TabIndex = 12;
+            this.chkDiap.Text = "by  200";
+            this.hint.SetToolTip(this.chkDiap, "Turn by small change - not full channel range");
+            this.chkDiap.UseVisualStyleBackColor = true;
             // 
             // TOGGLE_BEH
             // 
@@ -1341,6 +1406,7 @@ namespace OSD
             this.TOGGLE_BEH.Size = new System.Drawing.Size(101, 17);
             this.TOGGLE_BEH.TabIndex = 10;
             this.TOGGLE_BEH.Text = "Rotation Switch";
+            this.hint.SetToolTip(this.TOGGLE_BEH, "Go to next screen on each switch");
             this.TOGGLE_BEH.UseVisualStyleBackColor = true;
             this.TOGGLE_BEH.CheckedChanged += new System.EventHandler(this.TOGGLE_BEHChanged);
             // 
@@ -1349,23 +1415,18 @@ namespace OSD
             this.ONOFF_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
-            "Disabled", // 0
+            "Disabled",
+            "By time",
             "External PWM",
             "Mode Switch",
             "Ch 5",
             "Ch 6",
             "Ch 7",
-            "Ch 8",
-/*            "Ch 9",
-            "Ch 10",
-            "Ch 11",
-            "Ch 12",
- */
-            });
+            "Ch 8"});
             this.ONOFF_combo.Location = new System.Drawing.Point(11, 20);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
-            this.ONOFF_combo.Size = new System.Drawing.Size(157, 21);
+            this.ONOFF_combo.Size = new System.Drawing.Size(84, 21);
             this.ONOFF_combo.TabIndex = 3;
             this.ONOFF_combo.SelectedIndexChanged += new System.EventHandler(this.ONOFF_combo_SelectedIndexChanged);
             // 
@@ -1385,6 +1446,7 @@ namespace OSD
             this.chkSwitchOnce.Size = new System.Drawing.Size(52, 17);
             this.chkSwitchOnce.TabIndex = 11;
             this.chkSwitchOnce.Text = "Once";
+            this.hint.SetToolTip(this.chkSwitchOnce, "Turn off autorepeat");
             this.chkSwitchOnce.UseVisualStyleBackColor = true;
             // 
             // groupBox6
@@ -1393,7 +1455,7 @@ namespace OSD
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Location = new System.Drawing.Point(190, 5);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(129, 46);
+            this.groupBox6.Size = new System.Drawing.Size(131, 46);
             this.groupBox6.TabIndex = 7;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Units";
@@ -1445,6 +1507,7 @@ namespace OSD
             this.txtBattA_k.TabIndex = 23;
             this.txtBattA_k.Text = "1";
             this.txtBattA_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.txtBattA_k, "Factor to fine tuning");
             this.txtBattA_k.Leave += new System.EventHandler(this.txtBattA_k_TextChanged);
             // 
             // label27
@@ -1494,6 +1557,7 @@ namespace OSD
             this.BATT_WARNnumeric.Size = new System.Drawing.Size(91, 20);
             this.BATT_WARNnumeric.TabIndex = 12;
             this.BATT_WARNnumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.BATT_WARNnumeric, "Warning level, 0 to turn off");
             this.BATT_WARNnumeric.ValueChanged += new System.EventHandler(this.BATT_WARNnumeric_ValueChanged);
             // 
             // label7
@@ -1501,9 +1565,9 @@ namespace OSD
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(5, 45);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(118, 13);
+            this.label7.Size = new System.Drawing.Size(147, 13);
             this.label7.TabIndex = 2;
-            this.label7.Text = "Min. Battery Voltage (V)";
+            this.label7.Text = "Warn Min. Battery Voltage (V)";
             // 
             // MINVOLT_numeric
             // 
@@ -1523,6 +1587,7 @@ namespace OSD
             this.MINVOLT_numeric.Size = new System.Drawing.Size(91, 20);
             this.MINVOLT_numeric.TabIndex = 0;
             this.MINVOLT_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.MINVOLT_numeric, "Warning level, 0 to turn off");
             this.MINVOLT_numeric.ValueChanged += new System.EventHandler(this.MINVOLT_numeric_ValueChanged);
             // 
             // groupBox3
@@ -1533,14 +1598,15 @@ namespace OSD
             this.groupBox3.Controls.Add(this.STALL_numeric);
             this.groupBox3.Location = new System.Drawing.Point(190, 119);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(131, 115);
+            this.groupBox3.Size = new System.Drawing.Size(131, 116);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Warnings";
             // 
             // OVERSPEED_label
             // 
             this.OVERSPEED_label.AutoSize = true;
-            this.OVERSPEED_label.Location = new System.Drawing.Point(8, 55);
+            this.OVERSPEED_label.Location = new System.Drawing.Point(8, 71);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
             this.OVERSPEED_label.Size = new System.Drawing.Size(93, 13);
             this.OVERSPEED_label.TabIndex = 4;
@@ -1548,7 +1614,7 @@ namespace OSD
             // 
             // OVERSPEED_numeric
             // 
-            this.OVERSPEED_numeric.Location = new System.Drawing.Point(37, 72);
+            this.OVERSPEED_numeric.Location = new System.Drawing.Point(37, 87);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -1563,7 +1629,7 @@ namespace OSD
             // STALL_label
             // 
             this.STALL_label.AutoSize = true;
-            this.STALL_label.Location = new System.Drawing.Point(6, 10);
+            this.STALL_label.Location = new System.Drawing.Point(6, 26);
             this.STALL_label.Name = "STALL_label";
             this.STALL_label.Size = new System.Drawing.Size(95, 13);
             this.STALL_label.TabIndex = 2;
@@ -1571,7 +1637,7 @@ namespace OSD
             // 
             // STALL_numeric
             // 
-            this.STALL_numeric.Location = new System.Drawing.Point(35, 26);
+            this.STALL_numeric.Location = new System.Drawing.Point(35, 41);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
@@ -1596,21 +1662,22 @@ namespace OSD
             this.groupBoxRSSI.Controls.Add(this.lblRSSIMin);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_max);
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
-            this.groupBoxRSSI.Location = new System.Drawing.Point(5, 75);
+            this.groupBoxRSSI.Location = new System.Drawing.Point(490, 119);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
-            this.groupBoxRSSI.Size = new System.Drawing.Size(179, 159);
+            this.groupBoxRSSI.Size = new System.Drawing.Size(181, 159);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
             this.groupBoxRSSI.Text = "RSSI";
             // 
             // txtRSSI_k
             // 
-            this.txtRSSI_k.Location = new System.Drawing.Point(121, 128);
+            this.txtRSSI_k.Location = new System.Drawing.Point(125, 128);
             this.txtRSSI_k.Name = "txtRSSI_k";
             this.txtRSSI_k.Size = new System.Drawing.Size(47, 20);
             this.txtRSSI_k.TabIndex = 23;
             this.txtRSSI_k.Text = "1";
             this.txtRSSI_k.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.txtRSSI_k, "Factor to fine tuning");
             this.txtRSSI_k.Leave += new System.EventHandler(this.txtRSSI_k_TextChanged);
             // 
             // label20
@@ -1632,7 +1699,7 @@ namespace OSD
             "Pin RSSI analog",
             "Pin RSSI PWM",
             "3DR modem RSSI"});
-            this.cbxRSSIChannel.Location = new System.Drawing.Point(77, 9);
+            this.cbxRSSIChannel.Location = new System.Drawing.Point(81, 9);
             this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
             this.cbxRSSIChannel.Name = "cbxRSSIChannel";
             this.cbxRSSIChannel.Size = new System.Drawing.Size(91, 21);
@@ -1659,11 +1726,12 @@ namespace OSD
             // 
             // RSSI_WARNnumeric
             // 
-            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(99, 85);
+            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(111, 85);
             this.RSSI_WARNnumeric.Name = "RSSI_WARNnumeric";
-            this.RSSI_WARNnumeric.Size = new System.Drawing.Size(69, 20);
+            this.RSSI_WARNnumeric.Size = new System.Drawing.Size(61, 20);
             this.RSSI_WARNnumeric.TabIndex = 10;
             this.RSSI_WARNnumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.RSSI_WARNnumeric, "0 to turn off");
             this.RSSI_WARNnumeric.ValueChanged += new System.EventHandler(this.RSSI_WARNnumeric_ValueChanged);
             // 
             // RSSI_RAW
@@ -1672,9 +1740,9 @@ namespace OSD
             this.RSSI_RAW.Location = new System.Drawing.Point(8, 106);
             this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2);
             this.RSSI_RAW.Name = "RSSI_RAW";
-            this.RSSI_RAW.Size = new System.Drawing.Size(84, 17);
+            this.RSSI_RAW.Size = new System.Drawing.Size(102, 17);
             this.RSSI_RAW.TabIndex = 9;
-            this.RSSI_RAW.Text = "Enable Raw";
+            this.RSSI_RAW.Text = "Show raw value";
             this.RSSI_RAW.UseVisualStyleBackColor = true;
             this.RSSI_RAW.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
@@ -1698,7 +1766,7 @@ namespace OSD
             // 
             // RSSI_numeric_max
             // 
-            this.RSSI_numeric_max.Location = new System.Drawing.Point(77, 61);
+            this.RSSI_numeric_max.Location = new System.Drawing.Point(81, 61);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -1717,7 +1785,7 @@ namespace OSD
             // 
             // RSSI_numeric_min
             // 
-            this.RSSI_numeric_min.Location = new System.Drawing.Point(77, 35);
+            this.RSSI_numeric_min.Location = new System.Drawing.Point(81, 35);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -1790,7 +1858,7 @@ namespace OSD
             // 
             this.cbxModelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxModelType.FormattingEnabled = true;
-            this.cbxModelType.Location = new System.Drawing.Point(123, 13);
+            this.cbxModelType.Location = new System.Drawing.Point(134, 13);
             this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
             this.cbxModelType.Name = "cbxModelType";
             this.cbxModelType.Size = new System.Drawing.Size(126, 21);
@@ -1898,8 +1966,6 @@ namespace OSD
             // 
             // OSD
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            //this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(688, 558);
             this.Controls.Add(this.BUT_ClearScreen);
@@ -1927,14 +1993,13 @@ namespace OSD
             this.menuStrip1.PerformLayout();
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
+            this.tabPageConfig.PerformLayout();
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox15.ResumeLayout(false);
-            this.groupBox15.PerformLayout();
             this.groupBox16.ResumeLayout(false);
             this.groupBox16.PerformLayout();
             this.groupBox13.ResumeLayout(false);
@@ -2059,7 +2124,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem getFwFromOSDToolStripMenuItem;
         private System.Windows.Forms.CheckBox cbxAutoUpdate;
         private System.Windows.Forms.CheckBox cbxShowUpdateDialog;
-        private System.Windows.Forms.GroupBox groupBox15;
+        
         private System.Windows.Forms.CheckBox chkRadar;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.Label label16;
@@ -2135,6 +2200,13 @@ namespace OSD
         private System.Windows.Forms.CheckBox chkSwitchOnce;
         private System.Windows.Forms.Button BUT_CopyScreen;
         private System.Windows.Forms.Button BUT_ClearScreen;
+        private System.Windows.Forms.TextBox txtTime3;
+        private System.Windows.Forms.TextBox txtTime2;
+        private System.Windows.Forms.TextBox txtTime1;
+        private System.Windows.Forms.TextBox txtTime0;
+        private System.Windows.Forms.Label lblTimes;
+        private System.Windows.Forms.CheckBox chkDiap;
+        private System.Windows.Forms.ToolTip hint;
     }
 
 }

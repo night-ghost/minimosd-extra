@@ -21,6 +21,7 @@ namespace ArdupilotMega
             // default dtr status is false
 
             //from http://svn.savannah.nongnu.org/viewvc/RELEASE_5_11_0/arduino.c?root=avrdude&view=markup
+            if(base.IsOpen) base.Close ();
             base.Open();
 
             base.DtrEnable = false;

@@ -410,6 +410,10 @@ Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi
 
 		} break;
 		
+		case MAVLINK_MSG_ID_RANGEFINDER:
+		    //float mavlink_msg_rangefinder_get_distance(&msg.m);
+		    break;
+		
             default:
                 //Do nothing
                 break;

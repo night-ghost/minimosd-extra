@@ -1,0 +1,4 @@
+localisation support! lang.txt file in EXE's folder, 
+preliminary support of timed screen switch (only in form)
+
+file default.osd readed at startup if present

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r857 DV";
+        public const string VERSION = "r858 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -104,7 +104,7 @@ namespace OSD {
         /*------------------------------------------------*/
         public int panel_number = 0;
 
-        const Int16 toggle_offset = 2;
+        const Int16 toggle_offset = 1;
         public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
         /// <summary>
         /// the un-scaled font render image
@@ -284,6 +284,7 @@ namespace OSD {
                 usedPostion[a] = new string[SCREEN_H];
             }
 
+            InitPanelControls();
 
 
             for (n = 0; n < npanel; n++) { // для всех панелей
@@ -338,12 +339,10 @@ namespace OSD {
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
-                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
-                 //pi[a++] = new Panel("Baro Alt", pan.panBaroAlt, 1, 4, panBroAlt_XY, 1, -1);
+                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");                
                 pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
                 pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb_Strings, 0, "Select channel", -1, "Extended range (800-2200)", str_id: 0, str_count: 5, strings: "Off|Low|Mid|Hi!|On!" );
                 pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
-
                 pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
     
 
@@ -417,15 +416,20 @@ namespace OSD {
                 }
                 li.CheckBoxes = true;
                 li.Sort();
+
+
                 startup = false;
-
-                Draw(n);
-
             }	// цикл по экранам
 
+            loadDefaultOsd();
 
+            for (n = 0; n < npanel; n++) { // для всех панелей
+                Draw(n);
+            }
 
+        }
 
+        void InitPanelControls(){
             //Setup configuration panel
             STALL_numeric.Value = pan.stall;
             RSSI_numeric_min.Value = pan.rssipersent;
@@ -444,9 +448,9 @@ namespace OSD {
             //			cbxHomeAltitudeSign.Checked = (pan.sign_home_altitude!=0);
             //			cbxMslAltitudeSign.Checked = (pan.sign_msl_altitude!=0);
 
-//            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
-//                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
-//            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)(pan.auto_screen_switch);
+            //            if (cbxWarningsAutoPanelSwitch.Items.Count == 0)
+            //                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
+            //            cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)(pan.auto_screen_switch);
 
             if (!pan.converts) {
                 UNITS_combo.SelectedIndex = 0; //metric
@@ -460,22 +464,22 @@ namespace OSD {
 
             MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
 
-            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels+1)
+            if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels + 1)
                 ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
-                /*
-                 0 -> 2 = disabled
-                 1 -> 3 = Ext PWM
-                 2 -> 4 = mode
-                 3 -> 5 = Ch N
-                 4...
-                 */
+            /*
+             0 -> 2 = disabled
+             1 -> 3 = Ext PWM
+             2 -> 4 = mode
+             3 -> 5 = Ch N
+             4...
+             */
             else
                 ONOFF_combo.SelectedIndex = 0; //reject garbage from the read file
 
             CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
             CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
-//            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+            //            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
             chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
             BATT_WARNnumeric.Value = pan.batt_warn_level;
@@ -508,6 +512,7 @@ namespace OSD {
 
             chkRadar.Checked = pan.flgRadar;
             chkILS.Checked = pan.flgILS;
+
         }
 
         public string[] GetPortNames() {
@@ -768,6 +773,9 @@ namespace OSD {
                 scr[k].init();
                 scr[k].last_init();
             }
+
+            Translate(this);
+
             BUT_CopyScreen.Visible = false;
             BUT_ClearScreen.Visible = false;
 
@@ -981,6 +989,9 @@ namespace OSD {
                 conf.eeprom.sensors.sensor_A4 = myConvert(txtSAdd4.Text);
 
                 conf.eeprom.flags[osd_switch_once] = chkSwitchOnce.Checked;
+    
+                  
+                conf.eeprom .sets.autoswitch_times =convertTimes();
 
             } else if (panel_number >= 0 && panel_number < npanel) {
                 //First Panel 
@@ -1573,6 +1584,8 @@ namespace OSD {
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
                 chkSwitchOnce.Checked = conf.eeprom.flags[osd_switch_once];
+
+                updateTimes(conf.eeprom.sets.autoswitch_times);
             } catch  { }
 
 
@@ -1838,6 +1851,10 @@ namespace OSD {
                         sw.WriteLine("{0}\t{1}", "SAdd4", txtSAdd4.Text);
 
                         sw.WriteLine("{0}\t{1}", "flgOnce", chkSwitchOnce.Checked);
+                        sw.WriteLine("{0}\t{1}", "txtTime0", txtTime0.Text);
+                        sw.WriteLine("{0}\t{1}", "txtTime1", txtTime1.Text);
+                        sw.WriteLine("{0}\t{1}", "txtTime2", txtTime2.Text);
+                        sw.WriteLine("{0}\t{1}", "txtTime3", txtTime3.Text);
                         
                         sw.Close();
                     }
@@ -1854,251 +1871,262 @@ namespace OSD {
             //const int nosdfunctions = 29;
             ofd.ShowDialog();
 
-            startup = true;
+            if (ofd.FileName != "") 
+                loadOsdFile(ofd.FileName);
 
+            //ofd.OpenFile()
+        }
+
+        void loadOsdFile(string fn) {
             string[] strings = { "" };
+            startup=true;
+            try {
+                using (StreamReader sr = new StreamReader(fn)) {
+                    while (!sr.EndOfStream) {
+                        //Panel 1
+                        //string stringh = sr.ReadLine(); //
+                        string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
+                        int k = 0;
 
-            if (ofd.FileName != "") {
-                try {
-                    using (StreamReader sr = new StreamReader(ofd.OpenFile())) {
-                        while (!sr.EndOfStream) {
-                            //Panel 1
-                            //string stringh = sr.ReadLine(); //
-                            string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
-                            int k = 0;
+                        if (hdr[0] != "Panel")
+                            break;
 
-                            if (hdr[0] != "Panel")
-                                break;
-
-                            k = int.Parse(hdr[1]);
-                            //while (!sr.EndOfStream)
-                            for (int i = 0; i < osd_functions_N; i++) {
-                                strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                                for (int a = 0; a < scr[k].panelItems.Length; a++) {
-                                    if (this.scr[k].panelItems[a] != null && scr[k].panelItems[a].name == strings[0]) {
-                                        var pi = scr[k].panelItems[a];
-                                        // incase there is an invalid line number or to shore
-                                        try {
-                                            //scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
-                                            pi.x = int.Parse(strings[1]);
-                                            pi.y = int.Parse(strings[2]);
-                                            if (!int.TryParse(strings[4], out pi.sign)) {
-                                                pi.sign = 1;
-                                            }
-                                            // if TryParse fails, default is zero
-                                            int.TryParse(strings[5], out pi.Altf);
-                                            int.TryParse(strings[6], out pi.Alt2);
-                                            int.TryParse(strings[7], out pi.Alt3);
-                                            int.TryParse(strings[8], out pi.Alt4);
-
-                                            try {
-                                                if(pi.string_count >0){
-                                                    pi.strings =strings[9];
-                                                    updatePanelStrings(pi.string_id, pi.string_count, pi.strings );
-                                                }
-                                            } catch{};
-                                            TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
-                                            if (tnArray.Length > 0)
-                                                tnArray[0].Checked = (strings[3] == "True");
-                                        } catch (Exception ex) {
-                                            MessageBox.Show("Error reading file: " + ex.Message);
+                        k = int.Parse(hdr[1]);
+                        //while (!sr.EndOfStream)
+                        for (int i = 0; i < osd_functions_N; i++) {
+                            strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int a = 0; a < scr[k].panelItems.Length; a++) {
+                                if (this.scr[k].panelItems[a] != null && scr[k].panelItems[a].name == strings[0]) {
+                                    var pi = scr[k].panelItems[a];
+                                    // incase there is an invalid line number or to shore
+                                    try {
+                                        //scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
+                                        pi.x = int.Parse(strings[1]);
+                                        pi.y = int.Parse(strings[2]);
+                                        if (!int.TryParse(strings[4], out pi.sign)) {
+                                            pi.sign = 1;
                                         }
+                                        // if TryParse fails, default is zero
+                                        if(strings.Length >=6)
+                                        int.TryParse(strings[5], out pi.Altf);
+                                        if (strings.Length >= 7)
+                                        int.TryParse(strings[6], out pi.Alt2);
+                                        if (strings.Length >= 8)
+                                        int.TryParse(strings[7], out pi.Alt3);
+                                        if (strings.Length >= 9)
+                                        int.TryParse(strings[8], out pi.Alt4);
+
+                                        try {
+                                            if(pi.string_count >0){
+                                                pi.strings =strings[9];
+                                                updatePanelStrings(pi.string_id, pi.string_count, pi.strings );
+                                            }
+                                        } catch{};
+                                        TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
+                                        if (tnArray.Length > 0)
+                                            tnArray[0].Checked = (strings[3] == "True");
+                                    } catch (Exception ex) {
+                                        MessageBox.Show("Error reading file: " + ex.Message);
                                     }
                                 }
                             }
                         }
-                        //                        stringh = sr.ReadLine(); //config
-                        while (!sr.EndOfStream) {
-                            strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-
-                            if (strings[0] == "Units")
-                                try {
-                                    pan.converts = byte.Parse(strings[1]) != 0;
-                                } catch {
-                                    pan.converts = bool.Parse(strings[1]);
-                                } else if (strings[0] == "Overspeed")
-                                pan.overspeed = byte.Parse(strings[1]);
-                            else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
-                            else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
-                            else if (strings[0] == "RSSI High")
-                                pan.rssical = (UInt16)(int.Parse(strings[1]));
-                            else if (strings[0] == "RSSI Low")
-                                pan.rssipersent = (UInt16)(int.Parse(strings[1]));
-                            else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
-                            else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
-                            else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
-                            else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
-                            else if (strings[0] == "Video Mode")
-                                try {
-                                    pan.pal_ntsc = byte.Parse(strings[1]) != 0;
-                                } catch {
-                                    pan.pal_ntsc = bool.Parse(strings[1]);
-                                }
-                                //sw.WriteLine("{0}\t{1}", "Auto Mode", pan.mode_auto);
-                            else if (strings[0] == "Auto Mode")
-                                try {
-                                    pan.mode_auto = byte.Parse(strings[1]) != 0;
-                                } catch {
-                                    pan.mode_auto = bool.Parse(strings[1]);
-                                } else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
-                            else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
-                            else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
-                            else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
-                            else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1])); //we're not overwriting "eeprom" model type
-                            else if (strings[0] == "BattB") pan.battBv = byte.Parse(strings[1]);
-                            else if (strings[0] == "rssi_k") pan.rssi_koef = float.Parse(strings[1]);
-                            else if (strings[0] == "curr_k") pan.Curr_koef = float.Parse(strings[1]);
-                            else if (strings[0] == "batt_a_k") pan.battA_koef = float.Parse(strings[1]);
-                            else if (strings[0] == "batt_b_k") pan.battB_koef = float.Parse(strings[1]);
-                            else if (strings[0] == "roll_k") pan.roll_k = float.Parse(strings[1]);
-                            else if (strings[0] == "pitch_k") pan.pitch_k = float.Parse(strings[1]);
-                            else if (strings[0] == "roll_kn") pan.roll_k_ntsc = float.Parse(strings[1]);
-                            else if (strings[0] == "pitch_kn") pan.pitch_k_ntsc = float.Parse(strings[1]);
-                            else if (strings[0] == "fBattA") pan.flgBattA = bool.Parse(strings[1]);
-                            else if (strings[0] == "fBattB") pan.flgBattB = bool.Parse(strings[1]);
-                            else if (strings[0] == "fCurr") pan.flgCurrent = bool.Parse(strings[1]);
-                            else if (strings[0] == "fRadar") pan.flgRadar = bool.Parse(strings[1]);
-                            else if (strings[0] == "fILS") pan.flgILS = bool.Parse(strings[1]);
-                            else if (strings[0] == "HOS") pan.horiz_offs = (byte)int.Parse(strings[1]);
-                            else if (strings[0] == "VOS") pan.vert_offs = (byte)int.Parse(strings[1]);
-                            else if (strings[0] == "PWMSRC") pan.pwm_src = (byte)int.Parse(strings[1]);
-                            else if (strings[0] == "PWMDST") pan.pwm_dst = (byte)int.Parse(strings[1]);
-                            else if (strings[0] == "NSCREENS") pan.n_screens = (byte)int.Parse(strings[1]);
-                            else if (strings[0] == "flgHUD") pan.flgHUD = bool.Parse(strings[1]);
-                            else if (strings[0] == "flgTrack") pan.flgTrack = bool.Parse(strings[1]);
-
-                            else if (strings[0] == "SFormat1") txtFormat1.Text = strings[1];
-                            else if (strings[0] == "SFormat2") txtFormat2.Text = strings[1];
-                            else if (strings[0] == "SFormat3") txtFormat3.Text = strings[1];
-                            else if (strings[0] == "SFormat4") txtFormat4.Text = strings[1];
-
-                            else if (strings[0] == "SFactor1") txtFactor1.Text = strings[1];
-                            else if (strings[0] == "SFactor2") txtFactor2.Text = strings[1];
-                            else if (strings[0] == "SFactor3") txtFactor3.Text = strings[1];
-                            else if (strings[0] == "SFactor4") txtFactor4.Text = strings[1];
-
-                            else if (strings[0] == "SAdd1") txtSAdd1.Text = strings[1];
-                            else if (strings[0] == "SAdd2") txtSAdd2.Text = strings[1];
-                            else if (strings[0] == "SAdd3") txtSAdd3.Text = strings[1];
-                            else if (strings[0] == "SAdd4") txtSAdd4.Text = strings[1];
-
-                            else if (strings[0] == "flgOnce") chkSwitchOnce.Checked = bool.Parse(strings[1]);
-                        }
-
-                        //pan.model_type = (byte)cbxModelType.SelectedItem;
-
-                        //Modify units
-                        if (!pan.converts) {
-                            UNITS_combo.SelectedIndex = 0; //metric
-                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
-                            OVERSPEED_label.Text = "Overspeed (km/h)";
-                        } else {
-                            UNITS_combo.SelectedIndex = 1; //imperial
-                            STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
-                            OVERSPEED_label.Text = "Overspeed (mph)";
-                        }
-
-                        OVERSPEED_numeric.Value = pan.overspeed;
-                        STALL_numeric.Value = pan.stall;
-                        MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
-
-                        //RSSI_numeric_max.Value = pan.rssical;
-                        //RSSI_numeric_min.Value = pan.rssipersent;
-
-                        updatingRSSI = true;
-                        RSSI_numeric_min.Minimum = 0;
-                        RSSI_numeric_min.Maximum = 2047;
-                        RSSI_numeric_max.Minimum = 0;
-                        RSSI_numeric_max.Maximum = 2047;
-                        RSSI_numeric_min.Value = 0;
-                        RSSI_numeric_max.Value = 0;
-                        RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
-                        try {
-                            RSSI_numeric_min.Value = pan.rssipersent;
-                        } catch {
-                            RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
-                        }
-                        try {
-                            RSSI_numeric_max.Value = pan.rssical;
-                        } catch {
-                            RSSI_numeric_max.Value = RSSI_numeric_max.Minimum;
-                        }
-
-                        cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
-
-                        if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels+1) 
-                             ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
-                        else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
-
-                        //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
-                        TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
-
-                        CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
-                        CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
-
-                        //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
-                        chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
-
-                        BATT_WARNnumeric.Value = pan.batt_warn_level;
-                        RSSI_WARNnumeric.Value = pan.rssi_warn_level;
-
-                        BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
-
-                        try {
-                            numHOS.Value = pan.horiz_offs - 0x20;
-                            numVOS.Value = pan.vert_offs - 0x10;
-                        } catch {
-                            pan.horiz_offs = (byte)numHOS.Value;
-                            pan.vert_offs = (byte)numVOS.Value;
-                        }
-
-                        CALLSIGNmaskedText.Text = pan.callsign_str;
-
-                        //                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
-                        //                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
-                        //                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
-                        //                        cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0 ;
-
-                        this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
-                        this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
-                        this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
-                        // new!
-                        numMinVoltB.Text = (pan.battBv / 10.0).ToString();
-                        txtRSSI_k.Text = pan.rssi_koef.ToString();
-                        txtCurr_k.Text = pan.Curr_koef.ToString();
-                        txtBattA_k.Text = pan.battA_koef.ToString();
-                        txtBattB_k.Text = pan.battB_koef.ToString();
-                        txtRollPal.Text = pan.roll_k.ToString();
-                        txtPitchPal.Text = pan.pitch_k.ToString();
-                        txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
-                        txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
-
-
-                        cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
-                        cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
-
-                        chkRadar.Checked = pan.flgRadar;
-                        chkILS.Checked = pan.flgILS;
-
-                        try {
-                            cbOutSource.SelectedIndex = pan.pwm_src;
-                            cbOutPin.SelectedIndex = pan.pwm_dst;
-                        } catch  { }
-
-                        try {
-                            cbNscreens.SelectedIndex = pan.n_screens ;
-                        } catch  { }
-
                     }
-                } catch (Exception ex) {
-                    MessageBox.Show("Error Reading file at " + ex.Message + " str=" + strings[0] + " val=" + strings[1]);
-                } finally {
-                    updatingRSSI = false;
+                    //                        stringh = sr.ReadLine(); //config
+                    while (!sr.EndOfStream) {
+                        strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (strings[0] == "Units")
+                            try {
+                                pan.converts = byte.Parse(strings[1]) != 0;
+                            } catch {
+                                pan.converts = bool.Parse(strings[1]);
+                            } else if (strings[0] == "Overspeed")
+                            pan.overspeed = byte.Parse(strings[1]);
+                        else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
+                        else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
+                        else if (strings[0] == "RSSI High")
+                            pan.rssical = (UInt16)(int.Parse(strings[1]));
+                        else if (strings[0] == "RSSI Low")
+                            pan.rssipersent = (UInt16)(int.Parse(strings[1]));
+                        else if (strings[0] == "RSSI Enable Raw") pan.rssiraw_on = byte.Parse(strings[1]);
+                        else if (strings[0] == "Toggle Channel") pan.ch_toggle = byte.Parse(strings[1]);
+                        else if (strings[0] == "Auto Screen Switch") pan.auto_screen_switch = byte.Parse(strings[1]);
+                        else if (strings[0] == "Chanel Rotation Switching") pan.switch_mode = byte.Parse(strings[1]);
+                        else if (strings[0] == "Video Mode")
+                            try {
+                                pan.pal_ntsc = byte.Parse(strings[1]) != 0;
+                            } catch {
+                                pan.pal_ntsc = bool.Parse(strings[1]);
+                            }
+                            //sw.WriteLine("{0}\t{1}", "Auto Mode", pan.mode_auto);
+                        else if (strings[0] == "Auto Mode")
+                            try {
+                                pan.mode_auto = byte.Parse(strings[1]) != 0;
+                            } catch {
+                                pan.mode_auto = bool.Parse(strings[1]);
+                            } else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
+                        else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
+                        else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
+                        else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
+                        else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1])); //we're not overwriting "eeprom" model type
+                        else if (strings[0] == "BattB") pan.battBv = byte.Parse(strings[1]);
+                        else if (strings[0] == "rssi_k") pan.rssi_koef = float.Parse(strings[1]);
+                        else if (strings[0] == "curr_k") pan.Curr_koef = float.Parse(strings[1]);
+                        else if (strings[0] == "batt_a_k") pan.battA_koef = float.Parse(strings[1]);
+                        else if (strings[0] == "batt_b_k") pan.battB_koef = float.Parse(strings[1]);
+                        else if (strings[0] == "roll_k") pan.roll_k = float.Parse(strings[1]);
+                        else if (strings[0] == "pitch_k") pan.pitch_k = float.Parse(strings[1]);
+                        else if (strings[0] == "roll_kn") pan.roll_k_ntsc = float.Parse(strings[1]);
+                        else if (strings[0] == "pitch_kn") pan.pitch_k_ntsc = float.Parse(strings[1]);
+                        else if (strings[0] == "fBattA") pan.flgBattA = bool.Parse(strings[1]);
+                        else if (strings[0] == "fBattB") pan.flgBattB = bool.Parse(strings[1]);
+                        else if (strings[0] == "fCurr") pan.flgCurrent = bool.Parse(strings[1]);
+                        else if (strings[0] == "fRadar") pan.flgRadar = bool.Parse(strings[1]);
+                        else if (strings[0] == "fILS") pan.flgILS = bool.Parse(strings[1]);
+                        else if (strings[0] == "HOS") pan.horiz_offs = (byte)int.Parse(strings[1]);
+                        else if (strings[0] == "VOS") pan.vert_offs = (byte)int.Parse(strings[1]);
+                        else if (strings[0] == "PWMSRC") pan.pwm_src = (byte)int.Parse(strings[1]);
+                        else if (strings[0] == "PWMDST") pan.pwm_dst = (byte)int.Parse(strings[1]);
+                        else if (strings[0] == "NSCREENS") pan.n_screens = (byte)int.Parse(strings[1]);
+                        else if (strings[0] == "flgHUD") pan.flgHUD = bool.Parse(strings[1]);
+                        else if (strings[0] == "flgTrack") pan.flgTrack = bool.Parse(strings[1]);
+
+                        else if (strings[0] == "SFormat1") txtFormat1.Text = strings[1];
+                        else if (strings[0] == "SFormat2") txtFormat2.Text = strings[1];
+                        else if (strings[0] == "SFormat3") txtFormat3.Text = strings[1];
+                        else if (strings[0] == "SFormat4") txtFormat4.Text = strings[1];
+
+                        else if (strings[0] == "SFactor1") txtFactor1.Text = strings[1];
+                        else if (strings[0] == "SFactor2") txtFactor2.Text = strings[1];
+                        else if (strings[0] == "SFactor3") txtFactor3.Text = strings[1];
+                        else if (strings[0] == "SFactor4") txtFactor4.Text = strings[1];
+
+                        else if (strings[0] == "SAdd1") txtSAdd1.Text = strings[1];
+                        else if (strings[0] == "SAdd2") txtSAdd2.Text = strings[1];
+                        else if (strings[0] == "SAdd3") txtSAdd3.Text = strings[1];
+                        else if (strings[0] == "SAdd4") txtSAdd4.Text = strings[1];
+
+                        else if (strings[0] == "flgOnce") chkSwitchOnce.Checked = bool.Parse(strings[1]);
+                        else if (strings[0] == "txtTime0") txtTime0.Text = strings[1];
+                        else if (strings[0] == "txtTime1") txtTime1.Text = strings[1];
+                        else if (strings[0] == "txtTime2") txtTime2.Text = strings[1];
+                        else if (strings[0] == "txtTime3") txtTime3.Text = strings[1];
+                    }
+
+                    //pan.model_type = (byte)cbxModelType.SelectedItem;
+
+                    //Modify units
+                    if (!pan.converts) {
+                        UNITS_combo.SelectedIndex = 0; //metric
+                        STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                        OVERSPEED_label.Text = "Overspeed (km/h)";
+                    } else {
+                        UNITS_combo.SelectedIndex = 1; //imperial
+                        STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                        OVERSPEED_label.Text = "Overspeed (mph)";
+                    }
+
+                    OVERSPEED_numeric.Value = pan.overspeed;
+                    STALL_numeric.Value = pan.stall;
+                    MINVOLT_numeric.Value = Convert.ToDecimal(pan.battv) / Convert.ToDecimal(10.0);
+
+                    //RSSI_numeric_max.Value = pan.rssical;
+                    //RSSI_numeric_min.Value = pan.rssipersent;
+
+                    updatingRSSI = true;
+                    RSSI_numeric_min.Minimum = 0;
+                    RSSI_numeric_min.Maximum = 2047;
+                    RSSI_numeric_max.Minimum = 0;
+                    RSSI_numeric_max.Maximum = 2047;
+                    RSSI_numeric_min.Value = 0;
+                    RSSI_numeric_max.Value = 0;
+                    RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
+                    try {
+                        RSSI_numeric_min.Value = pan.rssipersent;
+                    } catch {
+                        RSSI_numeric_min.Value = RSSI_numeric_min.Minimum;
+                    }
+                    try {
+                        RSSI_numeric_max.Value = pan.rssical;
+                    } catch {
+                        RSSI_numeric_max.Value = RSSI_numeric_max.Minimum;
+                    }
+
+                    cbxRSSIChannel.SelectedIndex = rssi_decode(pan.rssiraw_on);
+
+                    if (pan.ch_toggle >= toggle_offset && pan.ch_toggle < NUM_PWM_Channels+1) 
+                            ONOFF_combo.SelectedIndex = pan.ch_toggle - toggle_offset;
+                    else ONOFF_combo.SelectedIndex = 0; //reject garbage from the red file
+
+                    //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
+                    TOGGLE_BEH.Checked = Convert.ToBoolean(pan.switch_mode);
+
+                    CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
+                    CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
+
+                    //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
+                    chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
+
+                    BATT_WARNnumeric.Value = pan.batt_warn_level;
+                    RSSI_WARNnumeric.Value = pan.rssi_warn_level;
+
+                    BRIGHTNESScomboBox.SelectedIndex = pan.osd_brightness;
+
+                    try {
+                        numHOS.Value = pan.horiz_offs - 0x20;
+                        numVOS.Value = pan.vert_offs - 0x10;
+                    } catch {
+                        pan.horiz_offs = (byte)numHOS.Value;
+                        pan.vert_offs = (byte)numVOS.Value;
+                    }
+
+                    CALLSIGNmaskedText.Text = pan.callsign_str;
+
+                    //                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
+                    //                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
+                    //                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
+                    //                        cbxMslAltitudeSign.Checked = pan.sign_msl_altitude!=0 ;
+
+                    this.CHK_pal_CheckedChanged(EventArgs.Empty, EventArgs.Empty);
+                    this.pALToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+                    this.nTSCToolStripMenuItem_CheckStateChanged(EventArgs.Empty, EventArgs.Empty);
+                    // new!
+                    numMinVoltB.Text = (pan.battBv / 10.0).ToString();
+                    txtRSSI_k.Text = pan.rssi_koef.ToString();
+                    txtCurr_k.Text = pan.Curr_koef.ToString();
+                    txtBattA_k.Text = pan.battA_koef.ToString();
+                    txtBattB_k.Text = pan.battB_koef.ToString();
+                    txtRollPal.Text = pan.roll_k.ToString();
+                    txtPitchPal.Text = pan.pitch_k.ToString();
+                    txtRollNtsc.Text = pan.roll_k_ntsc.ToString();
+                    txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
+
+
+                    cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
+                    cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
+
+                    chkRadar.Checked = pan.flgRadar;
+                    chkILS.Checked = pan.flgILS;
+
+                    try {
+                        cbOutSource.SelectedIndex = pan.pwm_src;
+                        cbOutPin.SelectedIndex = pan.pwm_dst;
+                    } catch  { }
+
+                    try {
+                        cbNscreens.SelectedIndex = pan.n_screens ;
+                    } catch  { }
+
                 }
+            } catch (Exception ex) {
+                MessageBox.Show("Error Reading file at " + ex.Message + " str=" + strings[0] + " val=" + strings[1]);
+            } finally {
+                updatingRSSI = false;
             }
+
             startup = false;
             Draw(panel_number);
-
         }
 
         private void loadDefaultsToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -2626,6 +2654,13 @@ namespace OSD {
 
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e) {
             pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + toggle_offset);
+            bool flg=(ONOFF_combo.SelectedIndex==1);
+
+            lblTimes.Visible =flg;
+            txtTime0.Visible =flg;
+            txtTime1.Visible = flg;
+            txtTime2.Visible = flg;
+            txtTime3.Visible = flg;
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e) {
@@ -4363,7 +4398,139 @@ namespace OSD {
                 MessageBox.Show("Error sending data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
                 return 0;
             }
-        } 
+        }
+
+        void loadDefaultOsd(){
+            string fn = Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "default.osd";
+            if (!File.Exists(fn)) {                
+                return;
+            }
+        
+            loadOsdFile(fn);
+
+        }
+
+        private void Translate(Form f) {
+            bool found = false;
+            string fn = Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "lang.txt";
+            if (!File.Exists(fn)) {
+                generateLang(fn);
+                return;
+            }
+
+            using (StreamReader sr = new StreamReader(fn)) {
+                while (!sr.EndOfStream) {
+
+                    string s = sr.ReadLine();
+                    if (!found) {
+                        if (s == "[" + f.Name + "]")
+                            found = true;
+                        continue;
+                    }
+                    if (s[0] == '[') break; // next section
+                    // found
+                    string[] sa = s.Split('=');
+
+                    string nm = sa[0].Substring(sa[0].Length - 3);
+                    if (nm == "-tt") { // tooltip
+                        Control ct = this.Controls.Find(sa[0].Substring(0, sa[0].Length - 3), true).FirstOrDefault() as Control;
+                        if (ct != null)
+                            hint.SetToolTip(ct, sa[1]);
+                    } else {
+                        Control c = this.Controls.Find(sa[0], true).FirstOrDefault() as Control;
+                        if(c==null) continue;
+                        if (c.ToString().Contains("System.Windows.Forms.TextBox")) continue;
+                        if (c.ToString().Contains("System.Windows.Forms.ComboBox")) continue;
+                        if (c.ToString().Contains("System.Windows.Forms.NumericUpDown")) continue;
+                        if (c.ToString().Contains("System.Windows.Forms.MaskedTextBox")) continue;
+
+                        c.Text = sa[1];
+                    }
+                }
+            }
+        }
+
+        void parseControls(StreamWriter sw, Control.ControlCollection ctls) {
+            foreach (Control c in ctls) {
+
+                if (c.Controls != null && c.Controls.Count > 0) {
+                    parseControls(sw, c.Controls);
+                }
+
+                if (c.Name == "") continue;
+                if (c.Name == c.Text) continue;
+                string tt = hint.GetToolTip(c);
+                if (tt != "") {
+                    sw.WriteLine(c.Name + "-tt" + "=" + tt);
+                }
+
+                if (c.Text == "") continue;
+                //txtParam
+                if (c.ToString().Contains("System.Windows.Forms.TextBox")) continue;
+                if (c.ToString().Contains("System.Windows.Forms.ComboBox")) continue;
+                if (c.ToString().Contains("System.Windows.Forms.NumericUpDown")) continue;
+                if (c.ToString().Contains("System.Windows.Forms.MaskedTextBox")) continue;
+                
+                sw.WriteLine(c.Name + "=" + c.Text);
+            }
+
+            /*
+                        foreach (System.Windows.Forms.ToolTip p in hint.tools) {
+
+                        }
+            */
+        }
+
+        void generateLang(string fn) {
+            /*
+                        List<Type> forms = new List<Type>();
+                        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
+                            forms.AddRange(from t in asm.GetTypes() where t.IsSubclassOf(typeof(Form)) select t);
+                        }
+                        foreach (object f in forms) {
+                            Console.WriteLine ("f="+f.GetType());
+                            string n = ((System.RuntimeType)f).
+                        }
+              */
+
+            
+            using (StreamWriter sw = new StreamWriter(fn)) {       //Write   
+                sw.WriteLine("[" + this.Name + "]");
+
+                parseControls(sw, this.Controls);
+
+                sw.Close();
+            }
+
+
+        }
+
+        uint16_t convertTimes(){
+            int v0,v1,v2,v3;
+            
+            v0 = (int)myConvert(txtTime0.Text);
+            v1 = (int)myConvert(txtTime1.Text);
+            v2 = (int)myConvert(txtTime2.Text);
+            v3 = (int)myConvert(txtTime3.Text);
+            
+            if (v0 < 0) v0 = 0; if (v0 > 15) v0 = 15;
+            if (v1 < 0) v1 = 0; if (v1 > 15) v1 = 15;
+            if (v2 < 0) v2 = 0; if (v2 > 15) v2 = 15;
+            if (v3 < 0) v3 = 0; if (v3 > 15) v3 = 15;
+
+            return (uint16_t)((v3 << (4 * 3)) | (v2 << (4 * 2)) | (v1 << (4 * 1)) | v0);
+        }
+
+        void updateTimes(int v){
+            txtTime0.Text = (v & 0xf).ToString ();
+            v = v>>4;
+            txtTime1.Text = (v & 0xf).ToString();
+            v = v >> 4;
+            txtTime2.Text = (v & 0xf).ToString();
+            v = v >> 4;
+            txtTime3.Text = (v & 0xf).ToString();
+            
+        }
 
     }
 }

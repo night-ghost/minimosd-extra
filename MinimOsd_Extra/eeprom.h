@@ -121,7 +121,7 @@ union _Flags {
 struct Settings {
     byte model_type; // 0 - plane 1-copter
 
-    byte ch_toggle; //  9 - ext PWM!
+    byte ch_toggle; //  2 - ext PWM!
     
     byte OSD_BRIGHTNESS;
 
@@ -130,10 +130,10 @@ struct Settings {
     byte battv; // уровень предупреждения по напряжению
     
     byte switch_mode; // режим переключения: 0 значение, 1 по кругу TODO move to flags
-    byte auto_screen_switch; // номер экрана куда переключаться при наличии сообщений TODO not used
+    byte auto_screen_switch; //  TODO not used
     
-    byte RSSI_high; // TODO not used
-    byte RSSI_low;  // TODO not used
+    uint16_t autoswitch_times; // 4 bits per screen
+
     byte RSSI_raw;
     
     byte batt_warn_level; // уровень предупреждения по заряду
