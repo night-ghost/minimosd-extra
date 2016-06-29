@@ -169,13 +169,10 @@ static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
 // used formula: y = m * x + n <=> y = tan(a) * x + n
 static void showHorizon(byte start_col, byte start_row) {
     byte col, row;
-    byte pitch_line;
-    int middle;
-    int8_t hit;
-    int subval;
+    
     int roll;
-    int line_set = LINE_SET_STRAIGHT__;
-    int line_set_overflow = LINE_SET_STRAIGHT_O;
+    byte line_set = LINE_SET_STRAIGHT__;
+    byte line_set_overflow = LINE_SET_STRAIGHT_O;
     int8_t subval_overflow = 9;
 
 
@@ -233,16 +230,32 @@ static void showHorizon(byte start_col, byte start_row) {
 	}
     }
     
-    pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+    byte shf=0;
+    
+    int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+// если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
+    if(pitch_line<0){
+	pitch_line += AH_TOTAL_LINES-2;
+	shf+=2;
+    }
+    if(pitch_line>AH_TOTAL_LINES){
+	pitch_line += AH_TOTAL_LINES-2;
+	shf+=2;
+    }
+
     
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
-    for (col=1; col<=AH_COLS; col++) {
-        middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
-        
-        hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+    for (col=1+shf; col<=AH_COLS-shf; col++) {
+	// получим координаты средней субколонки каждой колонки
+    //         = (col - AH_COLS/2 - 1/2) * CHAR_COLS;
+        int8_t middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
+
+    // tg(72 gr) ==3 so byte overflows        
+        int16_t  hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
+	    byte subval;
 	    if(subval_overflow) // adjusted lines
 	        subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
 	    else
@@ -355,7 +368,7 @@ byte NOINLINE radar_char(){
     return pgm_read_byte(&arr[index]);
 }
 
-static void showRADAR(byte center_col, byte center_line) {
+static void showRADAR(byte center_col, byte center_line, byte fTrack) {
 
 
     // calculate distances from home in lat (y) and lon (x) direction in [m]
@@ -371,7 +384,7 @@ static void showRADAR(byte center_col, byte center_line) {
 
 
 
-    if(flags.flgTrack){
+    if(fTrack){
 	static Point trk[4];
 	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
 	    for(byte i=4; i!=1;){
@@ -391,10 +404,6 @@ static void showRADAR(byte center_col, byte center_line) {
     // show UAV
     OSD::write_xy(center_col + x, center_line - y, radar_char());
 
-
-    // show home
-//    OSD::setPanel(center_col, center_line);
-//    osd.printf_P(PSTR("\xF5\xF6"));
 }
 
 
@@ -957,9 +966,15 @@ static void panHomeDis(point p){
 // Size   : 5 x 14  (rows x chars)
 // Staus  : done
 
-const char str_hud[] PROGMEM = "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|";
 
-const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
+
+//const char str_hud[] PROGMEM = "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|";
+
+//const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
+
+static void spaces(byte n){
+    while(n-- >0) osd_blank();
+}
 
 static void panHorizon(point p){
   
@@ -974,14 +989,17 @@ static void panHorizon(point p){
 */
 	byte i;
 	for(i=5;i!=0; i--){ // 30 bytes of flash
-            osd.print_P(i==3 ? str_mid : str_hud);
+	    //osd.print_P(i==3 ? str_mid : str_hud);
+	    osd.write_S(i==3 ? '\xc6' : '\xb2');
+	    spaces(12);
+	    osd.write_S(i==3 ? '\xc5' : '\xb3');
 	}
     }
 
     showHorizon(p.x + 1, p.y);
 
-    if(flags.radar_on)
-	showRADAR(p.x+6, p.y+2);
+    if(is_alt3(p))
+	showRADAR(p.x+6, p.y+2, is_alt4(p));
 
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(p.x+6, p.y+2);
@@ -989,7 +1007,7 @@ static void panHorizon(point p){
     }
 
     //Show ground level on  HUD
-    if(flags.ils_on && lflags.motor_armed)
+    if(is_alt2(p) && lflags.motor_armed)
 	showILS(p.x, p.y);
 
 }
@@ -1368,14 +1386,14 @@ static void panWaitMAVBeats(){
     extern volatile uint16_t lost_bytes;
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
-
+/*
     OSD::setPanel(6,5);
     osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
     osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
 
     osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
-    
+*/    
     lflags.input_active=0;
 #else
     panFdata({3,5});
@@ -2098,7 +2116,7 @@ again:
     lflags.got_data=1; // renew screen
 }
 
-static void move_screen(char dir){
+static void /*NOINLINE*/ move_screen(char dir){
 
     setup_menu=1;
 
@@ -2113,6 +2131,16 @@ static void move_screen(char dir){
 
 #define SETUP_START_ROW 1
 
+static void NOINLINE storeChannels(){
+    for(byte i=0; i<4; i++){
+        if (chan_raw_middle[i] < 1000)
+	    chan_raw_middle[i] = chan_raw[i];	// запомнить начальные значения  - центр джойстика для первых 4 каналов
+    }
+}
+
+static int NOINLINE channelDiff(byte n){
+    return chan_raw[n] - chan_raw_middle[n];
+}
 
 static void panSetup(){
 
@@ -2137,15 +2165,7 @@ static void panSetup(){
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
     size = pgm_read_byte((void *)&pscreen->size);
 
-    if (chan_raw_middle[0] < 1000)
-        chan_raw_middle[0] = chan_raw[0];	// запомнить начальные значения  - центр джойстика - лево/право
-    
-    if(chan_raw_middle[1] < 1000) 
-        chan_raw_middle[1] = chan_raw[1]; //                                                   верх-низ
-    
-    if(chan_raw_middle[2] < 1000)
-        chan_raw_middle[2] = chan_raw[3];// запомнить начальные значения  - центр ВТОРОГО джойстика
-
+    storeChannels();
 
     for(byte i=0; i < size; i++) {
 	OSD::setPanel(1, SETUP_START_ROW + i);
@@ -2230,20 +2250,29 @@ as_char:
 
 //Serial.printf_P(PSTR("ch1=%d mid=%d\n"), chan_raw[1], chan_raw_middle[1]);
 //Serial.printf_P(PSTR("ch3=%d mid=%d\n"), chan_raw[3], chan_raw_middle[2]);
+    
+    {
+        int cd;
+    
+        cd=channelDiff(1);
+//    if ((chan_raw[1] - 150) > chan_raw_middle[1] ){  move_menu(1);    return; } // переходы по строкам по верх-низ
+//    if ((chan_raw[1] + 150) < chan_raw_middle[1] ){  move_menu(-1);   return; }
+        if ( cd > 150){  move_menu(1);    return; } // переходы по строкам по верх-низ
+        if ( cd < 150){  move_menu(-1);   return; }
 
-    if ((chan_raw[1] - 150) > chan_raw_middle[1] ){  move_menu(1);    return; } // переходы по строкам по верх-низ
-    if ((chan_raw[1] + 150) < chan_raw_middle[1] ){  move_menu(-1);   return; }
-
-    if ((chan_raw[3] - 150) > chan_raw_middle[2] ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
-    if ((chan_raw[3] + 150) < chan_raw_middle[2] ){  move_screen(-1); return; }
-
+//    if ((chan_raw[3] - 150) > chan_raw_middle[3] ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+//    if ((chan_raw[3] + 150) < chan_raw_middle[3] ){  move_screen(-1); return; }
+        cd=channelDiff(3);
+        if (cd>150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+        if (cd<150){  move_screen(-1); return; }
+    }
 
     OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
 
     p = &params[setup_menu];
 
     bool fNeg=false;
-    int diff = ( chan_raw_middle[0] - chan_raw[0] );
+    int diff = -channelDiff(0); // ( chan_raw_middle[0] - chan_raw[0] );
     if(diff<0) {
 	diff = -diff;
 	fNeg=true;
@@ -2361,7 +2390,6 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0  },
-//    { ID_of(GPS2),		panGPS2, 	0  },
     { ID_of(batteryPercent),	panBatteryPercent, 0 },
     { ID_of(COG),		panCOG, 	0 },
 //10
@@ -2431,6 +2459,12 @@ static void print_all_panels(const Panels_list *pl ) {
     }
 }
 
+uint16_t uidiff(uint16_t a, uint16_t b){
+    if(a>b) return a-b;
+    return b-a;
+
+}
+
 void writePanels(){
 
     osd.detectMode(); // PAL/NTSC live
@@ -2450,6 +2484,7 @@ void writePanels(){
 	landed = pt; // запомнится время дизарма
     }
     
+    
     lflags.last_armed_status = lflags.motor_armed;
     
 #endif
@@ -2460,10 +2495,10 @@ void writePanels(){
     }
 #endif
 
+    
+
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
 
-  //Base panel selection
-  //No mavlink data available panel
 //    if(pt > (lastMAVBeat + 2500)){
     if(time_since(&lastMAVBeat) > 2500){
         panWaitMAVBeats(); //Waiting for MAVBeats...
@@ -2473,26 +2508,43 @@ void writePanels(){
 //  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-  else if (!lflags.motor_armed && time_since(&landed) < 10000 && ((int)trip_distance > 5)){ // 10 seconds after disarm
+  else if (!lflags.motor_armed && time_since(&landed) < 3000 
+#ifndef DEBUG
+      && ((int)trip_distance > 5) // show always in debug mode
+#endif
+				  ){ // 3 seconds after disarm one can jerk sticks
 
 #else
 #ifdef IS_PLANE
     //Only show flight summary 7 seconds after landing
-  else if ( time_since(&landed) < 10000 && ((int)trip_distance > 5)){
+  else if ( time_since(&landed) < 3000 && ((int)trip_distance > 5)){
 #else
     else if(0) {
 #endif
 #endif
+	lflags.fdata=1;
+	storeChannels(); // remember control state
+	fdata_screen=panelN;
 
-    panFdata({1,1});    //Flight summary panel
+	goto show_fdata;
+  } else if(lflags.fdata){
+	if(fdata_screen!=panelN) { // turn off by screen switch
+	    panelN=fdata_screen;
+	    lflags.fdata=0;
+DBG_PRINTLN("reset FData by sw");
+	}
+
+	if(labs(chan_raw_middle[2]-chan_raw[2])>300 || lflags.motor_armed){ // or by throttle - and disable Flight Data when armed
+DBG_PRINTLN("reset FData by throttle");
+	    lflags.fdata=0;
+	}
+show_fdata:
+	panFdata({1,1});    //Flight summary panel
 
   } else{  //Normal osd panel
 
 //	OSD::setPanel(0,0);
 //	osd.printf_P("p=%d t=%d",panelN, sets.ch_toggle);
-
-    //Check for panel toggle
-//    if(sets.ch_toggle > 0) pan_toggle(); // This must be first so you can always toggle
 
     if(sets.n_screens==0 || panelN < sets.n_screens){ // конфигурируемые юзером экраны
 	print_all_panels(panels_list);

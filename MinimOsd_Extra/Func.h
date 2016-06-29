@@ -49,6 +49,15 @@ static void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 
+byte get_switch_time(byte n){
+    uint16_t val = sets.autoswitch_times;
+    while(true){
+	if(n-- == 0) return val & 0xf;
+	
+	val = val >> 4;
+    }
+}
+
 static void pan_toggle(){
     byte old_panel=panelN;
 
@@ -111,21 +120,45 @@ static void pan_toggle(){
             }
         }// once
       }
+      
+        if(!lflags.rotatePanel){
+            if( autoswitch_time && autoswitch_time<millis()) { // автопереключение активно и время вышло
+DBG_PRINTLN("switch by AutoSwitch");
+        	lflags.autosw=1; // авторежим
+        	lflags.rotatePanel =1; // переключить
+            }
+        }
     }
-    if(lflags.rotatePanel == 1){
+    if(lflags.rotatePanel){
 	lflags.rotatePanel = 0;
+next_panel:
         panelN++;
         if (panelN > sets.n_screens)
             panelN = 0;
 
     }
-//  }
+
   if(old_panel != panelN){
-//	readPanelSettings();
+
 	lflags.got_data=1; // redraw even no news
 	
-	//extern void reset_setup_data();
 	reset_setup_data();
+	
+	
+	if(lflags.autosw && panelN == sets.n_screens) goto next_panel;  // при автопереключении пропускаем пустой экран
+	
+	byte swt = get_switch_time(panelN);
+DBG_PRINTLN("autoswitch time");
+DBG_PRINTVARLN(swt);
+DBG_PRINTVARLN(panelN);
+	if(swt) { // установлено время переключения
+	    millis_plus(&autoswitch_time, swt); // следующее
+	} else {	// no autoswitch
+	    if(lflags.autosw) goto next_panel;  // при автопереключении пропускаем  экраны без автопереключения
+	    autoswitch_time=0; // при ручном переключении отменить автомат
+	}
+	
+	lflags.autosw=0; // once
 	
 	static const char msg[] PROGMEM = "Screen 0";
 
@@ -207,7 +240,7 @@ static int grad_to_sect_p(int grad){
 
 
 
-float NOINLINE diff_coord(float &c1, float &c2){
+static float NOINLINE diff_coord(float &c1, float &c2){
     return (c1 - c2) * 111319.5;
 }
 
@@ -216,7 +249,7 @@ float NOINLINE diff_coord(float &c1, float &c2){
     return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 }*/
 
-static float distance(float x, float y){
+static float NOINLINE distance(float x, float y){
     return sqrt(sq(x) + sq(y));
 }
 
@@ -389,7 +422,7 @@ void setFdataVars()
 
 	if(l > h) {
 	    l=h;
-	    h=sets.RSSI_low;
+	    h=sets.RSSI_16_low;
 	    rev=true;
 	}
 
@@ -574,3 +607,4 @@ static void getData(){
 bool NOINLINE timeToScreen(){
     return lflags.need_redraw && !vsync_wait;
 }
+

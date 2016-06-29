@@ -251,12 +251,10 @@ struct loc_flags {
     bool vs_ms:1; // vertical speed in m/s;
     bool was_mav_config:1; // was EEPROM write via MAVlink
     
-//    bool osd_clear:1;
-//MAVLink session control
-//    bool mavbeat:1;
-//    bool sw_state:1;
-//    bool got_baud:1;
-//    bool got_protocol:1;
+    bool fdata:1;	// show FData screen
+
+    bool autosw:1; 	// automatic screen switch
+    
 };
 
 #ifdef DEBUG
@@ -287,9 +285,12 @@ volatile unsigned long int_Timer = 0;         // set in the INT1
 
 byte PWM_out_pin=0;
 
-#if defined(USE_SENSORS)
+//#if defined(USE_SENSORS)
 unsigned int sensorData[4];
-#endif
+//#endif
+
+uint8_t fdata_screen;
+
 
 // Setup screen 
 
@@ -319,6 +320,8 @@ static uint16_t chan_raw_middle[3]; // запомненные при входе 
 const Params *params; // указатель на текущий набор параметров
 
 volatile static uint16_t vsync_count;
+
+uint32_t autoswitch_time=0;
 
 #define GPS_MUL 10000000.0f
 

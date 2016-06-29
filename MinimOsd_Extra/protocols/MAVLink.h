@@ -99,8 +99,8 @@ DBG_PRINTVARLN(seq);
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
 #ifdef DEBUG
-    packets_skip+=1;
-    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
+//    packets_skip+=1;
+//    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
 		    break; // skip packet and exit 
 		}
@@ -118,10 +118,10 @@ DBG_PRINTVARLN(seq);
                 apm_mav_type = mavlink_msg_heartbeat_get_type(&msg.m);  // quad hexa octo etc
                 if(apm_mav_type == 6) { // MAV_TYPE_GCS
 #ifdef MAVLINK_CONFIG
-DBG_PRINTLN("GCS heartbeat!");
+//DBG_PRINTLN("GCS heartbeat!");
 
             	    mav_gcs_id = msg.m.sysid; // store GCS ID
-DBG_PRINTVARLN(mav_gcs_id);            	    
+//DBG_PRINTVARLN(mav_gcs_id);            	    
             	    last_seq_n = 0; // reset sequence
 #endif
             	    goto skip_packet;
@@ -130,7 +130,7 @@ DBG_PRINTVARLN(mav_gcs_id);
 skip_packet:
 #ifdef DEBUG
     packets_skip+=1;
-    Serial.printf_P(PSTR("\nHEARTBEAT skip type=%d\n"), apm_mav_type);
+//    Serial.printf_P(PSTR("\nHEARTBEAT skip type=%d\n"), apm_mav_type);
 #endif
 		    break;
 
@@ -143,10 +143,10 @@ skip_packet:
 
 
 #ifdef DEBUG
-	if(apm_mav_system  != msg.m.sysid){
-	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
-	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
-	}
+//	if(apm_mav_system  != msg.m.sysid){
+//	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
+//	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
+//	}
 #endif
 
                 lflags.motor_armed = getBit(base_mode,7);
@@ -181,7 +181,7 @@ skip_packet:
                 eph = mavlink_msg_gps_raw_int_get_eph(&msg.m);
 
 #ifdef DEBUG
-Serial.printf_P(PSTR("MAVLINK_MSG_ID_GPS_RAW_INT fix=%d\n"), osd_fix_type);
+//Serial.printf_P(PSTR("MAVLINK_MSG_ID_GPS_RAW_INT fix=%d\n"), osd_fix_type);
 #endif
 
                 break; 
@@ -383,7 +383,7 @@ typedef struct __mavlink_radio_t
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
 
 #ifdef DEBUG
-Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n"), rssi, remrssi);
+//Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n"), rssi, remrssi);
 #endif
 
 		} break;
@@ -405,7 +405,7 @@ typedef struct __mavlink_radio_status_t
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
 #ifdef DEBUG
-Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
+//Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
 #endif
 
 		} break;

@@ -29,6 +29,9 @@ Project receives Donations from:
  William Studley
  Tony Yeung 
  Marc J MERLIN 
+ Сергей Сырескин
+ Aleksandr Starostin
+ 
 
 Figures, harm the development of an idiotic question:
  MachVoluM

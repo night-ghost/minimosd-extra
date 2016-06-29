@@ -12,7 +12,7 @@
 #define VERSION "2.4"
 
 
-//#define DEBUG
+#define DEBUG
 #define STARTUP_SCREEN 0
 
 #define USE_MAVLINK 1
@@ -20,8 +20,8 @@
 //#define USE_MWII 1
 //#define USE_LTM 1
 #define AUTOBAUD 1
-#define USE_SENSORS 1
-#define MAVLINK_CONFIG 1
+//#define USE_SENSORS 1
+//#define MAVLINK_CONFIG 1
 
 
 #define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
@@ -89,8 +89,10 @@
   #define DBG_PRINTLN(x)     { Serial.print_P(PSTR(x)); Serial.println();  Serial.wait();  }
   #define DBG_PRINTVARLN(x)  { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.println(x);  Serial.wait(); }
   #define DBG_PRINTVAR(x)    { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.print(x); Serial.print(" "); Serial.wait();  }
+  #define DBG_PRINTF(x,...)  { Serial.printf_P(PSTR(x),## __VA_ARGS__); Serial.wait();  }
 #else
   #define DBG_PRINTLN(x)     {}
   #define DBG_PRINTVAR(x)    {}
   #define DBG_PRINTVARLN(x)  {}
+  #define DBG_PRINTF(x,...)  {}
 #endif

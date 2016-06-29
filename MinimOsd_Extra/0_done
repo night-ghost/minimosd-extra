@@ -1,4 +1,11 @@
 localisation support! lang.txt file in EXE's folder, 
-preliminary support of timed screen switch (only in form)
+
+support of timed screen switch (only in form)
 
 file default.osd readed at startup if present
+
+fixed bug with reverse RSSI
+
+Fixed Horizon behavior for large banks
+
+Flight Data turned off by mode switch o throttle
