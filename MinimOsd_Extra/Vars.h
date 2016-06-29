@@ -39,7 +39,7 @@ static uint8_t      wp_number = 0; 	// Current waypoint number
 #ifdef IS_PLANE
 static float        alt_error = 0; // Current altitude error in meters *10
 static float        aspd_error = 0; // Current airspeed error in meters/second
-static long         osd_home_alt = 0; 
+//static long         osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
 static unsigned long landed = 4294967295;
 

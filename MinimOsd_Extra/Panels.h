@@ -65,12 +65,12 @@ static void printSpeed(PGM_P fmt, float s, byte alt){
     osd_printf_2(fmt,s/k,c);
 
 }
-static NOINLINE void printSpeed(float f, byte alt){
+/*static NOINLINE void printSpeed(float f, byte alt){
     printSpeed(PSTR("%3.0f"), f, alt);
-}
-static NOINLINE void printSpeed(float f){
+}*/
+/*static NOINLINE void printSpeed(float f){
     printSpeed(f, false);
-}
+}*/
 
 
 static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
@@ -79,9 +79,10 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
 static void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
-static NOINLINE void printSpeedCnv(float *s){
+
+/*static NOINLINE void printSpeedCnv(float *s){
     printSpeedCnv(s, false);
-}
+}*/
 
 
 
@@ -282,29 +283,41 @@ static void showILS(byte start_col, byte start_row) {
     
     if(sets.model_type==0) { // plane
 
-      //Vertical calculation
-        int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
-        //Calc current char position.
-        //int numberOfPixels = CHAR_ROWS * AH_ROWS;
-        int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
-        int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
-        int8_t charPosition = linePosition / 9;
-        uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
-        if(charPosition >= 0 && charPosition <= CHAR_ROWS) {
-          OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
-          OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
-        }
+      { //Vertical calculation
+            int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
+            //Calc current char position.
+            //int numberOfPixels = CHAR_ROWS * AH_ROWS;
+            int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+            int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+            int8_t charPosition = linePosition / 9;
+            uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
+            if(charPosition >= 0 && charPosition <= AH_ROWS) {
+              OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
+              OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
+            }
 
-      //Horizontal calculation
-        currentAngleDisplacement = osd_home_direction - takeoff_heading;
-        //Horizontal calculation
-        totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
-        linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
-        charPosition = linePosition / 6;
-        selectedChar = (linePosition % 6) + 0xBF;
-        if(charPosition >= 0 && charPosition <= CHAR_COLS)  {
-          OSD::write_xy(start_col + charPosition, start_row + AH_ROWS-1, selectedChar ); // в первой и последней строке
-          OSD::write_xy(start_col + charPosition, start_row + 1, selectedChar );
+	}
+        {  //Horizontal calculation
+            int currentAngleDisplacement = normalize_angle(osd_home_direction - takeoff_heading);
+    
+            if(currentAngleDisplacement > 180) currentAngleDisplacement = 360 - currentAngleDisplacement; // we can to come to runway from opposite side
+    
+            currentAngleDisplacement-=180; // range -90..90
+	
+            int8_t totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
+            int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+            int8_t charPosition = linePosition / 6;
+            uint8_t selectedChar = (linePosition % 6) + 0xBF;
+            if(charPosition < 0){
+        	OSD::write_xy(start_col +1, start_row + AH_ROWS-1, '<' ); // в первой и последней строке
+        	OSD::write_xy(start_col +1, start_row + 1, '<' );
+            } else if(charPosition > AH_COLS)  {
+        	OSD::write_xy(start_col +AH_COLS-1, start_row + AH_ROWS-1, '>' ); // в первой и последней строке
+        	OSD::write_xy(start_col +AH_COLS-1, start_row + 1, '>' );
+            } else {
+              OSD::write_xy(start_col + charPosition, start_row + AH_ROWS-1, selectedChar ); // в первой и последней строке
+              OSD::write_xy(start_col + charPosition, start_row + 1, selectedChar );
+            }
         }
     } else { // copter
     
@@ -424,13 +437,15 @@ static void panCOG(point p){
 
     int cog_100=(osd_cog + 50) / 100 - osd_heading;
     
-    if (cog_100  > 180){
+/*    if (cog_100  > 180){
        off_course = cog_100 - 360;
     }else if (cog_100 < -180){
        off_course = cog_100 + 360;
     }else{
        off_course = cog_100;
     }
+*/
+    off_course = normalize_angle(cog_100) - 180;   // -180..180
     
     showArrow(grad_to_sect(off_course),2); // use off_course as global
 }
@@ -617,7 +632,8 @@ static void panWindSpeed(point p){
 
     int /*float*/ dir = osd_winddirection;
 
-    if (dir < 0)  dir+=360;
+    //if (dir < 0)  dir+=360;
+    dir=normalize_angle(dir);
 
 #if defined(USE_FILTER)
     filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
@@ -1469,9 +1485,11 @@ static void panRose(point p){
 
 
 static int getTargetBearing(){
-    if (wp_target_bearing < 0) wp_target_bearing+=360;
+//    int a=wp_target_bearing);
+//    if (a < 0) a+=360;
+    int a=normalize_angle(wp_target_bearing);
 
-    return grad_to_sect(wp_target_bearing - osd_heading); //Convert to int 1-16 
+    return grad_to_sect(a - osd_heading); //Convert to int 1-16 
 }
 
 /* **************************************************************** */
@@ -1500,8 +1518,9 @@ static void panWPDir(point p){
 static void panWPDis(point p){
     if (osd_mode == 10){ // auto
 
-        if (xtrack_error > 999)  xtrack_error = 999;
-        if (xtrack_error < -999) xtrack_error = -999;
+	int err=xtrack_error;
+        if (err > 999)  err = 999;
+        if (err < -999) err = -999;
 
 
         byte h=get_mhigh();
@@ -1512,7 +1531,7 @@ static void panWPDis(point p){
     
         showArrow(getTargetBearing(), 0);
 
-        osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (xtrack_error * get_converth()), h);
+        osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (err * get_converth()), h);
     }
 }
 
@@ -2132,6 +2151,7 @@ static void /*NOINLINE*/ move_screen(char dir){
 #define SETUP_START_ROW 1
 
 static void NOINLINE storeChannels(){
+
     for(byte i=0; i<4; i++){
         if (chan_raw_middle[i] < 1000)
 	    chan_raw_middle[i] = chan_raw[i];	// запомнить начальные значения  - центр джойстика для первых 4 каналов
@@ -2534,7 +2554,7 @@ void writePanels(){
 DBG_PRINTLN("reset FData by sw");
 	}
 
-	if(labs(chan_raw_middle[2]-chan_raw[2])>300 || lflags.motor_armed){ // or by throttle - and disable Flight Data when armed
+	if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
 DBG_PRINTLN("reset FData by throttle");
 	    lflags.fdata=0;
 	}

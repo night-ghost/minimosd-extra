@@ -38,7 +38,7 @@ OPT += -fno-early-inlining
 #OPT += -ftree-tail-merge 
 #OPT += -fivopts 
 #OPT += -fpredictive-commoning
-#OPT += -foptimize-strlen
+OPT += -foptimize-strlen
 #OPT +=  -fdelayed-branch  not supported
 #OPT += -frename-registers  size more
 #OPT += -fbranch-target-load-optimize 
@@ -48,7 +48,7 @@ OPT += -fno-early-inlining
 #OPT += -maccumulate-args more size
 
 #nothing
-#OPT += -faggressive-loop-optimizations 
+OPT += -fno-aggressive-loop-optimizations 
 #OPT += -fauto-inc-dec  
 #OPT += -fbranch-probabilities 
 #OPT +=  -floop-strip-mine 

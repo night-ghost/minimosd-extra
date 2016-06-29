@@ -99,7 +99,8 @@ static void ltm_check() {
         osd_att.roll  = (int)(ltm_read_uint(offsetof(LTM_A, roll) )) * 10;
         osd_att.pitch = (int)(ltm_read_uint(offsetof(LTM_A, pitch))) * 10;
         osd_att.yaw   = (int)(ltm_read_uint(offsetof(LTM_A, heading)));
-        if (osd_att.yaw < 0 ) osd_att.yaw += 360; //convert from -180/180 to 0/360°
+        //if (osd_att.yaw < 0 ) osd_att.yaw += 360; //convert from -180/180 to 0/360°
+        osd_att.yaw=normalize_angle(osd_att.yaw);
         
         if (*((long *)&osd_pos.lat) == 0) { // if no GPS use yaw as heading
             osd_heading = osd_att.yaw;

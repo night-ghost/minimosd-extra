@@ -17,7 +17,7 @@ extern Settings sets;
 extern Flags flags;
 
 uint8_t  OSD::col, OSD::row, OSD::video_mode;
-uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время прерывания по VSYNC переносится в OSD - 480 байт, четверть всей памяти
 uint16_t OSD::bufpos;
 
 
@@ -222,6 +222,10 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 //------------------ write ---------------------------------------------------
 
+void OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
+    osdbuf[bufpos++] = c;
+}
+
 void OSD::write_S(uint8_t c){
   
   if(c == '|'){
@@ -233,9 +237,6 @@ void OSD::write_S(uint8_t c){
   } 
 }
 
-void OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
-    osdbuf[bufpos++] = c;
-}
 
 size_t OSD::write(uint8_t c){
     write_S(c);
@@ -306,7 +307,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   byte screen_char;
 
   char_address_hi = font_count;
-//  byte char_address_lo = 0;
+//  byte char_address_lo = 0; - autoincrement mode
 
 //    cli();
 
@@ -326,8 +327,11 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
   // wait until bit 5 in the status register returns to 0 (12ms)
   while (1) {
-    Spi.transfer(MAX7456_STAT_reg_read);
-    if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
+    if(!(MAX_read(MAX7456_STAT_reg_read) & STATUS_reg_nvr_busy)) break;
+//    delay_1();
+    //delayMicroseconds(1000);
+    extern void delay_telem();
+    delay_telem(); // some delay 
   }
 
 //  sei();

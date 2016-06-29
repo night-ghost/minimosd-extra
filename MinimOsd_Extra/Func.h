@@ -40,6 +40,13 @@ void NOINLINE mav_message_start(byte len, byte time){
 //    lflags.flgMessage=1;
 }
 
+int NOINLINE normalize_angle(int a){
+    if(a<0)   a+=360;
+    if(a>360) a-=360;
+    return a;
+}
+
+
 uint16_t NOINLINE time_since(uint32_t *t){
     return (uint16_t)(millis() - *t); // loop time no more 1000 ms
 
@@ -230,14 +237,6 @@ int NOINLINE grad_to_sect(int grad){
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
 }
 
-static int grad_to_sect_p(int grad){
-    //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
-
-    while(grad < 0) grad +=360;
-    
-    return grad_to_sect(grad);
-}
-
 
 
 static float NOINLINE diff_coord(float &c1, float &c2){
@@ -332,7 +331,9 @@ static void setHomeVars()
         
 //        if(bearing < 0) bearing += 360;//normalization
         bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-        while(bearing < 0) bearing += 360;//normalization
+
+        //while(bearing < 0) bearing += 360;//normalization
+        bearing=normalize_angle(bearing);
 
         osd_home_direction = grad_to_sect(bearing); 
   }
@@ -363,6 +364,7 @@ void inline filter( float &dst, float val){ // комплиментарный ф
 void NOINLINE float_add(float &dst, float val){
     dst+=val;
 }
+
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -494,9 +496,13 @@ void NOINLINE set_data_got() {
 }
 
 
+void NOINLINE delay_telem(){
+        delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
+}
+
 void NOINLINE delay_byte(){
     if(!Serial.available_S())
-        delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта
+	delay_telem();
 }
 
 
