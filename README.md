@@ -277,6 +277,21 @@ v857
 * a try to change Horizon behavior for large banks (>70grad)
 * minor fixes
 
+v858
+* fixed some CT bugs
+* localisation support! lang.txt file in EXE's folder, 
+* support of timed screen switch (untested)
+* file default.osd loaded at startup if present
+* fixed bug with reverse RSSI
+* Fixed Horizon behavior for large banks
+* Flight Data turned off by mode switch or throttle stick
+* Real Heading field width increased
+* check of flash contents after write! no more bugs caused by flash write errors
+* ILS now allows plane to come to runway from opposite direction
+* fixed bug in ILS with HUD size
+* when landing markers are not visible ILS now show arrows to help find smaller turn
+* some size optimizations to fit all above :)
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -582,6 +597,22 @@ v857
 * комплиментарный фильтр панели panEff изменен с 1/10 на 1/100
 * попытка изменить поведение горизонта для больших кренов (>70grad)
 * мелкие изменения
+
+v858
+* исправлено несколько ошибок в конфигураторе
+* поддержка локализации! Файл lang.txt в каталоге с EXE-файлом
+* поддержка переключения экранов по времени (не тестировалось)
+* файл default.osd загружается при запуске если есть
+* исправлен баг с реверсным RSSI
+* Исправлено поведение Горизонта при больших кренах
+* Панель Результаты полета (Flight Data) выключается не по времени а по движению стика газа или переключению экрана ОСД
+* Увеличена ширина панели Real Heading 
+* Флеш-память проверяется после записи! Нет больше багов, вызванных некорректной записью во флеш
+* ILS теперь позволяет заходить на полосу с противоположной стороны
+* исправлен баг в ILS с неверным размером горизонта
+* ILS: если посадочные маркеры не видны то отображается стрелка нужного направления поворота
+* некоторые оптимизации размера чтобы все это впихнуть :)
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
