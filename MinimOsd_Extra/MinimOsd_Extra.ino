@@ -129,17 +129,26 @@ BetterStream *mavlink_comm_0_port;
 
 /* **********************************************/
 
+volatile byte nested=0;
+volatile byte nest_count=0;
+
 // обработка прерывания по кадровому синхроимпульсу
 void isr_VSYNC(){
     vsync_wait=0;	// единственное что нам надо - отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
 
-    if(update_stat) { // there is data for screen
-        sei(); 			// enable other interrupts 
-        OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
+    if(nested) {
+	nest_count++;
+    } else {
+        if(update_stat) { // there is data for screen
+            nested++;
+            sei(); 			// enable other interrupts 
+            OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
     
-	update_stat = 0;
+            update_stat = 0;
+            nested--;
+        }
     }
 }
 
@@ -305,6 +314,7 @@ void setup()     {
 */    
 #endif
 
+    crlf_count=0;
 
 } // END of setup();
 
@@ -325,27 +335,35 @@ void loop()
 
 
     if(pt < BOOTTIME){ // startup delay for fonts
-            if(Serial.available_S()) {
+            while(Serial.available_S()) {
                 byte c=Serial.read_S();
 
-                if (c == '\n' || c == '\r') {
+                if (c == '\n' /* || c == '\r'*/ ) {
                     crlf_count++;
                 } else {
                     crlf_count = 0;
                 }
+//DBG_PRINTF("crlf=%d c=%d\n", (int)crlf_count, (int)c);
 
                 if (crlf_count > 3) {
                     uploadFont();
+                    return;
                 }
             }
             return;
     }
 
+//DBG_PRINTF("time=%ld\n",pt);
+
     getData(); // получить данные с контроллера
 
     if(lflags.got_data){ // были свежие данные - обработать
 
+//DBG_PRINTLN("data got!");
+
 	pan_toggle(); // проверить переключение экранов
+
+//DBG_PRINTLN("toggle!");
 
 	if(!lflags.need_redraw) {
 	    lflags.need_redraw=1;
@@ -357,14 +375,11 @@ void loop()
 
     if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания
         lflags.need_redraw=0; // экран перерисован
+
+//DBG_PRINTF("need redraw! nest_count=%d\n",nest_count);
         setHomeVars();   // calculate and set Distance from home and Direction to home
-
         setFdataVars();  // накопление статистики и рекордов
-
         writePanels();   // writing enabled panels (check OSD_Panels Tab)
-
-//	vsync_wait=1;
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 //	LED_BLINK;
 
@@ -424,16 +439,24 @@ void loop()
         lflags.blinker = !lflags.blinker;
         if(lflags.blinker) {
             seconds++;
+            static byte err_count=0;
             lflags.one_sec_timer_switch = 1; // for warnings
 
 	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
-		osd.init();    // restart MAX7456
-	    }
+		err_count++;
+		if(err_count>3) { // 3 seconds no sync
+#ifdef DEBUG	
+		    Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);	        
+#endif
+		    osd.init();    // restart MAX7456
+		}
+	    } else
+		err_count=0;
+	     
 	    vsync_count=0;
 
-
 #ifdef DEBUG
-	    if(seconds % 60 == 0) {
+	    if(seconds % 30 == 0) {
 		extern volatile uint16_t lost_bytes;
 	        Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
 	        

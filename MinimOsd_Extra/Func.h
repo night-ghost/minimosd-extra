@@ -65,6 +65,9 @@ byte get_switch_time(byte n){
     }
 }
 
+
+#define USE_AUTOSWITCH 1
+
 static void pan_toggle(){
     byte old_panel=panelN;
 
@@ -127,14 +130,16 @@ static void pan_toggle(){
             }
         }// once
       }
-      
+
+#ifdef USE_AUTOSWITCH
         if(!lflags.rotatePanel){
-            if( autoswitch_time && autoswitch_time<millis()) { // автопереключение активно и время вышло
+            if( autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
 DBG_PRINTLN("switch by AutoSwitch");
         	lflags.autosw=1; // авторежим
         	lflags.rotatePanel =1; // переключить
             }
         }
+#endif
     }
     if(lflags.rotatePanel){
 	lflags.rotatePanel = 0;
@@ -148,25 +153,29 @@ next_panel:
   if(old_panel != panelN){
 
 	lflags.got_data=1; // redraw even no news
+
+DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 	
 	reset_setup_data();
 	
-	
-	if(lflags.autosw && panelN == sets.n_screens) goto next_panel;  // при автопереключении пропускаем пустой экран
+#ifdef USE_AUTOSWITCH
+	if( lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
+	    goto next_panel;  // при автопереключении пропускаем пустой экран
 	
 	byte swt = get_switch_time(panelN);
-DBG_PRINTLN("autoswitch time");
-DBG_PRINTVARLN(swt);
-DBG_PRINTVARLN(panelN);
+DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
 	if(swt) { // установлено время переключения
-	    millis_plus(&autoswitch_time, swt); // следующее
+	    autoswitch_time = seconds + swt; // следующее
+//	    if(autoswitch_time < seconds) { // overflow    
+//	    }
 	} else {	// no autoswitch
 	    if(lflags.autosw) goto next_panel;  // при автопереключении пропускаем  экраны без автопереключения
 	    autoswitch_time=0; // при ручном переключении отменить автомат
 	}
 	
 	lflags.autosw=0; // once
-	
+#endif	
+
 	static const char msg[] PROGMEM = "Screen 0";
 
 	const char *cp;

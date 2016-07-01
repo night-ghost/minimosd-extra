@@ -116,7 +116,7 @@ static void NOINLINE showArrow(uint8_t rotate_arrow,uint8_t method, byte alt){
     
     case 2:	//      course
 	//osd.printf_P(PSTR("%4i\x05"), off_course);
-	osd_printi_1(PSTR("%3i\x05"), off_course);
+	osd_printi_1(PSTR("%4i\x05"), off_course);
 	break;
 
     default:		// just arrow
@@ -1009,6 +1009,7 @@ static void panHorizon(point p){
 	    osd.write_S(i==3 ? '\xc6' : '\xb2');
 	    spaces(12);
 	    osd.write_S(i==3 ? '\xc5' : '\xb3');
+	    osd_nl();
 	}
     }
 
@@ -1394,22 +1395,22 @@ static void panWaitMAVBeats(){
 #endif
 
     OSD::setPanel(5,3);
-    osd.print_P(PSTR("No input data! ||"));
+    osd.printf_P(PSTR("No input data! %d||"),seconds);
 
-#ifdef DEBUG
+#if defined(DEBUG) && 0
     extern uint16_t packet_drops;
     extern long bytes_comes;
     extern volatile uint16_t lost_bytes;
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
-/*
+
     OSD::setPanel(6,5);
     osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
     osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
 
     osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
-*/    
+    
     lflags.input_active=0;
 #else
     panFdata({3,5});
@@ -2460,6 +2461,8 @@ static void print_all_panels(const Panels_list *pl ) {
 
     for(;;){
 	byte n = pgm_read_byte(&pl->n); // номер панели в массиве
+
+DBG_PRINTF("panel %d\n", n);
 	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
 	if(f==0) break;
 	
@@ -2495,13 +2498,17 @@ void writePanels(){
 #ifdef IS_PLANE
 
 // в универсальном случае если выбран планер
-    if(sets.model_type == 0 /* plane */  && lflags.motor_armed  && lflags.in_air  &&
-      ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
-        landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
+    if(sets.model_type == 0) { /* plane */ 
+	if( lflags.motor_armed  && lflags.in_air  &&
+          ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
+            landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
+DBG_PRINTF("set p landed=%d\n", landed);
+	}
     }
 #ifdef IS_COPTER
       else if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
 	landed = pt; // запомнится время дизарма
+DBG_PRINTF("set c landed=%d\n", landed);
     }
     
     
@@ -2510,7 +2517,7 @@ void writePanels(){
 #endif
 #else // pure copter
 
-    if (!lflags.motor_armed && lflags.last_armed_status ){ // on motors disarm.
+    if (!lflags.motor_armed && lflags.last_armed_status ){ // on motors disarm
 	landed = pt; // запомнится время дизарма
     }
 #endif
@@ -2528,7 +2535,7 @@ void writePanels(){
 //  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-  else if (!lflags.motor_armed && time_since(&landed) < 3000 
+  else if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
 #ifndef DEBUG
       && ((int)trip_distance > 5) // show always in debug mode
 #endif
@@ -2537,11 +2544,14 @@ void writePanels(){
 #else
 #ifdef IS_PLANE
     //Only show flight summary 7 seconds after landing
-  else if ( time_since(&landed) < 3000 && ((int)trip_distance > 5)){
+  else if (landed /* not 0! */ && time_since(&landed) < 3000 && ((int)trip_distance > 5)){
 #else
     else if(0) {
 #endif
 #endif
+
+DBG_PRINTF("set FData landed=%d\n", landed);
+
 	lflags.fdata=1;
 	storeChannels(); // remember control state
 	fdata_screen=panelN;

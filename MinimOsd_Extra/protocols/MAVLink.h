@@ -409,11 +409,11 @@ typedef struct __mavlink_radio_status_t
 #endif
 
 		} break;
-		
+/*
 		case MAVLINK_MSG_ID_RANGEFINDER:
 		    //float mavlink_msg_rangefinder_get_distance(&msg.m);
 		    break;
-		
+*/		
             default:
                 //Do nothing
                 break;

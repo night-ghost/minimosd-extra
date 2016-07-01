@@ -24,7 +24,6 @@ static uint8_t LTMrcvChecksum;
 static uint8_t LTMreadIndex;
 static uint8_t LTMframelength;
 static uint8_t LTMpassed = 0;
-static uint8_t crlf_count = 0;
 */
 
 /*

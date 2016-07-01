@@ -293,7 +293,7 @@ void OSD::update() {
     }
     PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
 
-    Spi.transfer(MAX7456_END_string);
+    Spi.transfer(MAX7456_END_string); // 0xff
 
     PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 }

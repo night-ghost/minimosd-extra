@@ -41,7 +41,7 @@ static float        alt_error = 0; // Current altitude error in meters *10
 static float        aspd_error = 0; // Current airspeed error in meters/second
 //static long         osd_home_alt = 0; 
 static float        osd_alt_to_home = 0; 
-static unsigned long landed = 4294967295;
+static unsigned long landed = 0;
 
 static int          takeoff_heading = -400;         // Calculated takeoff heading
 #endif
@@ -276,6 +276,7 @@ struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевы�
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
+volatile static uint8_t vsync_count=0;
 
 #ifdef PWM_PIN
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
@@ -319,7 +320,6 @@ static uint16_t chan_raw_middle[3]; // запомненные при входе 
 
 const Params *params; // указатель на текущий набор параметров
 
-volatile static uint16_t vsync_count;
 
 uint32_t autoswitch_time=0;
 
