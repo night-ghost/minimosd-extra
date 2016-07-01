@@ -205,7 +205,7 @@ static uint16_t     rssi = 0;     //normalized 0-100%
 uint8_t crlf_count = 0;
 
 byte mav_message[52]; // in MavLink max isize is 50
-byte mav_msg_ttl=0;
+uint16_t mav_msg_ttl=0;
 byte mav_msg_len=0;
 byte mav_msg_severity=0;
 byte mav_msg_shift=0;

@@ -859,7 +859,6 @@ const char PROGMEM w9[]="Fence High!";
 const char PROGMEM w10[]="Fence Far!";
 
 const char * const warn_str[] = {
-    0, // 0
     w1,
     w2,
     w3,
@@ -877,10 +876,8 @@ static void panWarn(point p){
 
     check_warn();
 
-    PGM_P w;
-    w=warn_str[warning];
-    if(w)
-	osd.print_P(w);
+    if(warning) 
+	osd.print_P(warn_str[warning-1]);
 }
 
 
@@ -1596,16 +1593,10 @@ static void panMessage(point p){
 		}
 		osd_blank();
 	    }
-//OSD::setPanel(p.x,p.y +1);
-//osd.printf_P(PSTR("pos=%d diff=%d len=%d"), pos, diff, len);
 	}
-//OSD::setPanel(p.x,p.y +1);
-//osd.printf_P(PSTR(" sev=%d"), mav_msg_severity);
     } else {
 	mav_message[0]=0; // no message
-//	lflags.flgMessage=0;
     }
-//  } // lflags.flgMessage
 }
 
 
@@ -1694,23 +1685,23 @@ const char * const mode_p_strings[] PROGMEM ={
 #endif
 
 #if defined(USE_UAVTALK)
-//const char PROGMEM u_mode00[] = "manu";    // MANUAL
+//const char PROGMEM u_mode00[] = "manu";   // MANUAL
 const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
 const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
 const char PROGMEM u_mode03[] = "stb3";    // STABILIZED3
 const char PROGMEM u_mode04[] = "stb4";    // STABILIZED4
 const char PROGMEM u_mode05[] = "stb5";    // STABILIZED5
 const char PROGMEM u_mode06[] = "stb6";    // STABILIZED6
-//const char PROGMEM u_mode07[] = "posh";    // POSITIONHOLD
-const char PROGMEM u_mode08[] = "cl";    // COURSELOCK
+//const char PROGMEM u_mode07[] = "posh";  // POSITIONHOLD
+const char PROGMEM u_mode08[] = "cl";      // COURSELOCK
 const char PROGMEM u_mode09[] = "posr";    // POSITIONROAM
-const char PROGMEM u_mode10[] = "hl";    // HOMELEASH
-const char PROGMEM u_mode11[] = "pa";    // ABSOLUTEPOSITION
-//const char PROGMEM u_mode12[] = "rtl ";    // RETURNTOBASE
-//const char PROGMEM u_mode13[] = "land";    // LAND
-const char PROGMEM u_mode14[] = "pp";    // PATHPLANNER
-const char PROGMEM u_mode15[] = "poi";    // POI
-//const char PROGMEM u_mode16[] = "ac  ";    // AUTOCRUISE
+const char PROGMEM u_mode10[] = "hl";      // HOMELEASH
+const char PROGMEM u_mode11[] = "pa";      // ABSOLUTEPOSITION
+//const char PROGMEM u_mode12[] = "rtl ";  // RETURNTOBASE
+//const char PROGMEM u_mode13[] = "land";  // LAND
+const char PROGMEM u_mode14[] = "pp";      // PATHPLANNER
+const char PROGMEM u_mode15[] = "poi";     // POI
+//const char PROGMEM u_mode16[] = "ac  ";  // AUTOCRUISE
 const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
 
 char const * const mode_u_strings[] PROGMEM ={ 
@@ -2180,19 +2171,23 @@ static void panSetup(){
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
     size = pgm_read_byte((void *)&pscreen->size);
 
-    storeChannels();
+    storeChannels(); // save channels values on first entry to screen (clears on screen switch)
 
     for(byte i=0; i < size; i++) {
-	OSD::setPanel(1, SETUP_START_ROW + i);
-
-	p = &params[i];
-	nm=(char *)pgm_read_word((void *)&p->name);
-
-        osd.print_P(nm);
+	{
+	    byte row = SETUP_START_ROW + i;
         
-        //            x    y
-        OSD::setPanel(19, SETUP_START_ROW + i);
+            OSD::setPanel(1, row);
 
+            p = &params[i];
+            nm=(char *)pgm_read_word((void *)&p->name);
+
+            osd.print_P(nm);
+        
+            //            x    y
+            OSD::setPanel(19, row);
+	}
+	
 	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
 	    col=OSD::col;
@@ -2205,14 +2200,14 @@ static void panSetup(){
 
         switch (type){
         
-        case 'h':
+        case 'h': // header
     	    if(OSD::getMode()) 
 		osd.print_P(PSTR(" (PAL)"));
 	    else
 		osd.print_P(PSTR(" (NTSC)"));
 	    // no break!
 	case 0:
-	    continue;
+	    continue;// no value
         
         case 'b': // byte param
 	    { 
@@ -2295,12 +2290,9 @@ as_char:
 
     void *pval=(void *)pgm_read_word((void *)&p->value);
 
-    min =(int)pgm_read_word((void *)&p->min);
-    max =(int)pgm_read_word((void *)&p->max);
 
     type=pgm_read_byte((void *)&p->type);
     k   =pgm_read_byte((void *)&p->k);
-
 
     v=c_val;
     
@@ -2329,11 +2321,13 @@ as_char:
     
     
     if(diff>100){
-//if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
 //	if(fNeg) v += inc;
 //	else     v -= inc;
 	if(fNeg) inc = -inc;
 	float_add(v, inc);
+
+        min =(int)pgm_read_word((void *)&p->min);
+        max =(int)pgm_read_word((void *)&p->max);
 
         if(v<min) v=min;
         if(v>max) v=max;
@@ -2345,30 +2339,29 @@ as_char:
 	int8_t cv=(char)(v * k);
 
         switch (type){
-    	    case 'Z':
-    		*((char *)pval) = cv + 0x20;
-    		break;
-    	    case 'z':
-    		*((char *)pval) = cv + 0x10;
-    		break;
+    	case 'Z':
+            *((char *)pval) = cv + 0x20;
+            break;
+    	case 'z':
+            *((char *)pval) = cv + 0x10;
+            break;
+        case 'c':
+            *((char *)pval) = cv;
+            break;
 
-	    case 'c':
-		*((char *)pval) = cv;
-		break;
-
-            case 'b': // byte param
-	        *((byte *)pval) = (byte)(cv);
-	        break;
+        case 'b': // byte param
+            *((byte *)pval) = (byte)(cv);
+            break;
 	    
-            case 'f': // float param
-	        *((float *)pval) = v;
-	        break;
+        case 'f': // float param
+            *((float *)pval) = v;
+            break;
 
 #if defined(USE_SENSORS)
-	    case 's': //sensors in EEPROM
-	        float f=v;
-	        eeprom_write_len((byte *)&f, (uint16_t)pval,  sizeof(float) );
-	        goto no_write;
+        case 's': //sensors in EEPROM
+            float f=v;
+            eeprom_write_len((byte *)&f, (uint16_t)pval,  sizeof(float) );
+            goto no_write;
 #endif
 	}
 
@@ -2407,19 +2400,16 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(GPS),		panGPS, 	0  },
     { ID_of(batteryPercent),	panBatteryPercent, 0 },
     { ID_of(COG),		panCOG, 	0 },
-//10
     { ID_of(rose),		panRose, 	0 },
     { ID_of(heading),		panHeading, 	0 },
     { ID_of(Fdata),		panFdata, 	0 },
     { ID_of(homeDist),		panHomeDis, 	0x0b },
     { ID_of(homeDir), 		panHomeDir, 	0 },
     { ID_of(time),		panTime, 	0 },
-//16
     { ID_of(WP_dist),		panWPDis,	0x5c },
-    { ID_of(alt),		panAlt, 	0x11 }, // GPS Alt
+    { ID_of(alt),		panAlt, 	0x11 }, 
     { ID_of(homeAlt),		panHomeAlt, 	0x12 },
     { ID_of(vel),		panVel, 	0x14 },
-//20
     { ID_of(airSpeed),		panAirSpeed, 	0x13 },
     { ID_of(throttle),		panThr, 	0x02 },
     { ID_of(FMod),		panFlightMode,	0x7f },
