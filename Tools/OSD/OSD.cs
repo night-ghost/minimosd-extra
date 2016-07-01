@@ -164,6 +164,8 @@ namespace OSD {
         Boolean fwWasRead = false;
         private bool tlog_run = false;
         public byte[] tlog_data;
+        private bool need_stop_tlog=false;
+
         System.Threading.Thread tlog_thread;
         public System.Threading.Thread com_thread;
         public bool com_run=false;
@@ -292,7 +294,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0, "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0 , "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -1261,7 +1263,8 @@ namespace OSD {
 
             if (fail)
                 return;
-            scr[panel_number].deselect();
+            if (panel_number>=0)
+                scr[panel_number].deselect();
 
             //Verify EEPROM version
             if (conf.eeprom.sets.CHK1_VERSION != VER) { // no match
@@ -1692,6 +1695,7 @@ namespace OSD {
             toolStripProgressBar1.Value = progress;
 
             statusStrip1.Refresh();
+            Application.DoEvents();
         }
 
 
@@ -2150,7 +2154,7 @@ namespace OSD {
 
             if (ofd.FileName != "") {
                 byte[] FLASH;
-                bool spuploadflash_flag = false;
+                bool result = false;
                 try {
                     toolStripStatusLabel1.Text = "Reading Hex File";
 
@@ -2173,16 +2177,47 @@ namespace OSD {
                     sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);//////
                     try {
                         for (int i = 0; i < 3; i++) { //try to upload 3 times //try to upload n times if it fail
-                            spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
-                            if (!spuploadflash_flag) {
+                            toolStripStatusLabel1.Text = "Witing flash " + i.ToString();
+                            Application.DoEvents();
+                            sp.Close();
+
+                            sp.Open();
+                            sp.connectAP ();
+                            result = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+                            if (!result) {
                                 if (sp.keepalive())
                                     Console.WriteLine("keepalive successful (iter " + i + ")");
                                 else
                                     Console.WriteLine("keepalive fail (iter " + i + ")");
-                            } else
-                                break;
-                        }
+                            } else {
+                                bool fOK=false;
+                                toolStripStatusLabel1.Text = "Reading flash ";
+                                for(int j=0;j<3;j++) {
+                                    sp.Close();
 
+                                    sp.Open(); 
+                                    sp.connectAP();
+                                    fOK = true;
+                                    toolStripStatusLabel1.Text = "Reading flash "+j.ToString();
+                                    Application.DoEvents();
+                                    byte[] test=sp.downloadflash((short)FLASH.Length);
+                                    
+                                    for(int k=0;k<FLASH.Length;k++){
+                                        if(test[k]!=FLASH[k]){
+                                            fOK=false;
+                                            Console.WriteLine ("content mismatch at {0}! {1}!={2} try {3}",k,test[k], FLASH[k], j);
+                                            break;
+                                        }
+                                    }
+
+                                    if(fOK) break; // OK ends loop
+                                }
+
+                                if(fOK) 
+                                    break; // OK ends tries
+                            }
+                        }
+                        
                     } catch (Exception ex) {
 
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -2194,7 +2229,8 @@ namespace OSD {
 
                 sp.Close();
 
-                if (spuploadflash_flag) {
+                
+                if (result) {
                     // TODO: update pan.fw_version = conf.eeprom.FW_version ;
                     //		pan.cs_version = conf.eeprom.CS_version;
 
@@ -2213,6 +2249,8 @@ namespace OSD {
             //read EEPROM 
             this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
 
+            toolStripStatusLabel1.Text = "Firmware written successully!";
+            start_clear_timeout();
         }
 
         private Boolean customImage = false;
@@ -2234,7 +2272,14 @@ namespace OSD {
         }
 
         private void stop_tlog(){
-            tlog_thread.Abort();
+            need_stop_tlog=true;
+            delay(200);
+            Application.DoEvents();
+            if(tlog_run) {
+                try {
+                    tlog_thread.Abort();
+                } catch{}
+            }
             tlog_run = false;
             btnTLog.Text = tlog_run ? "Stop" : "Start";
         }
@@ -3854,22 +3899,32 @@ namespace OSD {
 
 
         private void btnTLog_Click(object sender, EventArgs e) {
-            tlog_run = !tlog_run;
-            btnTLog.Text = tlog_run ? "Stop" : "Start";
+            
 
-            if (tlog_run) {
+            if (!tlog_run) {
                 CurrentCOM = CMB_ComPort.Text;
                 tlog_thread = new System.Threading.Thread(thread_proc);
+                tlog_run = true;
                 tlog_thread.Start();
             } else {
-                try {
-                    tlog_thread.Abort();
-                } catch {};
+                need_stop_tlog=true;
+
+                delay(100);
+                Application.DoEvents();
+                delay(100);
+
+                if(tlog_run) {
+                    tlog_run=false;
+                    try {
+                        tlog_thread.Abort();
+                    } catch {};
+                }
                 try {
                     if (comPort.IsOpen)
                         comPort.Close();
                 } catch {};
             }
+            btnTLog.Text = tlog_run ? "Stop" : "Start";
         }
 
 
@@ -4029,7 +4084,12 @@ namespace OSD {
             return time;
         }
 
+        double millis(){
+            return (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+        }
+
         void thread_proc() {
+            need_stop_tlog=false;
             byte[] bytes = tlog_data;
             int frStart = 0;
             int frEnd = 0;
@@ -4072,7 +4132,7 @@ namespace OSD {
                 np = 0;
                 UInt64 time, start_time;
                 DateTime localtime = DateTime.Now;
-                UInt64 stamp = (UInt64)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1000);
+                UInt64 stamp = (UInt64)(millis() * 1000);
 
                 int byteIndex;
                 try {
@@ -4082,6 +4142,10 @@ namespace OSD {
                             
                     time = start_time = get_timestamp(bytes, 0);
                     for (byteIndex = 8; byteIndex < bytes.Length; byteIndex++) {
+                        if(need_stop_tlog) {
+                            tlog_run=false;
+                            return;
+                        }
                         if (comPort.BytesToRead != 0)
                             parseInputData(comPort.ReadExisting());
 
@@ -4114,19 +4178,23 @@ namespace OSD {
 
                             } catch { };
 
-                            double time_w = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+                            double time_w = millis();
                             while(true){
                                 UInt64 diff_log=(time - start_time);
-                                UInt64 diff_real = ((UInt64)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1000)) - stamp; // если время лога опережает реальное - задерживаемся
+                                UInt64 diff_real = ((UInt64)(millis() * 1000)) - stamp; // если время лога опережает реальное - задерживаемся
                                 if(diff_log < diff_real) {
                                     //Console.WriteLine("go");
                                     break;
                                 }
 
-                                if (((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds - time_w) > 100) { // но не реже 10 раз в секунду
+                                if ((millis() - time_w) > 100) { // но не реже 10 раз в секунду
                                     start_time=time; // ждали слишком долго, сместим метку времени в логе
                                     break;
-                                } 
+                                }
+                                if (need_stop_tlog) {
+                                    tlog_run = false;
+                                    return;
+                                }
                                 //Console.WriteLine("wait");
                                 System.Threading.Thread.Sleep(1); 
                             }
@@ -4160,10 +4228,13 @@ namespace OSD {
 
         }
 
+        void delay(int t){
+            System.Threading.Thread.Sleep(t); 
+        }
 
         private void connectComPortToolStripMenuItem_Click(object sender, EventArgs e) {
             frmComPort frm = new frmComPort(this);
-            //frm.Show();
+            
             frm.ShowInTaskbar =false;
             frm.ShowDialog(); // modal
         }
@@ -4274,18 +4345,14 @@ namespace OSD {
 
                 //Console.WriteLine(DateTime.Now + " PC Doing req "+ messageType + " " + this.BytesToRead);
                 byte[] packet = new byte[data.Length + 6 + 2];
-
-                packet[0] = 254;
-                packet[1] = (byte)data.Length;
-                packet[2] = (byte)MAV_packetcount;
-
-                MAV_packetcount++;
-
-                packet[3] = 255; // gcssysid; // this is always 255 - MYGCS
-                packet[4] = (byte)MAVLink.MAV_COMPONENT.MAV_COMP_ID_CAMERA;
-                packet[5] = messageType;
-
-                int i = 6;
+                int i = 0;
+                packet[i++] = 254;
+                packet[i++] = (byte)data.Length;
+                packet[i++] = (byte)(MAV_packetcount++);
+                packet[i++] = 255; // gcssysid; // this is always 255 - MYGCS
+                packet[i++] = (byte)MAVLink.MAV_COMPONENT.MAV_COMP_ID_CAMERA;
+                packet[i++] = messageType;
+                
                 foreach (byte b in data) {
                     packet[i++] = b;
                 }
@@ -4302,7 +4369,7 @@ namespace OSD {
 
                 comPort.Write(packet, 0, i);
 
-                System.Threading.Thread.Sleep(100); 
+                delay(100); 
                 parseInputData(comPort.ReadExisting());
             }
         }

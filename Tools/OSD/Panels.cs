@@ -264,7 +264,7 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
 
-            osd.printf("%c%c%3i%c", 0x94, 0x95, tr, 0x05);
+            osd.printf("%c%c%4i%c", 0x94, 0x95, tr, 0x05);
 
             
             return 0;

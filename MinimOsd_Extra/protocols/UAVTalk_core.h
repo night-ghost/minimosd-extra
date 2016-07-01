@@ -268,9 +268,16 @@ void NOINLINE set_crc(byte c){
 static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 
 	byte state=msg.u.state;
+DBG_PRINTF("U c=%d s=%d\n",c, state);
 
 	switch (state) {
+	case UAVTALK_PARSE_STATE_NOINIT:
+	    state = UAVTALK_PARSE_STATE_WAIT_SYNC;
+	// no break!
+	
 	case UAVTALK_PARSE_STATE_WAIT_SYNC:
+DBG_PRINTLN("no sync");
+
 		if (c == UAVTALK_SYNC_VAL) {
 again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->Sync = c;
@@ -282,6 +289,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_SYNC:
+DBG_PRINTLN("got sync");
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
 			state = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
@@ -296,6 +304,8 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
+DBG_PRINTLN("got type");
+
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		if (++msg.u.cnt < 2) {
 			//msg->Length = ((uint16_t) c);
@@ -319,6 +329,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 		
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
+DBG_PRINTLN("got len");
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		switch (++msg.u.cnt) {
 		case 1:
@@ -344,6 +355,8 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
+DBG_PRINTLN("got objid");
+
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		switch (++msg.u.cnt) {
 		case 1:
@@ -368,6 +381,8 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_INSTID:
+DBG_PRINTLN("got instid");
+
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		msg.u.cnt++;
 		switch (msg.u.cnt) {
@@ -386,6 +401,8 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
+DBG_PRINTLN("got time");
+
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		
 		umsg->Data[msg.u.cnt++] = c;
@@ -396,14 +413,20 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_DATA:
+DBG_PRINTLN("got data");
+
 		//msg.u.state = UAVTALK_PARSE_STATE_GOT_CRC;
 		state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		//msg->Crc = c;
 		if (c == umsg->Crc) {
 		    msg.u.state = state;
+DBG_PRINTLN("data OK!");
+
 		    return umsg->Length;
 		} else {
 #ifdef DEBUG
+DBG_PRINTLN("bad CRC!");
+
 		    // Update global packet drops counter
 	    	    packet_drops += 1;
 #endif
@@ -423,7 +446,9 @@ bool uavtalk_read(void) {
 	// grabbing data
 	while (Serial.available_S()) {
 		uint8_t c = Serial.read_S();
-		
+
+DBG_PRINTF("Ut c=%d\n",c);
+	
 #ifdef DEBUG
 	        bytes_comes+=1;
 #endif
@@ -432,6 +457,9 @@ bool uavtalk_read(void) {
 			lflags.uavtalk_active = 1; // будем слушать UAVtalk
 
 			set_data_got(); 
+
+DBG_PRINTF("got packet ID=\n",msg.u.ObjID);
+
 
 			// consume msg
 			switch (msg.u.ObjID) {

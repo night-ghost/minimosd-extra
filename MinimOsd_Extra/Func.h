@@ -593,18 +593,21 @@ static void getData(){
 	
 #if defined(USE_UAVTALK)
 	case 2:
+//DBG_PRINTLN("UAVtalk read");
 	    extern bool uavtalk_read(void);
 	    uavtalk_read();
 	    break;
 #endif
 #if defined(USE_MWII)
 	case 3:
+//DBG_PRINTLN("MWII read");
 	    extern bool mwii_read(void);
 	    mwii_read();
 	    break;
 #endif
 #if defined(USE_LTM)
 	case 4:
+//DBG_PRINTLN("LTM read");
 	    extern void read_ltm(void);
 	    read_ltm();
 	    break;

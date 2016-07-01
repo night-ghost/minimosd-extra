@@ -988,7 +988,7 @@ static void panHomeDis(point p){
 
 //const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
 
-static void spaces(byte n){
+static void inline spaces(byte n){
     while(n-- >0) osd_blank();
 }
 
@@ -1397,7 +1397,7 @@ static void panWaitMAVBeats(){
     OSD::setPanel(5,3);
     osd.printf_P(PSTR("No input data! %d||"),seconds);
 
-#if defined(DEBUG) && 0
+#if defined(DEBUG)
     extern uint16_t packet_drops;
     extern long bytes_comes;
     extern volatile uint16_t lost_bytes;
@@ -1407,9 +1407,8 @@ static void panWaitMAVBeats(){
     OSD::setPanel(6,5);
     osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
-    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
-
-    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
+//    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
+//    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
     
     lflags.input_active=0;
 #else

@@ -219,22 +219,17 @@ namespace ArdupilotMega
 
         public bool uploadflash(byte[] data, int startfrom, int length, int startaddress)
         {
-            if (!this.IsOpen)
-            {
+            if (!this.IsOpen) {
                 return false;
             }
             int loops = (length / 0x100);
             int totalleft = length;
             int sending = 0;
 
-            for (int a = 0; a <= loops; a++)
-            {
-                if (totalleft > 0x100)
-                {
+            for (int a = 0; a <= loops; a++){
+                if (totalleft > 0x100){
                     sending = 0x100;
-                }
-                else
-                {
+                }else{
                     sending = totalleft;
                 }
 
@@ -258,8 +253,7 @@ namespace ArdupilotMega
                 if (Progress != null)
                     Progress((int)(((float)startaddress / (float)length) * 100));
 
-                if (!sync())
-                {
+                if (!sync()){
                     Console.WriteLine("No Sync");
                     Progress(0); //reset progress bar
                     return false;

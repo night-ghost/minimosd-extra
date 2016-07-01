@@ -1,4 +1,4 @@
-# minimosd-extra (russian wil be in tail of this file)
+# minimosd-extra (russian is at the tail of this file)
 
 Quickstart Guide (c) Johnex
 ----------------------
@@ -291,6 +291,10 @@ v858
 * fixed bug in ILS with HUD size
 * when landing markers are not visible ILS now show arrows to help find smaller turn
 * some size optimizations to fit all above :)
+
+
+v859
+* UAVtalk is now working!
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -612,6 +616,10 @@ v858
 * исправлен баг в ILS с неверным размером горизонта
 * ILS: если посадочные маркеры не видны то отображается стрелка нужного направления поворота
 * некоторые оптимизации размера чтобы все это впихнуть :)
+
+
+v859
+* работает UAVtalk!
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
