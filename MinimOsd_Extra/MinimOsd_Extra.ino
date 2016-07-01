@@ -353,7 +353,8 @@ void loop()
             return;
     }
 
-//DBG_PRINTF("time=%ld\n",pt);
+//Serial.printf_P(PSTR("time=%ld\n"),pt);
+
 
     getData(); // получить данные с контроллера
 

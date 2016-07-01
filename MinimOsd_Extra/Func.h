@@ -178,6 +178,8 @@ DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
 
 	static const char msg[] PROGMEM = "Screen 0";
 
+	// strcpy_P((char *)mav_message,msg); 10 bytes more
+
 	const char *cp;
 	byte *wp;
 	for(cp=msg, wp=mav_message;;){
@@ -494,6 +496,8 @@ void NOINLINE gps_norm(float &dst, long f){
 void NOINLINE set_data_got() {
     lastMAVBeat = millis();
     //millis_plus(&lastMAVBeat, 0);
+    
+    lastMavSeconds=seconds;
 
     lflags.got_data = 1;
 #ifdef DEBUG
@@ -544,6 +548,9 @@ static void getData(){
 	read_ltm();
 #endif
     } else {
+    
+	const char * proto;
+	
 	switch(count05s % 5){
 #if defined(AUTOBAUD)
 	case 1: {
@@ -596,6 +603,7 @@ static void getData(){
 //DBG_PRINTLN("UAVtalk read");
 	    extern bool uavtalk_read(void);
 	    uavtalk_read();
+	    proto= PSTR("UAVTalk");
 	    break;
 #endif
 #if defined(USE_MWII)
@@ -603,6 +611,7 @@ static void getData(){
 //DBG_PRINTLN("MWII read");
 	    extern bool mwii_read(void);
 	    mwii_read();
+	    proto= PSTR("MWII");
 	    break;
 #endif
 #if defined(USE_LTM)
@@ -610,16 +619,33 @@ static void getData(){
 //DBG_PRINTLN("LTM read");
 	    extern void read_ltm(void);
 	    read_ltm();
+	    proto= PSTR("LTM");
 	    break;
 #endif
 	default: // 0 and all not used
 #if defined(USE_MAVLINK)
 	    read_mavlink();
-#endif
+	    proto= PSTR("MAVLink");
+#endif	
 	    break;
 	}
-    }
+/*
+	if(lflags.got_data) {
+            // strcpy_P((char *)mav_message,msg); 10 bytes more
 
+            byte *wp;
+            byte len;
+            for( len=0, wp=mav_message;;len++){
+                byte c=pgm_read_byte(proto++);
+                *wp++ = c;
+                if(c==0) break;
+                len++;
+            }
+
+            mav_message_start(len,6); // len, time
+	}
+*/
+    }
 }
 
 bool NOINLINE timeToScreen(){

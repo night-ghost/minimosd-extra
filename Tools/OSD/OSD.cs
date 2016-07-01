@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r858 DV";
+        public const string VERSION = "r860 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -2198,7 +2198,7 @@ namespace OSD {
                                     sp.Open(); 
                                     sp.connectAP();
                                     fOK = true;
-                                    toolStripStatusLabel1.Text = "Reading flash "+j.ToString();
+                                    toolStripStatusLabel1.Text = "Reading flash "+(j>0?" try "+ (j+1).ToString():"");
                                     Application.DoEvents();
                                     byte[] test=sp.downloadflash((short)FLASH.Length);
                                     
@@ -2246,6 +2246,7 @@ namespace OSD {
                 }
             }
 
+            toolStripStatusLabel1.Text = "Reading EEPOM!";
             //read EEPROM 
             this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
 

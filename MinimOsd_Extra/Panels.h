@@ -26,7 +26,7 @@ static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 }
 
 static void NOINLINE printTime(uint16_t t, byte blink){
-    osd.printf_P(PSTR("%3i%c%02i"),((int)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (int)t%60);
+    osd.printf_P(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
 }
 
 static void NOINLINE printTime(int t){
@@ -182,14 +182,11 @@ static void showHorizon(byte start_col, byte start_row) {
 	  AH_ROLL_FACTOR ; // conversion factor for roll
     
     // NTSC: osd.getMode() == 0
-    if(osd.getMode() == 0) { // ntsc
-	AH_PITCH_FACTOR = sets.horiz_kRoll_a  * AH_PITCH_FACTOR0;
-	AH_ROLL_FACTOR  = sets.horiz_kPitch_a * AH_ROLL_FACTOR0;
-    } else {
-	AH_PITCH_FACTOR = sets.horiz_kRoll    * AH_PITCH_FACTOR0;
-	AH_ROLL_FACTOR  = sets.horiz_kPitch   * AH_ROLL_FACTOR0;
+    {
+	byte fPAL=osd.getMode();
+        AH_PITCH_FACTOR = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a) * AH_PITCH_FACTOR0;
+        AH_ROLL_FACTOR  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a)  * AH_ROLL_FACTOR0;    
     }
-
 
     // preset the line char attributes
     roll = osd_att.roll;
@@ -310,10 +307,10 @@ static void showILS(byte start_col, byte start_row) {
             uint8_t selectedChar = (linePosition % 6) + 0xBF;
             if(charPosition < 0){
         	OSD::write_xy(start_col +1, start_row + AH_ROWS-1, '<' ); // в первой и последней строке
-        	OSD::write_xy(start_col +1, start_row + 1, '<' );
+        	OSD::write_xy(start_col +1, start_row + 1,         '<' );
             } else if(charPosition > AH_COLS)  {
         	OSD::write_xy(start_col +AH_COLS-1, start_row + AH_ROWS-1, '>' ); // в первой и последней строке
-        	OSD::write_xy(start_col +AH_COLS-1, start_row + 1, '>' );
+        	OSD::write_xy(start_col +AH_COLS-1, start_row + 1,         '>' );
             } else {
               OSD::write_xy(start_col + charPosition, start_row + AH_ROWS-1, selectedChar ); // в первой и последней строке
               OSD::write_xy(start_col + charPosition, start_row + 1, selectedChar );
@@ -398,7 +395,7 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
 
 
     if(fTrack){
-	static Point trk[4];
+//	static Point trk[4];
 	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
 	    for(byte i=4; i!=1;){
 		i--;
@@ -630,10 +627,8 @@ static void panCALLSIGN(point p){
 
 static void panWindSpeed(point p){
 
-    int /*float*/ dir = osd_winddirection;
-
     //if (dir < 0)  dir+=360;
-    dir=normalize_angle(dir);
+    int dir=normalize_angle(osd_winddirection);
 
 #if defined(USE_FILTER)
     filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
@@ -1395,7 +1390,7 @@ static void panWaitMAVBeats(){
 #endif
 
     OSD::setPanel(5,3);
-    osd.printf_P(PSTR("No input data! %d||"),seconds);
+    osd.printf_P(PSTR("No input data! %d||"),seconds - lastMavSeconds);
 
 #if defined(DEBUG)
     extern uint16_t packet_drops;

@@ -145,12 +145,12 @@ Coords              osd_pos = {0,0,0};			// current coordinates
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
-static uint16_t     osd_cog;                        // Course over ground
-static uint16_t     off_course;
+static uint16_t     osd_cog=0;                      // Course over ground
+static uint16_t     off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
-static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
-static int          dst_x,dst_y; // расстояние по осям - для радара
+static uint8_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)
+static int          dst_x=0,dst_y=0; // расстояние по осям - для радара
 
 struct Att {
     int16_t             pitch;                  // pitch from DCM
@@ -172,12 +172,14 @@ static float        loc_speed=0;    // local speed
 
 static uint8_t      osd_throttle = 0;               // throtle
 
-static byte         seconds; // это только для panCALLSIGN
+static uint16_t     seconds; // это только для panCALLSIGN
+static uint16_t     lastMavSeconds=0;
 static uint32_t     lastMAVBeat = 0;
 
+
 static uint8_t      apm_mav_system = 0;
-static uint8_t      apm_mav_component;
-static uint8_t      osd_autopilot;	// system type: 3 - apm 14 - autoquad
+static uint8_t      apm_mav_component=0;
+static uint8_t      osd_autopilot=0;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
 #ifdef MAVLINK_CONFIG
@@ -191,6 +193,7 @@ byte count02s=0;
 #define MAX_PANELS 4
 static uint8_t panelN = STARTUP_SCREEN;
 
+static Point trk[4] = {{0,0},{0,0},{0,0},{0,0}};
 
 //*************************************************************************************************************
 static uint8_t      osd_rssi = 0; // raw value from mavlink
@@ -202,41 +205,41 @@ static uint16_t     rssi = 0;     //normalized 0-100%
 uint8_t crlf_count = 0;
 
 byte mav_message[52]; // in MavLink max isize is 50
-byte mav_msg_ttl;
-byte mav_msg_len;
-byte mav_msg_severity;
-byte mav_msg_shift;
+byte mav_msg_ttl=0;
+byte mav_msg_len=0;
+byte mav_msg_severity=0;
+byte mav_msg_shift=0;
 
 volatile byte update_stat=0;
 
 struct loc_flags {
 //    bool update_stat:1; 		// есть данные для показа
-    bool got_data:1;		// флаг получения пакета
-    bool need_redraw:1;         // надо перерисовать экран
+    bool got_data;		// флаг получения пакета
+    bool need_redraw;         // надо перерисовать экран
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mwii_active:1;    // got valid MWII packet - flag forever
     bool ltm_active:1;     // got valid LTM packet - flag forever
-    bool input_active:1;    // got ANY valid packet - flag forever
+    bool input_active;    // got ANY valid packet - flag forever
     
-    bool rotatePanel:1;
-    bool last_sw_ch:1;
-    bool one_sec_timer_switch:1;
+    bool rotatePanel;
+    bool last_sw_ch;
+    bool one_sec_timer_switch;
 
-    bool motor_armed:1;
-    bool last_armed_status:1;
-    bool was_armed:1;
-    bool throttle_on:1;
-    bool in_air:1;
+    bool motor_armed;
+    bool last_armed_status;
+    bool was_armed;
+    bool throttle_on;
+    bool in_air;
 
-    bool blinker:1;
-    bool flgMessage:1;
+    bool blinker;
+    bool flgMessage;
     
-    bool mode_switch:1;
-    bool osd_got_home:1; // tels if got home position or not
+    bool mode_switch;
+    bool osd_got_home; // tels if got home position or not
     
-    bool flag_05s:1; // sets each 0.5s for setup
-    bool flag_01s:1;
+    bool flag_05s; // sets each 0.5s for setup
+    bool flag_01s;
 
     bool flgSensor1:1;
     bool flgSensor2:1;
@@ -246,14 +249,14 @@ struct loc_flags {
     bool fPulseSensor3:1;
     bool fPulseSensor4:1;
 
-    bool show_screnN:1;
-    bool gps_active:1; // было что-то с GPS
-    bool vs_ms:1; // vertical speed in m/s;
-    bool was_mav_config:1; // was EEPROM write via MAVlink
+    bool show_screnN;
+    bool gps_active; // было что-то с GPS
+    bool vs_ms; // vertical speed in m/s;
+    bool was_mav_config; // was EEPROM write via MAVlink
     
-    bool fdata:1;	// show FData screen
+    bool fdata;	// show FData screen
 
-    bool autosw:1; 	// automatic screen switch
+    bool autosw; 	// automatic screen switch
     
 };
 
@@ -264,13 +267,13 @@ uint16_t packets_got = 0;
 
 long bytes_comes=0;
 uint16_t max_dly=0;
-volatile uint16_t lost_bytes;
+volatile uint16_t lost_bytes =0;
 
 long mavlink_time=0, mavlink_dt=0;
 int mavlink_cnt=0;
 #endif
 
-byte skip_inc;
+byte skip_inc=0;
 
 struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
@@ -280,17 +283,17 @@ volatile static uint8_t vsync_count=0;
 
 #ifdef PWM_PIN
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
-volatile uint16_t      PWM_IN;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile uint16_t      PWM_IN=0;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
 volatile unsigned long int_Timer = 0;         // set in the INT1
 #endif
 
 byte PWM_out_pin=0;
 
 //#if defined(USE_SENSORS)
-unsigned int sensorData[4];
+unsigned int sensorData[4] = {0,0,0,0};
 //#endif
 
-uint8_t fdata_screen;
+uint8_t fdata_screen=0;
 
 
 // Setup screen 

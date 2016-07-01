@@ -292,9 +292,13 @@ v858
 * when landing markers are not visible ILS now show arrows to help find smaller turn
 * some size optimizations to fit all above :)
 
-
 v859
 * UAVtalk is now working!
+
+v860
+* MAVLink don't loses sync on CRC errors
+
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -621,6 +625,8 @@ v858
 v859
 * работает UAVtalk!
 
+v860
+* MAVLink не теряет синхронизацию при ошибках CRC
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

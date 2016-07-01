@@ -137,7 +137,8 @@ typedef enum {
     MAVLINK_PARSE_STATE_GOT_COMPID,
     MAVLINK_PARSE_STATE_GOT_MSGID,
     MAVLINK_PARSE_STATE_GOT_PAYLOAD,
-    MAVLINK_PARSE_STATE_GOT_CRC1
+    MAVLINK_PARSE_STATE_GOT_CRC1,
+    MAVLINK_PARSE_STATE_BAD_CRC1
 } mavlink_parse_state_t; ///< The state machine for the comm parser
 
 typedef struct __mavlink_status {
