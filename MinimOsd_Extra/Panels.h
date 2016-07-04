@@ -79,7 +79,6 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
 static void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
-
 /*static NOINLINE void printSpeedCnv(float *s){
     printSpeedCnv(s, false);
 }*/
@@ -170,7 +169,7 @@ static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
 // used formula: y = m * x + n <=> y = tan(a) * x + n
 static void showHorizon(byte start_col, byte start_row) {
     byte col, row;
-    
+
     int roll;
     byte line_set = LINE_SET_STRAIGHT__;
     byte line_set_overflow = LINE_SET_STRAIGHT_O;
@@ -183,10 +182,10 @@ static void showHorizon(byte start_col, byte start_row) {
     
     // NTSC: osd.getMode() == 0
     {
-	byte fPAL=osd.getMode();
+        byte fPAL=osd.getMode();
         AH_PITCH_FACTOR = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a) * AH_PITCH_FACTOR0;
         AH_ROLL_FACTOR  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a)  * AH_ROLL_FACTOR0;    
-    }
+     }
 
     // preset the line char attributes
     roll = osd_att.roll;
@@ -229,30 +228,30 @@ static void showHorizon(byte start_col, byte start_row) {
     }
     
     byte shf=0;
-    
     int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
-// если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
+
+    // если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
     if(pitch_line<0){
-	pitch_line += AH_TOTAL_LINES-2;
-	shf+=2;
+       pitch_line += AH_TOTAL_LINES-2;
+       shf+=2;
     }
     if(pitch_line>AH_TOTAL_LINES){
-	pitch_line += AH_TOTAL_LINES-2;
-	shf+=2;
+       pitch_line += AH_TOTAL_LINES-2;
+       shf+=2;
     }
-
     
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1+shf; col<=AH_COLS-shf; col++) {
-	// получим координаты средней субколонки каждой колонки
+       // получим координаты средней субколонки каждой колонки
     //         = (col - AH_COLS/2 - 1/2) * CHAR_COLS;
         int8_t middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
-
-    // tg(72 gr) ==3 so byte overflows        
-        int16_t  hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+        
+        // tg(72 gr) ==3 so byte overflows
+        int16_t hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
+
 	    byte subval;
 	    if(subval_overflow) // adjusted lines
 	        subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
@@ -280,42 +279,41 @@ static void showILS(byte start_col, byte start_row) {
     
     if(sets.model_type==0) { // plane
 
-      { //Vertical calculation
-            int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
-            //Calc current char position.
-            //int numberOfPixels = CHAR_ROWS * AH_ROWS;
-            int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
-            int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
-            int8_t charPosition = linePosition / 9;
-            uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
-            if(charPosition >= 0 && charPosition <= AH_ROWS) {
-              OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
-              OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
-            }
-
-	}
-        {  //Horizontal calculation
-            int currentAngleDisplacement = normalize_angle(osd_home_direction - takeoff_heading);
+       { //Vertical calculation
+        int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
+        //Calc current char position.
+        //int numberOfPixels = CHAR_ROWS * AH_ROWS;
+        int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+        int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+        int8_t charPosition = linePosition / 9;
+        uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
+        if(charPosition >= 0 && charPosition <= AH_ROWS) {
+          OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
+          OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
+        }
+      }
+      { //Horizontal calculation
+	    int currentAngleDisplacement = normalize_angle(osd_home_direction - takeoff_heading);
     
             if(currentAngleDisplacement > 180) currentAngleDisplacement = 360 - currentAngleDisplacement; // we can to come to runway from opposite side
     
             currentAngleDisplacement-=180; // range -90..90
-	
+       
             int8_t totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
             int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
             int8_t charPosition = linePosition / 6;
             uint8_t selectedChar = (linePosition % 6) + 0xBF;
             if(charPosition < 0){
-        	OSD::write_xy(start_col +1, start_row + AH_ROWS-1, '<' ); // в первой и последней строке
-        	OSD::write_xy(start_col +1, start_row + 1,         '<' );
+               OSD::write_xy(start_col +1, start_row + AH_ROWS-1, '<' ); // в первой и последней строке
+               OSD::write_xy(start_col +1, start_row + 1,         '<' );
             } else if(charPosition > AH_COLS)  {
-        	OSD::write_xy(start_col +AH_COLS-1, start_row + AH_ROWS-1, '>' ); // в первой и последней строке
-        	OSD::write_xy(start_col +AH_COLS-1, start_row + 1,         '>' );
+               OSD::write_xy(start_col +AH_COLS-1, start_row + AH_ROWS-1, '>' ); // в первой и последней строке
+               OSD::write_xy(start_col +AH_COLS-1, start_row + 1,         '>' );
             } else {
               OSD::write_xy(start_col + charPosition, start_row + AH_ROWS-1, selectedChar ); // в первой и последней строке
               OSD::write_xy(start_col + charPosition, start_row + 1, selectedChar );
             }
-        }
+      }
     } else { // copter
     
         //Show line on panel center because horizon line can be
@@ -433,8 +431,9 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
 static void panCOG(point p){
 
     int cog_100=(osd_cog + 50) / 100 - osd_heading;
-    
-/*    if (cog_100  > 180){
+
+/*
+    if (cog_100  > 180){
        off_course = cog_100 - 360;
     }else if (cog_100 < -180){
        off_course = cog_100 + 360;
@@ -443,7 +442,7 @@ static void panCOG(point p){
     }
 */
     off_course = normalize_angle(cog_100) - 180;   // -180..180
-    
+
     showArrow(grad_to_sect(off_course),2); // use off_course as global
 }
 
@@ -627,7 +626,6 @@ static void panCALLSIGN(point p){
 
 static void panWindSpeed(point p){
 
-    //if (dir < 0)  dir+=360;
     int dir=normalize_angle(osd_winddirection);
 
 #if defined(USE_FILTER)
@@ -877,7 +875,8 @@ static void panWarn(point p){
     check_warn();
 
     if(warning) 
-	osd.print_P(warn_str[warning-1]);
+       osd.print_P(warn_str[warning-1]);
+
 }
 
 
@@ -923,7 +922,9 @@ static void panBatteryPercent(point p){
     if(has_sign(p)) {
 	OSD::write_S(0x88); // донышко батарейки не зависит от
 
-        setBatteryPic(byte(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
+//Serial.printf_P(PSTR("batt val="),val);
+
+        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
 
 	if (is_alt(p))
@@ -974,10 +975,7 @@ static void panHomeDis(point p){
 // Size   : 5 x 14  (rows x chars)
 // Staus  : done
 
-
-
 //const char str_hud[] PROGMEM = "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|";
-
 //const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
 
 static void inline spaces(byte n){
@@ -997,21 +995,23 @@ static void panHorizon(point p){
 */
 	byte i;
 	for(i=5;i!=0; i--){ // 30 bytes of flash
-	    //osd.print_P(i==3 ? str_mid : str_hud);
-	    osd.write_S(i==3 ? '\xc6' : '\xb2');
-	    spaces(12);
-	    osd.write_S(i==3 ? '\xc5' : '\xb3');
-	    osd_nl();
+            //osd.print_P(i==3 ? str_mid : str_hud);
+            osd.write_S(i==3 ? '\xc6' : '\xb2');
+            spaces(12);
+            osd.write_S(i==3 ? '\xc5' : '\xb3');
+            osd_nl();
 	}
     }
 
     showHorizon(p.x + 1, p.y);
 
+    byte mid_x = p.x+6;
+    byte mid_y = p.y+2;
     if(is_alt3(p))
-	showRADAR(p.x+6, p.y+2, is_alt4(p));
+       showRADAR(mid_x, mid_y, is_alt4(p));
 
     if(has_sign(p)) { // Птичка по центру
-	OSD::setPanel(p.x+6, p.y+2);
+	OSD::setPanel(mid_x, mid_y);
 	osd.print_P(PSTR("\xb8\xb9"));
     }
 
@@ -1477,8 +1477,6 @@ static void panRose(point p){
 
 
 static int getTargetBearing(){
-//    int a=wp_target_bearing);
-//    if (a < 0) a+=360;
     int a=normalize_angle(wp_target_bearing);
 
     return grad_to_sect(a - osd_heading); //Convert to int 1-16 
@@ -1513,7 +1511,6 @@ static void panWPDis(point p){
 	int err=xtrack_error;
         if (err > 999)  err = 999;
         if (err < -999) err = -999;
-
 
         byte h=get_mhigh();
 
@@ -1559,10 +1556,6 @@ static void panMessage(point p){
 	    OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
 	    if(has_sign(p) && sign) OSD::write_S(sign);
 	    osd.print((char *)mav_message);
-
-
-//OSD::setPanel(p.x,p.y +1);
-//osd.printf_P(PSTR("diff=%d len=%d"), diff, len);
 
 	} else {				// message don't fit
 	    int pos;
@@ -1685,23 +1678,23 @@ const char * const mode_p_strings[] PROGMEM ={
 #endif
 
 #if defined(USE_UAVTALK)
-//const char PROGMEM u_mode00[] = "manu";   // MANUAL
+//const char PROGMEM u_mode00[] = "manu";    // MANUAL
 const char PROGMEM u_mode01[] = "stb1";    // STABILIZED1
 const char PROGMEM u_mode02[] = "stb2";    // STABILIZED2
 const char PROGMEM u_mode03[] = "stb3";    // STABILIZED3
 const char PROGMEM u_mode04[] = "stb4";    // STABILIZED4
 const char PROGMEM u_mode05[] = "stb5";    // STABILIZED5
 const char PROGMEM u_mode06[] = "stb6";    // STABILIZED6
-//const char PROGMEM u_mode07[] = "posh";  // POSITIONHOLD
-const char PROGMEM u_mode08[] = "cl";      // COURSELOCK
+//const char PROGMEM u_mode07[] = "posh";    // POSITIONHOLD
+const char PROGMEM u_mode08[] = "cl";    // COURSELOCK
 const char PROGMEM u_mode09[] = "posr";    // POSITIONROAM
-const char PROGMEM u_mode10[] = "hl";      // HOMELEASH
-const char PROGMEM u_mode11[] = "pa";      // ABSOLUTEPOSITION
-//const char PROGMEM u_mode12[] = "rtl ";  // RETURNTOBASE
-//const char PROGMEM u_mode13[] = "land";  // LAND
-const char PROGMEM u_mode14[] = "pp";      // PATHPLANNER
-const char PROGMEM u_mode15[] = "poi";     // POI
-//const char PROGMEM u_mode16[] = "ac  ";  // AUTOCRUISE
+const char PROGMEM u_mode10[] = "hl";    // HOMELEASH
+const char PROGMEM u_mode11[] = "pa";    // ABSOLUTEPOSITION
+//const char PROGMEM u_mode12[] = "rtl ";    // RETURNTOBASE
+//const char PROGMEM u_mode13[] = "land";    // LAND
+const char PROGMEM u_mode14[] = "pp";    // PATHPLANNER
+const char PROGMEM u_mode15[] = "poi";    // POI
+//const char PROGMEM u_mode16[] = "ac  ";    // AUTOCRUISE
 const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
 
 char const * const mode_u_strings[] PROGMEM ={ 
@@ -2134,19 +2127,20 @@ static void /*NOINLINE*/ move_screen(char dir){
     lflags.got_data=1; // renew screen
 }
 
-#define SETUP_START_ROW 1
-
 static void NOINLINE storeChannels(){
 
     for(byte i=0; i<4; i++){
         if (chan_raw_middle[i] < 1000)
-	    chan_raw_middle[i] = chan_raw[i];	// запомнить начальные значения  - центр джойстика для первых 4 каналов
+           chan_raw_middle[i] = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
     }
 }
 
 static int NOINLINE channelDiff(byte n){
     return chan_raw[n] - chan_raw_middle[n];
 }
+
+#define SETUP_START_ROW 1
+
 
 static void panSetup(){
 
@@ -2176,18 +2170,17 @@ static void panSetup(){
     for(byte i=0; i < size; i++) {
 	{
 	    byte row = SETUP_START_ROW + i;
-        
-            OSD::setPanel(1, row);
+	    OSD::setPanel(1, row);
 
-            p = &params[i];
-            nm=(char *)pgm_read_word((void *)&p->name);
+	    p = &params[i];
+	    nm=(char *)pgm_read_word((void *)&p->name);
 
-            osd.print_P(nm);
+	    osd.print_P(nm);
         
-            //            x    y
+	    //            x    y
             OSD::setPanel(19, row);
-	}
-	
+        }
+
 	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
 	    col=OSD::col;
@@ -2200,14 +2193,14 @@ static void panSetup(){
 
         switch (type){
         
-        case 'h': // header
+        case 'h':		 // header
     	    if(OSD::getMode()) 
 		osd.print_P(PSTR(" (PAL)"));
 	    else
 		osd.print_P(PSTR(" (NTSC)"));
 	    // no break!
 	case 0:
-	    continue;// no value
+	    continue;	// no value
         
         case 'b': // byte param
 	    { 
@@ -2260,22 +2253,26 @@ as_char:
 
 //Serial.printf_P(PSTR("ch1=%d mid=%d\n"), chan_raw[1], chan_raw_middle[1]);
 //Serial.printf_P(PSTR("ch3=%d mid=%d\n"), chan_raw[3], chan_raw_middle[2]);
-    
-    {
-        int cd;
-    
-        cd=channelDiff(1);
-//    if ((chan_raw[1] - 150) > chan_raw_middle[1] ){  move_menu(1);    return; } // переходы по строкам по верх-низ
-//    if ((chan_raw[1] + 150) < chan_raw_middle[1] ){  move_menu(-1);   return; }
-        if ( cd > 150){  move_menu(1);    return; } // переходы по строкам по верх-низ
-        if ( cd < 150){  move_menu(-1);   return; }
 
-//    if ((chan_raw[3] - 150) > chan_raw_middle[3] ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
-//    if ((chan_raw[3] + 150) < chan_raw_middle[3] ){  move_screen(-1); return; }
+/*
+    if ((chan_raw[1] - 150) > chan_raw_middle[1] ){  move_menu(1);    return; } // переходы по строкам по верх-низ
+    if ((chan_raw[1] + 150) < chan_raw_middle[1] ){  move_menu(-1);   return; }
+
+    if ((chan_raw[3] - 150) > chan_raw_middle[2] ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+    if ((chan_raw[3] + 150) < chan_raw_middle[2] ){  move_screen(-1); return; }
+*/
+    {
+	int cd;
+	
+	cd=channelDiff(1);
+	if ( cd > 150){  move_menu(1);    return; } // переходы по строкам по верх-низ
+        if ( cd < 150){  move_menu(-1);   return; }
+        
         cd=channelDiff(3);
         if (cd>150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
         if (cd<150){  move_screen(-1); return; }
     }
+
 
     OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
 
@@ -2293,6 +2290,7 @@ as_char:
 
     type=pgm_read_byte((void *)&p->type);
     k   =pgm_read_byte((void *)&p->k);
+
 
     v=c_val;
     
@@ -2321,6 +2319,7 @@ as_char:
     
     
     if(diff>100){
+//if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
 //	if(fNeg) v += inc;
 //	else     v -= inc;
 	if(fNeg) inc = -inc;
@@ -2339,29 +2338,30 @@ as_char:
 	int8_t cv=(char)(v * k);
 
         switch (type){
-    	case 'Z':
-            *((char *)pval) = cv + 0x20;
-            break;
-    	case 'z':
-            *((char *)pval) = cv + 0x10;
-            break;
-        case 'c':
-            *((char *)pval) = cv;
-            break;
+    	    case 'Z':
+    		*((char *)pval) = cv + 0x20;
+    		break;
+    	    case 'z':
+    		*((char *)pval) = cv + 0x10;
+    		break;
 
-        case 'b': // byte param
-            *((byte *)pval) = (byte)(cv);
-            break;
+	    case 'c':
+		*((char *)pval) = cv;
+		break;
+
+            case 'b': // byte param
+	        *((byte *)pval) = (byte)(cv);
+	        break;
 	    
-        case 'f': // float param
-            *((float *)pval) = v;
-            break;
+            case 'f': // float param
+	        *((float *)pval) = v;
+	        break;
 
 #if defined(USE_SENSORS)
-        case 's': //sensors in EEPROM
-            float f=v;
-            eeprom_write_len((byte *)&f, (uint16_t)pval,  sizeof(float) );
-            goto no_write;
+	    case 's': //sensors in EEPROM
+	        float f=v;
+	        eeprom_write_len((byte *)&f, (uint16_t)pval,  sizeof(float) );
+	        goto no_write;
 #endif
 	}
 
@@ -2407,7 +2407,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(homeDir), 		panHomeDir, 	0 },
     { ID_of(time),		panTime, 	0 },
     { ID_of(WP_dist),		panWPDis,	0x5c },
-    { ID_of(alt),		panAlt, 	0x11 }, 
+    { ID_of(alt),		panAlt, 	0x11 },
     { ID_of(homeAlt),		panHomeAlt, 	0x12 },
     { ID_of(vel),		panVel, 	0x14 },
     { ID_of(airSpeed),		panAirSpeed, 	0x13 },
@@ -2445,8 +2445,6 @@ static void print_all_panels(const Panels_list *pl ) {
 
     for(;;){
 	byte n = pgm_read_byte(&pl->n); // номер панели в массиве
-
-DBG_PRINTF("panel %d\n", n);
 	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
 	if(f==0) break;
 	
@@ -2482,8 +2480,8 @@ void writePanels(){
 #ifdef IS_PLANE
 
 // в универсальном случае если выбран планер
-    if(sets.model_type == 0) { /* plane */ 
-	if( lflags.motor_armed  && lflags.in_air  &&
+    if(sets.model_type == 0 ) { /* plane */ 
+        if( lflags.motor_armed  && lflags.in_air  &&
           ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
             landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
 DBG_PRINTF("set p landed=%d\n", landed);
@@ -2495,7 +2493,6 @@ DBG_PRINTF("set p landed=%d\n", landed);
 DBG_PRINTF("set c landed=%d\n", landed);
     }
     
-    
     lflags.last_armed_status = lflags.motor_armed;
     
 #endif
@@ -2506,9 +2503,8 @@ DBG_PRINTF("set c landed=%d\n", landed);
     }
 #endif
 
-    
-
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
+
 
 //    if(pt > (lastMAVBeat + 2500)){
     if(time_since(&lastMAVBeat) > 2500){
@@ -2519,11 +2515,11 @@ DBG_PRINTF("set c landed=%d\n", landed);
 //  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
 //  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-  else if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
-#ifndef DEBUG
+    else if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
+#if !defined(DEBUG) || 1
       && ((int)trip_distance > 5) // show always in debug mode
 #endif
-				  ){ // 3 seconds after disarm one can jerk sticks
+                                 ){ // 3 seconds after disarm one can jerk sticks
 
 #else
 #ifdef IS_PLANE
@@ -2533,27 +2529,26 @@ DBG_PRINTF("set c landed=%d\n", landed);
     else if(0) {
 #endif
 #endif
-
 DBG_PRINTF("set FData landed=%d\n", landed);
 
-	lflags.fdata=1;
-	storeChannels(); // remember control state
-	fdata_screen=panelN;
+       lflags.fdata=1;
+       storeChannels(); // remember control state
+       fdata_screen=panelN;
 
-	goto show_fdata;
+       goto show_fdata;
   } else if(lflags.fdata){
-	if(fdata_screen!=panelN) { // turn off by screen switch
-	    panelN=fdata_screen;
-	    lflags.fdata=0;
+       if(fdata_screen!=panelN) { // turn off by screen switch
+           panelN=fdata_screen;
+           lflags.fdata=0;
 DBG_PRINTLN("reset FData by sw");
-	}
+       }
 
-	if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
+       if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
 DBG_PRINTLN("reset FData by throttle");
-	    lflags.fdata=0;
-	}
+           lflags.fdata=0;
+       }
 show_fdata:
-	panFdata({1,1});    //Flight summary panel
+       panFdata({1,1});    //Flight summary panel
 
   } else{  //Normal osd panel
 

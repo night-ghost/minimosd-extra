@@ -133,7 +133,7 @@ struct Settings {
     byte auto_screen_switch; //  TODO not used
     
     uint16_t autoswitch_times; // 4 bits per screen
-
+    
     byte RSSI_raw;
     
     byte batt_warn_level; // уровень предупреждения по заряду

@@ -19,6 +19,7 @@ OPT += -fmerge-all-constants
 OPT += -fomit-frame-pointer 
 OPT += -fno-optimize-sibling-calls 
 OPT += -fno-early-inlining 
+OPT += -fno-aggressive-loop-optimizations
 #OPT += -fmodulo-sched 
 #OPT += -fmodulo-sched-allow-regmoves 
 #OPT += -fassociative-math
@@ -38,7 +39,7 @@ OPT += -fno-early-inlining
 #OPT += -ftree-tail-merge 
 #OPT += -fivopts 
 #OPT += -fpredictive-commoning
-OPT += -foptimize-strlen
+# OPT += -foptimize-strlen
 #OPT +=  -fdelayed-branch  not supported
 #OPT += -frename-registers  size more
 #OPT += -fbranch-target-load-optimize 
@@ -48,7 +49,7 @@ OPT += -foptimize-strlen
 #OPT += -maccumulate-args more size
 
 #nothing
-OPT += -fno-aggressive-loop-optimizations 
+#OPT += -faggressive-loop-optimizations 
 #OPT += -fauto-inc-dec  
 #OPT += -fbranch-probabilities 
 #OPT +=  -floop-strip-mine 

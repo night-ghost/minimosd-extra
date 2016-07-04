@@ -298,6 +298,8 @@ v859
 v860
 * MAVLink don't loses sync on CRC errors
 
+v861
+* some bugfixes
 
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
@@ -627,6 +629,10 @@ v859
 
 v860
 * MAVLink не теряет синхронизацию при ошибках CRC
+
+v861
+* исправление багов
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

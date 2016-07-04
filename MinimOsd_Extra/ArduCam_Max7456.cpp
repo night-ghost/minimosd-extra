@@ -221,10 +221,10 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 
 //------------------ write ---------------------------------------------------
-
 void OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
     osdbuf[bufpos++] = c;
 }
+
 
 void OSD::write_S(uint8_t c){
   
@@ -236,7 +236,6 @@ void OSD::write_S(uint8_t c){
     write_raw(c);
   } 
 }
-
 
 size_t OSD::write(uint8_t c){
     write_S(c);
@@ -293,7 +292,7 @@ void OSD::update() {
     }
     PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
 
-    Spi.transfer(MAX7456_END_string); // 0xff
+    Spi.transfer(MAX7456_END_string); // 0xFF
 
     PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
 }
@@ -307,7 +306,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   byte screen_char;
 
   char_address_hi = font_count;
-//  byte char_address_lo = 0; - autoincrement mode
+//  byte char_address_lo = 0;  - autoincrement mode
 
 //    cli();
 
@@ -326,13 +325,18 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   MAX_write(MAX7456_CMM_reg, WRITE_nvr);
 
   // wait until bit 5 in the status register returns to 0 (12ms)
+#if 0
   while (1) {
-    if(!(MAX_read(MAX7456_STAT_reg_read) & STATUS_reg_nvr_busy)) break;
-//    delay_1();
-    //delayMicroseconds(1000);
-    extern void delay_telem();
-    delay_telem(); // some delay 
+    Spi.transfer(MAX7456_STAT_reg_read);
+    if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   }
+#else
+   while (1) {
+    if(!(MAX_read(MAX7456_STAT_reg_read) & STATUS_reg_nvr_busy)) break;
+    extern void delay_telem();
+    delay_telem(); // some delay
+   }
+#endif
 
 //  sei();
 

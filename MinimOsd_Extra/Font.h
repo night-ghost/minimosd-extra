@@ -27,8 +27,8 @@ static void uploadFont() {
             case 0x0d: // carridge return, end of line
                 //Serial.println("cr");
                 if (bit_count == 8)  {
-            	    chk ^= character_bitmap[byte_count];
-                    byte_count++;                    
+                    chk ^= character_bitmap[byte_count];
+                    byte_count++;
                     character_bitmap[byte_count] = 0;
                 }
                 bit_count = 0;
@@ -36,7 +36,6 @@ static void uploadFont() {
             
             case 0x30: // ascii '0'
             case 0x31: // ascii '1' 
-                
                 character_bitmap[byte_count] <<= 1;
                 if(incomingByte == 0x31)
                     character_bitmap[byte_count] += 1;

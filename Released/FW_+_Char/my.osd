@@ -1,83 +1,236 @@
+Panel 0
+Horizon	8	5	True	1	0	0	0	0	
+Pitch	1	2	True	-1	-1	-1	-1	-1	
+Roll	1	3	True	-1	-1	-1	-1	-1	
+Battery A	22	12	True	1	-1	-1	-1	-1	
+Battery B	23	10	False	1	-1	-1	-1	-1	
+Visible Sats	1	11	True	1	0	-1	-1	-1	
+Real heading	13	12	True	1	-1	-1	-1	-1	
+GPS Coord	1	12	True	1	0	0	0	0	
+Heading Rose	10	11	True	0	0	0	-1	-1	
+Heading	5	10	True	1	-1	-1	-1	-1	
+Home Direction	22	5	True	-1	-1	-1	-1	-1	
+Home Distance	22	4	True	1	-1	-1	-1	-1	
+WP Direction	20	12	False	-1	-1	-1	-1	-1	
+WP Distance	1	11	False	1	-1	-1	-1	-1	
+Altitude	1	7	True	1	0	-1	-1	-1	
+Home Altitude	1	5	True	1	-1	-1	-1	-1	
+Vertical Speed	23	7	True	1	0	-1	-1	-1	
+Battery Percent	22	13	False	1	0	-1	-1	-1	
+Current	22	13	True	1	-1	-1	-1	-1	
+Velocity	24	5	True	1	0	-1	-1	-1	
+Air Speed	24	6	True	1	0	-1	-1	-1	
+Throttle	1	8	True	1	-1	-1	-1	-1	
+Flight Mode	12	2	True	0	-1	-1	-1	-1	
+Wind Speed	24	9	True	1	0	-1	-1	-1	
+Warnings	9	3	True	-1	-1	-1	-1	-1	
+Time	23	2	True	-1	0	-1	-1	-1	
+RSSI	24	10	False	1	-1	-1	-1	-1	
+Tune	1	1	False	1	-1	-1	-1	-1	
+Efficiency	1	11	False	1	-1	-1	-1	-1	
+Call Sign	0	0	False	-1	-1	-1	-1	-1	
+Channel Raw	1	0	False	-1	-1	-1	-1	-1	
+Temperature	1	11	False	-1	-1	-1	-1	-1	
+Trip Distance	22	3	True	1	-1	-1	-1	-1	
+Radar Scale	12	10	True	0	-1	-1	-1	-1	
+Flight Data	30	0	False	-1	-1	-1	-1	-1	
+Message	30	15	False	0	1	-1	-1	-1	
+Sensor 1	30	15	False	-1	1	-1	-1	-1	
+Sensor 2	30	15	False	-1	1	-1	-1	-1	
+Sensor 3	30	15	False	-1	1	-1	-1	-1	
+Sensor 4	30	15	False	-1	1	-1	-1	-1	
+GPS HDOP	30	15	False	0	-1	-1	-1	-1	
+Channel state	30	15	False	0	1	1	1	1	Off|Low|Mid|Hi!|On!
+Channel Scale	30	15	False	0	1	1	1	1	
+Channel Value	30	15	False	0	1	1	1	1	
 Panel 1
-Pitch	7	1	False
-Roll	13	1	False
-Battery A	23	1	True
-Visible Sats	0	13	True
-Real heading	22	12	False
-GPS Coord	0	14	True
-Heading Rose	10	12	True
-Heading	22	12	True
-Home Direction	14	3	True
-Home Distance	23	3	True
-WP Distance	19	14	True
-Altitude	0	9	True
-Home Altitude	20	13	False
-Vertical Speed	23	9	True
-Battery Percent	22	0	True
-Current	13	13	False
-Velocity	25	4	True
-Air Speed	1	1	False
-Throttle	0	11	True
-Flight Mode	12	0	True
-Horizon	8	4	True
-Wind Speed	0	3	True
-Warnings	9	1	True
-Time	0	0	True
-RSSI	7	12	False
-Tune	2	15	False
-Efficiency	1	8	False
-Call Sign	0	0	False
-Temperature	1	10	False
-Trip Distance	0	1	True
+Horizon	8	5	True	1	0	0	0	0	
+Pitch	1	2	True	-1	-1	-1	-1	-1	
+Roll	1	3	True	-1	-1	-1	-1	-1	
+Battery A	22	12	True	1	-1	-1	-1	-1	
+Battery B	12	14	False	1	-1	-1	-1	-1	
+Visible Sats	1	11	True	1	0	-1	-1	-1	
+Real heading	22	12	False	1	-1	-1	-1	-1	
+GPS Coord	1	12	True	1	0	0	0	0	
+Heading Rose	10	10	True	1	0	0	-1	-1	
+Heading	6	10	True	1	-1	-1	-1	-1	
+Home Direction	22	5	True	-1	-1	-1	-1	-1	
+Home Distance	22	4	True	1	-1	-1	-1	-1	
+WP Direction	14	11	True	-1	-1	-1	-1	-1	
+WP Distance	13	12	True	1	-1	-1	-1	-1	
+Altitude	1	7	True	1	0	-1	-1	-1	
+Home Altitude	1	5	True	1	-1	-1	-1	-1	
+Vertical Speed	23	7	True	1	0	-1	-1	-1	
+Battery Percent	22	13	False	1	0	-1	-1	-1	
+Current	22	13	True	1	-1	-1	-1	-1	
+Velocity	24	5	True	1	0	-1	-1	-1	
+Air Speed	24	6	True	1	0	-1	-1	-1	
+Throttle	1	8	True	1	-1	-1	-1	-1	
+Flight Mode	12	2	True	0	-1	-1	-1	-1	
+Wind Speed	24	9	True	1	0	-1	-1	-1	
+Warnings	9	3	True	-1	-1	-1	-1	-1	
+Time	23	2	True	-1	0	-1	-1	-1	
+RSSI	7	12	False	1	-1	-1	-1	-1	
+Tune	2	15	False	1	-1	-1	-1	-1	
+Efficiency	1	8	False	1	-1	-1	-1	-1	
+Call Sign	0	0	False	-1	-1	-1	-1	-1	
+Channel Raw	1	0	False	-1	-1	-1	-1	-1	
+Temperature	1	10	False	-1	-1	-1	-1	-1	
+Trip Distance	22	3	True	1	-1	-1	-1	-1	
+Radar Scale	12	9	True	0	-1	-1	-1	-1	
+Flight Data	30	0	False	-1	-1	-1	-1	-1	
+Message	30	15	False	0	1	-1	-1	-1	
+Sensor 1	30	15	False	-1	1	-1	-1	-1	
+Sensor 2	30	15	False	-1	1	-1	-1	-1	
+Sensor 3	30	15	False	-1	1	-1	-1	-1	
+Sensor 4	30	15	False	-1	1	-1	-1	-1	
+GPS HDOP	30	15	False	0	-1	-1	-1	-1	
+Channel state	30	15	False	0	1	1	1	1	Off|Low|Mid|Hi!|On!
+Channel Scale	30	15	False	0	1	1	1	1	
+Channel Value	30	15	False	0	1	1	1	1	
 Panel 2
-Pitch	24	0	True
-Roll	24	1	True
-Battery A	0	15	True
-Visible Sats	14	13	False
-Real heading	1	10	False
-GPS Coord	19	14	True
-Heading Rose	11	12	True
-Heading	17	11	False
-Home Direction	14	1	False
-Home Distance	22	1	False
-WP Distance	9	14	False
-Altitude	23	5	True
-Home Altitude	22	3	False
-Vertical Speed	0	5	True
-Battery Percent	22	13	False
-Current	1	12	False
-Velocity	1	2	False
-Air Speed	1	1	False
-Throttle	0	14	True
-Flight Mode	0	0	True
-Horizon	8	6	True
-Wind Speed	1	14	False
-Warnings	9	1	True
-Time	22	4	False
-RSSI	12	13	False
-Tune	255	255	False
-Efficiency	1	3	False
-Call Sign	1	0	False
-Temperature	22	14	False
-Trip Distance	22	2	False
+Horizon	8	5	True	1	0	0	0	0	
+Pitch	7	1	False	-1	-1	-1	-1	-1	
+Roll	13	1	False	-1	-1	-1	-1	-1	
+Battery A	22	12	True	1	-1	-1	-1	-1	
+Battery B	21	3	False	1	-1	-1	-1	-1	
+Visible Sats	26	11	False	1	0	-1	-1	-1	
+Real heading	22	14	False	1	-1	-1	-1	-1	
+GPS Coord	1	14	False	1	0	0	0	0	
+Heading Rose	10	12	True	0	0	0	-1	-1	
+Heading	24	13	False	1	-1	-1	-1	-1	
+Home Direction	14	4	True	-1	-1	-1	-1	-1	
+Home Distance	22	1	False	1	-1	-1	-1	-1	
+WP Direction	20	12	False	-1	-1	-1	-1	-1	
+WP Distance	1	11	False	1	-1	-1	-1	-1	
+Altitude	22	3	False	1	0	-1	-1	-1	
+Home Altitude	22	2	False	1	-1	-1	-1	-1	
+Vertical Speed	1	8	False	1	0	-1	-1	-1	
+Battery Percent	14	15	False	1	0	-1	-1	-1	
+Current	14	14	False	1	-1	-1	-1	-1	
+Velocity	1	2	False	1	0	-1	-1	-1	
+Air Speed	1	1	False	1	0	-1	-1	-1	
+Throttle	1	3	False	1	-1	-1	-1	-1	
+Flight Mode	1	13	False	1	-1	-1	-1	-1	
+Wind Speed	24	7	False	1	0	-1	-1	-1	
+Warnings	9	2	True	-1	-1	-1	-1	-1	
+Time	23	4	False	-1	0	-1	-1	-1	
+RSSI	7	13	False	1	-1	-1	-1	-1	
+Tune	1	1	False	1	-1	-1	-1	-1	
+Efficiency	1	11	False	1	-1	-1	-1	-1	
+Call Sign	0	0	False	-1	-1	-1	-1	-1	
+Channel Raw	1	4	False	-1	-1	-1	-1	-1	
+Temperature	1	11	False	-1	-1	-1	-1	-1	
+Trip Distance	22	2	False	1	-1	-1	-1	-1	
+Radar Scale	12	10	True	0	-1	-1	-1	-1	
+Flight Data	30	0	False	-1	-1	-1	-1	-1	
+Message	30	15	False	0	1	-1	-1	-1	
+Sensor 1	30	15	False	-1	1	-1	-1	-1	
+Sensor 2	30	15	False	-1	1	-1	-1	-1	
+Sensor 3	30	15	False	-1	1	-1	-1	-1	
+Sensor 4	30	15	False	-1	1	-1	-1	-1	
+GPS HDOP	30	15	False	0	-1	-1	-1	-1	
+Channel state	30	15	False	0	1	1	1	1	Off|Low|Mid|Hi!|On!
+Channel Scale	30	15	False	0	1	1	1	1	
+Channel Value	30	15	False	0	1	1	1	1	
+Panel 3
+Horizon	8	6	False	1	0	0	0	0	
+Pitch	7	1	False	-1	-1	-1	-1	-1	
+Roll	13	1	False	-1	-1	-1	-1	-1	
+Battery A	22	12	True	1	-1	-1	-1	-1	
+Battery B	23	13	False	1	-1	-1	-1	-1	
+Visible Sats	26	11	False	1	0	-1	-1	-1	
+Real heading	22	14	False	1	-1	-1	-1	-1	
+GPS Coord	1	14	False	1	0	0	0	0	
+Heading Rose	21	15	False	1	0	0	-1	-1	
+Heading	24	13	False	1	-1	-1	-1	-1	
+Home Direction	6	2	True	-1	-1	-1	-1	-1	
+Home Distance	22	1	False	1	-1	-1	-1	-1	
+WP Direction	20	12	False	-1	-1	-1	-1	-1	
+WP Distance	1	11	False	1	-1	-1	-1	-1	
+Altitude	22	3	False	1	0	-1	-1	-1	
+Home Altitude	22	2	False	1	-1	-1	-1	-1	
+Vertical Speed	1	8	False	1	0	-1	-1	-1	
+Battery Percent	14	15	False	1	0	-1	-1	-1	
+Current	23	14	False	1	-1	-1	-1	-1	
+Velocity	1	2	False	1	0	-1	-1	-1	
+Air Speed	1	1	False	1	0	-1	-1	-1	
+Throttle	1	3	False	1	-1	-1	-1	-1	
+Flight Mode	1	13	False	1	-1	-1	-1	-1	
+Wind Speed	24	7	False	1	0	-1	-1	-1	
+Warnings	9	2	True	-1	-1	-1	-1	-1	
+Time	23	4	False	-1	0	-1	-1	-1	
+RSSI	24	14	False	1	-1	-1	-1	-1	
+Tune	1	4	True	1	-1	-1	-1	-1	
+Efficiency	1	11	False	1	-1	-1	-1	-1	
+Call Sign	0	0	False	-1	-1	-1	-1	-1	
+Channel Raw	22	4	True	-1	-1	-1	-1	-1	
+Temperature	1	11	False	-1	-1	-1	-1	-1	
+Trip Distance	22	2	False	1	-1	-1	-1	-1	
+Radar Scale	30	0	False	0	-1	-1	-1	-1	
+Flight Data	10	4	True	-1	-1	-1	-1	-1	
+Message	30	15	False	0	1	-1	-1	-1	
+Sensor 1	30	15	False	-1	1	-1	-1	-1	
+Sensor 2	30	15	False	-1	1	-1	-1	-1	
+Sensor 3	30	15	False	-1	1	-1	-1	-1	
+Sensor 4	30	15	False	-1	1	-1	-1	-1	
+GPS HDOP	30	15	False	0	-1	-1	-1	-1	
+Channel state	30	15	False	0	1	1	1	1	Off|Low|Mid|Hi!|On!
+Channel Scale	30	15	False	0	1	1	1	1	
+Channel Value	30	15	False	0	1	1	1	1	
 Configuration
 Model Type	1
-Units	0
+Units	False
 Overspeed	40
 Stall	5
-Battery	101
-RSSI High	255
-RSSI Low	0
-RSSI Enable Raw	0
+Battery	105
+RSSI High	65535
+RSSI Low	65535
+RSSI Enable Raw	7
 Toggle Channel	8
-Auto Screen Switch	255
-Chanel Rotation Switching	0
-Video Mode	0
-Battery Warning Level	11
+Auto Screen Switch	0
+Chanel Rotation Switching	1
+Video Mode	True
+Auto Mode	True
+Battery Warning Level	0
 RSSI Warning Level	0
-OSD Brightness	1
+OSD Brightness	3
 Call Sign	ptichkin
-Sign Air Speed	19
-Sign Ground  Speed	20
-Sign Home Altitude	18
-Sign MSL Altitude	17
+flgHUD	True
+flgTrack	False
+BattB	0
+rssi_k	1
+curr_k	1
+batt_a_k	1
+batt_b_k	1
+roll_k	1
+pitch_k	1
+roll_kn	1
+pitch_kn	1
+fBattA	False
+fBattB	False
+fCurr	False
+fRadar	True
+fILS	False
+HOS	33
+VOS	0
+PWMSRC	1
+PWMDST	4
+NSCREENS	255
+SFormat1	ab%5.2f\x10
+SFormat2	cd%5.2fmv
+SFormat3	ef%5.2f%%
+SFormat4	gh%5.2fKM
+SFactor1	10
+SFactor2	10
+SFactor3	1
+SFactor4	1
+SAdd1	0
+SAdd2	0
+SAdd3	0
+SAdd4	0
+flgOnce	True
+txtTime0	0
+txtTime1	0
+txtTime2	0
+txtTime3	0

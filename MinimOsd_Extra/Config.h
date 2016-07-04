@@ -94,5 +94,5 @@
   #define DBG_PRINTLN(x)     {}
   #define DBG_PRINTVAR(x)    {}
   #define DBG_PRINTVARLN(x)  {}
-  #define DBG_PRINTF(x,...)  {}
+  #define DBG_PRINTF(x,...) {}
 #endif

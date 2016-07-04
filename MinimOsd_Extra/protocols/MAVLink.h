@@ -99,7 +99,7 @@ DBG_PRINTVARLN(seq);
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
 #ifdef DEBUG
-//    packets_skip+=1;
+    packets_skip+=1;
 //    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
 		    break; // skip packet and exit 
@@ -142,11 +142,11 @@ skip_packet:
                 base_mode = mavlink_msg_heartbeat_get_base_mode(&msg.m);
 
 
-#ifdef DEBUG
-//	if(apm_mav_system  != msg.m.sysid){
-//	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
-//	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
-//	}
+#if defined(DEBUG) && 0
+	if(apm_mav_system  != msg.m.sysid){
+	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
+	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
+	}
 #endif
 
                 lflags.motor_armed = getBit(base_mode,7);
@@ -405,15 +405,17 @@ typedef struct __mavlink_radio_status_t
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
 #ifdef DEBUG
-//Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
+Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
 #endif
 
 		} break;
+
 /*
-		case MAVLINK_MSG_ID_RANGEFINDER:
-		    //float mavlink_msg_rangefinder_get_distance(&msg.m);
-		    break;
-*/		
+               case MAVLINK_MSG_ID_RANGEFINDER:
+                   //float mavlink_msg_rangefinder_get_distance(&msg.m);
+                   break;
+*/
+
             default:
                 //Do nothing
                 break;

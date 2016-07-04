@@ -31,7 +31,7 @@ Project receives Donations from:
  Marc J MERLIN 
  Сергей Сырескин
  Aleksandr Starostin
- 
+ Михаил Павлов
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -139,10 +139,10 @@ void isr_VSYNC(){
     vsync_count++; // считаем кадровые прерывания
 
     if(nested) {
-	nest_count++;
+       nest_count++;
     } else {
         if(update_stat) { // there is data for screen
-            nested++;
+    	    nested++;
             sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
     
@@ -218,9 +218,11 @@ void setup()     {
     unplugSlaves();
     OSD::update();// clear memory
 
+    sei();
+/*
     OSD::setPanel(5, 5);
     osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
-
+*/
 #ifdef DEBUG
 //    Serial.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
 #endif
@@ -263,17 +265,12 @@ void setup()     {
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset
+#if 0
     if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
         OSD::setPanel(1,1);
         osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
-/*
-        osd.printf_P(PSTR("|vers %x sets %x"), (offsetof(Settings,CHK1_VERSION)), EEPROM_offs(sets) ); 
-        hex_dump((byte *)&sets,64);
-*/
-
-//        InitializeOSD(); нечего дефолтным значениям тут делать
     }
-
+#endif
 
 //    panelN = 0; //set panel to 0 to start in the first navigation screen
 
@@ -287,6 +284,8 @@ void setup()     {
 //    Serial.flush(); без него лучше шрифты грузятся
 
     LED_OFF;  // turn off on init done
+
+    crlf_count=0;
 
 #ifdef DEBUG
 /*    OSD::setPanel(0,0);
@@ -314,7 +313,8 @@ void setup()     {
 */    
 #endif
 
-    crlf_count=0;
+
+//Serial.printf_P(PSTR("osd pitch=%d roll=%d\n"), osd_att.pitch, osd_att.roll ); Serial.wait();
 
 } // END of setup();
 
@@ -329,42 +329,53 @@ void setup()     {
 void loop() 
 {
     unsigned long pt;
-    pt=millis();     //millis_plus(&pt, 0); much larger
 
     wdt_reset();
 
+    pt=millis();     //millis_plus(&pt, 0); much larger
 
+
+    seconds = pt / 1000;
+    
     if(pt < BOOTTIME){ // startup delay for fonts
+//if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
+
+	    OSD::setPanel(5, 5);
+	    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
+	    osd_printi_1(PSTR("|%d"), (uint16_t)pt);
+
+            if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
+                OSD::setPanel(1,1);
+                osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
+            }
+
             while(Serial.available_S()) {
                 byte c=Serial.read_S();
 
-                if (c == '\n' /* || c == '\r'*/ ) {
+                if (c == '\n' /* || c == '\r'*/) {
                     crlf_count++;
+//DBG_PRINTF("crlf=%d c=%d\n", (int)crlf_count, (int)c);
                 } else {
                     crlf_count = 0;
                 }
-//DBG_PRINTF("crlf=%d c=%d\n", (int)crlf_count, (int)c);
 
                 if (crlf_count > 3) {
                     uploadFont();
                     return;
                 }
             }
+            OSD::update();
+            delay_150();
             return;
     }
 
-//Serial.printf_P(PSTR("time=%ld\n"),pt);
-
+//if((pt & 0xf0) == 0) { Serial.printf_P(PSTR("time=%ld\n"),pt); Serial.wait(); }
 
     getData(); // получить данные с контроллера
 
     if(lflags.got_data){ // были свежие данные - обработать
 
-//DBG_PRINTLN("data got!");
-
 	pan_toggle(); // проверить переключение экранов
-
-//DBG_PRINTLN("toggle!");
 
 	if(!lflags.need_redraw) {
 	    lflags.need_redraw=1;
@@ -376,11 +387,14 @@ void loop()
 
     if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания
         lflags.need_redraw=0; // экран перерисован
-
-//DBG_PRINTF("need redraw! nest_count=%d\n",nest_count);
         setHomeVars();   // calculate and set Distance from home and Direction to home
+
         setFdataVars();  // накопление статистики и рекордов
+
         writePanels();   // writing enabled panels (check OSD_Panels Tab)
+
+//	vsync_wait=1;
+//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
 //	LED_BLINK;
 
@@ -439,22 +453,23 @@ void loop()
 
         lflags.blinker = !lflags.blinker;
         if(lflags.blinker) {
-            seconds++;
+    //        seconds++;
             static byte err_count=0;
+            
             lflags.one_sec_timer_switch = 1; // for warnings
 
 	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
 		err_count++;
-		if(err_count>3) { // 3 seconds no sync
-#ifdef DEBUG	
-		    Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);	        
+               if(err_count>3) { // 3 seconds no sync
+#ifdef DEBUG   
+                    Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
 #endif
-		    osd.init();    // restart MAX7456
-		}
-	    } else
-		err_count=0;
-	     
+                    osd.init();    // restart MAX7456
+                }
+	    } else  err_count=0;
+
 	    vsync_count=0;
+
 
 #ifdef DEBUG
 	    if(seconds % 30 == 0) {

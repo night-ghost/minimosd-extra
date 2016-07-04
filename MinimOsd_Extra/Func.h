@@ -46,7 +46,6 @@ int NOINLINE normalize_angle(int a){
     return a;
 }
 
-
 uint16_t NOINLINE time_since(uint32_t *t){
     return (uint16_t)(millis() - *t); // loop time no more 1000 ms
 
@@ -59,12 +58,11 @@ static void inline reset_setup_data(){ // called on any screen change
 byte get_switch_time(byte n){
     uint16_t val = sets.autoswitch_times;
     while(true){
-	if(n-- == 0) return val & 0xf;
-	
-	val = val >> 4;
+       if(n-- == 0) return val & 0xf;
+       
+       val = val >> 4;
     }
 }
-
 
 #define USE_AUTOSWITCH 1
 
@@ -130,56 +128,54 @@ static void pan_toggle(){
             }
         }// once
       }
-
-#ifdef USE_AUTOSWITCH
-        if(!lflags.rotatePanel){
-            if( autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
-DBG_PRINTLN("switch by AutoSwitch");
-        	lflags.autosw=1; // авторежим
-        	lflags.rotatePanel =1; // переключить
-            }
-        }
-#endif
     }
     if(lflags.rotatePanel){
-	lflags.rotatePanel = 0;
 next_panel:
+	lflags.rotatePanel = 0;
         panelN++;
         if (panelN > sets.n_screens)
             panelN = 0;
 
     }
+#ifdef USE_AUTOSWITCH
+        else {
+            if( autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
+DBG_PRINTLN("switch by AutoSwitch");
+               lflags.autosw=1; // авторежим
+               lflags.rotatePanel=1; // переключить
+            }
+    }
+#endif
 
   if(old_panel != panelN){
+DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 
 	lflags.got_data=1; // redraw even no news
-
-DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 	
+	//extern void reset_setup_data();
 	reset_setup_data();
-	
+
 #ifdef USE_AUTOSWITCH
-	if( lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
-	    goto next_panel;  // при автопереключении пропускаем пустой экран
-	
-	byte swt = get_switch_time(panelN);
+       if( lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
+           goto next_panel;  // при автопереключении пропускаем пустой экран
+       
+       byte swt = get_switch_time(panelN);
 DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
-	if(swt) { // установлено время переключения
-	    autoswitch_time = seconds + swt; // следующее
-//	    if(autoswitch_time < seconds) { // overflow    
-//	    }
-	} else {	// no autoswitch
-	    if(lflags.autosw) goto next_panel;  // при автопереключении пропускаем  экраны без автопереключения
-	    autoswitch_time=0; // при ручном переключении отменить автомат
-	}
-	
-	lflags.autosw=0; // once
-#endif	
+       if(swt) { // установлено время переключения
+           autoswitch_time = seconds + swt; // следующее
+//         if(autoswitch_time < seconds) { // overflow    
+//         }
+       } else {        // no autoswitch
+           if(lflags.autosw) goto next_panel;  // при автопереключении пропускаем  экраны без автопереключения
+           autoswitch_time=0; // при ручном переключении отменить автомат
+       }
+       
+       lflags.autosw=0; // once
+#endif
 
 	static const char msg[] PROGMEM = "Screen 0";
 
 	// strcpy_P((char *)mav_message,msg); 10 bytes more
-
 	const char *cp;
 	byte *wp;
 	for(cp=msg, wp=mav_message;;){
@@ -249,7 +245,6 @@ int NOINLINE grad_to_sect(int grad){
 }
 
 
-
 static float NOINLINE diff_coord(float &c1, float &c2){
     return (c1 - c2) * 111319.5;
 }
@@ -259,7 +254,7 @@ static float NOINLINE diff_coord(float &c1, float &c2){
     return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
 }*/
 
-static float NOINLINE distance(float x, float y){
+static float /* NOINLINE */ distance(float x, float y){
     return sqrt(sq(x) + sq(y));
 }
 
@@ -342,7 +337,6 @@ static void setHomeVars()
         
 //        if(bearing < 0) bearing += 360;//normalization
         bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-
         //while(bearing < 0) bearing += 360;//normalization
         bearing=normalize_angle(bearing);
 
@@ -375,7 +369,6 @@ void inline filter( float &dst, float val){ // комплиментарный ф
 void NOINLINE float_add(float &dst, float val){
     dst+=val;
 }
-
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -496,7 +489,6 @@ void NOINLINE gps_norm(float &dst, long f){
 void NOINLINE set_data_got() {
     lastMAVBeat = millis();
     //millis_plus(&lastMAVBeat, 0);
-    
     lastMavSeconds=seconds;
 
     lflags.got_data = 1;
@@ -515,7 +507,7 @@ void NOINLINE delay_telem(){
 
 void NOINLINE delay_byte(){
     if(!Serial.available_S())
-	delay_telem();
+        delay_telem();
 }
 
 
@@ -548,9 +540,8 @@ static void getData(){
 	read_ltm();
 #endif
     } else {
-    
 	const char * proto;
-	
+    
 	switch(count05s % 5){
 #if defined(AUTOBAUD)
 	case 1: {
@@ -600,37 +591,35 @@ static void getData(){
 	
 #if defined(USE_UAVTALK)
 	case 2:
-//DBG_PRINTLN("UAVtalk read");
 	    extern bool uavtalk_read(void);
 	    uavtalk_read();
-	    proto= PSTR("UAVTalk");
+//	    proto= PSTR("UAVTalk");
 	    break;
 #endif
 #if defined(USE_MWII)
 	case 3:
-//DBG_PRINTLN("MWII read");
 	    extern bool mwii_read(void);
 	    mwii_read();
-	    proto= PSTR("MWII");
+//		proto= PSTR("MWII");
 	    break;
 #endif
 #if defined(USE_LTM)
 	case 4:
-//DBG_PRINTLN("LTM read");
 	    extern void read_ltm(void);
 	    read_ltm();
-	    proto= PSTR("LTM");
+//	    proto= PSTR("LTM");
 	    break;
 #endif
 	default: // 0 and all not used
 #if defined(USE_MAVLINK)
 	    read_mavlink();
-	    proto= PSTR("MAVLink");
-#endif	
+#endif
+//	    proto= PSTR("MAVLink");
 	    break;
 	}
+	
 /*
-	if(lflags.got_data) {
+       if(lflags.got_data) {
             // strcpy_P((char *)mav_message,msg); 10 bytes more
 
             byte *wp;
@@ -641,14 +630,13 @@ static void getData(){
                 if(c==0) break;
                 len++;
             }
-
             mav_message_start(len,6); // len, time
-	}
+       }
 */
     }
+
 }
 
 bool NOINLINE timeToScreen(){
     return lflags.need_redraw && !vsync_wait;
 }
-
