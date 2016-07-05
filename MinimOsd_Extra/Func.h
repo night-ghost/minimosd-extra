@@ -64,7 +64,7 @@ byte get_switch_time(byte n){
     }
 }
 
-#define USE_AUTOSWITCH 1
+//#define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
     byte old_panel=panelN;

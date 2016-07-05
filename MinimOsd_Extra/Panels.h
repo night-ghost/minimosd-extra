@@ -163,7 +163,7 @@ static NOINLINE void showArrow(uint8_t rotate_arrow,uint8_t method){
 #define ANGLE_1			9			// angle above we switch to line set 1
 #define ANGLE_2			25			// angle above we switch to line set 2
 #define ANGLE_DOT               70 // 50                      // angle above we switch to dots
-#define ANGLE_VERT              80                      // angle above we switch to vertical lines
+#define ANGLE_VERT              70                      // angle above we switch to vertical lines
 
 // Calculate and show artificial horizon
 // used formula: y = m * x + n <=> y = tan(a) * x + n
@@ -1983,10 +1983,11 @@ void setup_horiz(){
 
 #if defined(USE_SENSORS)
 void setup_sens() {
-    /*if(is_on(panel.sensor1))*/ osd_nl();   panSensor1({8 , 6});
-    /*if(is_on(panel.sensor2))*/ osd_nl();   panSensor2({8 , 7});
-    /*if(is_on(panel.sensor3))*/ osd_nl();   panSensor3({8 , 8});
-    /*if(is_on(panel.sensor4))*/ osd_nl();   panSensor4({8 , 9});
+    osd.setPanel(6,10);
+    for(byte i=0;i<4;i++) {
+	printSensor(i);
+        osd_nl();
+    }
 }
 #endif
 
@@ -2075,7 +2076,7 @@ static const PROGMEM Setup_screen screens[] = {
     {params1, (sizeof(params1)/sizeof(Params)), 0 },
     {params2, (sizeof(params2)/sizeof(Params)), setup_horiz },
 #if defined(USE_SENSORS)
-    {params3, (sizeof(params2)/sizeof(Params)), setup_sens },
+    {params3, (sizeof(params3)/sizeof(Params)), setup_sens },
 #endif
     {0,0} // end marker
 };
@@ -2279,7 +2280,7 @@ as_char:
     p = &params[setup_menu];
 
     bool fNeg=false;
-    int diff = -channelDiff(0); // ( chan_raw_middle[0] - chan_raw[0] );
+    int diff = channelDiff(0); // ( chan_raw_middle[0] - chan_raw[0] );
     if(diff<0) {
 	diff = -diff;
 	fNeg=true;

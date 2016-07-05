@@ -304,7 +304,8 @@ v861
 v862
 * fixed hangup in Setup screen
 * fixed no-signal UAVtalk behavior
-
+* fixed stick direstions in Setup
+* fixed sensors in Setup
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -640,6 +641,8 @@ v861
 v862
 * исправлено зависание экрана настройки
 * исправлено поведение без приемника на UAVtalk
+* испралено направление стиков экрана настройки
+* исправлена настройка сенсоров
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
