@@ -50,7 +50,7 @@ static int /*float*/ xtrack_error = 0; // Current crosstrack error on x-y plane 
 
 static uint16_t     eph = 0;
 
-static uint16_t     chan_raw[8]; // значение каналов управления
+static uint16_t     chan_raw[8]={0,0,0,0,0,0,0,0}; // значение каналов управления
 
 struct Measure {
     float        converts;
@@ -319,7 +319,7 @@ struct Setup_screen {
 
 static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
-static uint16_t chan_raw_middle[3]; // запомненные при входе значения каналов
+static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при входе значения каналов
 
 const Params *params; // указатель на текущий набор параметров
 

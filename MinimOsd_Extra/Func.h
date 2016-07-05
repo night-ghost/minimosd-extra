@@ -112,14 +112,14 @@ static void pan_toggle(){
         }
       } else{ 			 //Rotation switch
         if(flags.chkSwitchOnce) { // once at 1 -> 0
-            if (ch_raw > 1200) {
+            if (ch_raw > 1200 && ch_raw < 3000) { // in valid HIGH range
                 lflags.last_sw_ch = 1;
             } else { // выключено
                 if(lflags.last_sw_ch) lflags.rotatePanel = 1;
                 lflags.last_sw_ch = 0;
             }
         } else {
-            if (ch_raw > 1500) { // full on
+            if (ch_raw > 1500 && ch_raw < 3000) { // full on and valid
                 if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
                     lflags.rotatePanel = 1;
                     //osd_switch_time = millis() + 500;
@@ -147,7 +147,7 @@ DBG_PRINTLN("switch by AutoSwitch");
     }
 #endif
 
-  if(old_panel != panelN){
+    if(old_panel != panelN){
 DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 
 	lflags.got_data=1; // redraw even no news
@@ -170,24 +170,28 @@ DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
            autoswitch_time=0; // при ручном переключении отменить автомат
        }
        
-       lflags.autosw=0; // once
 #endif
 
-	static const char msg[] PROGMEM = "Screen 0";
+	if(!lflags.autosw) {
+	    static const char msg[] PROGMEM = "Screen 0";
 
-	// strcpy_P((char *)mav_message,msg); 10 bytes more
-	const char *cp;
-	byte *wp;
-	for(cp=msg, wp=mav_message;;){
-	    byte c=pgm_read_byte(cp++);
-	    *wp++ = c;
-	    if(c==0) break;
+	    // strcpy_P((char *)mav_message,msg); 10 bytes more
+	    const char *cp;
+	    byte *wp;
+	    for(cp=msg, wp=mav_message;;){
+	        byte c=pgm_read_byte(cp++);
+	        *wp++ = c;
+	        if(c==0) break;
+	    }
+	
+	    mav_message[sizeof(msg)-2] += panelN;
+	
+	    mav_message_start(sizeof(msg)-1,3); // len, time
 	}
-	
-	mav_message[sizeof(msg)-2] += panelN;
-	
-	mav_message_start(sizeof(msg)-1,3); // len, time
-  }
+
+       lflags.autosw=0; // once
+
+    }
 
 }
 

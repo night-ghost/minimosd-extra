@@ -2265,12 +2265,12 @@ as_char:
 	int cd;
 	
 	cd=channelDiff(1);
-	if ( cd > 150){  move_menu(1);    return; } // переходы по строкам по верх-низ
-        if ( cd < 150){  move_menu(-1);   return; }
+	if ( cd >  150){  move_menu(1);    return; } // переходы по строкам по верх-низ
+        if ( cd < -150){  move_menu(-1);   return; }
         
         cd=channelDiff(3);
-        if (cd>150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
-        if (cd<150){  move_screen(-1); return; }
+        if (cd >  150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+        if (cd < -150){  move_screen(-1); return; }
     }
 
 

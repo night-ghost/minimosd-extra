@@ -301,6 +301,10 @@ v860
 v861
 * some bugfixes
 
+v862
+* fixed hangup in Setup screen
+* fixed no-signal UAVtalk behavior
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -633,6 +637,9 @@ v860
 v861
 * исправление багов
 
+v862
+* исправлено зависание экрана настройки
+* исправлено поведение без приемника на UAVtalk
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
