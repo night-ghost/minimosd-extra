@@ -314,6 +314,9 @@ v863
 * added Max Wind Speed to Flight Data panel
 * some code optimizations
 
+v864
+* detects frozen datastreams and (if TX connected) tries to re-request them.
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -657,6 +660,9 @@ v863
 * исправлена panEff
 * добавлен максимум скорости ветра в панель результатов полета (Flight Data)
 * некоторая оптимизация
+
+v864
+* определяет зависшие потоки данных и пытается (если подключен TX) запрашивать их снова 
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

@@ -260,7 +260,8 @@ struct loc_flags {
 
     bool autosw; 	// automatic screen switch
 
-    bool mav_request_done;    
+    bool mav_request_done; 
+    bool mav_data_frozen;
 };
 
 #ifdef DEBUG
@@ -326,6 +327,7 @@ static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при �
 
 const Params *params; // указатель на текущий набор параметров
 
+byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
 uint32_t autoswitch_time=0;
 

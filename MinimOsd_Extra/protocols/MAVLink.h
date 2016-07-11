@@ -11,16 +11,24 @@ void request_mavlink_rates()
 {
     
     const uint8_t PROGMEM MAVStreams[] = {
-        MAV_DATA_STREAM_RAW_SENSORS,
+//        MAV_DATA_STREAM_RAW_SENSORS,
+        MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
-        MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
         MAV_DATA_STREAM_EXTRA2,
         MAV_DATA_STREAM_EXTRA3
     };
 
-    const uint16_t PROGMEM  MAVRates[] = {0x02, 0x02, 0x05, 0x02, 0x10, 0x02, 1};
+    const uint16_t PROGMEM  MAVRates[] = {
+	//0x02, 
+	0x01, 
+	0x02, 
+	0x05, 
+	0x10, 
+	0x02, 
+	1
+    };
     
     for (int i=0; i < sizeof(MAVStreams); i++) {
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
@@ -158,8 +166,17 @@ skip_packet:
                 apm_mav_system    = msg.m.sysid; // store ID to filter out alien messages
                 // apm_mav_component = msg.m.compid;
 
+
+		if(mav_data_count==0){ // there is no data comes to OSD
+		    if(lflags.mav_data_frozen<5) 
+    			lflags.mav_data_frozen++;
+    		    else 
+                        lflags.mav_request_done = 0; // make new request
+		}
+		mav_data_count=0;
                 break;
                 
+    // MAV_DATA_STREAM_POSITION,
             case MAVLINK_MSG_ID_SYS_STATUS:
                 if(!flags.useExtVbattA){
                     osd_vbat_A = mavlink_msg_sys_status_get_voltage_battery(&msg.m) ; //Battery voltage, in millivolts (1 = 1 millivolt)
@@ -171,6 +188,10 @@ skip_packet:
                 //osd_mode = apm_mav_component;//Debug
                 break;
 
+	//    case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: - it has less priority
+	//	break;
+
+    // EXTENDED_STATUS
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 gps_norm(osd_pos.lat,mavlink_msg_gps_raw_int_get_lat(&msg.m));
                 gps_norm(osd_pos.lon,mavlink_msg_gps_raw_int_get_lon(&msg.m));
@@ -186,9 +207,12 @@ skip_packet:
 #ifdef DEBUG
 //Serial.printf_P(PSTR("MAVLINK_MSG_ID_GPS_RAW_INT fix=%d\n"), osd_fix_type);
 #endif
+		mav_data_count++;
+		lflags.mav_data_frozen=0;
 
                 break; 
 
+    // EXTRA_2
             case MAVLINK_MSG_ID_VFR_HUD: // todo copy at once
 /*
 float airspeed; ///< Current airspeed in m/s
@@ -227,6 +251,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
 */	    
 
 
+    // EXTRA_1
             case MAVLINK_MSG_ID_ATTITUDE:
                 osd_att.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg.m));
                 osd_att.roll  = ToDeg(mavlink_msg_attitude_get_roll(&msg.m));
@@ -235,6 +260,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
 //LED_BLINK;
                 break;
 
+    // EXTENDED_STATUS
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
 /*
  float nav_roll; ///< Current desired roll in degrees
@@ -257,6 +283,10 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg.m);
                 wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg.m);
                 xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg.m);
+
+		mav_data_count++;
+		lflags.mav_data_frozen=0;
+
                 break;
 
             case MAVLINK_MSG_ID_MISSION_CURRENT:
@@ -294,14 +324,14 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 break;
 
 
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: {
-                    // height of takeoff point
-                    //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
-                    osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
-		    int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m); // speed for non-GPS setups
-		    int16_t vy = mavlink_msg_global_position_int_get_vx(&msg.m);
-		    loc_speed = distance(vx, vy) / 100;
-                } break; 
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: { // coordinates are here too
+                // height of takeoff point
+                //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
+                osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
+		int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m); // speed for non-GPS setups
+		int16_t vy = mavlink_msg_global_position_int_get_vx(&msg.m);
+		loc_speed = distance(vx, vy) / 100;
+            } break; 
 
 /*
 	    case MAVLINK_MSG_ID_RC_CHANNELS: // 1-18 but in not sent :(

@@ -1158,7 +1158,12 @@ static const PROGMEM char * const gps_fmtF[]= {
 
 
 static void NOINLINE print_gps(PGM_P f, byte div){
-    osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
+    if(lflags.mav_data_frozen>=5){
+	osd.print_P(PSTR("Stream"));	
+	OSD::write_S(div);
+	osd.print_P(PSTR("frozen"));	
+    } else
+	osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
 }
 
 static void panGPS(point p){
