@@ -99,7 +99,6 @@ class OSD: public BetterStream
     static void detectMode(void);
     static void setMode(uint8_t mode);
     static void setBrightness();
-    static uint8_t getMode(void);
     static void update(void);
     static void write_S(uint8_t c);
     static void write_raw(uint8_t c);
@@ -119,6 +118,13 @@ class OSD: public BetterStream
     static uint16_t bufpos;
     
     static void NOINLINE calc_pos();
+
+    //static uint8_t getMode(void);
+    static uint8_t inline getMode(){
+	return video_mode==MAX7456_MODE_MASK_PAL;
+
+    }
+    
 };
 
 

@@ -307,6 +307,13 @@ v862
 * fixed stick direstions in Setup
 * fixed sensors in Setup
 
+v863
+* project moved to per-protocol builds so now filename is MinimOsd_Extra_Uni.{version}DV-{protocol}-{built type}.hex
+* reversed wind direction
+* fixed panEff
+* added Max Wind Speed to Flight Data panel
+* some code optimizations
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -643,6 +650,14 @@ v862
 * исправлено поведение без приемника на UAVtalk
 * испралено направление стиков экрана настройки
 * исправлена настройка сенсоров
+
+v863
+* проект перещел на отдельные бинарники на каждый протокол, так что теперь имена файлов выглядят как  MinimOsd_Extra_Uni.{версия}DV-{протокол}-{тип сборки}.hex
+* реверсировано направление ветра
+* исправлена panEff
+* добавлен максимум скорости ветра в панель результатов полета (Flight Data)
+* некоторая оптимизация
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

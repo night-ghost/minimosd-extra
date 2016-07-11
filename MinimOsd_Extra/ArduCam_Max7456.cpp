@@ -53,13 +53,13 @@ void OSD::adjust(){
 void OSD::hw_init(){
     max7456_on();
 
-    //read black level register
+//read black level register
     byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read); //black level read register
   
     MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
     delay_150();
 
-    //set black level
+//set black level
     MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
 
     MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
@@ -178,28 +178,6 @@ void OSD::setBrightness()
 }
 
 
-//------------------ Get Mode (PAL 0/NTSC 1) --------------------------------
-
-uint8_t OSD::getMode(){
-  switch(video_mode){
-//    case MAX7456_MODE_MASK_NTCS:
-//      return 0;
-//      break;
-
-    case MAX7456_MODE_MASK_PAL:
-      return 1;
-      break;
-  }
-  return 0;
-}
-
-/*
-void OSD::clear() {  // clear the screen
-  max7456_on();
-  MAX_write(MAX7456_DMM_reg, MAX7456_CLEAR_display);
-  max7456_off();
-}
-*/
 
 //------------------ set panel -----------------------------------------------
 
@@ -221,8 +199,9 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 
 //------------------ write ---------------------------------------------------
-void OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
-    osdbuf[bufpos++] = c;
+void NOINLINE OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
+    if(c!=0xff)			// this character is MAX7456's "end of screen"
+        osdbuf[bufpos++] = c;
 }
 
 
@@ -232,7 +211,6 @@ void OSD::write_S(uint8_t c){
     row++;
     calc_pos();
   } else {
-    //osdbuf[bufpos++] = c;
     write_raw(c);
   } 
 }
@@ -244,7 +222,7 @@ size_t OSD::write(uint8_t c){
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
     setPanel(x,y);
-    OSD::write_S(c);
+    write_S(c);
 }
 
 

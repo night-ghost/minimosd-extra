@@ -9,6 +9,8 @@
  Settings sets;	// настройки из EEPROM
 
 
+static byte max7456_err_count=0;
+
 static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
 static float        max_osd_groundspeed = 0; 
@@ -162,7 +164,7 @@ static int /* float*/  osd_heading = 0;                // ground course heading 
 
 static float        osd_alt_mav = 0;                    // altitude - float from MAVlink!
 
-static int /* float */        osd_airspeed = 0;                   // airspeed
+static float        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
 //static float        osd_windspeedz = 0;
 static int /*float*/  osd_winddirection = 0; // потеря точности мизерная - у нас всего 16 положений
@@ -257,7 +259,8 @@ struct loc_flags {
     bool fdata;	// show FData screen
 
     bool autosw; 	// automatic screen switch
-    
+
+    bool mav_request_done;    
 };
 
 #ifdef DEBUG

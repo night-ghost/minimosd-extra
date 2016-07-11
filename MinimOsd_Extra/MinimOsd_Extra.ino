@@ -21,7 +21,7 @@ and all other members of DIY Drones Dev team
 Thanks to: Chris Anderson, Jordi Munoz
 
 
-Project receives Donations from:
+Project received Donations from:
  Povl H Pedersen
  Richard Healey
  Lauri Andler
@@ -32,6 +32,7 @@ Project receives Donations from:
  Сергей Сырескин
  Aleksandr Starostin
  Михаил Павлов
+ Jimmy Alexander Castro Sanchez
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -115,7 +116,7 @@ OSD osd; //OSD object
 
 #if defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
-BetterStream *mavlink_comm_0_port;
+extern BetterStream *mavlink_comm_0_port;
 #endif
 
 #include "Panels.h"
@@ -185,6 +186,36 @@ void delay_150(){
 
 /* ***************** SETUP() *******************/
 
+ISR(INT0_vect) {
+    isr_VSYNC();
+}
+
+
+ISR(INT1_vect) {
+    ReadINT_PIN();
+}
+
+
+
+static NOINLINE void logo(){
+    OSD::setPanel(5, 5);
+    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV|"), RELEASE_NUM);
+
+    osd.print((uint16_t)millis());
+
+    // Check EEPROM to see if we have initialized it already or not
+    // also checks if we have new version that needs EEPROM reset
+
+    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
+        OSD::setPanel(1,1);
+        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION); 
+    }
+
+    delay_150();
+
+    OSD::update();// Show sign bar
+}
+
 void setup()     {
     wdt_disable(); 
 
@@ -194,6 +225,12 @@ void setup()     {
     pinMode(LEDPIN,OUTPUT); // led
     LED_ON; 		    // turn on for full light
 #endif
+
+
+    // memory 2k, user's from &flags to stack
+
+    // Get correct settings from EEPROM
+    readSettings();
 
     Serial.begin(TELEMETRY_SPEED);
 
@@ -206,9 +243,20 @@ void setup()     {
     
     adc_setup(); // do it some faster
 
-    OSD::update();// clear memory
+//    OSD::update();// clear memory
 
-    attachInterrupt(INT0, isr_VSYNC, FALLING);
+//    attachInterrupt(INT0, isr_VSYNC, FALLING); // 78 bytes
+    EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (FALLING << ISC00);
+    EIMSK |= (1 << INT0);
+
+#if defined(PWM_PIN)
+    if(sets.ch_toggle == 1) { // only if used
+	pinMode(PWM_PIN, INPUT_PULLUP);
+	//attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
+	EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (CHANGE << ISC10);
+        EIMSK |= (1 << INT1);
+    }
+#endif
 
 #if defined(USE_MAVLINK)
     mavlink_comm_0_port = &Serial; // setup mavlink port
@@ -219,23 +267,13 @@ void setup()     {
     OSD::update();// clear memory
 
     sei();
-/*
-    OSD::setPanel(5, 5);
-    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
-*/
+
+
 #ifdef DEBUG
 //    Serial.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
 #endif
 
-    // Get correct settings from EEPROM
-    readSettings();
 
-#if defined(PWM_PIN)
-    if(sets.ch_toggle == 1) { // only if used
-	pinMode(PWM_PIN, INPUT_PULLUP);
-	attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
-    }
-#endif
 
     
 #define REL_1 int(RELEASE_NUM/100)
@@ -263,22 +301,13 @@ void setup()     {
 	}
     }
 
-    // Check EEPROM to see if we have initialized it already or not
-    // also checks if we have new version that needs EEPROM reset
-#if 0
-    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
-        OSD::setPanel(1,1);
-        osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
-    }
-#endif
-
 //    panelN = 0; //set panel to 0 to start in the first navigation screen
 
     osd.init();    // Start 
-    
-    delay_150();
 
-    OSD::update();// Show sign bar
+    logo();
+
+
 
 //    delay(2000); // у нас есть задержка на авто-бауд
 //    Serial.flush(); без него лучше шрифты грузятся
@@ -340,14 +369,6 @@ void loop()
     if(pt < BOOTTIME){ // startup delay for fonts
 //if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
 
-	    OSD::setPanel(5, 5);
-	    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
-	    osd_printi_1(PSTR("|%d"), (uint16_t)pt);
-
-            if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
-                OSD::setPanel(1,1);
-                osd.printf_P(PSTR("Missing/Old Config: %d my %d" /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION, VER); 
-            }
 
             while(Serial.available_S()) {
                 byte c=Serial.read_S();
@@ -364,12 +385,21 @@ void loop()
                     return;
                 }
             }
-            OSD::update();
-            delay_150();
+            logo();
             return;
     }
 
 //if((pt & 0xf0) == 0) { Serial.printf_P(PSTR("time=%ld\n"),pt); Serial.wait(); }
+#if defined(MAV_REQUEST) && defined(USE_MAVLINK)
+
+    if(apm_mav_system && !lflags.mav_request_done){ // we got HEARTBEAT packet and still don't send requests
+        for(byte n = 3; n >0; n--){
+            request_mavlink_rates();//Three times to certify it will be readed
+            delay_150();
+        }
+        lflags.mav_request_done=1;
+    }
+#endif
 
     getData(); // получить данные с контроллера
 
@@ -454,19 +484,17 @@ void loop()
         lflags.blinker = !lflags.blinker;
         if(lflags.blinker) {
     //        seconds++;
-            static byte err_count=0;
-            
             lflags.one_sec_timer_switch = 1; // for warnings
 
 	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
-		err_count++;
-               if(err_count>3) { // 3 seconds no sync
+	        max7456_err_count++;
+                if(max7456_err_count>3) { // 3 seconds no sync
 #ifdef DEBUG   
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
 #endif
                     osd.init();    // restart MAX7456
                 }
-	    } else  err_count=0;
+	    } else  max7456_err_count=0;
 
 	    vsync_count=0;
 

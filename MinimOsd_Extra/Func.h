@@ -469,8 +469,7 @@ void setFdataVars()
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float f=osd_home_distance;
     calc_max(max_home_distance, f);
-    f=osd_airspeed;
-    calc_max(max_osd_airspeed, f);
+    calc_max(max_osd_airspeed, osd_airspeed);
     calc_max(max_osd_groundspeed, osd_groundspeed);
     calc_max(max_osd_home_alt, osd_alt_mav);
     calc_max(max_osd_windspeed, osd_windspeed);

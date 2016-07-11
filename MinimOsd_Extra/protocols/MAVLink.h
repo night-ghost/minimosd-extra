@@ -6,28 +6,31 @@
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
 
-/* перенастраивать оборудование без спроса - моветон
+#if defined(MAV_REQUEST)
 void request_mavlink_rates()
 {
-    const uint8_t  maxStreams = 6;
     
-    const uint8_t MAVStreams[maxStreams] = {
+    const uint8_t PROGMEM MAVStreams[] = {
         MAV_DATA_STREAM_RAW_SENSORS,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
         MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
-        MAV_DATA_STREAM_EXTRA2};
+        MAV_DATA_STREAM_EXTRA2,
+        MAV_DATA_STREAM_EXTRA3
+    };
 
-    const uint16_t MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x10, 0x02};
-    for (int i=0; i < maxStreams; i++) {
+    const uint16_t PROGMEM  MAVRates[] = {0x02, 0x02, 0x05, 0x02, 0x10, 0x02, 1};
+    
+    for (int i=0; i < sizeof(MAVStreams); i++) {
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
             apm_mav_system, apm_mav_component,
-            MAVStreams[i], MAVRates[i], 1);
+            pgm_read_byte(&MAVStreams[i]), 
+            pgm_read_byte(&MAVRates[i]), 1);
     }
 }
-*/
 
+#endif
 
 /* in  protocols.h
 union {
@@ -68,23 +71,21 @@ bool read_mavlink(){
 
             set_data_got(); //lastMAVBeat = millis();
 
-#ifdef DEBUG
-//   Serial.printf_P(PSTR("\ngot id=%d\n"), msg.m.msgid);
-#endif
+//   DBG_PRINTF("\ngot id=%d\n", msg.m.msgid);
 
             lflags.mavlink_active = 1;
 
 #ifdef MAVLINK_CONFIG
-DBG_PRINTVARLN(msg.m.msgid);
-DBG_PRINTVARLN(msg.m.sysid);
-DBG_PRINTVARLN(msg.m.compid);
+//DBG_PRINTVARLN(msg.m.msgid);
+//DBG_PRINTVARLN(msg.m.sysid);
+//DBG_PRINTVARLN(msg.m.compid);
 
 	    if(msg.m.msgid == MAVLINK_MSG_ID_ENCAPSULATED_DATA && 
 	       msg.m.sysid == mav_gcs_id &&
 	       msg.m.compid == MAV_COMP_ID_CAMERA ) { // stole this ID
 		uint16_t seq=mavlink_msg_encapsulated_data_get_seqnr(&msg.m);
 
-DBG_PRINTVARLN(seq);
+//DBG_PRINTVARLN(seq);
 
 		if(seq!=last_seq_n) {
 		    last_seq_n = seq;
@@ -111,6 +112,8 @@ DBG_PRINTVARLN(seq);
 
 
 	    cnt++;
+
+//DBG_PRINTVARLN(msg.m.msgid);
 	    
             //handle msg
             switch(msg.m.msgid) {
@@ -271,15 +274,14 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 chan_raw[7] = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg.m);
                 osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg.m);
                 break;
-/*
-	    case MAVLINK_MSG_ID_RC_CHANNELS: // 1-18 but in not sent :(
-		break;
-*/
 
 
             case MAVLINK_MSG_ID_WIND:
                 osd_winddirection = mavlink_msg_wind_get_direction(&msg.m); // 0..360 deg, 0=north
+//DBG_PRINTVARLN(osd_winddirection);                
+//DBG_PRINTVARLN(osd_windspeed);                
                 osd_windspeed = mavlink_msg_wind_get_speed(&msg.m); //m/s
+//DBG_PRINTF("new osd_windspeed=%f\n",osd_windspeed);                
 //              osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg.m); //m/s
                 break;
 
@@ -287,27 +289,26 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 temperature = mavlink_msg_scaled_pressure_get_temperature(&msg.m);
                 break;
 
-#if 1
             case MAVLINK_MSG_ID_SCALED_PRESSURE2:
                 temperature = mavlink_msg_scaled_pressure2_get_temperature(&msg.m);
-/*
-
-packet.press_abs = press_abs;
-packet.press_diff = press_diff;
-
-*/
                 break;
-#endif
 
-//#ifdef IS_PLANE
+
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: {
                     // height of takeoff point
                     //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
                     osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
-		    int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m);
+		    int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m); // speed for non-GPS setups
 		    int16_t vy = mavlink_msg_global_position_int_get_vx(&msg.m);
 		    loc_speed = distance(vx, vy) / 100;
                 } break; 
+
+/*
+	    case MAVLINK_MSG_ID_RC_CHANNELS: // 1-18 but in not sent :(
+		break;
+*/
+
+
 /*
 case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
             {
@@ -316,7 +317,7 @@ case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
             }
             break;
 */
-//#endif
+
 
 /*
     MAV_SEVERITY_EMERGENCY=0,  System is unusable. This is a "panic" condition. | 
@@ -381,11 +382,7 @@ typedef struct __mavlink_radio_t
 		    byte rssi    = mavlink_msg_radio_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
-
-#ifdef DEBUG
-//Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n"), rssi, remrssi);
-#endif
-
+//DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n", rssi, remrssi);
 		} break;
 
 		case MAVLINK_MSG_ID_RADIO_STATUS: {// 3dr telemetry status
@@ -404,9 +401,7 @@ typedef struct __mavlink_radio_status_t
 		    byte rssi    = mavlink_msg_radio_status_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
-#ifdef DEBUG
-Serial.printf_P(PSTR("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n"), rssi, remrssi);
-#endif
+//DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
 
 		} break;
 
