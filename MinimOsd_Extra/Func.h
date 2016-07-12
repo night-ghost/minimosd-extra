@@ -574,14 +574,16 @@ static void getData(){
 	// 1000000 / BAUD for 115200 is 8.68uS
 	//  so I has no idea about pulse times - thease simply measured
 	
-	    if(     pulse < 11) 	speed = 115200;
-	    else if(pulse < 19) 	speed =  57600;
-	    else if(pulse < 29) 	speed =  38400;
-	    else if(pulse < 40) 	speed =  28800;
-	    else if(pulse < 60) 	speed =  19200;
-	    else if(pulse < 150)	speed =   9600;
-	    else                        speed =   4800;
+	    byte rate;
+	    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
+	    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
+	    else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
+	    else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
+	    else if(pulse < 60) 	{ speed =  19200; rate = 16; }
+	    else if(pulse < 150)	{ speed =   9600; rate = 32; }
+	    else                        { speed =   4800; rate = 64; }
 
+	    stream_rate = rate;
 #ifdef DEBUG
 	    OSD::setPanel(3,2);
 	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);

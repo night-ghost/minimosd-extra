@@ -1592,7 +1592,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             osd.setPanel(first_col, first_line);
             if (sign == 1) osd.write(0x1f);
 
-            osd.printf("%3d", 12);
+            osd.printf("%4.2f", 1.24);
 
             return 0;
         }

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r860 DV";
+        public const string VERSION = "r865 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -183,6 +183,9 @@ namespace OSD {
         private int MAV_packetcount=0;
         volatile object objlock = new object();
 
+        bool fDone=false;
+        bool comBusy=false;
+
         public OSD() {
 
             conf = new Config(this); // конфиг по умолчанию
@@ -228,7 +231,7 @@ namespace OSD {
 
             lblPresentedCharset.Text = "Presented Charset: " + "MinimOSD_" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".mcm";
             try { // load default bg pic			{
-                bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
+                bgpicture = Image.FromFile(Application.StartupPath + Path.DirectorySeparatorChar + "vlcsnap-2012-01-28-07h46m04s95.png");
             } catch {
             }
 
@@ -294,7 +297,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 5, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0 , "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0 , "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -302,8 +305,8 @@ namespace OSD {
                 pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
                 pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1, UI_Mode.UI_Checkbox, 0,"Icon in tail");
-                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 14, panCOG_XY, 1);
-                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 14, panGPS_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
+                pi[a++] = new Panel("Real heading", pan.panCOG, 22, 15, panCOG_XY, 1);
+                pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 11, panGPS_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
                 //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
 
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0, UI_Mode.UI_Checkbox, 0,"Marker below rose", 0, "Even panel length");
@@ -799,6 +802,9 @@ namespace OSD {
 
             Draw(panel_number);
 
+            if(System.Diagnostics.Debugger.IsAttached)
+                btnListen.Visible =true ;
+
         }
 
 
@@ -1055,12 +1061,15 @@ namespace OSD {
                 }
 
                 if(MavlinkModeMenuItem.Checked){
+                    comBusy = true;
                     err = MavWriteEEprom(wr_start, wr_length);
                     if(writeStrings) {
                         conf.eeprom.strings = StringArray;
                         err = MavWriteEEprom(Strings_offst, Config.Settings_size);
                     }
+                    comBusy = false;
                 } else {
+                    comBusy = true;
                     err = conf.writeEEPROM(wr_start, wr_length);
                     if(err==0) { // write all strings on each panel change
                         if(writeStrings) {
@@ -1068,6 +1077,7 @@ namespace OSD {
                             err = conf.writeEEPROM(Strings_offst, Config.Settings_size);
                         }
                     }
+                    comBusy = false;
 
                     if (err > 0)
                         MessageBox.Show("Failed to upload new Panel data");
@@ -1217,8 +1227,10 @@ namespace OSD {
             conf.eeprom.sensors.sensor_A3 = (float)0;
             conf.eeprom.sensors.sensor_A4 = (float)0;
 
-
+            comBusy = true;
             int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
+            comBusy = false;
+
             if (err > 0) {
                 MessageBox.Show("Failed to upload configuration data");
                 return 1;
@@ -1258,11 +1270,14 @@ namespace OSD {
         private void BUT_ReadOSD_Click(object sender, EventArgs e) {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
-
+            comBusy = true;
             bool fail = conf.readEEPROM(Config.EEPROM_SIZE);
+            comBusy = false;
 
             if (fail)
                 return;
+            
+
             if (panel_number>=0)
                 scr[panel_number].deselect();
 
@@ -1281,7 +1296,7 @@ namespace OSD {
             //				MessageBox.Show("Done downloading data!");
             //			} 
 
-            StringArray = conf.eeprom.strings; // read strings for panels
+            StringArray = conf.eeprom.strings; // read strings for panels            
 
             int tN = panel_number;
             for (int k = 0; k < npanel; k++) {
@@ -2146,6 +2161,7 @@ namespace OSD {
         private void updateFirmwareToolStripMenuItem_Click(object sender, EventArgs e) {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
+            fDone =true;
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "*.hex|*.hex";
@@ -2227,7 +2243,9 @@ namespace OSD {
                     MessageBox.Show("Failed to talk to bootloader");
                 }
 
-                sp.Close();
+                try {
+                    sp.Close();
+                } catch{}
 
                 
                 if (result) {
@@ -2246,7 +2264,8 @@ namespace OSD {
                 }
             }
 
-            toolStripStatusLabel1.Text = "Reading EEPOM!";
+            toolStripStatusLabel1.Text = "Reading EEPOM";
+            Application.DoEvents();
             //read EEPROM 
             this.BUT_ReadOSD_Click(EventArgs.Empty, EventArgs.Empty);
 
@@ -2308,7 +2327,7 @@ namespace OSD {
                     byte[] bytes = br.ReadBytes(20000000); // no more 20MB
   
                     tlog_data = bytes;
-                    grpTLog.Enabled = true;
+                    btnTLog.Enabled = true;
 
                 } catch { break; }
 
@@ -2325,6 +2344,8 @@ namespace OSD {
         }
 
         private void OSD_FormClosed(object sender, FormClosedEventArgs e) {
+            fDone=true;
+
             if (tlog_run)
                 stop_tlog();
 
@@ -2446,6 +2467,7 @@ namespace OSD {
         }
 
         private void updateFontToolStripMenuItem_Click(object sender, EventArgs e) {
+            fDone = true;
             Application.DoEvents();
 
             this.BeginInvoke((MethodInvoker)delegate {
@@ -2784,11 +2806,15 @@ namespace OSD {
 
             if (modelType == ModelType.Plane) {
                 if (!customImage)
-                    bgpicture = Image.FromFile("vlcsnap-2012-01-28-07h46m04s95.png");
+                    try {
+                        bgpicture = Image.FromFile(Application.StartupPath + Path.DirectorySeparatorChar + "vlcsnap-2012-01-28-07h46m04s95.png");
+                    } catch (Exception ex) {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    };
             } else if (modelType == ModelType.Copter) {
                 if (!customImage)
                     try {
-                        bgpicture = Image.FromFile("quad.png");
+                        bgpicture = Image.FromFile(Application.StartupPath + Path.DirectorySeparatorChar + "quad.png");
                     } catch (Exception ex) {
                         //fail = true;
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -3906,6 +3932,7 @@ namespace OSD {
                 CurrentCOM = CMB_ComPort.Text;
                 tlog_thread = new System.Threading.Thread(thread_proc);
                 tlog_run = true;
+                comBusy=true ; 
                 tlog_thread.Start();
             } else {
                 need_stop_tlog=true;
@@ -3924,6 +3951,7 @@ namespace OSD {
                     if (comPort.IsOpen)
                         comPort.Close();
                 } catch {};
+                comBusy = false;
             }
             btnTLog.Text = tlog_run ? "Stop" : "Start";
         }
@@ -4133,6 +4161,7 @@ namespace OSD {
                 np = 0;
                 UInt64 time, start_time;
                 DateTime localtime = DateTime.Now;
+                DateTime tlog_start_time = DateTime.Now;
                 UInt64 stamp = (UInt64)(millis() * 1000);
 
                 int byteIndex;
@@ -4164,7 +4193,27 @@ namespace OSD {
                             while(comPort.BytesToWrite!=0) // подождем передачи пакета
                                 System.Threading.Thread.Sleep(1); 
 
+                            byte[] packet=new byte[256];
+
+                            for(int i=0, j=frStart; i<256 && j<frEnd +1; i++, j++){
+                                packet[i]=bytes[j];
+                            }
+
+                            //0 - STX
+                            // 1 - len
+                            // 2 - seq
+                            // 3 - sysid
+                            // 4 - compid
+                            // 5 - msgid
+                            //
                             comPort.Write(bytes, frStart, frEnd - frStart + 1);
+
+                            if(packet[5]==  168 ) { // MAVLINK_MSG_ID_WIND
+                                //Console.WriteLine ("wind !");
+                                byte bb=packet[6];// float direction
+                                // float speed
+                                // float speed_Z
+                            }
 
                             if (((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
                                 time = get_timestamp(bytes, byteIndex+1);  // skip parsed CRC2                              
@@ -4175,6 +4224,7 @@ namespace OSD {
                             try {
                                 this.Invoke((MethodInvoker)delegate {
                                     lblTLog.Text = np.ToString(); // runs on UI thread
+                                    lblTime.Text = (DateTime.Now - tlog_start_time).ToString ();
                                 });
 
                             } catch { };
@@ -4599,6 +4649,34 @@ namespace OSD {
             txtTime3.Text = (v & 0xf).ToString();
             
         }
+
+        void com_thread_proc(){
+            fDone=false;
+            while (!fDone) {
+                if (!comBusy) {
+                    try {
+                        if (comPort.IsOpen && comPort.BytesToRead > 0) {
+                            string s = comPort.ReadExisting();
+                            Console.Write(s);
+                        }
+                    } catch { }
+                }
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+        private void btnListen_Click(object sender, EventArgs e) {
+            if(!comPort.IsOpen){
+                comPort.PortName = CMB_ComPort.Text; ;
+                comPort.BaudRate = 57600;
+                comPort.Open ();
+            }
+
+            com_thread = new System.Threading.Thread(com_thread_proc);
+            com_thread.Start();
+        }
+
+    
+
 
     }
 }

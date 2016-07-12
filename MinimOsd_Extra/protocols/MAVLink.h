@@ -5,36 +5,37 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+typedef struct _Stream_params {
+    byte stream;
+    byte rate;
+} Stream_params;
 
 #if defined(MAV_REQUEST)
 void request_mavlink_rates()
 {
     
-    const uint8_t PROGMEM MAVStreams[] = {
-//        MAV_DATA_STREAM_RAW_SENSORS,
-        MAV_DATA_STREAM_POSITION,
-        MAV_DATA_STREAM_EXTENDED_STATUS,
-        MAV_DATA_STREAM_RC_CHANNELS,
-        MAV_DATA_STREAM_EXTRA1, 
-        MAV_DATA_STREAM_EXTRA2,
-        MAV_DATA_STREAM_EXTRA3
+    const Stream_params PROGMEM MAVStreams[] = {
+//      {  MAV_DATA_STREAM_RAW_SENSORS,  	2 },
+        {  MAV_DATA_STREAM_POSITION,		1 },
+        {  MAV_DATA_STREAM_EXTENDED_STATUS,	2 },
+        {  MAV_DATA_STREAM_RC_CHANNELS,		5 },
+        {  MAV_DATA_STREAM_EXTRA1,		10 },
+        {  MAV_DATA_STREAM_EXTRA2,		2 },
+        {  MAV_DATA_STREAM_EXTRA3,		1 }
     };
 
-    const uint16_t PROGMEM  MAVRates[] = {
-	//0x02, 
-	0x01, 
-	0x02, 
-	0x05, 
-	0x10, 
-	0x02, 
-	1
-    };
-    
+
     for (int i=0; i < sizeof(MAVStreams); i++) {
+	byte rate = pgm_read_byte(&(MAVStreams[i].rate));
+	if(stream_rate){
+	    rate *= 4;
+	    rate /= stream_rate; // нормируем на скорость соединения
+	    if(rate<1) rate=1;
+	}
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
-            apm_mav_system, apm_mav_component,
-            pgm_read_byte(&MAVStreams[i]), 
-            pgm_read_byte(&MAVRates[i]), 1);
+            apm_mav_system, apm_mav_component,	// received by HEARTBEAT 
+            pgm_read_byte(&(MAVStreams[i].stream)),
+            rate, 1);
     }
 }
 
@@ -154,10 +155,10 @@ skip_packet:
 
 
 #if defined(DEBUG) && 0
-	if(apm_mav_system  != msg.m.sysid){
-	    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
-	    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
-	}
+if(apm_mav_system  != msg.m.sysid){
+    byte status=mavlink_msg_heartbeat_get_system_status(&msg.m);
+    Serial.printf_P(PSTR("\nHEARTBEAT type=%d sysid=%d pilot=%d component=%d status=%d\n"), apm_mav_type,  msg.m.sysid, osd_autopilot, msg.m.compid, status);
+}
 #endif
 
                 lflags.motor_armed = getBit(base_mode,7);
@@ -168,13 +169,29 @@ skip_packet:
 
 
 		if(mav_data_count==0){ // there is no data comes to OSD
-		    if(lflags.mav_data_frozen<5) 
-    			lflags.mav_data_frozen++;
-    		    else 
-                        lflags.mav_request_done = 0; // make new request
+		    if(mav_raw_imu_count) { // we has IMU data but not GPS - stream overload
+		        if(lflags.mav_stream_overload<5) 
+    			    lflags.mav_stream_overload++;
+    		        else {
+                            lflags.mav_request_done = 0; // make new request
+                            if(stream_rate<127)
+                                stream_rate *=2;		// on half rate
+                        }
+		    } else { // no data at all
+		        if(lflags.mav_data_frozen<5) 
+    			    lflags.mav_data_frozen++;
+    		        else 
+                            lflags.mav_request_done = 0; // make new request
+                    }
 		}
 		mav_data_count=0;
+		mav_raw_imu_count=0;
                 break;
+                
+    // MAV_DATA_STREAM_RAW_SENSORS - the hiest priority message
+            case MAVLINK_MSG_ID_RAW_IMU:
+        	mav_raw_imu_count++;
+        	break;
                 
     // MAV_DATA_STREAM_POSITION,
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -187,9 +204,6 @@ skip_packet:
 
                 //osd_mode = apm_mav_component;//Debug
                 break;
-
-	//    case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: - it has less priority
-	//	break;
 
     // EXTENDED_STATUS
             case MAVLINK_MSG_ID_GPS_RAW_INT:

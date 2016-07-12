@@ -175,6 +175,7 @@ namespace OSD
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.grpTLog = new System.Windows.Forms.GroupBox();
+            this.btnListen = new System.Windows.Forms.Button();
             this.lblTLog = new System.Windows.Forms.Label();
             this.btnTLog = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
@@ -191,6 +192,7 @@ namespace OSD
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.lblTime = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -1799,31 +1801,44 @@ namespace OSD
             // 
             // grpTLog
             // 
+            this.grpTLog.Controls.Add(this.lblTime);
+            this.grpTLog.Controls.Add(this.btnListen);
             this.grpTLog.Controls.Add(this.lblTLog);
             this.grpTLog.Controls.Add(this.btnTLog);
             this.grpTLog.Controls.Add(this.label14);
-            this.grpTLog.Enabled = false;
-            this.grpTLog.Location = new System.Drawing.Point(565, 27);
+            this.grpTLog.Location = new System.Drawing.Point(478, 27);
             this.grpTLog.Name = "grpTLog";
-            this.grpTLog.Size = new System.Drawing.Size(119, 64);
+            this.grpTLog.Size = new System.Drawing.Size(206, 74);
             this.grpTLog.TabIndex = 8;
             this.grpTLog.TabStop = false;
             this.grpTLog.Text = "TLog player";
             // 
+            // btnListen
+            // 
+            this.btnListen.Location = new System.Drawing.Point(9, 44);
+            this.btnListen.Name = "btnListen";
+            this.btnListen.Size = new System.Drawing.Size(47, 20);
+            this.btnListen.TabIndex = 17;
+            this.btnListen.Text = "Listen";
+            this.btnListen.UseVisualStyleBackColor = true;
+            this.btnListen.Visible = false;
+            this.btnListen.Click += new System.EventHandler(this.btnListen_Click);
+            // 
             // lblTLog
             // 
-            this.lblTLog.Location = new System.Drawing.Point(38, 42);
+            this.lblTLog.Location = new System.Drawing.Point(56, 18);
             this.lblTLog.Name = "lblTLog";
-            this.lblTLog.Size = new System.Drawing.Size(64, 18);
+            this.lblTLog.Size = new System.Drawing.Size(59, 18);
             this.lblTLog.TabIndex = 16;
             this.lblTLog.Text = "0";
             this.lblTLog.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // btnTLog
             // 
+            this.btnTLog.Enabled = false;
             this.btnTLog.Location = new System.Drawing.Point(9, 15);
             this.btnTLog.Name = "btnTLog";
-            this.btnTLog.Size = new System.Drawing.Size(64, 24);
+            this.btnTLog.Size = new System.Drawing.Size(47, 24);
             this.btnTLog.TabIndex = 15;
             this.btnTLog.Text = "Start";
             this.btnTLog.UseVisualStyleBackColor = true;
@@ -1841,7 +1856,7 @@ namespace OSD
             // 
             this.lblFWModelType.Location = new System.Drawing.Point(6, 13);
             this.lblFWModelType.Name = "lblFWModelType";
-            this.lblFWModelType.Size = new System.Drawing.Size(269, 21);
+            this.lblFWModelType.Size = new System.Drawing.Size(200, 21);
             this.lblFWModelType.TabIndex = 14;
             this.lblFWModelType.Text = "Model Type found in OSD: Unknown";
             // 
@@ -1861,7 +1876,7 @@ namespace OSD
             this.cbxModelType.Location = new System.Drawing.Point(134, 13);
             this.cbxModelType.Margin = new System.Windows.Forms.Padding(2);
             this.cbxModelType.Name = "cbxModelType";
-            this.cbxModelType.Size = new System.Drawing.Size(126, 21);
+            this.cbxModelType.Size = new System.Drawing.Size(107, 21);
             this.cbxModelType.TabIndex = 12;
             this.cbxModelType.SelectedIndexChanged += new System.EventHandler(this.cbxModelType_SelectedIndexChanged);
             // 
@@ -1889,7 +1904,7 @@ namespace OSD
             // 
             this.lblLatestCharsetUploaded.Location = new System.Drawing.Point(6, 40);
             this.lblLatestCharsetUploaded.Name = "lblLatestCharsetUploaded";
-            this.lblLatestCharsetUploaded.Size = new System.Drawing.Size(269, 13);
+            this.lblLatestCharsetUploaded.Size = new System.Drawing.Size(206, 13);
             this.lblLatestCharsetUploaded.TabIndex = 17;
             this.lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: Unknown";
             // 
@@ -1900,7 +1915,7 @@ namespace OSD
             this.groupBox11.Controls.Add(this.lblPresentedCharset);
             this.groupBox11.Location = new System.Drawing.Point(1, 26);
             this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(271, 65);
+            this.groupBox11.Size = new System.Drawing.Size(247, 65);
             this.groupBox11.TabIndex = 18;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "CT Tool Status:";
@@ -1909,9 +1924,9 @@ namespace OSD
             // 
             this.groupBox12.Controls.Add(this.lblFWModelType);
             this.groupBox12.Controls.Add(this.lblLatestCharsetUploaded);
-            this.groupBox12.Location = new System.Drawing.Point(278, 26);
+            this.groupBox12.Location = new System.Drawing.Point(254, 26);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(281, 65);
+            this.groupBox12.Size = new System.Drawing.Size(218, 65);
             this.groupBox12.TabIndex = 19;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "OSD Status:";
@@ -1963,6 +1978,13 @@ namespace OSD
             this.BUT_ClearScreen.Text = "Clear Screen";
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
+            // 
+            // lblTime
+            // 
+            this.lblTime.Location = new System.Drawing.Point(125, 21);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(73, 18);
+            this.lblTime.TabIndex = 18;
             // 
             // OSD
             // 
@@ -2207,6 +2229,8 @@ namespace OSD
         private System.Windows.Forms.Label lblTimes;
         private System.Windows.Forms.CheckBox chkDiap;
         private System.Windows.Forms.ToolTip hint;
+        private System.Windows.Forms.Button btnListen;
+        private System.Windows.Forms.Label lblTime;
     }
 
 }

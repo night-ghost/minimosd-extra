@@ -1158,12 +1158,8 @@ static const PROGMEM char * const gps_fmtF[]= {
 
 
 static void NOINLINE print_gps(PGM_P f, byte div){
-    if(lflags.mav_data_frozen>=5){
-	osd.print_P(PSTR("Stream"));	
-	OSD::write_S(div);
-	osd.print_P(PSTR("frozen"));	
-    } else
-	osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
+
+    osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
 }
 
 static void panGPS(point p){
@@ -1177,6 +1173,21 @@ static void panGPS(point p){
     byte fLow= is_alt(p)?1:0;      // low precision
 
     byte idx= fLow | (has_sign(p)?2:0);
+
+    if(lflags.blinker) {
+	if(lflags.mav_data_frozen>=5){
+	    osd.print_P(PSTR("Stream"));
+	    OSD::write_S(div);
+	    osd.print_P(PSTR("frozen"));
+	    return;
+	}
+	if(lflags.mav_stream_overload>=5){
+	    osd.print_P(PSTR("Stream"));
+	    OSD::write_S(div);
+	    osd.print_P(PSTR("overload"));
+	    return;
+	}
+    }
 
     if(is_alt2(p)){ // fractional
 	f=(const char *)pgm_read_word(&gps_fmt[idx]);
@@ -1408,7 +1419,7 @@ static void panWaitMAVBeats(){
 #endif
 
     OSD::setPanel(5,3);
-    osd_printi_1(PSTR("No input data! %d"),seconds - lastMavSeconds);
+    osd_printi_1(PSTR("No input data! %u"),seconds - lastMavSeconds);
 //    osd_printi_xy({5,3},PSTR("No input data! %d"),seconds - lastMavSeconds);
 
 #if defined(DEBUG)
@@ -1859,7 +1870,6 @@ static void panRadarScale(Point p){
 
 static void panCh(point p){
     for(byte i=0; i<8;i++)
-	//osd.printf_P(PSTR("C%d%5i|"), i+1, chan_raw[i] );
 	osd_printi_2(PSTR("C%d%5i|"), i+1, chan_raw[i] );
 }
 
@@ -2518,13 +2528,13 @@ void writePanels(){
         if( lflags.motor_armed  && lflags.in_air  &&
           ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
             landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
-DBG_PRINTF("set p landed=%ud\n", landed);
+DBG_PRINTF("set p landed=%u\n", landed);
 	}
     }
 #ifdef IS_COPTER
       else if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
 	landed = pt; // запомнится время дизарма
-DBG_PRINTF("set c landed=%ud\n", landed);
+DBG_PRINTF("set c landed=%u\n", landed);
     }
     
     lflags.last_armed_status = lflags.motor_armed;
@@ -2563,7 +2573,7 @@ DBG_PRINTF("set c landed=%ud\n", landed);
     else if(0) {
 #endif
 #endif
-DBG_PRINTF("set FData landed=%ud\n", landed);
+DBG_PRINTF("set FData landed=%u\n", landed);
 
        lflags.fdata=1;
        storeChannels(); // remember control state

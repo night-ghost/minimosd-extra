@@ -10,6 +10,8 @@
 
 
 static byte max7456_err_count=0;
+static byte stream_rate=0; // divider to requested rates 
+static byte mav_raw_imu_count=0;
 
 static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
@@ -262,6 +264,7 @@ struct loc_flags {
 
     bool mav_request_done; 
     bool mav_data_frozen;
+    bool mav_stream_overload;
 };
 
 #ifdef DEBUG
@@ -279,7 +282,7 @@ int mavlink_cnt=0;
 
 byte skip_inc=0;
 
-struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
@@ -287,7 +290,7 @@ volatile static uint8_t vsync_count=0;
 
 #ifdef PWM_PIN
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
-volatile uint16_t      PWM_IN=0;                // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
+volatile uint16_t      PWM_IN=0;              // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
 volatile unsigned long int_Timer = 0;         // set in the INT1
 #endif
 
@@ -330,6 +333,7 @@ const Params *params; // указатель на текущий набор па�
 byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
 uint32_t autoswitch_time=0;
+
 
 #define GPS_MUL 10000000.0f
 

@@ -2,7 +2,7 @@
 
 Quickstart Guide (c) Johnex
 ----------------------
-1. Download the latest MinimOSD-Extra build here: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip
+1. Download the latest MinimOSD-Extra build here: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip?raw=true
 2. Run the OSD_Config.exe
 3. Connect your MinimOSD to your pc making sure you are using an FTDI that has 5V and not 3.3V.
 4. After the usb driver is installed, select your COM port in OSD_Config.
@@ -317,6 +317,12 @@ v863
 v864
 * detects frozen datastreams and (if TX connected) tries to re-request them.
 
+v865
+* calculates adequate stream rate for current COM-port baudrate.
+* detects overloaded datastreams and (if TX connected) tries to re-request them at less rate.
+* minor fixes
+* CT shows TLOG time
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -327,7 +333,7 @@ Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
 БЫстрый старт
 
 
-1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip
+1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip?raw=true
 2. Запустите OSD_Config.exe
 3. Подключите MinimOSD на ваш компьютер, убедившись, что вы используете FTDI с напряжением 5V, а не 3.3V.
 4. После установки драйвера USB, выберите COM-порт в OSD_Config.
@@ -664,6 +670,10 @@ v863
 v864
 * определяет зависшие потоки данных и пытается (если подключен TX) запрашивать их снова 
 
+v865
+* запрашивает нужные потоки данных на правильных скоростях для текущей скорости COM-порта
+* определяет переполнение потока данных и пытается (если подключен TX) запрашивать их снова на меньшей скорости
+* мелкие исправления
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

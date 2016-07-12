@@ -156,6 +156,10 @@ namespace OSD {
                 cbComPort.SelectedIndex = 0;
         }
 
+        private void btnListen_Click(object sender, EventArgs e) {
+            if (!comPort.IsOpen) comPort.Open();
+        }
+
         
         private void btnStop_Click(object sender, EventArgs e) {
             btnStop.Enabled = false;
