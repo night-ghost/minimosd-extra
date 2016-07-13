@@ -20,12 +20,12 @@ static void uploadFont() {
     byte chk=0;
     while(font_count < 256) { 
 	if(Serial.available_S()){ // absense of this is not a good
-            uint8_t incomingByte = Serial.read_S();
+            uint8_t c = Serial.read_S();
 
-            switch(incomingByte){ // parse and decode mcm file
+            switch(c){ // parse and decode mcm file
             case 0x0A: // carridge return, end of line
                 continue;
-            
+
             case 0x0d: // carridge return, end of line
                 //Serial.println("cr");
                 if (bit_count == 8)  {
@@ -35,11 +35,11 @@ static void uploadFont() {
                 }
                 bit_count = 0;
                 break;
-            
+
             case 0x30: // ascii '0'
             case 0x31: // ascii '1' 
                 character_bitmap[byte_count] <<= 1;
-                if(incomingByte == 0x31)
+                if(c == 0x31)
                     character_bitmap[byte_count] += 1;
                 bit_count++;
                 break;
@@ -47,7 +47,7 @@ static void uploadFont() {
             case 'r':
                 font_count--;
             break;
-	
+
             default:
                 break;
             }

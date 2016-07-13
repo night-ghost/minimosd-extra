@@ -328,7 +328,7 @@ namespace OSD {
                 pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1);
                 pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
 
-                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s");
+                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
                 pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
                 pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
@@ -515,7 +515,7 @@ namespace OSD {
 
             cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-            chkRadar.Checked = pan.flgRadar;
+            chkRusHUD.Checked = pan.flgRusHUD;
             chkILS.Checked = pan.flgILS;
 
         }
@@ -969,7 +969,7 @@ namespace OSD {
                 conf.eeprom.sets.horiz_kPitch_a = pan.pitch_k_ntsc;
                 conf.eeprom.flags[useExtVbattA] = pan.flgBattA;
                 conf.eeprom.flags[useExtCurr] = pan.flgCurrent;
-                conf.eeprom.flags[radar_on] = pan.flgRadar;
+                conf.eeprom.flags[russian_HUD] = pan.flgRusHUD;
                 conf.eeprom.flags[ils_on] = pan.flgILS;
 
                 conf.eeprom.flags[flgTrack] = pan.flgTrack;
@@ -1593,8 +1593,8 @@ namespace OSD {
                 pan.flgCurrent = conf.eeprom.flags[useExtCurr];
                 cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-                pan.flgRadar = conf.eeprom.flags[radar_on];
-                chkRadar.Checked = pan.flgRadar;
+                pan.flgRusHUD = conf.eeprom.flags[russian_HUD];
+                chkRusHUD.Checked = pan.flgRusHUD;
 
                 pan.flgILS = conf.eeprom.flags[ils_on];
                 chkILS.Checked = pan.flgILS;
@@ -1844,7 +1844,7 @@ namespace OSD {
                         sw.WriteLine("{0}\t{1}", "fBattB", pan.flgBattB);
                         sw.WriteLine("{0}\t{1}", "fCurr", pan.flgCurrent);
 
-                        sw.WriteLine("{0}\t{1}", "fRadar", pan.flgRadar);
+                        sw.WriteLine("{0}\t{1}", "fRussianHUD", pan.flgRusHUD);
                         sw.WriteLine("{0}\t{1}", "fILS", pan.flgILS);
                         sw.WriteLine("{0}\t{1}", "HOS", pan.horiz_offs);
                         sw.WriteLine("{0}\t{1}", "VOS", pan.vert_offs);
@@ -1896,6 +1896,14 @@ namespace OSD {
             //ofd.OpenFile()
         }
 
+        int parseFlag(string s){
+            int f=0;
+            if (s != null)
+                int.TryParse(s, out f);
+            if(f<0) f=0;
+            return f;
+        }
+
         void loadOsdFile(string fn) {
             string[] strings = { "" };
             startup=true;
@@ -1926,14 +1934,19 @@ namespace OSD {
                                             pi.sign = 1;
                                         }
                                         // if TryParse fails, default is zero
+                                        
                                         if(strings.Length >=6)
-                                        int.TryParse(strings[5], out pi.Altf);
+                                            pi.Altf = parseFlag(strings[5]);
+                                            
                                         if (strings.Length >= 7)
-                                        int.TryParse(strings[6], out pi.Alt2);
+                                            pi.Alt2 = parseFlag(strings[6]);
+                                            
                                         if (strings.Length >= 8)
-                                        int.TryParse(strings[7], out pi.Alt3);
+                                            pi.Alt3 = parseFlag(strings[7]);
+                                            
                                         if (strings.Length >= 9)
-                                        int.TryParse(strings[8], out pi.Alt4);
+                                            pi.Alt4 = parseFlag(strings[8]);
+                                            
 
                                         try {
                                             if(pi.string_count >0){
@@ -2001,7 +2014,7 @@ namespace OSD {
                         else if (strings[0] == "fBattA") pan.flgBattA = bool.Parse(strings[1]);
                         else if (strings[0] == "fBattB") pan.flgBattB = bool.Parse(strings[1]);
                         else if (strings[0] == "fCurr") pan.flgCurrent = bool.Parse(strings[1]);
-                        else if (strings[0] == "fRadar") pan.flgRadar = bool.Parse(strings[1]);
+                        else if (strings[0] == "fRussianHUD") pan.flgRusHUD = bool.Parse(strings[1]);
                         else if (strings[0] == "fILS") pan.flgILS = bool.Parse(strings[1]);
                         else if (strings[0] == "HOS") pan.horiz_offs = (byte)int.Parse(strings[1]);
                         else if (strings[0] == "VOS") pan.vert_offs = (byte)int.Parse(strings[1]);
@@ -2125,7 +2138,7 @@ namespace OSD {
                     cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
                     cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-                    chkRadar.Checked = pan.flgRadar;
+                    chkRusHUD.Checked = pan.flgRusHUD;
                     chkILS.Checked = pan.flgILS;
 
                     try {
@@ -3719,8 +3732,8 @@ namespace OSD {
                 txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
         }
 
-        private void chkRadar_CheckedChanged(object sender, EventArgs e) {
-            pan.flgRadar = chkRadar.Checked;
+        private void chkRusHUD_CheckedChanged(object sender, EventArgs e) {
+            pan.flgRusHUD = chkRusHUD.Checked;
         }
 
         private void chkILS_CheckedChanged(object sender, EventArgs e) {

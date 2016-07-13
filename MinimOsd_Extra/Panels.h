@@ -183,8 +183,12 @@ static void showHorizon(byte start_col, byte start_row) {
         AH_ROLL_FACTOR  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a)  * AH_ROLL_FACTOR0;    
      }
 
+
     // preset the line char attributes
     roll = osd_att.roll;
+
+    if(flags.russian_HUD) roll = -roll;
+
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
 	roll = roll < 0 ? roll + 179 : roll;
 	uint16_t a_roll=abs(roll);
@@ -243,7 +247,10 @@ static void showHorizon(byte start_col, byte start_row) {
         int8_t middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
         
         // tg(72 gr) ==3 so byte overflows
-        int16_t hit = (int)(tan(AH_ROLL_FACTOR * osd_att.roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+        int iroll  = osd_att.roll;
+        if(flags.russian_HUD)
+            iroll  = -iroll;
+        int16_t hit = (int)(tan(AH_ROLL_FACTOR * iroll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up

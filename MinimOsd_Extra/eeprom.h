@@ -103,7 +103,7 @@ struct Flags { // 4 байта
     bool useExtVbattA:1;// 4
     bool useExtVbattB:1;// 5 - generated internally
     bool useExtCurr:1;	// 6
-    bool radar_on:1;	// 7 - not used, use panel.alt3 instead
+    bool russian_HUD:1;	// 7 
     bool ils_on:1;	// 8 - not used, use panel.alt4 instead
     
     bool mode_auto:1; 	// 9

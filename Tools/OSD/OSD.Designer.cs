@@ -69,7 +69,7 @@ namespace OSD
             this.tabPageConfig = new System.Windows.Forms.TabPage();
             this.chkILS = new System.Windows.Forms.CheckBox();
             this.chkTrack = new System.Windows.Forms.CheckBox();
-            this.chkRadar = new System.Windows.Forms.CheckBox();
+            this.chkRusHUD = new System.Windows.Forms.CheckBox();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.txtCurr_k = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
@@ -175,6 +175,7 @@ namespace OSD
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.grpTLog = new System.Windows.Forms.GroupBox();
+            this.lblTime = new System.Windows.Forms.Label();
             this.btnListen = new System.Windows.Forms.Button();
             this.lblTLog = new System.Windows.Forms.Label();
             this.btnTLog = new System.Windows.Forms.Button();
@@ -192,7 +193,6 @@ namespace OSD
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
-            this.lblTime = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -540,7 +540,7 @@ namespace OSD
             // 
             this.tabPageConfig.Controls.Add(this.chkILS);
             this.tabPageConfig.Controls.Add(this.chkTrack);
-            this.tabPageConfig.Controls.Add(this.chkRadar);
+            this.tabPageConfig.Controls.Add(this.chkRusHUD);
             this.tabPageConfig.Controls.Add(this.groupBox14);
             this.tabPageConfig.Controls.Add(this.groupBox2);
             this.tabPageConfig.Controls.Add(this.groupBox1);
@@ -565,7 +565,7 @@ namespace OSD
             // chkILS
             // 
             this.chkILS.AutoSize = true;
-            this.chkILS.Location = new System.Drawing.Point(490, 307);
+            this.chkILS.Location = new System.Drawing.Point(490, 315);
             this.chkILS.Name = "chkILS";
             this.chkILS.Size = new System.Drawing.Size(70, 17);
             this.chkILS.TabIndex = 1;
@@ -586,17 +586,16 @@ namespace OSD
             this.chkTrack.Visible = false;
             this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
             // 
-            // chkRadar
+            // chkRusHUD
             // 
-            this.chkRadar.AutoSize = true;
-            this.chkRadar.Location = new System.Drawing.Point(489, 294);
-            this.chkRadar.Name = "chkRadar";
-            this.chkRadar.Size = new System.Drawing.Size(83, 17);
-            this.chkRadar.TabIndex = 0;
-            this.chkRadar.Text = "show Radar";
-            this.chkRadar.UseVisualStyleBackColor = true;
-            this.chkRadar.Visible = false;
-            this.chkRadar.CheckedChanged += new System.EventHandler(this.chkRadar_CheckedChanged);
+            this.chkRusHUD.AutoSize = true;
+            this.chkRusHUD.Location = new System.Drawing.Point(497, 296);
+            this.chkRusHUD.Name = "chkRusHUD";
+            this.chkRusHUD.Size = new System.Drawing.Size(91, 17);
+            this.chkRusHUD.TabIndex = 0;
+            this.chkRusHUD.Text = "Russian HUD";
+            this.chkRusHUD.UseVisualStyleBackColor = true;
+            this.chkRusHUD.CheckedChanged += new System.EventHandler(this.chkRusHUD_CheckedChanged);
             // 
             // groupBox14
             // 
@@ -1813,6 +1812,13 @@ namespace OSD
             this.grpTLog.TabStop = false;
             this.grpTLog.Text = "TLog player";
             // 
+            // lblTime
+            // 
+            this.lblTime.Location = new System.Drawing.Point(125, 21);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(73, 18);
+            this.lblTime.TabIndex = 18;
+            // 
             // btnListen
             // 
             this.btnListen.Location = new System.Drawing.Point(9, 44);
@@ -1979,13 +1985,6 @@ namespace OSD
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
-            // lblTime
-            // 
-            this.lblTime.Location = new System.Drawing.Point(125, 21);
-            this.lblTime.Name = "lblTime";
-            this.lblTime.Size = new System.Drawing.Size(73, 18);
-            this.lblTime.TabIndex = 18;
-            // 
             // OSD
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2147,7 +2146,7 @@ namespace OSD
         private System.Windows.Forms.CheckBox cbxAutoUpdate;
         private System.Windows.Forms.CheckBox cbxShowUpdateDialog;
         
-        private System.Windows.Forms.CheckBox chkRadar;
+        private System.Windows.Forms.CheckBox chkRusHUD;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label6;

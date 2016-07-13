@@ -72,7 +72,7 @@ namespace OSD
 		
 		public bool flgCurrent=false;
 		public bool flgILS=true;
-		public bool flgRadar=true;
+		public bool flgRusHUD=true;
         public bool flgHUD = true;
         public bool flgTrack = false;
 		
@@ -465,13 +465,17 @@ namespace OSD
             } else {
                 c = velocityChar;
                 k = 1.0f;
-            }            
+            }      
+            int arrow=0xA4;
+            if(is_alt2 (fAlt)){
+                arrow=0x94;
+            }
             if(sign==1)
                 osd.printf("%c%3.0f%c|%c%c%2.0f%c", 0x1D, (double)(osd_windspeed * convertspeed/3 / k), c,
-				                      0xA4, 0xA5, (double)(osd_windspeed * convertspeed / k), c);
+                                      arrow, arrow+1, (double)(osd_windspeed * convertspeed / k), c);
             else
-				osd.printf("%3.0f%c|%c%c%2.0f%c", (double)(osd_windspeed * convertspeed/3 /k), c, 
-				           			 0xA4, 0xA5, (double)(osd_windspeed * convertspeed / k), c);
+				osd.printf("%3.0f%c|%c%c%2.0f%c", (double)(osd_windspeed * convertspeed/3 /k), c,
+                                      arrow, arrow+1, (double)(osd_windspeed * convertspeed / k), c);
             
             return 0;
         }
@@ -1275,7 +1279,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
     int  col, row;
     int pitch_line, middle, hit, subval;
-    int roll;
+    double roll;
     int line_set = LINE_SET_STRAIGHT__;
     int line_set_overflow = LINE_SET_STRAIGHT_O;
     int subval_overflow = 9;
@@ -1296,6 +1300,9 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
     
     // preset the line char attributes
     roll = osd_roll;
+                
+    if(flgRusHUD) roll = -roll;
+
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {      // positive angle line chars
         roll = roll < 0 ? roll + 179 : roll;
         if (abs(roll) > ANGLE_2) {
@@ -1320,7 +1327,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
         }			
 	}
 			
-	double dRoll=osd_roll ;
+	double dRoll=roll ;
 	dRoll *= AH_ROLL_FACTOR;
 			
     pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;  // 90 total lines

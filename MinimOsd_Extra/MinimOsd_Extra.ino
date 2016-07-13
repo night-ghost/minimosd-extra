@@ -429,9 +429,6 @@ void loop()
 
         writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
-//	vsync_wait=1;
-//Serial.printf_P(PSTR("parseNewData e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
 //	LED_BLINK;
 
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
@@ -450,7 +447,6 @@ void loop()
 //LED_BLINK;
 
     if(pt > timer_20ms){
-        //timer_20ms = pt + 20;
         long_plus(&timer_20ms, 20);
         On20ms();
     }
@@ -500,8 +496,8 @@ void loop()
         serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
 #endif
-		    osd.update();
                     osd.hw_init();    // restart MAX7456
+		    osd.update(); // clear screen
                 }
 	    } else  max7456_err_count=0;
 

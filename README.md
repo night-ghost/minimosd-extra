@@ -329,6 +329,8 @@ v866
 * fixed panWarning bug
 * optimized stack usage
 
+v867
+* reversed roll in horizon AKA Russian HUD
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -686,6 +688,10 @@ v866
 * реверс направления ветра в конфигураторе
 * исправлен баг с панелью Warnings
 * оптимизация использования стека
+
+v867
+* реверс крена в горизонте - Russian HUD
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
