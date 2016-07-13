@@ -37,12 +37,12 @@ void SPI::mode(byte config){
 }
 
 //------------------ transfer -----------------------------------------------
-
+/*
 byte SPI::transfer(byte value){
   SPDR = value;
   while (!(SPSR & (1<<SPIF))) ;
   return SPDR;
-}
+}*/
 
 byte SPI::transfer(byte value, byte period){
   SPDR = value;

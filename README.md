@@ -323,6 +323,13 @@ v865
 * minor fixes
 * CT shows TLOG time
 
+
+v866
+* wind direction can be reversed in CT
+* fixed panWarning bug
+* optimized stack usage
+
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -674,6 +681,11 @@ v865
 * запрашивает нужные потоки данных на правильных скоростях для текущей скорости COM-порта
 * определяет переполнение потока данных и пытается (если подключен TX) запрашивать их снова на меньшей скорости
 * мелкие исправления
+
+v866
+* реверс направления ветра в конфигураторе
+* исправлен баг с панелью Warnings
+* оптимизация использования стека
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

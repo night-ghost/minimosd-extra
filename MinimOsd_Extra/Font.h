@@ -6,8 +6,10 @@ static void uploadFont() {
     uint8_t byte_count = 0;
     byte bit_count=0;
 
-    // move these local to prevent ram usage
-    uint8_t character_bitmap[0x40];
+//  move these local to prevent ram usage
+//    uint8_t character_bitmap[0x40];
+// protocols buffers don't used when uploading fonts
+#define character_bitmap ((byte *)&msg.bytes[0])  
 
     int font_count = 0;
 

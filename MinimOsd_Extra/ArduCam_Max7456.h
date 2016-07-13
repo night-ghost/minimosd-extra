@@ -112,6 +112,14 @@ class OSD: public BetterStream
     static void adjust();
     using BetterStream::write;
 
+    static INLINE void max7456_off(){
+        PORTD |= _BV(PD6);         //gitalWrite(MAX7456_SELECT,HIGH);
+    }
+
+    static INLINE void max7456_on(){
+        PORTD &= ~_BV(PD6);         //gitalWrite(MAX7456_SELECT,LOW);
+    }
+
 //  private:
     static uint8_t col, row, video_mode;
     static uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
@@ -128,18 +136,9 @@ class OSD: public BetterStream
 };
 
 
-static INLINE void max7456_off(){
-    //gitalWrite(MAX7456_SELECT,HIGH);
-    PORTD |= _BV(PD6);
-}
-
-static INLINE void max7456_on(){
-    //gitalWrite(MAX7456_SELECT,LOW);
-    PORTD &= ~_BV(PD6);
-}
 
 static INLINE void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+    OSD::max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 
 

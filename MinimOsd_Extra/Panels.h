@@ -524,12 +524,13 @@ static void panEff(point p){
 #else
 
 // скорость у нас км/ч, ток в ма, получаем ма/км * ч = ма*ч / км, то есть сколько ма/ч надо затратить на километр полета
-            float raw_eff = ((float)osd_curr_A ) / cnvGroundSpeed();
-DBG_PRINTF("raw eff=%f\n", raw_eff );
+            float raw_eff = ((float)osd_curr_A ) / cnvGroundSpeed() * 10.0;
+//DBG_PRINTF("raw eff=%f\n", raw_eff );
 
-	    if(eff==0)	eff = raw_eff * 10;
+	    if(eff==0)	eff = raw_eff;
         
-            eff = raw_eff * (10.0 * EFF_FILTER) + eff * (1-EFF_FILTER); // комплиментарный фильтр 1/10
+//            eff = raw_eff * EFF_FILTER + eff * (1-EFF_FILTER); // комплиментарный фильтр 1/10
+            eff += (raw_eff  - eff) * EFF_FILTER; // комплиментарный фильтр 1/10
         	
             //eff = (((float)osd_curr_A * 10.0 ) / cnvGroundSpeed())*0.1  + eff * 0.9;
             //dst+=(val-dst)*k;
@@ -648,7 +649,7 @@ static void panWindSpeed(point p){
     printSpeedCnv(&osd_windspeed, alt);
     osd_nl();
 
-    showArrow(grad_to_sect(dir - osd_heading)); //print data to OSD
+    showArrow(grad_to_sect(dir - osd_heading) + (is_alt2(p)?8:0) ); //print data to OSD
     printSpeedCnv(PSTR("%2.0f"), &nor_osd_windspeed, alt);
 
 }
@@ -869,7 +870,7 @@ const char PROGMEM w8[]="Fence Low!";
 const char PROGMEM w9[]="Fence High!";
 const char PROGMEM w10[]="Fence Far!";
 
-const char * const warn_str[] = {
+const char * const PROGMEM warn_str[] = {
     w1,
     w2,
     w3,
@@ -888,7 +889,7 @@ static void panWarn(point p){
     check_warn();
 
     if(warning) 
-       osd.print_P(warn_str[warning-1]);
+       osd.print_P((char *)pgm_read_word(&warn_str[warning-1]) );
 
 }
 
@@ -1428,10 +1429,12 @@ static void panWaitMAVBeats(){
     extern volatile uint16_t lost_bytes;
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
+    extern volatile byte nest_count;
 
-    OSD::setPanel(6,5);
-    osd.printf_P(PSTR("crc drops=%u |bytes=%ld lost=%u"),packet_drops, bytes_comes,  lost_bytes);
+    OSD::setPanel(1,5);
+    osd.printf_P(PSTR("loop time=%dms crc drops=%u|bytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
+    osd.printf_P(PSTR("|stack bottom = %x nest=%d"),stack_bottom, nest_count);
 //    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
 //    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
     
@@ -1468,28 +1471,14 @@ static void panRose(point p){
  // generate the heading patern
     char buf_show[14];
 
-    const unsigned char buf_Rule[] PROGMEM = {
+    static const unsigned char buf_Rule[] PROGMEM = {
       0x82,0x80,0x81,0x80,0x81,0x80,
       0x84,0x80,0x81,0x80,0x81,0x80,
       0x83,0x80,0x81,0x80,0x81,0x80,
       0x85,0x80,0x81,0x80,0x81,0x80
      };
 
-    int start = (osd_heading * 24+12)/360 - 4;
- 
-    if(start < 0) start += 24;
-  
-    char *c=buf_show;
-    uint8_t x;
-//  *c++=0xc3;
-    for(x=(is_alt2(p)?10:9); x != 0; x--){
-        *c++ = buf_Rule[start];
-        if(++start >= 24) start = 0;
-    }
-//  *c++ = 0x87;
-    *c++ = '\0';
 
-// Serial.printf_P(PSTR("Rose buf=%s\n"), buf_show);
     PGM_P s;
 
     if(has_sign(p) && !is_alt(p)){
@@ -1500,9 +1489,19 @@ static void panRose(point p){
             
         osd.print_P(s);
     }
-    //osd.printf_P(PSTR("\xc3%s\x87"), buf_show);
+
     osd.write_S('\xc3');
-    osd.print(buf_show);
+
+
+    byte start = (osd_heading * 24+12)/360 - 4;
+    if(start < 0) start += 24;
+  
+    uint8_t x;
+    for(x=(is_alt2(p)?10:9); x != 0; x--){
+        osd.write_S( pgm_read_byte(&buf_Rule[start]) );
+        if(++start >= 24) start = 0;
+    }
+
     osd.write_S('\x87');
     
     if(has_sign(p) && is_alt(p)){
@@ -2191,10 +2190,8 @@ static void panSetup(){
     float v = 0;
     byte size;
     byte type;
-    float inc = 0;
     byte col = 0;
     char *nm;
-    int min, max;
     byte k;
 
     int8_t offs=0;
@@ -2285,10 +2282,11 @@ as_char:
 	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v);
     }
 
-    fptr tail = (fptr) pgm_read_word((void *)&pscreen->tail);
+    {
+        fptr tail = (fptr) pgm_read_word((void *)&pscreen->tail);
 
-    if(tail) tail();
-
+        if(tail) tail();
+    }
     if(!lflags.flag_05s) return;
     lflags.flag_05s=0;
 
@@ -2337,12 +2335,13 @@ as_char:
 
 
     v=c_val;
-    
-    switch (type){
+    {
+        float inc = 0;
+        switch (type){
 	case 'z': // offset
 	case 'Z': // offset
 	case 'c': // char
-        case 'b': // byte param
+    	case 'b': // byte param
     	    size= 1;
 	    if(     diff>300)	inc=10/(float)k;
 	    else if(diff>150)	inc=1 /(float)k;
@@ -2358,24 +2357,26 @@ as_char:
 	    else if(diff>100) inc=0.001;
 
 	    break;
-    }
+        }
 
     
     
-    if(diff>100){
+        if(diff>100){
 //if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
 //	if(fNeg) v += inc;
 //	else     v -= inc;
-	if(fNeg) inc = -inc;
-	float_add(v, inc);
+	    if(fNeg) inc = -inc;
+	    float_add(v, inc);
 
-        min =(int)pgm_read_word((void *)&p->min);
-        max =(int)pgm_read_word((void *)&p->max);
+            int min, max;
 
-        if(v<min) v=min;
-        if(v>max) v=max;
+            min =(int)pgm_read_word((void *)&p->min);
+            max =(int)pgm_read_word((void *)&p->max);
+
+            if(v<min) v=min;
+            if(v>max) v=max;
+        }
     }
-
 
     if(v != c_val) {
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
@@ -2528,7 +2529,7 @@ void writePanels(){
         if( lflags.motor_armed  && lflags.in_air  &&
           ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
             landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
-DBG_PRINTF("set p landed=%u\n", landed);
+//DBG_PRINTF("set p landed=%u\n", landed);
 	}
     }
 #ifdef IS_COPTER

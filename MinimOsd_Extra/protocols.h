@@ -34,6 +34,7 @@ union {
 #if defined(USE_LTM)
     LTM ltm;
 #endif
+    byte bytes[0x40];
 } msg;
 
 

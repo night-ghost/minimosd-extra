@@ -14,7 +14,7 @@ typedef struct _Stream_params {
 void request_mavlink_rates()
 {
     
-    const Stream_params PROGMEM MAVStreams[] = {
+    static const Stream_params PROGMEM MAVStreams[] = {
 //      {  MAV_DATA_STREAM_RAW_SENSORS,  	2 },
         {  MAV_DATA_STREAM_POSITION,		1 },
         {  MAV_DATA_STREAM_EXTENDED_STATUS,	2 },
@@ -55,7 +55,7 @@ union {
 */
 
 bool read_mavlink(){
-    uint8_t      base_mode=0;
+    uint8_t   base_mode=0;
     mavlink_status_t status;
     byte cnt=0;
 

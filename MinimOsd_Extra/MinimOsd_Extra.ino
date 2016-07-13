@@ -88,15 +88,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "prototypes.h"
 
 
-// Objects and Serial definitions
-SingleSerialPort(Serial);
 
 OSD osd; //OSD object 
+
+// Objects and Serial definitions
+SingleSerialPort(Serial);
 
 
 // program parts
 #include "adc_setup.h"
-#include "Font.h"
 #include "Config_Func.h"
 #include "Func.h"
 
@@ -119,6 +119,7 @@ OSD osd; //OSD object
 extern BetterStream *mavlink_comm_0_port;
 #endif
 
+#include "Font.h"
 #include "Panels.h"
 
 
@@ -134,7 +135,8 @@ volatile byte nested=0;
 volatile byte nest_count=0;
 
 // обработка прерывания по кадровому синхроимпульсу
-void isr_VSYNC(){
+//void isr_VSYNC(){
+ISR(INT0_vect) {
     vsync_wait=0;	// единственное что нам надо - отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
@@ -145,13 +147,22 @@ void isr_VSYNC(){
         if(update_stat) { // there is data for screen
     	    nested++;
             sei(); 			// enable other interrupts 
-            OSD::update(); 		// do it in interrupt! execution time is ~500Us so without interrupts we will lose serial bytes
-    
+            OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
+	    cli();
             update_stat = 0;
             nested--;
         }
     }
+#if defined(DEBUG)
+    byte sp;
+
+    if(((uint16_t)&sp)<stack_bottom)
+        stack_bottom=((uint16_t)&sp);
+#endif
 }
+/*ISR(INT0_vect) {
+    isr_VSYNC();
+}*/
 
 // PWM Measurement
 #if defined(PWM_PIN)
@@ -186,10 +197,6 @@ void delay_150(){
 
 /* ***************** SETUP() *******************/
 
-ISR(INT0_vect) {
-    isr_VSYNC();
-}
-
 
 ISR(INT1_vect) {
     ReadINT_PIN();
@@ -219,20 +226,21 @@ static NOINLINE void logo(){
 void setup()     {
     wdt_disable(); 
 
-    pinMode(MAX7456_SELECT,  OUTPUT); // OSD CS
+//    pinMode(MAX7456_SELECT,  OUTPUT); in OSD::init
 
 #ifdef LEDPIN
     pinMode(LEDPIN,OUTPUT); // led
     LED_ON; 		    // turn on for full light
 #endif
+    Serial.begin(TELEMETRY_SPEED);
 
-
-    // memory 2k, user's from &flags to stack
+    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
     // Get correct settings from EEPROM
     readSettings();
 
-    Serial.begin(TELEMETRY_SPEED);
+    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
+
 
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
     TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );
@@ -242,8 +250,6 @@ void setup()     {
 //    wdt_enable(WDTO_2S); - bootloader don't supports WDT
     
     adc_setup(); // do it some faster
-
-//    OSD::update();// clear memory
 
 //    attachInterrupt(INT0, isr_VSYNC, FALLING); // 78 bytes
     EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (FALLING << ISC00);
@@ -389,9 +395,9 @@ void loop()
             return;
     }
 
-//if((pt & 0xf0) == 0) { Serial.printf_P(PSTR("time=%ld\n"),pt); Serial.wait(); }
-#if defined(MAV_REQUEST) && defined(USE_MAVLINK)
+//if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
 
+#if defined(MAV_REQUEST) && defined(USE_MAVLINK)
     if(apm_mav_system && !lflags.mav_request_done){ // we got HEARTBEAT packet and still don't send requests
         for(byte n = 3; n >0; n--){
             request_mavlink_rates();//Three times to certify it will be readed
@@ -491,8 +497,11 @@ void loop()
                 if(max7456_err_count>3) { // 3 seconds no sync
 #ifdef DEBUG   
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
+        serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
+
 #endif
-                    osd.init();    // restart MAX7456
+		    osd.update();
+                    osd.hw_init();    // restart MAX7456
                 }
 	    } else  max7456_err_count=0;
 
@@ -503,7 +512,8 @@ void loop()
 	    if(seconds % 30 == 0) {
 		extern volatile uint16_t lost_bytes;
 	        Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
-	        
+	        Serial.printf_P(PSTR("stack bottom = %x nest count=%d\n"),stack_bottom, nest_count);
+//    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 	    }
 #endif
 	}

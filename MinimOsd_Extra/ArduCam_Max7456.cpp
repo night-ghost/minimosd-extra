@@ -253,26 +253,27 @@ void OSD::update() {
     
 */
 
-    PORTD &= ~_BV(PD6); //  digitalWrite(MAX7456_SELECT,LOW); 
+    max7456_on(); //  digitalWrite(MAX7456_SELECT,LOW); 
 
     MAX_write(MAX7456_DMAH_reg, 0);
     MAX_write(MAX7456_DMAL_reg, 0);
     MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
-    PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
+    max7456_off(); //  digitalWrite(MAX7456_SELECT, HIGH);
 
     for(; b < end_b;) {
-        PORTD &= ~_BV(PD6);  //  digitalWrite(MAX7456_SELECT, HIGH);
-        SPDR = *b;
+        max7456_on();  //  digitalWrite(MAX7456_SELECT, HIGH);
+//        SPDR = *b;
+//        while (!(SPSR & (1<<SPIF))) ;
+	SPI::transfer(*b);
         *b++=' ';		// обойдемся без memset
-        while (!(SPSR & (1<<SPIF))) ;
-        PORTD |= _BV(PD6);	//  digitalWrite(MAX7456_SELECT,LOW); 
+        max7456_off();	//  digitalWrite(MAX7456_SELECT,LOW); 
     }
-    PORTD &= ~_BV(PD6); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
+    max7456_on(); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
 
-    Spi.transfer(MAX7456_END_string); // 0xFF
+    SPI::transfer(MAX7456_END_string); // 0xFF
 
-    PORTD |= _BV(PD6); //  digitalWrite(MAX7456_SELECT, HIGH);
+    max7456_off(); //  digitalWrite(MAX7456_SELECT, HIGH);
 }
 
 

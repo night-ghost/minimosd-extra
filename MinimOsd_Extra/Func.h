@@ -265,7 +265,6 @@ static float /* NOINLINE */ distance(float x, float y){
 static void setHomeVars()
 {
     float dstlon, dstlat;
-    int bearing;
 
 
     if(osd_fix_type!=0) lflags.gps_active=1; // если что-то появилось то запомним что было
@@ -322,29 +321,33 @@ static void setHomeVars()
         //osd_alt_cnt = 0;
         lflags.osd_got_home = 1;
     } else if(lflags.osd_got_home){
-        float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
+	{
+            float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
 
-        //DST to Home
+            //DST to Home
 
-//        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
-//        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
-        dstlat = diff_coord(osd_home.lat, osd_pos.lat);
-        dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
-        
+//	        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
+//	        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
+            dstlat = diff_coord(osd_home.lat, osd_pos.lat);
+            dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
+        }
         //osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
         osd_home_distance = distance(dstlat, dstlon);
 	dst_x=(int)fabs(dstlat);
 	dst_y=(int)fabs(dstlon);
 
-        //DIR to Home
-        bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
-        
-//        if(bearing < 0) bearing += 360;//normalization
-        bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-        //while(bearing < 0) bearing += 360;//normalization
-        bearing=normalize_angle(bearing);
+        { //DIR to Home
+            int bearing;
 
-        osd_home_direction = grad_to_sect(bearing); 
+            bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
+        
+//	        if(bearing < 0) bearing += 360;//normalization
+            bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
+            //while(bearing < 0) bearing += 360;//normalization
+            bearing=normalize_angle(bearing);
+
+            osd_home_direction = grad_to_sect(bearing); 
+        }
   }
 }
 
@@ -645,3 +648,10 @@ static void getData(){
 bool NOINLINE timeToScreen(){
     return lflags.need_redraw && !vsync_wait;
 }
+
+inline uint16_t freeRam () {
+  extern uint16_t __heap_start, *__brkval; 
+  byte v; 
+  return (uint16_t) &v - (__brkval == 0 ? (uint16_t) &__heap_start : (uint16_t) __brkval); 
+}
+

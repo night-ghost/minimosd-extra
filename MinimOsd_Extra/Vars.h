@@ -219,7 +219,7 @@ volatile byte update_stat=0;
 struct loc_flags {
 //    bool update_stat:1; 		// есть данные для показа
     bool got_data;		// флаг получения пакета
-    bool need_redraw;         // надо перерисовать экран
+    bool need_redraw:1;         // надо перерисовать экран
     bool mavlink_active:1; 	// флаг активности (навсегда)
     bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
     bool mwii_active:1;    // got valid MWII packet - flag forever
@@ -228,22 +228,22 @@ struct loc_flags {
     
     bool rotatePanel;
     bool last_sw_ch;
-    bool one_sec_timer_switch;
+    bool one_sec_timer_switch:1;
 
     bool motor_armed;
     bool last_armed_status;
-    bool was_armed;
-    bool throttle_on;
-    bool in_air;
+    bool was_armed:1;
+    bool throttle_on:1;
+    bool in_air:1;
 
     bool blinker;
-    bool flgMessage;
+    bool flgMessage:1;
     
-    bool mode_switch;
-    bool osd_got_home; // tels if got home position or not
+    bool mode_switch:1;
+    bool osd_got_home:1; // tels if got home position or not
     
-    bool flag_05s; // sets each 0.5s for setup
-    bool flag_01s;
+    bool flag_05s:1; // sets each 0.5s for setup
+    bool flag_01s:1;
 
     bool flgSensor1:1;
     bool flgSensor2:1;
@@ -253,16 +253,16 @@ struct loc_flags {
     bool fPulseSensor3:1;
     bool fPulseSensor4:1;
 
-    bool show_screnN;
-    bool gps_active; // было что-то с GPS
-    bool vs_ms; // vertical speed in m/s;
-    bool was_mav_config; // was EEPROM write via MAVlink
+    bool show_screnN:4;
+    bool gps_active:1; // было что-то с GPS
+    bool vs_ms:1; // vertical speed in m/s;
+    bool was_mav_config:1; // was EEPROM write via MAVlink
     
     bool fdata;	// show FData screen
 
-    bool autosw; 	// automatic screen switch
+    bool autosw:1; 	// automatic screen switch
 
-    bool mav_request_done; 
+    bool mav_request_done:1;
     bool mav_data_frozen;
     bool mav_stream_overload;
 };
@@ -278,6 +278,7 @@ volatile uint16_t lost_bytes =0;
 
 long mavlink_time=0, mavlink_dt=0;
 int mavlink_cnt=0;
+volatile uint16_t stack_bottom=0xffff; // check for stack size in interrupts
 #endif
 
 byte skip_inc=0;
