@@ -51,7 +51,6 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 
 static void NOINLINE printTime(uint16_t t, byte blink){
 //    osd.printf_P(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
-//    osd_printi_2(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
     osd_printi_1(PSTR("%3i"),((uint16_t)t/60));
     osd.write_S( (blink && lflags.blinker)?0x20:0x3a);
     osd_printi_1(PSTR("%02i"), (uint16_t)t%60);
@@ -104,9 +103,6 @@ static void printSpeedCnv(float *s, byte alt){
 
 
 
-void inline write_arrow(byte arrow_set1){
-    OSD::write_S(arrow_set1); OSD::write_S(arrow_set1+1);
-}
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
@@ -119,7 +115,7 @@ static void NOINLINE showArrow(uint8_t rotate_arrow){
 
     arrow_set1 += rotate_arrow * 2 - 2;
 
-    write_arrow(arrow_set1);
+    OSD::write_S(arrow_set1); OSD::write_S(arrow_set1+1);
 }
 
 
@@ -1476,7 +1472,6 @@ static void panHeading(point p){
 
 static void panRose(point p){
  // generate the heading patern
-    char buf_show[14];
 
     static const unsigned char buf_Rule[] PROGMEM = {
       0x82,0x80,0x81,0x80,0x81,0x80,

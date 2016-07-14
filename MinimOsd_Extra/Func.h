@@ -391,7 +391,8 @@ void setFdataVars()
 #if defined(USE_FILTER)
     filter(vertical_speed, (osd_climb * get_converth() ) *  60); // комплиментарный фильтр 1/10
 #else
-    vertical_speed = (osd_climb * get_converth() ) * ( 60 * 0.1) + vertical_speed * 0.9; // комплиментарный фильтр 1/10
+    float speed_raw= (osd_climb * get_converth() ) *  60;
+    vertical_speed += (speed_raw - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
     //dst+=(val-dst)*k;
     //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
     //float vs=(osd_climb * get_converth() ) * 60;

@@ -25,7 +25,7 @@ void request_mavlink_rates()
     };
 
 
-    for (int i=0; i < sizeof(MAVStreams); i++) {
+    for (byte i=0; i < sizeof(MAVStreams)/sizeof(Stream_params); i++) {
 	byte rate = pgm_read_byte(&(MAVStreams[i].rate));
 	if(stream_rate){
 	    rate *= 4;

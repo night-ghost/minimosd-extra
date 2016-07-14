@@ -332,6 +332,9 @@ v866
 v867
 * reversed roll in horizon AKA Russian HUD
 
+v868
+* fixed lot of bugs in latest features
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -670,7 +673,7 @@ v862
 * исправлена настройка сенсоров
 
 v863
-* проект перещел на отдельные бинарники на каждый протокол, так что теперь имена файлов выглядят как  MinimOsd_Extra_Uni.{версия}DV-{протокол}-{тип сборки}.hex
+* проект перешел на отдельные бинарники на каждый протокол, так что теперь имена файлов выглядят как  MinimOsd_Extra_Uni.{версия}DV-{протокол}-{тип сборки}.hex
 * реверсировано направление ветра
 * исправлена panEff
 * добавлен максимум скорости ветра в панель результатов полета (Flight Data)
@@ -692,6 +695,8 @@ v866
 v867
 * реверс крена в горизонте - Russian HUD
 
+v868
+* исправлено множество багов в последних изменениях
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

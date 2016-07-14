@@ -263,8 +263,8 @@ struct loc_flags {
     bool autosw:1; 	// automatic screen switch
 
     bool mav_request_done:1;
-    bool mav_data_frozen;
-    bool mav_stream_overload;
+    uint8_t mav_data_frozen;
+    uint8_t mav_stream_overload;
 };
 
 #ifdef DEBUG
