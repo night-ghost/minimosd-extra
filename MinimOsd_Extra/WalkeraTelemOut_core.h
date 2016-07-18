@@ -53,16 +53,16 @@ void WalkeraTelem::sendTelemetry(){
 	devoPacket.volt = osd_vbat_A;
 	devoPacket.temp = temperature;
 
-	devoPacket.cs = 0; // Init Checksum with zero Byte
+	byte cs = 0; // Init Checksum with zero Byte
 
 //Serial.printf_P(PSTR("devo start "));
 
 	byte *b = (byte *)&devoPacket;
 	for (byte i = sizeof(devoPacket)-1; i !=0; i--) { // excluding CRC
 		DevoSerial.write_S(*b);
-		devoPacket.cs += *b++; // Add Checksum
+		cs += *b++; // Add Checksum
 	}
-	DevoSerial.write_S(devoPacket.cs); // Write Checksum to serial
+	DevoSerial.write_S(cs); // Write Checksum to serial
 //Serial.printf_P(PSTR(" crc=%02x\n"), devoPacket.cs);
 }
 

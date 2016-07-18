@@ -335,6 +335,10 @@ v867
 v868
 * fixed lot of bugs in latest features
 
+v869
+* support for copter's Brake and Throw modes
+
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -697,6 +701,10 @@ v867
 
 v868
 * исправлено множество багов в последних изменениях
+
+v869
+* поддержка режимов коптера Brake и Throw 
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

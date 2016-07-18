@@ -398,11 +398,11 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
 		i--;
 		trk[i] = trk[i-1]; // move points to end
 
-//		OSD::write_xy(center_col + x, center_line - y, c);
 	    }
 	    trk[0].x =x;
 	    trk[0].y =y;
 	}
+	
 	for(byte i=3; i!=0;i--){
 	    OSD::write_xy(center_col + trk[i].x, center_line - trk[i].y, 0x24);
 	}
@@ -460,22 +460,22 @@ static void NOINLINE printDistCnv(float d){
 
 static NOINLINE void printFullDist(float dd){
 
-    dd *= get_converth();
-    if ((int)dd <= 9999) { // in meters
+    float f =  get_converth() * dd;
+    if ((int)f <= 9999) { // in meters
     //    printDist(dd);
-	osd_printf_2(PSTR("%4.0f"), dd, get_mhigh());
+	osd_printf_2(PSTR("%4.0f"), f, get_mhigh());
 
     }else{ // in kilometers
-	dd = dd / pgm_read_word(&measure->distconv);
+	f = f / pgm_read_word(&measure->distconv);
 	PGM_P fmt;
-	if((int)dd<=9)
+	if((int)f<=9)
 	    fmt = PSTR("%4.2f");
-	else if((int)dd<=99)
+	else if((int)f<=99)
 	    fmt = PSTR("%4.1f");
         else
             fmt = PSTR("%4.0f");
 
-        osd_printf_2(fmt, dd, pgm_read_byte(&measure->distchar));
+        osd_printf_2(fmt, f, pgm_read_byte(&measure->distchar));
     }
 }
 
@@ -1663,13 +1663,15 @@ const char PROGMEM s_mode13[] = "sprt"; //Sport		13
 const char PROGMEM s_mode14[] = "flip"; //Flip		14
 const char PROGMEM s_mode15[] = "tune"; //Tune		15
 const char PROGMEM s_mode16[] = "hold"; //Position Hold (Earlier called Hybrid) 16
+const char PROGMEM s_mode17[] = "brk";  //brake 17
+const char PROGMEM s_mode18[] = "thrw";  //throw 18
 
 #ifdef IS_COPTER
 char const * const mode_c_strings[] PROGMEM ={ 
     s_mode00, s_mode01, s_mode02, s_mode03, s_mode04, 
     s_mode05, s_mode06, s_mode07, s_mode08, s_mode09, 
     s_mode10, s_mode11, s_mode_n, s_mode13, s_mode14,
-    s_mode15, s_mode16
+    s_mode15, s_mode16, s_mode17, s_mode18
 };
 #endif
 
@@ -1887,39 +1889,33 @@ static void printSensor(byte n){
     osd.printf(s.format,v);
 }
 
-static void NOINLINE panSensor1(point p) {
+static void NOINLINE panSensor(point p, byte n) {
+    register byte * bp = &flgSensor[n];
+    
     if(is_on(p)) {
-	lflags.flgSensor1=1;
-	printSensor(0);
+	*bp=1;
+	fPulseSensor[n] = is_alt(p);
+	printSensor(n);
     } else
-	lflags.flgSensor1=0;
+	*bp=0;
     
 }
 
-static void NOINLINE panSensor2(point p) {
-    if(is_on(p)) {
-	lflags.flgSensor2=1;
-        printSensor(1);
-    } else
-	lflags.flgSensor2=0;
+
+static void  panSensor1(point p) {
+    panSensor(p,0);
+}    
+
+static void  panSensor2(point p) {
+    panSensor(p,1);
 }
 
-static void NOINLINE panSensor3(point p) {
-    if(is_on(p)) {
-	lflags.flgSensor3=1;
-	lflags.fPulseSensor3 = is_alt(p);
-        printSensor(2);
-    } else
-	lflags.flgSensor3=0;
+static void  panSensor3(point p) {
+    panSensor(p,2);
 }
 
-static void NOINLINE panSensor4(point p) {
-    if(is_on(p)) {
-	lflags.flgSensor4=1;
-	lflags.fPulseSensor4 = is_alt(p);
-        printSensor(3);
-    } else
-	lflags.flgSensor4=0;
+static void  panSensor4(point p) {
+    panSensor(p,3);
 }
 #endif
 
@@ -2173,9 +2169,10 @@ static void /*NOINLINE*/ move_screen(char dir){
 
 static void NOINLINE storeChannels(){
 
-    for(byte i=0; i<4; i++){
-        if (chan_raw_middle[i] < 1000)
-           chan_raw_middle[i] = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
+    uint16_t *cp= &chan_raw_middle[0];
+    for(byte i=0; i<4; i++,cp++){
+        if (*cp < 1000)
+           *cp = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
     }
 }
 
@@ -2294,20 +2291,9 @@ as_char:
 
     lflags.got_data=1;   // renew screen
 
-
-//Serial.printf_P(PSTR("ch1=%d mid=%d\n"), chan_raw[1], chan_raw_middle[1]);
-//Serial.printf_P(PSTR("ch3=%d mid=%d\n"), chan_raw[3], chan_raw_middle[2]);
-
-/*
-    if ((chan_raw[1] - 150) > chan_raw_middle[1] ){  move_menu(1);    return; } // переходы по строкам по верх-низ
-    if ((chan_raw[1] + 150) < chan_raw_middle[1] ){  move_menu(-1);   return; }
-
-    if ((chan_raw[3] - 150) > chan_raw_middle[2] ){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
-    if ((chan_raw[3] + 150) < chan_raw_middle[2] ){  move_screen(-1); return; }
-*/
     {
 	int cd;
-	
+
 	cd=channelDiff(1);
 	if ( cd >  150){  move_menu(1);    return; } // переходы по строкам по верх-низ
         if ( cd < -150){  move_menu(-1);   return; }

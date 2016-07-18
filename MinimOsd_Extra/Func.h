@@ -351,7 +351,7 @@ static void setHomeVars()
   }
 }
 
-void NOINLINE calc_max(float &dst, float &src){
+void NOINLINE calc_max(float &dst, float src){
     if (dst < src) dst = src;
 
 }
@@ -381,26 +381,36 @@ void NOINLINE float_add(float &dst, float val){
 // накопление статистики и рекордов
 void setFdataVars()
 {
-//    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
-    uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
+    float time_1000; 
+    { // isolate time_lapse
     
-    //runtime = millis();
-    millis_plus(&runtime,0);
+//	    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+        uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
+        //runtime = millis();
+        millis_plus(&runtime,0);
 
-  //Moved from panel because warnings also need this var and panClimb could be off
+        //total_flight_time_milis += time_lapse;
+        long_plus(&total_flight_time_milis, time_lapse);
+        time_1000 = f_div1000(time_lapse); // in seconds
+    }
+    
+
+    //Moved from panel because warnings also need this var and panClimb could be off
 #if defined(USE_FILTER)
-    filter(vertical_speed, (osd_climb * get_converth() ) *  60); // комплиментарный фильтр 1/10
+        filter(vertical_speed, (osd_climb * get_converth() ) *  60); // комплиментарный фильтр 1/10
 #else
-    float speed_raw= (osd_climb * get_converth() ) *  60;
-    vertical_speed += (speed_raw - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
-    //dst+=(val-dst)*k;
-    //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
-    //float vs=(osd_climb * get_converth() ) * 60;
-    // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+	{
+            float speed_raw= (osd_climb * get_converth() ) *  60;
+            vertical_speed += (speed_raw - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+        }
+        //dst+=(val-dst)*k;
+        //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+        //float vs=(osd_climb * get_converth() ) * 60;
+        // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
 #endif
 
-    if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
-	max_battery_reading = osd_battery_remaining_A;
+        if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
+            max_battery_reading = osd_battery_remaining_A;
 
 #ifdef IS_PLANE
 //                              Altitude above ground in meters, expressed as * 1000 (millimeters)
@@ -414,43 +424,37 @@ void setFdataVars()
     }
 #endif
 
-//    float time_1000 = time_lapse / 1000.0; // in seconds
-    float time_1000 = f_div1000(time_lapse); // in seconds
 
     //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home && lflags.motor_armed) float_add(trip_distance, osd_groundspeed * time_1000);
+    if(lflags.osd_got_home && lflags.motor_armed) 
+        float_add(trip_distance, osd_groundspeed * time_1000);
 
-    //mah_used += (osd_curr_A * 10.0 * time_lapse / (3600.0 * 1000.0));
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 
-    uint16_t rssi_v = rssi_in;
-//    byte ch = sets.RSSI_raw / 2;
+    { // isolate RSSI calc
+        uint16_t rssi_v = rssi_in;
 
-//    if(ch == 0) rssi_v = osd_rssi; // mavlink
-//    if(ch == 4) rssi_v = chan_raw[7]; // ch 8
-//    if(ch == 1 || ch == 2) rssi_v = rssi_in; // analog/pwm input
+        if((sets.RSSI_raw % 2 == 0))  {
+            uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
+            bool rev=false;
 
-    if((sets.RSSI_raw % 2 == 0))  {
-	uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
-	bool rev=false;
+            if(l > h) {
+                l=h;
+                h=sets.RSSI_16_low;
+                rev=true;
+            }
 
-	if(l > h) {
-	    l=h;
-	    h=sets.RSSI_16_low;
-	    rev=true;
-	}
+            if(rssi_v < l) rssi_v = l;
+            if(rssi_v > h) rssi_v = h;
 
-        if(rssi_v < l) rssi_v = l;
-        if(rssi_v > h) rssi_v = h;
+            rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
+            //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
-        rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
-        //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
-
-        if(rssi > 100) rssi = 100;
-        if(rev) rssi=100-rssi;
-    } else 
-        rssi = rssi_v;
-
+            if(rssi > 100) rssi = 100;
+            if(rev) rssi=100-rssi;
+        } else 
+            rssi = rssi_v;
+    }
 
   //Set max data
 #ifdef IS_COPTER
@@ -467,8 +471,6 @@ void setFdataVars()
  #endif
 #endif
 
-    //total_flight_time_milis += time_lapse;
-    long_plus(&total_flight_time_milis, time_lapse);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float f=osd_home_distance;
@@ -548,6 +550,8 @@ static void getData(){
 #endif
     } else {
 	const char * proto;
+
+	memset( &msg.bytes[0], 0, sizeof(msg.bytes)); // clear packet buffer to initial state
     
 	switch(count05s % 5){
 #if defined(AUTOBAUD)
@@ -592,7 +596,7 @@ static void getData(){
 	    OSD::setPanel(3,2);
 	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
-	    Serial.flush();
+	    Serial.flush();	// clear serial buffer from garbage
 	    Serial.begin(speed);
 	    } break;
 #endif    
@@ -646,13 +650,15 @@ static void getData(){
 
 }
 
-bool NOINLINE timeToScreen(){
+bool NOINLINE timeToScreen(){ // we should renew screen 
     return lflags.need_redraw && !vsync_wait;
 }
 
+#if defined(DEBUG)
 inline uint16_t freeRam () {
   extern uint16_t __heap_start, *__brkval; 
   byte v; 
   return (uint16_t) &v - (__brkval == 0 ? (uint16_t) &__heap_start : (uint16_t) __brkval); 
 }
+#endif
 

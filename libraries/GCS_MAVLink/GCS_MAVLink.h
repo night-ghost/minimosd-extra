@@ -6,10 +6,14 @@
 #ifndef GCS_MAVLink_h
 #define GCS_MAVLink_h
 
-#define HardwareSerial_h
-#include "../SingleSerial/BetterStream.h"
+//#define HardwareSerial_h
+#include "../SingleSerial/SingleSerial.h"
 
 #include "compat.h"
+
+#include "Arduino.h"
+
+extern SingleSerial Serial;
 
 // we have separate helpers disabled to make it possible
 // to select MAVLink 1.0 in the arduino GUI build
@@ -54,7 +58,8 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 		break;
 	}
 #else
-		mavlink_comm_0_port->write(ch);
+	//mavlink_comm_0_port->write(ch);
+	Serial.write_S(ch);
 #endif
 }
 
@@ -80,7 +85,8 @@ static inline uint8_t comm_receive_ch(mavlink_channel_t chan)
 	}
     return data;
 #else
-    return mavlink_comm_0_port->read();
+    //return mavlink_comm_0_port->read();
+    return Serial.read_S();
 #endif
 }
 
@@ -104,7 +110,8 @@ static inline uint16_t comm_get_available(mavlink_channel_t chan)
 	}
     return bytes;
 #else
-	return mavlink_comm_0_port->available();
+	//return mavlink_comm_0_port->available();
+	return Serial.available_S();
 #endif
 }
 

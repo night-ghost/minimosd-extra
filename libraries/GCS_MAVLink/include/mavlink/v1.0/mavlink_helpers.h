@@ -95,7 +95,7 @@ MAVLINK_HELPER uint16_t mavlink_finalize_message(mavlink_message_t* msg, uint8_t
 #endif
 
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
-MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, uint16_t len);
+MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, uint8_t len);
 
 /**
  * @brief Finalize a MAVLink message with channel assignment and send
@@ -539,7 +539,7 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 }
  */
 
-MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, uint16_t len)
+MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, uint8_t len)
 {
 #ifdef MAVLINK_SEND_UART_BYTES
 	/* this is the more efficient approach, if the platform
@@ -547,7 +547,7 @@ MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, 
 	MAVLINK_SEND_UART_BYTES(chan, (uint8_t *)buf, len);
 #else
 	/* fallback to one byte at a time */
-	uint16_t i;
+	uint8_t i;
 	for (i = 0; i < len; i++) {
 		comm_send_ch(chan, (uint8_t)buf[i]);
 	}

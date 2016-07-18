@@ -245,14 +245,6 @@ struct loc_flags {
     bool flag_05s:1; // sets each 0.5s for setup
     bool flag_01s:1;
 
-    bool flgSensor1:1;
-    bool flgSensor2:1;
-    bool flgSensor3:1;
-    bool flgSensor4:1;
-
-    bool fPulseSensor3:1;
-    bool fPulseSensor4:1;
-
     bool show_screnN:4;
     bool gps_active:1; // было что-то с GPS
     bool vs_ms:1; // vertical speed in m/s;
@@ -266,6 +258,7 @@ struct loc_flags {
     uint8_t mav_data_frozen;
     uint8_t mav_stream_overload;
 };
+
 
 #ifdef DEBUG
 uint16_t packet_drops = 0; // used only in debug
@@ -283,7 +276,7 @@ volatile uint16_t stack_bottom=0xffff; // check for stack size in interrupts
 
 byte skip_inc=0;
 
-struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
@@ -300,9 +293,14 @@ byte PWM_out_pin=0;
 //#if defined(USE_SENSORS)
 unsigned int sensorData[4] = {0,0,0,0};
 //#endif
+#if defined(USE_SENSORS)
+byte flgSensor[4]={0,0,0,0};
+byte fPulseSensor[4]={0,0,0,0};
+#endif
 
 uint8_t fdata_screen=0;
 
+float tmp_f; // temp float to get rid  of stack usage
 
 // Setup screen 
 

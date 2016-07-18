@@ -4,7 +4,7 @@ An Open Source Arduino based OSD and Camera Control project.
 
 Program  : Minim-OSD 
 
-Version  : V8.51, 09 june 2016
+Version  : V8.68, 14 jule 2016
 
 based on: minimOSD-extra by Sandro Benigno
 Coauthor(s):
@@ -98,9 +98,11 @@ SingleSerialPort(Serial);
 // program parts
 #include "adc_setup.h"
 #include "Config_Func.h"
-#include "Func.h"
 
 #include "protocols.h"
+
+#include "Func.h"
+
 
 #if defined(USE_UAVTALK)
 #include "protocols/UAVTalk_core.h"
@@ -131,18 +133,22 @@ extern BetterStream *mavlink_comm_0_port;
 
 /* **********************************************/
 
-volatile byte nested=0;
-volatile byte nest_count=0;
+volatile byte nested=0; 
+#if defined(DEBUG)
+volatile byte nest_count=0; // mostly for debugging
+#endif
 
 // обработка прерывания по кадровому синхроимпульсу
 //void isr_VSYNC(){
 ISR(INT0_vect) {
-    vsync_wait=0;	// единственное что нам надо - отметить его наличие
+    vsync_wait=0;	// отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
 
-    if(nested) {
-       nest_count++;
+    if(nested) {	// вложенное прерывание игнорируем
+#if defined(DEBUG)
+       nest_count++;	// ... но запишем в тетрадочку
+#endif
     } else {
         if(update_stat) { // there is data for screen
     	    nested++;
@@ -215,7 +221,7 @@ static NOINLINE void logo(){
 
     if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
         OSD::setPanel(1,1);
-        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) /* "|vers %x sets %x"*/ ), sets.CHK1_VERSION); 
+        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
     }
 
     delay_150();
@@ -234,12 +240,12 @@ void setup()     {
 #endif
     Serial.begin(TELEMETRY_SPEED);
 
-    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
+//    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
     // Get correct settings from EEPROM
     readSettings();
 
-    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
+//    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
 
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
@@ -295,11 +301,11 @@ void setup()     {
     }
 
 
-    static const int PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
+    static const byte PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
 
     if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
 
-	PWM_out_pin = pgm_read_word(&alt_pins[sets.pwm_dst-1]);
+	PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
 
 	if(PWM_out_pin) {
 	    pinMode(PWM_out_pin,  OUTPUT);
@@ -337,19 +343,8 @@ void setup()     {
     delay(10000); 
 */
 
-/*
-    OSD::setPanel(0,0);
-
-    osd.printf_P(PSTR("sets.pwm_src=%d sets.pwm_dst=%d pin=%d VoltagePin=%d"),sets.pwm_src, sets.pwm_dst, PWM_out_pin, VoltagePin);
-//    hex_dump((byte *)alt_pins, 8);
-
-    OSD::update();
-    delay(10000); 
-*/    
 #endif
 
-
-//Serial.printf_P(PSTR("osd pitch=%d roll=%d\n"), osd_att.pitch, osd_att.roll ); Serial.wait();
 
 } // END of setup();
 
@@ -421,8 +416,9 @@ void loop()
         lflags.got_data=0; // данные обработаны
     }
 
-    if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания
+    if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания дабы успеть закончить расчет к следующему
         lflags.need_redraw=0; // экран перерисован
+
         setHomeVars();   // calculate and set Distance from home and Direction to home
 
         setFdataVars();  // накопление статистики и рекордов
@@ -528,10 +524,10 @@ void loop()
 }
 
 #if defined(USE_SENSORS)
- #define SENSOR1_ON lflags.flgSensor1
- #define SENSOR2_ON lflags.flgSensor2
- #define SENSOR3_ON lflags.flgSensor3
- #define SENSOR4_ON lflags.flgSensor4
+ #define SENSOR1_ON flgSensor[0]
+ #define SENSOR2_ON flgSensor[1]
+ #define SENSOR3_ON flgSensor[2]
+ #define SENSOR4_ON flgSensor[3]
 #else
  #define SENSOR1_ON 0
  #define SENSOR2_ON 0
@@ -553,8 +549,6 @@ float avgRSSI(uint16_t d){
 
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
-
-//Serial.printf_P(PSTR("on100ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 
     if(flags.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = -1;
@@ -627,7 +621,7 @@ void On100ms(){ // периодические события, не связан�
 	uint16_t d;
 
 #if defined(USE_SENSORS)
-	if(lflags.fPulseSensor3)
+	if(fPulseSensor[2])
 	    d=pulseIn(AmperagePin,HIGH,10000);
 	else
 #endif
@@ -687,7 +681,7 @@ case_4:
 	    uint16_t d;
 
 	    if(SENSOR4_ON) {
-		if(lflags.fPulseSensor4)
+		if(fPulseSensor[3])
 		    d=pulseIn(RssiPin,HIGH,10000);
 		else
 		    d=analogRead(RssiPin);
