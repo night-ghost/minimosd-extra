@@ -70,13 +70,13 @@ OPT += -mcall-prologues
 #OPT +=  -Wl,--relax 
 # OPT += -maccumulate-args #bad
 # OPT += -mbranch-cost=1  #bad
-OPT += -flto -fuse-linker-plugin
+#OPT += -flto -fuse-linker-plugin
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
 CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -Wl,--relax -felide-constructors -std=c++0x
 CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
-LDFLAGS = -Wl,--relax
+#LDFLAGS = -Wl,--relax
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref
 MCU=atmega328p
 ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
