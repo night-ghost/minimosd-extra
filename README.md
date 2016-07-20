@@ -338,6 +338,9 @@ v868
 v869
 * support for copter's Brake and Throw modes
 
+v870
+* unknown new modes shown as numbers but not as screen garbage
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -705,6 +708,8 @@ v868
 v869
 * поддержка режимов коптера Brake и Throw 
 
+v870
+* неизвестные режимы показываются номером а не мусором на экране
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

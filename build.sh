@@ -11,7 +11,7 @@ version(){
 VERS=`version`
 
 make_one(){
-PROTO=$1
+    PROTO=$1
 
     make -C $SRC PROTO="-DUSE_${PROTO}=1"
     [ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.${VERS}DV-${PROTO}-release.hex && rm -rf $BUILD

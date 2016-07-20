@@ -1797,16 +1797,19 @@ static void panFlightMode(point p){
 
     //PGM_P mode_str;
     const char * const *ptr;
+    byte len;
     
 #if defined(USE_UAVTALK)
     if(lflags.uavtalk_active) {
 	ptr = mode_u_strings;
+	len = sizeof(mode_u_strings)/sizeof(char *);
     } else 
 #endif
 
 #if defined(USE_MWII)
     if(lflags.mwii_active) {
 	ptr = mode_mw_strings;
+	len = sizeof(mode_mw_strings)/sizeof(char *);
     } else 
 #endif
 
@@ -1822,28 +1825,37 @@ static void panFlightMode(point p){
 
 	    osd_mode = bc;
 	    ptr = mode_aq_strings;
+	    len = sizeof(mode_aq_strings)/sizeof(char *);
 	} else {
 
 #ifdef IS_COPTER
  #ifdef IS_PLANE
             if(sets.model_type==0) {
                 ptr = mode_p_strings;
+                len = sizeof(mode_p_strings)/sizeof(char *);
             } else {
                 ptr = mode_c_strings;
+                len = sizeof(mode_c_strings)/sizeof(char *);
             }
 
  #else
             ptr = mode_c_strings;
+            len = sizeof(mode_c_strings)/sizeof(char *);
  #endif    
 #else
  #ifdef IS_PLANE
             ptr = mode_p_strings;
+            len = sizeof(mode_p_strings)/sizeof(char *);
  #endif    
 #endif
         }
     }
     
-    PGM_P str=(PGM_P)pgm_read_word(&ptr[osd_mode]);
+    PGM_P str;
+    if(osd_mode >= len) {
+	str=s_mode_n;
+    } else
+	str=(PGM_P)pgm_read_word(&ptr[osd_mode]);
 
     osd_printi_1(str,osd_mode);
     
