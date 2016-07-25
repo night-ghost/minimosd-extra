@@ -341,6 +341,9 @@ v869
 v870
 * unknown new modes shown as numbers but not as screen garbage
 
+v871
+* fixed fly time
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -710,6 +713,10 @@ v869
 
 v870
 * неизвестные режимы показываются номером а не мусором на экране
+
+v871
+* исправлено время полета
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

@@ -33,6 +33,7 @@ Project received Donations from:
  Aleksandr Starostin
  Михаил Павлов
  Jimmy Alexander Castro Sanchez
+ Damien Bellet
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -345,6 +346,7 @@ void setup()     {
 
 #endif
 
+    total_flight_time_milis=0; // memory somewhere gets corrupted :(
 
 } // END of setup();
 
@@ -706,8 +708,6 @@ case_4:
 void On20ms(){ // 50Hz
 
     if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
-//Serial.printf_P(PSTR("on20ms pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
 	int pwm=chan_raw[sets.pwm_src-1 + 5];
 	
         uint8_t bit = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
@@ -725,8 +725,6 @@ void On20ms(){ // 50Hz
 	interrupts();
 
     }
-
-//Serial.printf_P(PSTR("on20ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
 }
 
 
