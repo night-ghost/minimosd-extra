@@ -520,6 +520,23 @@ void NOINLINE delay_byte(){
 }
 
 
+uint32_t getBaudRate(byte pulse){
+    uint32_t speed;
+
+    byte rate;
+    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
+    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
+    else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
+    else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
+    else if(pulse < 60) 	{ speed =  19200; rate = 16; }
+    else if(pulse < 150)	{ speed =   9600; rate = 32; }
+    else                        { speed =   4800; rate = 64; }
+
+    stream_rate = rate;
+
+    return speed;
+}
+
 
 // чтение пакетов нужного протокола
 static void getData(){
@@ -573,15 +590,15 @@ static void getData(){
 	        }
 	    }
 	    
-	    long speed;
-	    
 	    if(pulse == 255)    pulse = last_pulse; // no input at all - use last
 	    else                last_pulse = pulse; // remember last correct time
 	
 	// F_CPU   / BAUD for 115200 is 138
 	// 1000000 / BAUD for 115200 is 8.68uS
 	//  so I has no idea about pulse times - thease simply measured
-	
+
+	    long speed;
+
 	    byte rate;
 	    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
 	    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
@@ -596,6 +613,7 @@ static void getData(){
 	    OSD::setPanel(3,2);
 	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
+	    serial_speed=speed; // store detected port speed for show
 	    Serial.flush();	// clear serial buffer from garbage
 	    Serial.begin(speed);
 	    } break;

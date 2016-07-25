@@ -344,6 +344,9 @@ v870
 v871
 * fixed fly time
 
+v872
+* added detected port speed to "no data" screen
+
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -716,6 +719,9 @@ v870
 
 v871
 * исправлено время полета
+
+v872
+* добавлено отображение определенной скорости порта
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

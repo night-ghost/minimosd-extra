@@ -369,8 +369,9 @@ byte NOINLINE radar_char(){
     static const byte arr[] PROGMEM = {0xb0, 0xb1, 0xb4, 0xb5, 0xb6, 0xb7, 0x7b, 0x7d };
 
 //    int index = (int)((osd_heading + 22.5) / 45.0);
-    int index = (2*osd_heading + 45) / 90;
-    index = index > 7 ? 0 : index;
+    int index = (2 * osd_heading + 45) / 90;
+    while(index<0)  index+=8;
+    while(index>=8) index-=8;
     
     return pgm_read_byte(&arr[index]);
 }
@@ -1341,6 +1342,8 @@ static void panFdata(point p){ // итоги полета
     osd_nl();
     print_list(fd);
 
+    OSD::setPanel(p.x + 11,p.y);
+
     print_gps(gps_f6,'|');
 }
 
@@ -1423,8 +1426,12 @@ static void panWaitMAVBeats(){
 #endif
 
     OSD::setPanel(5,3);
-    osd_printi_1(PSTR("No input data! %u"),seconds - lastMavSeconds);
+    osd_printi_1(PSTR("No input data! %u|"),seconds - lastMavSeconds);
 //    osd_printi_xy({5,3},PSTR("No input data! %d"),seconds - lastMavSeconds);
+
+#if defined(AUTOBAUD)
+    osd.print(serial_speed); // detected port speed
+#endif
 
 #if defined(DEBUG)
     extern uint16_t packet_drops;

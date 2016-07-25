@@ -216,6 +216,10 @@ byte mav_msg_shift=0;
 
 volatile byte update_stat=0;
 
+#if defined(AUTOBAUD)
+uint32_t serial_speed=57600; // detected port speed
+#endif
+
 struct loc_flags {
 //    bool update_stat:1; 		// есть данные для показа
     bool got_data;		// флаг получения пакета
