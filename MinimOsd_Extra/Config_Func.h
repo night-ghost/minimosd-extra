@@ -39,8 +39,8 @@ byte get_alt_num(point p){
 
 // чтение и запись мелких объектов
 static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
-    for(;l!=0; l--, e++) {
-	*p++ = (byte)eeprom_read_byte( (byte *)e );
+    for(;l!=0; l--) {
+	*p++ = (byte)eeprom_read_byte( (byte *)e++ );
     }
 }
 
@@ -51,11 +51,11 @@ static NOINLINE void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
 }
 
 static void readSettings() {
-    eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
+//    eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
     eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
 // сразу настроим системы измерения
-    measure = flags.measure ? &imper :  &metr;
+    measure = sets.flags.flags.measure ? &imper :  &metr;
 
 }
 

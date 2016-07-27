@@ -5,8 +5,7 @@
 
 #pragma pack(push,1)
 
- Flags flags; // битовые флаги из EEPROM
- Settings sets;	// настройки из EEPROM
+Settings sets;	// настройки из EEPROM
 
 
 static byte max7456_err_count=0;
@@ -285,6 +284,8 @@ struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
 volatile static uint8_t vsync_count=0;
+
+uint16_t screen_flags;
 
 #ifdef PWM_PIN
 volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value

@@ -111,7 +111,7 @@ static void pan_toggle(){
           panelN = n;
         }
       } else{ 			 //Rotation switch
-        if(flags.chkSwitchOnce) { // once at 1 -> 0
+        if(sets.flags.flags.chkSwitchOnce) { // once at 1 -> 0
             if (ch_raw > 1200 && ch_raw < 3000) { // in valid HIGH range
                 lflags.last_sw_ch = 1;
             } else { // выключено
@@ -154,6 +154,14 @@ DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 	
 	//extern void reset_setup_data();
 	reset_setup_data();
+	
+	union {
+	    point p;
+	    uint16_t i;
+	} upi;
+	
+	upi.p = readPanel(0); // read flags for new screen
+	screen_flags = upi.i;
 
 #ifdef USE_AUTOSWITCH
        if( lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 

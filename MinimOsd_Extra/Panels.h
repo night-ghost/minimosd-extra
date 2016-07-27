@@ -145,7 +145,6 @@ static void NOINLINE showArrow(uint8_t rotate_arrow){
 static void showHorizon(byte start_col, byte start_row) {
     byte col, row;
 
-    int roll;
     byte line_set = LINE_SET_STRAIGHT__;
     byte line_set_overflow = LINE_SET_STRAIGHT_O;
     int8_t subval_overflow = 9;
@@ -164,9 +163,10 @@ static void showHorizon(byte start_col, byte start_row) {
 
 
     // preset the line char attributes
-    roll = osd_att.roll;
+    int  roll = osd_att.roll;
+    if(screen_flags & scrFlg_russianHUD) roll = -roll;
 
-    if(flags.russian_HUD) roll = -roll;
+    int iroll  = roll; // for tangens later
 
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
 	roll = roll < 0 ? roll + 179 : roll;
@@ -226,9 +226,7 @@ static void showHorizon(byte start_col, byte start_row) {
         int8_t middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
         
         // tg(72 gr) ==3 so byte overflows
-        int iroll  = osd_att.roll;
-        if(flags.russian_HUD)
-            iroll  = -iroll;
+
         int16_t hit = (int)(tan(AH_ROLL_FACTOR * iroll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
@@ -1075,10 +1073,10 @@ static void panBatt_A(point p){
 
 static void panBatt_B(point p){
     if(is_on(p)) {
-	flags.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
+	sets.flags.flags.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
         printVolt(osd_vbat_B);
     } else
-        flags.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
+        sets.flags.flags.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
 
 

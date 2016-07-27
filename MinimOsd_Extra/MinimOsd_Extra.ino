@@ -84,7 +84,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 
-#include "ArduCam_Max7456.h"
+#include "OSD_Max7456.h"
 #include "Vars.h"
 
 #include "prototypes.h"
@@ -551,7 +551,7 @@ byte NOINLINE normalize_voltage(int v){
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
-    if(flags.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
+    if(sets.flags.flags.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = -1;
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
@@ -564,7 +564,7 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[0] =  (sensorData[0]*7 + voltageRaw) /8;
 #endif
-        if( flags.useExtVbattA ) {
+        if( sets.flags.flags.useExtVbattA ) {
         
             voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
@@ -583,9 +583,9 @@ void On100ms(){ // периодические события, не связан�
     }
 
 // flag useExtVbattB not used - will se to panel BattB
-//    if(flags.useExtVbattB){ //аналоговый ввод - напряжение видео
+//    if(sets.flags.flags.useExtVbattB){ //аналоговый ввод - напряжение видео
 
-    if(flags.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
+    if(sets.flags.flags.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
@@ -597,7 +597,7 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[1] = (sensorData[1]*7 + voltageRaw) /8;
 #endif
-	if(flags.useExtVbattB){
+	if(sets.flags.flags.useExtVbattB){
             voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
@@ -616,7 +616,7 @@ void On100ms(){ // периодические события, не связан�
 	}
     }
 
-    if(flags.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
+    if(sets.flags.flags.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
         static uint8_t ind = -1;
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
@@ -635,7 +635,7 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[2] = (sensorData[2]*7 + currentRaw) /8;
 #endif
-        if(flags.useExtCurr) {
+        if(sets.flags.flags.useExtCurr) {
             currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	    if(osd_curr_A ==0) osd_curr_A = currentRaw;

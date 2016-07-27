@@ -352,6 +352,9 @@ v873
 * coordinates in Flight Data panel can be shown in 2nd column
 * added ability to show "%" sign for RSSI
 
+v874
+* fixed Russian HUD flag now working
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -732,6 +735,8 @@ v873
 * координаты в панели результатов полета "Flight Data" могут отображаться второй колонкой
 * добавлена возможность отображать знак "%" для RSSI
 
+v874
+* починена работа флагов Russian HUD 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

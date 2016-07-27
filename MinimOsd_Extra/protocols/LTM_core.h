@@ -108,7 +108,7 @@ static void ltm_check() {
 	}break;
 	
     case LIGHTTELEMETRY_SFRAME: {
-        if(!flags.useExtVbattA){
+        if(!sets.flags.flags.useExtVbattA){
             osd_vbat_A = ltm_read_uint(offsetof(LTM_S, volt) );
             osd_battery_remaining_A = ltm_read_uint(offsetof(LTM_S, batUsedCapacity) );
         }

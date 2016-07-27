@@ -29,7 +29,7 @@ typedef struct Point point;
 
 
 // Экранные флаги
-#define scrFlg_russianHUD = (1<<0);
+#define scrFlg_russianHUD  (1<<0)
 
 // данные одного экрана
 struct Panel {
@@ -122,6 +122,8 @@ union _Flags {
 
 // общие настройки
 struct Settings {
+    _Flags flags; // 4 байта флагов
+
     byte model_type; // 0 - plane 1-copter
 
     byte ch_toggle; //  2 - ext PWM!
@@ -181,7 +183,7 @@ struct Settings {
 
 union _Settings {
     Settings sets;
-    byte _pad[128-4]; // место под расширение Settings, за вычетом флагов 
+    byte _pad[128]; // место под расширение Settings, за вычетом флагов 
 };
 
 
@@ -211,7 +213,6 @@ struct Eeprom {
     _Panel panels[4]; // сначала 4 экрана по 128 байт (64 панели возможно), читаются индивидуальные точки по мере необходимости
 
 // 512
-    _Flags flags; // 4 байта флагов
     
     _Settings sets; // и до 124 байт EEPROM под остальные настройки, считываемые в RAM при инициализации
     _SensorInfo sensors; // не считываемые настройки - читаются по необходимости

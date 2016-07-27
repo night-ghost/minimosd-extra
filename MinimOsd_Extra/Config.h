@@ -15,13 +15,13 @@
 //#define DEBUG
 #define STARTUP_SCREEN 0
 #define AUTOBAUD 1
-#define SHOW_FONT 1
+//#define SHOW_FONT 1
 #define USE_SENSORS 1
 #define MAVLINK_CONFIG 1
 
 
 #define MAV_REQUEST 1
-#define USE_MAVLINK 1
+//#define USE_MAVLINK 1
 //#define USE_UAVTALK 1
 //#define USE_MWII 1
 //#define USE_LTM 1
