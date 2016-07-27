@@ -21,7 +21,7 @@
 
 
 #define MAV_REQUEST 1
-//#define USE_MAVLINK 1
+#define USE_MAVLINK 1
 //#define USE_UAVTALK 1
 //#define USE_MWII 1
 //#define USE_LTM 1

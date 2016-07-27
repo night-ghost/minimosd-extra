@@ -21,10 +21,10 @@ version 2.1 of the License, or (at your option) any later version.
 #include <GCS_MAVLink.h>
 
 
-BetterStream	*mavlink_comm_0_port;
-BetterStream	*mavlink_comm_1_port;
+extern BetterStream	*mavlink_comm_0_port;
+//BetterStream	*mavlink_comm_1_port;
 
-mavlink_system_t mavlink_system = {12,1}; //modified
+extern mavlink_system_t mavlink_system = {12,1}; //modified
 
 uint8_t mavlink_check_target(uint8_t sysid, uint8_t compid)
 {

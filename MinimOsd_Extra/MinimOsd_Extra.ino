@@ -120,7 +120,8 @@ SingleSerialPort(Serial);
 
 #if defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
-extern BetterStream *mavlink_comm_0_port;
+BetterStream *mavlink_comm_0_port;
+mavlink_system_t mavlink_system = {12,1}; 
 #endif
 
 #include "Font.h"
@@ -210,7 +211,7 @@ ISR(INT1_vect) {
 
 
 
-static NOINLINE void logo(){
+NOINLINE void logo(){
     OSD::setPanel(5, 5);
     osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV|"), RELEASE_NUM);
 
