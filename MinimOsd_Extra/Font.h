@@ -65,6 +65,21 @@ static void uploadFont() {
     }
     Serial.print_P(PSTR("FD\n"));
 
+#if defined(SHOW_FONT) && 0
+    byte n=0;
+    OSD::setPanel(0, 0);
+
+    for(byte j=16; j!=0; j--) { // show full font
+        for(byte i=16; i!=0; i--)   {
+              osd.write_raw((byte)(n));
+              n++;
+        }
+        osd.write('|');
+    }
+
+    osd.update();
+#endif
+
 }
 
 

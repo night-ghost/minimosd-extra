@@ -254,10 +254,6 @@ static float NOINLINE diff_coord(float &c1, float &c2){
 }
 
 
-/*int grad_to_sect(float grad){
-    return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
-}*/
-
 static float /* NOINLINE */ distance(float x, float y){
     return sqrt(sq(x) + sq(y));
 }
@@ -323,9 +319,7 @@ static void setHomeVars()
     } else if(lflags.osd_got_home){
 	{
             float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
-
             //DST to Home
-
 //	        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
 //	        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
             dstlat = diff_coord(osd_home.lat, osd_pos.lat);
@@ -333,7 +327,7 @@ static void setHomeVars()
         }
         //osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
         osd_home_distance = distance(dstlat, dstlon);
-	dst_x=(int)fabs(dstlat);
+	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
 	dst_y=(int)fabs(dstlon);
 
         { //DIR to Home
@@ -467,7 +461,7 @@ void setFdataVars()
  #ifdef IS_PLANE
   if (lflags.in_air){
  #else
-    if(0){
+    if(0){ // neither copter nor plane
  #endif
 #endif
 
@@ -519,23 +513,6 @@ void NOINLINE delay_byte(){
         delay_telem();
 }
 
-
-uint32_t getBaudRate(byte pulse){
-    uint32_t speed;
-
-    byte rate;
-    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
-    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
-    else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
-    else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
-    else if(pulse < 60) 	{ speed =  19200; rate = 16; }
-    else if(pulse < 150)	{ speed =   9600; rate = 32; }
-    else                        { speed =   4800; rate = 64; }
-
-    stream_rate = rate;
-
-    return speed;
-}
 
 
 // чтение пакетов нужного протокола
@@ -598,7 +575,6 @@ static void getData(){
 	//  so I has no idea about pulse times - thease simply measured
 
 	    long speed;
-
 	    byte rate;
 	    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
 	    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
@@ -624,46 +600,27 @@ static void getData(){
 	case 2:
 	    extern bool uavtalk_read(void);
 	    uavtalk_read();
-//	    proto= PSTR("UAVTalk");
 	    break;
 #endif
 #if defined(USE_MWII)
 	case 3:
 	    extern bool mwii_read(void);
 	    mwii_read();
-//		proto= PSTR("MWII");
 	    break;
 #endif
 #if defined(USE_LTM)
 	case 4:
 	    extern void read_ltm(void);
 	    read_ltm();
-//	    proto= PSTR("LTM");
 	    break;
 #endif
 	default: // 0 and all not used
 #if defined(USE_MAVLINK)
 	    read_mavlink();
 #endif
-//	    proto= PSTR("MAVLink");
 	    break;
 	}
 	
-/*
-       if(lflags.got_data) {
-            // strcpy_P((char *)mav_message,msg); 10 bytes more
-
-            byte *wp;
-            byte len;
-            for( len=0, wp=mav_message;;len++){
-                byte c=pgm_read_byte(proto++);
-                *wp++ = c;
-                if(c==0) break;
-                len++;
-            }
-            mav_message_start(len,6); // len, time
-       }
-*/
     }
 
 }

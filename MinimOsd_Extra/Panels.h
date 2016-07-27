@@ -53,7 +53,7 @@ static void NOINLINE printTime(uint16_t t, byte blink){
 //    osd.printf_P(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
     osd_printi_1(PSTR("%3i"),((uint16_t)t/60));
     osd.write_S( (blink && lflags.blinker)?0x20:0x3a);
-    osd_printi_1(PSTR("%02i"), (uint16_t)t%60);
+    osd_printi_1(PSTR("%02i|"), (uint16_t)t%60);
 }
 
 static void NOINLINE printTime(int t){
@@ -67,28 +67,17 @@ static void NOINLINE printTimeCnv(uint32_t *t, byte blink){
 
 
 static void printSpeed(PGM_P fmt, float s, byte alt){
-    float k;
     byte c;
     
     if(alt){
-	k=3.6;
+	s = s /3.6;
 	c=0x18;
     } else {
-	k=1;
 	c=pgm_read_byte(&measure->spe);
     }
-    osd_printf_2(fmt,s/k,c);
+    osd_printf_2(fmt,s,c);
 
 }
-/*static NOINLINE void printSpeed(float f, byte alt){
-    printSpeed(PSTR("%3.0f"), f, alt);
-}*/
-/*static NOINLINE void printSpeed(float f){
-    printSpeed(f, false);
-}*/
-
-
-
 
 static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
     printSpeed(fmt, *s * get_converts(), alt);
@@ -96,12 +85,6 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
 static void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(PSTR("%3.0f"), s, alt);
 }
-/*static NOINLINE void printSpeedCnv(float *s){
-    printSpeedCnv(s, false);
-}*/
-
-
-
 
 
 // ---------------- EXTRA FUNCTIONS ----------------------
@@ -613,6 +596,8 @@ static void panEff(point p){
 static void panRSSI(point p){
 
     osd_printi_1(PSTR("%3i"), rssi);
+    if(!(sets.RSSI_raw%2) && is_alt(p))
+	osd.write_S('%');
 }
 
 /* **************************************************************** */
@@ -1321,6 +1306,7 @@ static void panFdata(point p){ // итоги полета
 	{0}
     };
 
+
     OSD::write_xy(p.x, p.y, 0x08); // this is absolutely needed!
 
     printTimeCnv(&total_flight_time_milis, 0);
@@ -1339,10 +1325,12 @@ static void panFdata(point p){ // итоги полета
 //*/
 
 
-    osd_nl();
+//    osd_nl();
     print_list(fd);
 
-    OSD::setPanel(p.x + 11,p.y);
+    if(is_alt(p)) {
+        OSD::setPanel(p.x + 10,p.y);
+    }
 
     print_gps(gps_f6,'|');
 }
@@ -1430,7 +1418,8 @@ static void panWaitMAVBeats(){
 //    osd_printi_xy({5,3},PSTR("No input data! %d"),seconds - lastMavSeconds);
 
 #if defined(AUTOBAUD)
-    osd.print(serial_speed); // detected port speed
+    if(serial_speed)
+        osd.print(serial_speed); // detected port speed
 #endif
 
 #if defined(DEBUG)
@@ -1450,7 +1439,7 @@ static void panWaitMAVBeats(){
     
     lflags.input_active=0;
 #else
-    panFdata({3,5});
+    panFdata(do_alt({3,5}));
 #endif
 }
 

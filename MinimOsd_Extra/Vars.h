@@ -217,7 +217,7 @@ byte mav_msg_shift=0;
 volatile byte update_stat=0;
 
 #if defined(AUTOBAUD)
-uint32_t serial_speed=57600; // detected port speed
+uint32_t serial_speed=0; // detected port speed
 #endif
 
 struct loc_flags {
@@ -292,7 +292,9 @@ volatile uint16_t      PWM_IN=0;              // Value to hold PWM signal width.
 volatile unsigned long int_Timer = 0;         // set in the INT1
 #endif
 
-byte PWM_out_pin=0;
+//byte   PWM_out_pin=0;
+         byte   PWM_out_bit=0;
+volatile byte * PWM_out_port=0;
 
 //#if defined(USE_SENSORS)
 unsigned int sensorData[4] = {0,0,0,0};

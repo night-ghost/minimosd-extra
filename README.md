@@ -347,6 +347,10 @@ v871
 v872
 * added detected port speed to "no data" screen
 
+v873
+* 'Russian HUD' flag moved to per-screen flags
+* coordinates in Flight Data panel can be shown in 2nd column
+* added ability to show "%" sign for RSSI
 
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
@@ -722,6 +726,11 @@ v871
 
 v872
 * добавлено отображение определенной скорости порта
+
+v873
+* флаг 'Russian HUD' сделан независимым по экранам
+* координаты в панели результатов полета "Flight Data" могут отображаться второй колонкой
+* добавлена возможность отображать знак "%" для RSSI
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

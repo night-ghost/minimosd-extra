@@ -28,11 +28,14 @@ typedef struct Point point;
 
 
 
-// 
+// Экранные флаги
+#define scrFlg_russianHUD = (1<<0);
 
 // данные одного экрана
 struct Panel {
-    point center; 	// #define panCenter_XY = 0;
+//    point center; 	// #define panCenter_XY = 0; not used
+    uint16_t screen_flags; // 0  дополнительные флаги панелей, не влезшие в доп биты самой панели. Пока надо только 1 для горизонта но для соблюдения размера 16 бит
+
     point pitch;  	// #define panPitch_XY = 2;
     point roll;	  	// #define panRoll_XY = 4;
     point batt_A; 	// #define panBatt_A_XY = 6;

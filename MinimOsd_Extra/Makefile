@@ -74,9 +74,9 @@ OPT += -mcall-prologues
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
-CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -Wl,--relax -felide-constructors -std=c++0x
-CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT)  -Wl,--relax
-LDFLAGS = -Wl,--relax
+CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x
+CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
+LDFLAGS = $(OPT) 
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref
 MCU=atmega328p
 ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so

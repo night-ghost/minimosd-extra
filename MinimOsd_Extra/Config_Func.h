@@ -16,6 +16,11 @@ static boolean inline is_alt(point p){
     return (p.y & 0x40);
 }
 
+static point inline do_alt(point p){
+    p.y |= 0x40;
+    return p;
+}
+
 static boolean inline is_alt2(point p){
     return (p.y & 0x20);
 }

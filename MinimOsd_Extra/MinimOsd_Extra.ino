@@ -34,6 +34,7 @@ Project received Donations from:
  Михаил Павлов
  Jimmy Alexander Castro Sanchez
  Damien Bellet
+ Dmitry Yatsenko
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -182,9 +183,7 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
         // PWM Signal is HIGH, so measure it's length.
         int_Timer = time;
 
-    } else {
-
-        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
+    } else {        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
         uint32_t t= int_Timer; 
         if( t /* && !New_PWM_Frame */){
     	    time -= t;
@@ -282,11 +281,6 @@ void setup()     {
     sei();
 
 
-#ifdef DEBUG
-//    Serial.printf_P(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV"), RELEASE_NUM);
-#endif
-
-
 
     
 #define REL_1 int(RELEASE_NUM/100)
@@ -306,15 +300,15 @@ void setup()     {
 
     if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
 
-	PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
+	byte PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
 
-	if(PWM_out_pin) {
-	    pinMode(PWM_out_pin,  OUTPUT);
-	    digitalWrite(PWM_out_pin, 0);
-	}
+	pinMode(PWM_out_pin,  OUTPUT);
+	digitalWrite(PWM_out_pin, 0);
+
+        uint8_t port = digitalPinToPort(PWM_out_pin);
+        PWM_out_bit  = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
+        PWM_out_port = portOutputRegister(port);
     }
-
-//    panelN = 0; //set panel to 0 to start in the first navigation screen
 
     osd.init();    // Start 
 
@@ -365,7 +359,6 @@ void loop()
     wdt_reset();
 
     pt=millis();     //millis_plus(&pt, 0); much larger
-
 
     seconds = pt / 1000;
     
@@ -491,7 +484,7 @@ void loop()
                 if(max7456_err_count>3) { // 3 seconds no sync
 #ifdef DEBUG   
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
-        serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
+//        serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
 #endif
                     osd.hw_init();    // restart MAX7456
@@ -549,6 +542,11 @@ float avgRSSI(uint16_t d){
     return d/8.0;
 }
 
+byte NOINLINE normalize_voltage(int v){
+    if(v<0)        return 0;
+    else if(v>255) return 255;
+    else           return (byte)v;
+}
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
@@ -576,9 +574,10 @@ void On100ms(){ // периодические события, не связан�
 	     //             voltage above limit in 0.1              max voltage above limit
 	    int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
 	
-	    if(v<0)        osd_battery_remaining_A  = 0;
-	    else if(v>255) osd_battery_remaining_A  = 255;
-	    else           osd_battery_remaining_A  = v;
+	    //if(v<0)        osd_battery_remaining_A  = 0;
+	    //else if(v>255) osd_battery_remaining_A  = 255;
+	    //else           osd_battery_remaining_A  = v;
+	    osd_battery_remaining_A=normalize_voltage(v);
 	}
     }
 
@@ -609,9 +608,10 @@ void On100ms(){ // периодические события, не связан�
 
 	    int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
 
-	    if(v<0)        osd_battery_remaining_B  = 0;
-	    else if(v>255) osd_battery_remaining_B  = 255;
-	    else           osd_battery_remaining_B  = v;
+	//    if(v<0)        osd_battery_remaining_B  = 0;
+	//    else if(v>255) osd_battery_remaining_B  = 255;
+	//    else           osd_battery_remaining_B  = v;
+	    osd_battery_remaining_B=normalize_voltage(v);
 	}
     }
 
@@ -694,29 +694,18 @@ case_4:
 	    break;
 	}
     }
-
-
-// timers
-
-//Serial.printf_P(PSTR("on100ms e pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
-
 }
 
 // loop time can be up to 75ms so 20ms is too optimistic 8)
 // but mean looptime is 8..12ms so...
 void On20ms(){ // 50Hz
 
-    if(PWM_out_pin) { // трансляция PWM на внешний вывод если заданы источник и приемник
+    if(PWM_out_bit) { // трансляция PWM на внешний вывод если заданы источник и приемник
 	int pwm=chan_raw[sets.pwm_src-1 + 5];
 	
-        uint8_t bit = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
-        uint8_t port = digitalPinToPort(PWM_out_pin);
-        volatile uint8_t *out = portOutputRegister(port);
-
 //#define OUT_PORT(val) if (val == LOW) { *out &= ~bit; } else { *out |= bit; }
-#define SET_LOW()   *out &= ~bit
-#define SET_HIGH()  *out |=  bit
+#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
+#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
 
 	noInterrupts();		// pulse widh disabled interrups for accuracy
 	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
