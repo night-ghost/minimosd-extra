@@ -9,8 +9,9 @@ namespace OSD {
 
 		// EEPROM Storage addresses 
 
-		// First of 8 panels
-		const int panCenter_XY = 0;
+		
+		//const int panCenter_XY = 0;  - not used
+        const int screen_flags_XY = 0;
 		const int panPitch_XY = 2;
 		const int panRoll_XY = 4;
 		const int panBatt_A_XY = 6;
@@ -91,6 +92,9 @@ namespace OSD {
         public const int flgHUD                 = 10;
         public const int flgTrack               = 11;
 
+
+        // Экранные флаги
+        public const int scrFlg_russianHUD = 0;
        	
 	}
 }

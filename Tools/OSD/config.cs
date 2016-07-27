@@ -519,6 +519,20 @@ namespace OSD {
             return err; 
         }
 
+        public void setEepromScrFlags(uint16_t val) {
+            const int pan_pos=0; // position of flags
+            eeprom[osd.screen_number * OSD.OffsetBITpanel + pan_pos] = (byte)(val & 0xFF); // x
+            eeprom[osd.screen_number * OSD.OffsetBITpanel + pan_pos + 1] = (byte)(val>>8); // y
+        }
+
+        public uint16_t getEepromScrFlags() {
+            uint16_t val;
+            const int pan_pos = 0; // position of flags
+            val  = (uint16_t)(eeprom[osd.screen_number * OSD.OffsetBITpanel + pan_pos]); // x
+            val |= (uint16_t)(eeprom[osd.screen_number * OSD.OffsetBITpanel + pan_pos + 1] <<8); // y
+            return val;
+        }
+
         public void setEepromXY(Panel pan, bool enabled) {
             int flag =  pan.Altf == 1 ? 0x40 : 0;
             int flag2 = pan.Alt2 == 1 ? 0x20 : 0;
@@ -530,13 +544,13 @@ namespace OSD {
             int y=pan.y & 0x0f;
             int x=pan.x & 0x3f;
 
-            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos] = (byte)(x | fSign | flag4); // x
-            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)((enabled ? y : y | 0x80) | flag | flag2 | flag3); // y
+            eeprom[osd.screen_number * OSD.OffsetBITpanel + pan.pos] = (byte)(x | fSign | flag4); // x
+            eeprom[osd.screen_number * OSD.OffsetBITpanel + pan.pos + 1] = (byte)((enabled ? y : y | 0x80) | flag | flag2 | flag3); // y
         }
 
         public Pos getEepromXY(Panel pan) {
-            return new Pos(eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos],
-                            eeprom[osd.panel_number * OSD.OffsetBITpanel + pan.pos + 1]);
+            return new Pos(eeprom[osd.screen_number * OSD.OffsetBITpanel + pan.pos],
+                            eeprom[osd.screen_number * OSD.OffsetBITpanel + pan.pos + 1]);
         }
 
         public string ReadCharsetVersion() {

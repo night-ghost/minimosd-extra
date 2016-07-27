@@ -19,8 +19,14 @@ using System.Diagnostics;
 
 namespace OSD
 {
-	public class osd_screen
+    using uint32_t = System.UInt32;
+    using uint16_t = System.UInt16;
+    using uint8_t = System.Byte;
+    using int8_t = System.SByte;
+
+    public class osd_screen
 	{
+
 		public Panel[] panelItems; 
         public Panel[] panelItems_default;
 		public System.Windows.Forms.TreeView LIST_items;
@@ -38,6 +44,7 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt2;
         public System.Windows.Forms.CheckBox chkAlt3;
         public System.Windows.Forms.CheckBox chkAlt4;
+        public System.Windows.Forms.CheckBox chkAlt5;
         public System.Windows.Forms.ComboBox cbNumber;
         public System.Windows.Forms.Label labNumber;
         public System.Windows.Forms.Label labStrings;
@@ -50,6 +57,7 @@ namespace OSD
 		
 		private bool mousedown;
 		public bool fReenter=false;
+        public uint16_t screen_flags=0;
 
 		public osd_screen (int num, OSD aosd)
 		{
@@ -75,6 +83,7 @@ namespace OSD
             this.chkAlt2 = new System.Windows.Forms.CheckBox();
             this.chkAlt3 = new System.Windows.Forms.CheckBox();
             this.chkAlt4 = new System.Windows.Forms.CheckBox();
+            this.chkAlt5 = new System.Windows.Forms.CheckBox();
             this.cbNumber = new System.Windows.Forms.ComboBox();
             this.labNumber = new System.Windows.Forms.Label();
             this.labStrings = new System.Windows.Forms.Label();
@@ -132,6 +141,7 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt2);
             this.groupBox.Controls.Add(this.chkAlt3);
             this.groupBox.Controls.Add(this.chkAlt4);
+            this.groupBox.Controls.Add(this.chkAlt5);
             this.groupBox.Controls.Add(this.cbNumber);
             this.groupBox.Controls.Add(this.labNumber);
             this.groupBox.Controls.Add(this.labStrings);
@@ -232,7 +242,7 @@ namespace OSD
             this.chkAlt.Location = new System.Drawing.Point(10, 51);
             this.chkAlt.Name = "chkAlt";
             this.chkAlt.Size = new System.Drawing.Size(137, 17);
-            this.chkAlt.TabIndex = 4;
+            this.chkAlt.TabIndex = 5;
             this.chkAlt.Text = "Alternative mode";
             this.chkAlt.UseVisualStyleBackColor = true;
             this.chkAlt.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
@@ -246,7 +256,7 @@ namespace OSD
             this.chkAlt2.Location = new System.Drawing.Point(10, 68);
             this.chkAlt2.Name = "chkAlt2";
             this.chkAlt2.Size = new System.Drawing.Size(137, 17);
-            this.chkAlt2.TabIndex = 4;
+            this.chkAlt2.TabIndex = 6;
             this.chkAlt2.Text = "Alternative mode2";
             this.chkAlt2.UseVisualStyleBackColor = true;
             this.chkAlt2.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
@@ -260,7 +270,7 @@ namespace OSD
             this.chkAlt3.Location = new System.Drawing.Point(10, 83);
             this.chkAlt3.Name = "chkAlt3";
             this.chkAlt3.Size = new System.Drawing.Size(137, 17);
-            this.chkAlt3.TabIndex = 4;
+            this.chkAlt3.TabIndex = 7;
             this.chkAlt3.Text = "Alternative mode3";
             this.chkAlt3.UseVisualStyleBackColor = true;
             this.chkAlt3.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
@@ -274,11 +284,25 @@ namespace OSD
             this.chkAlt4.Location = new System.Drawing.Point(10, 98);
             this.chkAlt4.Name = "chkAlt4";
             this.chkAlt4.Size = new System.Drawing.Size(137, 17);
-            this.chkAlt4.TabIndex = 4;
+            this.chkAlt4.TabIndex = 8;
             this.chkAlt4.Text = "Alternative mode4";
             this.chkAlt4.UseVisualStyleBackColor = true;
             this.chkAlt4.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
             this.chkAlt4.Visible = false;
+
+            // 
+            // chkAlt5
+            //
+            this.chkAlt5.AutoSize = true;
+            //this.chkAlt5.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt5.Location = new System.Drawing.Point(10, 113);
+            this.chkAlt5.Name = "chkAlt5";
+            this.chkAlt5.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt5.TabIndex = 9;
+            this.chkAlt5.Text = "Alternative mode5";
+            this.chkAlt5.UseVisualStyleBackColor = true;
+            this.chkAlt5.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt5.Visible = false;
 
             //128
 
@@ -477,6 +501,8 @@ namespace OSD
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = (thing.sign >= 0);
 
+            chkAlt5.Visible=false;
+
             labStrings.Visible=false;
             txtStrings.Visible = false;
 
@@ -517,8 +543,14 @@ as_combo_cb:
                 labNumber.Visible = true;
                 break;
 
+            case UI_Mode.UI_Checkbox_1:
+                chkAlt5.Text = thing.alt5_text;
+                chkAlt5.Visible = thing.alt5_text != "";
+                chkAlt5.Checked = thing.Alt5 !=0;
+                goto as_checkbox;
             case UI_Mode.UI_Checkbox:
             default:
+as_checkbox:
                 labNumber.Visible = false;
                 cbNumber.Visible = false;
 
@@ -737,6 +769,14 @@ as_combo_cb:
                         panelItems[a].Alt3 = chkAlt3.Checked ? 1 : 0;
                     if (panelItems[a].Alt4 >= 0)
                         panelItems[a].Alt4 = chkAlt4.Checked ? 1 : 0;
+                    if (panelItems[a].Alt5_mask != 0) {
+                        panelItems[a].Alt5 = chkAlt5.Checked? 1 : 0 ;
+                        if(panelItems[a].Alt5!=0) 
+                            screen_flags |= (uint16_t)(panelItems[a].Alt5_mask);
+                        else
+                            screen_flags &= (uint16_t)(~panelItems[a].Alt5_mask);
+
+                    }
 
                 }
             }

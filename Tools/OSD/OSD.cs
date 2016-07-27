@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r865 DV";
+        public const string VERSION = "r873 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -102,7 +102,7 @@ namespace OSD {
         public const int npanel = 4; // количество панелей 
 
         /*------------------------------------------------*/
-        public int panel_number = 0;
+        public int screen_number = 0;
 
         const Int16 toggle_offset = 1;
         public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
@@ -297,7 +297,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, UI_Mode.UI_Checkbox, 0, "Show HUD frame", 0 , "Show ILS", 1,   "Show Radar" , 0 , "  with track"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, UI_Mode.UI_Checkbox_1, 0, "Show HUD frame", 0, "Show ILS", 1, "Show Radar", 0, "  with track", 0, 0, "", (1 << scrFlg_russianHUD),"Russian HUD"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -331,7 +331,7 @@ namespace OSD {
                 pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
                 pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
                 pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
-                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1);
+                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1,UI_Mode.UI_Checkbox,0,"Show sign '%'");
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
                 pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
@@ -339,7 +339,7 @@ namespace OSD {
                 pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
-                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY);
+                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, UI_Mode.UI_Checkbox,0,"Coordinates on top" );
                 pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, UI_Mode.UI_Checkbox, 0, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
@@ -644,7 +644,7 @@ namespace OSD {
         }
 
         public int getAlt(Panel p){
-            return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0);
+            return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0) + (p.Alt5!=0?16:0);
         }
 
         public void drawNode(TreeNode tn) {
@@ -669,7 +669,7 @@ namespace OSD {
             if (k < 0 || k >= npanel)
                 return;
 
-            panel_number = k;
+            screen_number = k;
             if (startup)
                 return;
 
@@ -790,7 +790,7 @@ namespace OSD {
 //                cbxWarningsAutoPanelSwitch.DataSource = Enum.GetValues(typeof(PanelsAutoSwitch));
 
             string strVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.Text = this.Text + " " + strVersion + " - Pre-Release " + VERSION;
+            this.Text = this.Text + " " + strVersion + " " + VERSION;
             currentVersion = strVersion + VERSION;
 
             CMB_ComPort.Items.AddRange(GetPortNames());
@@ -800,7 +800,7 @@ namespace OSD {
 
             xmlconfig(false);
 
-            Draw(panel_number);
+            Draw(screen_number);
 
             if(System.Diagnostics.Debugger.IsAttached)
                 btnListen.Visible =true ;
@@ -815,7 +815,7 @@ namespace OSD {
             // add a delay to this so it runs after the control value has been defined.
             if (this.IsHandleCreated)
                 this.BeginInvoke((MethodInvoker)delegate {
-                    Draw(panel_number);
+                    Draw(screen_number);
                 });
         }
 
@@ -1001,16 +1001,16 @@ namespace OSD {
                   
                 conf.eeprom .sets.autoswitch_times =convertTimes();
 
-            } else if (panel_number >= 0 && panel_number < npanel) {
+            } else if (screen_number >= 0 && screen_number < npanel) {
                 //First Panel 
 
-                wr_start = panel_number * OffsetBITpanel;
+                wr_start = screen_number * OffsetBITpanel;
                 wr_length = OffsetBITpanel;
 
                 // все что мы тут делаем это задаем	ПОЛНЫЙ список всех существующих	панелей на всех экранах		
 
                 List<TreeNode> AllNodes = new List<TreeNode>();
-                foreach (TreeNode tn in this.scr[this.panel_number].LIST_items.Nodes) {
+                foreach (TreeNode tn in this.scr[this.screen_number].LIST_items.Nodes) {
                     foreach (TreeNode tn2 in tn.Nodes) {
                         AllNodes.Add(tn2);
                     }
@@ -1019,9 +1019,9 @@ namespace OSD {
 
                 foreach (TreeNode tn in AllNodes) {
                     string str = tn.Text;
-                    foreach (var pan in scr[panel_number].panelItems) {
+                    foreach (var pan in scr[screen_number].panelItems) {
                         if ((pan != null) && ((pan.name == str)) && pan.pos != -1) {
-                            TreeNode[] trArray = scr[panel_number].LIST_items.Nodes.Find(str, true);
+                            TreeNode[] trArray = scr[screen_number].LIST_items.Nodes.Find(str, true);
                             if(pan.string_count!=0)
                                 updatePanelStrings(pan.string_id, pan.string_count, pan.strings);// renew before draw
                             conf.setEepromXY(pan, trArray[0].Checked);
@@ -1029,6 +1029,7 @@ namespace OSD {
                             //Console.WriteLine(str);
                         }
                     }
+                    conf.setEepromScrFlags(scr[screen_number].screen_flags);
                 }                
                                
             }
@@ -1051,7 +1052,7 @@ namespace OSD {
                         toolStripStatusLabel1.Text = "Done writing configuration data!";
                 }
 
-            } else if (panel_number >= 0 && panel_number < npanel) {
+            } else if (screen_number >= 0 && screen_number < npanel) {
                 string[] tmp = new string[128];
                 tmp=conf.eeprom.strings;
                 bool writeStrings=false;
@@ -1108,10 +1109,10 @@ namespace OSD {
 
             for (int k = 0; k < npanel; k++) {
                 //First Panel 
-                panel_number = k;
+                screen_number = k;
 
                 List<TreeNode> AllNodes = new List<TreeNode>();
-                foreach (TreeNode tn in scr[panel_number].LIST_items.Nodes) {
+                foreach (TreeNode tn in scr[screen_number].LIST_items.Nodes) {
                     foreach (TreeNode tn2 in tn.Nodes) {
                         AllNodes.Add(tn2);
                     }
@@ -1120,7 +1121,7 @@ namespace OSD {
 
                 foreach (TreeNode tn in AllNodes) {
                     string str = tn.Text;
-                    foreach (var it in scr[panel_number].panelItems_default) {
+                    foreach (var it in scr[screen_number].panelItems_default) {
                         if ((it != null) && ((it.name == str)) && it.pos != -1) {
                             bool en;
                             if (str == "Center")
@@ -1254,13 +1255,13 @@ namespace OSD {
 
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e) {
-            Draw(panel_number);
+            Draw(screen_number);
         }
 
         private void OSD_Resize(object sender, EventArgs e) {
 
             try {
-                Draw(panel_number);
+                Draw(screen_number);
 
             } catch { }
         }
@@ -1278,8 +1279,8 @@ namespace OSD {
                 return;
             
 
-            if (panel_number>=0)
-                scr[panel_number].deselect();
+            if (screen_number>=0)
+                scr[screen_number].deselect();
 
             //Verify EEPROM version
             if (conf.eeprom.sets.CHK1_VERSION != VER) { // no match
@@ -1298,10 +1299,12 @@ namespace OSD {
 
             StringArray = conf.eeprom.strings; // read strings for panels            
 
-            int tN = panel_number;
+            int last_panel_number = screen_number;
             for (int k = 0; k < npanel; k++) {
-                panel_number = k;
+                screen_number = k; // used globally
                 scr[k].fReenter =true;
+
+                scr[screen_number].screen_flags = conf.getEepromScrFlags();
 
                 for (int a = 0; a < scr[k].panelItems.Length; a++) {
                     if (this.scr[k].panelItems[a] != null) {
@@ -1328,7 +1331,11 @@ namespace OSD {
                                 pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;                            
                                 pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
                                 break;
+                            case UI_Mode.UI_Checkbox_1:
+                                pi.Alt5 = scr[k].screen_flags & pi.Alt5_mask;
+                                goto as_checkbox;
                             case UI_Mode.UI_Checkbox:
+as_checkbox:
                                 if(pi.Altf >=0)
                                     pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
                                 if (pi.Alt2 >= 0)
@@ -1643,7 +1650,7 @@ namespace OSD {
 
             toolStripStatusLabel1.Text="EEPROM read OK";
             start_clear_timeout();
-            Draw(panel_number = tN);
+            Draw(screen_number = last_panel_number);
 
         }
 
@@ -1718,7 +1725,7 @@ namespace OSD {
             if (!CHK_auto.Checked) {
                 changeToPal(CHK_pal.Checked);
 
-                Draw(panel_number);
+                Draw(screen_number);
             }
         }
 
@@ -1743,7 +1750,7 @@ namespace OSD {
             if (CHK_auto.Checked) {
                 changeToPal(true);
                 pan.mode_auto = true;
-                Draw(panel_number);
+                Draw(screen_number);
 
                 CHK_pal.Checked = false;
                 CHK_ntsc.Checked = false;
@@ -1777,8 +1784,8 @@ namespace OSD {
                 try {
                     using (StreamWriter sw = new StreamWriter(sfd.OpenFile())) {       //Write                    
                         //Panel 1
-                        for (int k = 0; k < npanel; k++) {
-                            sw.WriteLine("{0}", "Panel " + k);
+                        for (int k = 0; k < npanel; k++) {                            
+                            sw.WriteLine("{0}\t{1}\t{2}", "Panel", k, scr[k].screen_flags);
                             foreach (var item in this.scr[k].panelItems) {
                                 if (item != null) {
                                     TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(item.name, true);
@@ -1786,6 +1793,7 @@ namespace OSD {
                                         sw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", item.name, item.x, item.y, tnArray[0].Checked.ToString(), item.sign, item.Altf, item.Alt2, item.Alt3, item.Alt4, item.strings);
                                 }
                             }
+
                         }
 
                         //Config 
@@ -1874,7 +1882,7 @@ namespace OSD {
                         sw.WriteLine("{0}\t{1}", "txtTime1", txtTime1.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime2", txtTime2.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime3", txtTime3.Text);
-                        
+
                         sw.Close();
                     }
                 } catch (Exception ex) {
@@ -1912,21 +1920,36 @@ namespace OSD {
                     while (!sr.EndOfStream) {
                         //Panel 1
                         //string stringh = sr.ReadLine(); //
-                        string[] hdr = sr.ReadLine().Split(new char[] { '\x20' }, StringSplitOptions.RemoveEmptyEntries);
+                        strings = sr.ReadLine().Split(new char[] { '\t',' ' }, StringSplitOptions.RemoveEmptyEntries);
                         int k = 0;
 
-                        if (hdr[0] != "Panel")
+                        if (strings[0] != "Panel")
                             break;
+                        
+again:
+                        k = int.Parse(strings[1]); // number of panels
 
-                        k = int.Parse(hdr[1]);
+                        try {                           
+                            scr[k].screen_flags = (uint16_t)int.Parse(strings[2]);
+                        } catch{
+                            scr[k].screen_flags = 0;
+                        }
+
                         //while (!sr.EndOfStream)
                         for (int i = 0; i < osd_functions_N; i++) {
-                            strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            string line=sr.ReadLine();
+                            strings = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] hdr = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (strings[0] == "Panel" || hdr[0] == "Panel") { // try to load more options      
+                                goto again;
+                            }
                             for (int a = 0; a < scr[k].panelItems.Length; a++) {
                                 if (this.scr[k].panelItems[a] != null && scr[k].panelItems[a].name == strings[0]) {
                                     var pi = scr[k].panelItems[a];
                                     // incase there is an invalid line number or to shore
                                     try {
+
+                                        //scr[k].fReenter =true;
                                         //scr[k].panelItems[a] = new Panel(pi.name, pi.show, int.Parse(strings[1]), int.Parse(strings[2]), pi.pos);
                                         pi.x = int.Parse(strings[1]);
                                         pi.y = int.Parse(strings[2]);
@@ -1947,13 +1970,16 @@ namespace OSD {
                                         if (strings.Length >= 9)
                                             pi.Alt4 = parseFlag(strings[8]);
                                             
-
+                                        if(pi.Alt5_mask!=0){
+                                            pi.Alt5 =  scr[k].screen_flags & pi.Alt5_mask;
+                                        }
                                         try {
                                             if(pi.string_count >0){
                                                 pi.strings =strings[9];
                                                 updatePanelStrings(pi.string_id, pi.string_count, pi.strings );
                                             }
                                         } catch{};
+                                        //scr[k].fReenter = false;
                                         TreeNode[] tnArray = scr[k].LIST_items.Nodes.Find(scr[k].panelItems[a].name, true);
                                         if (tnArray.Length > 0)
                                             tnArray[0].Checked = (strings[3] == "True");
@@ -2044,6 +2070,9 @@ namespace OSD {
                         else if (strings[0] == "txtTime1") txtTime1.Text = strings[1];
                         else if (strings[0] == "txtTime2") txtTime2.Text = strings[1];
                         else if (strings[0] == "txtTime3") txtTime3.Text = strings[1];
+
+                      
+
                     }
 
                     //pan.model_type = (byte)cbxModelType.SelectedItem;
@@ -2158,7 +2187,7 @@ namespace OSD {
             }
 
             startup = false;
-            Draw(panel_number);
+            Draw(screen_number);
         }
 
         private void loadDefaultsToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -2299,7 +2328,7 @@ namespace OSD {
 
                 } catch { MessageBox.Show("Bad Image"); }
                 customImage = true;
-                Draw(panel_number);
+                Draw(screen_number);
 
             }
         }
@@ -2663,7 +2692,7 @@ namespace OSD {
                         comPort.ReadLine();
 
                     comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
+/*
                     comPort.DtrEnable = false;
                     comPort.RtsEnable = false;
 
@@ -2675,7 +2704,8 @@ namespace OSD {
 
                     System.Threading.Thread.Sleep(50);
                     Application.DoEvents();
-
+*/
+ 
                     comPort.Close();
 
                     comPort.DtrEnable = false;
@@ -2725,7 +2755,7 @@ namespace OSD {
             }
             pan.do_converts();
 
-            Draw(panel_number);
+            Draw(screen_number);
 
         }
 
@@ -2771,7 +2801,7 @@ namespace OSD {
 
             CALLSIGNmaskedText.Text = pan.callsign_str;
 
-            Draw(panel_number);
+            Draw(screen_number);
 
         }
 
@@ -2834,7 +2864,7 @@ namespace OSD {
                     }
             }
 
-            Draw(panel_number);
+            Draw(screen_number);
 
         }
 
@@ -2994,7 +3024,7 @@ namespace OSD {
             lblPresentedCharset.Text = "Presented Charset: " + ofd.SafeFileName;
 
 
-            Draw(panel_number);
+            Draw(screen_number);
         }
 
         private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -3639,7 +3669,7 @@ namespace OSD {
                 BUT_CopyScreen.Visible = true;
                 BUT_ClearScreen.Visible = true;
             } else {
-                panel_number = -1;
+                screen_number = -1;
                 BUT_CopyScreen.Visible = false;
                 BUT_ClearScreen.Visible = false;
             }
@@ -4311,7 +4341,7 @@ namespace OSD {
             if (res == DialogResult.OK) {
                 int screen = frm.Selection;
                 scr[PANEL_tabs.SelectedIndex-1].copyFrom(scr[screen-1]);
-                Draw(panel_number);
+                Draw(screen_number);
             }
 
         }

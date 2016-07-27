@@ -362,6 +362,7 @@ namespace OSD
  	            osd.printf("%c%3i", 0x09, osd_rssi);
  	        else
             	osd.printf("%3i", osd_rssi);
+            if(is_alt(fAlt)) osd.write('%');
  	        return 0;
  	    }
 
@@ -1301,7 +1302,9 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
     // preset the line char attributes
     roll = osd_roll;
                 
-    if(flgRusHUD) roll = -roll;
+    //if(flgRusHUD) roll = -roll;
+    if ((osd.scr[osd.screen_number].screen_flags & (1<<OSD.scrFlg_russianHUD)) != 0) roll = -roll;
+    
 
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {      // positive angle line chars
         roll = roll < 0 ? roll + 179 : roll;
@@ -1498,7 +1501,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
               byte ch_climb = (vs_ms != 0 ? (byte)(0x18) : (byte)climbChar);
 			osd.setPanel(first_col, first_line);
 			
-	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|\x03%10.6f|\x04%10.6f"),
+	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|"),
               ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
                                       (int)((max_home_distance) * converth), chrHigh,
                                                  (int)(tdistance * converth), chrHigh,
@@ -1506,10 +1509,13 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
                                                                             (int)(max_osd_home_alt * converth), chrHigh,
                                                                                    54.3,ch_climb,
                                                                                                 24.7,ch_climb,
-                                                                                                                47,
-                                                                                                                       osd_lat,
-                                                                                                                                     osd_lon);
-				return 0;
+                                                                                                                47);
+            
+            if(is_alt(fAlt)) osd.setPanel(first_col+10, first_line);
+
+            osd.printf_P("\x03%10.6f|\x04%10.6f",osd_lat, osd_lon);
+			
+            return 0;
 		}
 
         public int panBaroAlt(int first_col, int first_line, int sign, int fAlt, Panel p) {

@@ -595,6 +595,7 @@ namespace OSD
             this.chkRusHUD.TabIndex = 0;
             this.chkRusHUD.Text = "Russian HUD";
             this.chkRusHUD.UseVisualStyleBackColor = true;
+            this.chkRusHUD.Visible = false;
             this.chkRusHUD.CheckedChanged += new System.EventHandler(this.chkRusHUD_CheckedChanged);
             // 
             // groupBox14
