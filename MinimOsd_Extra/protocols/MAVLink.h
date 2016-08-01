@@ -82,8 +82,6 @@ bool read_mavlink(){
 
 //   DBG_PRINTF("\ngot id=%d\n", msg.m.msgid);
 
-            lflags.mavlink_active = 1;
-
 #ifdef MAVLINK_CONFIG
 //DBG_PRINTVARLN(msg.m.msgid);
 //DBG_PRINTVARLN(msg.m.sysid);

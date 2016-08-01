@@ -1,8 +1,4 @@
 
-
-void startPanels();
-void writePanels();
-
 bool read_mavlink();
 
 void On100ms();

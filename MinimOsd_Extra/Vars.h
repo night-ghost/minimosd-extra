@@ -222,12 +222,10 @@ uint32_t serial_speed=0; // detected port speed
 struct loc_flags {
 //    bool update_stat:1; 		// есть данные для показа
     bool got_data;		// флаг получения пакета
-    bool need_redraw:1;         // надо перерисовать экран
-    bool mavlink_active:1; 	// флаг активности (навсегда)
-    bool uavtalk_active:1; // got valid UAVtalk packet - flag forever
-    bool mwii_active:1;    // got valid MWII packet - flag forever
-    bool ltm_active:1;     // got valid LTM packet - flag forever
+    bool need_redraw;         // надо перерисовать экран
+
     bool input_active;    // got ANY valid packet - flag forever
+    bool data_mode;
     
     bool rotatePanel;
     bool last_sw_ch;
@@ -279,7 +277,7 @@ volatile uint16_t stack_bottom=0xffff; // check for stack size in interrupts
 
 byte skip_inc=0;
 
-struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
@@ -340,6 +338,7 @@ byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
 uint32_t autoswitch_time=0;
 
+static uint16_t last_chan_raw=0;
 
 #define GPS_MUL 10000000.0f
 

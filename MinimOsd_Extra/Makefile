@@ -13,7 +13,7 @@ F_CPU = 16000000
 
 OPT  = -ffast-math 
 OPT += -floop-strip-mine
-OPT += -finline-functions-called-once 
+#OPT += -finline-functions-called-once 
 OPT += -finline-small-functions
 OPT += -fmerge-all-constants
 OPT += -fomit-frame-pointer 

@@ -208,17 +208,9 @@ static void showHorizon(byte start_col, byte start_row) {
     
     byte shf=0;
     int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+// -45 .. +45
+again:
 
-    // если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
-    if(pitch_line<0){
-       pitch_line += AH_TOTAL_LINES-2;
-       shf+=2;
-    }
-    if(pitch_line>AH_TOTAL_LINES){
-       pitch_line += AH_TOTAL_LINES-2;
-       shf+=2;
-    }
-    
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1+shf; col<=AH_COLS-shf; col++) {
        // получим координаты средней субколонки каждой колонки
@@ -247,6 +239,22 @@ static void showHorizon(byte start_col, byte start_row) {
 	    }
         }
     }
+
+ // если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
+// уйти-то она может и ушла, но при кренах появляется в углах, поэтому надо отрисовывать И ту, И другую
+
+    if(pitch_line<0){
+       pitch_line += AH_TOTAL_LINES-2;
+       shf+=2;
+       goto again;
+    }
+    if(pitch_line>AH_TOTAL_LINES){
+       pitch_line -= AH_TOTAL_LINES-2;
+       shf+=2;
+       goto again;
+    }
+
+
 }
 
 
@@ -570,11 +578,13 @@ static void panEff(point p){
       // show estimated flight time
       
       if (lflags.motor_armed) { //Check takeoff just to prevent initial false readings
-        if(osd_battery_remaining_A != last_battery_reading && !lflags.uavtalk_active) {    // UAVtalk sends this itself
+#if ! defined(USE_UAVTALK)
+        if(osd_battery_remaining_A != last_battery_reading) {    // UAVtalk sends this itself
             remaining_estimated_flight_time_seconds = f_div1000((float)osd_battery_remaining_A * total_flight_time_milis / 
         					    (max_battery_reading - osd_battery_remaining_A));
             last_battery_reading = osd_battery_remaining_A;
 	}
+#endif
 	if(has_sign(p))
 	    OSD::write_S(0x17);
 
@@ -1488,9 +1498,9 @@ static void panRose(point p){
 
     osd.write_S('\xc3');
 
-
-    byte start = (osd_heading * 24+12)/360 - 4;
-    if(start < 0) start += 24;
+    int pos = (osd_heading * 24+12)/360 - 4;
+    byte start=pos;
+    if(pos < 0) start += 24;
   
     uint8_t x;
     for(x=(is_alt2(p)?10:9); x != 0; x--){
@@ -1794,18 +1804,16 @@ static void panFlightMode(point p){
     byte len;
     
 #if defined(USE_UAVTALK)
-    if(lflags.uavtalk_active) {
 	ptr = mode_u_strings;
 	len = sizeof(mode_u_strings)/sizeof(char *);
-    } else 
 #endif
 
 #if defined(USE_MWII)
-    if(lflags.mwii_active) {
 	ptr = mode_mw_strings;
 	len = sizeof(mode_mw_strings)/sizeof(char *);
-    } else 
 #endif
+
+#if defined(USE_MAVLINK)
 
     {
 
@@ -1844,6 +1852,7 @@ static void panFlightMode(point p){
 #endif
         }
     }
+#endif
     
     PGM_P str;
     if(osd_mode >= len) {

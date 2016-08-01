@@ -1,4 +1,7 @@
 #if defined(USE_MAVLINK)
+#define MAVLINK_EXTERNAL_RX_BUFFER 1
+#define m_mavlink_message 1
+
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #endif
 
@@ -16,8 +19,6 @@
 #include "protocols/LTM.h"
 #endif
 
-#define MAVLINK_EXTERNAL_RX_BUFFER 1
-#define m_mavlink_message 1
 
 
 

@@ -76,7 +76,6 @@ static inline void ltm_read_len(void *dst, byte pos, byte sz) {
 // Decoded received commands
 static void ltm_check() {
 
-    lflags.ltm_active = true;
     set_data_got();
 
     switch(msg.ltm.cmd) {

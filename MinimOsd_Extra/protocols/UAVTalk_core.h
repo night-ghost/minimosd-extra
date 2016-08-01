@@ -158,15 +158,15 @@ static inline float uavtalk_get_float(int pos) {
 	return f;
 }
 
-/*
+
 void uavtalk_send_msg(uavtalk_message_t *msg) {
-	uint8_t *d;
-	uint8_t i;
-	uint8_t c;
+
 	
-	if (op_uavtalk_mode & UAVTALK_MODE_PASSIVE)
-		return;
-	
+//	if (op_uavtalk_mode & UAVTALK_MODE_PASSIVE)
+//		return;
+	byte i, c;
+
+/*
 	c = (uint8_t) (msg->Sync);
 	Serial.write(c);
 	msg->Crc = CRC_VAL(0 ^ c);
@@ -201,41 +201,43 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	Serial.write(c);
 	msg->Crc = CRC_VAL(msg->Crc ^ c);
 #endif
-        
-	if (msg->Length > HEADER_LEN) {
-	  d = msg->Data;
-	  for (i=0; i<msg->Length-HEADER_LEN; i++) {
-		c = *d++;
-		Serial.write(c);
-		msg->Crc = CRC_VAL(msg->Crc ^ c);
-          }
-	}
-	Serial.write(msg->Crc);
-}
-*/
-/*
-void uavtalk_respond_object(uavtalk_message_t *msg_to_respond, uint8_t type) {
-	uavtalk_message_t msg;
-	
-	msg.Sync	= UAVTALK_SYNC_VAL;
-	msg.MsgType	= type;
-	msg.Length	= RESPOND_OBJ_LEN;
-	msg.ObjID	= msg_to_respond->ObjID;
-	
-	uavtalk_send_msg(&msg);
-}
 */
 
-#if 0 // currently unused
+
+	Serial.write(UAVTALK_SYNC_VAL);
+
+	msg->Crc = CRC_VAL(0 ^ UAVTALK_SYNC_VAL);
+
+        byte len=msg->Length-1; // no sync
+        byte *d;
+        
+	d = (byte *)msg;
+	for (i=0; i<len; i++) {
+	    c = *d++;
+	    Serial.write(c);
+	    msg->Crc = CRC_VAL(msg->Crc ^ c);
+        }
+	
+	Serial.write(msg->Crc);
+}
+
+
+void uavtalk_respond_object(byte id, uint8_t type) {
+	msg.u.MsgType	= type;
+	msg.u.Length	= RESPOND_OBJ_LEN;
+	msg.u.ObjID	= id; // msg_to_respond->ObjID;
+	
+	uavtalk_send_msg(&msg.u);
+}
+
+
 void uavtalk_request_object(uint8_t id) {
-	msg.u.Sync	= UAVTALK_SYNC_VAL;
 	msg.u.MsgType	= UAVTALK_TYPE_OBJ_REQ;
 	msg.u.Length	= REQUEST_OBJ_LEN;
 	msg.u.ObjID	= id;
 	
-	uavtalk_send_msg(&msg);
+	uavtalk_send_msg(&msg.u);
 }
-#endif
 
 /*
 void uavtalk_send_gcstelemetrystats(void) {
@@ -433,7 +435,6 @@ bool uavtalk_read(void) {
 #endif
 		// parse data to msg
 		if (uavtalk_parse_char(c, &msg.u)) {
-			lflags.uavtalk_active = 1; // будем слушать UAVtalk
 
 			set_data_got(); 
 
@@ -656,10 +657,9 @@ bool uavtalk_read(void) {
 			    break;
 			}
 			
-// мы подслушиваем разговор наземки и борта, и не вмешиваемся
-//			if (msg.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
-//				uavtalk_respond_object(UAVTALK_TYPE_ACK);
-//			}
+			if (msg.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
+				uavtalk_respond_object(msg.u.ObjID, UAVTALK_TYPE_ACK);
+			}
 			
 			if(timeToScreen())  // если надо перерисовать экран
 			    return true;

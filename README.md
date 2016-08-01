@@ -355,6 +355,11 @@ v873
 v874
 * fixed Russian HUD flag now working
 
+v875
+* UAVtalk works again!
+* fixed underflow bug in panRose
+* fixed lagre pitch horizon behavior
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -737,6 +742,12 @@ v873
 
 v874
 * починена работа флагов Russian HUD 
+
+v875
+* UAVtalk снова работает!
+* исправлен баг с переполнением в panRose
+* исправлено поведение горизонта на больших тангажах
+* удалены последние остатки работы нескольких протоколов одновременно
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

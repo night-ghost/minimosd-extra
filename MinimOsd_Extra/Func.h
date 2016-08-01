@@ -64,12 +64,13 @@ byte get_switch_time(byte n){
     }
 }
 
-//#define USE_AUTOSWITCH 1
+#define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
     byte old_panel=panelN;
 
     uint16_t ch_raw;
+//    static uint16_t last_chan_raw=0; in vars.h
 
     if(sets.ch_toggle <= 2) // disabled
 	return;
@@ -80,11 +81,12 @@ static void pan_toggle(){
     else 
         ch_raw = chan_raw[7]; // в случае мусора - канал 8
 
+    if(ch_raw < 1000 || ch_raw > 3000) return; // not in valid range - no switch
 
 //	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
     if (sets.ch_toggle == 4){
       if ((osd_mode != 6) && (osd_mode != 7)){
-        if (osd_off_switch != osd_mode){ 
+        if (osd_off_switch != osd_mode){
             osd_off_switch = osd_mode;
             //osd_switch_time = millis();
             millis_plus(&osd_switch_time,0);
@@ -111,15 +113,25 @@ static void pan_toggle(){
           panelN = n;
         }
       } else{ 			 //Rotation switch
+        byte ch_on=0;
+//*
+        if(sets.flags.flags.chkSwitch200) {
+    	    if(last_chan_raw)
+        	ch_on = (ch_raw - last_chan_raw) > 200;
+            last_chan_raw = ch_raw;
+        } else
+//*/
+            ch_on = (ch_raw > 1500);
+
         if(sets.flags.flags.chkSwitchOnce) { // once at 1 -> 0
-            if (ch_raw > 1200 && ch_raw < 3000) { // in valid HIGH range
+            if (ch_on) { // in HIGH range
                 lflags.last_sw_ch = 1;
             } else { // выключено
                 if(lflags.last_sw_ch) lflags.rotatePanel = 1;
                 lflags.last_sw_ch = 0;
             }
         } else {
-            if (ch_raw > 1500 && ch_raw < 3000) { // full on and valid
+            if (ch_on) { // full on and valid
                 if (osd_switch_time < millis()){ // переключаем сразу, а при надолго включенном канале переключаем каждые 0.5 сек
                     lflags.rotatePanel = 1;
                     //osd_switch_time = millis() + 500;
@@ -139,7 +151,7 @@ next_panel:
     }
 #ifdef USE_AUTOSWITCH
         else {
-            if( autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
+            if(sets.flags.flags.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
 DBG_PRINTLN("switch by AutoSwitch");
                lflags.autosw=1; // авторежим
                lflags.rotatePanel=1; // переключить
@@ -164,7 +176,7 @@ DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 	screen_flags = upi.i;
 
 #ifdef USE_AUTOSWITCH
-       if( lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
+       if(sets.flags.flags.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
            goto next_panel;  // при автопереключении пропускаем пустой экран
        
        byte swt = get_switch_time(panelN);
@@ -529,40 +541,36 @@ static void getData(){
 
     bool got=false;
 
+again:
+    if(lflags.input_active || lflags.data_mode || lflags.blinker) {
+
 #if defined(USE_MAVLINK)
-    if(lflags.mavlink_active){
 	read_mavlink();
-#else
-    if(0){
-#endif
-#if defined(USE_UAVTALK)
-    } else if(lflags.uavtalk_active) {
+#elif defined(USE_UAVTALK)
 	extern bool uavtalk_read(void);
 	uavtalk_read();
-#endif
-#if defined(USE_MWII)
-    } else if(lflags.mwii_active) {
+#elif defined(USE_MWII)
 	extern bool mwii_read(void);
 	mwii_read();
-#endif
-#if defined(USE_LTM)
-    } else if(lflags.ltm_active) {
+#elif defined(USE_LTM)
 	extern void read_ltm(void);
 	read_ltm();
+#else
+#error "No data protocol defined"
 #endif
+
+	lflags.data_mode=lflags.input_active; // if not received any then flag clears
+
     } else {
-	const char * proto;
 
 	memset( &msg.bytes[0], 0, sizeof(msg.bytes)); // clear packet buffer to initial state
     
-	switch(count05s % 5){
 #if defined(AUTOBAUD)
-	case 1: {
-	    Serial.end();
-	    static uint8_t last_pulse = 15; // 57600 by default
-	    uint8_t pulse=255;
+	Serial.end();
+	static uint8_t last_pulse = 15; // 57600 by default
+	uint8_t pulse=255;
 
-	    { // isolate PT and SPEED
+	{ // isolate PT and SPEED
 		uint32_t pt = millis() + 100; // не более 0.1 секунды
 	
 	        for(byte i=250; i!=0; i--){
@@ -573,62 +581,37 @@ static void getData(){
 	            if(tb==0) continue;   // no pulse at all
 	            if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
 	        }
-	    }
-	    
-	    if(pulse == 255)    pulse = last_pulse; // no input at all - use last
-	    else                last_pulse = pulse; // remember last correct time
+	}
+	
+	if(pulse == 255)    pulse = last_pulse; // no input at all - use last
+	else                last_pulse = pulse; // remember last correct time
 	
 	// F_CPU   / BAUD for 115200 is 138
 	// 1000000 / BAUD for 115200 is 8.68uS
 	//  so I has no idea about pulse times - thease simply measured
 
-	    long speed;
-	    byte rate;
-	    if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
-	    else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
-	    else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
-	    else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
-	    else if(pulse < 60) 	{ speed =  19200; rate = 16; }
-	    else if(pulse < 150)	{ speed =   9600; rate = 32; }
-	    else                        { speed =   4800; rate = 64; }
+	long speed;
+	byte rate;
+	if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
+	else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
+	else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
+	else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
+	else if(pulse < 60) 	{ speed =  19200; rate = 16; }
+	else if(pulse < 150)	{ speed =   9600; rate = 32; }
+	else                    { speed =   4800; rate = 64; }
 
-	    stream_rate = rate;
+	stream_rate = rate;
 #ifdef DEBUG
-	    OSD::setPanel(3,2);
-	    osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
+	OSD::setPanel(3,2);
+	osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
 #endif
-	    serial_speed=speed; // store detected port speed for show
-	    Serial.flush();	// clear serial buffer from garbage
-	    Serial.begin(speed);
-	    } break;
+	serial_speed=speed; // store detected port speed for show
+	Serial.flush();	// clear serial buffer from garbage
+	Serial.begin(speed);
 #endif    
 	
-	
-#if defined(USE_UAVTALK)
-	case 2:
-	    extern bool uavtalk_read(void);
-	    uavtalk_read();
-	    break;
-#endif
-#if defined(USE_MWII)
-	case 3:
-	    extern bool mwii_read(void);
-	    mwii_read();
-	    break;
-#endif
-#if defined(USE_LTM)
-	case 4:
-	    extern void read_ltm(void);
-	    read_ltm();
-	    break;
-#endif
-	default: // 0 and all not used
-#if defined(USE_MAVLINK)
-	    read_mavlink();
-#endif
-	    break;
-	}
-	
+	lflags.data_mode=true; // пробуем почитать данные
+	goto again;
     }
 
 }

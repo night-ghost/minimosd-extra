@@ -536,7 +536,6 @@ static void mwii_check_mode() {
 static inline void mwii_parse_data() {
     msg.mwii.read_idx = 0;
 
-    lflags.mwii_active = true;
     set_data_got(); 
 
 

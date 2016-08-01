@@ -99,19 +99,19 @@ union _Panel {
 struct Flags { // 4 байта
     bool chkSwitchOnce:1;  		// 0 - instead of batt_percent
     bool measure:1;			// 1
-    bool RADIO_ON:1;			// 2 - not used
+    bool chkSwitch200:1;		// 2 
     bool PAL_NTSC:1;			// 3
 
 // new!
-    bool useExtVbattA:1;// 4
-    bool useExtVbattB:1;// 5 - generated internally
-    bool useExtCurr:1;	// 6
-    bool russian_HUD:1;	// 7 
-    bool ils_on:1;	// 8 - not used, use panel.alt4 instead
+    bool useExtVbattA:1;	// 4
+    bool useExtVbattB:1;	// 5 - generated internally
+    bool useExtCurr:1;		// 6
+    bool AutoScreenSwitch:1;	// 7 
+    bool ils_on:1;		// 8 - not used, use panel.alt4 instead
     
-    bool mode_auto:1; 	// 9
-    bool flgHUD:1;      // 10 - not used, use panel.alt instead
-    bool flgTrack:1;    // 11 - not used, use panel.al2
+    bool mode_auto:1; 		// 9
+    bool flgHUD:1;      	// 10 - not used, use panel.alt instead
+    bool flgTrack:1;    	// 11 - not used, use panel.al2
 };
 
 union _Flags {
