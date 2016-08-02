@@ -110,8 +110,8 @@ static void NOINLINE showArrow(uint8_t rotate_arrow){
 // Calculate and shows Artificial Horizon
 // Smooth horizon by Jörg Rothfuchs
 							// with different factors we can adapt do different cam optics
-#define AH_PITCH_FACTOR0	0.010471976		// conversion factor for pitch
-#define AH_ROLL_FACTOR0		0.017453293		// conversion factor for roll
+#define AH_PITCH_FACTOR		0.010471976		// conversion factor for pitch
+#define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
 #define AH_COLS			12			// number of artificial horizon columns
 #define AH_ROWS			5			// number of artificial horizon rows
 #define CHAR_COLS		12			// number of MAX7456 char columns
@@ -151,26 +151,26 @@ static void showHorizon(byte start_col, byte start_row) {
 
 
 
-    float AH_PITCH_FACTOR, // conversion factor for pitch
-	  AH_ROLL_FACTOR ; // conversion factor for roll
+    float k_pitch, // conversion factor for pitch
+	  k_roll ; // conversion factor for roll
     
     // NTSC: osd.getMode() == 0
     {
         byte fPAL=osd.getMode();
-        AH_PITCH_FACTOR = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a) * AH_PITCH_FACTOR0;
-        AH_ROLL_FACTOR  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a)  * AH_ROLL_FACTOR0;    
+        k_pitch = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a);
+        k_roll  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a);
      }
 
 
     // preset the line char attributes
-    int  roll = osd_att.roll;
+    float  roll = osd_att.roll * k_roll;
     if(screen_flags & scrFlg_russianHUD) roll = -roll;
 
-    int iroll  = roll; // for tangens later
+    int iroll  = roll;
 
-    if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
-	roll = roll < 0 ? roll + 179 : roll;
-	uint16_t a_roll=abs(roll);
+    if ((iroll >= 0 && iroll < 90) || (iroll >= -179 && iroll < -90)) {	// positive angle line chars
+	iroll = iroll < 0 ? iroll + 179 : iroll;
+	uint16_t a_roll=abs(iroll);
 	if(       a_roll > ANGLE_VERT) {
 	    line_set =          0xc1;
 	    subval_overflow = 0;
@@ -187,8 +187,8 @@ static void showHorizon(byte start_col, byte start_row) {
             subval_overflow = 8;
 	}
     } else {								// negative angle line chars
-	roll = roll > 90 ? roll - 179 : roll;
-	uint16_t a_roll=abs(roll);
+	iroll = iroll > 90 ? iroll - 179 : iroll;
+	uint16_t a_roll=abs(iroll);
 	if(        a_roll > ANGLE_VERT) {
 	    line_set =          0xc1;
 	    subval_overflow = 0;
@@ -207,9 +207,11 @@ static void showHorizon(byte start_col, byte start_row) {
     }
     
     byte shf=0;
-    int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
-// -45 .. +45
+    int8_t shift_angle=0;
 again:
+    int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * (osd_att.pitch + shift_angle )* k_pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+// -45 .. +45
+
 
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1+shf; col<=AH_COLS-shf; col++) {
@@ -219,7 +221,7 @@ again:
         
         // tg(72 gr) ==3 so byte overflows
 
-        int16_t hit = (int)(tan(AH_ROLL_FACTOR * iroll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+        int16_t hit = (int)(tan(AH_ROLL_FACTOR * roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
@@ -230,8 +232,13 @@ again:
 	    else
 		subval = 0; // raw chars
 	    
-	    // print the line char
-            OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 1, line_set + subval);
+	    OSD::setPanel(start_col + col - 1, start_row + AH_ROWS - row - 1);
+	    if(shift_angle!=0 && col==(AH_COLS-1)/2){
+		osd.print(abs(shift_angle));
+		col++; // skip next
+	    } else {   // print the line char
+                OSD::write_S(line_set + subval);
+            }
 	    
 	    // check if we have to print an overflow line char
 	    if ( subval && subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
@@ -243,15 +250,19 @@ again:
  // если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
 // уйти-то она может и ушла, но при кренах появляется в углах, поэтому надо отрисовывать И ту, И другую
 
+// но вобшем-то лучше отнимать не строки, а угол, и возвращаться на шаг выше. Бонусом это даст возможность печатать посередине цифры угла
+
     if(pitch_line<0){
-       pitch_line += AH_TOTAL_LINES-2;
-       shf+=2;
-       goto again;
+//       pitch_line += AH_TOTAL_LINES-2;
+	shift_angle +=30;
+        shf+=2;
+        goto again;
     }
     if(pitch_line>AH_TOTAL_LINES){
-       pitch_line -= AH_TOTAL_LINES-2;
-       shf+=2;
-       goto again;
+//       pitch_line -= AH_TOTAL_LINES-2;
+	shift_angle -=30;
+        shf+=2;
+        goto again;
     }
 
 
