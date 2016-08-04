@@ -31,23 +31,23 @@
 #include "UAVTalk.h"
 
 
-//static unsigned long last_gcstelemetrystats_send = 0;
-//static unsigned long last_flighttelemetry_connect = 0;
-//static uint8_t gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
+static unsigned long last_gcstelemetrystats_send = 0;
+static unsigned long last_flighttelemetry_connect = 0;
+static uint8_t gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
 
-/*
+
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
-static uint32_t gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID;
-static uint8_t gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN;
-static uint8_t gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS;
-static uint8_t flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS;
+ #define gcstelemetrystats_objid  GCSTELEMETRYSTATS_OBJID
+ #define  gcstelemetrystats_obj_len  GCSTELEMETRYSTATS_OBJ_LEN
+ #define  gcstelemetrystats_obj_status  GCSTELEMETRYSTATS_OBJ_STATUS
+ #define  flighttelemetrystats_obj_status  FLIGHTTELEMETRYSTATS_OBJ_STATUS
 #else
-static uint32_t gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID_001;
-static uint8_t gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN_001;
-static uint8_t gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS_001;
-static uint8_t flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS_001;
+ #define  gcstelemetrystats_objid   GCSTELEMETRYSTATS_OBJID_001
+ #define  gcstelemetrystats_obj_len  GCSTELEMETRYSTATS_OBJ_LEN_001
+ #define  gcstelemetrystats_obj_status  GCSTELEMETRYSTATS_OBJ_STATUS_001
+ #define  flighttelemetrystats_obj_status  FLIGHTTELEMETRYSTATS_OBJ_STATUS_001
 #endif
-*/
+
 
 // CRC lookup table
 static const PROGMEM uint8_t crc_table[256] = {
@@ -239,12 +239,11 @@ void uavtalk_request_object(uint8_t id) {
 	uavtalk_send_msg(&msg.u);
 }
 
-/*
+
 void uavtalk_send_gcstelemetrystats(void) {
 	uint8_t *d;
 	uint8_t i;
 
-	msg.u.Sync	= UAVTALK_SYNC_VAL;
 	msg.u.MsgType	= UAVTALK_TYPE_OBJ_ACK;
 	msg.u.Length	= gcstelemetrystats_obj_len + HEADER_LEN;
 	msg.u.ObjID	= gcstelemetrystats_objid;
@@ -257,10 +256,10 @@ void uavtalk_send_gcstelemetrystats(void) {
 	msg.u.Data[gcstelemetrystats_obj_status] = gcstelemetrystatus;
 	// remaining data unused and unset
 	
-	uavtalk_send_msg(&msg);
+	uavtalk_send_msg(&msg.u);
 	last_gcstelemetrystats_send = millis();
 }
-*/
+
 
 void NOINLINE set_crc(byte c){
     msg.u.Crc = CRC_VAL(msg.u.Crc ^ c);
@@ -441,7 +440,6 @@ bool uavtalk_read(void) {
 			// consume msg
 			switch (msg.u.ObjID) {
 
-#if 0
 			case FLIGHTTELEMETRYSTATS_OBJID_000:
 			case FLIGHTTELEMETRYSTATS_OBJID_001:
 				switch (msg.u.Data[flighttelemetrystats_obj_status]) {
@@ -458,11 +456,9 @@ bool uavtalk_read(void) {
 					break;
 				}
 			break;
-#endif
 
 			case ATTITUDEACTUAL_OBJID_000:
 			case ATTITUDESTATE_OBJID_000:
-
         			osd_att.roll		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_ROLL);
         			osd_att.pitch		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_PITCH);
         			osd_att.yaw		= uavtalk_get_float(ATTITUDEACTUAL_OBJ_YAW);
@@ -551,8 +547,11 @@ bool uavtalk_read(void) {
 				osd_satellites_visible	= uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
 				osd_fix_type		= uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
 				osd_heading		= uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
-				osd_pos.alt		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
 				osd_groundspeed		= uavtalk_get_float(GPSPOSITION_OBJ_GROUNDSPEED);
+				if(osd_fix_type>0)
+				    osd_pos.alt		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
+		                else
+                		    osd_pos.alt=osd_alt_mav;
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
@@ -561,8 +560,11 @@ bool uavtalk_read(void) {
 				osd_satellites_visible	= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
 				osd_fix_type		= uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
 				osd_heading		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
-				osd_pos.alt		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
 				osd_groundspeed		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Groundspeed));
+				if(osd_fix_type>0)
+				    osd_pos.alt		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
+		                else
+                		    osd_pos.alt=osd_alt_mav;
 				break;
 #endif
 
@@ -605,11 +607,14 @@ bool uavtalk_read(void) {
 			case BAROALTITUDE_OBJID_000:
 			case BAROSENSOR_OBJID_000:
 				osd_alt_mav		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
+				if(osd_pos.alt==0)
+				    osd_pos.alt=osd_alt_mav;
 				break;
 #if BAROSENSOR_OBJID_000 != BAROSENSOR_OBJID
 			case BAROSENSOR_OBJID:
-				//revo_baro_alt		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
 				osd_alt_mav		= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
+				if(osd_pos.alt==0)
+				    osd_pos.alt=osd_alt_mav;
 				break;
 #endif
 
@@ -667,6 +672,18 @@ bool uavtalk_read(void) {
 		
 		delay_byte();
 	}
+
+	// check connect timeout
+        if (last_flighttelemetry_connect + FLIGHTTELEMETRYSTATS_CONNECT_TIMEOUT < millis()) {
+                gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
+//                show_prio_info = 1;
+        }
+        
+        // periodically send gcstelemetrystats
+        if (last_gcstelemetrystats_send + GCSTELEMETRYSTATS_SEND_PERIOD < millis()) {
+                uavtalk_send_gcstelemetrystats();
+        }
 	return false;
 }
+
 

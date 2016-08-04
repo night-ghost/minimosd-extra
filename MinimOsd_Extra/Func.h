@@ -64,6 +64,24 @@ byte get_switch_time(byte n){
     }
 }
 
+void doScreenSwitch(){
+	lflags.got_data=1; // redraw even no news
+	
+	//extern void reset_setup_data();
+	reset_setup_data();
+	
+	union {
+	    point p;
+	    uint16_t i;
+	} upi;
+	
+	upi.p = readPanel(0); // read flags for new screen
+	screen_flags = upi.i;
+//	screen_flags = (upi.i & 0xff)<<8 | (upi.i>>8) ;
+DBG_PRINTF("screen flags %x\n", screen_flags);
+
+}
+
 #define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
@@ -162,18 +180,7 @@ DBG_PRINTLN("switch by AutoSwitch");
     if(old_panel != panelN){
 DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 
-	lflags.got_data=1; // redraw even no news
-	
-	//extern void reset_setup_data();
-	reset_setup_data();
-	
-	union {
-	    point p;
-	    uint16_t i;
-	} upi;
-	
-	upi.p = readPanel(0); // read flags for new screen
-	screen_flags = upi.i;
+	doScreenSwitch();
 
 #ifdef USE_AUTOSWITCH
        if(sets.flags.flags.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
@@ -396,18 +403,16 @@ void NOINLINE float_add(float &dst, float val){
 void setFdataVars()
 {
     float time_1000; 
-    { // isolate time_lapse
-    
-//	    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
-        uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
-        //runtime = millis();
-        millis_plus(&runtime,0);
 
-        //total_flight_time_milis += time_lapse;
-        long_plus(&total_flight_time_milis, time_lapse);
-        time_1000 = f_div1000(time_lapse); // in seconds
-    }
     
+//    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+    uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
+    //runtime = millis();
+    millis_plus(&runtime,0);
+
+    time_1000 = f_div1000(time_lapse); // in seconds
+
+
 
     //Moved from panel because warnings also need this var and panClimb could be off
 #if defined(USE_FILTER)
@@ -484,6 +489,8 @@ void setFdataVars()
     if(0){ // neither copter nor plane
  #endif
 #endif
+
+    long_plus(&total_flight_time_milis, time_lapse);
 
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;

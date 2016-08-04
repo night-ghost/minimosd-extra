@@ -341,7 +341,7 @@ void setup()     {
 
 #endif
 
-    total_flight_time_milis=0; // memory somewhere gets corrupted :(
+    doScreenSwitch(); // set vars for startup screen
 
 } // END of setup();
 
