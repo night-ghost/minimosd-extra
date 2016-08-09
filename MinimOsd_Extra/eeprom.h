@@ -85,8 +85,9 @@ struct Panel {
     point Hdop;         // 86
     point State;        // 88
     point Scale;        // 90
-    point EScale;       // 92
+    point Power;        // 92
     point CValue;       // 94
+//    point ;         // 96
 
 };
 

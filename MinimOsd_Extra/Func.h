@@ -347,8 +347,6 @@ static void setHomeVars()
 	{
             float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
             //DST to Home
-//	        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
-//	        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
             dstlat = diff_coord(osd_home.lat, osd_pos.lat);
             dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
         }
@@ -379,18 +377,18 @@ void NOINLINE calc_max(float &dst, float src){
 
 
 
-//#define USE_FILTER 1 /* +36 bytes :( */
+#define USE_FILTER 1 
 
 #if defined(USE_FILTER)
-void NOINLINE filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
+void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
     //dst = (val * k) + dst * (1.0 - k); 
     //dst = val * k + dst - dst*k;
     //dst = (val-dst)*k + dst;
-    dst+=(val-dst)*k;
+    dst+=(val-dst)/k;
 }
 
 void inline filter( float &dst, float val){ // комплиментарный фильтр 1/10
-    filter(dst,val,0.1);
+    filter(dst,val,10);
 }
 #endif
 
@@ -412,6 +410,20 @@ void setFdataVars()
 
     time_1000 = f_div1000(time_lapse); // in seconds
 
+
+#if defined(USE_FILTER)
+                          // voltage in mV, current in 10mA
+        filter(power, (osd_vbat_A / (1000 * 100.0) * osd_curr_A )); // комплиментарный фильтр 1/10
+#else
+	{
+            float pow= (osd_vbat_A / (1000 * 100.0) * osd_curr_A );
+            power += (pow - power) * 0.1; // комплиментарный фильтр 1/10
+        }
+        //dst+=(val-dst)*k;
+        //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+        //float vs=(osd_climb * get_converth() ) * 60;
+        // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+#endif
 
 
     //Moved from panel because warnings also need this var and panClimb could be off
@@ -500,6 +512,7 @@ void setFdataVars()
     calc_max(max_osd_groundspeed, osd_groundspeed);
     calc_max(max_osd_home_alt, osd_alt_mav);
     calc_max(max_osd_windspeed, osd_windspeed);
+    calc_max(max_osd_power, power);
 
     f=osd_curr_A;
     calc_max(max_osd_curr_A, f);

@@ -35,6 +35,8 @@ Project received Donations from:
  Jimmy Alexander Castro Sanchez
  Damien Bellet
  Dmitry Yatsenko
+ William Foster
+ david albella
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -108,20 +110,16 @@ SingleSerialPort(Serial);
 
 #if defined(USE_UAVTALK)
 #include "protocols/UAVTalk_core.h"
-#endif
-
-#if defined(USE_MWII)
+#elif defined(USE_MWII)
 #include "protocols/cleanflight_core.h"
-#endif
-
-#if defined(USE_LTM)
+#elif defined(USE_LTM)
 #include "protocols/LTM_core.h"
-#endif
-
-#if defined(USE_MAVLINK)
+#elif defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
 BetterStream *mavlink_comm_0_port;
 mavlink_system_t mavlink_system = {12,1}; 
+#else
+#error "No protocol defined"
 #endif
 
 #include "Font.h"
@@ -137,6 +135,7 @@ mavlink_system_t mavlink_system = {12,1};
 /* **********************************************/
 
 volatile byte nested=0; 
+
 #if defined(DEBUG)
 volatile byte nest_count=0; // mostly for debugging
 #endif
@@ -169,9 +168,7 @@ ISR(INT0_vect) {
         stack_bottom=((uint16_t)&sp);
 #endif
 }
-/*ISR(INT0_vect) {
-    isr_VSYNC();
-}*/
+
 
 // PWM Measurement
 #if defined(PWM_PIN)
@@ -247,7 +244,6 @@ void setup()     {
     readSettings();
 
 //    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
-
 
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
     TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );

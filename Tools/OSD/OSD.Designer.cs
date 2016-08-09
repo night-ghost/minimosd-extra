@@ -135,11 +135,12 @@ namespace OSD
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.lblTimes = new System.Windows.Forms.Label();
+            this.chkByTime = new System.Windows.Forms.CheckBox();
             this.txtTime3 = new System.Windows.Forms.TextBox();
             this.txtTime2 = new System.Windows.Forms.TextBox();
             this.txtTime1 = new System.Windows.Forms.TextBox();
             this.txtTime0 = new System.Windows.Forms.TextBox();
-            this.lblTimes = new System.Windows.Forms.Label();
             this.chkDiap = new System.Windows.Forms.CheckBox();
             this.TOGGLE_BEH = new System.Windows.Forms.CheckBox();
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
@@ -596,7 +597,6 @@ namespace OSD
             this.chkRusHUD.Text = "Russian HUD";
             this.chkRusHUD.UseVisualStyleBackColor = true;
             this.chkRusHUD.Visible = false;
-            this.chkRusHUD.CheckedChanged += new System.EventHandler(this.chkRusHUD_CheckedChanged);
             // 
             // groupBox14
             // 
@@ -1319,11 +1319,12 @@ namespace OSD
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.lblTimes);
+            this.groupBox7.Controls.Add(this.chkByTime);
             this.groupBox7.Controls.Add(this.txtTime3);
             this.groupBox7.Controls.Add(this.txtTime2);
             this.groupBox7.Controls.Add(this.txtTime1);
             this.groupBox7.Controls.Add(this.txtTime0);
-            this.groupBox7.Controls.Add(this.lblTimes);
             this.groupBox7.Controls.Add(this.chkDiap);
             this.groupBox7.Controls.Add(this.TOGGLE_BEH);
             this.groupBox7.Controls.Add(this.ONOFF_combo);
@@ -1336,9 +1337,30 @@ namespace OSD
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "OSD Toggle Channel";
             // 
+            // lblTimes
+            // 
+            this.lblTimes.AutoSize = true;
+            this.lblTimes.Location = new System.Drawing.Point(85, 65);
+            this.lblTimes.Name = "lblTimes";
+            this.lblTimes.Size = new System.Drawing.Size(88, 13);
+            this.lblTimes.TabIndex = 34;
+            this.lblTimes.Text = "Times per screen";
+            this.lblTimes.Visible = false;
+            // 
+            // chkByTime
+            // 
+            this.chkByTime.AutoSize = true;
+            this.chkByTime.Location = new System.Drawing.Point(6, 64);
+            this.chkByTime.Name = "chkByTime";
+            this.chkByTime.Size = new System.Drawing.Size(81, 17);
+            this.chkByTime.TabIndex = 33;
+            this.chkByTime.Text = "Auto-switch";
+            this.chkByTime.UseVisualStyleBackColor = true;
+            this.chkByTime.CheckedChanged += new System.EventHandler(this.chkByTime_CheckedChanged);
+            // 
             // txtTime3
             // 
-            this.txtTime3.Location = new System.Drawing.Point(125, 84);
+            this.txtTime3.Location = new System.Drawing.Point(120, 84);
             this.txtTime3.Name = "txtTime3";
             this.txtTime3.Size = new System.Drawing.Size(32, 20);
             this.txtTime3.TabIndex = 32;
@@ -1348,7 +1370,7 @@ namespace OSD
             // 
             // txtTime2
             // 
-            this.txtTime2.Location = new System.Drawing.Point(87, 84);
+            this.txtTime2.Location = new System.Drawing.Point(82, 84);
             this.txtTime2.Name = "txtTime2";
             this.txtTime2.Size = new System.Drawing.Size(32, 20);
             this.txtTime2.TabIndex = 31;
@@ -1358,7 +1380,7 @@ namespace OSD
             // 
             // txtTime1
             // 
-            this.txtTime1.Location = new System.Drawing.Point(49, 84);
+            this.txtTime1.Location = new System.Drawing.Point(44, 84);
             this.txtTime1.Name = "txtTime1";
             this.txtTime1.Size = new System.Drawing.Size(32, 20);
             this.txtTime1.TabIndex = 30;
@@ -1368,7 +1390,7 @@ namespace OSD
             // 
             // txtTime0
             // 
-            this.txtTime0.Location = new System.Drawing.Point(11, 84);
+            this.txtTime0.Location = new System.Drawing.Point(6, 84);
             this.txtTime0.Name = "txtTime0";
             this.txtTime0.Size = new System.Drawing.Size(32, 20);
             this.txtTime0.TabIndex = 29;
@@ -1377,16 +1399,6 @@ namespace OSD
             this.hint.SetToolTip(this.txtTime0, "Time to show screen. If 0 then this screen will not be in auto-switch and will be" +
         " available by manual switching");
             this.txtTime0.Visible = false;
-            // 
-            // lblTimes
-            // 
-            this.lblTimes.AutoSize = true;
-            this.lblTimes.Location = new System.Drawing.Point(13, 68);
-            this.lblTimes.Name = "lblTimes";
-            this.lblTimes.Size = new System.Drawing.Size(142, 13);
-            this.lblTimes.TabIndex = 13;
-            this.lblTimes.Text = "Auto-switch times per screen";
-            this.lblTimes.Visible = false;
             // 
             // chkDiap
             // 
@@ -1402,7 +1414,7 @@ namespace OSD
             // TOGGLE_BEH
             // 
             this.TOGGLE_BEH.AutoSize = true;
-            this.TOGGLE_BEH.Location = new System.Drawing.Point(11, 48);
+            this.TOGGLE_BEH.Location = new System.Drawing.Point(6, 44);
             this.TOGGLE_BEH.Margin = new System.Windows.Forms.Padding(2);
             this.TOGGLE_BEH.Name = "TOGGLE_BEH";
             this.TOGGLE_BEH.Size = new System.Drawing.Size(101, 17);
@@ -1418,14 +1430,13 @@ namespace OSD
             this.ONOFF_combo.FormattingEnabled = true;
             this.ONOFF_combo.Items.AddRange(new object[] {
             "Disabled",
-            "By time",
             "External PWM",
             "Mode Switch",
             "Ch 5",
             "Ch 6",
             "Ch 7",
             "Ch 8"});
-            this.ONOFF_combo.Location = new System.Drawing.Point(11, 20);
+            this.ONOFF_combo.Location = new System.Drawing.Point(6, 20);
             this.ONOFF_combo.Margin = new System.Windows.Forms.Padding(2);
             this.ONOFF_combo.Name = "ONOFF_combo";
             this.ONOFF_combo.Size = new System.Drawing.Size(84, 21);
@@ -1443,13 +1454,14 @@ namespace OSD
             // chkSwitchOnce
             // 
             this.chkSwitchOnce.AutoSize = true;
-            this.chkSwitchOnce.Location = new System.Drawing.Point(116, 48);
+            this.chkSwitchOnce.Location = new System.Drawing.Point(117, 44);
             this.chkSwitchOnce.Name = "chkSwitchOnce";
             this.chkSwitchOnce.Size = new System.Drawing.Size(52, 17);
             this.chkSwitchOnce.TabIndex = 11;
             this.chkSwitchOnce.Text = "Once";
             this.hint.SetToolTip(this.chkSwitchOnce, "Turn off autorepeat");
             this.chkSwitchOnce.UseVisualStyleBackColor = true;
+            this.chkSwitchOnce.CheckedChanged += new System.EventHandler(this.chkSwitchOnce_CheckedChanged);
             // 
             // groupBox6
             // 
@@ -2226,11 +2238,12 @@ namespace OSD
         private System.Windows.Forms.TextBox txtTime2;
         private System.Windows.Forms.TextBox txtTime1;
         private System.Windows.Forms.TextBox txtTime0;
-        private System.Windows.Forms.Label lblTimes;
         private System.Windows.Forms.CheckBox chkDiap;
         private System.Windows.Forms.ToolTip hint;
         private System.Windows.Forms.Button btnListen;
         private System.Windows.Forms.Label lblTime;
+        private System.Windows.Forms.Label lblTimes;
+        private System.Windows.Forms.CheckBox chkByTime;
     }
 
 }

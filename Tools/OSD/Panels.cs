@@ -72,7 +72,7 @@ namespace OSD
 		
 		public bool flgCurrent=false;
 		public bool flgILS=true;
-		public bool flgRusHUD=true;
+		public bool flgTimedSwitch=true;
         public bool flgHUD = true;
         public bool flgTrack = false;
 		
@@ -1245,8 +1245,8 @@ namespace OSD
 // Calculate and shows Artificial Horizon
 // Smooth horizon by Jörg Rothfuchs
                                                         // with different factors we can adapt do different cam optics
-const double  AH_PITCH_FACTOR0 =      0.010471976   ;           // conversion factor for pitch
-const double  AH_ROLL_FACTOR0 =       0.017453293  ;            // conversion factor for roll
+const double  AH_PITCH_FACTOR =      0.010471976   ;           // conversion factor for pitch
+const double  AH_ROLL_FACTOR =       0.017453293  ;            // conversion factor for roll
 const int  AH_COLS       =         12         ;             // number of artificial horizon columns
 const int  AH_ROWS      =          5        ;              // number of artificial horizon rows
 const int  CHAR_COLS     =         12       ;               // number of MAX7456 char columns
@@ -1280,31 +1280,30 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
     int  col, row;
     int pitch_line, middle, hit, subval;
-    double roll;
+    double roll, a_roll;
     int line_set = LINE_SET_STRAIGHT__;
     int line_set_overflow = LINE_SET_STRAIGHT_O;
     int subval_overflow = 9;
     
-
-    double  AH_PITCH_FACTOR, // conversion factor for pitch
-          AH_ROLL_FACTOR ; // conversion factor for roll
+    double K_roll, K_pitch;
 
     // NTSC: osd.getMode() == 0
     if(!pal_ntsc ) { // ntsc
-        AH_PITCH_FACTOR = pitch_k_ntsc  * AH_PITCH_FACTOR0;
-        AH_ROLL_FACTOR  = roll_k_ntsc * AH_ROLL_FACTOR0;
+        K_pitch = pitch_k_ntsc;
+        K_roll = roll_k_ntsc;
     } else {
-        AH_PITCH_FACTOR = pitch_k    * AH_PITCH_FACTOR0;
-        AH_ROLL_FACTOR  = roll_k   * AH_ROLL_FACTOR0;
+        K_pitch = pitch_k;
+        K_roll = roll_k;
     }
 
     
     // preset the line char attributes
-    roll = osd_roll;
+    a_roll = osd_roll * K_roll;
                 
     //if(flgRusHUD) roll = -roll;
-    if ((osd.scr[osd.screen_number].screen_flags & (1<<OSD.scrFlg_russianHUD)) != 0) roll = -roll;
-    
+    if ((osd.scr[osd.screen_number].screen_flags & (1<<OSD.scrFlg_russianHUD)) != 0) a_roll = -a_roll;
+
+    roll=a_roll;
 
     if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {      // positive angle line chars
         roll = roll < 0 ? roll + 179 : roll;
@@ -1329,11 +1328,11 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             subval_overflow = 8;
         }			
 	}
+
+    double dRoll = a_roll * AH_ROLL_FACTOR;
+	
 			
-	double dRoll=roll ;
-	dRoll *= AH_ROLL_FACTOR;
-			
-    pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;  // 90 total lines
+    pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch * K_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;  // 90 total lines
     for (col=1; col<=AH_COLS; col++) {
         middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;        // -66 to +66>center X point at middle of each column
         hit = (int)(tan(dRoll) * middle + pitch_line);                // 1 to 90      calculating hit point on Y plus offset
@@ -1649,6 +1648,14 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
 
             if (sign == 1) osd.printf("C%d ", fAlt / 2 + 5);
             osd.printf("1513");
+            return 0;
+        }
+
+        public int panPower(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            if (sign == 1) osd.printf("W");
+            osd.printf("160");
             return 0;
         }
 

@@ -524,7 +524,7 @@ static void panEff(point p){
 // calculate mean even if throttle==0
 
 #if defined(USE_FILTER)
-            filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
+            filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, 1/EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
 #else
 
 // скорость у нас км/ч, ток в ма, получаем ма/км * ч = ма*ч / км, то есть сколько ма/ч надо затратить на километр полета
@@ -645,7 +645,7 @@ static void panWindSpeed(point p){
     int dir=normalize_angle(osd_winddirection);
 
 #if defined(USE_FILTER)
-    filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
+    filter(nor_osd_windspeed,  osd_windspeed, 100 ); // комплиментарный фильтр 1/100 
 #else
     //nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
     //dst+=(val-dst)*k;
@@ -1101,7 +1101,10 @@ static void panBatt_B(point p){
 }
 
 
-
+static void panPower(point p){
+	    // calced in func.h
+    osd_printf_1(PSTR("%3.0f"), power);
+}
 
 
 
@@ -1320,6 +1323,7 @@ static void panFdata(point p){ // итоги полета
 	{fmt6, '\x90', 'v',  &max_osd_climb       },
 	{fmt7, '\xA0', 'v',  &min_osd_climb       },
 	{fmt1, '\xBD', 'a',  &max_osd_curr_A      },
+	{fmt1, 'W',    'w',  &max_osd_power       },
 //	{fmt4, 'f',  &osd_pos.lat         },
 //	{fmt5, 'f',  &osd_pos.lon         },
 	{0}
@@ -1431,6 +1435,7 @@ static void panWaitMAVBeats(){
     OSD::setPanel(3,3);
     
 #endif
+    osd_groundspeed=0; // to not move with last speed when "no data"
 
     OSD::setPanel(5,3);
     osd_printi_1(PSTR("No input data! %u|"),seconds - lastMavSeconds);
@@ -2473,6 +2478,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(throttle),		panThr, 	0x02 },
     { ID_of(FMod),		panFlightMode,	0x7f },
     { ID_of(curr_A),		panCur_A, 	0xbd },
+    { ID_of(Power),		panPower, 	'W'  },
     { ID_of(windSpeed),		panWindSpeed, 	0x1d },
     { ID_of(climb),		panClimb, 	0x15 },
     { ID_of(tune),		panTune, 	0 },

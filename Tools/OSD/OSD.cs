@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r873 DV";
+        public const string VERSION = "r877 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -104,7 +104,7 @@ namespace OSD {
         /*------------------------------------------------*/
         public int screen_number = 0;
 
-        const Int16 toggle_offset = 1;
+        const Int16 toggle_offset = 2;
         public Size basesize = new Size(OSD.SCREEN_W, SCREEN_H);
         /// <summary>
         /// the un-scaled font render image
@@ -349,6 +349,7 @@ namespace OSD {
                 pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb_Strings, 0, "Select channel", -1, "Extended range (800-2200)", str_id: 0, str_count: 5, strings: "Off|Low|Mid|Hi!|On!" );
                 pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
                 pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
+                pi[a++] = new Panel("Power", pan.panPower, 1, 5, panPower_XY, 1);
     
 
                 osd_functions_N = a;
@@ -515,7 +516,7 @@ namespace OSD {
 
             cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-            chkRusHUD.Checked = pan.flgRusHUD;
+            chkByTime.Checked = pan.flgTimedSwitch;
             chkILS.Checked = pan.flgILS;
 
         }
@@ -969,7 +970,7 @@ namespace OSD {
                 conf.eeprom.sets.horiz_kPitch_a = pan.pitch_k_ntsc;
                 conf.eeprom.flags[useExtVbattA] = pan.flgBattA;
                 conf.eeprom.flags[useExtCurr] = pan.flgCurrent;
-                conf.eeprom.flags[russian_HUD] = pan.flgRusHUD;
+                conf.eeprom.flags[AutoScreenSwitch] = pan.flgTimedSwitch;
                 conf.eeprom.flags[ils_on] = pan.flgILS;
 
                 conf.eeprom.flags[flgTrack] = pan.flgTrack;
@@ -997,9 +998,10 @@ namespace OSD {
                 conf.eeprom.sensors.sensor_A4 = myConvert(txtSAdd4.Text);
 
                 conf.eeprom.flags[osd_switch_once] = chkSwitchOnce.Checked;
-    
+                conf.eeprom.flags[chkSwitch200] = chkDiap.Checked;
+                
                   
-                conf.eeprom .sets.autoswitch_times =convertTimes();
+                conf.eeprom.sets.autoswitch_times =convertTimes();
 
             } else if (screen_number >= 0 && screen_number < npanel) {
                 //First Panel 
@@ -1227,6 +1229,11 @@ namespace OSD {
             conf.eeprom.sensors.sensor_A2 = (float)0;
             conf.eeprom.sensors.sensor_A3 = (float)0;
             conf.eeprom.sensors.sensor_A4 = (float)0;
+
+            conf.eeprom.flags[osd_switch_once] = false;
+            conf.eeprom.flags[chkSwitch200] = false;
+
+            conf.eeprom.sets.autoswitch_times = convertTimes();
 
             comBusy = true;
             int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
@@ -1600,8 +1607,8 @@ as_checkbox:
                 pan.flgCurrent = conf.eeprom.flags[useExtCurr];
                 cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-                pan.flgRusHUD = conf.eeprom.flags[russian_HUD];
-                chkRusHUD.Checked = pan.flgRusHUD;
+                pan.flgTimedSwitch = conf.eeprom.flags[AutoScreenSwitch];
+                chkByTime.Checked = pan.flgTimedSwitch;
 
                 pan.flgILS = conf.eeprom.flags[ils_on];
                 chkILS.Checked = pan.flgILS;
@@ -1609,6 +1616,7 @@ as_checkbox:
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
                 chkSwitchOnce.Checked = conf.eeprom.flags[osd_switch_once];
+                chkDiap.Checked = conf.eeprom.flags[chkSwitch200];
 
                 updateTimes(conf.eeprom.sets.autoswitch_times);
             } catch  { }
@@ -1852,7 +1860,7 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "fBattB", pan.flgBattB);
                         sw.WriteLine("{0}\t{1}", "fCurr", pan.flgCurrent);
 
-                        sw.WriteLine("{0}\t{1}", "fRussianHUD", pan.flgRusHUD);
+                        sw.WriteLine("{0}\t{1}", "timedSwitch", pan.flgTimedSwitch);
                         sw.WriteLine("{0}\t{1}", "fILS", pan.flgILS);
                         sw.WriteLine("{0}\t{1}", "HOS", pan.horiz_offs);
                         sw.WriteLine("{0}\t{1}", "VOS", pan.vert_offs);
@@ -1878,6 +1886,7 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "SAdd4", txtSAdd4.Text);
 
                         sw.WriteLine("{0}\t{1}", "flgOnce", chkSwitchOnce.Checked);
+                        sw.WriteLine("{0}\t{1}", "flg200", chkDiap.Checked);
                         sw.WriteLine("{0}\t{1}", "txtTime0", txtTime0.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime1", txtTime1.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime2", txtTime2.Text);
@@ -1940,9 +1949,13 @@ again:
                             string line=sr.ReadLine();
                             strings = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                             string[] hdr = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            if (strings[0] == "Panel" || hdr[0] == "Panel") { // try to load more options      
+                            if (strings[0] == "Panel" ) { // try to load more options      
+                                goto again;
+                            }else if(hdr[0] == "Panel"){
+                                strings=hdr;
                                 goto again;
                             }
+
                             for (int a = 0; a < scr[k].panelItems.Length; a++) {
                                 if (this.scr[k].panelItems[a] != null && scr[k].panelItems[a].name == strings[0]) {
                                     var pi = scr[k].panelItems[a];
@@ -2040,7 +2053,7 @@ again:
                         else if (strings[0] == "fBattA") pan.flgBattA = bool.Parse(strings[1]);
                         else if (strings[0] == "fBattB") pan.flgBattB = bool.Parse(strings[1]);
                         else if (strings[0] == "fCurr") pan.flgCurrent = bool.Parse(strings[1]);
-                        else if (strings[0] == "fRussianHUD") pan.flgRusHUD = bool.Parse(strings[1]);
+                        else if (strings[0] == "timedSwitch") pan.flgTimedSwitch = bool.Parse(strings[1]);
                         else if (strings[0] == "fILS") pan.flgILS = bool.Parse(strings[1]);
                         else if (strings[0] == "HOS") pan.horiz_offs = (byte)int.Parse(strings[1]);
                         else if (strings[0] == "VOS") pan.vert_offs = (byte)int.Parse(strings[1]);
@@ -2066,6 +2079,8 @@ again:
                         else if (strings[0] == "SAdd4") txtSAdd4.Text = strings[1];
 
                         else if (strings[0] == "flgOnce") chkSwitchOnce.Checked = bool.Parse(strings[1]);
+                        else if (strings[0] == "flg200")  chkDiap.Checked = bool.Parse(strings[1]);
+
                         else if (strings[0] == "txtTime0") txtTime0.Text = strings[1];
                         else if (strings[0] == "txtTime1") txtTime1.Text = strings[1];
                         else if (strings[0] == "txtTime2") txtTime2.Text = strings[1];
@@ -2167,7 +2182,7 @@ again:
                     cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
                     cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
-                    chkRusHUD.Checked = pan.flgRusHUD;
+                    chkByTime.Checked = pan.flgTimedSwitch;
                     chkILS.Checked = pan.flgILS;
 
                     try {
@@ -2765,13 +2780,7 @@ again:
 
         private void ONOFF_combo_SelectedIndexChanged(object sender, EventArgs e) {
             pan.ch_toggle = (byte)(ONOFF_combo.SelectedIndex + toggle_offset);
-            bool flg=(ONOFF_combo.SelectedIndex==1);
-
-            lblTimes.Visible =flg;
-            txtTime0.Visible =flg;
-            txtTime1.Visible = flg;
-            txtTime2.Visible = flg;
-            txtTime3.Visible = flg;
+            
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e) {
@@ -3762,9 +3771,7 @@ again:
                 txtPitchNtsc.Text = pan.pitch_k_ntsc.ToString();
         }
 
-        private void chkRusHUD_CheckedChanged(object sender, EventArgs e) {
-            pan.flgRusHUD = chkRusHUD.Checked;
-        }
+       
 
         private void chkILS_CheckedChanged(object sender, EventArgs e) {
             pan.flgILS = chkILS.Checked;
@@ -4716,6 +4723,21 @@ again:
 
             com_thread = new System.Threading.Thread(com_thread_proc);
             com_thread.Start();
+        }
+
+        private void chkByTime_CheckedChanged(object sender, EventArgs e) {
+            bool flg = chkByTime.Checked ;
+            pan.flgTimedSwitch = flg;
+
+            lblTimes.Visible = flg;
+            txtTime0.Visible = flg;
+            txtTime1.Visible = flg;
+            txtTime2.Visible = flg;
+            txtTime3.Visible = flg;
+        }
+
+        private void chkSwitchOnce_CheckedChanged(object sender, EventArgs e) {
+
         }
 
     

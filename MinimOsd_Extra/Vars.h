@@ -12,14 +12,6 @@ static byte max7456_err_count=0;
 static byte stream_rate=0; // divider to requested rates 
 static byte mav_raw_imu_count=0;
 
-static float        max_home_distance = 0;
-static float        max_osd_airspeed = 0;
-static float        max_osd_groundspeed = 0; 
-static float        max_osd_home_alt = 0;
-static float        max_osd_windspeed = 0;
-static float        max_osd_curr_A = 0;                 // max Battery A current
-static float        max_osd_climb=0;
-static float        min_osd_climb=0;
 
 static float        nor_osd_windspeed = 0; // calculated from osd_windspeed by LPF 1/100
 static float        vertical_speed = 0; // calculated from osd_climb by LPF 1/10
@@ -104,6 +96,8 @@ static uint16_t     osd_vbat_B = 0;                 // voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_remaining_B = 0;    // 0 to 100 <=> 0 to 1000
+
+float power=0; 
 
 static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
@@ -229,33 +223,33 @@ struct loc_flags {
     
     bool rotatePanel;
     bool last_sw_ch;
-    bool one_sec_timer_switch:1;
+    bool one_sec_timer_switch;
 
     bool motor_armed;
     bool last_armed_status;
     bool was_armed:1;
-    bool throttle_on:1;
+    bool throttle_on;
     bool in_air:1;
 
     bool blinker;
     bool flgMessage:1;
     
     bool mode_switch:1;
-    bool osd_got_home:1; // tels if got home position or not
+    bool osd_got_home; // tels if got home position or not
     
-    bool flag_05s:1; // sets each 0.5s for setup
-    bool flag_01s:1;
+    bool flag_05s; // sets each 0.5s for setup
+    bool flag_01s;
 
     bool show_screnN:4;
-    bool gps_active:1; // было что-то с GPS
-    bool vs_ms:1; // vertical speed in m/s;
-    bool was_mav_config:1; // was EEPROM write via MAVlink
+    bool gps_active; // было что-то с GPS
+    bool vs_ms; // vertical speed in m/s;
+    bool was_mav_config; // was EEPROM write via MAVlink
     
     bool fdata;	// show FData screen
 
-    bool autosw:1; 	// automatic screen switch
+    bool autosw; 	// automatic screen switch
 
-    bool mav_request_done:1;
+    bool mav_request_done;
     uint8_t mav_data_frozen;
     uint8_t mav_stream_overload;
 };
@@ -341,4 +335,14 @@ uint32_t autoswitch_time=0;
 static uint16_t last_chan_raw=0;
 
 #define GPS_MUL 10000000.0f
+
+static float        max_home_distance = 0;
+static float        max_osd_airspeed = 0;
+static float        max_osd_groundspeed = 0; 
+static float        max_osd_home_alt = 0;
+static float        max_osd_windspeed = 0;
+static float        max_osd_curr_A = 0;                 // max Battery A current
+static float        max_osd_climb=0;
+static float        min_osd_climb=0;
+static float        max_osd_power=0;
 

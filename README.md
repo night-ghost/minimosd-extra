@@ -365,6 +365,13 @@ v876
 * fixed flight time counting
 * fixed RussianHUD on startup screen
 
+
+v877
+* new Power panel which shows mean consumed power (smoothing by complementary filter 1:10)
+* maximal power added to flight results (FlightData panel)
+* all complementary filters are unified
+* trip distance not grows when "No input data"
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -372,7 +379,7 @@ Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
 
 /* RUSSIAN */
 
-БЫстрый старт
+Быстрый старт
 
 
 1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip?raw=true
@@ -758,6 +765,12 @@ v876
 * UAVtalk использует высоту по барометру при отсутствии GPS
 * исправлен подсчет времени полета
 * исправлен режим RussianHUD на стартовом экране
+
+v877
+* новая панель Power, отображающая среднюю потребляемую мощность (сглаживание комплиментарным фильтром 1:10)
+* в панель результатов полета добавлен максимум мощности
+* унификация комплиментарных фильтров
+* пройденное расстояние не растет при отсутствии данных
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

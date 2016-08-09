@@ -59,8 +59,9 @@ namespace OSD {
         const int panHdop_XY = 86;
         const int panState_XY = 88;
         const int panScale_XY = 90;
-        const int panEScale_XY = 92;
+        const int panPower_XY = 92;
         const int panCvalue_XY = 94;
+        //const int   = 96;
 
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана
@@ -73,20 +74,19 @@ namespace OSD {
 	// флаги
 /*		
 	    bool OSD_BATT_SHOW_PERCENT:1;
-	    bool measure:1;
-	    bool RADIO_ON:1;
-	    bool PAL_NTSC:1;
+	    bool measure:1;	    
+	    
 */		
 		public const int osd_switch_once 	    = 0;
 		public const int converts 				= 1;
-		public const int radio_on 				= 2;
+        public const int chkSwitch200           = 2;
 		public const int pal_ntsc				= 3;
 		
 	// new!
 		public const int useExtVbattA			= 4;
 		public const int useExtVbattB			= 5;
     	public const int useExtCurr				= 6;
-		public const int russian_HUD 			= 7;
+		public const int AutoScreenSwitch       = 7;
 		public const int ils_on 				= 8;
 		public const int mode_auto              = 9;
         public const int flgHUD                 = 10;
