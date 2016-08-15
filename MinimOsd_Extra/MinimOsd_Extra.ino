@@ -547,7 +547,7 @@ byte NOINLINE normalize_voltage(int v){
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
-    if(sets.flags.flags.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
+    if(FLAGS.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
         static uint8_t ind = -1;
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
@@ -560,7 +560,7 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[0] =  (sensorData[0]*7 + voltageRaw) /8;
 #endif
-        if( sets.flags.flags.useExtVbattA ) {
+        if( FLAGS.useExtVbattA ) {
         
             voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
@@ -571,17 +571,12 @@ void On100ms(){ // периодические события, не связан�
 	     //             voltage above limit in 0.1              max voltage above limit
 	    int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
 	
-	    //if(v<0)        osd_battery_remaining_A  = 0;
-	    //else if(v>255) osd_battery_remaining_A  = 255;
-	    //else           osd_battery_remaining_A  = v;
 	    osd_battery_remaining_A=normalize_voltage(v);
 	}
     }
 
-// flag useExtVbattB not used - will se to panel BattB
-//    if(sets.flags.flags.useExtVbattB){ //аналоговый ввод - напряжение видео
-
-    if(sets.flags.flags.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
+//  аналоговый ввод - напряжение видео
+    if(FLAGS.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
@@ -593,8 +588,8 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[1] = (sensorData[1]*7 + voltageRaw) /8;
 #endif
-	if(sets.flags.flags.useExtVbattB){
-            voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
+	if(FLAGS.useExtVbattB){
+            voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // in mv - 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
 	    else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
@@ -612,7 +607,7 @@ void On100ms(){ // периодические события, не связан�
 	}
     }
 
-    if(sets.flags.flags.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
+    if(FLAGS.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
         static uint8_t ind = -1;
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
@@ -631,7 +626,7 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[2] = (sensorData[2]*7 + currentRaw) /8;
 #endif
-        if(sets.flags.flags.useExtCurr) {
+        if(FLAGS.useExtCurr) {
             currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
 	    if(osd_curr_A ==0) osd_curr_A = currentRaw;
@@ -644,19 +639,22 @@ void On100ms(){ // периодические события, не связан�
     {
         byte ch = sets.RSSI_raw / 2;
 
-        unsigned int d;
+        uint16_t d;
 
-#ifdef DEBUG 
-//Serial.printf_P(PSTR("\n RSSI ch=%d telem_rssi=%d\n"), ch, telem_rssi ); Serial.wait();
-#endif
+
+//DBG_PRINTF("\n RSSI ch=%d ", ch);
 
         switch(ch) {
         case 1:
             d = analogRead(RssiPin);
+//DBG_PRINTF("analog_rssi=%d\n", d );
             goto case_2;
 
         case 2:
             d = pulseIn(RssiPin,HIGH, 20000);
+//DBG_PRINTF("pulse_rssi=%d\n", d );
+
+
 case_2:
 	    rssi_in = avgRSSI(d) * sets.eRSSI_koef; // 8 элементов
 
@@ -665,20 +663,26 @@ case_2:
 
 	case 0:
 	    d=osd_rssi;	// mavlink
+//DBG_PRINTF("osd_rssi=%d\n", osd_rssi );
 	    goto case_4;
 	
 	case 3: // 3dr modem rssi
 	    d=telem_rssi;
+//DBG_PRINTF("telem_rssi=%d\n", telem_rssi );
+//Serial.printf_P(PSTR("telem_rssi=%d\n"), d); Serial.wait(); << without this RSSI not works
 	    goto case_4;
 	
 	case 4:
+	default:
 	    d = chan_raw[7]; // ch 8
+
+//DBG_PRINTF("ch8_rssi=%d\n", d );
+
 case_4:
 	    rssi_in = avgRSSI(d);
 
+// RSSI source is not pin so we can read it for sensor
 #if defined(USE_SENSORS)
-	    uint16_t d;
-
 	    if(SENSOR4_ON) {
 		if(fPulseSensor[3])
 		    d=pulseIn(RssiPin,HIGH,10000);
@@ -704,7 +708,7 @@ void On20ms(){ // 50Hz
 #define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
 #define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
 
-	noInterrupts();		// pulse widh disabled interrups for accuracy
+	noInterrupts();		// pulse widh disabled interrups for accuracy but we lose MAVlink bytes
 	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
 	delayMicroseconds(pwm);
 	SET_LOW();		//digitalWrite(PWM_out_pin,0);

@@ -614,7 +614,7 @@ static void panEff(point p){
 
 static void panRSSI(point p){
 
-    osd_printi_1(PSTR("%3i"), rssi);
+    osd_printi_1(PSTR("%3i"), rssi_norm);
     if(!(sets.RSSI_raw%2) && is_alt(p))
 	osd.write_S('%');
 }
@@ -787,76 +787,76 @@ static void check_warn()
 
 
 //1
- if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
-    wmask |= 1; //0
-
+    if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
+        wmask |= 1; //0
+ 
 //2    
- if (sets.model_type==0 && iAirspeed < sets.stall && lflags.in_air ) // plane
-    wmask |= (1<<1);
+    if (sets.model_type==0 && iAirspeed < sets.stall && lflags.in_air ) // plane
+        wmask |= (1<<1);
 
 //3    
- if (sets.overspeed && iAirspeed > sets.overspeed) 
-    wmask |= (1<<2);
+    if (sets.overspeed && iAirspeed > sets.overspeed) 
+        wmask |= (1<<2);
 
 
     int vbat = (osd_battery_remaining_A * 100  + max_battery_reading/2)/ max_battery_reading; // normalize to 100
     
 //4    voltage limit set and less                   capacity limit set and less
- if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
-    wmask |= (1<<3);
+    if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
+        wmask |= (1<<3);
 
 //5
     // не сырое значение  
- if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
-    wmask |= (1<<4);
+    if (!(sets.RSSI_raw%2) && rssi_norm < sets.rssi_warn_level )
+        wmask |= (1<<4);
 
     int iVs = (int)abs(vertical_speed) /10;
 
 //6
- if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
-    wmask |= (1<<5);
+    if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
+        wmask |= (1<<5);
 
     iVolt = osd_vbat_B/100; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
- if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
-    wmask |= (1<<6);
+    if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
+        wmask |= (1<<6);
 
 #if defined(USE_MAVLINK)
 //8
- if(mav_fence_status == FENCE_BREACH_MINALT)
-    wmask |= (1<<7);
+    if(mav_fence_status == FENCE_BREACH_MINALT)
+        wmask |= (1<<7);
 
 //9
- if(mav_fence_status == FENCE_BREACH_MAXALT)
-    wmask |= (1<<8);
+    if(mav_fence_status == FENCE_BREACH_MAXALT)
+        wmask |= (1<<8);
 
 //10
- if(mav_fence_status == FENCE_BREACH_BOUNDARY)
-    wmask |= (1<<9);
+    if(mav_fence_status == FENCE_BREACH_BOUNDARY)
+        wmask |= (1<<9);
 #endif
 
- if(wmask == 0) 
-    warning = 0;
- else {
-    prev_warn = warning;
-    if(warning == 0) warning = 1;
-    else             warning = prev_warn+1;
+    if(wmask == 0) {
+        warning = 0;
+    }else {
+        prev_warn = warning;
+        if(warning == 0) warning = 1;
+        else             warning = prev_warn+1;
 
-    bit = 1 << (warning-1);
+        bit = 1 << (warning-1);
 
-    while(1) {
-        if(warning >= WARNINGS+1) {
-	    warning = 1;
-	    bit = 1;
+        while(1) {
+            if(warning >= WARNINGS+1) {
+                warning = 1;
+                bit = 1;
+            }
+            if(wmask&bit) break;
+            warning++;
+            bit <<= 1;
         }
-        if(wmask&bit) break;
-        warning++;
-        bit <<= 1;
+        /* stay blank for one cycle for single warning */
+        if(warning == prev_warn) warning = 0;
     }
-    /* stay blank for one cycle for single warning */
-    if(warning == prev_warn) warning = 0;
- }
 
 }
 
@@ -1094,10 +1094,10 @@ static void panBatt_A(point p){
 
 static void panBatt_B(point p){
     if(is_on(p)) {
-	sets.flags.flags.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
+	FLAGS.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
         printVolt(osd_vbat_B);
     } else
-        sets.flags.flags.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
+        FLAGS.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
 
 
@@ -1439,7 +1439,6 @@ static void panWaitMAVBeats(){
 
     OSD::setPanel(5,3);
     osd_printi_1(PSTR("No input data! %u|"),seconds - lastMavSeconds);
-//    osd_printi_xy({5,3},PSTR("No input data! %d"),seconds - lastMavSeconds);
 
 #if defined(AUTOBAUD)
     if(serial_speed)
@@ -2013,6 +2012,21 @@ static void panCValue(point p) {
 
 }
 
+static void NOINLINE storeChannels(){
+
+    uint16_t *cp= &chan_raw_middle[0];
+    for(byte i=0; i<4; i++,cp++){
+        if (*cp < 1000)
+           *cp = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
+    }
+}
+
+static int NOINLINE channelDiff(byte n){
+    return chan_raw[n] - chan_raw_middle[n];
+}
+
+
+#ifdef USE_SETUP
 
 /* **************************************************************** */
 // Panel  : panSetup
@@ -2039,6 +2053,7 @@ struct Setup_screen {
     fptr tail;	// функция отображения остального
 };
 */
+
 
 void renew(){
 //Serial.printf_P(PSTR("renew!\n")); Serial.wait();
@@ -2198,18 +2213,6 @@ static void /*NOINLINE*/ move_screen(char dir){
     lflags.got_data=1; // renew screen
 }
 
-static void NOINLINE storeChannels(){
-
-    uint16_t *cp= &chan_raw_middle[0];
-    for(byte i=0; i<4; i++,cp++){
-        if (*cp < 1000)
-           *cp = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
-    }
-}
-
-static int NOINLINE channelDiff(byte n){
-    return chan_raw[n] - chan_raw_middle[n];
-}
 
 #define SETUP_START_ROW 1
 
@@ -2439,7 +2442,7 @@ no_write:
     }
 
 }
-
+#endif
 
 typedef void (*fPan_ptr)(Point p);
 
@@ -2570,17 +2573,22 @@ DBG_PRINTF("set c landed=%u\n", landed);
 
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
 
+//DBG_PRINTF("time_since(&lastMAVBeat)=%d\n", time_since(&lastMAVBeat));
 
 //    if(pt > (lastMAVBeat + 2500)){
-    if(time_since(&lastMAVBeat) > 2500){
-        panWaitMAVBeats(); //Waiting for MAVBeats...
+    {
+	uint16_t t=time_since(&lastMAVBeat);
+        if(t > 2500){
+            panWaitMAVBeats(); //Waiting for MAVBeats...
+            return;
+        }
     }
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
-//  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
-//  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
-//  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-    else if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
+//  if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
+//  if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
+//  if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
+    if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
 #if !defined(DEBUG) || 1
       && ((int)trip_distance > 5) // show always in debug mode
 #endif
@@ -2624,11 +2632,13 @@ show_fdata:
 	print_all_panels(panels_list);
     } else { 			// last panel
 
+#ifdef USE_SETUP
 	if(!lflags.motor_armed) {
 	    panSetup();			// Setup when not armed
-	}  else  { // warnings on clear screen
+	}  else   // warnings on clear screen
+#endif
 	    print_all_panels(&panels_list[sizeof(panels_list)/sizeof(Panels_list)-2]); // warnings only
-	}
+	
 
     }
   }

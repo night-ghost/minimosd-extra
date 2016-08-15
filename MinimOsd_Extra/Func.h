@@ -133,7 +133,7 @@ static void pan_toggle(){
       } else{ 			 //Rotation switch
         byte ch_on=0;
 //*
-        if(sets.flags.flags.chkSwitch200) {
+        if(FLAGS.chkSwitch200) {
     	    if(last_chan_raw)
         	ch_on = (ch_raw - last_chan_raw) > 200;
             last_chan_raw = ch_raw;
@@ -141,7 +141,7 @@ static void pan_toggle(){
 //*/
             ch_on = (ch_raw > 1500);
 
-        if(sets.flags.flags.chkSwitchOnce) { // once at 1 -> 0
+        if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
             if (ch_on) { // in HIGH range
                 lflags.last_sw_ch = 1;
             } else { // выключено
@@ -169,7 +169,7 @@ next_panel:
     }
 #ifdef USE_AUTOSWITCH
         else {
-            if(sets.flags.flags.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
+            if(FLAGS.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
 DBG_PRINTLN("switch by AutoSwitch");
                lflags.autosw=1; // авторежим
                lflags.rotatePanel=1; // переключить
@@ -183,7 +183,7 @@ DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 	doScreenSwitch();
 
 #ifdef USE_AUTOSWITCH
-       if(sets.flags.flags.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
+       if(FLAGS.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
            goto next_panel;  // при автопереключении пропускаем пустой экран
        
        byte swt = get_switch_time(panelN);
@@ -387,7 +387,7 @@ void NOINLINE filter( float &dst, float val, const byte k){ // комплиме�
     dst+=(val-dst)/k;
 }
 
-void inline filter( float &dst, float val){ // комплиментарный фильтр 1/10
+void filter( float &dst, float val){ // комплиментарный фильтр 1/10
     filter(dst,val,10);
 }
 #endif
@@ -463,10 +463,10 @@ void setFdataVars()
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 
     { // isolate RSSI calc
-        uint16_t rssi_v = rssi_in;
+        int16_t rssi_v = rssi_in;
 
         if((sets.RSSI_raw % 2 == 0))  {
-            uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
+            int16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
             bool rev=false;
 
             if(l > h) {
@@ -478,13 +478,16 @@ void setFdataVars()
             if(rssi_v < l) rssi_v = l;
             if(rssi_v > h) rssi_v = h;
 
-            rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
+            rssi_v = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
             //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
-            if(rssi > 100) rssi = 100;
-            if(rev) rssi=100-rssi;
+            if(rssi_v > 100) rssi_v = 100;
+            if(rssi_v < 0)   rssi_v = 0;
+            
+            if(rev) rssi_v=100-rssi_v;
+            rssi_norm=rssi_v;
         } else 
-            rssi = rssi_v;
+            rssi_norm = rssi_v;
     }
 
   //Set max data

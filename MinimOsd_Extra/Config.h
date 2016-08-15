@@ -17,7 +17,11 @@
 #define AUTOBAUD 1
 //#define SHOW_FONT 1
 #define USE_SENSORS 1
+
+#ifndef DEBUG // don't fit
+#define USE_SETUP 1
 #define MAVLINK_CONFIG 1
+#endif
 
 
 #define MAV_REQUEST 1

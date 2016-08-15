@@ -193,19 +193,21 @@ static uint8_t panelN = STARTUP_SCREEN;
 static Point trk[4] = {{0,0},{0,0},{0,0},{0,0}};
 
 //*************************************************************************************************************
-static uint8_t      osd_rssi = 0; // raw value from mavlink
-static uint8_t      telem_rssi = 0; // telemetry modem RSSI raw value
-static uint16_t     rssi_in = 0;  // temp readed value after sliding average
-static uint16_t     rssi = 0;     //normalized 0-100%
+uint8_t      osd_rssi = 0; // raw value from mavlink
+uint8_t      telem_rssi = 0; // telemetry modem RSSI raw value
+uint16_t     rssi_in = 0;  // temp readed value after sliding average
+uint16_t     rssi_norm = 0;     //normalized 0-100%, but in RAW mode can contain full PWM value
 
 
-uint8_t crlf_count = 0;
+uint8_t  crlf_count = 0;
 
-byte mav_message[52]; // in MavLink max isize is 50
+byte     mav_message[52]; // in MavLink max size is 50
 uint16_t mav_msg_ttl=0;
-byte mav_msg_len=0;
-byte mav_msg_severity=0;
-byte mav_msg_shift=0;
+byte     mav_msg_len=0;
+byte     mav_msg_severity=0;
+byte     mav_msg_shift=0;
+
+byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
 volatile byte update_stat=0;
 
@@ -247,9 +249,10 @@ struct loc_flags {
     
     bool fdata;	// show FData screen
 
-    bool autosw; 	// automatic screen switch
+    bool autosw; // automatic screen switch
 
     bool mav_request_done;
+    
     uint8_t mav_data_frozen;
     uint8_t mav_stream_overload;
 };
@@ -265,13 +268,13 @@ uint16_t max_dly=0;
 volatile uint16_t lost_bytes =0;
 
 long mavlink_time=0, mavlink_dt=0;
-int mavlink_cnt=0;
+int  mavlink_cnt=0;
 volatile uint16_t stack_bottom=0xffff; // check for stack size in interrupts
 #endif
 
 byte skip_inc=0;
 
-struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct   loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
@@ -302,7 +305,9 @@ uint8_t fdata_screen=0;
 float tmp_f; // temp float to get rid  of stack usage
 
 // Setup screen 
+static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при входе значения каналов
 
+#ifdef USE_SETUP
 typedef void (*fptr)();
 
 struct Params {
@@ -324,11 +329,9 @@ struct Setup_screen {
 
 static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
-static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при входе значения каналов
 
 const Params *params; // указатель на текущий набор параметров
-
-byte mav_data_count=0; // how many GPS data packets comes between heartbeats
+#endif
 
 uint32_t autoswitch_time=0;
 

@@ -372,6 +372,10 @@ v877
 * all complementary filters are unified
 * trip distance not grows when "No input data"
 
+v878
+* Compiler downgraded to 4.8.1 so that got rid of many compiler-related bugs (rssi not works, timer stats from wrong numbers etc)
+* Fixed the behavior of the overflow detector of MAVLink stream 
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -771,6 +775,10 @@ v877
 * в панель результатов полета добавлен максимум мощности
 * унификация комплиментарных фильтров
 * пройденное расстояние не растет при отсутствии данных
+
+v878
+* версия компилятора уменьшена до 4.8.1 что позволило избавиться от множества багов, вызваных компилятором
+* исправлено поведение обнаружения переполнения потока MAVLink
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

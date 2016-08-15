@@ -223,8 +223,11 @@ struct Eeprom {
     
 };
 
+#define FLAGS sets.flags.flags
+
 #pragma pack(pop)
 
 //#if sizeof(struct Eeprom) > 1024
 //#error EEPROM overflow!
 //#endif
+

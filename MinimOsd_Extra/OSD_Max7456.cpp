@@ -100,7 +100,7 @@ void OSD::detectMode()
     
     byte osdstat_r;
 
-    if(!sets.flags.flags.mode_auto) {
+    if(!FLAGS.mode_auto) {
 	goto no_auto;
     }else {
 
@@ -108,16 +108,16 @@ void OSD::detectMode()
 
         if ((B00000001 & osdstat_r) != 0){ //PAL
             setMode(1);  
-            sets.flags.flags.PAL_NTSC = 1; // remember in case of camera off
+            FLAGS.PAL_NTSC = 1; // remember in case of camera off
         }
         else if((B00000010 & osdstat_r) != 0){ //NTSC
             setMode(0);
-            sets.flags.flags.PAL_NTSC = 0; // remember in case of camera off
+            FLAGS.PAL_NTSC = 0; // remember in case of camera off
         }
         else if((B00000100 & osdstat_r) != 0){ //loss of sync
 //      setMode(1); // PAL without video 
 no_auto:
-          if (sets.flags.flags.PAL_NTSC) //NTSC
+          if (FLAGS.PAL_NTSC) //NTSC
               setMode(1);
           else  //PAL
               setMode(0);
