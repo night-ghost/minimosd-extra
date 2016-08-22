@@ -509,16 +509,11 @@ static void panTemp(point p){
 // Output : 
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
-static void panEff(point p){
 
-    static float ddistance = 0;
-    float        eff = 0; //Efficiency
 
-    if(sets.model_type==0){ // plane
-#ifdef IS_PLANE
+static float        eff = 0; //Efficiency
 
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
-
+static void calc_energy(){
 #define EFF_FILTER 0.01
 
 // calculate mean even if throttle==0
@@ -544,19 +539,42 @@ static void panEff(point p){
             //eff += (e0  - eff) * 0.1; // комплиментарный фильтр 1/10
 #endif
 
+}
+
+static void print_energy(point p){
+    int iEff=eff;
+    if (iEff > 0 && iEff <= 9999) {
+        if(has_sign(p))
+            OSD::write_S(0x16);
+            
+        osd_printf_1(PSTR("%4.0f\x01"), eff);
+    }
+}
+
+
+static void panEff(point p){
+
+    static float ddistance = 0;
+
+    if(is_alt(p)){
+        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+	    calc_energy();
+	    print_energy(p);
+	}
+	return;
+    }
+
+    if(sets.model_type==0){ // plane
+#ifdef IS_PLANE
+        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+
+	    calc_energy();
 
             if (osd_throttle > 2){		// motor is working
                 if (!lflags.throttle_on) 
                     lflags.throttle_on = 1;
     
-	    
-                int iEff=eff;
-                if (iEff > 0 && iEff <= 9999) {
-                    if(has_sign(p))
-        		OSD::write_S(0x16);
-            
-                    osd_printf_1(PSTR("%4.0f\x01"), eff);
-                }
+		print_energy(p);
 
             }else{	// free fly
                 if (lflags.throttle_on) {
@@ -946,8 +964,8 @@ static void panBatteryPercent(point p){
 
 //Serial.printf_P(PSTR("batt val="),val);
 
-        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
-//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
+        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);    // battery A remaning picture
+//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
 	if (is_alt(p))
 	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
@@ -997,8 +1015,6 @@ static void panHomeDis(point p){
 // Size   : 5 x 14  (rows x chars)
 // Staus  : done
 
-//const char str_hud[] PROGMEM = "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|";
-//const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
 
 static void inline spaces(byte n){
     while(n-- >0) osd_blank();
@@ -1009,15 +1025,8 @@ static void panHorizon(point p){
   // сначала нарисуем стрелочки.
 
     if(is_alt(p)) {
-/*        osd.print_P(str_hud);
-        osd.print_P(str_hud);
-        osd.print_P(str_mid);
-        osd.print_P(str_hud);
-        osd.print_P(str_hud);
-*/
 	byte i;
 	for(i=5;i!=0; i--){ // 30 bytes of flash
-            //osd.print_P(i==3 ? str_mid : str_hud);
             osd.write_S(i==3 ? '\xc6' : '\xb2');
             spaces(12);
             osd.write_S(i==3 ? '\xc5' : '\xb3');
@@ -1029,13 +1038,13 @@ static void panHorizon(point p){
 
     byte mid_x = p.x+6;
     byte mid_y = p.y+2;
+
     if(is_alt3(p))
        showRADAR(mid_x, mid_y, is_alt4(p));
 
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(mid_x, mid_y);
 	osd.print_P(PSTR("\xb8\xb9"));
-//	osd_printi_xy({mid_x, mid_y}, PSTR("\xb8\xb9"),0);
     }
 
     //Show ground level on  HUD
@@ -1052,8 +1061,6 @@ static void panHorizon(point p){
 // Staus  : done
 
 static void panPitch(point p){
-//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
     osd_printi_1(PSTR("%4i\x05\x07"),osd_att.pitch);
 }
 
@@ -1208,7 +1215,6 @@ static void panGPS(point p){
     } 
 
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
-//    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
     print_gps(f,div);
 }
 
@@ -2012,6 +2018,48 @@ static void panCValue(point p) {
 
 }
 
+
+
+
+
+
+
+#if 0
+uint16_t readVCC() { // in mv
+    ADMUX = 0x4e; //AVCC with external capacitor at AREF pin, 1.1v as meashured
+    delay_1();
+    sum=0;
+
+#define VCC_AVGB 100
+
+    for(byte i=VCC_AVGB; i>0; i--){
+        delay_1();
+
+        ADCSRA |= 1 << ADSC; // start conversion
+
+        while (bit_is_set(ADCSRA, ADSC));
+
+        byte low  = ADCL;
+        byte high = ADCH;
+
+        uint16_t v = (high << 8) | low;
+    // return 11253 / v;
+        sum+=  v;
+    }
+    
+    return (118645531UL /* * VCC_AVGB / 100 */ ) / sum; // in mv, calibrated
+#endif
+
+
+
+
+
+
+
+
+
+
+
 static void NOINLINE storeChannels(){
 
     uint16_t *cp= &chan_raw_middle[0];
@@ -2032,17 +2080,17 @@ static int NOINLINE channelDiff(byte n){
 // Panel  : panSetup
 // Needs  : Nothing, uses whole screen
 // Output : The settings menu
-// Size   : 3 x ?? (rows x chars)
+// Size   : fullscreen
 // Staus  : done
 
 /* in vars.h
 struct Params {
     PGM_P name; 	// наименование
-    char type;	// тип (f-float, b - byte etc)
+    char type;		// тип (f-float, b - byte etc)
     byte k;		// коэффициент сдвига запятой
     void *value;	// адрес самой переменной
-    fptr cb;	// callback для применения параметра
-    PGM_P fmt;	// формат печати параметра
+    fptr cb;		// callback для применения параметра
+    PGM_P fmt;		// формат печати параметра
     int min;		// диапазон изменения параметра
     int max;
 };

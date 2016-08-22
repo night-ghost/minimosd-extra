@@ -146,20 +146,28 @@ ISR(INT0_vect) {
     vsync_wait=0;	// отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
+    vsync_time=millis();
+
 
     if(nested) {	// вложенное прерывание игнорируем
 #if defined(DEBUG)
        nest_count++;	// ... но запишем в тетрадочку
 #endif
     } else {
+	byte tmp=SREG;
         if(update_stat) { // there is data for screen
-    	    nested++;
+            nested++;
             sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
-	    cli();
+            cli();
             update_stat = 0;
             nested--;
         }
+#if defined(PWM_IN_INTERRUPT)
+        sei(); 			// enable other interrupts - jitter is small because no big calculations in interrupts
+        generate_PWM(false);
+#endif
+        SREG=tmp;
     }
 #if defined(DEBUG)
     byte sp;
@@ -168,6 +176,7 @@ ISR(INT0_vect) {
         stack_bottom=((uint16_t)&sp);
 #endif
 }
+
 
 
 // PWM Measurement
@@ -184,7 +193,7 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
     } else {        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
         uint32_t t= int_Timer; 
         if( t /* && !New_PWM_Frame */){
-    	    time -= t;
+            time -= t;
             PWM_IN = (int)(time);
             int_Timer = 0;
 
@@ -311,14 +320,11 @@ void setup()     {
 
     logo();
 
-
-
-//    delay(2000); // у нас есть задержка на авто-бауд
 //    Serial.flush(); без него лучше шрифты грузятся
 
     LED_OFF;  // turn off on init done
 
-    crlf_count=0;
+//    crlf_count=0;
 
 #ifdef DEBUG
 /*    OSD::setPanel(0,0);
@@ -382,6 +388,7 @@ void loop()
             return;
     }
 
+    sei(); // на случай если глючит
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
 
 #if defined(MAV_REQUEST) && defined(USE_MAVLINK)
@@ -393,6 +400,8 @@ void loop()
         lflags.mav_request_done=1;
     }
 #endif
+
+
 
     getData(); // получить данные с контроллера
 
@@ -437,6 +446,15 @@ void loop()
     if(pt > timer_20ms){
         long_plus(&timer_20ms, 20);
         On20ms();
+
+        if(update_stat && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились
+            vsync_wait=0; // хватит ждать
+        
+            OSD::update(); // обновим принудительно
+            update_stat = 0;
+        }
+
+
     }
     if(pt > timer_100ms){
         long_plus(&timer_100ms, 100);
@@ -468,7 +486,7 @@ void loop()
 	count05s++;
 
 #ifdef WALKERA_TELEM
-        walkera.sendTelemetry();
+        walkera.sendTelemetry(); // 2 times in second
 #endif
 
         lflags.blinker = !lflags.blinker;
@@ -484,8 +502,8 @@ void loop()
 //        serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
 #endif
-                    osd.hw_init();    // restart MAX7456
-		    osd.update(); // clear screen
+                    osd.reset();    // restart MAX7456
+//		    osd.update(); // clear screen
                 }
 	    } else  max7456_err_count=0;
 
@@ -700,21 +718,9 @@ case_4:
 // loop time can be up to 75ms so 20ms is too optimistic 8)
 // but mean looptime is 8..12ms so...
 void On20ms(){ // 50Hz
-
-    if(PWM_out_bit) { // трансляция PWM на внешний вывод если заданы источник и приемник
-	int pwm=chan_raw[sets.pwm_src-1 + 5];
-	
-//#define OUT_PORT(val) if (val == LOW) { *out &= ~bit; } else { *out |= bit; }
-#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
-#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
-
-	noInterrupts();		// pulse widh disabled interrups for accuracy but we lose MAVlink bytes
-	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
-	delayMicroseconds(pwm);
-	SET_LOW();		//digitalWrite(PWM_out_pin,0);
-	interrupts();
-
-    }
+#if !defined(PWM_IN_INTERRUPT)
+    generate_PWM(true);
+#endif
 }
 
 

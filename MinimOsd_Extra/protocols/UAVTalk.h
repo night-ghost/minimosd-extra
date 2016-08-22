@@ -124,6 +124,7 @@ typedef byte UAVObjMetadata;
 #include "uavobjects/waypointactive.h"
 #include "uavobjects/airspeedsensor.h"
 #include "uavobjects/waypoint.h"
+#include "uavobjects/gyrosensor.h"
 
 
 #define	FLIGHTTELEMETRYSTATS_OBJ_LEN			21

@@ -67,8 +67,7 @@ byte get_switch_time(byte n){
 void doScreenSwitch(){
 	lflags.got_data=1; // redraw even no news
 	
-	//extern void reset_setup_data();
-	reset_setup_data();
+	reset_setup_data(); // clear channels middle values
 	
 	union {
 	    point p;
@@ -306,6 +305,7 @@ static void setHomeVars()
 //	    en=1;                			         // lock home position
 //	}  само сделается через пару строк
         lflags.was_armed = lflags.motor_armed; // only once
+        total_flight_time_milis=0; // reset on arm
     } 
 
 
@@ -456,9 +456,6 @@ void setFdataVars()
 #endif
 
 
-    //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home && lflags.motor_armed) 
-        float_add(trip_distance, osd_groundspeed * time_1000);
 
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 
@@ -507,6 +504,10 @@ void setFdataVars()
 
     long_plus(&total_flight_time_milis, time_lapse);
 
+
+    //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
+    if(lflags.osd_got_home) 
+        float_add(trip_distance, osd_groundspeed * time_1000);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float f=osd_home_distance;
@@ -651,3 +652,81 @@ inline uint16_t freeRam () {
 }
 #endif
 
+// трансляция PWM на внешний вывод если заданы источник и приемник
+#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
+#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
+
+#if defined PWM_BY_INTERRUPT
+
+void generate_PWM(bool nointerrupt) {
+    if(!PWM_out_bit) return;
+    
+    uint16_t pwm=chan_raw[sets.pwm_src-1 + 5];
+
+    OCR1A = pwm * 2; // 0.5ms tick
+
+    TCCR1A =
+       (0 << WGM10) |
+       (0 << WGM11) |
+       (0 << COM1A1) |
+       (0 << COM1A0) | // no active pin om compare-match
+       (0 << COM1B1) |
+       (0 << COM1B0);
+
+    TCCR1B =
+        (0 << ICNC1)| // Input capture noise canceler
+        (0 << ICES1)| // Input capture edge select
+        (0 << CS10) | // Prescale 8 - 2MHz frequency
+        (1 << CS11) | // Prescale 8
+        (0 << CS12) | // Prescale 8
+        (0 << WGM13)|
+        (1 << WGM12); // CTC mode (Clear timer on compare match) with OCR1A as top
+
+    // Not used in this case:
+    TCCR1C =
+        (0 << FOC1A)| // No force output compare (A)
+        (0 << FOC1B); // No force output compare (B)
+
+    TIFR1  = (1 << OCF1A);     // clear interrupt flag
+    TIMSK1 = (1 << OCIE1A);     // enable Interrupt on compare A
+
+}
+
+ISR(TIMER1_COMPA_vect){
+    static boolean state = false;
+
+    if(state) {  // turn off
+        SET_LOW();
+        state = false;
+        TIMSK1=0; // disable timer interrupts
+    } else { 
+        SET_HIGH();
+        state = true;
+    }
+}
+#else
+void generate_PWM(bool nointerrupt) {
+    if(PWM_out_bit) { 
+	int pwm=chan_raw[sets.pwm_src-1 + 5];
+	
+//#define OUT_PORT(val) if (val == LOW) { *out &= ~bit; } else { *out |= bit; }
+#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
+#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
+
+#if !defined(PWM_IN_INTERRUPT)
+	byte tmp=SREG;
+
+	if(nointerrupt)
+	    noInterrupts();		// pulse widh disabled interrups for accuracy but we lose MAVlink bytes
+#endif
+	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
+	delayMicroseconds(pwm);
+	SET_LOW();		//digitalWrite(PWM_out_pin,0);
+#if !defined(PWM_IN_INTERRUPT)
+	SREG=tmp; //	if(nointerrupt)    interrupts();
+#endif
+    }
+}
+
+
+#endif // PWM_BY_INTERRUPT

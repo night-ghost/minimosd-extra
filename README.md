@@ -376,6 +376,13 @@ v878
 * Compiler downgraded to 4.8.1 so that got rid of many compiler-related bugs (rssi not works, timer stats from wrong numbers etc)
 * Fixed the behavior of the overflow detector of MAVLink stream 
 
+
+v879
+* fixed Voltage and Altitude for UAVtalk
+* added Temperature (by Baro) for UAVtalk
+* if MAX7456 loses VSYNC interrupts then OSD switch to old-style refresh by timer - snow on scren is better than freeze
+* Output PWM generation is doing in VSYNC
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -779,6 +786,15 @@ v877
 v878
 * версия компилятора уменьшена до 4.8.1 что позволило избавиться от множества багов, вызваных компилятором
 * исправлено поведение обнаружения переполнения потока MAVLink
+
+v879
+* исправлены напряжение и высота для UAVtalk
+* добавлена температура (по барометру) для UAVtalk
+* если MAX7456 теряет кадровую синхронизацию и перестает выдавать прерывания то OSD переключается в старый режим обновления по таймеру - снег на 
+экране таки лучше чем полная остановка отображения.
+* генерация PWM производится в кадровом прерывании
+
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

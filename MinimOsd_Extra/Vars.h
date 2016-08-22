@@ -278,7 +278,8 @@ struct   loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
-volatile static uint8_t vsync_count=0;
+volatile uint8_t vsync_count=0;
+volatile uint32_t vsync_time=0;
 
 uint16_t screen_flags;
 

@@ -1,1 +1,1 @@
-#define RELEASE_NUM 878
+#define RELEASE_NUM 879

@@ -23,6 +23,8 @@
 #define MAVLINK_CONFIG 1
 #endif
 
+#define PWM_IN_INTERRUPT 1
+//#define PWM_BY_INTERRUPT 1
 
 #define MAV_REQUEST 1
 //#define USE_MAVLINK 1

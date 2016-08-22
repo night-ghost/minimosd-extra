@@ -415,6 +415,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		    if (c == UAVTALK_SYNC_VAL) goto again;
 		}
 		break;
+	
 	}
 
 	msg.u.state = state;
@@ -549,9 +550,9 @@ bool uavtalk_read(void) {
 				osd_heading		= uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
 				osd_groundspeed		= uavtalk_get_float(GPSPOSITION_OBJ_GROUNDSPEED);
 				if(osd_fix_type>0)
-				    osd_pos.alt		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE);
+				    osd_pos.alt		= uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE) * 1000;
 		                else
-                		    osd_pos.alt=osd_alt_mav;
+                		    osd_pos.alt=osd_alt_mav * 1000;
 				break;
 #if GPSPOSITIONSENSOR_OBJID_000 != GPSPOSITIONSENSOR_OBJID
 			case GPSPOSITIONSENSOR_OBJID:
@@ -562,9 +563,9 @@ bool uavtalk_read(void) {
 				osd_heading		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
 				osd_groundspeed		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Groundspeed));
 				if(osd_fix_type>0)
-				    osd_pos.alt		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude));
+				    osd_pos.alt		= uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude)) * 1000;
 		                else
-                		    osd_pos.alt=osd_alt_mav;
+                		    osd_pos.alt=osd_alt_mav * 1000;
 				break;
 #endif
 
@@ -587,7 +588,7 @@ bool uavtalk_read(void) {
 			case FLIGHTBATTERYSTATE_OBJID_000:
 			case FLIGHTBATTERYSTATE_OBJID_001:
 				if(!FLAGS.useExtVbattA)
-				    osd_vbat_A		= uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
+				    osd_vbat_A		= uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_VOLTAGE) * 1000;
 				if(!FLAGS.useExtCurr)
 				    osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CURRENT));
 //				osd_total_A		= (int16_t) uavtalk_get_float(FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
@@ -596,7 +597,7 @@ bool uavtalk_read(void) {
 #if FLIGHTBATTERYSTATE_OBJID_000 != FLIGHTBATTERYSTATE_OBJID && FLIGHTBATTERYSTATE_OBJID_001 != FLIGHTBATTERYSTATE_OBJID
 			case FLIGHTBATTERYSTATE_OBJID:
 				if(!FLAGS.useExtVbattA)
-				    osd_vbat_A		= uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Voltage));
+				    osd_vbat_A		= uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Voltage)) * 1000;
 				if(!FLAGS.useExtCurr)
 				    osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, Current));
 //				osd_total_A		= (int16_t) uavtalk_get_float(offsetof(FlightBatteryStateDataPacked, ConsumedEnergy));
@@ -604,15 +605,19 @@ bool uavtalk_read(void) {
 				break;
 #endif
 
+//HWSETTINGS_ADCROUTING_BATTERYVOLTAGE
+
 			case BAROALTITUDE_OBJID_000:
 			case BAROSENSOR_OBJID_000:
 				osd_alt_mav		= (int16_t) uavtalk_get_float(BAROALTITUDE_OBJ_ALTITUDE);
+				temperature		= uavtalk_get_float(BAROALTITUDE_OBJ_TEMPERATURE) * 10;
 				if(osd_pos.alt==0)
 				    osd_pos.alt=osd_alt_mav;
 				break;
 #if BAROSENSOR_OBJID_000 != BAROSENSOR_OBJID
 			case BAROSENSOR_OBJID:
-				osd_alt_mav		= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
+				osd_alt_mav	= (int16_t) uavtalk_get_float(offsetof(BaroSensorDataPacked, Altitude));
+				temperature	= uavtalk_get_float(offsetof(BaroSensorDataPacked, Temperature)) * 10;
 				if(osd_pos.alt==0)
 				    osd_pos.alt=osd_alt_mav;
 				break;
@@ -653,8 +658,13 @@ bool uavtalk_read(void) {
 			case WAYPOINTACTIVE_OBJID:
 			    wp_number = uavtalk_get_int16(offsetof(WaypointActiveDataPacked, Index));
 			    break;
-			    
-				// osd_airspeed = 0;               // air speed (only with pitot tube)
+
+/*			case GYROSENSOR_OBJID:
+			    uavtalk_get_int16(offsetof(GyroSensorDataPacked,temperature)) ;
+			    break;
+*/
+
+			// osd_airspeed = 0;               // air speed (only with pitot tube)
 			case AIRSPEEDSENSOR_OBJID:
 			    byte connected = uavtalk_get_int8(offsetof(AirspeedSensorDataPacked, SensorConnected));
 			    if(connected)

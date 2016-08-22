@@ -23,9 +23,9 @@ OPT += -fno-aggressive-loop-optimizations
 
 #OPT += -fmodulo-sched 
 #OPT += -fmodulo-sched-allow-regmoves 
-#OPT += -fassociative-math
+OPT += -fassociative-math
 #OPT += -fconserve-stack
-#OPT += -freorder-blocks-and-partition
+#OPT += -freorder-blocks-and-partition size more
 #OPT += -fno-signed-zeros
 #OPT += -fearly-inlining 
 #OPT += -floop-nest-optimize 
@@ -62,14 +62,14 @@ OPT += -fno-aggressive-loop-optimizations
 
 #OPT += -v -save-temps # for GCC bugreport
 
-#OPT +=  -fno-caller-saves
+OPT +=  -fno-caller-saves
 
 OPT += $(PROTO)
 
-#OPT += -mcall-prologues 
+OPT += -mcall-prologues 
 # http://www.nongnu.org/avr-libc/user-manual/FAQ.html
-#OPT +=  -Wl,--relax 
-# OPT += -maccumulate-args #bad
+OPT +=  -Wl,--relax 
+
 # OPT += -mbranch-cost=1  #bad
 #OPT += -flto -fuse-linker-plugin
 
