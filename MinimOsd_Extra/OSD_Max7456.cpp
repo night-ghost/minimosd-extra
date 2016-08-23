@@ -49,6 +49,19 @@ void OSD::adjust(){
   max7456_off();
 }
 
+void delay_15(){
+    delay(15);
+}
+
+void OSD::reset(){
+    max7456_on();
+    MAX_write(MAX7456_VM0_reg, MAX7456_RESET );
+
+    delay_15();
+
+    hw_init();
+}
+
 void OSD::hw_init(){
     max7456_on();
 
@@ -64,11 +77,11 @@ void OSD::hw_init(){
     MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
 
   // define sync (auto,int,ext)
-    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_internal);  // first time on internal sync
+    MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_internal);  // first time on internal sync
 
     delay_150();
 
-    MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync);  // and then switch to auto mode
+    MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  // and then switch to auto mode
 
  // max7456_off();
 
@@ -87,9 +100,6 @@ void OSD::init()
     hw_init();
 }
 
-void delay_15(){
-    delay(15);
-}
 
 //------------------ Detect Mode (PAL/NTSC) ---------------------------------
 
@@ -100,7 +110,7 @@ void OSD::detectMode()
     
     byte osdstat_r;
 
-    if(!sets.flags.flags.mode_auto) {
+    if(!FLAGS.mode_auto) {
 	goto no_auto;
     }else {
 
@@ -108,16 +118,16 @@ void OSD::detectMode()
 
         if ((B00000001 & osdstat_r) != 0){ //PAL
             setMode(1);  
-            sets.flags.flags.PAL_NTSC = 1; // remember in case of camera off
+            FLAGS.PAL_NTSC = 1; // remember in case of camera off
         }
         else if((B00000010 & osdstat_r) != 0){ //NTSC
             setMode(0);
-            sets.flags.flags.PAL_NTSC = 0; // remember in case of camera off
+            FLAGS.PAL_NTSC = 0; // remember in case of camera off
         }
         else if((B00000100 & osdstat_r) != 0){ //loss of sync
 //      setMode(1); // PAL without video 
 no_auto:
-          if (sets.flags.flags.PAL_NTSC) //NTSC
+          if (FLAGS.PAL_NTSC) //NTSC
               setMode(1);
           else  //PAL
               setMode(0);
@@ -145,7 +155,7 @@ void OSD::setMode(uint8_t themode){
     if(video_mode != mode){
 	video_mode = mode;
         max7456_on();
-        MAX_write(MAX7456_VM0_reg, (MAX7456_ENABLE_display_vert | video_mode) | MAX7456_SYNC_autosync); 
+        MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync); 
         max7456_off();
     }
 }
@@ -154,7 +164,7 @@ void OSD::setMode(uint8_t themode){
 void OSD::setBrightness()
 {
 
-    static const uint8_t levels[] PROGMEM = {
+    static const uint8_t levels[] PROGMEM = { // black level always 0
 	MAX7456_WHITE_level_80, // 0
 	MAX7456_WHITE_level_90, // 1
 	MAX7456_WHITE_level_100,// 2
@@ -184,9 +194,11 @@ void NOINLINE OSD::calc_pos(){
   bufpos = row*30+col;
 }
 
+
+// screen size is 30 cols * 16 rows
 void OSD::setPanel(uint8_t st_col, uint8_t st_row){
-    col = st_col & 0x3f; // col,row нужны для отработки перевода строки с сохранением колонки
-    row = st_row & 0x0f; // в старших битах флаги, размер экрана все равно мелкий
+    col = st_col & 0x1f; // 30 cols - col,row нужны для отработки перевода строки с сохранением колонки
+    row = st_row & 0x0f; // 16 rows - в старших битах флаги, размер экрана все равно мелкий
 
 
     if(getMode()==0 && row >6) // ntsc after middle
@@ -209,9 +221,8 @@ void OSD::write_S(uint8_t c){
   if(c == '|'){
     row++;
     calc_pos();
-  } else {
+  } else
     write_raw(c);
-  } 
 }
 
 size_t OSD::write(uint8_t c){
@@ -224,16 +235,6 @@ void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
     write_S(c);
 }
 
-
-
-/* для сравнения
-uint8_t spi_transfer(uint8_t data) {
-  SPDR = data;                    // Start the transmission
-  while (!(SPSR & (1<<SPIF)))     // Wait the end of the transmission
-    ;
-  return SPDR;                    // return the received byte
-}
-*/
 
 void OSD::update() {
     uint8_t *b = osdbuf;
@@ -252,31 +253,30 @@ void OSD::update() {
     
 */
 
-    max7456_on(); //  digitalWrite(MAX7456_SELECT,LOW); 
+    max7456_on(); 
 
     MAX_write(MAX7456_DMAH_reg, 0);
     MAX_write(MAX7456_DMAL_reg, 0);
     MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
-    max7456_off(); //  digitalWrite(MAX7456_SELECT, HIGH);
+    max7456_off(); 
 
     for(; b < end_b;) {
-        max7456_on();  //  digitalWrite(MAX7456_SELECT, HIGH);
+        max7456_on();
 //        SPDR = *b;
 //        while (!(SPSR & (1<<SPIF))) ;
-	SPI::transfer(*b);
-        *b++=' ';		// обойдемся без memset
-        max7456_off();	//  digitalWrite(MAX7456_SELECT,LOW); 
+        SPI::transfer(*b);
+        *b++=' ';           // обойдемся без memset
+        max7456_off();
     }
-    max7456_on(); // digitalWrite(MAX7456_SELECT,LOW);  /CS OSD
+    max7456_on();
 
-    SPI::transfer(MAX7456_END_string); // 0xFF
+    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
 
-    max7456_off(); //  digitalWrite(MAX7456_SELECT, HIGH);
+    max7456_off();
 }
 
 
-//*
 void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 {
   byte x;
@@ -286,7 +286,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   char_address_hi = font_count;
 //  byte char_address_lo = 0;  - autoincrement mode
 
-//    cli();
+//    cli(); - нет смысла 
 
   max7456_on();
   MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display);
@@ -323,7 +323,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
   max7456_off();
 
 }
-//*/
+
 //------------------ pure virtual ones (just overriding) ---------------------
 
 byte  OSD::available(void){

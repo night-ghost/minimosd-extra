@@ -166,9 +166,12 @@ if(apm_mav_system  != msg.m.sysid){
                 // apm_mav_component = msg.m.compid;
 
 
+#define MAX_OVERLOAD_COUNT 5
+#define MAX_FROZEN_COUNT 5
+
 		if(mav_data_count==0){ // there is no data comes to OSD
 		    if(mav_raw_imu_count) { // we has IMU data but not GPS - stream overload
-		        if(lflags.mav_stream_overload<5) 
+		        if(lflags.mav_stream_overload < MAX_OVERLOAD_COUNT) 
     			    lflags.mav_stream_overload++;
     		        else {
                             lflags.mav_request_done = 0; // make new request
@@ -176,11 +179,14 @@ if(apm_mav_system  != msg.m.sysid){
                                 stream_rate *=2;		// on half rate
                         }
 		    } else { // no data at all
-		        if(lflags.mav_data_frozen<5) 
+		        if(lflags.mav_data_frozen < MAX_FROZEN_COUNT) 
     			    lflags.mav_data_frozen++;
     		        else 
                             lflags.mav_request_done = 0; // make new request
                     }
+		} else { // there was GPS data
+		    lflags.mav_stream_overload =0; // reset counters
+		    lflags.mav_data_frozen=0;
 		}
 		mav_data_count=0;
 		mav_raw_imu_count=0;
@@ -193,11 +199,11 @@ if(apm_mav_system  != msg.m.sysid){
                 
     // MAV_DATA_STREAM_POSITION,
             case MAVLINK_MSG_ID_SYS_STATUS:
-                if(!sets.flags.flags.useExtVbattA){
+                if(!FLAGS.useExtVbattA){
                     osd_vbat_A = mavlink_msg_sys_status_get_voltage_battery(&msg.m) ; //Battery voltage, in millivolts (1 = 1 millivolt)
                     osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msg.m); //Remaining battery energy: (0%: 0, 100%: 100)
                 }
-                if(!sets.flags.flags.useExtCurr)
+                if(!FLAGS.useExtCurr)
                     osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msg.m); //Battery current, in 10*milliamperes (1 = 10 milliampere)
 
                 //osd_mode = apm_mav_component;//Debug
@@ -409,7 +415,7 @@ typedef enum FENCE_BREACH{
 		    mav_fence_status = mavlink_msg_fence_status_get_breach_type(&msg.m);
 		break;
 
-		case MAVLINK_MSG_ID_RADIO: {// 3dr telemetry status
+		case MAVLINK_MSG_ID_RADIO: {// 3dr telemetry status - new 
 /*
 typedef struct __mavlink_radio_t
 {
@@ -427,7 +433,7 @@ typedef struct __mavlink_radio_t
 //DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO rssi=%d remrssi=%d\n", rssi, remrssi);
 		} break;
 
-		case MAVLINK_MSG_ID_RADIO_STATUS: {// 3dr telemetry status
+		case MAVLINK_MSG_ID_RADIO_STATUS: {// 3dr telemetry status - old APM
 /*
 typedef struct __mavlink_radio_status_t
 {

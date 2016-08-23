@@ -658,11 +658,11 @@ typedef struct {
 } MW_ANALOG_t;
 */
 //	r_struct((uint8_t*)&MW_ANALOG,7);
-	if(!sets.flags.flags.useExtVbattA){
+	if(!FLAGS.useExtVbattA){
 	    osd_vbat_A              = mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
 	    osd_battery_remaining_A = mwii_read_uint(offsetof(MW_ANALOG_t, pMeterSum) );
 	}
-	if (!sets.flags.flags.useExtCurr)
+	if (!FLAGS.useExtCurr)
 	    osd_curr_A = mwii_read_uint(offsetof(MW_ANALOG_t, Amperage) );
 
 	osd_rssi       = mwii_read_uint(offsetof(MW_ANALOG_t, Rssi) );

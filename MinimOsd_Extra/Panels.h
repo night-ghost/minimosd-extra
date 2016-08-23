@@ -110,8 +110,8 @@ static void NOINLINE showArrow(uint8_t rotate_arrow){
 // Calculate and shows Artificial Horizon
 // Smooth horizon by Jörg Rothfuchs
 							// with different factors we can adapt do different cam optics
-#define AH_PITCH_FACTOR0	0.010471976		// conversion factor for pitch
-#define AH_ROLL_FACTOR0		0.017453293		// conversion factor for roll
+#define AH_PITCH_FACTOR		0.010471976		// conversion factor for pitch
+#define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
 #define AH_COLS			12			// number of artificial horizon columns
 #define AH_ROWS			5			// number of artificial horizon rows
 #define CHAR_COLS		12			// number of MAX7456 char columns
@@ -151,26 +151,26 @@ static void showHorizon(byte start_col, byte start_row) {
 
 
 
-    float AH_PITCH_FACTOR, // conversion factor for pitch
-	  AH_ROLL_FACTOR ; // conversion factor for roll
+    float k_pitch, // conversion factor for pitch
+	  k_roll ; // conversion factor for roll
     
     // NTSC: osd.getMode() == 0
     {
         byte fPAL=osd.getMode();
-        AH_PITCH_FACTOR = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a) * AH_PITCH_FACTOR0;
-        AH_ROLL_FACTOR  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a)  * AH_ROLL_FACTOR0;    
+        k_pitch = (fPAL ? sets.horiz_kPitch:sets.horiz_kPitch_a);
+        k_roll  = (fPAL ? sets.horiz_kRoll :sets.horiz_kRoll_a);
      }
 
 
     // preset the line char attributes
-    int  roll = osd_att.roll;
+    float  roll = osd_att.roll * k_roll;
     if(screen_flags & scrFlg_russianHUD) roll = -roll;
 
-    int iroll  = roll; // for tangens later
+    int iroll  = roll;
 
-    if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
-	roll = roll < 0 ? roll + 179 : roll;
-	uint16_t a_roll=abs(roll);
+    if ((iroll >= 0 && iroll < 90) || (iroll >= -179 && iroll < -90)) {	// positive angle line chars
+	iroll = iroll < 0 ? iroll + 179 : iroll;
+	uint16_t a_roll=abs(iroll);
 	if(       a_roll > ANGLE_VERT) {
 	    line_set =          0xc1;
 	    subval_overflow = 0;
@@ -187,8 +187,8 @@ static void showHorizon(byte start_col, byte start_row) {
             subval_overflow = 8;
 	}
     } else {								// negative angle line chars
-	roll = roll > 90 ? roll - 179 : roll;
-	uint16_t a_roll=abs(roll);
+	iroll = iroll > 90 ? iroll - 179 : iroll;
+	uint16_t a_roll=abs(iroll);
 	if(        a_roll > ANGLE_VERT) {
 	    line_set =          0xc1;
 	    subval_overflow = 0;
@@ -207,9 +207,11 @@ static void showHorizon(byte start_col, byte start_row) {
     }
     
     byte shf=0;
-    int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * osd_att.pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
-// -45 .. +45
+    int8_t shift_angle=0;
 again:
+    int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * (osd_att.pitch + shift_angle )* k_pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
+// -45 .. +45
+
 
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1+shf; col<=AH_COLS-shf; col++) {
@@ -219,7 +221,7 @@ again:
         
         // tg(72 gr) ==3 so byte overflows
 
-        int16_t hit = (int)(tan(AH_ROLL_FACTOR * iroll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
+        int16_t hit = (int)(tan(AH_ROLL_FACTOR * roll) * middle) + pitch_line;    // 1 to 90	calculating hit point on Y plus offset
         
         if (hit >= 1 && hit <= AH_TOTAL_LINES) {
 	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
@@ -230,8 +232,13 @@ again:
 	    else
 		subval = 0; // raw chars
 	    
-	    // print the line char
-            OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 1, line_set + subval);
+	    OSD::setPanel(start_col + col - 1, start_row + AH_ROWS - row - 1);
+	    if(shift_angle!=0 && col==(AH_COLS-1)/2){
+		osd.print(abs(shift_angle));
+		col++; // skip next
+	    } else {   // print the line char
+                OSD::write_S(line_set + subval);
+            }
 	    
 	    // check if we have to print an overflow line char
 	    if ( subval && subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
@@ -243,15 +250,19 @@ again:
  // если линия по питчу ушла с экрана то надо ее заузить на пару символов и сместить обратно
 // уйти-то она может и ушла, но при кренах появляется в углах, поэтому надо отрисовывать И ту, И другую
 
+// но вобшем-то лучше отнимать не строки, а угол, и возвращаться на шаг выше. Бонусом это даст возможность печатать посередине цифры угла
+
     if(pitch_line<0){
-       pitch_line += AH_TOTAL_LINES-2;
-       shf+=2;
-       goto again;
+//       pitch_line += AH_TOTAL_LINES-2;
+	shift_angle +=30;
+        shf+=2;
+        goto again;
     }
     if(pitch_line>AH_TOTAL_LINES){
-       pitch_line -= AH_TOTAL_LINES-2;
-       shf+=2;
-       goto again;
+//       pitch_line -= AH_TOTAL_LINES-2;
+	shift_angle -=30;
+        shf+=2;
+        goto again;
     }
 
 
@@ -498,22 +509,17 @@ static void panTemp(point p){
 // Output : 
 // Size   : 1 x 7Hea  (rows x chars)
 // Staus  : done
-static void panEff(point p){
 
-    static float ddistance = 0;
-    float        eff = 0; //Efficiency
 
-    if(sets.model_type==0){ // plane
-#ifdef IS_PLANE
+static float        eff = 0; //Efficiency
 
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
-
+static void calc_energy(){
 #define EFF_FILTER 0.01
 
 // calculate mean even if throttle==0
 
 #if defined(USE_FILTER)
-            filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
+            filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, 1/EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
 #else
 
 // скорость у нас км/ч, ток в ма, получаем ма/км * ч = ма*ч / км, то есть сколько ма/ч надо затратить на километр полета
@@ -533,19 +539,42 @@ static void panEff(point p){
             //eff += (e0  - eff) * 0.1; // комплиментарный фильтр 1/10
 #endif
 
+}
+
+static void print_energy(point p){
+    int iEff=eff;
+    if (iEff > 0 && iEff <= 9999) {
+        if(has_sign(p))
+            OSD::write_S(0x16);
+            
+        osd_printf_1(PSTR("%4.0f\x01"), eff);
+    }
+}
+
+
+static void panEff(point p){
+
+    static float ddistance = 0;
+
+    if(is_alt(p)){
+        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+	    calc_energy();
+	    print_energy(p);
+	}
+	return;
+    }
+
+    if(sets.model_type==0){ // plane
+#ifdef IS_PLANE
+        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+
+	    calc_energy();
 
             if (osd_throttle > 2){		// motor is working
                 if (!lflags.throttle_on) 
                     lflags.throttle_on = 1;
     
-	    
-                int iEff=eff;
-                if (iEff > 0 && iEff <= 9999) {
-                    if(has_sign(p))
-        		OSD::write_S(0x16);
-            
-                    osd_printf_1(PSTR("%4.0f\x01"), eff);
-                }
+		print_energy(p);
 
             }else{	// free fly
                 if (lflags.throttle_on) {
@@ -578,7 +607,7 @@ static void panEff(point p){
       // show estimated flight time
       
       if (lflags.motor_armed) { //Check takeoff just to prevent initial false readings
-#if ! defined(USE_UAVTALK)
+#if !defined(USE_UAVTALK)
         if(osd_battery_remaining_A != last_battery_reading) {    // UAVtalk sends this itself
             remaining_estimated_flight_time_seconds = f_div1000((float)osd_battery_remaining_A * total_flight_time_milis / 
         					    (max_battery_reading - osd_battery_remaining_A));
@@ -603,7 +632,7 @@ static void panEff(point p){
 
 static void panRSSI(point p){
 
-    osd_printi_1(PSTR("%3i"), rssi);
+    osd_printi_1(PSTR("%3i"), rssi_norm);
     if(!(sets.RSSI_raw%2) && is_alt(p))
 	osd.write_S('%');
 }
@@ -634,7 +663,7 @@ static void panWindSpeed(point p){
     int dir=normalize_angle(osd_winddirection);
 
 #if defined(USE_FILTER)
-    filter(nor_osd_windspeed,  osd_windspeed, 0.01 ); // комплиментарный фильтр 1/100 
+    filter(nor_osd_windspeed,  osd_windspeed, 100 ); // комплиментарный фильтр 1/100 
 #else
     //nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
     //dst+=(val-dst)*k;
@@ -776,76 +805,76 @@ static void check_warn()
 
 
 //1
- if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
-    wmask |= 1; //0
-
+    if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
+        wmask |= 1; //0
+ 
 //2    
- if (sets.model_type==0 && iAirspeed < sets.stall && lflags.in_air ) // plane
-    wmask |= (1<<1);
+    if (sets.model_type==0 && iAirspeed < sets.stall && lflags.in_air ) // plane
+        wmask |= (1<<1);
 
 //3    
- if (sets.overspeed && iAirspeed > sets.overspeed) 
-    wmask |= (1<<2);
+    if (sets.overspeed && iAirspeed > sets.overspeed) 
+        wmask |= (1<<2);
 
 
     int vbat = (osd_battery_remaining_A * 100  + max_battery_reading/2)/ max_battery_reading; // normalize to 100
     
 //4    voltage limit set and less                   capacity limit set and less
- if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
-    wmask |= (1<<3);
+    if ( (sets.battv !=0 && iVolt!=0 && (iVolt < sets.battv)) || (sets.batt_warn_level != 0 &&  (vbat < sets.batt_warn_level)) )
+        wmask |= (1<<3);
 
 //5
     // не сырое значение  
- if (!(sets.RSSI_raw%2) && rssi < sets.rssi_warn_level )
-    wmask |= (1<<4);
+    if (!(sets.RSSI_raw%2) && rssi_norm < sets.rssi_warn_level )
+        wmask |= (1<<4);
 
     int iVs = (int)abs(vertical_speed) /10;
 
 //6
- if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
-    wmask |= (1<<5);
+    if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
+        wmask |= (1<<5);
 
     iVolt = osd_vbat_B/100; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
- if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
-    wmask |= (1<<6);
+    if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
+        wmask |= (1<<6);
 
 #if defined(USE_MAVLINK)
 //8
- if(mav_fence_status == FENCE_BREACH_MINALT)
-    wmask |= (1<<7);
+    if(mav_fence_status == FENCE_BREACH_MINALT)
+        wmask |= (1<<7);
 
 //9
- if(mav_fence_status == FENCE_BREACH_MAXALT)
-    wmask |= (1<<8);
+    if(mav_fence_status == FENCE_BREACH_MAXALT)
+        wmask |= (1<<8);
 
 //10
- if(mav_fence_status == FENCE_BREACH_BOUNDARY)
-    wmask |= (1<<9);
+    if(mav_fence_status == FENCE_BREACH_BOUNDARY)
+        wmask |= (1<<9);
 #endif
 
- if(wmask == 0) 
-    warning = 0;
- else {
-    prev_warn = warning;
-    if(warning == 0) warning = 1;
-    else             warning = prev_warn+1;
+    if(wmask == 0) {
+        warning = 0;
+    }else {
+        prev_warn = warning;
+        if(warning == 0) warning = 1;
+        else             warning = prev_warn+1;
 
-    bit = 1 << (warning-1);
+        bit = 1 << (warning-1);
 
-    while(1) {
-        if(warning >= WARNINGS+1) {
-	    warning = 1;
-	    bit = 1;
+        while(1) {
+            if(warning >= WARNINGS+1) {
+                warning = 1;
+                bit = 1;
+            }
+            if(wmask&bit) break;
+            warning++;
+            bit <<= 1;
         }
-        if(wmask&bit) break;
-        warning++;
-        bit <<= 1;
+        /* stay blank for one cycle for single warning */
+        if(warning == prev_warn) warning = 0;
     }
-    /* stay blank for one cycle for single warning */
-    if(warning == prev_warn) warning = 0;
- }
 
 }
 
@@ -935,8 +964,8 @@ static void panBatteryPercent(point p){
 
 //Serial.printf_P(PSTR("batt val="),val);
 
-        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);     // battery A remmaning picture
-//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remmaning picture
+        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);    // battery A remaning picture
+//    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
 	if (is_alt(p))
 	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
@@ -986,8 +1015,6 @@ static void panHomeDis(point p){
 // Size   : 5 x 14  (rows x chars)
 // Staus  : done
 
-//const char str_hud[] PROGMEM = "\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|";
-//const char str_mid[] PROGMEM = "\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|";
 
 static void inline spaces(byte n){
     while(n-- >0) osd_blank();
@@ -998,15 +1025,8 @@ static void panHorizon(point p){
   // сначала нарисуем стрелочки.
 
     if(is_alt(p)) {
-/*        osd.print_P(str_hud);
-        osd.print_P(str_hud);
-        osd.print_P(str_mid);
-        osd.print_P(str_hud);
-        osd.print_P(str_hud);
-*/
 	byte i;
 	for(i=5;i!=0; i--){ // 30 bytes of flash
-            //osd.print_P(i==3 ? str_mid : str_hud);
             osd.write_S(i==3 ? '\xc6' : '\xb2');
             spaces(12);
             osd.write_S(i==3 ? '\xc5' : '\xb3');
@@ -1018,13 +1038,13 @@ static void panHorizon(point p){
 
     byte mid_x = p.x+6;
     byte mid_y = p.y+2;
+
     if(is_alt3(p))
        showRADAR(mid_x, mid_y, is_alt4(p));
 
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(mid_x, mid_y);
 	osd.print_P(PSTR("\xb8\xb9"));
-//	osd_printi_xy({mid_x, mid_y}, PSTR("\xb8\xb9"),0);
     }
 
     //Show ground level on  HUD
@@ -1041,8 +1061,6 @@ static void panHorizon(point p){
 // Staus  : done
 
 static void panPitch(point p){
-//Serial.printf_P(PSTR("pitch=%f\n"), (float)osd_att.pitch ); Serial.wait();
-
     osd_printi_1(PSTR("%4i\x05\x07"),osd_att.pitch);
 }
 
@@ -1083,14 +1101,17 @@ static void panBatt_A(point p){
 
 static void panBatt_B(point p){
     if(is_on(p)) {
-	sets.flags.flags.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
+	FLAGS.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
         printVolt(osd_vbat_B);
     } else
-        sets.flags.flags.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
+        FLAGS.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
 
 
-
+static void panPower(point p){
+	    // calced in func.h
+    osd_printf_1(PSTR("%3.0f"), power);
+}
 
 
 
@@ -1194,7 +1215,6 @@ static void panGPS(point p){
     } 
 
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
-//    osd.printf_P(f, osd_pos.lat,div, osd_pos.lon);
     print_gps(f,div);
 }
 
@@ -1309,6 +1329,7 @@ static void panFdata(point p){ // итоги полета
 	{fmt6, '\x90', 'v',  &max_osd_climb       },
 	{fmt7, '\xA0', 'v',  &min_osd_climb       },
 	{fmt1, '\xBD', 'a',  &max_osd_curr_A      },
+	{fmt1, 'W',    'w',  &max_osd_power       },
 //	{fmt4, 'f',  &osd_pos.lat         },
 //	{fmt5, 'f',  &osd_pos.lon         },
 	{0}
@@ -1420,10 +1441,10 @@ static void panWaitMAVBeats(){
     OSD::setPanel(3,3);
     
 #endif
+    osd_groundspeed=0; // to not move with last speed when "no data"
 
     OSD::setPanel(5,3);
     osd_printi_1(PSTR("No input data! %u|"),seconds - lastMavSeconds);
-//    osd_printi_xy({5,3},PSTR("No input data! %d"),seconds - lastMavSeconds);
 
 #if defined(AUTOBAUD)
     if(serial_speed)
@@ -1998,21 +2019,78 @@ static void panCValue(point p) {
 }
 
 
+
+
+
+
+
+#if 0
+uint16_t readVCC() { // in mv
+    ADMUX = 0x4e; //AVCC with external capacitor at AREF pin, 1.1v as meashured
+    delay_1();
+    sum=0;
+
+#define VCC_AVGB 100
+
+    for(byte i=VCC_AVGB; i>0; i--){
+        delay_1();
+
+        ADCSRA |= 1 << ADSC; // start conversion
+
+        while (bit_is_set(ADCSRA, ADSC));
+
+        byte low  = ADCL;
+        byte high = ADCH;
+
+        uint16_t v = (high << 8) | low;
+    // return 11253 / v;
+        sum+=  v;
+    }
+    
+    return (118645531UL /* * VCC_AVGB / 100 */ ) / sum; // in mv, calibrated
+#endif
+
+
+
+
+
+
+
+
+
+
+
+static void NOINLINE storeChannels(){
+
+    uint16_t *cp= &chan_raw_middle[0];
+    for(byte i=0; i<4; i++,cp++){
+        if (*cp < 1000)
+           *cp = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
+    }
+}
+
+static int NOINLINE channelDiff(byte n){
+    return chan_raw[n] - chan_raw_middle[n];
+}
+
+
+#ifdef USE_SETUP
+
 /* **************************************************************** */
 // Panel  : panSetup
 // Needs  : Nothing, uses whole screen
 // Output : The settings menu
-// Size   : 3 x ?? (rows x chars)
+// Size   : fullscreen
 // Staus  : done
 
 /* in vars.h
 struct Params {
     PGM_P name; 	// наименование
-    char type;	// тип (f-float, b - byte etc)
+    char type;		// тип (f-float, b - byte etc)
     byte k;		// коэффициент сдвига запятой
     void *value;	// адрес самой переменной
-    fptr cb;	// callback для применения параметра
-    PGM_P fmt;	// формат печати параметра
+    fptr cb;		// callback для применения параметра
+    PGM_P fmt;		// формат печати параметра
     int min;		// диапазон изменения параметра
     int max;
 };
@@ -2023,6 +2101,7 @@ struct Setup_screen {
     fptr tail;	// функция отображения остального
 };
 */
+
 
 void renew(){
 //Serial.printf_P(PSTR("renew!\n")); Serial.wait();
@@ -2182,18 +2261,6 @@ static void /*NOINLINE*/ move_screen(char dir){
     lflags.got_data=1; // renew screen
 }
 
-static void NOINLINE storeChannels(){
-
-    uint16_t *cp= &chan_raw_middle[0];
-    for(byte i=0; i<4; i++,cp++){
-        if (*cp < 1000)
-           *cp = chan_raw[i];   // запомнить начальные значения  - центр джойстика для первых 4 каналов
-    }
-}
-
-static int NOINLINE channelDiff(byte n){
-    return chan_raw[n] - chan_raw_middle[n];
-}
 
 #define SETUP_START_ROW 1
 
@@ -2423,7 +2490,7 @@ no_write:
     }
 
 }
-
+#endif
 
 typedef void (*fPan_ptr)(Point p);
 
@@ -2462,6 +2529,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(throttle),		panThr, 	0x02 },
     { ID_of(FMod),		panFlightMode,	0x7f },
     { ID_of(curr_A),		panCur_A, 	0xbd },
+    { ID_of(Power),		panPower, 	'W'  },
     { ID_of(windSpeed),		panWindSpeed, 	0x1d },
     { ID_of(climb),		panClimb, 	0x15 },
     { ID_of(tune),		panTune, 	0 },
@@ -2553,17 +2621,22 @@ DBG_PRINTF("set c landed=%u\n", landed);
 
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
 
+//DBG_PRINTF("time_since(&lastMAVBeat)=%d\n", time_since(&lastMAVBeat));
 
 //    if(pt > (lastMAVBeat + 2500)){
-    if(time_since(&lastMAVBeat) > 2500){
-        panWaitMAVBeats(); //Waiting for MAVBeats...
+    {
+	uint16_t t=time_since(&lastMAVBeat);
+        if(t > 2500){
+            panWaitMAVBeats(); //Waiting for MAVBeats...
+            return;
+        }
     }
 #ifdef IS_COPTER
  //Only show flight summary 10 seconds after landing and if throttle < 15
-//  else if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
-//  else if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
-//  else if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-    else if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
+//  if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
+//  if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
+//  if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
+    if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
 #if !defined(DEBUG) || 1
       && ((int)trip_distance > 5) // show always in debug mode
 #endif
@@ -2607,11 +2680,13 @@ show_fdata:
 	print_all_panels(panels_list);
     } else { 			// last panel
 
+#ifdef USE_SETUP
 	if(!lflags.motor_armed) {
 	    panSetup();			// Setup when not armed
-	}  else  { // warnings on clear screen
+	}  else   // warnings on clear screen
+#endif
 	    print_all_panels(&panels_list[sizeof(panels_list)/sizeof(Panels_list)-2]); // warnings only
-	}
+	
 
     }
   }

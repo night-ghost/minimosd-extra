@@ -12,19 +12,20 @@ F_CPU = 16000000
 
 
 OPT  = -ffast-math 
-OPT += -floop-strip-mine
-#OPT += -finline-functions-called-once 
+#OPT += -floop-strip-mine
+OPT += -finline-functions-called-once 
 OPT += -finline-small-functions
 OPT += -fmerge-all-constants
 OPT += -fomit-frame-pointer 
 OPT += -fno-optimize-sibling-calls 
 OPT += -fno-early-inlining 
 OPT += -fno-aggressive-loop-optimizations
+
 #OPT += -fmodulo-sched 
 #OPT += -fmodulo-sched-allow-regmoves 
-#OPT += -fassociative-math
+OPT += -fassociative-math
 #OPT += -fconserve-stack
-#OPT += -freorder-blocks-and-partition
+#OPT += -freorder-blocks-and-partition size more
 #OPT += -fno-signed-zeros
 #OPT += -fearly-inlining 
 #OPT += -floop-nest-optimize 
@@ -61,14 +62,14 @@ OPT += -fno-aggressive-loop-optimizations
 
 #OPT += -v -save-temps # for GCC bugreport
 
-#OPT +=  -fno-caller-saves
+OPT +=  -fno-caller-saves
 
 OPT += $(PROTO)
 
 OPT += -mcall-prologues 
 # http://www.nongnu.org/avr-libc/user-manual/FAQ.html
-#OPT +=  -Wl,--relax 
-# OPT += -maccumulate-args #bad
+OPT +=  -Wl,--relax 
+
 # OPT += -mbranch-cost=1  #bad
 #OPT += -flto -fuse-linker-plugin
 
@@ -80,7 +81,7 @@ CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT)
 LDFLAGS = $(OPT) 
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref
 MCU=atmega328p
-ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
+#ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
 
 ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += GCS_MAVLink

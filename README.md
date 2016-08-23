@@ -360,6 +360,33 @@ v875
 * fixed underflow bug in panRose
 * fixed lagre pitch horizon behavior
 
+v876
+* UAVtalk uses BaroAlt when no GPS.
+* fixed flight time counting
+* fixed RussianHUD on startup screen
+
+
+v877
+* new Power panel which shows mean consumed power (smoothing by complementary filter 1:10)
+* maximal power added to flight results (FlightData panel)
+* all complementary filters are unified
+* trip distance not grows when "No input data"
+
+v878
+* Compiler downgraded to 4.8.1 so that got rid of many compiler-related bugs (rssi not works, timer stats from wrong numbers etc)
+* Fixed the behavior of the overflow detector of MAVLink stream 
+
+
+v879
+* fixed Voltage and Altitude for UAVtalk
+* added Temperature (by Baro) for UAVtalk
+* if MAX7456 loses VSYNC interrupts then OSD switch to old-style refresh by timer - snow on scren is better than freeze
+* Output PWM generation is doing in VSYNC
+
+v880
+* a try to get battery capacity for UAVTalk and calculate % remaining
+* slightly changed the order of reinitialization when MAX hangs
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -367,7 +394,7 @@ Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
 
 /* RUSSIAN */
 
-БЫстрый старт
+Быстрый старт
 
 
 1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip?raw=true
@@ -748,6 +775,34 @@ v875
 * исправлен баг с переполнением в panRose
 * исправлено поведение горизонта на больших тангажах
 * удалены последние остатки работы нескольких протоколов одновременно
+
+v876
+* UAVtalk использует высоту по барометру при отсутствии GPS
+* исправлен подсчет времени полета
+* исправлен режим RussianHUD на стартовом экране
+
+v877
+* новая панель Power, отображающая среднюю потребляемую мощность (сглаживание комплиментарным фильтром 1:10)
+* в панель результатов полета добавлен максимум мощности
+* унификация комплиментарных фильтров
+* пройденное расстояние не растет при отсутствии данных
+
+v878
+* версия компилятора уменьшена до 4.8.1 что позволило избавиться от множества багов, вызваных компилятором
+* исправлено поведение обнаружения переполнения потока MAVLink
+
+v879
+* исправлены напряжение и высота для UAVtalk
+* добавлена температура (по барометру) для UAVtalk
+* если MAX7456 теряет кадровую синхронизацию и перестает выдавать прерывания то OSD переключается в старый режим обновления по таймеру - снег на 
+экране таки лучше чем полная остановка отображения.
+* генерация PWM производится в кадровом прерывании
+
+v880
+* попытка получить емкость батареи через UAVTalk и вычислить % остатка
+* слегка изменен порядок реинициализации MAX7456
+
+
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 

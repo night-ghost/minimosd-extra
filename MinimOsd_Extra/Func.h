@@ -64,6 +64,23 @@ byte get_switch_time(byte n){
     }
 }
 
+void doScreenSwitch(){
+	lflags.got_data=1; // redraw even no news
+	
+	reset_setup_data(); // clear channels middle values
+	
+	union {
+	    point p;
+	    uint16_t i;
+	} upi;
+	
+	upi.p = readPanel(0); // read flags for new screen
+	screen_flags = upi.i;
+//	screen_flags = (upi.i & 0xff)<<8 | (upi.i>>8) ;
+DBG_PRINTF("screen flags %x\n", screen_flags);
+
+}
+
 #define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
@@ -115,7 +132,7 @@ static void pan_toggle(){
       } else{ 			 //Rotation switch
         byte ch_on=0;
 //*
-        if(sets.flags.flags.chkSwitch200) {
+        if(FLAGS.chkSwitch200) {
     	    if(last_chan_raw)
         	ch_on = (ch_raw - last_chan_raw) > 200;
             last_chan_raw = ch_raw;
@@ -123,7 +140,7 @@ static void pan_toggle(){
 //*/
             ch_on = (ch_raw > 1500);
 
-        if(sets.flags.flags.chkSwitchOnce) { // once at 1 -> 0
+        if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
             if (ch_on) { // in HIGH range
                 lflags.last_sw_ch = 1;
             } else { // выключено
@@ -151,7 +168,7 @@ next_panel:
     }
 #ifdef USE_AUTOSWITCH
         else {
-            if(sets.flags.flags.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
+            if(FLAGS.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
 DBG_PRINTLN("switch by AutoSwitch");
                lflags.autosw=1; // авторежим
                lflags.rotatePanel=1; // переключить
@@ -162,21 +179,10 @@ DBG_PRINTLN("switch by AutoSwitch");
     if(old_panel != panelN){
 DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 
-	lflags.got_data=1; // redraw even no news
-	
-	//extern void reset_setup_data();
-	reset_setup_data();
-	
-	union {
-	    point p;
-	    uint16_t i;
-	} upi;
-	
-	upi.p = readPanel(0); // read flags for new screen
-	screen_flags = upi.i;
+	doScreenSwitch();
 
 #ifdef USE_AUTOSWITCH
-       if(sets.flags.flags.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
+       if(FLAGS.AutoScreenSwitch && lflags.autosw && sets.n_screens>0 && panelN == sets.n_screens) 
            goto next_panel;  // при автопереключении пропускаем пустой экран
        
        byte swt = get_switch_time(panelN);
@@ -299,6 +305,7 @@ static void setHomeVars()
 //	    en=1;                			         // lock home position
 //	}  само сделается через пару строк
         lflags.was_armed = lflags.motor_armed; // only once
+        total_flight_time_milis=0; // reset on arm
     } 
 
 
@@ -340,8 +347,6 @@ static void setHomeVars()
 	{
             float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
             //DST to Home
-//	        dstlat = (osd_home.lat - osd_pos.lat) * 111319.5;
-//	        dstlon = (osd_home.lon - osd_pos.lon) * 111319.5 * scaleLongDown;
             dstlat = diff_coord(osd_home.lat, osd_pos.lat);
             dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
         }
@@ -372,18 +377,18 @@ void NOINLINE calc_max(float &dst, float src){
 
 
 
-//#define USE_FILTER 1 /* +36 bytes :( */
+#define USE_FILTER 1 
 
 #if defined(USE_FILTER)
-void NOINLINE filter( float &dst, float val, const float k){ // комплиментарный фильтр 1/k
+void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
     //dst = (val * k) + dst * (1.0 - k); 
     //dst = val * k + dst - dst*k;
     //dst = (val-dst)*k + dst;
-    dst+=(val-dst)*k;
+    dst+=(val-dst)/k;
 }
 
-void inline filter( float &dst, float val){ // комплиментарный фильтр 1/10
-    filter(dst,val,0.1);
+void filter( float &dst, float val){ // комплиментарный фильтр 1/10
+    filter(dst,val,10);
 }
 #endif
 
@@ -396,18 +401,30 @@ void NOINLINE float_add(float &dst, float val){
 void setFdataVars()
 {
     float time_1000; 
-    { // isolate time_lapse
-    
-//	    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
-        uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
-        //runtime = millis();
-        millis_plus(&runtime,0);
 
-        //total_flight_time_milis += time_lapse;
-        long_plus(&total_flight_time_milis, time_lapse);
-        time_1000 = f_div1000(time_lapse); // in seconds
-    }
     
+//    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+    uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
+    //runtime = millis();
+    millis_plus(&runtime,0);
+
+    time_1000 = f_div1000(time_lapse); // in seconds
+
+
+#if defined(USE_FILTER)
+                          // voltage in mV, current in 10mA
+        filter(power, (osd_vbat_A / (1000 * 100.0) * osd_curr_A )); // комплиментарный фильтр 1/10
+#else
+	{
+            float pow= (osd_vbat_A / (1000 * 100.0) * osd_curr_A );
+            power += (pow - power) * 0.1; // комплиментарный фильтр 1/10
+        }
+        //dst+=(val-dst)*k;
+        //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+        //float vs=(osd_climb * get_converth() ) * 60;
+        // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
+#endif
+
 
     //Moved from panel because warnings also need this var and panClimb could be off
 #if defined(USE_FILTER)
@@ -439,17 +456,15 @@ void setFdataVars()
 #endif
 
 
-    //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
-    if(lflags.osd_got_home && lflags.motor_armed) 
-        float_add(trip_distance, osd_groundspeed * time_1000);
-
+#if !defined USE_UAVTALK
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
+#endif
 
     { // isolate RSSI calc
-        uint16_t rssi_v = rssi_in;
+        int16_t rssi_v = rssi_in;
 
         if((sets.RSSI_raw % 2 == 0))  {
-            uint16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
+            int16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
             bool rev=false;
 
             if(l > h) {
@@ -461,13 +476,16 @@ void setFdataVars()
             if(rssi_v < l) rssi_v = l;
             if(rssi_v > h) rssi_v = h;
 
-            rssi = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
+            rssi_v = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
             //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
-            if(rssi > 100) rssi = 100;
-            if(rev) rssi=100-rssi;
+            if(rssi_v > 100) rssi_v = 100;
+            if(rssi_v < 0)   rssi_v = 0;
+            
+            if(rev) rssi_v=100-rssi_v;
+            rssi_norm=rssi_v;
         } else 
-            rssi = rssi_v;
+            rssi_norm = rssi_v;
     }
 
   //Set max data
@@ -485,6 +503,12 @@ void setFdataVars()
  #endif
 #endif
 
+    long_plus(&total_flight_time_milis, time_lapse);
+
+
+    //if (osd_groundspeed > 1.0) trip_distance += (osd_groundspeed * time_lapse / 1000.0);
+    if(lflags.osd_got_home) 
+        float_add(trip_distance, osd_groundspeed * time_1000);
     
     //if (osd_home_distance > max_home_distance) max_home_distance = osd_home_distance;
     float f=osd_home_distance;
@@ -493,6 +517,7 @@ void setFdataVars()
     calc_max(max_osd_groundspeed, osd_groundspeed);
     calc_max(max_osd_home_alt, osd_alt_mav);
     calc_max(max_osd_windspeed, osd_windspeed);
+    calc_max(max_osd_power, power);
 
     f=osd_curr_A;
     calc_max(max_osd_curr_A, f);
@@ -628,3 +653,81 @@ inline uint16_t freeRam () {
 }
 #endif
 
+// трансляция PWM на внешний вывод если заданы источник и приемник
+#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
+#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
+
+#if defined PWM_BY_INTERRUPT
+
+void generate_PWM(bool nointerrupt) {
+    if(!PWM_out_bit) return;
+    
+    uint16_t pwm=chan_raw[sets.pwm_src-1 + 5];
+
+    OCR1A = pwm * 2; // 0.5ms tick
+
+    TCCR1A =
+       (0 << WGM10) |
+       (0 << WGM11) |
+       (0 << COM1A1) |
+       (0 << COM1A0) | // no active pin om compare-match
+       (0 << COM1B1) |
+       (0 << COM1B0);
+
+    TCCR1B =
+        (0 << ICNC1)| // Input capture noise canceler
+        (0 << ICES1)| // Input capture edge select
+        (0 << CS10) | // Prescale 8 - 2MHz frequency
+        (1 << CS11) | // Prescale 8
+        (0 << CS12) | // Prescale 8
+        (0 << WGM13)|
+        (1 << WGM12); // CTC mode (Clear timer on compare match) with OCR1A as top
+
+    // Not used in this case:
+    TCCR1C =
+        (0 << FOC1A)| // No force output compare (A)
+        (0 << FOC1B); // No force output compare (B)
+
+    TIFR1  = (1 << OCF1A);     // clear interrupt flag
+    TIMSK1 = (1 << OCIE1A);     // enable Interrupt on compare A
+
+}
+
+ISR(TIMER1_COMPA_vect){
+    static boolean state = false;
+
+    if(state) {  // turn off
+        SET_LOW();
+        state = false;
+        TIMSK1=0; // disable timer interrupts
+    } else { 
+        SET_HIGH();
+        state = true;
+    }
+}
+#else
+void generate_PWM(bool nointerrupt) {
+    if(PWM_out_bit) { 
+	int pwm=chan_raw[sets.pwm_src-1 + 5];
+	
+//#define OUT_PORT(val) if (val == LOW) { *out &= ~bit; } else { *out |= bit; }
+#define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
+#define SET_HIGH()  *PWM_out_port |=  PWM_out_bit
+
+#if !defined(PWM_IN_INTERRUPT)
+	byte tmp=SREG;
+
+	if(nointerrupt)
+	    noInterrupts();		// pulse widh disabled interrups for accuracy but we lose MAVlink bytes
+#endif
+	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
+	delayMicroseconds(pwm);
+	SET_LOW();		//digitalWrite(PWM_out_pin,0);
+#if !defined(PWM_IN_INTERRUPT)
+	SREG=tmp; //	if(nointerrupt)    interrupts();
+#endif
+    }
+}
+
+
+#endif // PWM_BY_INTERRUPT

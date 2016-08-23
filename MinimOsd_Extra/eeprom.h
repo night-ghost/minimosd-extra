@@ -85,8 +85,9 @@ struct Panel {
     point Hdop;         // 86
     point State;        // 88
     point Scale;        // 90
-    point EScale;       // 92
+    point Power;        // 92
     point CValue;       // 94
+//    point ;         // 96
 
 };
 
@@ -222,8 +223,11 @@ struct Eeprom {
     
 };
 
+#define FLAGS sets.flags.flags
+
 #pragma pack(pop)
 
 //#if sizeof(struct Eeprom) > 1024
 //#error EEPROM overflow!
 //#endif
+

@@ -57,6 +57,7 @@
 
 //VM0 commands mixed with mode NTSC or PAL mode
 #define MAX7456_ENABLE_display_vert 0x0c //mask with NTSC/PAL
+#define MAX7456_ENABLE_display 0x08 //mask with NTSC/PAL
 #define MAX7456_RESET 0x02 //mask with NTSC/PAL
 #define MAX7456_DISABLE_display 0x00 //mask with NTSC/PAL
 
@@ -94,6 +95,7 @@ class OSD: public BetterStream
     OSD(void);
     static void init(void);
     static void hw_init(void);
+    static void reset(void);
     static void clear(void);
     static void setPanel(uint8_t start_col, uint8_t start_row);
     static void detectMode(void);

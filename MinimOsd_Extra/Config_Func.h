@@ -50,12 +50,12 @@ static NOINLINE void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
 
 }
 
-static void readSettings() {
+static inline void readSettings() {
 //    eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
     eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
 
 // сразу настроим системы измерения
-    measure = sets.flags.flags.measure ? &imper :  &metr;
+    measure = FLAGS.measure ? &imper :  &metr;
 
 }
 

@@ -12,14 +12,6 @@ static byte max7456_err_count=0;
 static byte stream_rate=0; // divider to requested rates 
 static byte mav_raw_imu_count=0;
 
-static float        max_home_distance = 0;
-static float        max_osd_airspeed = 0;
-static float        max_osd_groundspeed = 0; 
-static float        max_osd_home_alt = 0;
-static float        max_osd_windspeed = 0;
-static float        max_osd_curr_A = 0;                 // max Battery A current
-static float        max_osd_climb=0;
-static float        min_osd_climb=0;
 
 static float        nor_osd_windspeed = 0; // calculated from osd_windspeed by LPF 1/100
 static float        vertical_speed = 0; // calculated from osd_climb by LPF 1/10
@@ -105,13 +97,15 @@ static int16_t      osd_curr_A = 0;                 // Battery A current
 static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_remaining_B = 0;    // 0 to 100 <=> 0 to 1000
 
+float power=0; 
+
 static int8_t       max_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 
 static uint8_t      osd_battery_pic_A[2] = {0x8d, 0x8d};     // picture to show battery remaining
 //static uint8_t      osd_battery_pic_B[2] = {0x8d, 0x8d};     // picture to show battery remaining
 
-static uint16_t     temperature = 0;
+static uint16_t     temperature = 0;  // temp*100
 
 
 static uint16_t      remaining_estimated_flight_time_seconds = 0;
@@ -141,13 +135,11 @@ struct Coords {
     long alt; // altitude GPS
 };
 
-//long osd_baro_alt; // altitude baro 
-
 static float        osd_climb = 0;
 Coords              osd_pos = {0,0,0};			// current coordinates
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
-static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
+static uint8_t      osd_fix_type = 0;               // GPS lock 0=no GPS 1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog=0;                      // Course over ground
 static uint16_t     off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
@@ -199,19 +191,21 @@ static uint8_t panelN = STARTUP_SCREEN;
 static Point trk[4] = {{0,0},{0,0},{0,0},{0,0}};
 
 //*************************************************************************************************************
-static uint8_t      osd_rssi = 0; // raw value from mavlink
-static uint8_t      telem_rssi = 0; // telemetry modem RSSI raw value
-static uint16_t     rssi_in = 0;  // temp readed value after sliding average
-static uint16_t     rssi = 0;     //normalized 0-100%
+uint8_t      osd_rssi = 0; // raw value from mavlink
+uint8_t      telem_rssi = 0; // telemetry modem RSSI raw value
+uint16_t     rssi_in = 0;  // temp readed value after sliding average
+uint16_t     rssi_norm = 0;     //normalized 0-100%, but in RAW mode can contain full PWM value
 
 
-uint8_t crlf_count = 0;
+uint8_t  crlf_count = 0;
 
-byte mav_message[52]; // in MavLink max isize is 50
+byte     mav_message[52]; // in MavLink max size is 50
 uint16_t mav_msg_ttl=0;
-byte mav_msg_len=0;
-byte mav_msg_severity=0;
-byte mav_msg_shift=0;
+byte     mav_msg_len=0;
+byte     mav_msg_severity=0;
+byte     mav_msg_shift=0;
+
+byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
 volatile byte update_stat=0;
 
@@ -229,33 +223,34 @@ struct loc_flags {
     
     bool rotatePanel;
     bool last_sw_ch;
-    bool one_sec_timer_switch:1;
+    bool one_sec_timer_switch;
 
     bool motor_armed;
     bool last_armed_status;
     bool was_armed:1;
-    bool throttle_on:1;
+    bool throttle_on;
     bool in_air:1;
 
     bool blinker;
     bool flgMessage:1;
     
     bool mode_switch:1;
-    bool osd_got_home:1; // tels if got home position or not
+    bool osd_got_home; // tels if got home position or not
     
-    bool flag_05s:1; // sets each 0.5s for setup
-    bool flag_01s:1;
+    bool flag_05s; // sets each 0.5s for setup
+    bool flag_01s;
 
     bool show_screnN:4;
-    bool gps_active:1; // было что-то с GPS
-    bool vs_ms:1; // vertical speed in m/s;
-    bool was_mav_config:1; // was EEPROM write via MAVlink
+    bool gps_active; // было что-то с GPS
+    bool vs_ms; // vertical speed in m/s;
+    bool was_mav_config; // was EEPROM write via MAVlink
     
     bool fdata;	// show FData screen
 
-    bool autosw:1; 	// automatic screen switch
+    bool autosw; // automatic screen switch
 
-    bool mav_request_done:1;
+    bool mav_request_done;
+    
     uint8_t mav_data_frozen;
     uint8_t mav_stream_overload;
 };
@@ -271,17 +266,18 @@ uint16_t max_dly=0;
 volatile uint16_t lost_bytes =0;
 
 long mavlink_time=0, mavlink_dt=0;
-int mavlink_cnt=0;
+int  mavlink_cnt=0;
 volatile uint16_t stack_bottom=0xffff; // check for stack size in interrupts
 #endif
 
 byte skip_inc=0;
 
-struct loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
+struct   loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // все булевые флаги кучей
 
 // all bools in lflags exclude volatile
 volatile byte vsync_wait = 0;
-volatile static uint8_t vsync_count=0;
+volatile uint8_t vsync_count=0;
+volatile uint32_t vsync_time=0;
 
 uint16_t screen_flags;
 
@@ -308,7 +304,9 @@ uint8_t fdata_screen=0;
 float tmp_f; // temp float to get rid  of stack usage
 
 // Setup screen 
+static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при входе значения каналов
 
+#ifdef USE_SETUP
 typedef void (*fptr)();
 
 struct Params {
@@ -330,15 +328,23 @@ struct Setup_screen {
 
 static byte setup_menu=1; // номер строки меню
 static byte setup_screen=0; // номер экрана меню
-static uint16_t chan_raw_middle[4]={0,0,0,0}; // запомненные при входе значения каналов
 
 const Params *params; // указатель на текущий набор параметров
-
-byte mav_data_count=0; // how many GPS data packets comes between heartbeats
+#endif
 
 uint32_t autoswitch_time=0;
 
 static uint16_t last_chan_raw=0;
 
 #define GPS_MUL 10000000.0f
+
+static float        max_home_distance = 0;
+static float        max_osd_airspeed = 0;
+static float        max_osd_groundspeed = 0; 
+static float        max_osd_home_alt = 0;
+static float        max_osd_windspeed = 0;
+static float        max_osd_curr_A = 0;                 // max Battery A current
+static float        max_osd_climb=0;
+static float        min_osd_climb=0;
+static float        max_osd_power=0;
 
