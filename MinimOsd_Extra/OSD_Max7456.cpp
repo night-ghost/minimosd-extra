@@ -55,7 +55,7 @@ void delay_15(){
 
 void OSD::reset(){
     max7456_on();
-    MAX_write(MAX7456_VM0_reg, MAX7456_RESET | MAX7456_SYNC_internal);  // first time on internal sync
+    MAX_write(MAX7456_VM0_reg, MAX7456_RESET );
 
     delay_15();
 

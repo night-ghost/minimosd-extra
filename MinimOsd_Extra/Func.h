@@ -456,8 +456,9 @@ void setFdataVars()
 #endif
 
 
-
+#if !defined USE_UAVTALK
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
+#endif
 
     { // isolate RSSI calc
         int16_t rssi_v = rssi_in;

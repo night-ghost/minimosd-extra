@@ -607,7 +607,7 @@ static void panEff(point p){
       // show estimated flight time
       
       if (lflags.motor_armed) { //Check takeoff just to prevent initial false readings
-#if ! defined(USE_UAVTALK)
+#if !defined(USE_UAVTALK)
         if(osd_battery_remaining_A != last_battery_reading) {    // UAVtalk sends this itself
             remaining_estimated_flight_time_seconds = f_div1000((float)osd_battery_remaining_A * total_flight_time_milis / 
         					    (max_battery_reading - osd_battery_remaining_A));

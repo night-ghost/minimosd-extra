@@ -383,6 +383,10 @@ v879
 * if MAX7456 loses VSYNC interrupts then OSD switch to old-style refresh by timer - snow on scren is better than freeze
 * Output PWM generation is doing in VSYNC
 
+v880
+* a try to get battery capacity for UAVTalk and calculate % remaining
+* slightly changed the order of reinitialization when MAX hangs
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -793,6 +797,10 @@ v879
 * если MAX7456 теряет кадровую синхронизацию и перестает выдавать прерывания то OSD переключается в старый режим обновления по таймеру - снег на 
 экране таки лучше чем полная остановка отображения.
 * генерация PWM производится в кадровом прерывании
+
+v880
+* попытка получить емкость батареи через UAVTalk и вычислить % остатка
+* слегка изменен порядок реинициализации MAX7456
 
 
 

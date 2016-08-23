@@ -105,7 +105,7 @@ static int8_t       last_battery_reading = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_pic_A[2] = {0x8d, 0x8d};     // picture to show battery remaining
 //static uint8_t      osd_battery_pic_B[2] = {0x8d, 0x8d};     // picture to show battery remaining
 
-static uint16_t     temperature = 0;
+static uint16_t     temperature = 0;  // temp*100
 
 
 static uint16_t      remaining_estimated_flight_time_seconds = 0;
@@ -135,13 +135,11 @@ struct Coords {
     long alt; // altitude GPS
 };
 
-//long osd_baro_alt; // altitude baro 
-
 static float        osd_climb = 0;
 Coords              osd_pos = {0,0,0};			// current coordinates
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
-static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
+static uint8_t      osd_fix_type = 0;               // GPS lock 0=no GPS 1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog=0;                      // Course over ground
 static uint16_t     off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
