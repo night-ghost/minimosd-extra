@@ -425,11 +425,11 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 
 
 uint16_t NOINLINE mul_100(float f){
-    return (uint16_t)f*100.0;
+    return (uint16_t)(f*100.0);
 }
 
 uint32_t NOINLINE mul_1000(float f){
-    return (uint32_t)f*1000.0;
+    return (uint32_t)(f*1000.0);
 }
 
 bool uavtalk_read(void) {
@@ -531,7 +531,7 @@ bool uavtalk_read(void) {
                         case MANUALCONTROLCOMMAND_OBJID_000:
                         case MANUALCONTROLCOMMAND_OBJID_001:
                         case MANUALCONTROLCOMMAND_OBJID_002:
-                                osd_throttle                = (int16_t) mul_100( uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE));
+                                osd_throttle         = (int16_t) mul_100( uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE));
                                 if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
                                 // Channel mapping:
                                 // 0   is Throttle

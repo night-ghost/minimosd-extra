@@ -395,6 +395,11 @@ v881
 * "connect to COM-port" in CT now bidirectional
 * a try to revive MSP protocol (MWII Cleanflight Betaflight INAV) - now OSD sends requests for data
 
+
+v882
+* fixed rounding bug in UAVtalk
+
+
 fonts:
 
 MinimOSD_2.4.1.x.mcm         - base font
