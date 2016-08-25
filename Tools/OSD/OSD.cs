@@ -174,6 +174,8 @@ namespace OSD {
         bool curr_used = false;
         bool batt1_used = false;
 
+        bool fListen=false;
+
         string CurrentCOM;
 
         public string[] StringArray = new string[128];
@@ -333,7 +335,7 @@ namespace OSD {
                 pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1,UI_Mode.UI_Checkbox,0,"Show sign '%'");
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
-                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1);
+                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, UI_Mode.UI_Checkbox,0,"Show only mAh/km");
                 pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
                 pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
                 pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
@@ -517,7 +519,7 @@ namespace OSD {
             cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
             chkByTime.Checked = pan.flgTimedSwitch;
-            chkILS.Checked = pan.flgILS;
+            chkFlightResults.Checked=true;
 
         }
 
@@ -971,7 +973,7 @@ namespace OSD {
                 conf.eeprom.flags[useExtVbattA] = pan.flgBattA;
                 conf.eeprom.flags[useExtCurr] = pan.flgCurrent;
                 conf.eeprom.flags[AutoScreenSwitch] = pan.flgTimedSwitch;
-                conf.eeprom.flags[ils_on] = pan.flgILS;
+                conf.eeprom.flags[results_on] = chkFlightResults.Checked;
 
                 conf.eeprom.flags[flgTrack] = pan.flgTrack;
                 conf.eeprom.flags[flgHUD] = pan.flgHUD;
@@ -1610,8 +1612,8 @@ as_checkbox:
                 pan.flgTimedSwitch = conf.eeprom.flags[AutoScreenSwitch];
                 chkByTime.Checked = pan.flgTimedSwitch;
 
-                pan.flgILS = conf.eeprom.flags[ils_on];
-                chkILS.Checked = pan.flgILS;
+                chkFlightResults.Checked = conf.eeprom.flags[results_on];
+                
 
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
@@ -1860,8 +1862,7 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "fBattB", pan.flgBattB);
                         sw.WriteLine("{0}\t{1}", "fCurr", pan.flgCurrent);
 
-                        sw.WriteLine("{0}\t{1}", "timedSwitch", pan.flgTimedSwitch);
-                        sw.WriteLine("{0}\t{1}", "fILS", pan.flgILS);
+                        sw.WriteLine("{0}\t{1}", "timedSwitch", pan.flgTimedSwitch);                        
                         sw.WriteLine("{0}\t{1}", "HOS", pan.horiz_offs);
                         sw.WriteLine("{0}\t{1}", "VOS", pan.vert_offs);
                         // выходной PWM
@@ -1891,6 +1892,8 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "txtTime1", txtTime1.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime2", txtTime2.Text);
                         sw.WriteLine("{0}\t{1}", "txtTime3", txtTime3.Text);
+
+                        sw.WriteLine("{0}\t{1}", "fResults", chkFlightResults.Checked);
 
                         sw.Close();
                     }
@@ -2053,8 +2056,7 @@ again:
                         else if (strings[0] == "fBattA") pan.flgBattA = bool.Parse(strings[1]);
                         else if (strings[0] == "fBattB") pan.flgBattB = bool.Parse(strings[1]);
                         else if (strings[0] == "fCurr") pan.flgCurrent = bool.Parse(strings[1]);
-                        else if (strings[0] == "timedSwitch") pan.flgTimedSwitch = bool.Parse(strings[1]);
-                        else if (strings[0] == "fILS") pan.flgILS = bool.Parse(strings[1]);
+                        else if (strings[0] == "timedSwitch") pan.flgTimedSwitch = bool.Parse(strings[1]);                        
                         else if (strings[0] == "HOS") pan.horiz_offs = (byte)int.Parse(strings[1]);
                         else if (strings[0] == "VOS") pan.vert_offs = (byte)int.Parse(strings[1]);
                         else if (strings[0] == "PWMSRC") pan.pwm_src = (byte)int.Parse(strings[1]);
@@ -2085,6 +2087,7 @@ again:
                         else if (strings[0] == "txtTime1") txtTime1.Text = strings[1];
                         else if (strings[0] == "txtTime2") txtTime2.Text = strings[1];
                         else if (strings[0] == "txtTime3") txtTime3.Text = strings[1];
+                        else if (strings[0] == "fResults") chkFlightResults.Checked = bool.Parse(strings[1]);
 
                       
 
@@ -2183,7 +2186,7 @@ again:
                     cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
                     chkByTime.Checked = pan.flgTimedSwitch;
-                    chkILS.Checked = pan.flgILS;
+                    
 
                     try {
                         cbOutSource.SelectedIndex = pan.pwm_src;
@@ -4337,7 +4340,9 @@ again:
             frmComPort frm = new frmComPort(this);
             
             frm.ShowInTaskbar =false;
+            comBusy=true;
             frm.ShowDialog(); // modal
+            comBusy=false;
         }
 
         private void BUT_CopyScreen_Click(object sender, EventArgs e)
@@ -4714,15 +4719,20 @@ again:
                 System.Threading.Thread.Sleep(10);
             }
         }
-        private void btnListen_Click(object sender, EventArgs e) {
-            if(!comPort.IsOpen){
+        private void startListen(){
+            if (!comPort.IsOpen) {
                 comPort.PortName = CMB_ComPort.Text; ;
                 comPort.BaudRate = 57600;
-                comPort.Open ();
+                comPort.Open();
             }
 
             com_thread = new System.Threading.Thread(com_thread_proc);
             com_thread.Start();
+        }
+
+        private void btnListen_Click(object sender, EventArgs e) {
+           fListen = true;
+            startListen();
         }
 
         private void chkByTime_CheckedChanged(object sender, EventArgs e) {
@@ -4736,10 +4746,7 @@ again:
             txtTime3.Visible = flg;
         }
 
-        private void chkSwitchOnce_CheckedChanged(object sender, EventArgs e) {
-
-        }
-
+        
     
 
 

@@ -69,7 +69,7 @@ namespace OSD
             this.tabPageConfig = new System.Windows.Forms.TabPage();
             this.chkILS = new System.Windows.Forms.CheckBox();
             this.chkTrack = new System.Windows.Forms.CheckBox();
-            this.chkRusHUD = new System.Windows.Forms.CheckBox();
+            this.chkFlightResults = new System.Windows.Forms.CheckBox();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.txtCurr_k = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
@@ -541,7 +541,7 @@ namespace OSD
             // 
             this.tabPageConfig.Controls.Add(this.chkILS);
             this.tabPageConfig.Controls.Add(this.chkTrack);
-            this.tabPageConfig.Controls.Add(this.chkRusHUD);
+            this.tabPageConfig.Controls.Add(this.chkFlightResults);
             this.tabPageConfig.Controls.Add(this.groupBox14);
             this.tabPageConfig.Controls.Add(this.groupBox2);
             this.tabPageConfig.Controls.Add(this.groupBox1);
@@ -587,16 +587,15 @@ namespace OSD
             this.chkTrack.Visible = false;
             this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
             // 
-            // chkRusHUD
+            // chkFlightResults
             // 
-            this.chkRusHUD.AutoSize = true;
-            this.chkRusHUD.Location = new System.Drawing.Point(497, 296);
-            this.chkRusHUD.Name = "chkRusHUD";
-            this.chkRusHUD.Size = new System.Drawing.Size(91, 17);
-            this.chkRusHUD.TabIndex = 0;
-            this.chkRusHUD.Text = "Russian HUD";
-            this.chkRusHUD.UseVisualStyleBackColor = true;
-            this.chkRusHUD.Visible = false;
+            this.chkFlightResults.AutoSize = true;
+            this.chkFlightResults.Location = new System.Drawing.Point(491, 284);
+            this.chkFlightResults.Name = "chkFlightResults";
+            this.chkFlightResults.Size = new System.Drawing.Size(135, 17);
+            this.chkFlightResults.TabIndex = 0;
+            this.chkFlightResults.Text = "Show results after flight";
+            this.chkFlightResults.UseVisualStyleBackColor = true;
             // 
             // groupBox14
             // 
@@ -645,7 +644,7 @@ namespace OSD
             this.cbCurrentSoure.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbCurrentSoure.FormattingEnabled = true;
             this.cbCurrentSoure.Items.AddRange(new object[] {
-            "Mavlink",
+            "from FC",
             "Pin Current"});
             this.cbCurrentSoure.Location = new System.Drawing.Point(51, 22);
             this.cbCurrentSoure.Name = "cbCurrentSoure";
@@ -1461,7 +1460,6 @@ namespace OSD
             this.chkSwitchOnce.Text = "Once";
             this.hint.SetToolTip(this.chkSwitchOnce, "Turn off autorepeat");
             this.chkSwitchOnce.UseVisualStyleBackColor = true;
-            this.chkSwitchOnce.CheckedChanged += new System.EventHandler(this.chkSwitchOnce_CheckedChanged);
             // 
             // groupBox6
             // 
@@ -1547,7 +1545,7 @@ namespace OSD
             this.cbBattA_source.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbBattA_source.FormattingEnabled = true;
             this.cbBattA_source.Items.AddRange(new object[] {
-            "Mavlink Voltage",
+            "from FC",
             "Pin BattA"});
             this.cbBattA_source.Location = new System.Drawing.Point(51, 16);
             this.cbBattA_source.Name = "cbBattA_source";
@@ -1560,9 +1558,9 @@ namespace OSD
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(4, 85);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(146, 13);
+            this.label9.Size = new System.Drawing.Size(111, 13);
             this.label9.TabIndex = 13;
-            this.label9.Text = "Bat. Remain. Warn. Level (%)";
+            this.label9.Text = "Remain % warning (%)";
             // 
             // BATT_WARNnumeric
             // 
@@ -1571,7 +1569,7 @@ namespace OSD
             this.BATT_WARNnumeric.Size = new System.Drawing.Size(91, 20);
             this.BATT_WARNnumeric.TabIndex = 12;
             this.BATT_WARNnumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.hint.SetToolTip(this.BATT_WARNnumeric, "Warning level, 0 to turn off");
+            this.hint.SetToolTip(this.BATT_WARNnumeric, "Warning level by capacity, 0 to turn off");
             this.BATT_WARNnumeric.ValueChanged += new System.EventHandler(this.BATT_WARNnumeric_ValueChanged);
             // 
             // label7
@@ -1579,9 +1577,9 @@ namespace OSD
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(5, 45);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(147, 13);
+            this.label7.Size = new System.Drawing.Size(122, 13);
             this.label7.TabIndex = 2;
-            this.label7.Text = "Warn Min. Battery Voltage (V)";
+            this.label7.Text = "Min Voltage Warning (V)";
             // 
             // MINVOLT_numeric
             // 
@@ -1708,7 +1706,7 @@ namespace OSD
             this.cbxRSSIChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRSSIChannel.FormattingEnabled = true;
             this.cbxRSSIChannel.Items.AddRange(new object[] {
-            "Mavlink RSSI",
+            "RSSI from FC",
             "Channel 8",
             "Pin RSSI analog",
             "Pin RSSI PWM",
@@ -2159,7 +2157,7 @@ namespace OSD
         private System.Windows.Forms.CheckBox cbxAutoUpdate;
         private System.Windows.Forms.CheckBox cbxShowUpdateDialog;
         
-        private System.Windows.Forms.CheckBox chkRusHUD;
+        private System.Windows.Forms.CheckBox chkFlightResults;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label6;

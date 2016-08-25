@@ -18,12 +18,16 @@
 
 union {
 #if defined(USE_MAVLINK)
+#define PROTOCOL "MAVLink"
     mavlink_message_t m;
 #elif defined(USE_UAVTALK)
+#define PROTOCOL "UAVTalk"
     uavtalk_message_t u;
 #elif defined(USE_MWII)
+#define PROTOCOL "MSP"
     MWII_buffer mwii;
 #elif defined(USE_LTM)
+#define PROTOCOL "LTM"
     LTM ltm;
 #endif
     byte bytes[0x40]; // for font uploading 

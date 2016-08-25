@@ -207,14 +207,14 @@ byte     mav_msg_shift=0;
 
 byte mav_data_count=0; // how many GPS data packets comes between heartbeats
 
-volatile byte update_stat=0;
+volatile byte update_screen=0;
 
 #if defined(AUTOBAUD)
 uint32_t serial_speed=0; // detected port speed
 #endif
 
 struct loc_flags {
-//    bool update_stat:1; 		// есть данные для показа
+//    bool update_screen:1; 		// есть данные для показа
     bool got_data;		// флаг получения пакета
     bool need_redraw;         // надо перерисовать экран
 

@@ -108,7 +108,7 @@ struct Flags { // 4 байта
     bool useExtVbattB:1;	// 5 - generated internally
     bool useExtCurr:1;		// 6
     bool AutoScreenSwitch:1;	// 7 
-    bool ils_on:1;		// 8 - not used, use panel.alt4 instead
+    bool results_on:1;		// 8
     
     bool mode_auto:1; 		// 9
     bool flgHUD:1;      	// 10 - not used, use panel.alt instead
@@ -208,6 +208,7 @@ struct Strings {
 
 #define PANSTATE_STR_ID 0
 #define PANSTATE_STR_NO 5
+
 
 
 struct Eeprom {

@@ -387,6 +387,21 @@ v880
 * a try to get battery capacity for UAVTalk and calculate % remaining
 * slightly changed the order of reinitialization when MAX hangs
 
+
+v881
+* efficiency can show only mah/km
+* "flight data" screen after flight can be turned off
+* some code cleanup
+* "connect to COM-port" in CT now bidirectional
+* a try to revive MSP protocol (MWII Cleanflight Betaflight INAV) - now OSD sends requests for data
+
+fonts:
+
+MinimOSD_2.4.1.x.mcm         - base font
+MinimOSD_2.4.1.x-digital.mcm - styled for 7-segment and dotted horizon
+
+
+
 Attention! This version is incompatible with the tools from the ArduCam and original MinimOSD-extra!
 
 Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835
@@ -802,6 +817,19 @@ v880
 * попытка получить емкость батареи через UAVTalk и вычислить % остатка
 * слегка изменен порядок реинициализации MAX7456
 
+
+v881
+* панель efficiency может показывать только mah/km
+* 'rhfy "flight data" с результатами полета может быть отключен
+* некоторая чистка кода
+* Режим "connect to COM-port" в конфигураторе теперь двухсторонний
+* попытка оживить работу с протоколом MSP (MWII Cleanflight Betaflight INAV) - делаются запросы нужных данных
+
+
+fonts:
+
+MinimOSD_2.4.1.x.mcm         - основной фонт
+MinimOSD_2.4.1.x-digital.mcm - стилизация под 7-сегментный индикатор и точечный горизонт
 
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!

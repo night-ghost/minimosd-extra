@@ -2586,38 +2586,26 @@ uint16_t uidiff(uint16_t a, uint16_t b){
 
 }
 
-void writePanels(){
+void writePanels(unsigned long pt){  // текущее время - функция инлайнится и это просто удаляет лишний вызов millis()
 
     osd.detectMode(); // PAL/NTSC live
-    
-    unsigned long pt;
-    pt=millis();  // текущее время
 
-#ifdef IS_PLANE
-
-// в универсальном случае если выбран планер
+// если выбран планер
     if(sets.model_type == 0 ) { /* plane */ 
         if( lflags.motor_armed  && lflags.in_air  &&
           ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
             landed = pt; // пока летаем - заармлен, в воздухе, движется и есть газ -  постоянно обновляем это время
 //DBG_PRINTF("set p landed=%u\n", landed);
 	}
-    }
-#ifdef IS_COPTER
-      else if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
-	landed = pt; // запомнится время дизарма
+    } else // copter
+         if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
+            landed = pt; // запомнится время дизарма
 DBG_PRINTF("set c landed=%u\n", landed);
     }
     
     lflags.last_armed_status = lflags.motor_armed;
     
-#endif
-#else // pure copter
 
-    if (!lflags.motor_armed && lflags.last_armed_status ){ // on motors disarm
-	landed = pt; // запомнится время дизарма
-    }
-#endif
 
     if(sets.n_screens>MAX_PANELS) sets.n_screens = MAX_PANELS;
 
@@ -2631,50 +2619,46 @@ DBG_PRINTF("set c landed=%u\n", landed);
             return;
         }
     }
-#ifdef IS_COPTER
+
+    if(FLAGS.results_on){
  //Only show flight summary 10 seconds after landing and if throttle < 15
 //  if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
 //  if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
 //  if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-    if (!lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
+        if ( !lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
 #if !defined(DEBUG) || 1
-      && ((int)trip_distance > 5) // show always in debug mode
+          && ((int)trip_distance > 5) // show always in debug mode
 #endif
                                  ){ // 3 seconds after disarm one can jerk sticks
 
-#else
-#ifdef IS_PLANE
-    //Only show flight summary 7 seconds after landing
-  else if (landed /* not 0! */ && time_since(&landed) < 3000 && ((int)trip_distance > 5)){
-#else
-    else if(0) {
-#endif
-#endif
 DBG_PRINTF("set FData landed=%u\n", landed);
 
-       lflags.fdata=1;
-       storeChannels(); // remember control state
-       fdata_screen=panelN;
+           lflags.fdata=1;
+           storeChannels(); // remember control state
+           fdata_screen=panelN;
 
-       goto show_fdata;
-  } else if(lflags.fdata){
-       if(fdata_screen!=panelN) { // turn off by screen switch
-           panelN=fdata_screen;
-           lflags.fdata=0;
+           goto show_fdata;
+      } else if(lflags.fdata){
+           if(fdata_screen!=panelN) { // turn off by screen switch
+               panelN=fdata_screen;
+               lflags.fdata=0;
 DBG_PRINTLN("reset FData by sw");
-       }
+           }
 
-       if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
+           if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
 DBG_PRINTLN("reset FData by throttle");
-           lflags.fdata=0;
-       }
+               lflags.fdata=0;
+           }
 show_fdata:
-       panFdata({1,1});    //Flight summary panel
-
-  } else{  //Normal osd panel
+           panFdata({1,1});    //Flight summary panel
+           return;
+      }
+  }
+  
+    //Normal osd panel
 
 //	OSD::setPanel(0,0);
-//	osd.printf_P("p=%d t=%d",panelN, sets.ch_toggle);
+//	osd.printf_P(PSTR("p=%d t=%d"),panelN, sets.ch_toggle);
 
     if(sets.n_screens==0 || panelN < sets.n_screens){ // конфигурируемые юзером экраны
 	print_all_panels(panels_list);
@@ -2689,7 +2673,7 @@ show_fdata:
 	
 
     }
-  }
+  
 }
 
 

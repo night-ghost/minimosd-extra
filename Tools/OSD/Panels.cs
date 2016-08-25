@@ -337,11 +337,25 @@ namespace OSD
         public int panEff(int first_col, int first_line, int sign, int fAlt, Panel p)
         {
         osd.setPanel(first_col, first_line);
+
         
-        if(sign==1)
-        	osd.printf("\x17 30:05");
-		else
-			osd.printf(" 30:05");
+
+        if(is_alt(fAlt)){
+            if (sign == 1)
+                osd.printf("\x16");
+            osd.printf(" 276\x01");
+            return 0;
+        }
+        
+        if(model_type ==0) {// palne
+            if (sign == 1)
+                osd.printf("\x16");
+            osd.printf(" 176\x01");
+        } else {
+            if (sign == 1)
+                osd.printf("\x17");
+            osd.printf(" 30:05");
+        }
         
         
          return 0;
@@ -1500,13 +1514,14 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
               byte ch_climb = (vs_ms != 0 ? (byte)(0x18) : (byte)climbChar);
 			osd.setPanel(first_col, first_line);
 			
-	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|"),
+	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|x1d%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|W160.0|"),
               ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
                                       (int)((max_home_distance) * converth), chrHigh,
                                                  (int)(tdistance * converth), chrHigh,
                                                         (int)(max_osd_groundspeed * convertspeed),chrSpe,
-                                                                            (int)(max_osd_home_alt * converth), chrHigh,
-                                                                                   54.3,ch_climb,
+                                                                        12, chrSpe,
+                                                                                 (int)(max_osd_home_alt * converth), chrHigh,
+                                                                                       54.3,ch_climb,
                                                                                                 24.7,ch_climb,
                                                                                                                 47);
             

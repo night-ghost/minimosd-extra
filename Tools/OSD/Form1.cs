@@ -85,11 +85,31 @@ namespace OSD {
                     string message;
 
                     while(loop){
-                        while (parent.comPort.BytesToRead != 0)
-                            Console.WriteLine(parent.comPort.ReadExisting());
-
                         System.Threading.Thread.Sleep(2);
-                        Application.DoEvents();
+
+                        string s = "";
+                        string so = "";
+                        while (parent.comPort.BytesToRead != 0 && loop){
+                            
+                            //parent.comPort.Write(s);
+                            byte c = (byte)parent.comPort.ReadByte();
+                            byte[] ba = new byte[2];
+                            
+                            ba[0] = c;
+                            comPort.Write(ba, 0, 1);
+
+                            
+                            if(c==0 || c==10){
+                                Console.WriteLine('>' + s);
+                                s="";
+                            }else {
+                                char ch=(char)c;
+                                s = s + ch; //.ToString();
+                            }
+                            Application.DoEvents();
+                        }
+                        
+                        
 /*
                         while (comPort.BytesToRead != 0){
                             string s=comPort.ReadExisting();
@@ -105,7 +125,16 @@ namespace OSD {
                             if(flgRaw) {
                                 ba[0]=c;
                                 parent.comPort.Write(ba,0,1);
-                            } 
+                            }
+
+                            if (c == 0 || c == 10) {
+                                Console.WriteLine('<' + so);
+                                so = "";
+                            } else {
+                                char ch = (char)c;
+                                so = so + ch; //.ToString();
+                            }
+
 
                             if(index>=0) buffer[index++]=c;
 
@@ -120,7 +149,7 @@ namespace OSD {
                                         parent.comPort.Write(buffer, 0, index);
                                 }
                                 index= -1;
-
+                                
                                 np++;
                                 try {
                                     this.Invoke((MethodInvoker)delegate {

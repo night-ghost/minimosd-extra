@@ -87,7 +87,7 @@ namespace OSD {
 		public const int useExtVbattB			= 5;
     	public const int useExtCurr				= 6;
 		public const int AutoScreenSwitch       = 7;
-		public const int ils_on 				= 8;
+		public const int results_on     		= 8;
 		public const int mode_auto              = 9;
         public const int flgHUD                 = 10;
         public const int flgTrack               = 11;

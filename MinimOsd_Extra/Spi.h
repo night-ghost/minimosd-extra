@@ -11,7 +11,7 @@
 #define SCK_PIN   13
 #define MISO_PIN  12
 #define MOSI_PIN  11
-#define SS_PIN    10  // <------- !!! (Remember! This pin will select USB host chip Max3421)
+#define SS_PIN    10  // <------- !!! (Remember! without this pin OSD not works)
 
 class SPI
 {

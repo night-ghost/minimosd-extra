@@ -105,13 +105,11 @@ static void pan_toggle(){
       if ((osd_mode != 6) && (osd_mode != 7)){
         if (osd_off_switch != osd_mode){
             osd_off_switch = osd_mode;
-            //osd_switch_time = millis();
-            millis_plus(&osd_switch_time,0);
+            millis_plus(&osd_switch_time,0); //osd_switch_time = millis();
             if (osd_off_switch == osd_switch_last){
               lflags.rotatePanel = 1;
             }
         }
-//        if ((millis() - osd_switch_time) > 2000){
         if ( time_since(&osd_switch_time) > 2000){
           osd_switch_last = osd_mode;
         }
@@ -340,8 +338,6 @@ static void setHomeVars()
 
     if(!lflags.osd_got_home && osd_fix_type >= 3 ) { // first home lock on GPS 3D fix - ну или если фикс пришел уже после арма
         osd_home = osd_pos; // lat, lon & alt
-
-        //osd_alt_cnt = 0;
         lflags.osd_got_home = 1;
     } else if(lflags.osd_got_home){
 	{
@@ -350,7 +346,7 @@ static void setHomeVars()
             dstlat = diff_coord(osd_home.lat, osd_pos.lat);
             dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
         }
-        //osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+
         osd_home_distance = distance(dstlat, dstlon);
 	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
 	dst_y=(int)fabs(dstlon);
@@ -360,9 +356,7 @@ static void setHomeVars()
 
             bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
         
-//	        if(bearing < 0) bearing += 360;//normalization
             bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-            //while(bearing < 0) bearing += 360;//normalization
             bearing=normalize_angle(bearing);
 
             osd_home_direction = grad_to_sect(bearing); 
@@ -402,8 +396,7 @@ void setFdataVars()
 {
     float time_1000; 
 
-    
-//    uint16_t time_lapse = (uint16_t)(millis() - runtime); // loop time no more 1000 ms
+
     uint16_t time_lapse = time_since(&runtime); // loop time no more 1000 ms
     //runtime = millis();
     millis_plus(&runtime,0);
@@ -449,7 +442,7 @@ void setFdataVars()
 
 //    osd_alt_to_home = (osd_alt_mav - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
 
-    if (!lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 10){
+    if (sets.model_type == 0  /* plane */ && !lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 30){
 	lflags.in_air = 1; // взлетели!
 	trip_distance = 0;
     }

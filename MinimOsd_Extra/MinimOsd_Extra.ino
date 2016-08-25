@@ -155,12 +155,12 @@ ISR(INT0_vect) {
 #endif
     } else {
 	byte tmp=SREG;
-        if(update_stat) { // there is data for screen
+        if(update_screen) { // there is data for screen
             nested++;
             sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
             cli();
-            update_stat = 0;
+            update_screen = 0;
             nested--;
         }
 #if defined(PWM_IN_INTERRUPT)
@@ -219,7 +219,7 @@ ISR(INT1_vect) {
 
 NOINLINE void logo(){
     OSD::setPanel(5, 5);
-    osd_printi_1(PSTR("MinimOSD-Extra " VERSION "|" OSD_MODEL " r%d DV|"), RELEASE_NUM);
+    osd_printi_1(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r%d DV|"), RELEASE_NUM);
 
     osd.print((uint16_t)millis());
 
@@ -238,8 +238,6 @@ NOINLINE void logo(){
 
 void setup()     {
     wdt_disable(); 
-
-//    pinMode(MAX7456_SELECT,  OUTPUT); in OSD::init
 
 #ifdef LEDPIN
     pinMode(LEDPIN,OUTPUT); // led
@@ -424,12 +422,12 @@ void loop()
 
         setFdataVars();  // накопление статистики и рекордов
 
-        writePanels();   // writing enabled panels (check OSD_Panels Tab)
+        writePanels(pt);   // writing enabled panels (check OSD_Panels Tab)
 
 //	LED_BLINK;
 
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
-	update_stat = 1; // пришли данные, надо перерисовать экран
+	update_screen = 1; // пришли данные, надо перерисовать экран
     }
 
 
@@ -447,11 +445,11 @@ void loop()
         long_plus(&timer_20ms, 20);
         On20ms();
 
-        if(update_stat && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились
+        if(update_screen && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились
             vsync_wait=0; // хватит ждать
         
             OSD::update(); // обновим принудительно
-            update_stat = 0;
+            update_screen = 0;
         }
 
 
@@ -499,11 +497,8 @@ void loop()
                 if(max7456_err_count>3) { // 3 seconds no sync
 #ifdef DEBUG   
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
-//        serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
-
 #endif
                     osd.reset();    // restart MAX7456
-//		    osd.update(); // clear screen
                 }
 	    } else  max7456_err_count=0;
 
@@ -720,6 +715,10 @@ case_4:
 void On20ms(){ // 50Hz
 #if !defined(PWM_IN_INTERRUPT)
     generate_PWM(true);
+#endif
+
+#if defined(USE_MWII)
+    doMSPrequests();
 #endif
 }
 

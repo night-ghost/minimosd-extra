@@ -147,7 +147,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="key.snk" />
-    <None Include="MinimOSD_2.4.1.3.mcm">
+    <None Include="MinimOSD_2.4.1.5.mcm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />

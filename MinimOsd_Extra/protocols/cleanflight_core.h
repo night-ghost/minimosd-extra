@@ -2,6 +2,9 @@
 #include "cleanflight_const.h"
 #include "cleanflight_types.h"
 
+static byte MW_version=0;
+
+
 static  /*INLINE*/  inline uint8_t mwii_get_byte()  {
 	return msg.mwii.buf[msg.mwii.read_idx++];
 }
@@ -32,15 +35,18 @@ static inline void mwii_read_len(void *dst, byte pos, byte sz) {
 }
 
 
+void serialize8(uint8_t a) {
+	Serial.write_S(a);
+	msg.mwii.chk ^= a;
+}
+
+
+
 //void  r_struct(uint8_t *cb,uint8_t siz) {
 //	while(siz--) *cb++ = mwii_get_byte();
 //}
 
 /*
-void serialize8(uint8_t a) {
-	Serial.write(a);
-	msg.mwii.chk ^= a;
-}
 void serialize16(int16_t a) {
 	serialize8(BYTE_OF(a, 0));
 	serialize8(BYTE_OF(a, 1));
@@ -166,19 +172,6 @@ void fontCharacterReceived(uint8_t cindex) {
 
 
 
-void blankserialRequest(uint8_t requestMSP)
-{
-	if(requestMSP == MSP_OSD && fontMode) {
-		fontSerialRequest();
-		return;
-	}
-	serialize8('$');
-	serialize8('M');
-	serialize8('<');
-	serialize8((uint8_t)0x00);
-	serialize8(requestMSP);
-	serialize8(requestMSP);
-}
 
 void configExit()
 {
@@ -838,3 +831,97 @@ again:			if(c!='$') state = IDLE;
 	return false;
 }
 
+void blankserialRequest(uint8_t requestMSP)
+{
+	Serial.write_S('$');
+	Serial.write_S('M');
+	Serial.write_S('<');
+	Serial.write_S((uint8_t)0x00); // data size
+	Serial.write_S(requestMSP);   // command
+	Serial.write_S(requestMSP);   // checksum
+}
+
+
+void setMspRequests() {
+    msg.mwii.modeMSPRequests = 
+      REQ_MSP_IDENT|
+      REQ_MSP_STATUS|
+      REQ_MSP_RAW_GPS|
+      REQ_MSP_COMP_GPS|
+      REQ_MSP_ATTITUDE|
+      REQ_MSP_RAW_IMU|      
+      REQ_MSP_ALTITUDE | REQ_MSP_RC | REQ_MSP_ANALOG;;
+
+    if(apm_mav_system == 0)
+     msg.mwii.modeMSPRequests |= REQ_MSP_IDENT;
+
+/*    if(mode_armed == 0) {
+        modeMSPRequests |= REQ_MSP_BOX;
+    }
+*/
+
+
+  // so we do not send requests that are not needed.
+   msg.mwii.queuedMSPRequests &= msg.mwii.modeMSPRequests;
+}
+
+void doMSPrequests(){
+    static    bool flg=0;
+
+    flg = !flg;
+    
+    if(flg) return; // skip half of req
+
+    uint8_t MSPcmdsend;
+
+    setMspRequests();
+
+    if(msg.mwii.queuedMSPRequests == 0)
+        msg.mwii.queuedMSPRequests = msg.mwii.modeMSPRequests;
+
+    uint32_t req = msg.mwii.queuedMSPRequests & -msg.mwii.queuedMSPRequests;
+    msg.mwii.queuedMSPRequests &= ~req;
+    
+    switch(req) {
+      case REQ_MSP_IDENT:
+        MSPcmdsend = MSP_IDENT;
+        break;
+      case REQ_MSP_STATUS:
+        MSPcmdsend = MSP_STATUS;
+        break;
+      case REQ_MSP_RAW_IMU:
+        MSPcmdsend = MSP_RAW_IMU;
+        break;
+      case REQ_MSP_RC:
+        MSPcmdsend = MSP_RC;
+        break;
+      case REQ_MSP_RAW_GPS:
+        MSPcmdsend = MSP_RAW_GPS;
+        break;
+      case REQ_MSP_COMP_GPS:
+        MSPcmdsend = MSP_COMP_GPS;
+        break;
+      case REQ_MSP_ATTITUDE:
+        MSPcmdsend = MSP_ATTITUDE;
+        break;
+      case REQ_MSP_ALTITUDE:
+        MSPcmdsend = MSP_ALTITUDE;
+        break;
+      case REQ_MSP_ANALOG:
+        MSPcmdsend = MSP_ANALOG;
+        break;
+      case REQ_MSP_RC_TUNING:
+        MSPcmdsend = MSP_RC_TUNING;
+        break;
+      case REQ_MSP_PID:
+        MSPcmdsend = MSP_PID;
+        break;
+      case REQ_MSP_BOX:
+        MSPcmdsend = MSP_BOXIDS;
+         break;
+      case REQ_MSP_FONT:
+        MSPcmdsend = MSP_OSD;
+      break;
+    }
+    blankserialRequest(MSPcmdsend);
+}
