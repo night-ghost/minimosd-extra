@@ -209,6 +209,8 @@ static void showHorizon(byte start_col, byte start_row) {
     byte shf=0;
     int8_t shift_angle=0;
 again:
+    if(shf>6) return;
+    
     int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * (osd_att.pitch + shift_angle )* k_pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
 // -45 .. +45
 

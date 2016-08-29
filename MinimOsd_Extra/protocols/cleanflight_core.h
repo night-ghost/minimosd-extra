@@ -867,6 +867,13 @@ void setMspRequests() {
 
 void doMSPrequests(){
     static    bool flg=0;
+    static bool fReinit=0;
+    
+    if(!fReinit){
+	Serial.end();
+	Serial.begin(115200); // MWII works on this speed
+	fReinit=1;
+    }
 
     flg = !flg;
     

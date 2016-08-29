@@ -9,9 +9,11 @@ BUILD='MinimOsd_Extra/build-atmega328'
 
 #[ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.`version`DV-release.hex
 
+cp -f README.md CHANGELOG.md CHANGELOG_RU.md ./Released
 rm -rf $BUILD
 rm -f osd_latest.zip
 zip -r osd_latest.zip Released
+
 
 git add . -A
 git commit
