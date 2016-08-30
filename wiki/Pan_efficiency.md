@@ -1,6 +1,6 @@
 # Efficiency #
 
-Efficiency panel is a 3 in 1 panel.
+For plane, Efficiency panel is a 3 in 1 panel.
 
 ## If throttle is higher than 2% ##
 
@@ -15,3 +15,5 @@ It indicates the distance you can glide from your actual hight with your actual 
 ## If Throttle is below 2% and your plane is climbing ##
 
 It shows an up arrow indicating that you are probably in a thermic.
+
+##For copter, Efficiency panel shows estimated remaining flight time
