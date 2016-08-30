@@ -29,15 +29,17 @@
             this.btnStop = new System.Windows.Forms.Button();
             this.lblTLog = new System.Windows.Forms.Label();
             this.chkRaw = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbSpeed = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // cbComPort
             // 
             this.cbComPort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbComPort.FormattingEnabled = true;
-            this.cbComPort.Location = new System.Drawing.Point(101, 39);
+            this.cbComPort.Location = new System.Drawing.Point(145, 10);
             this.cbComPort.Name = "cbComPort";
-            this.cbComPort.Size = new System.Drawing.Size(179, 21);
+            this.cbComPort.Size = new System.Drawing.Size(85, 21);
             this.cbComPort.TabIndex = 0;
             this.cbComPort.SelectedIndexChanged += new System.EventHandler(this.cbComPort_SelectedIndexChanged);
             this.cbComPort.Click += new System.EventHandler(this.cbComPort_Click);
@@ -46,7 +48,7 @@
             // btnStart
             // 
             this.btnStart.Enabled = false;
-            this.btnStart.Location = new System.Drawing.Point(17, 78);
+            this.btnStart.Location = new System.Drawing.Point(17, 101);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(106, 22);
             this.btnStart.TabIndex = 1;
@@ -66,7 +68,7 @@
             // btnStop
             // 
             this.btnStop.Enabled = false;
-            this.btnStop.Location = new System.Drawing.Point(170, 78);
+            this.btnStop.Location = new System.Drawing.Point(170, 101);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(109, 22);
             this.btnStop.TabIndex = 3;
@@ -77,15 +79,16 @@
             // lblTLog
             // 
             this.lblTLog.AutoSize = true;
-            this.lblTLog.Location = new System.Drawing.Point(197, 13);
+            this.lblTLog.Location = new System.Drawing.Point(167, 37);
             this.lblTLog.Name = "lblTLog";
-            this.lblTLog.Size = new System.Drawing.Size(0, 13);
+            this.lblTLog.Size = new System.Drawing.Size(31, 13);
             this.lblTLog.TabIndex = 4;
+            this.lblTLog.Text = "0000";
             // 
             // chkRaw
             // 
             this.chkRaw.AutoSize = true;
-            this.chkRaw.Location = new System.Drawing.Point(231, 12);
+            this.chkRaw.Location = new System.Drawing.Point(236, 13);
             this.chkRaw.Name = "chkRaw";
             this.chkRaw.Size = new System.Drawing.Size(48, 17);
             this.chkRaw.TabIndex = 5;
@@ -93,11 +96,37 @@
             this.chkRaw.UseVisualStyleBackColor = true;
             this.chkRaw.CheckedChanged += new System.EventHandler(this.chkRaw_CheckedChanged);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(17, 67);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Port speed";
+            // 
+            // cbSpeed
+            // 
+            this.cbSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbSpeed.FormattingEnabled = true;
+            this.cbSpeed.Items.AddRange(new object[] {
+            "115200",
+            "57600",
+            "38400",
+            "19200",
+            "9600"});
+            this.cbSpeed.Location = new System.Drawing.Point(145, 62);
+            this.cbSpeed.Name = "cbSpeed";
+            this.cbSpeed.Size = new System.Drawing.Size(133, 21);
+            this.cbSpeed.TabIndex = 7;
+            // 
             // frmComPort
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 112);
+            this.ClientSize = new System.Drawing.Size(292, 135);
+            this.Controls.Add(this.cbSpeed);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.chkRaw);
             this.Controls.Add(this.lblTLog);
             this.Controls.Add(this.btnStop);
@@ -121,5 +150,7 @@
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Label lblTLog;
         private System.Windows.Forms.CheckBox chkRaw;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cbSpeed;
     }
 }

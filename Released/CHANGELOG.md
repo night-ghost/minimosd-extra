@@ -339,4 +339,8 @@ v881
 v882
 * fixed rounding bug in UAVtalk
 
+v883
+* fixed bug when OSD freezes
+* in CT "connect to COM port" now can set port speed 
+* MWII protocol now works!
 

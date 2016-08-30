@@ -209,8 +209,8 @@ static void showHorizon(byte start_col, byte start_row) {
     byte shf=0;
     int8_t shift_angle=0;
 again:
-    if(shf>6) return;
-    
+    if(shf>6) return; // not forever
+
     int pitch_line = (int)(round(tan(-AH_PITCH_FACTOR * (osd_att.pitch + shift_angle )* k_pitch) * AH_TOTAL_LINES)) + AH_TOTAL_LINES/2;	// 90 total lines - вычислили Y центра
 // -45 .. +45
 
@@ -218,7 +218,7 @@ again:
     // по уму при угле большем угла диагонали надо переходить с расчета по столбцам на расчет по строкам
     for (col=1+shf; col<=AH_COLS-shf; col++) {
        // получим координаты средней субколонки каждой колонки
-    //         = (col - AH_COLS/2 - 1/2) * CHAR_COLS;
+    //               = (col - AH_COLS/2 - 1/2) * CHAR_COLS;
         int8_t middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
         
         // tg(72 gr) ==3 so byte overflows
@@ -235,7 +235,7 @@ again:
 		subval = 0; // raw chars
 	    
 	    OSD::setPanel(start_col + col - 1, start_row + AH_ROWS - row - 1);
-	    if(shift_angle!=0 && col==(AH_COLS-1)/2){
+	    if(shift_angle!=0 && col==(AH_COLS-1)/2){ // time to draw scale
 		osd.print(abs(shift_angle));
 		col++; // skip next
 	    } else {   // print the line char
@@ -243,7 +243,7 @@ again:
             }
 	    
 	    // check if we have to print an overflow line char
-	    if ( subval && subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
+	    if ( subval && subval >= subval_overflow && row < 4) {  // only if it is a char which needs overflow and if it is not the upper most row
                 OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 2, line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
 	    }
         }

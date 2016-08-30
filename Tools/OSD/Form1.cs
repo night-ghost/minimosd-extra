@@ -53,7 +53,7 @@ namespace OSD {
             try {
 
                 parent.comPort.PortName = parent.CMB_ComPort.Text;
-                parent.comPort.BaudRate = 57600;
+                parent.comPort.BaudRate = int.Parse(cbSpeed.Text);
 
                 parent.comPort.Open();
 
@@ -69,7 +69,7 @@ namespace OSD {
                 Application.DoEvents();
  
                 comPort.PortName = cbComPort.Text;
-                comPort.BaudRate = 57600;
+                comPort.BaudRate = int.Parse(cbSpeed.Text);
                 //comPort.Encoding
 
                 try {
@@ -180,7 +180,7 @@ namespace OSD {
 
         private void frmComPort_Load(object sender, EventArgs e) {
             cbComPort_Enter(sender, null);
-
+            cbSpeed.Text ="57600";
             if (cbComPort.Items.Count > 0)
                 cbComPort.SelectedIndex = 0;
         }
