@@ -59,7 +59,8 @@ If you like this project and want to support further development - you can do it
   [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HXRA6EXZJ489C) EUR
 
 
-changelog in CHANGELOG.md
+changelog in [CHANGELOG.md](https://github.com/night-ghost/minimosd-extra/blob/master/CHANGELOG.md)
+some descriptions are in [wiki](https://github.com/night-ghost/minimosd-extra/tree/master/wiki)
 
 fonts:
 
@@ -157,7 +158,7 @@ http://forum.rcdesign.ru/f90/thread132831-195.html#post5602416 но через �
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M4ZSKGXMWVGXU) RUB
 
 
-история версий в файле CHANGELOG_RU.md
+история версий в файле [CHANGELOG_RU.md](https://github.com/night-ghost/minimosd-extra/blob/master/CHANGELOG_RU.md)
 
 
 Шрифты:
