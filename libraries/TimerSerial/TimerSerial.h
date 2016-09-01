@@ -27,6 +27,7 @@ public:
     static volatile uint8_t _transmitInvMask;
     static volatile uint8_t *_transmitPortRegister;
     static volatile byte fInt, bit;
+    static byte _TXpin;
 
 
     static volatile uint16_t _tx_delay; // public for debug
@@ -44,6 +45,7 @@ public:
   virtual uint8_t available();
   virtual void flush();
   
+  static void wait() {}; // do nothing
   using BetterStream::write;
 
 };

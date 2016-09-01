@@ -253,6 +253,8 @@ struct loc_flags {
     
     uint8_t mav_data_frozen;
     uint8_t mav_stream_overload;
+
+    bool bad_config;
 };
 
 

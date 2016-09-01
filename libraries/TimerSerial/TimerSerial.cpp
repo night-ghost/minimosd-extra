@@ -31,6 +31,8 @@ volatile uint16_t TimerSerial::_tx_delay;
 volatile uint8_t TimerSerial::fInt;
 volatile uint8_t TimerSerial::bit;
 
+uint8_t TimerSerial::_TXpin;
+
 byte  TimerSerial::prescaler;
 
 
@@ -39,12 +41,16 @@ byte  TimerSerial::prescaler;
 //
 TimerSerial::TimerSerial(uint8_t rxPin, uint8_t txPin) {
 
+/* we shouldn't do pin setup here because constructors executes BEFORE setup() and may be overridden
+
   // First write, then set output. If we do this the other way around,
   // the pin would be output low for a short while before switching to
   // output high. Now, it is input with pullup for a short while, which
   // is fine. With inverse logic, either order is fine.
   digitalWrite(txPin, HIGH);
   pinMode(txPin, OUTPUT);
+*/ 
+  _TXpin=txPin; // for later
 
   _transmitBitMask = digitalPinToBitMask(txPin);
   _transmitInvMask = ~_transmitBitMask;
@@ -60,6 +66,14 @@ TimerSerial::TimerSerial(uint8_t rxPin, uint8_t txPin) {
 
 void TimerSerial::begin(long speed){
     byte div=1;
+
+    // First write, then set output. If we do this the other way around,
+    // the pin would be output low for a short while before switching to
+    // output high. Now, it is input with pullup for a short while, which
+    // is fine. With inverse logic, either order is fine.
+    digitalWrite(_TXpin, HIGH);
+    pinMode(_TXpin, OUTPUT);
+
 
     switch(speed) {
     case 115200:

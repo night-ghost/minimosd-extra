@@ -11,7 +11,6 @@
 
 #define VERSION "2.4"
 
-
 //#define DEBUG
 #define STARTUP_SCREEN 0
 #define AUTOBAUD 1
@@ -51,6 +50,9 @@
 #define PWM_PIN PD3 
 
 //#define WALKERA_TELEM RssiPin // telemetry output
+
+//#define SERIALDEBUG RssiPin // debug output, conflicts with PWM_BY_INTERRUPT
+
 
 
 //#define LEDPIN AmperagePin
@@ -100,9 +102,17 @@
   #define DBG_PRINTVARLN(x)  { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.println(x);  Serial.wait(); }
   #define DBG_PRINTVAR(x)    { Serial.print_P(PSTR(#x)); Serial.print_P(PSTR(": ")); Serial.print(x); Serial.print(" "); Serial.wait();  }
   #define DBG_PRINTF(x,...)  { Serial.printf_P(PSTR(x),## __VA_ARGS__); Serial.wait();  }
+#elif defined(SERIALDEBUG)
+  #define DBG_PRINTLN(x)     { dbgSerial.print_P(PSTR(x)); dbgSerial.println();  dbgSerial.wait();  }
+  #define DBG_PRINTVARLN(x)  { dbgSerial.print_P(PSTR(#x)); dbgSerial.print_P(PSTR(": ")); dbgSerial.println(x);  dbgSerial.wait(); }
+  #define DBG_PRINTVAR(x)    { dbgSerial.print_P(PSTR(#x)); dbgSerial.print_P(PSTR(": ")); dbgSerial.print(x); dbgSerial.print(" "); dbgSerial.wait();  }
+  #define DBG_PRINTF(x,...)  { dbgSerial.printf_P(PSTR(x),## __VA_ARGS__); dbgSerial.wait();  }
 #else
   #define DBG_PRINTLN(x)     {}
   #define DBG_PRINTVAR(x)    {}
   #define DBG_PRINTVARLN(x)  {}
   #define DBG_PRINTF(x,...) {}
 #endif
+
+
+

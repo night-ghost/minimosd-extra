@@ -2,8 +2,6 @@
 #include "cleanflight_const.h"
 #include "cleanflight_types.h"
 
-static byte MW_version=0;
-
 
 static  /*INLINE*/  inline uint8_t mwii_get_byte()  {
 	return msg.mwii.buf[msg.mwii.read_idx++];
@@ -624,6 +622,7 @@ typedef struct {
 	osd_att.roll = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) );
 	osd_att.pitch  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) );
 //	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att)); // opposite direction
+DBG_PRINTF("got attitude roll=%d pitch=%d head=%d\n",osd_heading, osd_att.roll, osd_att.pitch);
 	break;
 
 
@@ -878,7 +877,7 @@ void doMSPrequests(){
     
     if(flg) return; // skip half of req
 
-    uint8_t MSPcmdsend;
+    uint8_t MSPcmdsend=0;
 
     setMspRequests();
 
@@ -924,10 +923,12 @@ void doMSPrequests(){
         break;
       case REQ_MSP_BOX:
         MSPcmdsend = MSP_BOXIDS;
-         break;
+        break;
       case REQ_MSP_FONT:
         MSPcmdsend = MSP_OSD;
-      break;
+        break;
     }
-    blankserialRequest(MSPcmdsend);
+
+    if(MSPcmdsend)
+        blankserialRequest(MSPcmdsend);
 }

@@ -37,6 +37,8 @@ Project received Donations from:
  Dmitry Yatsenko
  William Foster
  david albella
+ SERGEY MAKOVSKIY
+ Damir Pinezic
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -99,6 +101,11 @@ OSD osd; //OSD object
 SingleSerialPort(Serial);
 
 
+#if defined(SERIALDEBUG)
+#include "TimerSerial.h"
+TimerSerial dbgSerial(0, SERIALDEBUG);
+#endif
+
 // program parts
 #include "adc_setup.h"
 #include "Config_Func.h"
@@ -141,12 +148,11 @@ volatile byte nest_count=0; // mostly for debugging
 #endif
 
 // обработка прерывания по кадровому синхроимпульсу
-//void isr_VSYNC(){
 ISR(INT0_vect) {
     vsync_wait=0;	// отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
-    vsync_time=millis();
+    vsync_time=millis(); // и отметим его время
 
 
     if(nested) {	// вложенное прерывание игнорируем
@@ -229,6 +235,7 @@ NOINLINE void logo(){
     if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
         OSD::setPanel(1,1);
         osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
+        lflags.bad_config=1;
     }
 
     delay_150();
@@ -244,6 +251,12 @@ void setup()     {
     LED_ON; 		    // turn on for full light
 #endif
     Serial.begin(TELEMETRY_SPEED);
+
+
+#if defined(SERIALDEBUG)
+    dbgSerial.begin(38400);
+#endif
+
 
 //    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
@@ -363,9 +376,8 @@ void loop()
 
     seconds = pt / 1000;
     
-    if(pt < BOOTTIME){ // startup delay for fonts
+    if(pt < BOOTTIME || lflags.bad_config){ // startup delay for fonts
 //if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
-
 
             while(Serial.available_S()) {
                 byte c=Serial.read_S();
@@ -385,6 +397,8 @@ void loop()
             logo();
             return;
     }
+
+    
 
     sei(); // на случай если глючит
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);

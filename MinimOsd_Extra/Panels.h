@@ -2602,7 +2602,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
     } else // copter
          if (!lflags.motor_armed && lflags.last_armed_status ){ // copter only on motors disarm
             landed = pt; // запомнится время дизарма
-DBG_PRINTF("set c landed=%u\n", landed);
+//DBG_PRINTF("set c landed=%u\n", landed);
     }
     
     lflags.last_armed_status = lflags.motor_armed;
@@ -2633,7 +2633,7 @@ DBG_PRINTF("set c landed=%u\n", landed);
 #endif
                                  ){ // 3 seconds after disarm one can jerk sticks
 
-DBG_PRINTF("set FData landed=%u\n", landed);
+//DBG_PRINTF("set FData landed=%u\n", landed);
 
            lflags.fdata=1;
            storeChannels(); // remember control state
@@ -2644,11 +2644,11 @@ DBG_PRINTF("set FData landed=%u\n", landed);
            if(fdata_screen!=panelN) { // turn off by screen switch
                panelN=fdata_screen;
                lflags.fdata=0;
-DBG_PRINTLN("reset FData by sw");
+//DBG_PRINTLN("reset FData by sw");
            }
 
            if(labs(channelDiff(2))>300 || labs(channelDiff(3))>300 || lflags.motor_armed){ // or by throttle stick - and disable Flight Data when armed
-DBG_PRINTLN("reset FData by throttle");
+//DBG_PRINTLN("reset FData by throttle");
                lflags.fdata=0;
            }
 show_fdata:

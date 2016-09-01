@@ -520,18 +520,23 @@ bool uavtalk_read(void) {
 #endif
         			lflags.motor_armed	= uavtalk_get_int8(FLIGHTSTATUS_OBJ_ARMED);
         			osd_mode		= uavtalk_get_int8(FLIGHTSTATUS_OBJ_FLIGHTMODE);
+DBG_PRINTF("got1 mode=%d arm=%d\n", osd_mode, lflags.motor_armed);
 				break;
 #if FLIGHTSTATUS_OBJID_000 != FLIGHTSTATUS_OBJID
 			case FLIGHTSTATUS_OBJID:
         			lflags.motor_armed	= uavtalk_get_int8(offsetof(FlightStatusDataPacked, Armed));
         			osd_mode		= uavtalk_get_int8(offsetof(FlightStatusDataPacked, FlightMode));
+DBG_PRINTF("got2 mode=%d arm=%d\n", osd_mode, lflags.motor_armed);
 				break;
 #endif
 
                         case MANUALCONTROLCOMMAND_OBJID_000:
                         case MANUALCONTROLCOMMAND_OBJID_001:
-                        case MANUALCONTROLCOMMAND_OBJID_002:
-                                osd_throttle         = (int16_t) mul_100( uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE));
+                        case MANUALCONTROLCOMMAND_OBJID_002: {
+                    		float t = uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE);
+                                osd_throttle         = (int16_t) mul_100(t);
+DBG_PRINTF("got1 throttle=%f\n", t);
+
                                 if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
                                 // Channel mapping:
                                 // 0   is Throttle
@@ -551,10 +556,13 @@ bool uavtalk_read(void) {
                                 chan_raw[5]                = uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_6);
                                 chan_raw[6]                = uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_7);
                                 chan_raw[7]                = uavtalk_get_int16(MANUALCONTROLCOMMAND_OBJ_CHANNEL_8);
-                                break;
+                            }    break;
 #if MANUALCONTROLCOMMAND_OBJID_000 != MANUALCONTROLCOMMAND_OBJID
-                        case MANUALCONTROLCOMMAND_OBJID:
-                                osd_throttle                = (int16_t) mul_100(uavtalk_get_float(offsetof(ManualControlCommandDataPacked, Throttle)));
+                        case MANUALCONTROLCOMMAND_OBJID: {
+                                float t=uavtalk_get_float(offsetof(ManualControlCommandDataPacked, Throttle));
+                                osd_throttle         = (int16_t) mul_100(t);
+DBG_PRINTF("got2 throttle=%f\n", t);
+
                                 if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
                                 chan_raw[2]                = uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[0])); // remap!
                                 chan_raw[0]                = uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[1]));
@@ -564,7 +572,7 @@ bool uavtalk_read(void) {
                                 chan_raw[5]                = uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[5]));
                                 chan_raw[6]                = uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[6]));
                                 chan_raw[7]                = uavtalk_get_int16(offsetof(ManualControlCommandDataPacked, Channel[7]));
-                                break;
+                        }        break;
 #endif
 
                         case GPSPOSITION_OBJID_000:
@@ -572,9 +580,9 @@ bool uavtalk_read(void) {
                         case GPSPOSITIONSENSOR_OBJID_001:
                                 gps_norm(osd_pos.lat,uavtalk_get_int32(GPSPOSITION_OBJ_LAT));
                                 gps_norm(osd_pos.lon,uavtalk_get_int32(GPSPOSITION_OBJ_LON));
-                                osd_satellites_visible        = uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
-                                osd_fix_type                = uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
-                                osd_heading                = uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
+                                osd_satellites_visible         = uavtalk_get_int8(GPSPOSITION_OBJ_SATELLITES);
+                                osd_fix_type                   = uavtalk_get_int8(GPSPOSITION_OBJ_STATUS);
+                                osd_heading                    = uavtalk_get_float(GPSPOSITION_OBJ_HEADING);
                                 osd_groundspeed                = uavtalk_get_float(GPSPOSITION_OBJ_GROUNDSPEED);
                                 if(osd_fix_type>0)
                                     osd_pos.alt                = mul_1000(uavtalk_get_float(GPSPOSITION_OBJ_ALTITUDE));
@@ -585,9 +593,9 @@ bool uavtalk_read(void) {
                         case GPSPOSITIONSENSOR_OBJID:
                                 gps_norm(osd_pos.lat,uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Latitude)));
                                 gps_norm(osd_pos.lon,uavtalk_get_int32(offsetof(GPSPositionSensorDataPacked, Longitude)));
-                                osd_satellites_visible        = uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
-                                osd_fix_type                = uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
-                                osd_heading                = uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
+                                osd_satellites_visible         = uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Satellites));
+                                osd_fix_type                   = uavtalk_get_int8( offsetof(GPSPositionSensorDataPacked, Status));
+                                osd_heading                    = uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Heading));
                                 osd_groundspeed                = uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Groundspeed));
                                 if(osd_fix_type>0)
                                     osd_pos.alt                = mul_1000(uavtalk_get_float(offsetof(GPSPositionSensorDataPacked, Altitude)) );
@@ -599,7 +607,7 @@ bool uavtalk_read(void) {
 #if 0 // because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
                         case GPSTIME_OBJID:
                                 osd_time_hour                = uavtalk_get_int8(GPSTIME_OBJ_HOUR);
-                                osd_time_minute                = uavtalk_get_int8(GPSTIME_OBJ_MINUTE);
+                                osd_time_minute              = uavtalk_get_int8(GPSTIME_OBJ_MINUTE);
                                 break;
 #endif
                         case GPSVELOCITY_OBJID_000:

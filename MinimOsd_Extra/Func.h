@@ -77,7 +77,7 @@ void doScreenSwitch(){
 	upi.p = readPanel(0); // read flags for new screen
 	screen_flags = upi.i;
 //	screen_flags = (upi.i & 0xff)<<8 | (upi.i>>8) ;
-DBG_PRINTF("screen flags %x\n", screen_flags);
+//DBG_PRINTF("screen flags %x\n", screen_flags);
 
 }
 
@@ -167,7 +167,7 @@ next_panel:
 #ifdef USE_AUTOSWITCH
         else {
             if(FLAGS.AutoScreenSwitch && autoswitch_time && autoswitch_time<seconds) { // автопереключение активно и время вышло
-DBG_PRINTLN("switch by AutoSwitch");
+//DBG_PRINTLN("switch by AutoSwitch");
                lflags.autosw=1; // авторежим
                lflags.rotatePanel=1; // переключить
             }
@@ -175,7 +175,7 @@ DBG_PRINTLN("switch by AutoSwitch");
 #endif
 
     if(old_panel != panelN){
-DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
+//DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
 
 	doScreenSwitch();
 
@@ -184,7 +184,7 @@ DBG_PRINTF("switch from %d to %d\n",old_panel, panelN);
            goto next_panel;  // при автопереключении пропускаем пустой экран
        
        byte swt = get_switch_time(panelN);
-DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
+//DBG_PRINTF("autoswitch time=%d N=%d\n", swt, panelN);
        if(swt) { // установлено время переключения
            autoswitch_time = seconds + swt; // следующее
 //         if(autoswitch_time < seconds) { // overflow    
@@ -557,7 +557,7 @@ void NOINLINE delay_byte(){
 static void getData(){
 //LED_BLINK;
 
-    bool got=false;
+//    bool got=false;
 
 again:
     if(lflags.input_active || lflags.data_mode || lflags.blinker) {

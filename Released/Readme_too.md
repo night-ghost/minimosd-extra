@@ -1,12 +1,16 @@
 This folder contains Config Toll (OSD_Config.exe) and charsert (MinimOSD_2.4.1.2.mcm) for OSD. 
 
-Also it contains sample TLOG file for testing needs.
+Also it contains sample .TLOG file for testing needs.
 
 
-Ready-to-flash HEX files of firmware are in "FW & Char" folder.
+Ready-to-flash HEX files of firmware are in "FW_&_Char" folder.
 
-MinimOsd_Extra_Uni.[vers]DV-release.hex - main firmware
+MinimOsd_Extra_Uni.[vers]DV-[protocol]-release.hex - main firmware
 
 Character_Updater_FW.hex - utility tool to upload and check fonts if uploading via firmware fails.
 
 All *.osd files are the samples of OSD screens
+
+File lang.txt intendent to localization (and will be created on 1st start of CT), just translate strings after '=' sign. 
+
+File lang_ru.txt is a Russian localization, just rename to lang.txt
