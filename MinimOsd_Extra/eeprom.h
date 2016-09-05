@@ -105,13 +105,13 @@ struct Flags { // 4 байта
 
 // new!
     bool useExtVbattA:1;	// 4
-    bool useExtVbattB:1;	// 5 - generated internally
+    bool useExtVbattB:1;	// 5
     bool useExtCurr:1;		// 6
-    bool AutoScreenSwitch:1;	// 7 
+    bool AutoScreenSwitch:1;	// 7
     bool results_on:1;		// 8
     
     bool mode_auto:1; 		// 9
-    bool flgHUD:1;      	// 10 - not used, use panel.alt instead
+    bool xx:1;			// 10 - not used
     bool flgTrack:1;    	// 11 - not used, use panel.al2
 };
 

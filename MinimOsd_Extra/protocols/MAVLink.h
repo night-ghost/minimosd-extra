@@ -209,6 +209,13 @@ if(apm_mav_system  != msg.m.sysid){
                 //osd_mode = apm_mav_component;//Debug
                 break;
 
+            case MAVLINK_MSG_ID_BATTERY2:
+                if(!FLAGS.useExtVbattB){
+                    osd_vbat_B = mavlink_msg_battery2_get_voltage(&msg.m) ; //Battery voltage, in millivolts (1 = 1 millivolt)
+                }
+                break;
+
+
     // EXTENDED_STATUS
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 gps_norm(osd_pos.lat,mavlink_msg_gps_raw_int_get_lat(&msg.m));

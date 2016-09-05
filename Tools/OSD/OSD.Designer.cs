@@ -194,6 +194,7 @@ namespace OSD
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.cbBattB_source = new System.Windows.Forms.ComboBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -1093,6 +1094,7 @@ namespace OSD
             this.groupBox13.Controls.Add(this.txtBattB_k);
             this.groupBox13.Controls.Add(this.label28);
             this.groupBox13.Controls.Add(this.label16);
+            this.groupBox13.Controls.Add(this.cbBattB_source);
             this.groupBox13.Controls.Add(this.label6);
             this.groupBox13.Controls.Add(this.numMinVoltB);
             this.groupBox13.Location = new System.Drawing.Point(490, 5);
@@ -1127,9 +1129,9 @@ namespace OSD
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(8, 20);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(81, 13);
+            this.label16.Size = new System.Drawing.Size(34, 13);
             this.label16.TabIndex = 5;
-            this.label16.Text = "Input: Pin BattB";
+            this.label16.Text = "Input:";
             // 
             // label6
             // 
@@ -1996,6 +1998,19 @@ namespace OSD
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
+            // cbBattB_source
+            // 
+            this.cbBattB_source.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbBattB_source.FormattingEnabled = true;
+            this.cbBattB_source.Items.AddRange(new object[] {
+            "from FC",
+            "Pin BattB"});
+            this.cbBattB_source.Location = new System.Drawing.Point(55, 16);
+            this.cbBattB_source.Name = "cbBattB_source";
+            this.cbBattB_source.Size = new System.Drawing.Size(98, 21);
+            this.cbBattB_source.TabIndex = 16;
+            this.cbBattB_source.SelectedIndexChanged += new System.EventHandler(this.cbBattB_source_SelectedIndexChanged);
+            // 
             // OSD
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2242,6 +2257,7 @@ namespace OSD
         private System.Windows.Forms.Label lblTime;
         private System.Windows.Forms.Label lblTimes;
         private System.Windows.Forms.CheckBox chkByTime;
+        private System.Windows.Forms.ComboBox cbBattB_source;
     }
 
 }

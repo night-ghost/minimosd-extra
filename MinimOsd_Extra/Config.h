@@ -35,7 +35,7 @@
 
 #define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
 
-#define BOOTTIME         1300   // Time in milliseconds that we show boot loading bar and wait user input
+#define BOOTTIME         1500   // Time in milliseconds that we show boot loading bar and wait user input
 
 
 // additional pins

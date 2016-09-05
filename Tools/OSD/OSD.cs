@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r883 DV";
+        public const string VERSION = "r884 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -173,6 +173,7 @@ namespace OSD {
         bool RSSI_used = false; //  использование дополнительных ног
         bool curr_used = false;
         bool batt1_used = false;
+        bool batt2_used = false;
 
         bool fListen=false;
 
@@ -515,6 +516,7 @@ namespace OSD {
 
 
             cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
+            cbBattB_source.SelectedIndex = pan.flgBattB ? 1 : 0;
 
             cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
@@ -650,6 +652,10 @@ namespace OSD {
             return (p.Altf==1?1:0) + (p.Alt2==1?2:0) + (p.Alt3==1?4:0) + (p.Alt4==1?8:0) + (p.Alt5!=0?16:0);
         }
 
+        public bool is_ntsc(){
+            return !(CHK_pal.Checked || CHK_auto.Checked);
+        }
+
         public void drawNode(TreeNode tn) {
             Panel thing = (Panel)tn.Tag;
 
@@ -660,7 +666,7 @@ namespace OSD {
             updatePanelStrings(thing.string_id,thing.string_count, thing.strings);// renew before draw
 
             // ntsc and below the middle line
-            if (thing.y >= getCenter() && !(CHK_pal.Checked || CHK_auto.Checked)) {
+            if (thing.y >= getCenter() && is_ntsc()) {
                 thing.show(thing.x, thing.y - 3, thing.sign, getAlt(thing), thing);
             } else { // pal and no change
                 thing.show(thing.x, thing.y, thing.sign, getAlt(thing), thing);
@@ -891,13 +897,13 @@ namespace OSD {
 
 
                 // пройтись по всем панелям и проверить, включено ли отображение батареи B
-                //если да то pan.flgBattB=true
-                pan.flgBattB = false;
+                //если да то pan.battB_used=true
+                pan.battB_used = false;
                 for (int i = 0; i < npanel; i++) {
                     foreach (var p in scr[i].panelItems) {
                         if ((p != null) && ((p.name == "Battery B")) && p.pos != -1) {
                             var trArray = scr[i].LIST_items.Nodes.Find(p.name, true);
-                            pan.flgBattB |= trArray[0].Checked;
+                            pan.battB_used |= trArray[0].Checked;
                         }
                     }
                 }
@@ -971,12 +977,13 @@ namespace OSD {
                 conf.eeprom.sets.horiz_kRoll_a = pan.roll_k_ntsc;
                 conf.eeprom.sets.horiz_kPitch_a = pan.pitch_k_ntsc;
                 conf.eeprom.flags[useExtVbattA] = pan.flgBattA;
+                conf.eeprom.flags[useExtVbattB] = pan.flgBattB;
                 conf.eeprom.flags[useExtCurr] = pan.flgCurrent;
                 conf.eeprom.flags[AutoScreenSwitch] = pan.flgTimedSwitch;
                 conf.eeprom.flags[results_on] = chkFlightResults.Checked;
 
-                conf.eeprom.flags[flgTrack] = pan.flgTrack;
-                conf.eeprom.flags[flgHUD] = pan.flgHUD;
+                //conf.eeprom.flags[flgTrack] = pan.flgTrack;
+                //conf.eeprom.flags[flgHUD] = pan.flgHUD;
 
                 conf.eeprom.sets.pwm_src = pan.pwm_src;
                 conf.eeprom.sets.pwm_dst = pan.pwm_dst;
@@ -1210,8 +1217,8 @@ namespace OSD {
             conf.eeprom.sets.horiz_kRoll_a = 1; // коэффициенты горизонта для NTSC
             conf.eeprom.sets.horiz_kPitch_a = 1;
 
-            conf.eeprom.flags[flgTrack] = pan.flgTrack;
-            conf.eeprom.flags[flgHUD] = pan.flgHUD;
+            //conf.eeprom.flags[flgTrack] = pan.flgTrack;
+            //.eeprom.flags[flgHUD] = pan.flgHUD;
 
             conf.eeprom.sets.pwm_src = 0;
             conf.eeprom.sets.pwm_dst = 0;
@@ -1510,8 +1517,8 @@ as_checkbox:
 
                 CHK_ntsc.Checked = !(pan.mode_auto || pan.pal_ntsc);
 
-                pan.flgTrack = conf.eeprom.flags[flgTrack];
-                pan.flgHUD = conf.eeprom.flags[flgHUD];
+                //pan.flgTrack = conf.eeprom.flags[flgTrack];
+                //pan.flgHUD = conf.eeprom.flags[flgHUD];
 
                 chkTrack.Checked = pan.flgTrack;
                 //chkHUD.Checked = pan.flgHUD;
@@ -1605,6 +1612,9 @@ as_checkbox:
 
                 pan.flgBattA = conf.eeprom.flags[useExtVbattA];
                 cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
+
+                pan.flgBattB = conf.eeprom.flags[useExtVbattB];
+                cbBattB_source.SelectedIndex = pan.flgBattB ? 1 : 0;
 
                 pan.flgCurrent = conf.eeprom.flags[useExtCurr];
                 cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
@@ -2183,6 +2193,7 @@ again:
 
 
                     cbBattA_source.SelectedIndex = pan.flgBattA ? 1 : 0;
+                    cbBattB_source.SelectedIndex = pan.flgBattB ? 1 : 0;
                     cbCurrentSoure.SelectedIndex = pan.flgCurrent ? 1 : 0;
 
                     chkByTime.Checked = pan.flgTimedSwitch;
@@ -3720,8 +3731,8 @@ again:
             batt1_used = (pan.flgBattA);
 
             update_used_pins();
+            txtBattA_k.Enabled = pan.flgBattA;
         }
-
 
 
 
@@ -3731,7 +3742,7 @@ again:
             curr_used = (pan.flgCurrent);
 
             update_used_pins();
-
+            txtCurr_k.Enabled =pan.flgCurrent;
         }
 
         private void numMinVoltB_ValueChanged(object sender, EventArgs e) {
@@ -4745,6 +4756,16 @@ again:
             txtTime2.Visible = flg;
             txtTime3.Visible = flg;
         }
+
+        private void cbBattB_source_SelectedIndexChanged(object sender, EventArgs e) {        
+            pan.flgBattB = (cbBattB_source.SelectedIndex > 0);
+            batt2_used = (pan.flgBattB);
+
+            update_used_pins();
+            txtBattB_k.Enabled = pan.flgBattB;
+        }
+
+        
 
         
     

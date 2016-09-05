@@ -604,6 +604,12 @@ as_checkbox:
 			}
 		}
 		
+        private int correct_NTSC(int y){
+            if (y >= osd.getCenter() && osd.is_ntsc()) 
+                y+=3;
+            return y;
+        }
+
 		private void numericUpDown1_ValueChanged (object sender, EventArgs e) {
 			string item = osd.currentlyselected;
 			
@@ -618,19 +624,26 @@ as_checkbox:
         }
 
 
+
+        private void setYpos(int y) {
+            string item;
+
+            item = osd.currentlyselected;
+
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    panelItems[a].y = y;
+
+                }
+            }
+
+            osd.Draw(number);
+        }
+
         private void numericUpDown2_ValueChanged (object sender, EventArgs e) {
-			string item;
-
-			item = osd.currentlyselected;
 			
-			for (int a = 0; a < panelItems.Length; a++) {
-				if(panelItems[a]!=null && panelItems[a].name==item) {
-					panelItems[a].y = (int)NUM_Y.Value;
-
-				}
-			}
-
-			osd.Draw(number);
+            setYpos(correct_NTSC((int)NUM_Y.Value));
+            
 		}
 		
 		private void pictureBox1_MouseUp (object sender, MouseEventArgs e) {
@@ -645,14 +658,19 @@ as_checkbox:
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
 				getCharLoc(e.X, e.Y, out ansW, out ansH);
-				if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
-					ansH += 3;
-				}
+				//if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
+					//ansH += 3;
+				//}
 				ansW -= clickX; //запомним куда ткнули
 				ansH -= clickY;
-				
+				                
 				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
-				NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
+                NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
+
+                
+
+
+                Console.WriteLine("y=" + NUM_Y.Value.ToString());
 
 				pictureBox.Focus();
 			} else {

@@ -69,6 +69,7 @@ namespace OSD
 		
 		public bool flgBattA=false ;
 		public bool flgBattB=false ;
+        public bool battB_used = false;
 		
 		public bool flgCurrent=false;
 		public bool flgILS=true;
@@ -343,7 +344,7 @@ namespace OSD
         if(is_alt(fAlt)){
             if (sign == 1)
                 osd.printf("\x16");
-            osd.printf(" 276\x01");
+            osd.printf(" 124\x01");
             return 0;
         }
         

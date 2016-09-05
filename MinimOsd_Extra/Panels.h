@@ -1103,10 +1103,10 @@ static void panBatt_A(point p){
 
 static void panBatt_B(point p){
     if(is_on(p)) {
-	FLAGS.useExtVbattB=1; // отобразить состояние панели во ФЛАГЕ
+	lflags.battB_is_on=1; // отобразить состояние панели во ФЛАГЕ
         printVolt(osd_vbat_B);
     } else
-        FLAGS.useExtVbattB = ( sets.battBv!=0 ); // включено если есть надобность контроля
+        lflags.battB_is_on = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
 
 

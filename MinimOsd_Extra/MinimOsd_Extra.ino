@@ -165,7 +165,7 @@ ISR(INT0_vect) {
             nested++;
             sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
-            cli();
+//            cli();
             update_screen = 0;
             nested--;
         }
@@ -175,6 +175,14 @@ ISR(INT0_vect) {
 #endif
         SREG=tmp;
     }
+    
+    /* check PC of interrupted code
+    __asm volatile (
+        "in	r28, __SP_L__ \n"
+        "in	r29, __SP_H__ \n"
+        ld 
+    );
+    */
 #if defined(DEBUG)
     byte sp;
 
@@ -603,7 +611,7 @@ void On100ms(){ // периодические события, не связан�
     }
 
 //  аналоговый ввод - напряжение видео
-    if(FLAGS.useExtVbattB || SENSOR2_ON){ // меряем если есть панель или warning 
+    if((FLAGS.useExtVbattB && lflags.battB_is_on) || SENSOR2_ON){ // меряем если есть панель или warning 
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;

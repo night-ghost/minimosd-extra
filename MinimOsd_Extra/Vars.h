@@ -255,6 +255,8 @@ struct loc_flags {
     uint8_t mav_stream_overload;
 
     bool bad_config;
+    
+    bool battB_is_on;
 };
 
 

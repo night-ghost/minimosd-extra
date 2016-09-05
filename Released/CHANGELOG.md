@@ -344,3 +344,6 @@ v883
 * in CT "connect to COM port" now can set port speed 
 * MWII protocol now works!
 
+v884
+* fixed NTSC mode in CT
+* Battery2 voltage can be get via MAVlink
