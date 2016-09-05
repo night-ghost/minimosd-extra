@@ -2,7 +2,7 @@
 Copyright (c) 2011.  All rights reserved.
 An Open Source Arduino based OSD and Camera Control project.
 
-Program  : Minim-OSD 
+Program  : Minim-OSD
 
 Version  : V8.68, 14 jule 2016
 
@@ -27,8 +27,8 @@ Project received Donations from:
  Lauri Andler
  Esteban Dozsa
  William Studley
- Tony Yeung 
- Marc J MERLIN 
+ Tony Yeung
+ Marc J MERLIN
  Сергей Сырескин
  Aleksandr Starostin
  Михаил Павлов
@@ -95,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 
 
-OSD osd; //OSD object 
+OSD osd; //OSD object
 
 // Objects and Serial definitions
 SingleSerialPort(Serial);
@@ -124,7 +124,7 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 #elif defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
 BetterStream *mavlink_comm_0_port;
-mavlink_system_t mavlink_system = {12,1}; 
+mavlink_system_t mavlink_system = {12,1};
 #else
 #error "No protocol defined"
 #endif
@@ -135,13 +135,13 @@ mavlink_system_t mavlink_system = {12,1};
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
- 
+
  WalkeraTelem walkera;
 #endif
 
 /* **********************************************/
 
-volatile byte nested=0; 
+volatile byte nested=0;
 
 #if defined(DEBUG)
 volatile byte nest_count=0; // mostly for debugging
@@ -149,38 +149,38 @@ volatile byte nest_count=0; // mostly for debugging
 
 // обработка прерывания по кадровому синхроимпульсу
 ISR(INT0_vect) {
-    vsync_wait=0;	// отметить его наличие
-    
+    vsync_wait=0;   // отметить его наличие
+
     vsync_count++; // считаем кадровые прерывания
     vsync_time=millis(); // и отметим его время
 
 
-    if(nested) {	// вложенное прерывание игнорируем
+    if(nested) {    // вложенное прерывание игнорируем
 #if defined(DEBUG)
-       nest_count++;	// ... но запишем в тетрадочку
+       nest_count++;    // ... но запишем в тетрадочку
 #endif
     } else {
-	byte tmp=SREG;
+    byte tmp=SREG;
         if(update_screen) { // there is data for screen
             nested++;
-            sei(); 			// enable other interrupts 
-            OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
+            sei();          // enable other interrupts
+            OSD::update();      // do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
 //            cli();
             update_screen = 0;
             nested--;
         }
 #if defined(PWM_IN_INTERRUPT)
-        sei(); 			// enable other interrupts - jitter is small because no big calculations in interrupts
+        sei();          // enable other interrupts - jitter is small because no big calculations in interrupts
         generate_PWM(false);
 #endif
         SREG=tmp;
     }
-    
+
     /* check PC of interrupted code
     __asm volatile (
-        "in	r28, __SP_L__ \n"
-        "in	r29, __SP_H__ \n"
-        ld 
+        "in r28, __SP_L__ \n"
+        "in r29, __SP_H__ \n"
+        ld
     );
     */
 #if defined(DEBUG)
@@ -195,7 +195,7 @@ ISR(INT0_vect) {
 
 // PWM Measurement
 #if defined(PWM_PIN)
-void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
+void ReadINT_PIN() {    // прерывание по ноге внешнего PWM
     uint32_t time=micros(); // the 1st place to exclude jitter
 
     // We will start to read when signal goes HIGH
@@ -205,7 +205,7 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
         int_Timer = time;
 
     } else {        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-        uint32_t t= int_Timer; 
+        uint32_t t= int_Timer;
         if( t /* && !New_PWM_Frame */){
             time -= t;
             PWM_IN = (int)(time);
@@ -242,7 +242,7 @@ NOINLINE void logo(){
 
     if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
         OSD::setPanel(1,1);
-        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
+        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION);
         lflags.bad_config=1;
     }
 
@@ -252,11 +252,11 @@ NOINLINE void logo(){
 }
 
 void setup()     {
-    wdt_disable(); 
+    wdt_disable();
 
 #ifdef LEDPIN
     pinMode(LEDPIN,OUTPUT); // led
-    LED_ON; 		    // turn on for full light
+    LED_ON;             // turn on for full light
 #endif
     Serial.begin(TELEMETRY_SPEED);
 
@@ -279,7 +279,7 @@ void setup()     {
     analogReference(INTERNAL);  // INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
 
 //    wdt_enable(WDTO_2S); - bootloader don't supports WDT
-    
+
     adc_setup(); // do it some faster
 
 //    attachInterrupt(INT0, isr_VSYNC, FALLING); // 78 bytes
@@ -288,9 +288,9 @@ void setup()     {
 
 #if defined(PWM_PIN)
     if(sets.ch_toggle == 1) { // only if used
-	pinMode(PWM_PIN, INPUT_PULLUP);
-	//attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
-	EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (CHANGE << ISC10);
+    pinMode(PWM_PIN, INPUT_PULLUP);
+    //attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
+    EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (CHANGE << ISC10);
         EIMSK |= (1 << INT1);
     }
 #endif
@@ -299,7 +299,7 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
-    // Prepare OSD for displaying 
+    // Prepare OSD for displaying
     unplugSlaves();
     OSD::update();// clear memory
 
@@ -307,17 +307,17 @@ void setup()     {
 
 
 
-    
+
 #define REL_1 int(RELEASE_NUM/100)
-#define REL_2 int((RELEASE_NUM - REL_1*100 )/10) 
-#define REL_3 int((RELEASE_NUM - REL_1*100 - REL_2*10  )) 
+#define REL_2 int((RELEASE_NUM - REL_1*100 )/10)
+#define REL_3 int((RELEASE_NUM - REL_1*100 - REL_2*10  ))
 
     if(sets.FW_VERSION[0]!=(REL_1 + '0') || sets.FW_VERSION[1]!=(REL_2 + '0') || sets.FW_VERSION[2]!=(REL_3 + '0') ){
-	sets.FW_VERSION[0]=REL_1 + '0';
-	sets.FW_VERSION[1]=REL_2 + '0';
-	sets.FW_VERSION[2]=REL_3 + '0';
-    
-	eeprom_write_len( sets.FW_VERSION,  EEPROM_offs(sets) + ((byte *)sets.FW_VERSION - (byte *)&sets),  sizeof(sets.FW_VERSION) );
+    sets.FW_VERSION[0]=REL_1 + '0';
+    sets.FW_VERSION[1]=REL_2 + '0';
+    sets.FW_VERSION[2]=REL_3 + '0';
+
+    eeprom_write_len( sets.FW_VERSION,  EEPROM_offs(sets) + ((byte *)sets.FW_VERSION - (byte *)&sets),  sizeof(sets.FW_VERSION) );
     }
 
 
@@ -325,17 +325,17 @@ void setup()     {
 
     if(sets.pwm_src && sets.pwm_dst) { // трансляция PWM на внешний вывод если заданы источник и приемник
 
-	byte PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
+    byte PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
 
-	pinMode(PWM_out_pin,  OUTPUT);
-	digitalWrite(PWM_out_pin, 0);
+    pinMode(PWM_out_pin,  OUTPUT);
+    digitalWrite(PWM_out_pin, 0);
 
         uint8_t port = digitalPinToPort(PWM_out_pin);
         PWM_out_bit  = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
         PWM_out_port = portOutputRegister(port);
     }
 
-    osd.init();    // Start 
+    osd.init();    // Start
 
     logo();
 
@@ -349,7 +349,7 @@ void setup()     {
 /*    OSD::setPanel(0,0);
     hex_dump((byte *)&panel,0x70);
     OSD::update();
-    delay(10000); 
+    delay(10000);
 */
 /*
     eeprom_read_len((byte *)&msg,  768,  128 );
@@ -357,7 +357,7 @@ void setup()     {
     OSD::setPanel(0,0);
     hex_dump((byte *)&msg,0x70);
     OSD::update();
-    delay(10000); 
+    delay(10000);
 */
 
 #endif
@@ -374,7 +374,7 @@ void setup()     {
 
 // Mother of all happenings, The loop()
 // As simple as possible.
-void loop() 
+void loop()
 {
     unsigned long pt;
 
@@ -383,7 +383,7 @@ void loop()
     pt=millis();     //millis_plus(&pt, 0); much larger
 
     seconds = pt / 1000;
-    
+
     if(pt < BOOTTIME || lflags.bad_config){ // startup delay for fonts
 //if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
 
@@ -406,7 +406,7 @@ void loop()
             return;
     }
 
-    
+
 
     sei(); // на случай если глючит
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
@@ -427,12 +427,12 @@ void loop()
 
     if(lflags.got_data){ // были свежие данные - обработать
 
-	pan_toggle(); // проверить переключение экранов
+    pan_toggle(); // проверить переключение экранов
 
-	if(!lflags.need_redraw) {
-	    lflags.need_redraw=1;
-	    vsync_wait=1; // будем ждать прерывания
-	}
+    if(!lflags.need_redraw) {
+        lflags.need_redraw=1;
+        vsync_wait=1; // будем ждать прерывания
+    }
 
         lflags.got_data=0; // данные обработаны
     }
@@ -446,18 +446,18 @@ void loop()
 
         writePanels(pt);   // writing enabled panels (check OSD_Panels Tab)
 
-//	LED_BLINK;
+//  LED_BLINK;
 
 //LED_ON; // свечение диода во время ожидания перерисовки экрана
-	update_screen = 1; // пришли данные, надо перерисовать экран
+    update_screen = 1; // пришли данные, надо перерисовать экран
     }
 
 
 /* not used, let PWM data will be ALWAYS actual
     if(New_PWM_Frame){
-	New_PWM_Frame=false;
+    New_PWM_Frame=false;
 
-	// data is in PWM_IN
+    // data is in PWM_IN
     }
 */
 
@@ -469,7 +469,7 @@ void loop()
 
         if(update_screen && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились
             vsync_wait=0; // хватит ждать
-        
+
             OSD::update(); // обновим принудительно
             update_screen = 0;
         }
@@ -478,32 +478,32 @@ void loop()
     }
     if(pt > timer_100ms){
         long_plus(&timer_100ms, 100);
-	On100ms();
-	
-	lflags.flag_01s = !lflags.flag_01s;
-	
-	if(lflags.flag_01s) {
-	
-	    if(skip_inc) {
-	        skip_inc++;
-	
-		if(skip_inc >=3){
-		    count02s++;
-		    skip_inc=0; // we go again
-		}
-	        
-	    } else 
-		count02s++;
-	}
-//	count01s++;
+    On100ms();
+
+    lflags.flag_01s = !lflags.flag_01s;
+
+    if(lflags.flag_01s) {
+
+        if(skip_inc) {
+            skip_inc++;
+
+        if(skip_inc >=3){
+            count02s++;
+            skip_inc=0; // we go again
+        }
+
+        } else
+        count02s++;
+    }
+//  count01s++;
     }
     if(pt > timer_500ms){
-	long_plus(&timer_500ms, 500);
+    long_plus(&timer_500ms, 500);
         lflags.got_data=1; // каждые полсекунды принудительно
-	
-	lflags.flag_05s = 1;
 
-	count05s++;
+    lflags.flag_05s = 1;
+
+    count05s++;
 
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry(); // 2 times in second
@@ -514,36 +514,36 @@ void loop()
     //        seconds++;
             lflags.one_sec_timer_switch = 1; // for warnings
 
-	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
-	        max7456_err_count++;
+        if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
+            max7456_err_count++;
                 if(max7456_err_count>3) { // 3 seconds no sync
-#ifdef DEBUG   
+#ifdef DEBUG
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
 #endif
                     osd.reset();    // restart MAX7456
                 }
-	    } else  max7456_err_count=0;
+        } else  max7456_err_count=0;
 
-	    vsync_count=0;
+        vsync_count=0;
 
 
 #ifdef DEBUG
-	    if(seconds % 30 == 0) {
-		extern volatile uint16_t lost_bytes;
-	        Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
-	        Serial.printf_P(PSTR("stack bottom = %x nest count=%d\n"),stack_bottom, nest_count);
+        if(seconds % 30 == 0) {
+        extern volatile uint16_t lost_bytes;
+            Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
+            Serial.printf_P(PSTR("stack bottom = %x nest count=%d\n"),stack_bottom, nest_count);
 //    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
-	    }
+        }
 #endif
-	}
+    }
     }
 
 
-#ifdef DEBUG    
+#ifdef DEBUG
     uint16_t dly=millis() - pt;
-    
+
     if(dly>max_dly)
-	max_dly=dly; // накопление максимального времени цикла
+    max_dly=dly; // накопление максимального времени цикла
 #endif
 
 // measured max loop time = ~75ms
@@ -582,7 +582,7 @@ byte NOINLINE normalize_voltage(int v){
 
 void On100ms(){ // периодические события, не связанные с поступлением данных MAVLINK
 
-    if(FLAGS.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение 
+    if(FLAGS.useExtVbattA || SENSOR1_ON){ //аналоговый ввод - основное напряжение
         static uint8_t ind = -1;
         static uint16_t voltageRawArray[8];
         uint16_t voltageRaw = 0;
@@ -596,22 +596,22 @@ void On100ms(){ // периодические события, не связан�
         sensorData[0] =  (sensorData[0]*7 + voltageRaw) /8;
 #endif
         if( FLAGS.useExtVbattA ) {
-        
+
             voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
-	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
-	    else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
-	    lflags.got_data=1;
-// 	вычислить osd_battery_remaining_A по напряжению!
-	    byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
-	     //             voltage above limit in 0.1              max voltage above limit
-	    int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
-	
-	    osd_battery_remaining_A=normalize_voltage(v);
-	}
+        if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
+        else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
+        lflags.got_data=1;
+//  вычислить osd_battery_remaining_A по напряжению!
+        byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
+         //             voltage above limit in 0.1              max voltage above limit
+        int v = ( (osd_vbat_A+50)/100 - sets.battv  ) * 255L / (42 * n - sets.battv);
+
+        osd_battery_remaining_A=normalize_voltage(v);
+    }
     }
 
 //  аналоговый ввод - напряжение видео
-    if((FLAGS.useExtVbattB && lflags.battB_is_on) || SENSOR2_ON){ // меряем если есть панель или warning 
+    if((FLAGS.useExtVbattB && lflags.battB_is_on) || SENSOR2_ON){ // меряем если есть панель или warning
         static uint8_t ind = -1;
         static uint16_t voltageBRawArray[8];
         uint16_t voltageRaw = 0;
@@ -623,23 +623,23 @@ void On100ms(){ // периодические события, не связан�
 #if defined(USE_SENSORS)
         sensorData[1] = (sensorData[1]*7 + voltageRaw) /8;
 #endif
-	if(FLAGS.useExtVbattB){
+    if(FLAGS.useExtVbattB){
             voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // in mv - 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
-	    else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
-    
-// 		вычислить osd_battery_remaining_B по напряжению!
-	    byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
-//		int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
+        if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
+        else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
 
-	    int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
+//      вычислить osd_battery_remaining_B по напряжению!
+        byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
+//      int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
 
-	//    if(v<0)        osd_battery_remaining_B  = 0;
-	//    else if(v>255) osd_battery_remaining_B  = 255;
-	//    else           osd_battery_remaining_B  = v;
-	    osd_battery_remaining_B=normalize_voltage(v);
-	}
+        int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
+
+    //    if(v<0)        osd_battery_remaining_B  = 0;
+    //    else if(v>255) osd_battery_remaining_B  = 255;
+    //    else           osd_battery_remaining_B  = v;
+        osd_battery_remaining_B=normalize_voltage(v);
+    }
     }
 
     if(FLAGS.useExtCurr || SENSOR3_ON){ //аналоговый ввод - ток
@@ -647,14 +647,14 @@ void On100ms(){ // периодические события, не связан�
         static uint16_t currentRawArray[8];
         uint16_t currentRaw = 0;
 
-	uint16_t d;
+    uint16_t d;
 
 #if defined(USE_SENSORS)
-	if(fPulseSensor[2])
-	    d=pulseIn(AmperagePin,HIGH,10000);
-	else
+    if(fPulseSensor[2])
+        d=pulseIn(AmperagePin,HIGH,10000);
+    else
 #endif
-	    d=analogRead(AmperagePin);
+        d=analogRead(AmperagePin);
         currentRawArray[(++ind)%8] = d;
         for (uint8_t i=8;i!=0;)
             currentRaw += currentRawArray[--i];
@@ -664,9 +664,9 @@ void On100ms(){ // периодические события, не связан�
         if(FLAGS.useExtCurr) {
             currentRaw = float(currentRaw) * sets.eCurrent_koef  * (1000.0 / 10.0 * 20.0 /1023.0 / 80.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	    if(osd_curr_A ==0) osd_curr_A = currentRaw;
-	    else               osd_curr_A = (osd_curr_A *3 + currentRaw +2)/4;
-	}
+        if(osd_curr_A ==0) osd_curr_A = currentRaw;
+        else               osd_curr_A = (osd_curr_A *3 + currentRaw +2)/4;
+    }
 
     }
 
@@ -691,44 +691,44 @@ void On100ms(){ // периодические события, не связан�
 
 
 case_2:
-	    rssi_in = avgRSSI(d) * sets.eRSSI_koef; // 8 элементов
+        rssi_in = avgRSSI(d) * sets.eRSSI_koef; // 8 элементов
 
-	    lflags.got_data=1;
-	    break;
+        lflags.got_data=1;
+        break;
 
-	case 0:
-	    d=osd_rssi;	// mavlink
+    case 0:
+        d=osd_rssi; // mavlink
 //DBG_PRINTF("osd_rssi=%d\n", osd_rssi );
-	    goto case_4;
-	
-	case 3: // 3dr modem rssi
-	    d=telem_rssi;
+        goto case_4;
+
+    case 3: // 3dr modem rssi
+        d=telem_rssi;
 //DBG_PRINTF("telem_rssi=%d\n", telem_rssi );
 //Serial.printf_P(PSTR("telem_rssi=%d\n"), d); Serial.wait(); << without this RSSI not works
-	    goto case_4;
-	
-	case 4:
-	default:
-	    d = chan_raw[7]; // ch 8
+        goto case_4;
+
+    case 4:
+    default:
+        d = chan_raw[7]; // ch 8
 
 //DBG_PRINTF("ch8_rssi=%d\n", d );
 
 case_4:
-	    rssi_in = avgRSSI(d);
+        rssi_in = avgRSSI(d);
 
 // RSSI source is not pin so we can read it for sensor
 #if defined(USE_SENSORS)
-	    if(SENSOR4_ON) {
-		if(fPulseSensor[3])
-		    d=pulseIn(RssiPin,HIGH,10000);
-		else
-		    d=analogRead(RssiPin);
-		    
-		sensorData[3] = (sensorData[3]*7 + d) /8;
-	    }
+        if(SENSOR4_ON) {
+        if(fPulseSensor[3])
+            d=pulseIn(RssiPin,HIGH,10000);
+        else
+            d=analogRead(RssiPin);
+
+        sensorData[3] = (sensorData[3]*7 + d) /8;
+        }
 #endif
-	    break;
-	}
+        break;
+    }
     }
 }
 
