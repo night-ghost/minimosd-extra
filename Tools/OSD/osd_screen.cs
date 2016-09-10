@@ -57,8 +57,8 @@ namespace OSD
 		
 		private bool mousedown;
 		public bool fReenter=false;
-        public uint16_t screen_flags=0;
-        private bool topScreen = false;
+		public uint16_t screen_flags=0;
+		private bool topScreen = false;
 
         public osd_screen (int num, OSD aosd)
 		{
@@ -665,33 +665,32 @@ as_checkbox:
         private void pictureBox1_MouseMove (object sender, MouseEventArgs e) {
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
-                getCharLoc(e.X, e.Y, out ansW, out ansH);
+				getCharLoc(e.X, e.Y, out ansW, out ansH);
 				//if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
 					//ansH += 3;
 				//}
 				ansW -= clickX; //запомним куда ткнули
 				ansH -= clickY;
-
-
-                if (osd.is_ntsc())
-                {
-                    // started on top screen and went to bottom
-                    if (topScreen && ansH >= OSD.SCREEN_NTSC_SKIP_LINES.Min())
-                    {
-                        ansH += (topScreen)?3:-1;
-                    }
-                    // started on bottom screen and went to top
-                    else if (!topScreen && ansH <= OSD.SCREEN_NTSC_SKIP_LINES.Max())
-                    {
-                        ansH -= 3;
-                    }
-                }
-
-                NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
-                NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
-                
-                Console.WriteLine("y=" + NUM_Y.Value.ToString());
-
+				
+				if (osd.is_ntsc())
+				{
+					// started on top screen and went to bottom
+					if (topScreen && ansH >= OSD.SCREEN_NTSC_SKIP_LINES.Min())
+					{
+						ansH += (topScreen)?3:-1;
+					}
+					// started on bottom screen and went to top
+					else if (!topScreen && ansH <= OSD.SCREEN_NTSC_SKIP_LINES.Max())
+					{
+						ansH -= 3;
+					}
+				}
+				
+				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
+				NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
+				
+				Console.WriteLine("y=" + NUM_Y.Value.ToString());
+				
 				pictureBox.Focus();
 			} else {
 				mousedown = false;
@@ -710,17 +709,17 @@ as_checkbox:
         private void pictureBox1_MouseDown (object sender, MouseEventArgs e) {
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
-                adjustGroupbox();
-                for (int a = 0; a < panelItems.Length; a++)
-                {
-                    if (panelItems[a] != null && panelItems[a].name == osd.currentlyselected)
-                    {
-                        //keep track if change started on top of screen in NTSC mode.
-                        //this is necessary to skip mid (unused on NTSC) lines
-                        topScreen = (osd.is_ntsc() && panelItems[a].y < osd.getCenter());
-                    }
-                }
-            });
+				adjustGroupbox();
+				for (int a = 0; a < panelItems.Length; a++)
+				{
+					if (panelItems[a] != null && panelItems[a].name == osd.currentlyselected)
+					{
+						//keep track if change started on top of screen in NTSC mode.
+						//this is necessary to skip mid (unused on NTSC) lines
+						topScreen = (osd.is_ntsc() && panelItems[a].y < osd.getCenter());
+					}
+				}
+			});
 			
 
 			mousedown = true;
