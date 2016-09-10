@@ -2153,6 +2153,7 @@ again:
 
                     CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
                     CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
+                    CHK_ntsc.Checked = !CHK_pal.Checked && !CHK_auto.Checked;
 
                     //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
                     chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);

@@ -58,8 +58,9 @@ namespace OSD
 		private bool mousedown;
 		public bool fReenter=false;
         public uint16_t screen_flags=0;
+        private bool topScreen = false;
 
-		public osd_screen (int num, OSD aosd)
+        public osd_screen (int num, OSD aosd)
 		{
 			number=num;
 			osd=aosd;
@@ -604,6 +605,7 @@ as_checkbox:
 			}
 		}
 		
+        //not used anymore, was adding 3 lines to every widget when clicking on the treenode
         private int correct_NTSC(int y){
             if (y >= osd.getCenter() && osd.is_ntsc()) 
                 y+=3;
@@ -623,8 +625,6 @@ as_checkbox:
             osd.Draw(number);
         }
 
-
-
         private void setYpos(int y) {
             string item;
 
@@ -632,8 +632,17 @@ as_checkbox:
 
             for (int a = 0; a < panelItems.Length; a++) {
                 if (panelItems[a] != null && panelItems[a].name == item) {
-                    panelItems[a].y = y;
+                                     
+                    int centerPAL = OSD.SCREEN_H / 2;
+                    int centerNTSC = OSD.SCREEN_H_NTSC / 2;
+                    // on NSTC mode, skip mid (unused) lines when changing position on the numeric up/down
+                    if (osd.is_ntsc() && y >= centerNTSC && y <= centerPAL)
+                    {
+                        y = y > panelItems[a].y ? centerPAL + 1 : centerNTSC - 1;
+                        NUM_Y.Value = y;
+                    }
 
+                    panelItems[a].y = y;
                 }
             }
 
@@ -642,7 +651,7 @@ as_checkbox:
 
         private void numericUpDown2_ValueChanged (object sender, EventArgs e) {
 			
-            setYpos(correct_NTSC((int)NUM_Y.Value));
+            setYpos((int)NUM_Y.Value);
             
 		}
 		
@@ -657,19 +666,33 @@ as_checkbox:
         private void pictureBox1_MouseMove (object sender, MouseEventArgs e) {
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
-				getCharLoc(e.X, e.Y, out ansW, out ansH);
+                int centerPAL = (OSD.SCREEN_H / 2);
+                int centerNTSC = (OSD.SCREEN_H_NTSC / 2);
+                getCharLoc(e.X, e.Y, out ansW, out ansH);
 				//if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
 					//ansH += 3;
 				//}
 				ansW -= clickX; //запомним куда ткнули
 				ansH -= clickY;
-				                
-				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
+
+
+                if (osd.is_ntsc())
+                {
+                    // started on top screen and went to bottom
+                    if (topScreen && ansH >= centerNTSC)
+                    {
+                        ansH += 3;
+                    }
+                    // started on bottom screen and went to top
+                    else if (!topScreen && ansH <= centerPAL)
+                    {
+                        ansH -= 3;
+                    }
+                }
+
+                NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
                 NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
-
                 
-
-
                 Console.WriteLine("y=" + NUM_Y.Value.ToString());
 
 				pictureBox.Focus();
@@ -691,7 +714,16 @@ as_checkbox:
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
                 adjustGroupbox();
-			});
+                for (int a = 0; a < panelItems.Length; a++)
+                {
+                    if (panelItems[a] != null && panelItems[a].name == osd.currentlyselected)
+                    {
+                        //keep track if change started on top of screen in NTSC mode.
+                        //this is necessary to skip mid (unused on NTSC) lines
+                        topScreen = (osd.is_ntsc() && panelItems[a].y < osd.getCenter());
+                    }
+                }
+            });
 			
 
 			mousedown = true;
