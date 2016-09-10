@@ -632,13 +632,12 @@ as_checkbox:
 
             for (int a = 0; a < panelItems.Length; a++) {
                 if (panelItems[a] != null && panelItems[a].name == item) {
-                                     
-                    int centerPAL = OSD.SCREEN_H / 2;
-                    int centerNTSC = OSD.SCREEN_H_NTSC / 2;
+
                     // on NSTC mode, skip mid (unused) lines when changing position on the numeric up/down
-                    if (osd.is_ntsc() && y >= centerNTSC && y <= centerPAL)
+
+                    if (osd.is_ntsc() && Array.IndexOf(OSD.SCREEN_NTSC_SKIP_LINES, y) != -1)
                     {
-                        y = y > panelItems[a].y ? centerPAL + 1 : centerNTSC - 1;
+                        y = y > panelItems[a].y ? OSD.SCREEN_NTSC_SKIP_LINES.Max() + 1 : OSD.SCREEN_NTSC_SKIP_LINES.Min() - 1;
                         NUM_Y.Value = y;
                     }
 
@@ -666,8 +665,6 @@ as_checkbox:
         private void pictureBox1_MouseMove (object sender, MouseEventArgs e) {
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
-                int centerPAL = (OSD.SCREEN_H / 2);
-                int centerNTSC = (OSD.SCREEN_H_NTSC / 2);
                 getCharLoc(e.X, e.Y, out ansW, out ansH);
 				//if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
 					//ansH += 3;
@@ -679,12 +676,12 @@ as_checkbox:
                 if (osd.is_ntsc())
                 {
                     // started on top screen and went to bottom
-                    if (topScreen && ansH >= centerNTSC)
+                    if (topScreen && ansH >= OSD.SCREEN_NTSC_SKIP_LINES.Min())
                     {
-                        ansH += 3;
+                        ansH += (topScreen)?3:-1;
                     }
                     // started on bottom screen and went to top
-                    else if (!topScreen && ansH <= centerPAL)
+                    else if (!topScreen && ansH <= OSD.SCREEN_NTSC_SKIP_LINES.Max())
                     {
                         ansH -= 3;
                     }

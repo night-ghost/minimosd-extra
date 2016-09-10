@@ -45,6 +45,7 @@ namespace OSD {
         public const int SCREEN_W = 30;
         public const int SCREEN_H = 16;
         public const int SCREEN_H_NTSC = 13;
+        public static readonly int[] SCREEN_NTSC_SKIP_LINES = { 6, 7, 8 };
 
         public const int MAVLINK_MAX_PAYLOAD_LEN =255;
         public const int MAVLINK_NUM_CHECKSUM_BYTES =2;
