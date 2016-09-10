@@ -56,9 +56,7 @@ namespace OSD
 		private int clickX, clickY;
 		
 		private bool mousedown;
-        private bool topScreen = false;
-
-        public bool fReenter=false;
+		public bool fReenter=false;
         public uint16_t screen_flags=0;
 
 		public osd_screen (int num, OSD aosd)
@@ -606,6 +604,12 @@ as_checkbox:
 			}
 		}
 		
+        private int correct_NTSC(int y){
+            if (y >= osd.getCenter() && osd.is_ntsc()) 
+                y+=3;
+            return y;
+        }
+
 		private void numericUpDown1_ValueChanged (object sender, EventArgs e) {
 			string item = osd.currentlyselected;
 			
@@ -621,45 +625,28 @@ as_checkbox:
 
 
 
-        private Panel getCurrentPanel()
-        {
-            for (int a = 0; a < panelItems.Length; a++)
-            {
-                if (panelItems[a] != null && panelItems[a].name == osd.currentlyselected)
-                {
-                    return panelItems[a];
+        private void setYpos(int y) {
+            string item;
+
+            item = osd.currentlyselected;
+
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    panelItems[a].y = y;
 
                 }
             }
-            return null;
+
+            osd.Draw(number);
         }
 
-        private int getMaxScreenHeight()
-        {
-            return osd.is_ntsc() ? OSD.SCREEN_H_NTSC : OSD.SCREEN_H;
-        }
-
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-            Panel panel = getCurrentPanel();
-            if (panel != null)
-            {
-                int newYpos = (int)NUM_Y.Value;
-
-                int centerPAL = OSD.SCREEN_H / 2;
-                int centerNTSC = OSD.SCREEN_H_NTSC / 2;
-
-                if (osd.is_ntsc() && newYpos >= centerNTSC && newYpos <= centerPAL)
-                {
-                    newYpos = newYpos > panel.y ? centerPAL + 1 : centerNTSC - 1;
-                    NUM_Y.Value = newYpos;
-                }
-                panel.y = newYpos;
-                osd.Draw(number);
-            }
-        }
-
-        private void pictureBox1_MouseUp (object sender, MouseEventArgs e) {
+        private void numericUpDown2_ValueChanged (object sender, EventArgs e) {
+			
+            setYpos(correct_NTSC((int)NUM_Y.Value));
+            
+		}
+		
+		private void pictureBox1_MouseUp (object sender, MouseEventArgs e) {
 			getMouseOverItem(e.X, e.Y);
 
 			mousedown = false;
@@ -670,30 +657,18 @@ as_checkbox:
         private void pictureBox1_MouseMove (object sender, MouseEventArgs e) {
 			if(e.Button==System.Windows.Forms.MouseButtons.Left && mousedown==true) {
 				int ansW, ansH;
-                int centerPAL = (OSD.SCREEN_H / 2);
-                int centerNTSC = (OSD.SCREEN_H_NTSC / 2);
-
-                getCharLoc(e.X, e.Y, out ansW, out ansH);
-
+				getCharLoc(e.X, e.Y, out ansW, out ansH);
+				//if(ansH >= osd.getCenter() && !(osd.pal_checked() || osd.auto_checked())) {
+					//ansH += 3;
+				//}
 				ansW -= clickX; //запомним куда ткнули
 				ansH -= clickY;
-
-                if (osd.is_ntsc())
-                {
-                    // started on top screen and went to bottom
-                    if (topScreen && ansH >= centerNTSC)
-                    {
-                        ansH += 3;
-                    }
-                    // started on bottom screen and went to top
-                    else if (!topScreen && ansH <= centerPAL)
-                    {
-                        ansH -= 3;
-                    }
-                }
-
-                NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
+				                
+				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
                 NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
+
+                
+
 
                 Console.WriteLine("y=" + NUM_Y.Value.ToString());
 
@@ -716,12 +691,7 @@ as_checkbox:
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
                 adjustGroupbox();
-                Panel p = getCurrentPanel();
-                if (p != null)
-                {
-                    topScreen = (osd.is_ntsc() && p.y < osd.getCenter());
-                }
-            });
+			});
 			
 
 			mousedown = true;
