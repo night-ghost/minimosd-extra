@@ -37,6 +37,21 @@ byte get_alt_num(point p){
     return (is_alt2(p)?1:0) | (is_alt3(p)?2:0) | (is_alt4(p)?4:0);
 }
 
+
+int get_alt_filter(point p){
+    switch( (is_alt(p)?1:0) | (is_alt2(p)?2:0)) {
+    
+    case 1:
+	return 10;
+    case 2:
+	return 100;
+    case 3:
+	return 1000;
+    default: 
+	return 0;
+    }
+}
+
 // чтение и запись мелких объектов
 static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
     for(;l!=0; l--) {

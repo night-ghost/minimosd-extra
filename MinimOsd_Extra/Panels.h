@@ -691,7 +691,11 @@ static void panWindSpeed(point p){
 
 static void panCur_A(point p){
 
-    osd_printf_1(PSTR("%5.2f\x0e"), (float(osd_curr_A) * 0.01)); // in amps
+    static float curr=0;
+
+    filter(curr,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    
+    osd_printf_1(PSTR("%5.2f\x0e"), curr * 0.01); // in amps
 }
 
 /* **************************************************************** */
@@ -1090,7 +1094,11 @@ static void NOINLINE printVolt(uint16_t v) {
 }
 
 static void panBatt_A(point p){
-    printVolt(osd_vbat_A);
+    static float volt=0;
+
+    filter(volt,  osd_vbat_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    
+    printVolt(volt);
 }
 
 
@@ -1104,7 +1112,11 @@ static void panBatt_A(point p){
 static void panBatt_B(point p){
     if(is_on(p)) {
 	lflags.battB_is_on=1; // отобразить состояние панели во ФЛАГЕ
-        printVolt(osd_vbat_B);
+        static float volt=0;
+
+        filter(volt,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    
+        printVolt(volt);
     } else
         lflags.battB_is_on = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }

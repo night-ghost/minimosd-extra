@@ -347,3 +347,6 @@ v883
 v884
 * fixed NTSC mode in CT
 * Battery2 voltage can be get via MAVlink
+
+v885
+* voltages and current panels can be smoothed by filter by choose 1:10, 1:100 or 1:1000

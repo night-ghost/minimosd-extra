@@ -374,11 +374,13 @@ void NOINLINE calc_max(float &dst, float src){
 #define USE_FILTER 1 
 
 #if defined(USE_FILTER)
-void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
-    //dst = (val * k) + dst * (1.0 - k); 
-    //dst = val * k + dst - dst*k;
-    //dst = (val-dst)*k + dst;
-    dst+=(val-dst)/k;
+void NOINLINE filter( float &dst, float val, const int k){ // комплиментарный фильтр 1/k
+    if(dst==0 || k==0) dst=val;
+    else
+        //dst = (val * k) + dst * (1.0 - k); 
+        //dst = val * k + dst - dst*k;
+        //dst = (val-dst)*k + dst;
+        dst+=(val-dst)/k;
 }
 
 void filter( float &dst, float val){ // комплиментарный фильтр 1/10
