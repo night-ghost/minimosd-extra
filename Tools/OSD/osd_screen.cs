@@ -46,6 +46,7 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt4;
         public System.Windows.Forms.CheckBox chkAlt5;
         public System.Windows.Forms.ComboBox cbNumber;
+        public System.Windows.Forms.ComboBox cbFilter;
         public System.Windows.Forms.Label labNumber;
         public System.Windows.Forms.Label labStrings;
         public System.Windows.Forms.TextBox txtStrings;
@@ -85,6 +86,7 @@ namespace OSD
             this.chkAlt4 = new System.Windows.Forms.CheckBox();
             this.chkAlt5 = new System.Windows.Forms.CheckBox();
             this.cbNumber = new System.Windows.Forms.ComboBox();
+            this.cbFilter = new System.Windows.Forms.ComboBox();
             this.labNumber = new System.Windows.Forms.Label();
             this.labStrings = new System.Windows.Forms.Label();
             this.txtStrings = new System.Windows.Forms.TextBox();
@@ -143,6 +145,7 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt4);
             this.groupBox.Controls.Add(this.chkAlt5);
             this.groupBox.Controls.Add(this.cbNumber);
+            this.groupBox.Controls.Add(this.cbFilter);
             this.groupBox.Controls.Add(this.labNumber);
             this.groupBox.Controls.Add(this.labStrings);
             this.groupBox.Controls.Add(this.txtStrings);
@@ -325,6 +328,24 @@ namespace OSD
             this.cbNumber.SelectedIndexChanged += new System.EventHandler(this.cbNumber_SelectedIndexChanged);
             this.cbNumber.Visible =false;
             // 
+
+            //128
+
+            this.cbFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbFilter.FormattingEnabled = true;
+            this.cbFilter.Items.AddRange(new object[] {
+            "none",
+            "1:10",
+            "1:100",
+            "1:1000",
+            });
+            this.cbFilter.Location = new System.Drawing.Point(10, 85);
+            this.cbFilter.Name = "cbFilter";
+            this.cbFilter.Size = new System.Drawing.Size(137, 17);
+            this.cbFilter.TabIndex = 18;
+            this.cbFilter.SelectedIndexChanged += new System.EventHandler(this.cbFilter_SelectedIndexChanged);
+            this.cbFilter.Visible = false;
+
             // labNumber
             // 
             this.labNumber.AutoSize = true;
@@ -501,20 +522,23 @@ namespace OSD
             chkSign.Checked = thing.sign == 1;
             chkSign.Visible = (thing.sign >= 0);
 
-            chkAlt5.Visible=false;
-
+            // all invisible            
             labStrings.Visible=false;
             txtStrings.Visible = false;
+            labNumber.Visible = false;
+            cbNumber.Visible = false;
+            cbFilter.Visible = false;
+            chkAlt.Visible = false;
+            chkAlt2.Visible = false;
+            chkAlt3.Visible = false;
+            chkAlt4.Visible = false;
+            chkAlt5.Visible = false;
 
             switch(thing.ui_mode){ 
             case UI_Mode.UI_Combo:
                 n = osd.getAlt(thing)/2;
                 cbNumber.SelectedIndex =n;
-                cbNumber.Visible = true;
-                chkAlt.Visible = false;
-                chkAlt2.Visible = false;
-                chkAlt3.Visible = false;
-                chkAlt4.Visible = false;
+                cbNumber.Visible = true;                
                 cbNumber.Text = n.ToString();
                 labNumber.Text = thing.alt_text;
                 labNumber.Visible = true;
@@ -533,9 +557,6 @@ as_combo_cb:
                 cbNumber.SelectedIndex =n;
                 cbNumber.Visible = true;
                 chkAlt.Visible = true;
-                chkAlt2.Visible = false;
-                chkAlt3.Visible = false;
-                chkAlt4.Visible = false;
                 cbNumber.Text = n.ToString();
                 
                 labNumber.Text = thing.alt_text;
@@ -551,8 +572,10 @@ as_combo_cb:
             case UI_Mode.UI_Checkbox:
             default:
 as_checkbox:
-                labNumber.Visible = false;
-                cbNumber.Visible = false;
+                chkAlt.Visible = true;
+                chkAlt2.Visible = true;
+                chkAlt3.Visible = true;
+                chkAlt4.Visible = true;
 
                 chkAlt.Text = thing.alt_text;
                 chkAlt.Visible = thing.Altf != -1 && thing.alt_text != "";
@@ -569,6 +592,14 @@ as_checkbox:
                 chkAlt4.Text = thing.alt4_text;
                 chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
                 chkAlt4.Checked = thing.Alt4 == 1;
+                break;
+
+            case UI_Mode.UI_Filter:
+                n = osd.getAlt(thing);
+                cbFilter.SelectedIndex =n;
+                cbFilter.Visible = true;                
+                labNumber.Text = thing.alt_text;
+                labNumber.Visible = true;
                 break;
             }
             fReenter = false;
@@ -814,6 +845,21 @@ as_checkbox:
                     panelItems[a].Alt2 = (n & 1) != 0 ? 1 : 0;
                     panelItems[a].Alt3 = (n & 2) != 0 ? 1 : 0;
                     panelItems[a].Alt4 = (n & 4) != 0 ? 1 : 0;
+                }
+            }
+            osd.Draw(number);
+        }
+
+        private void cbFilter_SelectedIndexChanged(object sender, EventArgs e) {
+            string item = osd.currentlyselected;
+
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    int n = cbFilter.SelectedIndex;
+
+                    panelItems[a].Altf = (n & 1) != 0 ? 1 : 0;
+                    panelItems[a].Alt2 = (n & 2) != 0 ? 1 : 0;
+                    
                 }
             }
             osd.Draw(number);

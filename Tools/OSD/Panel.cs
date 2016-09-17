@@ -9,6 +9,7 @@ namespace OSD {
         UI_Combo_Cb, // Altf as checkbox, all others as combo with channel
         UI_Combo_Cb_Strings, // as above plus strings
         UI_Checkbox_1, // all flags as checkboxes plus 1 checkbox as screen flags
+        UI_Filter,    // one combo in 4 values
     };
 
     // проще и лучше чем эти туплы :)

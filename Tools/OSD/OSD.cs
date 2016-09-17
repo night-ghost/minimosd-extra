@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r884 DV";
+        public const string VERSION = "r885 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -305,8 +305,8 @@ namespace OSD {
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
                 pi[a++] = new Panel("Roll", pan.panRoll, 13, 1, panRoll_XY);
-                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1);
-                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1);
+                pi[a++] = new Panel("Battery A", pan.panBatt_A, 14, 13, panBatt_A_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value");
+                pi[a++] = new Panel("Battery B", pan.panBatt_B, 14, 12, panBatt_B_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value");
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1, UI_Mode.UI_Checkbox, 0,"Icon in tail");
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 15, panCOG_XY, 1);
                 pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 11, panGPS_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
@@ -324,7 +324,7 @@ namespace OSD {
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, UI_Mode.UI_Checkbox, 0 , "show in m/s");
                 pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, UI_Mode.UI_Checkbox, 0, "Show percent, not used mAH");
-                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1);
+                pi[a++] = new Panel("Current", pan.panCur_A, 14, 14, panCurrA_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value");
 
                 pi[a++] = new Panel("Velocity", pan.panVel, 1, 2, panVel_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s");
                 pi[a++] = new Panel("Air Speed", pan.panAirSpeed, 1, 1, panAirSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s");
@@ -1360,6 +1360,15 @@ as_checkbox:
                                     pi.Alt3 = (p.y & 0x10) == 0 ? 0 : 1;
                                 if (pi.Alt3 >= 0)
                                     pi.Alt4 = (p.x & 0x40) == 0 ? 0 : 1;
+                                break;
+                            case UI_Mode.UI_Filter:                            
+                                if (pi.Altf >= 0)
+                                    pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
+                                if (pi.Alt2 >= 0)
+                                    pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;
+
+                                pi.Alt3=0;
+                                pi.Alt4=0;
                                 break;
                             }
                             pi.x = (byte)Constrain(p.x & 0x3f, 0, SCREEN_W);
