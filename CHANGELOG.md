@@ -350,3 +350,6 @@ v884
 
 v885
 * voltages and current panels can be smoothed by filter by choose 1:10, 1:100 or 1:1000
+
+v886
+* added osdbuf bounds check by jussip
