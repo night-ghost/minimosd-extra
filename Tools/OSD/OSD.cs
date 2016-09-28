@@ -316,7 +316,7 @@ namespace OSD {
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
                 pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
-                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1);
+                pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1, UI_Mode.UI_Checkbox,0,"Reset home on disarm");
                 pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 9, panWPDir_XY);
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 

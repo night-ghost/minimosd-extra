@@ -74,7 +74,7 @@ static void uploadFont() {
               osd.write_raw((byte)(n));
               n++;
         }
-        osd.write('|');
+        osd.write_S('|');
     }
 
     osd.update();
