@@ -357,5 +357,5 @@ v886
 v887
 * GeoFence warnings can be turned off
 * fixed some scales in MWII protocol
-* fixen non-GPS speed bug
+* fixed non-GPS speed bug
 * home position can be cleared on disarm (flag in panel HomeDistance)
