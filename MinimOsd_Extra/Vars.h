@@ -257,6 +257,7 @@ struct loc_flags {
     bool bad_config;
     
     bool battB_is_on;
+    bool resetHome;
 };
 
 

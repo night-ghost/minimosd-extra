@@ -306,7 +306,13 @@ static void setHomeVars()
         total_flight_time_milis=0; // reset on arm
     } 
 
+    if (!lflags.motor_armed && lflags.was_armed ){ // on motors disarm 
 
+        if(lflags.resetHome) {
+            lflags.osd_got_home = 0;	//If motors armed, reset home 
+            lflags.was_armed = false;   // and clear armed flag
+        }
+    }
  #else // pure copter
   //Check disarm to arm switching.
   if (lflags.motor_armed && !lflags.was_armed){
@@ -339,7 +345,9 @@ static void setHomeVars()
     if(!lflags.osd_got_home && osd_fix_type >= 3 ) { // first home lock on GPS 3D fix - ну или если фикс пришел уже после арма
         osd_home = osd_pos; // lat, lon & alt
         lflags.osd_got_home = 1;
-    } else if(lflags.osd_got_home){
+    } 
+    
+    if(lflags.osd_got_home){
 	{
             float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
             //DST to Home

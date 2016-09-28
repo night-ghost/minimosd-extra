@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r885 DV";
+        public const string VERSION = "r887 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -45,7 +45,6 @@ namespace OSD {
         public const int SCREEN_W = 30;
         public const int SCREEN_H = 16;
         public const int SCREEN_H_NTSC = 13;
-        public static readonly int[] SCREEN_NTSC_SKIP_LINES = { 6, 7, 8 };
 
         public const int MAVLINK_MAX_PAYLOAD_LEN =255;
         public const int MAVLINK_NUM_CHECKSUM_BYTES =2;
@@ -333,7 +332,7 @@ namespace OSD {
                 pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
 
                 pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
-                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY);
+                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1, UI_Mode.UI_Checkbox, 1, "Enable GeoFence warning");
                 pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1,UI_Mode.UI_Checkbox,0,"Show sign '%'");
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
@@ -2163,7 +2162,6 @@ again:
 
                     CHK_pal.Checked = Convert.ToBoolean(pan.pal_ntsc);
                     CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
-                    CHK_ntsc.Checked = !CHK_pal.Checked && !CHK_auto.Checked;
 
                     //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
                     chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);

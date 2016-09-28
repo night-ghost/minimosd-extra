@@ -353,3 +353,9 @@ v885
 
 v886
 * added osdbuf bounds check by jussip
+
+v887
+* GeoFence warnings can be turned off
+* fixed some scales in MWII protocol
+* fixen non-GPS speed bug
+* home position can be cleared on disarm (flag in panel HomeDistance)

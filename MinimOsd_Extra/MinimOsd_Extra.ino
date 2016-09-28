@@ -82,17 +82,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <avr/wdt.h>
 
 // Get the common arduino functions
-#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#else
-#include "wiring.h"
-#endif
 
 #include "OSD_Max7456.h"
 #include "Vars.h"
 
 #include "prototypes.h"
-
 
 
 OSD osd; //OSD object 
@@ -144,7 +139,7 @@ mavlink_system_t mavlink_system = {12,1};
 volatile byte nested=0; 
 
 #if defined(DEBUG)
-volatile byte nest_count=0; // mostly for debugging
+volatile byte nest_count=0; // only for debugging
 #endif
 
 // обработка прерывания по кадровому синхроимпульсу
@@ -170,7 +165,7 @@ ISR(INT0_vect) {
             nested--;
         }
 #if defined(PWM_IN_INTERRUPT)
-        sei(); 			// enable other interrupts - jitter is small because no big calculations in interrupts
+        sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
         generate_PWM(false);
 #endif
         SREG=tmp;
@@ -233,7 +228,7 @@ ISR(INT1_vect) {
 
 NOINLINE void logo(){
     OSD::setPanel(5, 5);
-    osd_printi_1(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r%d DV|"), RELEASE_NUM);
+    osd.print_P(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV|"));
 
     osd.print((uint16_t)millis());
 
@@ -246,9 +241,8 @@ NOINLINE void logo(){
         lflags.bad_config=1;
     }
 
-    delay_150();
-
     OSD::update();// Show sign bar
+    delay_150();
 }
 
 void setup()     {
@@ -259,7 +253,6 @@ void setup()     {
     LED_ON; 		    // turn on for full light
 #endif
     Serial.begin(TELEMETRY_SPEED);
-
 
 #if defined(SERIALDEBUG)
     dbgSerial.begin(38400);
@@ -335,7 +328,7 @@ void setup()     {
         PWM_out_port = portOutputRegister(port);
     }
 
-    osd.init();    // Start 
+    osd.init();    // Start display
 
     logo();
 
@@ -384,7 +377,7 @@ void loop()
 
     seconds = pt / 1000;
     
-    if(pt < BOOTTIME || lflags.bad_config){ // startup delay for fonts
+    if(pt < BOOTTIME || lflags.bad_config){ // startup delay for fonts or EEPROM error
 //if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
 
             while(Serial.available_S()) {
@@ -467,10 +460,10 @@ void loop()
         long_plus(&timer_20ms, 20);
         On20ms();
 
-        if(update_screen && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились
+        if(update_screen && vsync_wait && time_since((uint32_t *)&vsync_time)>50){ // прерывания остановились - с последнего прошло более 50мс
             vsync_wait=0; // хватит ждать
         
-            OSD::update(); // обновим принудительно
+            OSD::update(); // обновим принудительно (и далее будем обновлять каждые 20мс)
             update_screen = 0;
         }
 

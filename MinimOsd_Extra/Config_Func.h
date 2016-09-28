@@ -139,16 +139,6 @@ static void parse_osd_packet(byte *p){
 }
 #endif
 
-/*
-static NOINLINE uint8_t checkPAL(uint8_t line){
-    if(line >= osd.getCenter() && osd.getMode() == 0){
-        line -= 3;	//Cutting lines offset after center if NTSC
-    }
-    return line;
-}
-*/
-
-
 
 #ifdef DEBUG
 /* prints hex numbers with leading zeroes */

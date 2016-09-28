@@ -354,7 +354,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
                 osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
 		int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m); // speed for non-GPS setups
-		int16_t vy = mavlink_msg_global_position_int_get_vx(&msg.m);
+		int16_t vy = mavlink_msg_global_position_int_get_vy(&msg.m);
 		loc_speed = distance(vx, vy) / 100;
             } break; 
 

@@ -795,7 +795,7 @@ static void panAirSpeed(point p){
 
 uint8_t warning;
 
-static void check_warn()
+static inline void check_warn(point p)
 {
     uint16_t wmask = 0;
     uint16_t bit;
@@ -847,6 +847,7 @@ static void check_warn()
         wmask |= (1<<6);
 
 #if defined(USE_MAVLINK)
+  if(is_alt(p)) {
 //8
     if(mav_fence_status == FENCE_BREACH_MINALT)
         wmask |= (1<<7);
@@ -858,6 +859,7 @@ static void check_warn()
 //10
     if(mav_fence_status == FENCE_BREACH_BOUNDARY)
         wmask |= (1<<9);
+  }
 #endif
 
     if(wmask == 0) {
@@ -918,7 +920,7 @@ const char * const PROGMEM warn_str[] = {
 static void panWarn(point p){
 //    osd_setPanel(p); // warn differs!
 
-    check_warn();
+    check_warn(p);
 
     if(warning) 
        osd.print_P((char *)pgm_read_word(&warn_str[warning-1]) );
@@ -1008,7 +1010,9 @@ static void panTime(point p){
 
 static void panHomeDis(point p){
 
-    if(!lflags.osd_got_home) return;
+    lflags.resetHome = is_alt(p);
+
+    if(!lflags.osd_got_home || !is_on(p)) return;
 
     printFullDist(osd_home_distance);
 }
@@ -2391,8 +2395,8 @@ as_char:
 	int cd;
 
 	cd=channelDiff(1);
-	if ( cd >  150){  move_menu(1);    return; } // переходы по строкам по верх-низ
-        if ( cd < -150){  move_menu(-1);   return; }
+	if ( cd >  150){  move_menu(1);   return; } // переходы по строкам по верх-низ
+        if ( cd < -150){  move_menu(-1);  return; }
         
         cd=channelDiff(3);
         if (cd >  150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
@@ -2462,9 +2466,9 @@ as_char:
         }
     }
 
-    if(v != c_val) {
+    if(v != c_val) { // value changed
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
-	int8_t cv=(char)(v * k);
+	int8_t cv=(char)(v * k); // предварительно посчитаем на всякий случай
 
         switch (type){
     	    case 'Z':
@@ -2532,7 +2536,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(rose),		panRose, 	0 },
     { ID_of(heading),		panHeading, 	0 },
     { ID_of(Fdata),		panFdata, 	0 },
-    { ID_of(homeDist),		panHomeDis, 	0x0b },
+    { ID_of(homeDist) | 0x80,	panHomeDis, 	0x0b },
     { ID_of(homeDir), 		panHomeDir, 	0 },
     { ID_of(time),		panTime, 	0 },
     { ID_of(WP_dist),		panWPDis,	0x5c },
@@ -2580,7 +2584,7 @@ static void print_all_panels(const Panels_list *pl ) {
 	
 	point p = readPanel(n & 0x7f);// читать непосредственно из EEPROM
 	
-        osd_setPanel(p);
+        osd_setPanel(p); // place cursor
 	if(is_on(p)){
 	    if(has_sign(p)) {
 		byte s = pgm_read_byte(&pl->sign);
@@ -2604,7 +2608,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
 
     osd.detectMode(); // PAL/NTSC live
 
-// если выбран планер
+// если выбран самолет
     if(sets.model_type == 0 ) { /* plane */ 
         if( lflags.motor_armed  && lflags.in_air  &&
           ((int)osd_alt_to_home > 10 || (int)osd_groundspeed > 1 || osd_throttle > 1 )){
