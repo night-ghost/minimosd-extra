@@ -21,7 +21,7 @@ and all other members of DIY Drones Dev team
 Thanks to: Chris Anderson, Jordi Munoz
 
 
-Project received Donations from:
+Project received Donations from (in time order)
  Povl H Pedersen
  Richard Healey
  Lauri Andler
@@ -39,6 +39,9 @@ Project received Donations from:
  david albella
  SERGEY MAKOVSKIY
  Damir Pinezic
+ John Van Brocklin
+ Ahmad Ansari Md Repah
+ Boris Tekaty
 
 Figures, harm the development of an idiotic question:
  MachVoluM

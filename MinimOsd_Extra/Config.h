@@ -53,6 +53,10 @@
 
 //#define SERIALDEBUG RssiPin // debug output, conflicts with PWM_BY_INTERRUPT
 
+#if defined(WALKERA_TELEM) || defined(SERIALDEBUG) // don't fit to flash
+ #undef MAVLINK_CONFIG
+ #undef USE_SENSORS
+#endif
 
 
 //#define LEDPIN AmperagePin

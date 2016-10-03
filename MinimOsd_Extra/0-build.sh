@@ -10,12 +10,14 @@ VERS=`version`
 make_one(){
     PROTO=$1
 
-    make PROTO="-DUSE_${PROTO}=1"
+    make PROTO="-DUSE_${PROTO}=1 $2"
 
 }
 
 
 #make_one 'UAVTALK'
 #make_one 'MAVLINK'
-make_one 'MWII'
+#make_one 'MWII'
 #make_one 'LTM' 
+
+make_one 'MAVLINK' -DWALKERA_TELEM=RssiPin
