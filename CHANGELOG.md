@@ -359,3 +359,10 @@ v887
 * fixed some scales in MWII protocol
 * fixed non-GPS speed bug
 * home position can be cleared on disarm (flag in panel HomeDistance)
+
+v888
+* filters changed to 1:10, 1:30, 1:100
+* ability to show less accurate voltage and current - only tenth
+* narrow size of all heights
+* adjusted vertical speed in m/s mode
+* fixed bug with distances more 32km

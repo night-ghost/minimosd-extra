@@ -58,10 +58,9 @@ namespace OSD
 		
 		private bool mousedown;
 		public bool fReenter=false;
-		public uint16_t screen_flags=0;
-		private bool topScreen = false;
+        public uint16_t screen_flags=0;
 
-        public osd_screen (int num, OSD aosd)
+		public osd_screen (int num, OSD aosd)
 		{
 			number=num;
 			osd=aosd;
@@ -337,10 +336,10 @@ namespace OSD
             this.cbFilter.Items.AddRange(new object[] {
             "none",
             "1:10",
+            "1:30",
             "1:100",
-            "1:1000",
             });
-            this.cbFilter.Location = new System.Drawing.Point(10, 85);
+            this.cbFilter.Location = new System.Drawing.Point(10, 70);
             this.cbFilter.Name = "cbFilter";
             this.cbFilter.Size = new System.Drawing.Size(137, 17);
             this.cbFilter.TabIndex = 18;
@@ -535,6 +534,10 @@ namespace OSD
             chkAlt4.Visible = false;
             chkAlt5.Visible = false;
 
+            labNumber.Location = new System.Drawing.Point(10, 70); // std
+            chkAlt3.Location = new System.Drawing.Point(10, 83);
+            chkAlt4.Location = new System.Drawing.Point(10, 98);
+
             switch(thing.ui_mode){ 
             case UI_Mode.UI_Combo:
                 n = osd.getAlt(thing)/2;
@@ -600,7 +603,21 @@ as_checkbox:
                 cbFilter.SelectedIndex =n;
                 cbFilter.Visible = true;                
                 labNumber.Text = thing.alt_text;
+                labNumber.Location = new System.Drawing.Point(10, 70-14); // moved
                 labNumber.Visible = true;
+
+                chkAlt3.Location = new System.Drawing.Point(10, 83+10);
+                chkAlt4.Location = new System.Drawing.Point(10, 98+10);
+
+
+                chkAlt3.Text = thing.alt3_text;
+                chkAlt3.Visible = thing.Alt3 != -1 && thing.alt3_text != "";
+                chkAlt3.Checked = thing.Alt3 == 1;
+
+                chkAlt4.Text = thing.alt4_text;
+                chkAlt4.Visible = thing.Alt4 != -1 && thing.alt4_text != "";
+                chkAlt4.Checked = thing.Alt4 == 1;
+
                 break;
             }
             fReenter = false;
@@ -636,7 +653,6 @@ as_checkbox:
 			}
 		}
 		
-        //not used anymore, was adding 3 lines to every widget when clicking on the treenode
         private int correct_NTSC(int y){
             if (y >= osd.getCenter() && osd.is_ntsc()) 
                 y+=3;
@@ -656,6 +672,8 @@ as_checkbox:
             osd.Draw(number);
         }
 
+
+
         private void setYpos(int y) {
             string item;
 
@@ -663,16 +681,8 @@ as_checkbox:
 
             for (int a = 0; a < panelItems.Length; a++) {
                 if (panelItems[a] != null && panelItems[a].name == item) {
-
-                    // on NSTC mode, skip mid (unused) lines when changing position on the numeric up/down
-
-                    if (osd.is_ntsc() && Array.IndexOf(OSD.SCREEN_NTSC_SKIP_LINES, y) != -1)
-                    {
-                        y = y > panelItems[a].y ? OSD.SCREEN_NTSC_SKIP_LINES.Max() + 1 : OSD.SCREEN_NTSC_SKIP_LINES.Min() - 1;
-                        NUM_Y.Value = y;
-                    }
-
                     panelItems[a].y = y;
+
                 }
             }
 
@@ -681,7 +691,7 @@ as_checkbox:
 
         private void numericUpDown2_ValueChanged (object sender, EventArgs e) {
 			
-            setYpos((int)NUM_Y.Value);
+            setYpos(correct_NTSC((int)NUM_Y.Value));
             
 		}
 		
@@ -702,26 +712,15 @@ as_checkbox:
 				//}
 				ansW -= clickX; //запомним куда ткнули
 				ansH -= clickY;
-				
-				if (osd.is_ntsc())
-				{
-					// started on top screen and went to bottom
-					if (topScreen && ansH >= OSD.SCREEN_NTSC_SKIP_LINES.Min())
-					{
-						ansH += (topScreen)?3:-1;
-					}
-					// started on bottom screen and went to top
-					else if (!topScreen && ansH <= OSD.SCREEN_NTSC_SKIP_LINES.Max())
-					{
-						ansH -= 3;
-					}
-				}
-				
+				                
 				NUM_X.Value = Constrain(ansW, 0, osd.get_basesize().Width - 1);
-				NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
-				
-				Console.WriteLine("y=" + NUM_Y.Value.ToString());
-				
+                NUM_Y.Value = Constrain(ansH, 0, OSD.SCREEN_H - 1);
+
+                
+
+
+                Console.WriteLine("y=" + NUM_Y.Value.ToString());
+
 				pictureBox.Focus();
 			} else {
 				mousedown = false;
@@ -740,16 +739,7 @@ as_checkbox:
         private void pictureBox1_MouseDown (object sender, MouseEventArgs e) {
 			osd.BeginInvoke((MethodInvoker)delegate {
 				osd.currentlyselected = getMouseOverItem(e.X, e.Y);
-				adjustGroupbox();
-				for (int a = 0; a < panelItems.Length; a++)
-				{
-					if (panelItems[a] != null && panelItems[a].name == osd.currentlyselected)
-					{
-						//keep track if change started on top of screen in NTSC mode.
-						//this is necessary to skip mid (unused on NTSC) lines
-						topScreen = (osd.is_ntsc() && panelItems[a].y < osd.getCenter());
-					}
-				}
+                adjustGroupbox();
 			});
 			
 

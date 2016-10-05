@@ -444,7 +444,7 @@ namespace OSD
             if(sign==1){
                 if(is_alt(fAlt)) {
                     vs_ms=1;
-                    osd.printf("%c%5.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
+                    osd.printf("%c% 4.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
                 } else {
                     vs_ms = 0;
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
@@ -452,7 +452,7 @@ namespace OSD
 			}else{
                 if (is_alt(fAlt)) {
                     vs_ms = 1;
-                    osd.printf("%5.2f%c",  (double)(osd_climb * converth/60), 0x18);
+                    osd.printf("% 4.2f%c",  (double)(osd_climb * converth/60), 0x18);
                 } else {
                     vs_ms = 0;
                     osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);
@@ -527,9 +527,12 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-                osd.printf("%c%5.2f%c%c", 0xBD, (osd_curr_A * .01), 0x0E);
+                osd.write(0xBD);
+            
+            if (is_alt3(fAlt))
+                osd.printf("%4.1f%c", (osd_curr_A * .01), 0x0E);
             else
-				osd.printf("%5.2f%c%c", (osd_curr_A * .01), 0x0E);
+				osd.printf("%5.2f%c", (osd_curr_A * .01), 0x0E);
             
             return 0;
         }
@@ -547,9 +550,9 @@ namespace OSD
             
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
             if (sign==1)//ArduCopter
-                osd.printf("%c%5.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
+                osd.printf("%c%4.0f%c", 0x11, (double)(osd_alt * converth), altitudeChar);
             else
-                osd.printf("%5.0f%c", (double)(osd_alt * converth), altitudeChar);
+                osd.printf("%4.0f%c", (double)(osd_alt * converth), altitudeChar);
 
             
             return 0;
@@ -581,9 +584,9 @@ namespace OSD
             
             //osd.printf("%c%5.0f%c",0x85, (double)(osd_alt - osd_home_alt), 0x8D);
             if (sign==1)//ArduCopter
-                osd.printf("%c%5.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
+                osd.printf("%c%4.0f%c", 0x12, (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
             else
-                osd.printf("%5.0f%c", (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
+                osd.printf("%4.0f%c", (double)((osd_alt - osd_home_alt) * converth), altitudeChar);
             
             return 0;
         }
@@ -867,10 +870,14 @@ namespace OSD
         {
             osd.setPanel(first_col, first_line);
             
+
             
 			if(sign==1)
-            	osd.printf("%c%5.2f%c", 0xBC, (double)osd_vbat, 0x0D);
-			else
+                osd.write(0xBC);
+
+            if(is_alt3(fAlt))
+                osd.printf("%4.1f%c", (double)osd_vbat, 0x0D);
+            else
 				osd.printf("%5.2f%c",  (double)osd_vbat, 0x0D);
             
             return 0;
@@ -878,7 +885,7 @@ namespace OSD
 
 		
         /* **************************************************************** */
-        // Panel  : panBattery A (Voltage 1)
+        // Panel  : panBattery B (Voltage 2)
         // Needs  : X, Y locations
         // Output : Voltage value as in XX.X and symbol of over all battery status
         // Size   : 1 x 8  (rows x chars)
@@ -889,9 +896,12 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             if(sign==1)
-            	osd.printf("%c%5.2f%c", 0x26, (double)osd_vbat, 0x0D);
-			else 
-				osd.printf("%5.2f%c", (double)osd_vbat, 0x0D);
+                osd.write(0x26);
+
+            if(is_alt3(fAlt))
+                osd.printf("%4.1f%c", (double)osd_vbat, 0x0D);
+            else
+            	osd.printf("%5.2f%c", (double)osd_vbat, 0x0D);
             
             return 0;
         }

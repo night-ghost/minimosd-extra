@@ -44,9 +44,9 @@ int get_alt_filter(point p){
     case 1:
 	return 10;
     case 2:
-	return 100;
+	return 30;
     case 3:
-	return 1000;
+	return 100;
     default: 
 	return 0;
     }

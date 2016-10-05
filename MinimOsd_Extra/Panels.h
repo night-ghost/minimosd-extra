@@ -449,23 +449,16 @@ static void panCOG(point p){
     osd_printi_1(PSTR("%4i\x05"), off_course);
 
 }
-
+/*
 static void NOINLINE printDist(float d){
       osd_printf_2(PSTR("%5.0f"), d, get_mhigh());
 }
-
-static void NOINLINE printDistCnv(float d){
-      printDist( d * get_converth());
-}
-
-
-
+*/
 
 static NOINLINE void printFullDist(float dd){
 
     float f =  get_converth() * dd;
-    if ((int)f <= 9999) { // in meters
-    //    printDist(dd);
+    if (f <= 9999) { // in meters
 	osd_printf_2(PSTR("%4.0f"), f, get_mhigh());
 
     }else{ // in kilometers
@@ -682,21 +675,6 @@ static void panWindSpeed(point p){
 
 }
 
-/* **************************************************************** */
-// Panel  : panCur_A
-// Needs  : X, Y locations
-// Output : Current symbol and altitude value in meters from MAVLink
-// Size   : 1 x 7Hea  (rows x chars)
-// Staus  : done
-
-static void panCur_A(point p){
-
-    static float curr=0;
-
-    filter(curr,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
-    
-    osd_printf_1(PSTR("%5.2f\x0e"), curr * 0.01); // in amps
-}
 
 /* **************************************************************** */
 // Panel  : panAlt
@@ -713,7 +691,8 @@ static void panAlt(point p){
 //	v=osd_alt_mav;
 
 //    printDistCnv(v/1000.0);
-    printDistCnv(f_div1000(v));
+//    printDistCnv(f_div1000(v));
+    printFullDist(f_div1000(v));
 }
 
 /*
@@ -736,8 +715,8 @@ static void panHomeAlt(point p){
     float v=osd_alt_to_home;
     
     if((*(long *)&v)==0) v = osd_alt_mav;
-    //printDist(osd_alt_mav * get_converth();
-    printDistCnv(v);
+    //printDistCnv(v);
+    printFullDist(v);
 }
 
 
@@ -754,10 +733,14 @@ static void panClimb(point p){
 	lflags.vs_ms=1;
 	PGM_P fmt;
 	float v= vertical_speed/60; // multiplied by filter in func.h
-	if(abs((int)v)<10)
-	    fmt=PSTR("% 5.2f\x18");
+	int as = abs((int)v);
+	
+	if(as<10)
+	    fmt=PSTR("% 4.2f\x18");
+	else if(as < 100)
+	    fmt=PSTR("% 4.1f\x18");
 	else
-	    fmt=PSTR("% 5.1f\x18");
+	    fmt=PSTR("% 4.0f\x18");
 	osd_printf_1(fmt, v);
     } else {
 	lflags.vs_ms=0;
@@ -1086,6 +1069,29 @@ static void panRoll(point p){
 }
 
 /* **************************************************************** */
+// Panel  : panCur_A
+// Needs  : X, Y locations
+// Output : Current symbol and altitude value in meters from MAVLink
+// Size   : 1 x 7Hea  (rows x chars)
+// Staus  : done
+
+static void panCur_A(point p){
+
+    static float curr=0;
+
+    filter(curr,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+
+    PGM_P fmt;    
+
+    if(is_alt3(p))
+        fmt=PSTR("%4.1f\x0E");
+    else
+        fmt=PSTR("%5.2f\x0E");
+
+    osd_printf_1(fmt, curr * 0.01); // in amps
+}
+
+/* **************************************************************** */
 // Panel  : panBattery A (Voltage 1)
 // Needs  : X, Y locations
 // Output : Voltage value as in XX.X and symbol of over all battery status
@@ -1093,8 +1099,13 @@ static void panRoll(point p){
 // Staus  : done
 
 
-static void NOINLINE printVolt(uint16_t v) {
-    osd_printf_1(PSTR("%5.2f\x0D"), f_div1000(v));
+static void NOINLINE printVolt(uint16_t v,byte f) {
+    PGM_P fmt;
+    if(f)
+        fmt=PSTR("%4.1f\x0D");
+    else
+        fmt=PSTR("%5.2f\x0D");
+    osd_printf_1(fmt, f_div1000(v));
 }
 
 static void panBatt_A(point p){
@@ -1102,7 +1113,7 @@ static void panBatt_A(point p){
 
     filter(volt,  osd_vbat_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
-    printVolt(volt);
+    printVolt(volt, is_alt3(p));
 }
 
 
@@ -1120,7 +1131,7 @@ static void panBatt_B(point p){
 
         filter(volt,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
-        printVolt(volt);
+        printVolt(volt, is_alt3(p));
     } else
         lflags.battB_is_on = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }

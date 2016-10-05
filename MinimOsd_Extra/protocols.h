@@ -15,7 +15,6 @@
 
 
 
-
 union {
 #if defined(USE_MAVLINK)
 #define PROTOCOL "MAVLink"
