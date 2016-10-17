@@ -534,6 +534,7 @@ DBG_PRINTF("got2 mode=%d arm=%d\n", osd_mode, lflags.motor_armed);
                         case MANUALCONTROLCOMMAND_OBJID_001:
                         case MANUALCONTROLCOMMAND_OBJID_002: {
                     		float t = uavtalk_get_float(MANUALCONTROLCOMMAND_OBJ_THROTTLE);
+                    		if(t<0) t=0;
                                 osd_throttle         = (int16_t) mul_100(t);
 DBG_PRINTF("got1 throttle=%f\n", t);
 
@@ -560,6 +561,7 @@ DBG_PRINTF("got1 throttle=%f\n", t);
 #if MANUALCONTROLCOMMAND_OBJID_000 != MANUALCONTROLCOMMAND_OBJID
                         case MANUALCONTROLCOMMAND_OBJID: {
                                 float t=uavtalk_get_float(offsetof(ManualControlCommandDataPacked, Throttle));
+                                if(t<0) t=0;
                                 osd_throttle         = (int16_t) mul_100(t);
 DBG_PRINTF("got2 throttle=%f\n", t);
 

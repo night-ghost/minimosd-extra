@@ -330,6 +330,18 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg.m);
                 break;
 
+            case MAVLINK_MSG_ID_RC_CHANNELS:
+                chan_raw[0] = mavlink_msg_rc_channels_get_chan1_raw(&msg.m);
+                chan_raw[1] = mavlink_msg_rc_channels_get_chan2_raw(&msg.m);
+                chan_raw[2] = mavlink_msg_rc_channels_get_chan3_raw(&msg.m);
+                chan_raw[3] = mavlink_msg_rc_channels_get_chan4_raw(&msg.m);
+                chan_raw[4] = mavlink_msg_rc_channels_get_chan5_raw(&msg.m);
+                chan_raw[5] = mavlink_msg_rc_channels_get_chan6_raw(&msg.m);
+                chan_raw[6] = mavlink_msg_rc_channels_get_chan7_raw(&msg.m);
+                chan_raw[7] = mavlink_msg_rc_channels_get_chan8_raw(&msg.m);
+                osd_rssi = mavlink_msg_rc_channels_get_rssi(&msg.m);
+                break;
+
 
             case MAVLINK_MSG_ID_WIND:
                 osd_winddirection = mavlink_msg_wind_get_direction(&msg.m); // 0..360 deg, 0=north
@@ -456,7 +468,7 @@ typedef struct __mavlink_radio_status_t
 		    byte rssi    = mavlink_msg_radio_status_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
-//DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
+DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
 
 		} break;
 

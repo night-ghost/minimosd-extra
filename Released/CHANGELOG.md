@@ -366,3 +366,7 @@ v888
 * narrow size of all heights
 * adjusted vertical speed in m/s mode
 * fixed bug with distances more 32km
+
+v889
+* support for new ArduCopter versions which uses MAVLINK_MSG_ID_RC_CHANNELS instead of MAVLINK_MSG_ID_RC_CHANNELS_RAW
+
