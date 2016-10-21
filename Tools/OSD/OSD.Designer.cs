@@ -67,6 +67,12 @@ namespace OSD
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.label45 = new System.Windows.Forms.Label();
+            this.UNITS_combo = new System.Windows.Forms.ComboBox();
+            this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
+            this.label44 = new System.Windows.Forms.Label();
+            this.timeOffset = new System.Windows.Forms.NumericUpDown();
+            this.label42 = new System.Windows.Forms.Label();
             this.chkILS = new System.Windows.Forms.CheckBox();
             this.chkTrack = new System.Windows.Forms.CheckBox();
             this.chkFlightResults = new System.Windows.Forms.CheckBox();
@@ -101,6 +107,8 @@ namespace OSD
             this.label32 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbOutMode = new System.Windows.Forms.ComboBox();
+            this.label43 = new System.Windows.Forms.Label();
             this.cbOutPin = new System.Windows.Forms.ComboBox();
             this.cbOutSource = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -120,6 +128,7 @@ namespace OSD
             this.txtBattB_k = new System.Windows.Forms.TextBox();
             this.label28 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
+            this.cbBattB_source = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.numMinVoltB = new System.Windows.Forms.NumericUpDown();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
@@ -132,8 +141,6 @@ namespace OSD
             this.label29 = new System.Windows.Forms.Label();
             this.BRIGHTNESScomboBox = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.lblTimes = new System.Windows.Forms.Label();
             this.chkByTime = new System.Windows.Forms.CheckBox();
@@ -146,9 +153,6 @@ namespace OSD
             this.ONOFF_combo = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.chkSwitchOnce = new System.Windows.Forms.CheckBox();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.UNITS_combo = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.txtBattA_k = new System.Windows.Forms.TextBox();
             this.label27 = new System.Windows.Forms.Label();
@@ -194,11 +198,11 @@ namespace OSD
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
-            this.cbBattB_source = new System.Windows.Forms.ComboBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
             this.tabPageConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timeOffset)).BeginInit();
             this.groupBox14.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -208,9 +212,7 @@ namespace OSD
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numHOS)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numVOS)).BeginInit();
-            this.groupBox8.SuspendLayout();
             this.groupBox7.SuspendLayout();
-            this.groupBox6.SuspendLayout();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).BeginInit();
@@ -540,6 +542,12 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.label45);
+            this.tabPageConfig.Controls.Add(this.UNITS_combo);
+            this.tabPageConfig.Controls.Add(this.CALLSIGNmaskedText);
+            this.tabPageConfig.Controls.Add(this.label44);
+            this.tabPageConfig.Controls.Add(this.timeOffset);
+            this.tabPageConfig.Controls.Add(this.label42);
             this.tabPageConfig.Controls.Add(this.chkILS);
             this.tabPageConfig.Controls.Add(this.chkTrack);
             this.tabPageConfig.Controls.Add(this.chkFlightResults);
@@ -549,9 +557,7 @@ namespace OSD
             this.tabPageConfig.Controls.Add(this.groupBox16);
             this.tabPageConfig.Controls.Add(this.groupBox13);
             this.tabPageConfig.Controls.Add(this.groupBox9);
-            this.tabPageConfig.Controls.Add(this.groupBox8);
             this.tabPageConfig.Controls.Add(this.groupBox7);
-            this.tabPageConfig.Controls.Add(this.groupBox6);
             this.tabPageConfig.Controls.Add(this.groupBox4);
             this.tabPageConfig.Controls.Add(this.groupBox3);
             this.tabPageConfig.Controls.Add(this.groupBoxRSSI);
@@ -564,10 +570,80 @@ namespace OSD
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
             // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(492, 337);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(31, 13);
+            this.label45.TabIndex = 26;
+            this.label45.Text = "Units";
+            // 
+            // UNITS_combo
+            // 
+            this.UNITS_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.UNITS_combo.FormattingEnabled = true;
+            this.UNITS_combo.Items.AddRange(new object[] {
+            "Metric",
+            "Imperial"});
+            this.UNITS_combo.Location = new System.Drawing.Point(553, 334);
+            this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
+            this.UNITS_combo.Name = "UNITS_combo";
+            this.UNITS_combo.Size = new System.Drawing.Size(109, 21);
+            this.UNITS_combo.TabIndex = 25;
+            // 
+            // CALLSIGNmaskedText
+            // 
+            this.CALLSIGNmaskedText.AllowPromptAsInput = false;
+            this.CALLSIGNmaskedText.AsciiOnly = true;
+            this.CALLSIGNmaskedText.BeepOnError = true;
+            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(553, 359);
+            this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
+            this.CALLSIGNmaskedText.Mask = "CCCCCCCC";
+            this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
+            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(109, 20);
+            this.CALLSIGNmaskedText.TabIndex = 24;
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Location = new System.Drawing.Point(492, 362);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(48, 13);
+            this.label44.TabIndex = 23;
+            this.label44.Text = "Call Sign";
+            // 
+            // timeOffset
+            // 
+            this.timeOffset.Location = new System.Drawing.Point(615, 305);
+            this.timeOffset.Maximum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            this.timeOffset.Minimum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            -2147483648});
+            this.timeOffset.Name = "timeOffset";
+            this.timeOffset.Size = new System.Drawing.Size(47, 20);
+            this.timeOffset.TabIndex = 22;
+            this.timeOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(492, 307);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(109, 13);
+            this.label42.TabIndex = 21;
+            this.label42.Text = "Time offset from GMT";
+            // 
             // chkILS
             // 
             this.chkILS.AutoSize = true;
-            this.chkILS.Location = new System.Drawing.Point(490, 315);
+            this.chkILS.Location = new System.Drawing.Point(632, 292);
             this.chkILS.Name = "chkILS";
             this.chkILS.Size = new System.Drawing.Size(70, 17);
             this.chkILS.TabIndex = 1;
@@ -579,7 +655,7 @@ namespace OSD
             // chkTrack
             // 
             this.chkTrack.AutoSize = true;
-            this.chkTrack.Location = new System.Drawing.Point(578, 307);
+            this.chkTrack.Location = new System.Drawing.Point(613, 315);
             this.chkTrack.Name = "chkTrack";
             this.chkTrack.Size = new System.Drawing.Size(72, 17);
             this.chkTrack.TabIndex = 4;
@@ -604,9 +680,9 @@ namespace OSD
             this.groupBox14.Controls.Add(this.label19);
             this.groupBox14.Controls.Add(this.label18);
             this.groupBox14.Controls.Add(this.cbCurrentSoure);
-            this.groupBox14.Location = new System.Drawing.Point(325, 160);
+            this.groupBox14.Location = new System.Drawing.Point(327, 160);
             this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(160, 83);
+            this.groupBox14.Size = new System.Drawing.Size(158, 83);
             this.groupBox14.TabIndex = 20;
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Current";
@@ -681,7 +757,7 @@ namespace OSD
             this.groupBox2.Controls.Add(this.label12);
             this.groupBox2.Location = new System.Drawing.Point(5, 236);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(316, 142);
+            this.groupBox2.Size = new System.Drawing.Size(319, 142);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sensors";
@@ -916,16 +992,39 @@ namespace OSD
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbOutMode);
+            this.groupBox1.Controls.Add(this.label43);
             this.groupBox1.Controls.Add(this.cbOutPin);
             this.groupBox1.Controls.Add(this.cbOutSource);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(190, 54);
+            this.groupBox1.Location = new System.Drawing.Point(180, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(131, 63);
+            this.groupBox1.Size = new System.Drawing.Size(144, 112);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Output";
+            // 
+            // cbOutMode
+            // 
+            this.cbOutMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbOutMode.FormattingEnabled = true;
+            this.cbOutMode.Items.AddRange(new object[] {
+            "PWM",
+            "On-Off"});
+            this.cbOutMode.Location = new System.Drawing.Point(60, 62);
+            this.cbOutMode.Name = "cbOutMode";
+            this.cbOutMode.Size = new System.Drawing.Size(77, 21);
+            this.cbOutMode.TabIndex = 5;
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(8, 65);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(34, 13);
+            this.label43.TabIndex = 4;
+            this.label43.Text = "Mode";
             // 
             // cbOutPin
             // 
@@ -937,7 +1036,7 @@ namespace OSD
             "V_Bat2",
             "Current",
             "RSSI"});
-            this.cbOutPin.Location = new System.Drawing.Point(48, 35);
+            this.cbOutPin.Location = new System.Drawing.Point(60, 37);
             this.cbOutPin.Name = "cbOutPin";
             this.cbOutPin.Size = new System.Drawing.Size(77, 21);
             this.cbOutPin.TabIndex = 3;
@@ -952,7 +1051,7 @@ namespace OSD
             "Channel 6",
             "Channel 7",
             "Channel 8"});
-            this.cbOutSource.Location = new System.Drawing.Point(48, 11);
+            this.cbOutSource.Location = new System.Drawing.Point(60, 13);
             this.cbOutSource.Name = "cbOutSource";
             this.cbOutSource.Size = new System.Drawing.Size(78, 21);
             this.cbOutSource.TabIndex = 2;
@@ -990,7 +1089,7 @@ namespace OSD
             this.groupBox16.Controls.Add(this.label21);
             this.groupBox16.Location = new System.Drawing.Point(6, 119);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(178, 116);
+            this.groupBox16.Size = new System.Drawing.Size(172, 116);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "Horizon Angle adjust";
@@ -1133,6 +1232,19 @@ namespace OSD
             this.label16.TabIndex = 5;
             this.label16.Text = "Input:";
             // 
+            // cbBattB_source
+            // 
+            this.cbBattB_source.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbBattB_source.FormattingEnabled = true;
+            this.cbBattB_source.Items.AddRange(new object[] {
+            "from FC",
+            "Pin BattB"});
+            this.cbBattB_source.Location = new System.Drawing.Point(55, 16);
+            this.cbBattB_source.Name = "cbBattB_source";
+            this.cbBattB_source.Size = new System.Drawing.Size(98, 21);
+            this.cbBattB_source.TabIndex = 16;
+            this.cbBattB_source.SelectedIndexChanged += new System.EventHandler(this.cbBattB_source_SelectedIndexChanged);
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -1174,9 +1286,9 @@ namespace OSD
             this.groupBox9.Controls.Add(this.label29);
             this.groupBox9.Controls.Add(this.BRIGHTNESScomboBox);
             this.groupBox9.Controls.Add(this.label13);
-            this.groupBox9.Location = new System.Drawing.Point(325, 247);
+            this.groupBox9.Location = new System.Drawing.Point(327, 247);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(160, 128);
+            this.groupBox9.Size = new System.Drawing.Size(158, 128);
             this.groupBox9.TabIndex = 10;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Screen";
@@ -1294,30 +1406,6 @@ namespace OSD
             this.label13.TabIndex = 2;
             this.label13.Text = "Brightness";
             // 
-            // groupBox8
-            // 
-            this.groupBox8.Controls.Add(this.CALLSIGNmaskedText);
-            this.groupBox8.Location = new System.Drawing.Point(490, 331);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(181, 41);
-            this.groupBox8.TabIndex = 9;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Call Sign";
-            // 
-            // CALLSIGNmaskedText
-            // 
-            this.CALLSIGNmaskedText.AllowPromptAsInput = false;
-            this.CALLSIGNmaskedText.AsciiOnly = true;
-            this.CALLSIGNmaskedText.BeepOnError = true;
-            this.CALLSIGNmaskedText.Location = new System.Drawing.Point(63, 14);
-            this.CALLSIGNmaskedText.Margin = new System.Windows.Forms.Padding(2);
-            this.CALLSIGNmaskedText.Mask = "CCCCCCCC";
-            this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
-            this.CALLSIGNmaskedText.Size = new System.Drawing.Size(109, 20);
-            this.CALLSIGNmaskedText.TabIndex = 11;
-            this.CALLSIGNmaskedText.Validating += new System.ComponentModel.CancelEventHandler(this.CALLSIGNmaskedText_Validating);
-            this.CALLSIGNmaskedText.Validated += new System.EventHandler(this.CALLSIGNmaskedText_Validated);
-            // 
             // groupBox7
             // 
             this.groupBox7.Controls.Add(this.lblTimes);
@@ -1333,7 +1421,7 @@ namespace OSD
             this.groupBox7.Controls.Add(this.chkSwitchOnce);
             this.groupBox7.Location = new System.Drawing.Point(5, 5);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(179, 112);
+            this.groupBox7.Size = new System.Drawing.Size(173, 112);
             this.groupBox7.TabIndex = 8;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "OSD Toggle Channel";
@@ -1341,7 +1429,7 @@ namespace OSD
             // lblTimes
             // 
             this.lblTimes.AutoSize = true;
-            this.lblTimes.Location = new System.Drawing.Point(85, 65);
+            this.lblTimes.Location = new System.Drawing.Point(81, 65);
             this.lblTimes.Name = "lblTimes";
             this.lblTimes.Size = new System.Drawing.Size(88, 13);
             this.lblTimes.TabIndex = 34;
@@ -1463,39 +1551,6 @@ namespace OSD
             this.hint.SetToolTip(this.chkSwitchOnce, "Turn off autorepeat");
             this.chkSwitchOnce.UseVisualStyleBackColor = true;
             // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.UNITS_combo);
-            this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(190, 5);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(131, 46);
-            this.groupBox6.TabIndex = 7;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Units";
-            // 
-            // UNITS_combo
-            // 
-            this.UNITS_combo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.UNITS_combo.FormattingEnabled = true;
-            this.UNITS_combo.Items.AddRange(new object[] {
-            "Metric",
-            "Imperial"});
-            this.UNITS_combo.Location = new System.Drawing.Point(40, 17);
-            this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
-            this.UNITS_combo.Name = "UNITS_combo";
-            this.UNITS_combo.Size = new System.Drawing.Size(86, 21);
-            this.UNITS_combo.TabIndex = 3;
-            this.UNITS_combo.SelectedIndexChanged += new System.EventHandler(this.UNITS_combo_SelectedIndexChanged);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(8, 13);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(0, 13);
-            this.label10.TabIndex = 2;
-            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.txtBattA_k);
@@ -1506,9 +1561,9 @@ namespace OSD
             this.groupBox4.Controls.Add(this.BATT_WARNnumeric);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.MINVOLT_numeric);
-            this.groupBox4.Location = new System.Drawing.Point(325, 5);
+            this.groupBox4.Location = new System.Drawing.Point(327, 5);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(160, 155);
+            this.groupBox4.Size = new System.Drawing.Size(158, 155);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Battery A";
@@ -1610,9 +1665,9 @@ namespace OSD
             this.groupBox3.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(190, 119);
+            this.groupBox3.Location = new System.Drawing.Point(180, 119);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(131, 116);
+            this.groupBox3.Size = new System.Drawing.Size(144, 116);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Warnings";
@@ -1620,22 +1675,22 @@ namespace OSD
             // OVERSPEED_label
             // 
             this.OVERSPEED_label.AutoSize = true;
-            this.OVERSPEED_label.Location = new System.Drawing.Point(8, 71);
+            this.OVERSPEED_label.Location = new System.Drawing.Point(6, 68);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
-            this.OVERSPEED_label.Size = new System.Drawing.Size(93, 13);
+            this.OVERSPEED_label.Size = new System.Drawing.Size(90, 13);
             this.OVERSPEED_label.TabIndex = 4;
-            this.OVERSPEED_label.Text = "Overspeed (km/h)";
+            this.OVERSPEED_label.Text = "Overspeed, km/h";
             // 
             // OVERSPEED_numeric
             // 
-            this.OVERSPEED_numeric.Location = new System.Drawing.Point(37, 87);
+            this.OVERSPEED_numeric.Location = new System.Drawing.Point(74, 82);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.OVERSPEED_numeric.Name = "OVERSPEED_numeric";
-            this.OVERSPEED_numeric.Size = new System.Drawing.Size(88, 20);
+            this.OVERSPEED_numeric.Size = new System.Drawing.Size(63, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
@@ -1643,22 +1698,23 @@ namespace OSD
             // STALL_label
             // 
             this.STALL_label.AutoSize = true;
-            this.STALL_label.Location = new System.Drawing.Point(6, 26);
+            this.STALL_label.Location = new System.Drawing.Point(6, 20);
             this.STALL_label.Name = "STALL_label";
-            this.STALL_label.Size = new System.Drawing.Size(95, 13);
+            this.STALL_label.Size = new System.Drawing.Size(92, 13);
             this.STALL_label.TabIndex = 2;
-            this.STALL_label.Text = "Stall Speed (km/h)";
+            this.STALL_label.Text = "Stall Speed, km/h";
+            this.STALL_label.UseMnemonic = false;
             // 
             // STALL_numeric
             // 
-            this.STALL_numeric.Location = new System.Drawing.Point(35, 41);
+            this.STALL_numeric.Location = new System.Drawing.Point(74, 37);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.STALL_numeric.Name = "STALL_numeric";
-            this.STALL_numeric.Size = new System.Drawing.Size(91, 20);
+            this.STALL_numeric.Size = new System.Drawing.Size(63, 20);
             this.STALL_numeric.TabIndex = 0;
             this.STALL_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.STALL_numeric.ValueChanged += new System.EventHandler(this.STALL_numeric_ValueChanged);
@@ -1713,17 +1769,17 @@ namespace OSD
             "Pin RSSI analog",
             "Pin RSSI PWM",
             "3DR modem RSSI"});
-            this.cbxRSSIChannel.Location = new System.Drawing.Point(81, 9);
+            this.cbxRSSIChannel.Location = new System.Drawing.Point(55, 9);
             this.cbxRSSIChannel.Margin = new System.Windows.Forms.Padding(2);
             this.cbxRSSIChannel.Name = "cbxRSSIChannel";
-            this.cbxRSSIChannel.Size = new System.Drawing.Size(91, 21);
+            this.cbxRSSIChannel.Size = new System.Drawing.Size(117, 21);
             this.cbxRSSIChannel.TabIndex = 13;
             this.cbxRSSIChannel.SelectedIndexChanged += new System.EventHandler(this.cbxRSSIChannel_SelectedIndexChanged);
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(34, 12);
+            this.label15.Location = new System.Drawing.Point(13, 12);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(45, 13);
             this.label15.TabIndex = 12;
@@ -1998,19 +2054,6 @@ namespace OSD
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
-            // cbBattB_source
-            // 
-            this.cbBattB_source.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbBattB_source.FormattingEnabled = true;
-            this.cbBattB_source.Items.AddRange(new object[] {
-            "from FC",
-            "Pin BattB"});
-            this.cbBattB_source.Location = new System.Drawing.Point(55, 16);
-            this.cbBattB_source.Name = "cbBattB_source";
-            this.cbBattB_source.Size = new System.Drawing.Size(98, 21);
-            this.cbBattB_source.TabIndex = 16;
-            this.cbBattB_source.SelectedIndexChanged += new System.EventHandler(this.cbBattB_source_SelectedIndexChanged);
-            // 
             // OSD
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2041,6 +2084,7 @@ namespace OSD
             this.PANEL_tabs.ResumeLayout(false);
             this.tabPageConfig.ResumeLayout(false);
             this.tabPageConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timeOffset)).EndInit();
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -2056,12 +2100,8 @@ namespace OSD
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numHOS)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numVOS)).EndInit();
-            this.groupBox8.ResumeLayout(false);
-            this.groupBox8.PerformLayout();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox6.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).EndInit();
@@ -2130,9 +2170,6 @@ namespace OSD
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label STALL_label;
         private System.Windows.Forms.NumericUpDown STALL_numeric;
-        private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.ComboBox UNITS_combo;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.ComboBox ONOFF_combo;
         private System.Windows.Forms.Label label11;
@@ -2142,8 +2179,6 @@ namespace OSD
         private System.Windows.Forms.NumericUpDown RSSI_WARNnumeric;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown BATT_WARNnumeric;
-        private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
         private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.ComboBox BRIGHTNESScomboBox;
         private System.Windows.Forms.Label label13;
@@ -2258,6 +2293,14 @@ namespace OSD
         private System.Windows.Forms.Label lblTimes;
         private System.Windows.Forms.CheckBox chkByTime;
         private System.Windows.Forms.ComboBox cbBattB_source;
+        private System.Windows.Forms.NumericUpDown timeOffset;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.ComboBox cbOutMode;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.ComboBox UNITS_combo;
+        private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
+        private System.Windows.Forms.Label label44;
     }
 
 }

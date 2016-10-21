@@ -370,3 +370,10 @@ v888
 v889
 * support for new ArduCopter versions which uses MAVLINK_MSG_ID_RC_CHANNELS instead of MAVLINK_MSG_ID_RC_CHANNELS_RAW
 
+v890
+* added recent MAVlink 1.0 massages
+* new panels - date & time. Works only  in recent ArduPilot versions!
+* panel Home Direction now has a angle in numerical form
+* added filter to RSSI panel
+* auto-calibration of screen switch in LEVEL switch mode
+* added on/off mode to PWM output translation

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r888 DV";
+        public const string VERSION = "r890 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -315,7 +315,7 @@ namespace OSD {
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0, UI_Mode.UI_Checkbox, 0,"Marker below rose", 0, "Even panel length");
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
                 //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
-                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY);
+                pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1, UI_Mode.UI_Checkbox,0,"Show number");
                 pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1, UI_Mode.UI_Checkbox,0,"Reset home on disarm");
                 pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 9, panWPDir_XY);
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
@@ -334,7 +334,7 @@ namespace OSD {
                 pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
                 pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1, UI_Mode.UI_Checkbox, 1, "Enable GeoFence warning");
                 pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
-                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1,UI_Mode.UI_Checkbox,0,"Show sign '%'");
+                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value",-1,"", 0, "Show sign '%'");
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, UI_Mode.UI_Checkbox,0,"Show only mAh/km");
                 pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
@@ -353,8 +353,10 @@ namespace OSD {
                 pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
                 pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
                 pi[a++] = new Panel("Power", pan.panPower, 1, 5, panPower_XY, 1);
-    
+                pi[a++] = new Panel("Date", pan.panDate, 7, 1, fDate_XY, 1, UI_Mode.UI_Checkbox, 0, " Format dd.mm.yyyy");
+                pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
 
+               
                 osd_functions_N = a;
                 //make backup in case EEPROM needs reset to default
                 scr[n].panelItems_default = pi;
@@ -788,10 +790,12 @@ namespace OSD {
                 scr[k].last_init();
             }
 
+            cbOutMode.SelectedIndex =0;
             Translate(this);
 
             BUT_CopyScreen.Visible = false;
             BUT_ClearScreen.Visible = false;
+            chkByTime.Checked =false;
 
             if (cbxModelType.Items.Count == 0)
                 cbxModelType.DataSource = Enum.GetValues(typeof(ModelType));
@@ -922,7 +926,7 @@ namespace OSD {
                     var x = ex;
                 }
                 conf.eeprom.flags[converts] = pan.converts;
-                conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
+                //conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
 
                 conf.eeprom.sets.overspeed = pan.overspeed;
                 conf.eeprom.sets.stall = pan.stall;
@@ -987,6 +991,7 @@ namespace OSD {
 
                 conf.eeprom.sets.pwm_src = pan.pwm_src;
                 conf.eeprom.sets.pwm_dst = pan.pwm_dst;
+                conf.eeprom.sets.pwm_mode = (byte)cbOutMode.SelectedIndex; 
                 conf.eeprom.sets.n_screens = pan.n_screens;
 
 
@@ -1011,6 +1016,7 @@ namespace OSD {
                 
                   
                 conf.eeprom.sets.autoswitch_times =convertTimes();
+                conf.eeprom.sets.timeOffset =  (uint8_t)(20 + timeOffset.Value);
 
             } else if (screen_number >= 0 && screen_number < npanel) {
                 //First Panel 
@@ -1169,7 +1175,7 @@ namespace OSD {
             conf.eeprom.sets.RSSI_16_low = pan.rssipersent;
             conf.eeprom.sets.OSD_RSSI_RAW = pan.rssiraw_on;
 
-            conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
+            //conf.eeprom.sets.auto_screen_switch = pan.auto_screen_switch;
             conf.eeprom.sets.ch_toggle = pan.ch_toggle;
             conf.eeprom.sets.switch_mode = pan.switch_mode;
 
@@ -1243,6 +1249,7 @@ namespace OSD {
             conf.eeprom.flags[chkSwitch200] = false;
 
             conf.eeprom.sets.autoswitch_times = convertTimes();
+            conf.eeprom.sets.timeOffset = (uint8_t)(20 + timeOffset.Value);
 
             comBusy = true;
             int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
@@ -1514,7 +1521,7 @@ as_checkbox:
                     ONOFF_combo.SelectedIndex = 0; //reject garbage from EEPROM
                 }
 
-                pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch;
+                //pan.auto_screen_switch = conf.eeprom.sets.auto_screen_switch;
                 //cbxWarningsAutoPanelSwitch.SelectedItem = (PanelsAutoSwitch)pan.auto_screen_switch;
 
                 pan.switch_mode = conf.eeprom.sets.switch_mode;
@@ -1638,10 +1645,13 @@ as_checkbox:
 
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
                 pan.pwm_dst = conf.eeprom.sets.pwm_dst;
+                cbOutMode.SelectedIndex = conf.eeprom.sets.pwm_mode;
                 chkSwitchOnce.Checked = conf.eeprom.flags[osd_switch_once];
                 chkDiap.Checked = conf.eeprom.flags[chkSwitch200];
 
                 updateTimes(conf.eeprom.sets.autoswitch_times);
+                timeOffset.Value = conf.eeprom.sets.timeOffset - 20;
+
             } catch  { }
 
 
@@ -1889,6 +1899,7 @@ as_checkbox:
                         // выходной PWM
                         sw.WriteLine("{0}\t{1}", "PWMSRC", pan.pwm_src);
                         sw.WriteLine("{0}\t{1}", "PWMDST", pan.pwm_dst);
+                        sw.WriteLine("{0}\t{1}", "pwm_mode", cbOutMode.SelectedIndex);                        
                         //
                         sw.WriteLine("{0}\t{1}", "NSCREENS", pan.n_screens);
 
@@ -1915,7 +1926,8 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "txtTime3", txtTime3.Text);
 
                         sw.WriteLine("{0}\t{1}", "fResults", chkFlightResults.Checked);
-
+                        sw.WriteLine("{0}\t{1}", "timeOffset", timeOffset.Value);
+                        
                         sw.Close();
                     }
                 } catch (Exception ex) {
@@ -2109,8 +2121,8 @@ again:
                         else if (strings[0] == "txtTime2") txtTime2.Text = strings[1];
                         else if (strings[0] == "txtTime3") txtTime3.Text = strings[1];
                         else if (strings[0] == "fResults") chkFlightResults.Checked = bool.Parse(strings[1]);
-
-                      
+                        else if (strings[0] == "timeOffset") timeOffset.Value = int.Parse(strings[1]);
+                        else if (strings[0] == "pwm_mode") cbOutMode.SelectedIndex = int.Parse(strings[1]);
 
                     }
 
@@ -2177,8 +2189,8 @@ again:
                         numHOS.Value = pan.horiz_offs - 0x20;
                         numVOS.Value = pan.vert_offs - 0x10;
                     } catch {
-                        pan.horiz_offs = (byte)numHOS.Value;
-                        pan.vert_offs = (byte)numVOS.Value;
+                        pan.horiz_offs = 0;
+                        pan.vert_offs = 0;
                     }
 
                     CALLSIGNmaskedText.Text = pan.callsign_str;
@@ -4201,6 +4213,7 @@ again:
             int np = 0;
             int[] last_seq = new int[256];
             string message;
+            MAVLink mv=new MAVLink();
 
 
             status.packet_rx_drop_count = 0;
@@ -4290,6 +4303,28 @@ again:
                                 // float speed_Z
                             }
 
+                            Console.WriteLine(MAVLink.MAVLINK_NAMES[packet[5]] + "\n");
+
+                            if(packet[5]==  109 ) { //MAVLINK_MSG_ID_RADIO_STATUS
+                                byte rssi=packet[11];
+                                byte remrssi = packet[12];
+                                /*
+typedef struct __mavlink_radio_status_t
+{
+7 uint16_t rxerrors; ///< receive errors
+9 uint16_t fixed; ///< count of error corrected packets
+11 uint8_t rssi; ///< local signal strength
+12 uint8_t remrssi; ///< remote signal strength
+ uint8_t txbuf; ///< how full the tx buffer is as a percentage
+ uint8_t noise; ///< background noise level
+ uint8_t remnoise; ///< remote background noise level
+} mavlink_radio_status_t;
+                                 */
+                            }
+
+                            if(packet[5]==  65 ) { // rc_channels
+                                byte b=packet[7];
+                            }
                             if (((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
                                 time = get_timestamp(bytes, byteIndex+1);  // skip parsed CRC2                              
                                 byteIndex += 8; // skip timestamp
@@ -4775,6 +4810,8 @@ again:
             update_used_pins();
             txtBattB_k.Enabled = pan.flgBattB;
         }
+
+        
 
         
 

@@ -9,6 +9,13 @@
 #define MAVLINK_HELPER
 #endif
 
+
+
+//#define MAV_DEBUG 1
+
+
+
+
 /*
   internal function to give access to the channel status for each channel
  */
@@ -216,7 +223,6 @@ MAVLINK_HELPER void NOINLINE mavlink_update_checksum(mavlink_message_t* msg, uin
  * @endcode
  */
  
-//#define MAV_DEBUG 1
  
 MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_message_t* r_message, mavlink_status_t* r_mavlink_status)
 {

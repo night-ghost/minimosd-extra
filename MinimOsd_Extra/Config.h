@@ -61,7 +61,7 @@
 
 //#define LEDPIN AmperagePin
 
-/*      END of configuration */
+/*****************      END of configuration ******************************************************/
 
 #ifdef LEDPIN
  #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)

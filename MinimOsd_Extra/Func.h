@@ -85,6 +85,10 @@ void doScreenSwitch(){
 
 static void pan_toggle(){
     byte old_panel=panelN;
+    
+    static uint16_t ch_min=1100;
+    static uint16_t ch_max=1900;
+    
 
     uint16_t ch_raw;
 //    static uint16_t last_chan_raw=0; in vars.h
@@ -98,7 +102,11 @@ static void pan_toggle(){
     else 
         ch_raw = chan_raw[7]; // в случае мусора - канал 8
 
-    if(ch_raw < 1000 || ch_raw > 3000) return; // not in valid range - no switch
+    if(ch_raw < 800 || ch_raw > 3000) return; // not in valid range - no switch
+
+// autoscale
+    if(ch_raw < ch_min) ch_min = ch_raw;
+    if(ch_raw > ch_max) ch_max = ch_raw;
 
 //	автоматическое управление OSD  (если режим не RTL или CIRCLE) смена режима туда-сюда переключает экран
     if (sets.ch_toggle == 4){
@@ -121,8 +129,8 @@ static void pan_toggle(){
 	    Зазор канала = диапазон изменения / (число экранов+1)
 	    текущий номер = приращение канала / зазор
         */
-        int d = (1900-1100)/sets.n_screens;
-        byte n = ch_raw>1100 ?(ch_raw-1100)/d : 0 ;
+        int d = (ch_max-ch_min)/sets.n_screens;
+        byte n = ch_raw>ch_min ?(ch_raw-ch_min)/d : 0 ;
         //First panel
         if ( panelN != n) {
           panelN = n;
@@ -136,7 +144,7 @@ static void pan_toggle(){
             last_chan_raw = ch_raw;
         } else
 //*/
-            ch_on = (ch_raw > 1500);
+            ch_on = (ch_raw > (ch_min+ch_max)/2);
 
         if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
             if (ch_on) { // in HIGH range
@@ -723,9 +731,19 @@ void generate_PWM(bool nointerrupt) {
 	if(nointerrupt)
 	    noInterrupts();		// pulse widh disabled interrups for accuracy but we lose MAVlink bytes
 #endif
-	SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
-	delayMicroseconds(pwm);
-	SET_LOW();		//digitalWrite(PWM_out_pin,0);
+        switch(sets.pwm_mode){
+        case 0: // pwm 
+            SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
+            delayMicroseconds(pwm);
+            SET_LOW();		//digitalWrite(PWM_out_pin,0);
+            break;
+        case 1: // on-off
+            if(pwm > 1500)
+                SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
+            else
+                SET_LOW();		//digitalWrite(PWM_out_pin,0);
+            break;
+        }
 #if !defined(PWM_IN_INTERRUPT)
 	SREG=tmp; //	if(nointerrupt)    interrupts();
 #endif

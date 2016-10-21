@@ -23,10 +23,6 @@ extern SingleSerial Serial;
 
 #include "include/mavlink/v1.0/ardupilotmega/version.h"
 
-// this allows us to make mavlink_message_t much smaller
-//#undef MAVLINK_MAX_PAYLOAD_LEN 
-//#define MAVLINK_MAX_PAYLOAD_LEN MAVLINK_MAX_DIALECT_PAYLOAD_SIZE
-
 #define MAVLINK_COMM_NUM_BUFFERS 1
 #include "include/mavlink/v1.0/mavlink_types.h"
 

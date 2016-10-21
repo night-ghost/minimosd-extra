@@ -509,6 +509,8 @@ void loop()
         if(lflags.blinker) {
     //        seconds++;
             lflags.one_sec_timer_switch = 1; // for warnings
+            
+            if(lflags.got_date) day_seconds++; // if we has GPS time - let it ticks
 
 	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
 	        max7456_err_count++;

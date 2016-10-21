@@ -172,6 +172,7 @@ MinimOSD_2.4.1.x-digital.mcm - стилизация под 7-сегментны�
 
 Внимание! Эта версия несовместима с утилитами из оригинальной MinimOSD!
 
+некоторая документация есть в [wiki](https://github.com/night-ghost/minimosd-extra/tree/master/wiki).
 
 Обсуждение - http://www.ykoctpa.ru/groups/eye-in-a-sky/forum/topic/minimosd-novaya-proshivka/
 

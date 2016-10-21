@@ -55,6 +55,11 @@ void delay_15(){
 
 void OSD::reset(){
     max7456_on();
+
+    byte cnt=15;
+
+    while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) );//read status register - sync to soft-only versions
+
     MAX_write(MAX7456_VM0_reg, MAX7456_RESET );
 
     delay_15();

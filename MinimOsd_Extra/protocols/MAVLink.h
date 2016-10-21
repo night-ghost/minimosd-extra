@@ -120,7 +120,7 @@ bool read_mavlink(){
 
 	    cnt++;
 
-//DBG_PRINTVARLN(msg.m.msgid);
+DBG_PRINTVARLN(msg.m.msgid);
 	    
             //handle msg
             switch(msg.m.msgid) {
@@ -340,6 +340,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 chan_raw[6] = mavlink_msg_rc_channels_get_chan7_raw(&msg.m);
                 chan_raw[7] = mavlink_msg_rc_channels_get_chan8_raw(&msg.m);
                 osd_rssi = mavlink_msg_rc_channels_get_rssi(&msg.m);
+DBG_PRINTF("got rssi=%d\n", osd_rssi );
                 break;
 
 
@@ -370,20 +371,6 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
 		loc_speed = distance(vx, vy) / 100;
             } break; 
 
-/*
-	    case MAVLINK_MSG_ID_RC_CHANNELS: // 1-18 but in not sent :(
-		break;
-*/
-
-
-/*
-case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:              // jmmods.
-            {
-                osd_rel_alt = mavlink_msg_global_position_int_get_relative_alt(&msg) ;   // alt above ground im MM
-                // uav.relative_alt = packet.relative_alt / 1000.0; //jmtune Altitude above ground in meters, expressed as * 1000 (millimeters)   // jmmods
-            }
-            break;
-*/
 
 
 /*
@@ -477,6 +464,24 @@ DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
                    //float mavlink_msg_rangefinder_get_distance(&msg.m);
                    break;
 */
+
+            case MAVLINK_MSG_ID_SYSTEM_TIME: {
+                uint32_t sys_seconds=mavlink_msg_system_time_get_time_unix_usec(&msg.m) / (1000 * 1000ULL); //uS to UNIX timestamp
+DBG_PRINTF("\ngot time=%ld\n", sys_seconds );
+                sys_days    = sys_seconds / (24*60*60uL);
+                day_seconds = sys_seconds % (24*60*60uL);
+DBG_PRINTF("day time=%ld\n", day_seconds );
+DBG_PRINTF("days=%ld\n",     sys_days );
+                
+                lflags.got_date= (sys_days>0);
+    
+/*
+got    1185299567
+now    1476955753
+
+ wtf???
+*/
+                } break;
 
             default:
                 //Do nothing

@@ -49,11 +49,18 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 }*/
 
 
-static void NOINLINE printTime(uint16_t t, byte blink){
+static void NOINLINE printTime(uint16_t t, byte blink, byte sec=0){
 //    osd.printf_P(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
+
     osd_printi_1(PSTR("%3i"),((uint16_t)t/60));
-    osd.write_S( (blink && lflags.blinker)?0x20:0x3a);
-    osd_printi_1(PSTR("%02i|"), (uint16_t)t%60);
+
+    if(sec){
+        osd_printi_1(PSTR(":%02i:"), (uint16_t)t%60);
+        osd_printi_1(PSTR("%02i|"), (sec&0x7f));
+    } else {
+        osd.write_S( (blink && lflags.blinker)?0x20:0x3a);
+        osd_printi_1(PSTR("%02i|"), (uint16_t)t%60);
+    }
 }
 
 static void NOINLINE printTime(int t){
@@ -626,9 +633,12 @@ static void panEff(point p){
 // Staus  : done
 
 static void panRSSI(point p){
+    static float rssi=0;
 
-    osd_printi_1(PSTR("%3i"), rssi_norm);
-    if(!(sets.RSSI_raw%2) && is_alt(p))
+    filter(rssi,  rssi_norm, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+
+    osd_printi_1(PSTR("%3i"), (int)rssi);
+    if(!(sets.RSSI_raw%2) && is_alt3(p))
 	osd.write_S('%');
 }
 
@@ -1632,6 +1642,8 @@ static void panHomeDir(point p){
     if(!lflags.osd_got_home) return;
 
     showArrow(osd_home_direction);
+    
+    if(is_alt(p)) osd_printi_1(PSTR("%3i"), osd_home_direction);
 }
 
 static void panMessage(point p){
@@ -2047,8 +2059,92 @@ static void panCValue(point p) {
 
 }
 
+static void panDayTime(point p) {
+/*
+    uint8_t seconds, minutes, hours,  month;
+
+    // calculate minutes 
+    minutes  = seconds / 60;
+    seconds -= minutes * 60;
+    // calculate hours 
+    hours    = minutes / 60;
+    minutes -= hours   * 60;
+    // calculate days 
+    days     = hours   / 24;
+    hours   -= days    * 24;
+*/
+
+    if(!lflags.got_date) return;
+
+    uint16_t min=day_seconds / 60 + /* local time */  (sets.timeOffset - 20) * 60;
+
+    if(is_alt2(p)) { // show seconds
+        printTime(min, false, (day_seconds % 60) | 0x80);
+    } else 
+        printTime(min, is_alt(p));
+}
+
+static void panDate(point p) {
+  /* Unix time starts in 1970 on a Thursday */
+//  uint16_t dayOfWeek = 4;
+  uint16_t year      = 1970;
+  uint8_t month;
+
+  uint32_t days = sys_days;
+  uint16_t y_day;
+
+    if(!lflags.got_date) return;
 
 
+  while(1) {
+    bool     leapYear   = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+    uint16_t daysInYear = leapYear ? 366 : 365;
+    
+    if (days >= daysInYear)  {
+//      dayOfWeek += leapYear ? 2 : 1;
+      days      -= daysInYear;
+//      if (dayOfWeek >= 7) dayOfWeek -= 7;
+      ++year;
+    } else {
+      y_day = days;
+//      dayOfWeek  += days;
+//      dayOfWeek  %= 7;
+
+      /* calculate the month and day */
+      static const PROGMEM uint8_t daysInMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+      for(month = 0; month < 12; ++month) {
+        uint8_t dim = pgm_read_byte(&daysInMonth[month]);
+
+        /* add a day to feburary if this is a leap year */
+        if (month == 1 && leapYear)      ++dim;
+
+        if (days >= dim)
+          days -= dim;
+        else
+          break;
+      }
+      break;
+    }
+  }
+/*
+  tm->tm_sec  = seconds;
+  tm->tm_min  = minutes;
+  tm->tm_hour = hours;
+  tm->tm_mday = days + 1;
+  tm->tm_mon  = month;
+  tm->tm_year = year;
+  tm->tm_wday = dayOfWeek;
+*/
+    if(is_alt(p)) { // yy.m.d
+        osd_printi_1(PSTR("%02d"),  days+1);
+        osd_printi_1(PSTR(".%02d"), month+1);
+        osd_printi_1(PSTR(".%4d"),  year);
+    } else {
+        osd_printi_1(PSTR("%4d"),   year);
+        osd_printi_1(PSTR(".%02d"), month+1);
+        osd_printi_1(PSTR(".%02d"), days+1);
+    }
+}
 
 
 
@@ -2580,6 +2676,8 @@ const Panels_list PROGMEM panels_list[] = {
 #endif
     { ID_of(callSign),		panCALLSIGN, 	0 },
     { ID_of(message),		panMessage, 	0 },
+    { ID_of(fDate),		panDate, 	0 },
+    { ID_of(dayTime),		panDayTime, 	0 },
 // warnings should be last
     { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}
@@ -2587,6 +2685,21 @@ const Panels_list PROGMEM panels_list[] = {
 
 
 static void print_all_panels(const Panels_list *pl ) {
+
+#if defined(DEBUG)
+    extern uint16_t packet_drops;
+    extern long bytes_comes;
+    extern volatile uint16_t lost_bytes;
+    extern uint16_t packets_skip;
+    extern uint16_t packets_got;
+    extern volatile byte nest_count;
+
+    OSD::setPanel(0,0);
+    osd.printf_P(PSTR("crc=%u b=%ld bl=%u"), packet_drops, bytes_comes,  lost_bytes);
+    osd.printf_P(PSTR("|pg=%u ps=%u"), packets_got, packets_skip);
+    
+#endif
+
 
     for(;;){
 	byte n = pgm_read_byte(&pl->n); // номер панели в массиве

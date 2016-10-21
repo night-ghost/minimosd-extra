@@ -87,8 +87,8 @@ struct Panel {
     point Scale;        // 90
     point Power;        // 92
     point CValue;       // 94
-//    point ;         // 96
-
+    point fDate;        // 96
+    point dayTime;      // 98
 };
 
 union _Panel {
@@ -136,7 +136,7 @@ struct Settings {
     byte battv; // уровень предупреждения по напряжению
     
     byte switch_mode; // режим переключения: 0 значение, 1 по кругу TODO move to flags
-    byte auto_screen_switch; //  TODO not used
+    byte timeOffset;
     
     uint16_t autoswitch_times; // 4 bits per screen
     
@@ -180,6 +180,7 @@ struct Settings {
     uint16_t RSSI_16_high;
 
 //0x45
+    byte pwm_mode; // 0-pwm 1-in/off
 };
 
 union _Settings {

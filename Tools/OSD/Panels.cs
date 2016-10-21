@@ -1172,6 +1172,8 @@ namespace OSD
             osd.setPanel(first_col, first_line);
             
             showArrow();
+
+            if (is_alt(fAlt)) osd.printf_P(PSTR("161"));
             
             return 0;
         }
@@ -1684,6 +1686,30 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             osd.printf("160");
             return 0;
         }
+
+        public int panDate(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            //if (sign == 1) 
+            if(is_alt(fAlt))
+                osd.printf("19.10.2016");
+            else
+                osd.printf("2016.10.19");
+            return 0;
+        }
+
+        public int panDayTime(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            //if (sign == 1) 
+            if (is_alt2(fAlt))
+                osd.printf("16:06:15");
+            else
+                osd.printf("16:06");
+            return 0;
+        }
+
+        
 
     }
 }

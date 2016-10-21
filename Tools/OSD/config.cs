@@ -48,7 +48,7 @@ namespace OSD {
         internal byte stall;
         internal byte battv;
         internal byte switch_mode;		// режим переключения: 0 значение, 1 по кругу
-        internal byte auto_screen_switch;
+        internal byte timeOffset;
 
         internal uint16_t autoswitch_times;
         
@@ -95,6 +95,7 @@ namespace OSD {
         internal uint16_t RSSI_16_low;
         internal uint16_t RSSI_16_high;
 
+        internal byte pwm_mode; // mode of output pin
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

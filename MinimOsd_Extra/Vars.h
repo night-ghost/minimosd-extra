@@ -255,6 +255,7 @@ struct loc_flags {
     uint8_t mav_stream_overload;
 
     bool bad_config;
+    bool got_date;
     
     bool battB_is_on;
     bool resetHome;
@@ -353,3 +354,5 @@ static float        max_osd_climb=0;
 static float        min_osd_climb=0;
 static float        max_osd_power=0;
 
+uint32_t sys_days;    // from unix epoch
+uint32_t day_seconds; // from midnight

@@ -40,6 +40,30 @@ namespace OSD {
             int n=cbComPort.SelectedIndex;
         }
 
+        string readBuf="";
+
+        private void readOut(){
+             string s;
+             while (parent.comPort.BytesToRead != 0 && loop) {
+
+                 //parent.comPort.Write(s);
+                 byte c = (byte)parent.comPort.ReadByte();
+                 byte[] ba = new byte[2];
+
+                 ba[0] = c;
+                 comPort.Write(ba, 0, 1);
+
+
+                 if (c == 0 || c == 10) {
+                     Console.WriteLine('>' + readBuf);
+                     readBuf = "";
+                 } else {
+                     char ch = (char)c;
+                     readBuf = readBuf + ch; //.ToString();
+                 }                 
+             }             
+        }
+
         private void btnStart_Click(object sender, EventArgs e) {
             btnStop.Enabled =true ;
             btnStart.Enabled =false;
@@ -87,28 +111,9 @@ namespace OSD {
                     while(loop){
                         System.Threading.Thread.Sleep(2);
 
-                        string s = "";
                         string so = "";
-                        while (parent.comPort.BytesToRead != 0 && loop){
-                            
-                            //parent.comPort.Write(s);
-                            byte c = (byte)parent.comPort.ReadByte();
-                            byte[] ba = new byte[2];
-                            
-                            ba[0] = c;
-                            comPort.Write(ba, 0, 1);
-
-                            
-                            if(c==0 || c==10){
-                                Console.WriteLine('>' + s);
-                                s="";
-                            }else {
-                                char ch=(char)c;
-                                s = s + ch; //.ToString();
-                            }
-                            Application.DoEvents();
-                        }
                         
+                        readOut();
                         
 /*
                         while (comPort.BytesToRead != 0){
@@ -135,6 +140,7 @@ namespace OSD {
                                 so = so + ch; //.ToString();
                             }
 
+                            readOut();
 
                             if(index>=0) buffer[index++]=c;
 
@@ -144,6 +150,9 @@ namespace OSD {
                                 buffer[index++] = c; // store STX
                                 break;
                             case 2: // got packet
+
+                                Console.WriteLine(MAVLink.MAVLINK_NAMES[buffer[5]] + "\n");
+
                                 if(!flgRaw) {
                                     if(parent.comPort.BytesToWrite==0) // skip packet on buffer overrun
                                         parent.comPort.Write(buffer, 0, index);
