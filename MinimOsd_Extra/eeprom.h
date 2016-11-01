@@ -30,6 +30,7 @@ typedef struct Point point;
 
 // Экранные флаги
 #define scrFlg_russianHUD  (1<<0)
+#define scrFlg_hideHorizon (1<<1)
 
 // данные одного экрана
 struct Panel {

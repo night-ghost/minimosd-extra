@@ -377,3 +377,9 @@ v890
 * added filter to RSSI panel
 * auto-calibration of screen switch in LEVEL switch mode
 * added on/off mode to PWM output translation
+
+v891
+* fixed callsign saving
+* fixed 3DR rssi problem
+* added ability to turn off horizon line
+* added parsing of VIBRATIONS MAVlink message

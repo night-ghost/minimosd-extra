@@ -1037,7 +1037,8 @@ static void panHorizon(point p){
 	}
     }
 
-    showHorizon(p.x + 1, p.y);
+    if(!(screen_flags & scrFlg_hideHorizon))
+        showHorizon(p.x + 1, p.y);
 
     byte mid_x = p.x+6;
     byte mid_y = p.y+2;

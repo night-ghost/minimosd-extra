@@ -105,7 +105,7 @@ bool read_mavlink(){
 #endif
 
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
-		apm_mav_system && apm_mav_system != msg.m.sysid) {       // another system
+		apm_mav_system && apm_mav_system != msg.m.sysid && msg.m.sysid !='3') {       // another system and not 3D radio
 #ifdef DEBUG
     packets_skip+=1;
 //    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);

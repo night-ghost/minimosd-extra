@@ -17,7 +17,7 @@ SPI::SPI()
   pinMode(SCK_PIN, OUTPUT);
   pinMode(MOSI_PIN, OUTPUT);
   pinMode(MISO_PIN, INPUT);
-  pinMode(SS_PIN, OUTPUT); // <------- !!! (Remember! This pin will select USB host chip Max3421)
+  pinMode(SS_PIN, OUTPUT); 
 
   // enable SPI Master, MSB, SPI mode 0, FOSC/4
   mode(0);
@@ -37,12 +37,6 @@ void SPI::mode(byte config){
 }
 
 //------------------ transfer -----------------------------------------------
-/*
-byte SPI::transfer(byte value){
-  SPDR = value;
-  while (!(SPSR & (1<<SPIF))) ;
-  return SPDR;
-}*/
 
 byte SPI::transfer(byte value, byte period){
   SPDR = value;
