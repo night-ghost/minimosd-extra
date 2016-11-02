@@ -37,11 +37,14 @@ namespace OSD {
         public int Alt5;
         public int Alt5_mask;
         public string alt5_text;
+        public int Alt6;
+        public int Alt6_mask;
+        public string alt6_text;
 
         //public TreeNode node;
 
         //public Panel(String aname, Func<int, int, int, int, int, Panel> ashow, int ax, int ay, int apos, int asign = -1, UI_Mode uim = UI_Mode.UI_Checkbox, int fAlt = -1, string text = "", int fAlt2 = -1, string text2 = "", int fAlt3 = -1, string text3 = "", int fAlt4 = -1, string text4 = "", int str_id=0, int str_count=0, string strings="") {
-        public Panel(String aname, ShowPanel ashow, int ax, int ay, int apos, int asign = -1, UI_Mode uim = UI_Mode.UI_Checkbox, int fAlt = -1, string text = "", int fAlt2 = -1, string text2 = "", int fAlt3 = -1, string text3 = "", int fAlt4 = -1, string text4 = "", int str_id=0, int str_count=0, string strings="",int mAlt5_mask=0,string text5="") {    
+        public Panel(String aname, ShowPanel ashow, int ax, int ay, int apos, int asign = -1, UI_Mode uim = UI_Mode.UI_Checkbox, int fAlt = -1, string text = "", int fAlt2 = -1, string text2 = "", int fAlt3 = -1, string text3 = "", int fAlt4 = -1, string text4 = "", int str_id = 0, int str_count = 0, string strings = "", int mAlt5_mask = 0, string text5 = "", int mAlt6_mask = 0, string text6 = "") {    
 			name = aname;
 			show = ashow;
 			x = ax;
@@ -66,6 +69,10 @@ namespace OSD {
             alt5_text = text5;
             Alt5_mask = mAlt5_mask;
 
+            Alt6 = 0;
+            alt6_text = text6;
+            Alt6_mask = mAlt6_mask;
+
             //OSD.osd_switch_once updatePanelStrings(string_id, str_count, strings);
             
         }
@@ -86,6 +93,14 @@ namespace OSD {
             Alt4 = other.Alt4;
             alt4_text = other.alt4_text;
             ui_mode = other.ui_mode;
+
+            Alt5 = other.Alt5;
+            alt5_text = other.alt5_text;
+            Alt5_mask = other.Alt5_mask;
+
+            Alt6 = other.Alt6;
+            alt6_text = other.alt6_text;
+            Alt6_mask = other.Alt6_mask;
 
             string_id = other.string_id;
             string_count = other.string_count;

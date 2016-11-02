@@ -372,8 +372,8 @@ static void setHomeVars()
 
             bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
         
-            bearing = 90 + bearing - 180 - osd_heading;//absolut return direction  //relative home direction
-            bearing=normalize_angle(bearing);
+    //        bearing += ;//absolut return direction  //relative home direction
+            bearing=normalize_angle(90 + bearing - 180 - osd_heading);
 
             osd_home_direction = grad_to_sect(bearing); 
         }

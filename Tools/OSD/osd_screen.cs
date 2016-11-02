@@ -45,6 +45,7 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt3;
         public System.Windows.Forms.CheckBox chkAlt4;
         public System.Windows.Forms.CheckBox chkAlt5;
+        public System.Windows.Forms.CheckBox chkAlt6;
         public System.Windows.Forms.ComboBox cbNumber;
         public System.Windows.Forms.ComboBox cbFilter;
         public System.Windows.Forms.Label labNumber;
@@ -85,6 +86,7 @@ namespace OSD
             this.chkAlt3 = new System.Windows.Forms.CheckBox();
             this.chkAlt4 = new System.Windows.Forms.CheckBox();
             this.chkAlt5 = new System.Windows.Forms.CheckBox();
+            this.chkAlt6 = new System.Windows.Forms.CheckBox();
             this.cbNumber = new System.Windows.Forms.ComboBox();
             this.cbFilter = new System.Windows.Forms.ComboBox();
             this.labNumber = new System.Windows.Forms.Label();
@@ -144,6 +146,7 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt3);
             this.groupBox.Controls.Add(this.chkAlt4);
             this.groupBox.Controls.Add(this.chkAlt5);
+            this.groupBox.Controls.Add(this.chkAlt6);
             this.groupBox.Controls.Add(this.cbNumber);
             this.groupBox.Controls.Add(this.cbFilter);
             this.groupBox.Controls.Add(this.labNumber);
@@ -306,6 +309,19 @@ namespace OSD
             this.chkAlt5.UseVisualStyleBackColor = true;
             this.chkAlt5.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
             this.chkAlt5.Visible = false;
+            // 
+            // chkAlt6
+            //
+            this.chkAlt6.AutoSize = true;
+            //this.chkAlt5.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkAlt6.Location = new System.Drawing.Point(10, 128);
+            this.chkAlt6.Name = "chkAlt6";
+            this.chkAlt6.Size = new System.Drawing.Size(137, 17);
+            this.chkAlt6.TabIndex = 9;
+            this.chkAlt6.Text = "Alternative mode5";
+            this.chkAlt6.UseVisualStyleBackColor = true;
+            this.chkAlt6.CheckedChanged += new System.EventHandler(this.chkAlt_CheckedChanged);
+            this.chkAlt6.Visible = false;
 
             //128
 
@@ -533,6 +549,7 @@ namespace OSD
             chkAlt3.Visible = false;
             chkAlt4.Visible = false;
             chkAlt5.Visible = false;
+            chkAlt6.Visible = false;
 
             labNumber.Location = new System.Drawing.Point(10, 70); // std
             chkAlt3.Location = new System.Drawing.Point(10, 83);
@@ -572,6 +589,10 @@ as_combo_cb:
                 chkAlt5.Text = thing.alt5_text;
                 chkAlt5.Visible = thing.alt5_text != "";
                 chkAlt5.Checked = thing.Alt5 !=0;
+
+                chkAlt6.Text = thing.alt6_text;
+                chkAlt6.Visible = thing.alt6_text != "";
+                chkAlt6.Checked = thing.Alt6 !=0;
                 goto as_checkbox;
             case UI_Mode.UI_Checkbox:
             default:
@@ -842,6 +863,14 @@ as_checkbox:
                             screen_flags |= (uint16_t)(panelItems[a].Alt5_mask);
                         else
                             screen_flags &= (uint16_t)(~panelItems[a].Alt5_mask);
+
+                    }
+                    if (panelItems[a].Alt6_mask != 0) {
+                        panelItems[a].Alt6 = chkAlt6.Checked ? 1 : 0;
+                        if (panelItems[a].Alt6 != 0)
+                            screen_flags |= (uint16_t)(panelItems[a].Alt6_mask);
+                        else
+                            screen_flags &= (uint16_t)(~panelItems[a].Alt6_mask);
 
                     }
 

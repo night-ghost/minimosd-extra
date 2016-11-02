@@ -75,7 +75,7 @@ struct Panel {
     point ch;           // #define panCh_XY = 64;
     point temp;         // #define panTemp_XY = 66;
     point distance;     // #define panDistance_XY = 68;
-    point GPS2;         // #define panGPS2_XY = 70;    
+    point fVibe;        // #define panVibe_XY = 70;    
     point RadarScale;	// 72
     point Fdata;	// 74
     point message;      // 76
@@ -90,6 +90,7 @@ struct Panel {
     point CValue;       // 94
     point fDate;        // 96
     point dayTime;      // 98
+    point fMotor;       // 100
 };
 
 union _Panel {

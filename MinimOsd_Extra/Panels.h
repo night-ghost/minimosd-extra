@@ -311,16 +311,19 @@ static void showILS(byte start_col, byte start_row) {
             int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
             int8_t charPosition = linePosition / 6;
             uint8_t selectedChar = (linePosition % 6) + 0xBF;
+            byte cl;
+        
             if(charPosition < 0){
-               OSD::write_xy(start_col +1, start_row + AH_ROWS-1, '<' ); // в первой и последней строке
-               OSD::write_xy(start_col +1, start_row,           '<' );
+                cl=start_col +1; // в первой и последней строке
+                selectedChar='<';
             } else if(charPosition > AH_COLS)  {
-               OSD::write_xy(start_col +AH_COLS, start_row + AH_ROWS-1, '>' ); // в первой и последней строке
-               OSD::write_xy(start_col +AH_COLS, start_row,           '>' );
+                cl = start_col +AH_COLS; // в первой и последней строке
+                selectedChar='>';
             } else {
-              OSD::write_xy(start_col + charPosition+1, start_row + AH_ROWS-1, selectedChar ); // в первой и последней строке
-              OSD::write_xy(start_col + charPosition+1, start_row, selectedChar );
+                cl=start_col + charPosition+1;
             }
+            OSD::write_xy(cl, start_row + AH_ROWS-1, selectedChar );
+            OSD::write_xy(cl, start_row,             selectedChar );
       }
     } else { // copter
     
@@ -441,26 +444,12 @@ static void panCOG(point p){
 
     int cog_100=(osd_cog + 50) / 100 - osd_heading;
 
-/*
-    if (cog_100  > 180){
-       off_course = cog_100 - 360;
-    }else if (cog_100 < -180){
-       off_course = cog_100 + 360;
-    }else{
-       off_course = cog_100;
-    }
-*/
     off_course = normalize_angle(cog_100)-180;   // -180..180
 
     showArrow(grad_to_sect(off_course)+8); 
     osd_printi_1(PSTR("%4i\x05"), off_course);
 
 }
-/*
-static void NOINLINE printDist(float d){
-      osd_printf_2(PSTR("%5.0f"), d, get_mhigh());
-}
-*/
 
 static NOINLINE void printFullDist(float dd){
 
@@ -650,7 +639,7 @@ static void panRSSI(point p){
 // Staus  : done
 
 static void panCALLSIGN(point p){
-    if((seconds % 64) < 2){
+    if((seconds % 64) < 2 || is_alt(p)){
       osd.print( (char *)sets.OSD_CALL_SIGN);
     }
 }
@@ -697,21 +686,10 @@ static void panAlt(point p){
 
     long v=osd_pos.alt;
     if(is_alt(p)) v-=osd_home.alt;
-//    if(!lflags.gps_active) // если нет GPS то покажем барометрическую
-//	v=osd_alt_mav;
 
-//    printDistCnv(v/1000.0);
-//    printDistCnv(f_div1000(v));
     printFullDist(f_div1000(v));
 }
 
-/*
-static void panBaroAlt(point p){
-
-    printDistCnv(osd_baro_alt/1000.0);
-
-}
-*/
 
 /* **************************************************************** */
 // Panel  : panHomeAlt
@@ -1083,7 +1061,7 @@ static void panRoll(point p){
 // Panel  : panCur_A
 // Needs  : X, Y locations
 // Output : Current symbol and altitude value in meters from MAVLink
-// Size   : 1 x 7Hea  (rows x chars)
+// Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
 static void panCur_A(point p){
@@ -1336,11 +1314,6 @@ as_f:
 	    break;
 	}
 
-
-#ifdef DEBUG
-//    Serial.printf_P(PSTR("list fmt=%S val=%f k=%f h=%d\n"),fmt,val, k,h);
-#endif
-
 	osd_printf_2(fmt,val,h);
 
 	osd_nl();
@@ -1357,9 +1330,6 @@ static void panFdata(point p){ // итоги полета
     static const char PROGMEM fmt6[]="\x91%7.2f";
     static const char PROGMEM fmt7[]="\xA1%7.2f";
 
-//    static const char PROGMEM fmt4[]="\x03%10.6f";
-//    static const char PROGMEM fmt5[]="\x04%10.6f";
-
     static const PROGMEM Formats fd[] = {
 	{fmt0, '\x0B', 'h',  &max_home_distance   },
 	{fmt1, '\x8F', 'h',  &trip_distance       },
@@ -1370,8 +1340,6 @@ static void panFdata(point p){ // итоги полета
 	{fmt7, '\xA0', 'v',  &min_osd_climb       },
 	{fmt1, '\xBD', 'a',  &max_osd_curr_A      },
 	{fmt1, 'W',    'w',  &max_osd_power       },
-//	{fmt4, 'f',  &osd_pos.lat         },
-//	{fmt5, 'f',  &osd_pos.lon         },
 	{0}
     };
 
@@ -1394,7 +1362,6 @@ static void panFdata(point p){ // итоги полета
 //*/
 
 
-//    osd_nl();
     print_list(fd);
 
     if(is_alt(p)) {
@@ -1575,9 +1542,9 @@ static void panRose(point p){
         if (is_alt2(p)) {
             osd.print_P(PSTR("|\x20\x20\x20\x24\xcb"));
             osd.write_raw(0x7c);
-            s=PSTR("\x40\xcb\x24\x20\x20\x20|");
+            s=PSTR("\x40\xcb\x24" /* \x20\x20\x20| */ );
         } else
-            s=PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce\x20");
+            s=PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce" /* \x20 */);
         
         osd.print_P(s);
     }
@@ -1600,8 +1567,6 @@ static int getTargetBearing(){
 static void panWPDir(point p){
     if(wp_number > 0 ){
    
-//    int wp_target_bearing_rotate = round(((float)wp_target_bearing - osd_heading)/360 * 16) + 1; //Convert to int 1-16 
-
 	showArrow(getTargetBearing());
     }
 }
@@ -1834,16 +1799,6 @@ char const * const mode_aq_strings[] PROGMEM ={
 };
 
 #if defined(USE_MWII)
-/*
-    { 0, 1, &msg.mwii.mode.armed},   0
-    { 1, 2, &msg.mwii.mode.stable},  1
-    { 2, 3, &msg.mwii.mode.horizon}, 2
-    { 3, 4, &msg.mwii.mode.baro},    3
-    { 5, 0, &msg.mwii.mode.mag},    
-    { 10,6, &msg.mwii.mode.gpshome}, 4 
-    { 11,7, &msg.mwii.mode.gpshold}, 5
-    { 19,0, &msg.mwii.mode.osd_switch}, 
-*/
 
 const char PROGMEM mw_mode1[] = "angl";
 const char PROGMEM mw_mode2[] = "hori";
@@ -1961,8 +1916,6 @@ static void printSensor(byte n){
     eeprom_read_len((byte *)&s,  EEPROM_offs(sensors) + n * sizeof(SensorInfo),  sizeof(SensorInfo) );
 
     float v=s.K * sensorData[n] + s.A;
-
-//Serial.printf_P(PSTR("\n n=%d k=%f v=%d fmt=%s addr=%d sz=%d\n"),n,s.K,sensorData[n], s.format, EEPROM_offs(sensors) + n * sizeof(SensorInfo), sizeof(SensorInfo));
 
     osd.printf(s.format,v);
 }
@@ -2147,6 +2100,20 @@ static void panDate(point p) {
     }
 }
 
+/*
+static void panMotor(point p) {
+}*/
+
+static void panVibe(point p) {
+    if(has_sign(p)) osd.print_P(PSTR("  x  y  z|"));
+    
+    byte i;
+    for(i=0;i<3;i++)
+        osd_printf_1(PSTR("%3.0f"), vibration[i]);
+
+    for(i=0;i<3;i++)
+        osd_printi_1(PSTR("3i"), clipping[i]);
+}
 
 
 
@@ -2546,12 +2513,15 @@ as_char:
 	case 's': // sensors
         case 'f': // float param
 	    size=4;
+	    static const PROGMEM float incs[]={1, 0.1, 0.01, 0.001 };
 	
+	    inc=incs[(int)(diff/100) - 1];
+/*	    
 	    if(     diff>400) inc=1;
 	    else if(diff>300) inc=0.1;
 	    else if(diff>200) inc=0.01;
 	    else if(diff>100) inc=0.001;
-
+*/
 	    break;
         }
 
@@ -2679,6 +2649,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(message),		panMessage, 	0 },
     { ID_of(fDate),		panDate, 	0 },
     { ID_of(dayTime),		panDayTime, 	0 },
+//    { ID_of(fMotor),		panMotor, 	0 },
+    { ID_of(fVibe),		panVibe, 	0 },
 // warnings should be last
     { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}

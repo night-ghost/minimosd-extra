@@ -93,12 +93,12 @@ namespace OSD
 		public byte n_screens=4;
 		
 //*************************		
-        private byte temperatureChar = 0x1B;
+        private byte temperatureChar = 0xBA;
         private byte bigDistanceChar = 0x1B;
-        //private byte smallDistanceChar = 0x1B;
+        
         private byte climbChar = 0x1A;
         private byte velocityChar = 0x10;
-        private byte altitudeChar = 0x10;
+        private byte altitudeChar = 0xc;
 
         private float convertspeed = 3.6f;
         private float converth = 1.0f;
@@ -817,8 +817,9 @@ namespace OSD
 
 			osd_roll=10;
 			osd_pitch=-6;
-			
-			showHorizon(first_col+1, first_line, sign );
+
+            if ((osd.scr[osd.screen_number].screen_flags & (1 << OSD.scrFlg_hideHorizon))==0)
+			    showHorizon(first_col+1, first_line, sign );
 			
 			osd.setPanel(first_col+6, first_line+2);
 			if(sign==1)
@@ -1708,6 +1709,31 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
                 osd.printf("16:06");
             return 0;
         }
+
+        public int panMotor(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            if (is_alt(fAlt))
+             osd.printf("1230 1345|1330 1267");
+            else
+            osd.printf("67 68|66 67");
+  
+            return 0;
+        }
+
+        public int panVibe(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            //if (sign == 1) 
+            //if (is_alt(fAlt))
+            if (sign == 1)
+                osd.printf(" x  y  z|");
+                osd.printf("19 13 44| 0  0  1");
+            //else
+              //  osd.printf("2016.10.19");
+            return 0;
+        }
+
 
         
 

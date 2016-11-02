@@ -98,7 +98,9 @@ namespace OSD {
 
                 try {
                     comPort.Open();
-                } catch{}
+                } catch{
+                    Console.WriteLine ("error opening port "+comPort.PortName);
+                }
 
                 byte[] buffer=new byte[512];
                 int index=-1;
@@ -142,12 +144,18 @@ namespace OSD {
 
                             readOut();
 
+                            int stx_count=0, error_count=0;
                             if(index>=0) buffer[index++]=c;
 
                             switch (parent.mavlink_parse_char(c)) {
+                            case 3: // error
+                                error_count++;
+                                Console.WriteLine("ERROR parsing "+MAVLink.MAVLINK_NAMES[buffer[5]] + "\n");
+                                break;
                             case 1: // got STX
                                 index=0;
                                 buffer[index++] = c; // store STX
+                                stx_count++;
                                 break;
                             case 2: // got packet
 

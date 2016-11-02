@@ -591,6 +591,7 @@ namespace OSD
             this.UNITS_combo.Name = "UNITS_combo";
             this.UNITS_combo.Size = new System.Drawing.Size(109, 21);
             this.UNITS_combo.TabIndex = 25;
+            this.UNITS_combo.SelectedIndexChanged += new System.EventHandler(this.UNITS_combo_SelectedIndexChanged);
             // 
             // CALLSIGNmaskedText
             // 
@@ -603,6 +604,9 @@ namespace OSD
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
             this.CALLSIGNmaskedText.Size = new System.Drawing.Size(109, 20);
             this.CALLSIGNmaskedText.TabIndex = 24;
+            this.CALLSIGNmaskedText.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.CALLSIGNmaskedText_MaskInputRejected);
+            this.CALLSIGNmaskedText.Validating += new System.ComponentModel.CancelEventHandler(this.CALLSIGNmaskedText_Validating);
+            this.CALLSIGNmaskedText.Validated += new System.EventHandler(this.CALLSIGNmaskedText_Validated);
             // 
             // label44
             // 
@@ -673,6 +677,7 @@ namespace OSD
             this.chkFlightResults.TabIndex = 0;
             this.chkFlightResults.Text = "Show results after flight";
             this.chkFlightResults.UseVisualStyleBackColor = true;
+            this.chkFlightResults.CheckedChanged += new System.EventHandler(this.chkFlightResults_CheckedChanged);
             // 
             // groupBox14
             // 

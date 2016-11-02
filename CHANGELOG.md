@@ -383,3 +383,9 @@ v891
 * fixed 3DR rssi problem
 * added ability to turn off horizon line
 * added parsing of VIBRATIONS MAVlink message
+
+v892
+* added panel Vibrations
+* fixed MAVlink parsing in CT
+* fixed Units selection
+

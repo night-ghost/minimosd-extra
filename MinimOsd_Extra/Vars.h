@@ -356,3 +356,6 @@ static float        max_osd_power=0;
 
 uint32_t sys_days;    // from unix epoch
 uint32_t day_seconds; // from midnight
+
+float vibration[3]; //< Vibration levels
+uint16_t clipping[3];// < first accelerometer clipping count

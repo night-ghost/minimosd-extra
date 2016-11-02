@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r890 DV";
+        public const string VERSION = "r892 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -80,11 +80,13 @@ namespace OSD {
             MAVLINK_PARSE_STATE_GOT_COMPID,
             MAVLINK_PARSE_STATE_GOT_MSGID,
             MAVLINK_PARSE_STATE_GOT_PAYLOAD,
-            MAVLINK_PARSE_STATE_GOT_CRC1
+            MAVLINK_PARSE_STATE_GOT_CRC1,
+            MAVLINK_PARSE_STATE_BAD_CRC1
         }; ///< The state machine for the comm parser
 
         public struct mavlink_status {
             public uint8_t msg_received;               /// Number of received messages
+            public uint8_t msg_error;                  /// Number of error messages
             public uint8_t buffer_overrun;             /// Number of buffer overruns
             public uint8_t parse_error;                /// Number of parse errors
             public mavlink_parse_state_t parse_state;  /// Parsing state machine
@@ -95,7 +97,7 @@ namespace OSD {
             public uint16_t packet_rx_drop_count;      /// Number of packet drops
         };
 
-        public mavlink_status status = new mavlink_status() { msg_received=0, buffer_overrun=0, parse_error=0, parse_state=mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE, packet_idx= 0, current_rx_seq =0, current_tx_seq=0, packet_rx_success_count=0, packet_rx_drop_count =0 };
+        public mavlink_status status = new mavlink_status() { msg_received = 0, msg_error=0, buffer_overrun = 0, parse_error = 0, parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE, packet_idx = 0, current_rx_seq = 0, current_tx_seq = 0, packet_rx_success_count = 0, packet_rx_drop_count = 0 };
 
         public mavlink_message rxmsg;
 
@@ -300,7 +302,7 @@ namespace OSD {
                 var pi = scr[n].panelItems;
 
                 // Display name,printfunction,X,Y,ENaddress,Xaddress,Yaddress
-                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, UI_Mode.UI_Checkbox_1, 0, "Show HUD frame", 0, "Show ILS", 1, "Show Radar", 0, "  with track", 0, 0, "", (1 << scrFlg_russianHUD),"Russian HUD"); // first!
+                pi[a++] = new Panel("Horizon", pan.panHorizon, 8, 6, panHorizon_XY, 1, UI_Mode.UI_Checkbox_1, 0, "Show HUD frame", 0, "Show ILS", 1, "Show Radar", 0, "  with track", 0, 0, "", (1 << scrFlg_russianHUD), "Russian HUD", (1 << scrFlg_hideHorizon), "Not show Horizon"); // first!
 
                 //pi[a++] = new Panel("Center", pan.panCenter, 13, 8, panCenter_XY);
                 pi[a++] = new Panel("Pitch", pan.panPitch, 7, 1, panPitch_XY);
@@ -337,7 +339,7 @@ namespace OSD {
                 pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value",-1,"", 0, "Show sign '%'");
                 pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
                 pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, UI_Mode.UI_Checkbox,0,"Show only mAh/km");
-                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY);
+                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1, UI_Mode.UI_Checkbox, 0, "Do not blink");
                 pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
                 pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
@@ -355,6 +357,8 @@ namespace OSD {
                 pi[a++] = new Panel("Power", pan.panPower, 1, 5, panPower_XY, 1);
                 pi[a++] = new Panel("Date", pan.panDate, 7, 1, fDate_XY, 1, UI_Mode.UI_Checkbox, 0, " Format dd.mm.yyyy");
                 pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
+                //pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
+                pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
 
                
                 osd_functions_N = a;
@@ -417,7 +421,11 @@ namespace OSD {
                             } else if (thing.name == "Channel Scale") {
                                 tn.Checked = false;
                             } else if (thing.name == "Channel Value") {
-                                tn.Checked = false;                                                                
+                                tn.Checked = false;
+                            } else if (thing.name == "Motors") {
+                                tn.Checked = false;
+                            } else if (thing.name == "Vibrations") {
+                                tn.Checked = false;
                             } else {
                                 tn.Checked = true;
                             }
@@ -1356,6 +1364,7 @@ namespace OSD {
                                 break;
                             case UI_Mode.UI_Checkbox_1:
                                 pi.Alt5 = scr[k].screen_flags & pi.Alt5_mask;
+                                pi.Alt6 = scr[k].screen_flags & pi.Alt6_mask;
                                 goto as_checkbox;
                             case UI_Mode.UI_Checkbox:
 as_checkbox:
@@ -2022,6 +2031,9 @@ again:
                                         if(pi.Alt5_mask!=0){
                                             pi.Alt5 =  scr[k].screen_flags & pi.Alt5_mask;
                                         }
+                                        if (pi.Alt6_mask != 0) {
+                                            pi.Alt6 = scr[k].screen_flags & pi.Alt6_mask;
+                                        }
                                         try {
                                             if(pi.string_count >0){
                                                 pi.strings =strings[9];
@@ -2276,6 +2288,12 @@ again:
                     start_clear_timeout();
                     return;
                 }
+
+                if(FLASH.Length >= 30720) {
+                    MessageBox.Show("File too big!");
+                    return;
+                }
+
 
                 //bool fail = false;
                 ArduinoSTK sp = OpenArduino();
@@ -3865,6 +3883,7 @@ again:
 		        if (c == MAVLINK_STX) {
                     status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
 			        rxmsg.len = 0;
+                    status.msg_error=0;
         //			rxmsg->magic = c;
 			        mavlink_start_checksum(ref rxmsg);
         //mavlink_comm_0_port->printf_P(PSTR("\n\ngot STX!"));
@@ -3927,7 +3946,7 @@ again:
                     status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD;
 		        } else {
                     status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_MSGID;
-		        }
+		        }               
 		        break;
 
             case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_MSGID:
@@ -3936,23 +3955,26 @@ again:
 		        if (status.packet_idx == rxmsg.len) {
                     status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD;
 
-		        }
+		        }                
 		        break;
 
             case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_PAYLOAD:
+                mavlink_update_checksum(ref rxmsg, MAVLink.MAVLINK_MESSAGE_CRCS[rxmsg.msgid]);
 
-		        if (false && c != (rxmsg.checksum & 0xFF)) {
-        //mavlink_comm_0_port->printf_P(PSTR("\n CRC1 err! want=%d got=%d"), rxmsg->checksum & 0xFF, c);
+		        if ( c != (rxmsg.checksum & 0xFF)) {
+        Console.WriteLine("\n CRC1 err! want={0} got={1}", rxmsg.checksum & 0xFF, c);
 			        // Check first checksum byte
 			        status.parse_error++;
 			        status.msg_received = 0;
+                    status.msg_error = 1;
 			        if (c == MAVLINK_STX) {
                         status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
                         rxmsg.len = 0;
+                        status.msg_error = 0;
                         mavlink_start_checksum(ref rxmsg);
 
                     } else {
-                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_BAD_CRC1;
 			        }
 		        } else {
  //  {
@@ -3961,29 +3983,45 @@ again:
 		        }
 		        break;
 
-            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_CRC1:
-/*		        if (c != (rxmsg.checksum >> 8)) {
-			        // Check second checksum byte
-        //mavlink_comm_0_port->printf_P(PSTR("\nCRC2 err! want=%d got=%d"), rxmsg->checksum >> 8, c);
-
-			        status.parse_error++;
-			        status.msg_received = 0;
-			
-			        if (c == MAVLINK_STX) {
-                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
-                        rxmsg.len = 0;                        
-                        mavlink_start_checksum(ref rxmsg);
-                    } else {
-				        //status->parse_state = MAVLINK_PARSE_STATE_IDLE;     
-                        status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
-			        }
-		        } else {
-//*/ {
-                  // Successfully got message
-			        status.msg_received = 1;
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_BAD_CRC1:
+                 if (c == MAVLINK_STX) {
+                           status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
+                           rxmsg.len = 0;
+                           status.msg_error = 0;
+                           mavlink_start_checksum(ref rxmsg);
+                 } else {
                     status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
 			        rxmsg.payload[status.packet_idx+1] = (byte)c;
-		        }
+                 }
+
+                break;
+
+            case mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_CRC1:
+                //*
+                   if (c != (rxmsg.checksum >> 8)) {// Check second checksum byte
+
+                       Console.WriteLine("\nCRC2 err! want={0} got={1}", rxmsg.checksum >> 8, c);
+                       status.msg_error = 1;
+                        status.parse_error++;
+                           status.msg_received = 0;
+			
+                           if (c == MAVLINK_STX) {
+                                  status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_GOT_STX;
+                                  rxmsg.len = 0;                                  
+                                  mavlink_start_checksum(ref rxmsg);
+                           } else {
+                                        //status->parse_state = MAVLINK_PARSE_STATE_IDLE;     
+                                   status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+                          }
+                 } else 
+                //*/ 
+                       {
+                  // Successfully got message
+			        status.msg_received = 1;
+
+                    status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
+			        rxmsg.payload[status.packet_idx+1] = (byte)c;
+                }
 		        break;
 	        }
 
@@ -4008,6 +4046,10 @@ again:
 	        status.packet_rx_drop_count = status.parse_error;
 	        //r_mavlink_status->buffer_overrun = status->buffer_overrun;
 
+            if(status.msg_error !=0) {
+                status.msg_error=0;
+                    return (byte)3;
+            }
 	        return status.msg_received!=0?(byte)2:(byte)0;
         }
 
@@ -4269,10 +4311,16 @@ again:
 
 
                         byte c = bytes[byteIndex];
+                        int stx_count=0, error_count=0;
 
                         switch (mavlink_parse_char(c)) {
+                        case 3: // some error
+                            error_count++;
+                            Console.WriteLine("ERROR! >" + MAVLink.MAVLINK_NAMES[bytes[frStart+5]] + "\n");
+                            break;
                         case 1: // got STX
                             frStart = byteIndex;
+                            stx_count++;
                             break;
                         case 2: // got packet
                             frameIndex++;
@@ -4809,6 +4857,14 @@ typedef struct __mavlink_radio_status_t
 
             update_used_pins();
             txtBattB_k.Enabled = pan.flgBattB;
+        }
+
+        private void CALLSIGNmaskedText_MaskInputRejected(object sender, MaskInputRejectedEventArgs e) {
+
+        }
+
+        private void chkFlightResults_CheckedChanged(object sender, EventArgs e) {
+
         }
 
         

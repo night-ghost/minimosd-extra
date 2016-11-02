@@ -48,7 +48,7 @@ namespace OSD {
 		const int panCh_XY = 64;
 		const int panTemp_XY = 66;
 		const int panDistance_XY = 68;
-		const int panGPS2_XY = 70;
+		const int fVibe_XY = 70;
 		const int panRadarScale_XY = 72;
 		const int panFdata_XY = 74;
         const int panMessage_XY = 76;
@@ -63,7 +63,8 @@ namespace OSD {
         const int panCvalue_XY = 94;
         const int fDate_XY = 96;
         const int dayTime_XY = 98;
-
+        const int fMotor_XY =100;
+       
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана
 
@@ -96,6 +97,7 @@ namespace OSD {
 
         // Экранные флаги
         public const int scrFlg_russianHUD = 0;
+        public const int scrFlg_hideHorizon = 1;
        	
 	}
 }

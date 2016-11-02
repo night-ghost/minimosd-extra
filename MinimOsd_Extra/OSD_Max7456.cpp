@@ -53,6 +53,11 @@ void delay_15(){
     delay(15);
 }
 
+void MAX_mode(byte mode){
+    MAX_write(MAX7456_VM0_reg,  mode);
+}
+
+
 void OSD::reset(){
     max7456_on();
 
@@ -60,7 +65,7 @@ void OSD::reset(){
 
     while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) );//read status register - sync to soft-only versions
 
-    MAX_write(MAX7456_VM0_reg, MAX7456_RESET );
+    MAX_mode( MAX7456_RESET );
 
     delay_15();
 
@@ -73,7 +78,7 @@ void OSD::hw_init(){
 //read black level register
     byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read); //black level read register
   
-    MAX_write(MAX7456_VM0_reg, MAX7456_RESET | video_mode);
+    MAX_mode( MAX7456_RESET | video_mode);
     delay_150();
 
 //set black level
@@ -82,11 +87,11 @@ void OSD::hw_init(){
     MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
 
   // define sync (auto,int,ext)
-    MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_internal);  // first time on internal sync
+    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_internal);  // first time on internal sync
 
     delay_150();
 
-    MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  // and then switch to auto mode
+    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  // and then switch to auto mode
 
  // max7456_off();
 
@@ -160,7 +165,7 @@ void OSD::setMode(uint8_t themode){
     if(video_mode != mode){
 	video_mode = mode;
         max7456_on();
-        MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync); 
+        MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync); 
         max7456_off();
     }
 }
@@ -294,7 +299,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 //    cli(); - нет смысла 
 
   max7456_on();
-  MAX_write(MAX7456_VM0_reg, MAX7456_DISABLE_display);
+   MAX_mode( MAX7456_DISABLE_display);
 
   MAX_write(MAX7456_CMAH_reg, char_address_hi);// set start address high
 
@@ -323,7 +328,7 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 
 //  sei();
 
-  MAX_write(MAX7456_VM0_reg, MAX7456_ENABLE_display_vert);// turn on screen next vertical
+  MAX_mode( MAX7456_ENABLE_display_vert);// turn on screen next vertical
 
   max7456_off();
 

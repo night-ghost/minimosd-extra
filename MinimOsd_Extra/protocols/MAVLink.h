@@ -475,13 +475,30 @@ DBG_PRINTF("days=%ld\n",     sys_days );
                 
                 lflags.got_date= (sys_days>0);
     
-/*
-got    1185299567
-now    1476955753
-
- wtf???
-*/
                 } break;
+
+            case MAVLINK_MSG_ID_VIBRATION: {
+/*
+typedef struct __mavlink_vibration_t {
+ uint64_t time_usec; < Timestamp (micros since boot or Unix epoch)
+ float vibration_x; < Vibration levels on X-axis
+ float vibration_y; < Vibration levels on Y-axis
+ float vibration_z; < Vibration levels on Z-axis
+ uint32_t clipping_0; < first accelerometer clipping count
+ uint32_t clipping_1; < second accelerometer clipping count
+ uint32_t clipping_2; < third accelerometer clipping count
+} mavlink_vibration_t;
+
+*/
+                vibration[0] = mavlink_msg_vibration_get_vibration_x(&msg.m);
+                vibration[1] = mavlink_msg_vibration_get_vibration_y(&msg.m);
+                vibration[2] = mavlink_msg_vibration_get_vibration_z(&msg.m);
+                clipping[0] = mavlink_msg_vibration_get_clipping_0(&msg.m);
+                clipping[1] = mavlink_msg_vibration_get_clipping_1(&msg.m);
+                clipping[2] = mavlink_msg_vibration_get_clipping_2(&msg.m);
+
+                } break;
+
 
             default:
                 //Do nothing
