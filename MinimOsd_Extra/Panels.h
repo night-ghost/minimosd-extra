@@ -50,7 +50,6 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 
 
 static void NOINLINE printTime(uint16_t t, byte blink, byte sec=0){
-//    osd.printf_P(PSTR("%3i%c%02i"),((uint16_t)t/60)%60,(blink && lflags.blinker)?0x20:0x3a, (uint16_t)t%60);
 
     osd_printi_1(PSTR("%3i"),((uint16_t)t/60));
 
@@ -264,13 +263,13 @@ again:
     if(pitch_line<0){
 //       pitch_line += AH_TOTAL_LINES-2;
 	shift_angle +=30;
-        shf+=2;
+        shf+=4;
         goto again;
     }
     if(pitch_line>AH_TOTAL_LINES){
 //       pitch_line -= AH_TOTAL_LINES-2;
 	shift_angle -=30;
-        shf+=2;
+        shf+=4;
         goto again;
     }
 
@@ -546,6 +545,8 @@ static void print_energy(point p){
 static void panEff(point p){
 
     static float ddistance = 0;
+
+    if(lflags.motor_armed) return;
 
     if(is_alt(p)){
         if (osd_groundspeed != 0) { // no efficiency at 0 speed
@@ -941,8 +942,6 @@ static void panBatteryPercent(point p){
     if(has_sign(p)) {
 	OSD::write_S(0x88); // донышко батарейки не зависит от
 
-//Serial.printf_P(PSTR("batt val="),val);
-
         setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);    // battery A remaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
@@ -1212,14 +1211,15 @@ static void panGPS(point p){
     byte idx= fLow | (has_sign(p)?2:0);
 
     if(lflags.blinker) {
+        PGM_P str=PSTR("Stream");
 	if(lflags.mav_data_frozen>=5){
-	    osd.print_P(PSTR("Stream"));
+	    osd.print_P(str);
 	    OSD::write_S(div);
 	    osd.print_P(PSTR("frozen"));
 	    return;
 	}
 	if(lflags.mav_stream_overload>=5){
-	    osd.print_P(PSTR("Stream"));
+	    osd.print_P(str);
 	    OSD::write_S(div);
 	    osd.print_P(PSTR("overload"));
 	    return;
@@ -1905,8 +1905,9 @@ static void panRadarScale(Point p){
 // Staus  : done
 
 static void panCh(point p){
-    for(byte i=0; i<8;i++)
+    for(byte i=0; i<8;i++) {
 	osd_printi_2(PSTR("C%d%5i|"), i+1, chan_raw[i] );
+    }
 }
 
 #if defined(USE_SENSORS)
@@ -2197,8 +2198,6 @@ struct Setup_screen {
 
 
 void renew(){
-//Serial.printf_P(PSTR("renew!\n")); Serial.wait();
-
     OSD::adjust();
 }
 

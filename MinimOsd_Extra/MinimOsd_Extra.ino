@@ -42,6 +42,8 @@ Project received Donations from (in time order)
  John Van Brocklin
  Ahmad Ansari Md Repah
  Boris Tekaty
+ Aldoir Ventura
+ Dean Berg
 
 Figures, harm the development of an idiotic question:
  MachVoluM

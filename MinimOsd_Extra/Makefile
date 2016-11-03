@@ -15,7 +15,7 @@ OPT  = -ffast-math
 #OPT += -floop-strip-mine
 OPT += -finline-functions-called-once 
 OPT += -finline-small-functions
-OPT += -fmerge-all-constants
+OPT +=  -fno-data-sections -fmerge-all-constants -fmerge-constants
 OPT += -fomit-frame-pointer 
 OPT += -fno-optimize-sibling-calls 
 OPT += -fno-early-inlining 
@@ -23,7 +23,7 @@ OPT += -fno-aggressive-loop-optimizations
 
 #OPT += -fmodulo-sched 
 #OPT += -fmodulo-sched-allow-regmoves 
-OPT += -fassociative-math
+OPT += -fassociative-math -freciprocal-math -fno-signed-zeros -fno-trapping-math -fsingle-precision-constant
 #OPT += -fconserve-stack
 #OPT += -freorder-blocks-and-partition size more
 #OPT += -fno-signed-zeros
@@ -60,9 +60,20 @@ OPT += -fassociative-math
 #OPT += -fno-partial-inlining 
 #OPT += -fno-inline-small-functions
 
-#OPT += -v -save-temps # for GCC bugreport
 
 OPT +=  -fno-caller-saves
+OPT +=  -funsigned-bitfields
+
+#OPT +=   -fno-keep-static-consts -fgcse-sm -fgcse-las -fgcse-after-reload -fdelete-null-pointer-checks
+
+#OPT +=   -fdevirtualize-speculatively -free -fira-region=one -fira-loop-pressure -fconserve-stack -ftree-partial-pre 
+
+OPT +=  -fipa-pta  -fwrapv
+# -fno-math-errno
+#-fisolate-erroneous-paths-attribute -ftree-loop-distribute-patterns -fivopts -fpredictive-commoning -fstrict-aliasing
+#-fdevirtualize-at-ltrans
+
+OPT +=  -fverbose-asm
 
 OPT += $(PROTO)
 
@@ -74,12 +85,15 @@ OPT +=  -Wl,--relax
 #OPT += -flto -fuse-linker-plugin
 
 
+#OPT += -v -save-temps # for GCC bugreport
+
+
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
-CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x
+CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x -fconserve-space -fno-enforce-eh-specs -fno-rtti -fvisibility-inlines-hidden
 CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
 LDFLAGS = $(OPT) 
-LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref
+LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref -fwhole-program
 MCU=atmega328p
 #ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
 
