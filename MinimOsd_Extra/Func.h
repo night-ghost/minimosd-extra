@@ -390,8 +390,8 @@ void NOINLINE calc_max(float &dst, float src){
 #define USE_FILTER 1 
 
 #if defined(USE_FILTER)
-void NOINLINE filter( float &dst, float val, const int k){ // комплиментарный фильтр 1/k
-    if(dst==0 || k==0) dst=val;
+void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
+    if(dst==0 || k==0 || k==1) dst=val;
     else
         //dst = (val * k) + dst * (1.0 - k); 
         //dst = val * k + dst - dst*k;
@@ -430,25 +430,17 @@ void setFdataVars()
             float pow= (osd_vbat_A / (1000 * 100.0) * osd_curr_A );
             power += (pow - power) * 0.1; // комплиментарный фильтр 1/10
         }
-        //dst+=(val-dst)*k;
-        //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
-        //float vs=(osd_climb * get_converth() ) * 60;
-        // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
 #endif
 
 
     //Moved from panel because warnings also need this var and panClimb could be off
 #if defined(USE_FILTER)
-        filter(vertical_speed, (osd_climb * get_converth() ) *  60); // комплиментарный фильтр 1/10
+        filter(vertical_speed, (osd_climb * get_converth() ) *  60, climb_filter); // комплиментарный фильтр 1/10..100
 #else
 	{
             float speed_raw= (osd_climb * get_converth() ) *  60;
             vertical_speed += (speed_raw - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
         }
-        //dst+=(val-dst)*k;
-        //vertical_speed += ((osd_climb * get_converth() ) * 60  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
-        //float vs=(osd_climb * get_converth() ) * 60;
-        // vertical_speed += (vs  - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
 #endif
 
         if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
@@ -456,10 +448,6 @@ void setFdataVars()
 
 #ifdef IS_PLANE
 //                              Altitude above ground in meters, expressed as * 1000 (millimeters)
-// osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);
-
-//    osd_alt_to_home = (osd_alt_mav - osd_home_alt/1000.0); // ->  mavlink_msg_global_position_int_get_relative_alt(&msg.m)/1000;
-
     if (sets.model_type == 0  /* plane */ && !lflags.in_air  && (int)osd_alt_to_home > 5 && osd_throttle > 30){
 	lflags.in_air = 1; // взлетели!
 	trip_distance = 0;

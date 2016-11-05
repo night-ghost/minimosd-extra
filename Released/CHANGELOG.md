@@ -389,3 +389,7 @@ v892
 * fixed MAVlink parsing in CT
 * fixed Units selection
 
+
+v893
+* added selectable filter to vertical speed
+* accuracy of vertical speed can be reduced to 1 decimal digit

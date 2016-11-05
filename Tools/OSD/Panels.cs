@@ -182,7 +182,7 @@ namespace OSD
         static float osd_curr_A = 453;
         static float osd_windspeed = 10;
   //      static float osd_windspeedz = 2;
-        static float osd_climb = 2;
+        static float osd_climb = 21;
         static float nav_roll = 0;
         static float nav_pitch = 0;
         static float tdistance = 1.27f;
@@ -442,9 +442,12 @@ namespace OSD
             
             
             if(sign==1){
-                if(is_alt(fAlt)) {
+                if(is_alt3(fAlt)) {
                     vs_ms=1;
-                    osd.printf("%c% 4.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
+                    if(is_alt4(fAlt))
+                        osd.printf("%c% 4.1f%c", 0x15, (double)(osd_climb * converth / 60), 0x18);
+                    else
+                        osd.printf("%c% 4.2f%c", 0x15, (double)(osd_climb * converth/60), 0x18);
                 } else {
                     vs_ms = 0;
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);

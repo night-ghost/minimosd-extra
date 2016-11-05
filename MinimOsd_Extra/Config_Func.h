@@ -38,7 +38,7 @@ byte get_alt_num(point p){
 }
 
 
-int get_alt_filter(point p){
+byte get_alt_filter(point p){
     switch( (is_alt(p)?1:0) | (is_alt2(p)?2:0)) {
     
     case 1:

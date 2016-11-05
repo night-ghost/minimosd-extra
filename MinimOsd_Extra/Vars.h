@@ -359,3 +359,5 @@ uint32_t day_seconds; // from midnight
 
 float vibration[3]; //< Vibration levels
 uint16_t clipping[3];// < first accelerometer clipping count
+
+byte climb_filter=10; // 

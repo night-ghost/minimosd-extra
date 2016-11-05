@@ -718,22 +718,28 @@ static void panHomeAlt(point p){
 // Staus  : done
 
 static void panClimb(point p){
-    if(is_alt(p)) { 	// in m/s
-	lflags.vs_ms=1;
-	PGM_P fmt;
-	float v= vertical_speed/60; // multiplied by filter in func.h
-	int as = abs((int)v);
+
+    climb_filter = get_alt_filter(p);
+
+    if(is_on(p)){
+
+        if(is_alt3(p)) { 	// in m/s
+            lflags.vs_ms=1;
+            PGM_P fmt;
+            float v= vertical_speed/60; // multiplied by filter in func.h
+            int as = abs((int)v);
 	
-	if(as<10)
-	    fmt=PSTR("% 4.2f\x18");
-	else if(as < 100)
-	    fmt=PSTR("% 4.1f\x18");
-	else
-	    fmt=PSTR("% 4.0f\x18");
-	osd_printf_1(fmt, v);
-    } else {
-	lflags.vs_ms=0;
-        osd_printf_2(PSTR("%4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
+            if(as<10 && !is_alt4(p))
+                fmt=PSTR("% 4.2f\x18");
+            else if(as < 100)
+                fmt=PSTR("% 4.1f\x18");
+            else
+                fmt=PSTR("% 4.0f\x18");
+            osd_printf_1(fmt, v);
+        } else {
+            lflags.vs_ms=0;
+            osd_printf_2(PSTR("%4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
+        }
     }
 }
 
@@ -2626,7 +2632,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(curr_A),		panCur_A, 	0xbd },
     { ID_of(Power),		panPower, 	'W'  },
     { ID_of(windSpeed),		panWindSpeed, 	0x1d },
-    { ID_of(climb),		panClimb, 	0x15 },
+    { ID_of(climb) | 0x80,	panClimb, 	0x15 },
     { ID_of(tune),		panTune, 	0 },
     { ID_of(RSSI),		panRSSI, 	0x09 },
     { ID_of(eff),		panEff, 	0 },
