@@ -149,7 +149,7 @@ v842
 * removed panGPS2, added flag to panGPS "Display in row" instead
 
 v843
-* 3DR modem RSSI can be used as RSSI source
+* 3DR modem RSSI can be used as RSSI source (if AP supports MAVlink routing)
 * additional fields in flight results - current, vertical speed up & down
 * support for GPS-less setup: Alt and Groundspeed works without GPS
 * flight data shown on "no input data" screen - for setup on ground station
@@ -380,7 +380,7 @@ v890
 
 v891
 * fixed callsign saving
-* fixed 3DR rssi problem
+* fixed 3DR rssi problem at ground station
 * added ability to turn off horizon line
 * added parsing of VIBRATIONS MAVlink message
 

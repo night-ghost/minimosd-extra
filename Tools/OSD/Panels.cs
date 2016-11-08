@@ -1738,6 +1738,30 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
         }
 
 
+        public int panVario(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+
+            //if (sign == 1) 
+            //if (is_alt(fAlt))
+            if (sign == 1){
+/*
+"\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
+"\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
+"\xC6\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xC5|" +
+"\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3|" +
+"\xb2\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xb3"));
+*/
+                if (!is_alt(fAlt)) {
+                    osd.printf("\xb2 |\xb2 |\xc6\xc7|\xb2 |\xb2 ");                    
+                } else {
+                    osd.printf(" \xb3| \xb3|\xc7\xc5| \xb2| \xb2");                                
+                }
+            } else {
+
+                osd.printf(" | |\xc7| | ");
+            }
+            return 0;
+        }
         
 
     }
