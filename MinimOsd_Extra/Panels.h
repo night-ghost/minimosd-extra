@@ -379,8 +379,11 @@ byte NOINLINE radar_char(){
 // символы квадрика с ориентацией
     static const byte arr[] PROGMEM = {0xb0, 0xb1, 0xb4, 0xb5, 0xb6, 0xb7, 0x7b, 0x7d };
 
-//    int index = (int)((osd_heading + 22.5) / 45.0);
-    int index = (2 * osd_heading + 45) / 90;
+//home - showArrow(osd_home_direction);
+
+
+//    int index = (2 * osd_heading + 45) / 90;
+    int index = (2 * normalize_angle(osd_home_direction+180) + 45) / 90;
     while(index<0)  index+=8;
     while(index>=8) index-=8;
     
@@ -2124,6 +2127,41 @@ static void panVibe(point p) {
 
 
 
+static void panVario(point p) {
+
+    PGM_P f;
+    byte shf=0;
+
+    if(has_sign(p)) {
+        if (!is_alt(p)) {
+            f=PSTR("\xb2|\xb2|\xc6|\xb2|\xb2");
+            shf=1;
+        } else {
+            f=PSTR(" \xb3| \xb3| \xc5| \xb3| \xb3");
+        }
+        osd.print_P(f);
+    } 
+
+    // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
+    uint8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
+    int ivs=-vertical_speed;
+    if(is_alt2(p)) ivs/=10;
+    int linePosition = ivs + (totalNumberOfLines / 2); //
+    
+    int8_t charPosition = linePosition / 9;
+    uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
+    if(charPosition >= 0 && charPosition <= AH_ROWS) {
+        OSD::write_xy(p.x + shf, p.y + charPosition, selectedChar);
+    } else if(charPosition < 0){
+        OSD::write_xy(p.x + shf, p.y-1,         0x60);
+    } else { // >max
+        OSD::write_xy(p.x + shf, p.y + AH_ROWS, 0x7e);
+    }
+
+}
+
+
+
 #if 0
 uint16_t readVCC() { // in mv
     ADMUX = 0x4e; //AVCC with external capacitor at AREF pin, 1.1v as meashured
@@ -2656,6 +2694,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(dayTime),		panDayTime, 	0 },
 //    { ID_of(fMotor),		panMotor, 	0 },
     { ID_of(fVibe),		panVibe, 	0 },
+    { ID_of(fVario),		panVario, 	0 },
 // warnings should be last
     { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}

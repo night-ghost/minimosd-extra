@@ -90,7 +90,7 @@ struct Panel {
     point CValue;       // 94
     point fDate;        // 96
     point dayTime;      // 98
-    point fMotor;       // 100
+    point fVario;       // 100
 };
 
 union _Panel {

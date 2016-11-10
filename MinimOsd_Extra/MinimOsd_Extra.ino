@@ -47,6 +47,9 @@ Project received Donations from (in time order)
 
 Figures, harm the development of an idiotic question:
  MachVoluM
+ brat002
+ FyreSG
+ Gygax
 
 
 This program is free software: you can redistribute it and/or modify

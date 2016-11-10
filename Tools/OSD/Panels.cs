@@ -1754,7 +1754,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
                 if (!is_alt(fAlt)) {
                     osd.printf("\xb2 |\xb2 |\xc6\xc7|\xb2 |\xb2 ");                    
                 } else {
-                    osd.printf(" \xb3| \xb3|\xc7\xc5| \xb2| \xb2");                                
+                    osd.printf(" \xb3| \xb3|\xc7\xc5| \xb3| \xb3");                                
                 }
             } else {
 

@@ -393,3 +393,7 @@ v892
 v893
 * added selectable filter to vertical speed
 * accuracy of vertical speed can be reduced to 1 decimal digit
+
+v894
+* new panel Variometer
+* RADAR arrow direction now is relative to home

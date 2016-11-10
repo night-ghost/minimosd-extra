@@ -621,7 +621,11 @@ as_checkbox:
 
             case UI_Mode.UI_Filter:
                 n = osd.getAlt(thing);
-                cbFilter.SelectedIndex =n;
+                try {
+                    cbFilter.SelectedIndex =n;
+                } catch{
+                    cbFilter.SelectedIndex=0;
+                }
                 cbFilter.Visible = true;                
                 labNumber.Text = thing.alt_text;
                 labNumber.Location = new System.Drawing.Point(10, 70-14); // moved
