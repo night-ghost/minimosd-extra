@@ -453,7 +453,7 @@ namespace OSD
                     osd.printf("%c%4.0f%c", 0x15, (double)(osd_climb * converth), climbChar);
                 }
 			}else{
-                if (is_alt(fAlt)) {
+                if (is_alt3(fAlt)) {
                     vs_ms = 1;
                     osd.printf("% 4.2f%c",  (double)(osd_climb * converth/60), 0x18);
                 } else {
@@ -1531,7 +1531,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
               byte ch_climb = (vs_ms != 0 ? (byte)(0x18) : (byte)climbChar);
 			osd.setPanel(first_col, first_line);
 			
-	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|x1d%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|W160.0|"),
+	   osd.printf_P(PSTR("\x08%3i\x3a%02u|\x0B%5i%c|\x8F%5i%c|\x14%5i%c|\x1d%5i%c|\x12%5i%c|\x90\x91%7.2f%c|\xA0\xA1%7.2f%c|\xBD%6.1fA|W160.0|"),
               ((int)total_flight_time_seconds/60)%60,(int)total_flight_time_seconds%60,
                                       (int)((max_home_distance) * converth), chrHigh,
                                                  (int)(tdistance * converth), chrHigh,

@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r894 DV";
+        public const string VERSION = "r896 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -361,7 +361,7 @@ namespace OSD {
                 pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
                 //pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
                 pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
-                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5" );
+                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5 m/m", 0, "Twice, so scale 10/100" );
 
                
                 osd_functions_N = a;
@@ -2987,9 +2987,9 @@ again:
 
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
-            RSSI_numeric_min.Maximum = 2047;
+            RSSI_numeric_min.Maximum = 4096;
             RSSI_numeric_max.Minimum = 0;
-            RSSI_numeric_max.Maximum = 2047;
+            RSSI_numeric_max.Maximum = 4096;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) { // analog 
                 lblRSSIMin.Text = "Min Value";
                 lblRSSIMax.Text = "Max Value";

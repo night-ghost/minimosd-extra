@@ -620,7 +620,7 @@ as_checkbox:
                 break;
 
             case UI_Mode.UI_Filter:
-                n = osd.getAlt(thing);
+                n = osd.getAlt(thing) & 3;
                 try {
                     cbFilter.SelectedIndex =n;
                 } catch{

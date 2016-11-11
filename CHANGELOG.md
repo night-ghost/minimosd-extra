@@ -398,3 +398,10 @@ v894
 * new panel Variometer
 * RADAR arrow direction now is relative to home
 
+v895
+* RSSI max value now 4096
+
+v896
+* added "twice" checkbox to variometer
+* fixed some bugs
+

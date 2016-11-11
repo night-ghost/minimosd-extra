@@ -2160,6 +2160,7 @@ static void panVario(point p) {
     uint8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
     int ivs=-vertical_speed;
     if(is_alt2(p)) ivs/=10;
+    if(is_alt3(p)) ivs/=2;
     int linePosition = ivs + (totalNumberOfLines / 2); //
     
     int8_t charPosition = linePosition / 9;
