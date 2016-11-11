@@ -41,6 +41,10 @@ void request_mavlink_rates()
 
 #endif
 
+void heartBeat() { //                          type, autopilot, base_mode, custom_mode, system_status)
+    mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0,    0,         0,         0,           0);
+}
+
 /* in  protocols.h
 union {
     struct {

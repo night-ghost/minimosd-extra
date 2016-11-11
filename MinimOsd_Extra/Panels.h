@@ -48,17 +48,21 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
     osd_printi_1(fmt, f);
 }*/
 
+static const PROGMEM char f3_0f[]="%3.0f";
+static const PROGMEM char f3i[]="%3i";
+
 
 static void NOINLINE printTime(uint16_t t, byte blink, byte sec=0){
+    static const PROGMEM char f_02in[]="%02i|";
 
-    osd_printi_1(PSTR("%3i"),((uint16_t)t/60));
+    osd_printi_1(f3i,((uint16_t)t/60));
 
     if(sec){
         osd_printi_1(PSTR(":%02i:"), (uint16_t)t%60);
-        osd_printi_1(PSTR("%02i|"), (sec&0x7f));
+        osd_printi_1(f_02in, (sec&0x7f));
     } else {
         osd.write_S( (blink && lflags.blinker)?0x20:0x3a);
-        osd_printi_1(PSTR("%02i|"), (uint16_t)t%60);
+        osd_printi_1(f_02in, (uint16_t)t%60);
     }
 }
 
@@ -69,7 +73,6 @@ static void NOINLINE printTime(int t){
 static void NOINLINE printTimeCnv(uint32_t *t, byte blink){
     printTime(*t/1000, blink);
 }
-
 
 
 static void printSpeed(PGM_P fmt, float s, byte alt){
@@ -89,7 +92,7 @@ static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
     printSpeed(fmt, *s * get_converts(), alt);
 }
 static void printSpeedCnv(float *s, byte alt){
-    printSpeedCnv(PSTR("%3.0f"), s, alt);
+    printSpeedCnv(f3_0f, s, alt);
 }
 
 
@@ -453,21 +456,26 @@ static void panCOG(point p){
 
 }
 
+static const PROGMEM char f5_2f[]="%5.2f";
+static const PROGMEM char f4_2f[]="%4.2f";
+static const PROGMEM char f4_1f[]="%4.1f";
+static const PROGMEM char f4_0f[]="%4.0f";
+
 static NOINLINE void printFullDist(float dd){
 
     float f =  get_converth() * dd;
     if (f <= 9999) { // in meters
-	osd_printf_2(PSTR("%4.0f"), f, get_mhigh());
+	osd_printf_2(f4_0f, f, get_mhigh());
 
     }else{ // in kilometers
 	f = f / pgm_read_word(&measure->distconv);
 	PGM_P fmt;
 	if((int)f<=9)
-	    fmt = PSTR("%4.2f");
+	    fmt = f4_2f;
 	else if((int)f<=99)
-	    fmt = PSTR("%4.1f");
+	    fmt = f4_1f;
         else
-            fmt = PSTR("%4.0f");
+            fmt = f4_0f;
 
         osd_printf_2(fmt, f, pgm_read_byte(&measure->distchar));
     }
@@ -540,7 +548,8 @@ static void print_energy(point p){
         if(has_sign(p))
             OSD::write_S(0x16);
             
-        osd_printf_1(PSTR("%4.0f\x01"), eff);
+        osd_printf_1(f4_0f, eff);
+        osd.write_S(0x01);
     }
 }
 
@@ -585,7 +594,7 @@ static void panEff(point p){
                     if (iGlide > 0){
                         if(has_sign(p))
                             OSD::write_S(0xee);
-                        osd_printf_2(PSTR("%4.0f"), glide, get_mhigh()); // аэродинамическое качество
+                        osd_printf_2(f4_0f, glide, get_mhigh()); // аэродинамическое качество
                     }
                 }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
                     PGM_P f = PSTR("\x20\x20\x90\x91");
@@ -630,7 +639,7 @@ static void panRSSI(point p){
 
     filter(rssi,  rssi_norm, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
 
-    osd_printi_1(PSTR("%3i"), (int)rssi);
+    osd_printi_1(f3i, (int)rssi);
     if(!(sets.RSSI_raw%2) && is_alt3(p))
 	osd.write_S('%');
 }
@@ -733,15 +742,16 @@ static void panClimb(point p){
             int as = abs((int)v);
 	
             if(as<10 && !is_alt4(p))
-                fmt=PSTR("% 4.2f\x18");
+                fmt=PSTR("% 4.2f");
             else if(as < 100)
-                fmt=PSTR("% 4.1f\x18");
+                fmt=PSTR("% 4.1f");
             else
-                fmt=PSTR("% 4.0f\x18");
+                fmt=PSTR("% 4.0f");
             osd_printf_1(fmt, v);
+            osd.write_S(0x18);
         } else {
             lflags.vs_ms=0;
-            osd_printf_2(PSTR("%4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
+            osd_printf_2(PSTR("% 4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
         }
     }
 }
@@ -961,8 +971,10 @@ static void panBatteryPercent(point p){
     } else {
 	if (is_alt(p))
 	    osd_printf_1(PSTR("%2.0f%%"),val);
-	else
-	    osd_printf_1(PSTR("%4.0f\x01"),(float)mah_used);
+	else {
+	    osd_printf_1(f4_0f,(float)mah_used);
+	    osd.write_S(0x01);
+	}
     }
 
 }
@@ -1081,11 +1093,12 @@ static void panCur_A(point p){
     PGM_P fmt;    
 
     if(is_alt3(p))
-        fmt=PSTR("%4.1f\x0E");
+        fmt=f4_1f;
     else
-        fmt=PSTR("%5.2f\x0E");
+        fmt=f5_2f;
 
     osd_printf_1(fmt, curr * 0.01); // in amps
+    osd.write_S(0x0E);
 }
 
 /* **************************************************************** */
@@ -1099,10 +1112,11 @@ static void panCur_A(point p){
 static void NOINLINE printVolt(uint16_t v,byte f) {
     PGM_P fmt;
     if(f)
-        fmt=PSTR("%4.1f\x0D");
+        fmt=f4_1f;
     else
-        fmt=PSTR("%5.2f\x0D");
+        fmt=f5_2f;
     osd_printf_1(fmt, f_div1000(v));
+    osd.write_S(0x0D);
 }
 
 static void panBatt_A(point p){
@@ -1136,7 +1150,7 @@ static void panBatt_B(point p){
 
 static void panPower(point p){
 	    // calced in func.h
-    osd_printf_1(PSTR("%3.0f"), power);
+    osd_printf_1(f3_0f, power);
 }
 
 
@@ -1437,9 +1451,9 @@ static void panTune(point p){
     
     float err = alt_error * get_converth();
 
-    osd_printf_2(PSTR("%3.0f|"), -err, get_mhigh());
+    osd_printf_2(f3_0f, -err, get_mhigh());
     
-//    osd_nl();
+    osd_nl();
     if(has_sign(p)) 
         OSD::write_S(0x13);
     printSpeed(aspd_error / 100.0);
@@ -1597,7 +1611,7 @@ static void panWPDis(point p){
         byte h=get_mhigh();
 
         osd_printi_1(PSTR("%2i "), wp_number);
-        osd_printf_2(PSTR("%4.0f"), ((float)wp_dist * get_converth()), h);
+        osd_printf_2(f4_0f, ((float)wp_dist * get_converth()), h);
         osd_nl(); // 2 byte less flash than "\n" above
     
         showArrow(getTargetBearing());
@@ -1618,7 +1632,7 @@ static void panHomeDir(point p){
 
     showArrow(osd_home_direction);
     
-    if(is_alt(p)) osd_printi_1(PSTR("%3i"), osd_home_direction);
+    if(is_alt(p)) osd_printi_1(f3i, osd_home_direction);
 }
 
 static void panMessage(point p){
@@ -1899,9 +1913,9 @@ static void panRadarScale(Point p){
     float dd= radar_zoom * STEP_WIDTH * get_converth();
     
     if(radar_zoom >=40) // 10 000 
-        osd_printf_2(PSTR("%4.2f"), f_div1000(dd), pgm_read_byte(&measure->distchar));
+        osd_printf_2(f4_2f, f_div1000(dd), pgm_read_byte(&measure->distchar));
     else
-        osd_printf_2(PSTR("%4.0f"), dd, get_mhigh());
+        osd_printf_2(f4_0f, dd, get_mhigh());
 }
 
 
@@ -1962,7 +1976,7 @@ static void  panSensor4(point p) {
 
 
 static void panHdop(point p) {
-    osd_printf_1(PSTR("%4.2f"),eph/100.0);
+    osd_printf_1(f4_2f,eph/100.0);
 }
 
 
@@ -2119,7 +2133,7 @@ static void panVibe(point p) {
     
     byte i;
     for(i=0;i<3;i++)
-        osd_printf_1(PSTR("%3.0f"), vibration[i]);
+        osd_printf_1(f3_0f, vibration[i]);
 
     for(i=0;i<3;i++)
         osd_printi_1(PSTR("3i"), clipping[i]);
@@ -2153,9 +2167,9 @@ static void panVario(point p) {
     if(charPosition >= 0 && charPosition <= AH_ROWS) {
         OSD::write_xy(p.x + shf, p.y + charPosition, selectedChar);
     } else if(charPosition < 0){
-        OSD::write_xy(p.x + shf, p.y-1,         0x60);
+        OSD::write_xy(p.x + shf, p.y,             0x60);
     } else { // >max
-        OSD::write_xy(p.x + shf, p.y + AH_ROWS, 0x7e);
+        OSD::write_xy(p.x + shf, p.y + AH_ROWS-1, 0x7e);
     }
 
 }

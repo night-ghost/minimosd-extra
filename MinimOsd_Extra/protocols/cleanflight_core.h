@@ -932,3 +932,6 @@ void doMSPrequests(){
     if(MSPcmdsend)
         blankserialRequest(MSPcmdsend);
 }
+
+void heartBeat() {
+}

@@ -8,7 +8,7 @@ typedef char prog_char;
 #define WEAK __attribute__((weak))
 
 
-
+#if 0
 #undef PSTR
 // black magick begins
 #define PSTR(str) PSTR_INTERNAL_1(str, __COUNTER__)
@@ -18,7 +18,7 @@ typedef char prog_char;
     PGM_P ptr;  \
     asm volatile \
     ( \
-      ".pushsection .progmem.data, \"SM\", @progbits, 1" "\n\t" \
+      ".pushsection .progmem.data, \"MS\", @progbits, 1" "\n\t" \
       "PSTR_" #num ": .string " #str                     "\n\t" \
       ".popsection"                                      "\n\t" \
     ); \
@@ -30,7 +30,7 @@ typedef char prog_char;
     ); \
     ptr; \
   }))
-
+#endif
 
 
 #define BYTE_OF(v,n) (((byte *)&(v))[n])

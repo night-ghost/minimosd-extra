@@ -397,3 +397,4 @@ v893
 v894
 * new panel Variometer
 * RADAR arrow direction now is relative to home
+

@@ -739,3 +739,5 @@ DBG_PRINTF("got2 throttle=%f\n", t);
 }
 
 
+void heartBeat() {
+}

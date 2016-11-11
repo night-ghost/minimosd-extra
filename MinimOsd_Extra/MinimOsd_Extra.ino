@@ -168,7 +168,6 @@ ISR(INT0_vect) {
             nested++;
             sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
-//            cli();
             update_screen = 0;
             nested--;
         }
@@ -235,7 +234,7 @@ ISR(INT1_vect) {
 
 
 NOINLINE void logo(){
-    OSD::setPanel(5, 5);
+    OSD::setPanel(2, 5);
     osd.print_P(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV|"));
 
     osd.print((uint16_t)millis());
@@ -243,10 +242,9 @@ NOINLINE void logo(){
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset
 
-    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) {
+    if(lflags.bad_config) {
         OSD::setPanel(1,1);
         osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
-        lflags.bad_config=1;
     }
 
     OSD::update();// Show sign bar
@@ -271,6 +269,11 @@ void setup()     {
 
     // Get correct settings from EEPROM
     readSettings();
+
+    if( sets.CHK1_VERSION != VER || sets.CHK2_VERSION != (VER ^ 0x55)) { // wrong version
+        lflags.bad_config=1;
+    }
+
 
 //    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 
@@ -380,6 +383,7 @@ void loop()
     unsigned long pt;
 
     wdt_reset();
+    sei(); // на случай если глючит
 
     pt=millis();     //millis_plus(&pt, 0); much larger
 
@@ -409,7 +413,6 @@ void loop()
 
     
 
-    sei(); // на случай если глючит
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
 
 #if defined(MAV_REQUEST) && defined(USE_MAVLINK)
@@ -528,7 +531,8 @@ void loop()
 	    } else  max7456_err_count=0;
 
 	    vsync_count=0;
-
+            
+            heartBeat();
 
 #ifdef DEBUG
 	    if(seconds % 30 == 0) {
@@ -634,13 +638,9 @@ void On100ms(){ // периодические события, не связан�
     
 // 		вычислить osd_battery_remaining_B по напряжению!
 	    byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее
-//		int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
-
+//          int v = (float(osd_vbat_B)/1000/n - 3.3)* ( 255.0 / (4.2 - 3.3) );
 	    int v = ( (osd_vbat_B+50)/100 - sets.battBv ) * 255L / (42 * n - sets.battBv);
 
-	//    if(v<0)        osd_battery_remaining_B  = 0;
-	//    else if(v>255) osd_battery_remaining_B  = 255;
-	//    else           osd_battery_remaining_B  = v;
 	    osd_battery_remaining_B=normalize_voltage(v);
 	}
     }

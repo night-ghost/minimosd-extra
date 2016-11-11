@@ -262,3 +262,5 @@ retry:
 }
 
 
+void heartBeat() {
+}

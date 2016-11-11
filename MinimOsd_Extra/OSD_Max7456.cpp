@@ -273,8 +273,6 @@ void OSD::update() {
 
     for(; b < end_b;) {
         max7456_on();
-//        SPDR = *b;
-//        while (!(SPSR & (1<<SPIF))) ;
         SPI::transfer(*b);
         *b++=' ';           // обойдемся без memset
         max7456_off();
@@ -299,7 +297,8 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
 //    cli(); - нет смысла 
 
   max7456_on();
-   MAX_mode( MAX7456_DISABLE_display);
+
+  MAX_mode( MAX7456_DISABLE_display);
 
   MAX_write(MAX7456_CMAH_reg, char_address_hi);// set start address high
 
@@ -319,14 +318,12 @@ void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
     if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
   }
 #else
-   while (1) {
+  while (1) {
     if(!(MAX_read(MAX7456_STAT_reg_read) & STATUS_reg_nvr_busy)) break;
     extern void delay_telem();
     delay_telem(); // some delay
-   }
+  }
 #endif
-
-//  sei();
 
   MAX_mode( MAX7456_ENABLE_display_vert);// turn on screen next vertical
 
