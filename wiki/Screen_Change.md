@@ -27,7 +27,7 @@ Switching by a momentary switch:
 For this you need a momentary switch (like trainer switch) assigned to the channel you set in Config. Tool "OSD Toggle Channel" drop-down menu. And check the "Rotation Switching" check-box.
 
 
-You select any channel you want to use from 5 to 8, than check Rotation Switching check-box.
+You select any channel you want to use from 5 to 8, than check Rotation Switching check-box. Also you can select switching by extermal PWM, connected to  "PAL" jumper
 
 This mode is also a rotation switching way of changing screens like by mode switch.
 The difference is that you have a separate switch to do so.
