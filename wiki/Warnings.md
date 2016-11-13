@@ -24,5 +24,5 @@ Available warnings:
 
 - GeoFence triggering
 
-Warnings always shown even you are on "Off" screen, but you can select position of Panel "Warnings" on each screen.
+Warnings always shown even you are on "Off" screen, but you can select position of Panel "Warnings" on each screen. Each warnings can be disabled individually by setting the level of controlled parameter to 0
 
