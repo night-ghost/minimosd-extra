@@ -296,7 +296,7 @@ static void showILS(byte start_col, byte start_row) {
         int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
         int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
         int8_t charPosition = linePosition / 9;
-        uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
+        uint8_t selectedChar = 8 - (linePosition % 9) + 0xC7;
         if(charPosition >= 0 && charPosition <= AH_ROWS) {
           OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
           OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
@@ -558,7 +558,7 @@ static void panEff(point p){
 
     static float ddistance = 0;
 
-    if(lflags.motor_armed) return;
+    if(!lflags.motor_armed) return;
 
     if(is_alt(p)){
         if (osd_groundspeed != 0) { // no efficiency at 0 speed
@@ -597,9 +597,9 @@ static void panEff(point p){
                         osd_printf_2(f4_0f, glide, get_mhigh()); // аэродинамическое качество
                     }
                 }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
-                    PGM_P f = PSTR("\x20\x20\x90\x91");
+                    PGM_P f = PSTR("\x20\x90\x91");
                     if(lflags.blinker) f++;
-                    osd.print_P(f); //термик
+                    osd_print_S(f); //термик
                 }
             }
         }
@@ -732,6 +732,8 @@ static void panHomeAlt(point p){
 static void panClimb(point p){
 
     climb_filter = get_alt_filter(p);
+    
+    static const PROGMEM char f_4_0f[]="% 4.0f";
 
     if(is_on(p)){
 
@@ -746,12 +748,12 @@ static void panClimb(point p){
             else if(as < 100)
                 fmt=PSTR("% 4.1f");
             else
-                fmt=PSTR("% 4.0f");
+                fmt=f_4_0f;
             osd_printf_1(fmt, v);
             osd.write_S(0x18);
         } else {
             lflags.vs_ms=0;
-            osd_printf_2(PSTR("% 4.0f"), vertical_speed, pgm_read_byte(&measure->climbchar));
+            osd_printf_2(f_4_0f, vertical_speed, pgm_read_byte(&measure->climbchar));
         }
     }
 }
@@ -914,7 +916,7 @@ static void panWarn(point p){
     check_warn(p);
 
     if(warning) 
-       osd.print_P((char *)pgm_read_word(&warn_str[warning-1]) );
+       osd_print_S((char *)pgm_read_word(&warn_str[warning-1]) );
 
 }
 
@@ -938,7 +940,7 @@ static void panThr(point p){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
-static NOINLINE void osd_print_bat(PGM_P fmt, float f){
+static NOINLINE void osd_print_bat(PGM_P fmt, uint16_t f){
     osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
 }
 
@@ -951,28 +953,31 @@ static /*NOINLINE */ byte guessMaxVolt(){
 
 static void panBatteryPercent(point p){
 
-    float val;
+    uint16_t val;
 
     byte maxv = guessMaxVolt();
 
-    val = (float)osd_battery_remaining_A/maxv*100;
+    if(maxv==100)
+        val = osd_battery_remaining_A;
+    else
+        val = (osd_battery_remaining_A*100)/maxv;
 
 
     if(has_sign(p)) {
 	OSD::write_S(0x88); // донышко батарейки не зависит от
 
-        setBatteryPic((uint16_t)(val * 2.56), osd_battery_pic_A);    // battery A remaning picture
+        setBatteryPic((val*256)/100, osd_battery_pic_A);    // battery A remaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
 	if (is_alt(p))
-	    osd_print_bat(PSTR("%c%c\x8e%2.0f%%"), val);
+	    osd_print_bat(PSTR("%c%c\x8e%2i%%"), val);
 	else
-    	    osd_print_bat(PSTR("%c%c\x8e%4.0f\x01"), (float)mah_used);
+    	    osd_print_bat(PSTR("%c%c\x8e%4i\x01"), mah_used);
     } else {
 	if (is_alt(p))
-	    osd_printf_1(PSTR("%2.0f%%"),val);
+	    osd_printi_1(PSTR("%2i%%"),val);
 	else {
-	    osd_printf_1(f4_0f,(float)mah_used);
+	    osd_printi_1(PSTR("%4i"),mah_used);
 	    osd.write_S(0x01);
 	}
     }
@@ -1046,7 +1051,7 @@ static void panHorizon(point p){
 
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(mid_x, mid_y);
-	osd.print_P(PSTR("\xb8\xb9"));
+	osd_print_S(PSTR("\xb8\xb9"));
     }
 
     //Show ground level on  HUD
@@ -1236,15 +1241,15 @@ static void panGPS(point p){
     if(lflags.blinker) {
         PGM_P str=PSTR("Stream");
 	if(lflags.mav_data_frozen>=5){
-	    osd.print_P(str);
+	    osd_print_S(str);
 	    OSD::write_S(div);
-	    osd.print_P(PSTR("frozen"));
+	    osd_print_S(PSTR("frozen"));
 	    return;
 	}
 	if(lflags.mav_stream_overload>=5){
-	    osd.print_P(str);
+	    osd_print_S(str);
 	    OSD::write_S(div);
-	    osd.print_P(PSTR("overload"));
+	    osd_print_S(PSTR("overload"));
 	    return;
 	}
     }
@@ -1544,7 +1549,7 @@ static void panRose(point p){
         else
             s=PSTR("\x20\xc8\xc8\xc8\xc8\x7e\xc8\xc8\xc8\xc8\x20|");
             
-        osd.print_P(s);
+        osd_print_S(s);
     }
 
     osd.write_S('\xc3');
@@ -1563,13 +1568,13 @@ static void panRose(point p){
     
     if(has_sign(p) && is_alt(p)){
         if (is_alt2(p)) {
-            osd.print_P(PSTR("|\x20\x20\x20\x24\xcb"));
+            osd_print_S(PSTR("|\x20\x20\x20\x24\xcb"));
             osd.write_raw(0x7c);
             s=PSTR("\x40\xcb\x24" /* \x20\x20\x20| */ );
         } else
             s=PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce" /* \x20 */);
         
-        osd.print_P(s);
+        osd_print_S(s);
     }
 }
 
@@ -2129,7 +2134,7 @@ static void panMotor(point p) {
 }*/
 
 static void panVibe(point p) {
-    if(has_sign(p)) osd.print_P(PSTR("  x  y  z|"));
+    if(has_sign(p)) osd_print_S(PSTR("  x  y  z|"));
     
     byte i;
     for(i=0;i<3;i++)
@@ -2144,35 +2149,39 @@ static void panVibe(point p) {
 static void panVario(point p) {
 
     PGM_P f;
-    byte shf=0;
+
+    byte x=p.x;
 
     if(has_sign(p)) {
         if (!is_alt(p)) {
             f=PSTR("\xb2|\xb2|\xc6|\xb2|\xb2");
-            shf=1;
+            x+=1;
         } else {
             f=PSTR(" \xb3| \xb3| \xc5| \xb3| \xb3");
         }
-        osd.print_P(f);
+        osd_print_S(f);
     } 
 
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
     uint8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
-    int ivs=-vertical_speed;
-    if(is_alt2(p)) ivs/=10;
-    if(is_alt3(p)) ivs/=2;
-    int linePosition = ivs + (totalNumberOfLines / 2); //
-    
-    int8_t charPosition = linePosition / 9;
-    uint8_t selectedChar = 9 - (linePosition % 9) + 0xC7;
-    if(charPosition >= 0 && charPosition <= AH_ROWS) {
-        OSD::write_xy(p.x + shf, p.y + charPosition, selectedChar);
-    } else if(charPosition < 0){
-        OSD::write_xy(p.x + shf, p.y,             0x60);
-    } else { // >max
-        OSD::write_xy(p.x + shf, p.y + AH_ROWS-1, 0x7e);
-    }
 
+    int linePosition = (int(-vertical_speed*2) + totalNumberOfLines) / 2; // 0 at middle
+
+    if(is_alt2(p)) linePosition/=10;
+    if(is_alt3(p)) linePosition/=2;
+
+    int8_t  charPosition = linePosition / 9;
+    uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
+
+    if(charPosition >= AH_ROWS) {
+        charPosition = AH_ROWS-1;
+        selectedChar = 0x7e;
+    } else if(charPosition < 0){
+        charPosition = 0;
+        selectedChar = 0x60;
+    } 
+        
+    OSD::write_xy(x, p.y + charPosition, selectedChar);
 }
 
 
@@ -2448,7 +2457,7 @@ static void panSetup(){
 
 	    OSD::setPanel(1, row);
 
-	    osd.print_P(nm);
+	    osd_print_S(nm);
         
 	    //            x    y
             OSD::setPanel(19, row);
@@ -2468,9 +2477,9 @@ static void panSetup(){
         
         case 'h':		 // header
     	    if(OSD::getMode()) 
-		osd.print_P(PSTR(" (PAL)"));
+		osd_print_S(PSTR(" (PAL)"));
 	    else
-		osd.print_P(PSTR(" (NTSC)"));
+		osd_print_S(PSTR(" (NTSC)"));
 	    // no break!
 	case 0:
 	    continue;	// no value

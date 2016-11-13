@@ -44,6 +44,7 @@ Project received Donations from (in time order)
  Boris Tekaty
  Aldoir Ventura
  Dean Berg
+ Gavin Williams
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -235,7 +236,7 @@ ISR(INT1_vect) {
 
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
-    osd.print_P(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV|"));
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV|"));
 
     osd.print((uint16_t)millis());
 

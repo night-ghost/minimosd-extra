@@ -55,6 +55,11 @@ static void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 
+
+void NOINLINE osd_print_S(PGM_P f){
+    osd.print_P(f);
+}
+
 byte get_switch_time(byte n){
     uint16_t val = sets.autoswitch_times;
     while(true){

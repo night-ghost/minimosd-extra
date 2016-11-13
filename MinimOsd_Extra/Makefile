@@ -5,6 +5,11 @@
 # If not, you might have to include the full path.
 #ALTERNATE_CORE_PATH = /home/sudar/Dropbox/code/arduino-sketches/hardware/attiny/
 
+#ARCHITECTURE = STM32F4
+#BOARD_TAG    = discovery_f407
+#F_CPU = 168000000
+#VARIANT    = standard
+
 BOARD_TAG    = atmega328
 VARIANT    = standard
 F_CPU = 16000000

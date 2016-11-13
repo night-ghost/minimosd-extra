@@ -405,3 +405,6 @@ v896
 * added "twice" checkbox to variometer
 * fixed some bugs
 
+v897
+* fixed efficiency
+
