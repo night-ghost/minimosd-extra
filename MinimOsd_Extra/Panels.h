@@ -16,6 +16,11 @@ static void NOINLINE osd_blank(){
     OSD::write_S(' ');
 }
 
+static void NOINLINE osd_percent(){
+    osd.write_S('%');
+}
+
+
 static /*NOINLINE*/ byte get_mhigh(){
     return pgm_read_byte(&measure->high);
 }
@@ -49,8 +54,9 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 }*/
 
 static const PROGMEM char f3_0f[]="%3.0f";
+static const PROGMEM char f4i[]="%4i";
 static const PROGMEM char f3i[]="%3i";
-
+static const PROGMEM char f2i[]="%2i";
 
 static void NOINLINE printTime(uint16_t t, byte blink, byte sec=0){
     static const PROGMEM char f_02in[]="%02i|";
@@ -548,8 +554,7 @@ static void print_energy(point p){
         if(has_sign(p))
             OSD::write_S(0x16);
             
-        osd_printf_1(f4_0f, eff);
-        osd.write_S(0x01);
+        osd_printf_2(f4_0f, eff, 0x01);
     }
 }
 
@@ -641,7 +646,7 @@ static void panRSSI(point p){
 
     osd_printi_1(f3i, (int)rssi);
     if(!(sets.RSSI_raw%2) && is_alt3(p))
-	osd.write_S('%');
+	osd_percent();
 }
 
 /* **************************************************************** */
@@ -749,8 +754,7 @@ static void panClimb(point p){
                 fmt=PSTR("% 4.1f");
             else
                 fmt=f_4_0f;
-            osd_printf_1(fmt, v);
-            osd.write_S(0x18);
+            osd_printf_2(fmt, v, 0x18);
         } else {
             lflags.vs_ms=0;
             osd_printf_2(f_4_0f, vertical_speed, pgm_read_byte(&measure->climbchar));
@@ -930,7 +934,8 @@ static void panWarn(point p){
 // Staus  : done
 
 static void panThr(point p){
-    osd_printi_1(PSTR("%3.0i%%"), osd_throttle);
+    osd_printi_1(f3i, osd_throttle);
+    osd_percent();
 }
 
 /* **************************************************************** */
@@ -940,8 +945,12 @@ static void panThr(point p){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
-static NOINLINE void osd_print_bat(PGM_P fmt, uint16_t f){
-    osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
+static NOINLINE void osd_print_bat(){
+    OSD::write_S(0x88); // донышко батарейки не зависит от
+    OSD::write_S(osd_battery_pic_A[0]);
+    OSD::write_S(osd_battery_pic_A[1]);
+    OSD::write_S(0x8e);
+//    osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
 }
 
 static /*NOINLINE */ byte guessMaxVolt(){
@@ -963,23 +972,19 @@ static void panBatteryPercent(point p){
         val = (osd_battery_remaining_A*100)/maxv;
 
 
-    if(has_sign(p)) {
-	OSD::write_S(0x88); // донышко батарейки не зависит от
-
-        setBatteryPic((val*256)/100, osd_battery_pic_A);    // battery A remaning picture
+    setBatteryPic((val*256)/100, osd_battery_pic_A);    // battery A remaning picture
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
-	if (is_alt(p))
-	    osd_print_bat(PSTR("%c%c\x8e%2i%%"), val);
-	else
-    	    osd_print_bat(PSTR("%c%c\x8e%4i\x01"), mah_used);
+    if(has_sign(p)) {
+        osd_print_bat();
+    }
+
+    if (is_alt(p)) {
+	osd_printi_1(f2i,val);        
+        osd_percent();
     } else {
-	if (is_alt(p))
-	    osd_printi_1(PSTR("%2i%%"),val);
-	else {
-	    osd_printi_1(PSTR("%4i"),mah_used);
-	    osd.write_S(0x01);
-	}
+	osd_printi_1(f4i,mah_used);
+        osd.write_S(0x01);
     }
 
 }
@@ -1052,6 +1057,11 @@ static void panHorizon(point p){
     if(has_sign(p)) { // Птичка по центру
 	OSD::setPanel(mid_x, mid_y);
 	osd_print_S(PSTR("\xb8\xb9"));
+/*        char c=0xb8;
+	OSD::write_S(c);
+	OSD::write_S(++c);
+*/
+
     }
 
     //Show ground level on  HUD
@@ -1102,8 +1112,7 @@ static void panCur_A(point p){
     else
         fmt=f5_2f;
 
-    osd_printf_1(fmt, curr * 0.01); // in amps
-    osd.write_S(0x0E);
+    osd_printf_2(fmt, curr * 0.01, 0x0E); // in amps
 }
 
 /* **************************************************************** */
@@ -1120,8 +1129,7 @@ static void NOINLINE printVolt(uint16_t v,byte f) {
         fmt=f4_1f;
     else
         fmt=f5_2f;
-    osd_printf_1(fmt, f_div1000(v));
-    osd.write_S(0x0D);
+    osd_printf_2(fmt, f_div1000(v), 0x0D);
 }
 
 static void panBatt_A(point p){
@@ -1180,7 +1188,7 @@ static void panGPSats(point p){
     if(has_sign(p) && !is_alt(p))
 	OSD::write_S(gps_str);
 
-    osd_printi_1(PSTR("%2i"), osd_satellites_visible);
+    osd_printi_1(f2i, osd_satellites_visible);
     
     if(has_sign(p) && is_alt(p))
 	OSD::write_S(gps_str);
@@ -1520,7 +1528,8 @@ static void panHeading(point p){
 	OSD::write_S(radar_char());
     }
 
-    osd_printi_1(PSTR("%3i\x05"), osd_heading);
+    osd_printi_1(f3i, osd_heading);
+    OSD::write_S(0x05);
 }
 
 /* **************************************************************** */
@@ -2141,7 +2150,7 @@ static void panVibe(point p) {
         osd_printf_1(f3_0f, vibration[i]);
 
     for(i=0;i<3;i++)
-        osd_printi_1(PSTR("3i"), clipping[i]);
+        osd_printi_1(f3i, clipping[i]);
 }
 
 
@@ -2322,29 +2331,29 @@ static const PROGMEM char f_int[]  = "%.0f";
 
 // первый экран настроек
 static const PROGMEM Params params1[] = { 
-	{n_sets,    0,   0,  0,                    0, 0},      // header
-	{n_batt,   'b', 10, &sets.battv ,          0, f_batt, 0, 255 },
-	{n_battB,  'b', 10, &sets.battBv,          0, f_batt, 0, 255 },
+	{n_sets,    0,   0,                      0},      // header
+	{n_batt,   'B',  &sets.battv ,           f_batt, 0, 255 },
+	{n_battB,  'B',  &sets.battBv,           f_batt, 0, 255 },
 
-	{n_stall,  'b', 1, &sets.stall,            0, f_int, 0, 255 },
-	{n_oversp, 'b', 1, &sets.overspeed,        0, f_int, 0, 255 },
-	{n_charge, 'b', 1, &sets.batt_warn_level,  0, f_int, 0, 255 },
-	{n_rssi,   'b', 1, &sets.rssi_warn_level , 0, f_int, 0, 255 },
+	{n_stall,  'b',  &sets.stall,            f_int,  0, 255 },
+	{n_oversp, 'b',  &sets.overspeed,        f_int,  0, 255 },
+	{n_charge, 'b',  &sets.batt_warn_level,  f_int,  0, 255 },
+	{n_rssi,   'b',  &sets.rssi_warn_level,  f_int,  0, 255 },
 
-	{n_screen,  0,  0,   0,                    0,     0}, // header
-	{n_scr,    'b', 1,   &sets.n_screens,      0,     f_int, 1, 4},
-	{n_contr,  'b', 1,   &sets.OSD_BRIGHTNESS, renew, f_int, 0, 3},
-	{n_horiz,  'Z', 1,   &sets.horiz_offs,     renew, f_int, -31, 31 },
-	{n_vert,   'z', 1,   &sets.vert_offs,      renew, f_int, -15, 15 },
+	{n_screen,  0,   0,                      0}, // header
+	{n_scr,    'b',  &sets.n_screens,        f_int,  1, 4},
+	{n_contr,  'b',  &sets.OSD_BRIGHTNESS,   f_int,  0, 3},
+	{n_horiz,  'Z',  &sets.horiz_offs,       f_int, -31, 31 },
+	{n_vert,   'z',  &sets.vert_offs,        f_int, -15, 15 },
 };
 
 // второй экран - горизонт
 static const PROGMEM Params params2[] = { 
-	{n_horizon,     'h', 0,   0,                    0, 0}, // header with pal/ntsc string
-	{n_k_RollPAL,   'f', 1,   &sets.horiz_kRoll,    0, f_float, -4, 4},
-	{n_k_PitchPAL,  'f', 1,   &sets.horiz_kPitch,   0, f_float, -4, 4},
-	{n_k_RollNTSC,  'f', 1,   &sets.horiz_kRoll_a,  0, f_float, -4, 4},
-	{n_k_PitchNTSC, 'f', 1,   &sets.horiz_kPitch_a, 0, f_float, -4, 4},
+	{n_horizon,     'h', 0,                    0}, // header with pal/ntsc string
+	{n_k_RollPAL,   'f', &sets.horiz_kRoll,    f_float, -4, 4},
+	{n_k_PitchPAL,  'f', &sets.horiz_kPitch,   f_float, -4, 4},
+	{n_k_RollNTSC,  'f', &sets.horiz_kRoll_a,  f_float, -4, 4},
+	{n_k_PitchNTSC, 'f', &sets.horiz_kPitch_a, f_float, -4, 4},
 };
 
 #if defined(USE_SENSORS)// третий экран - сенсоры
@@ -2352,15 +2361,15 @@ static const PROGMEM Params params2[] = {
 #define SENSOR(n) ((SensorInfo *)(EEPROM_offs(sensors) + n * sizeof(SensorInfo)))
 
 static const PROGMEM Params params3[] = {
-	{n_sensors,     0,   0,   0,                 0, 0}, 
-	{n_k_sensor1,   's', 1,   &SENSOR(0)->K, 0, f_float, -8000, 8000},
-	{n_a_sensor1,   's', 1,   &SENSOR(0)->A, 0, f_float, -100, 100},
-	{n_k_sensor2,   's', 1,   &SENSOR(1)->K, 0, f_float, -8000, 8000},
-	{n_a_sensor1,   's', 1,   &SENSOR(1)->A, 0, f_float, -100, 100},
-	{n_k_sensor3,   's', 1,   &SENSOR(2)->K, 0, f_float, -8000, 8000},
-	{n_a_sensor1,   's', 1,   &SENSOR(2)->A, 0, f_float, -100, 100},
-	{n_k_sensor4,   's', 1,   &SENSOR(3)->K, 0, f_float, -8000, 8000},
-	{n_a_sensor1,   's', 1,   &SENSOR(3)->A, 0, f_float, -100, 100},
+	{n_sensors,     0,   0,             0}, 
+	{n_k_sensor1,   's', &SENSOR(0)->K, f_float, -8000, 8000},
+	{n_a_sensor1,   's', &SENSOR(0)->A, f_float, -100, 100},
+	{n_k_sensor2,   's', &SENSOR(1)->K, f_float, -8000, 8000},
+	{n_a_sensor1,   's', &SENSOR(1)->A, f_float, -100, 100},
+	{n_k_sensor3,   's', &SENSOR(2)->K, f_float, -8000, 8000},
+	{n_a_sensor1,   's', &SENSOR(2)->A, f_float, -100, 100},
+	{n_k_sensor4,   's', &SENSOR(3)->K, f_float, -8000, 8000},
+	{n_a_sensor1,   's', &SENSOR(3)->A, f_float, -100, 100},
 	
 };
 #endif
@@ -2404,8 +2413,6 @@ again:
     else setup_menu +=dir;
 
     if(!pgm_read_word((void *)&params[setup_menu].value) ) goto again; // если нет связанной переменной то еще шаг - пропускаем заголовок
-
-    lflags.got_data=1; // renew screen
 }
 
 static void /*NOINLINE*/ move_screen(char dir){
@@ -2417,8 +2424,6 @@ static void /*NOINLINE*/ move_screen(char dir){
     if(     dir < 0 && setup_screen == 0)  setup_screen = n;	// цикл по экранам,
     else if(dir > 0 && setup_screen == n)  setup_screen = 0;
     else setup_screen +=dir;
-
-    lflags.got_data=1; // renew screen
 }
 
 
@@ -2431,7 +2436,7 @@ static void panSetup(){
     float v = 0;
     byte size;
     byte type;
-    byte col = 0;
+//    byte col = 0;
     char *nm;
     byte k;
 
@@ -2465,25 +2470,31 @@ static void panSetup(){
 
 	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
-	    col=OSD::col;
+//	    col=OSD::col;
 	} else {
 	    osd_blank();
 	}
 
 	type=pgm_read_byte((void *)&p->type);
-	k=pgm_read_byte((void *)&p->k);
+	k=1;
 
-        switch (type){
+        switch (type & 0x7f){
         
-        case 'h':		 // header
+        case 'h': {		 // header
+            PGM_P f;
     	    if(OSD::getMode()) 
-		osd_print_S(PSTR(" (PAL)"));
+		f=PSTR(" (PAL)");
 	    else
-		osd_print_S(PSTR(" (NTSC)"));
+		f=PSTR(" (NTSC)");
+	    osd_print_S(f);
+	    }
 	    // no break!
 	case 0:
 	    continue;	// no value
         
+        
+        case 'B':
+            k=10;
         case 'b': // byte param
 	    { 
 		int l = *((byte *)(pgm_read_word((void *)&p->value) ) ) ;
@@ -2496,12 +2507,12 @@ static void panSetup(){
 	    goto as_char;
 	case 'Z': // horiz offs
 	    offs=0x20;
-	    goto as_char;
+//	    goto as_char;
         case 'c': // signed byte param
 as_char:
 	    { 
 		int l = *((char *)(pgm_read_word((void *)&p->value) ) ) - offs;
-		v = l / (float)k;
+		v = l /* / (float)k */ ;
 	    }
 	    break;
 	    
@@ -2518,7 +2529,6 @@ as_char:
 	}
 
 	if(i == setup_menu) c_val = v;  // store currently edited value
-
 
 	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v);
     }
@@ -2546,7 +2556,7 @@ as_char:
     }
 
 
-    OSD::setPanel(col, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
+    OSD::setPanel(/*col*/ 20, SETUP_START_ROW + setup_menu); // в строку с выбранным параметром
 
     p = &params[setup_menu];
 
@@ -2559,22 +2569,24 @@ as_char:
 
     void *pval=(void *)pgm_read_word((void *)&p->value);
 
+    type = pgm_read_byte((void *)&p->type);
+    k    = 1;
+    v    = c_val;
 
-    type=pgm_read_byte((void *)&p->type);
-    k   =pgm_read_byte((void *)&p->k);
-
-
-    v=c_val;
     {
         float inc = 0;
-        switch (type){
+        switch (type & 0x7f){
+    	case 'B': // batt voltage
+            k=10;
 	case 'z': // offset
 	case 'Z': // offset
 	case 'c': // char
     	case 'b': // byte param
     	    size= 1;
-	    if(     diff>300)	inc=10/(float)k;
-	    else if(diff>150)	inc=1 /(float)k;
+	    if(     diff>300)	inc=10;
+	    else if(diff>150)	inc=1;
+	    
+	    inc /= k;
 	    break;
 
 	case 's': // sensors
@@ -2614,19 +2626,19 @@ as_char:
     if(v != c_val) { // value changed
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
 	int8_t cv=(char)(v * k); // предварительно посчитаем на всякий случай
+        byte add=0;
 
-        switch (type){
+        switch (type & 0x7f){
     	    case 'Z':
-    		*((char *)pval) = cv + 0x20;
-    		break;
+    		add= 0x20;
+    		goto as_c;
     	    case 'z':
-    		*((char *)pval) = cv + 0x10;
-    		break;
-
+    		add =  0x10;
 	    case 'c':
-		*((char *)pval) = cv;
+as_c:		*((char *)pval) = cv + add;
 		break;
 
+            case 'B':
             case 'b': // byte param
 	        *((byte *)pval) = (byte)(cv);
 	        break;
@@ -2647,9 +2659,12 @@ as_char:
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
 
 no_write:
+/*
 	fptr cb = (fptr) pgm_read_word((void *)&p->cb);
-
 	if(cb) cb(); // show tail
+*/
+        if(type & 0x80) renew();
+
     }
 
 }

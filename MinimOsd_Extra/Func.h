@@ -478,9 +478,11 @@ void setFdataVars()
             }
 
             if(rssi_v < l) rssi_v = l;
-            if(rssi_v > h) rssi_v = h;
-
-            rssi_v = (int16_t)(((float)rssi_v - l)/(h-l)*100.0f);
+            if(rssi_v > h) rssi_v = h; // all rssi values is limited to 4096 so we can multiply it only by 16
+            
+            uint16_t diap = h-l;
+            uint16_t val  = rssi_v - l;
+            rssi_v = (int16_t)(((float)val)/diap*100.0f);
             //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
             if(rssi_v > 100) rssi_v = 100;

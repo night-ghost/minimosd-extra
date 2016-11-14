@@ -408,3 +408,6 @@ v896
 v897
 * fixed efficiency
 
+v898
+* fixed bug in Vibrations panel
+

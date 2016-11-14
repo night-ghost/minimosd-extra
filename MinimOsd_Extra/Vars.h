@@ -318,10 +318,8 @@ typedef void (*fptr)();
 struct Params {
     PGM_P name; 	// наименование
     char type;	// тип (f-float, b - byte etc)
-    byte k;		// коэффициент сдвига запятой
     void *value;	// адрес самой переменной
-    fptr cb;	// callback для применения параметра
-    PGM_P fmt;	// формат печати параметра
+    PGM_P fmt;	        // формат печати параметра
     int min;		// диапазон изменения параметра
     int max;
 };
