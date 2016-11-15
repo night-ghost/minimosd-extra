@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r896 DV";
+        public const string VERSION = "r900 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -312,11 +312,8 @@ namespace OSD {
                 pi[a++] = new Panel("Visible Sats", pan.panGPSats, 26, 11, panGPSats_XY, 1, UI_Mode.UI_Checkbox, 0,"Icon in tail");
                 pi[a++] = new Panel("Real heading", pan.panCOG, 22, 15, panCOG_XY, 1);
                 pi[a++] = new Panel("GPS Coord", pan.panGPS, 1, 11, panGPS_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional", 0, "Display in row");
-                //        pi[a++] = new Panel("GPS Coord 2", pan.panGPS2, 2, 0, panGPS2_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
-
                 pi[a++] = new Panel("Heading Rose", pan.panRose, 10, 11, panRose_XY, 0, UI_Mode.UI_Checkbox, 0,"Marker below rose", 0, "Even panel length");
                 pi[a++] = new Panel("Heading", pan.panHeading, 21, 11, panHeading_XY, 0);
-                //          pi[a++] = new Panel("Heart Beat", pan.panMavBeat, 14, 15, panMavBeat_XY;
                 pi[a++] = new Panel("Home Direction", pan.panHomeDir, 14, 3, panHomeDir_XY, -1, UI_Mode.UI_Checkbox,0,"Show number");
                 pi[a++] = new Panel("Home Distance", pan.panHomeDis, 22, 1, panHomeDis_XY, 1, UI_Mode.UI_Checkbox,0,"Reset home on disarm");
                 pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 9, panWPDir_XY);
@@ -324,7 +321,6 @@ namespace OSD {
 
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, UI_Mode.UI_Checkbox, 0, "Reset to 0 on arming");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
-                //pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, UI_Mode.UI_Checkbox, 0 , "show in m/s");
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value", -1, "", 0, "show in m/s",0,"Less accurate");
                 
                 pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, UI_Mode.UI_Checkbox, 0, "Show percent, not used mAH");
@@ -1488,9 +1484,9 @@ as_checkbox:
 
                 updatingRSSI = true;
                 RSSI_numeric_min.Minimum = 0;
-                RSSI_numeric_min.Maximum = 2047;
+                RSSI_numeric_min.Maximum = 4095;
                 RSSI_numeric_max.Minimum = 0;
-                RSSI_numeric_max.Maximum = 2047;
+                RSSI_numeric_max.Maximum = 4095;
                 RSSI_numeric_min.Value = 0;
                 RSSI_numeric_max.Value = 0;
                 RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
@@ -2165,9 +2161,9 @@ again:
 
                     updatingRSSI = true;
                     RSSI_numeric_min.Minimum = 0;
-                    RSSI_numeric_min.Maximum = 2047;
+                    RSSI_numeric_min.Maximum = 4095;
                     RSSI_numeric_max.Minimum = 0;
-                    RSSI_numeric_max.Maximum = 2047;
+                    RSSI_numeric_max.Maximum = 4095;
                     RSSI_numeric_min.Value = 0;
                     RSSI_numeric_max.Value = 0;
                     RSSI_RAW.Checked = Convert.ToBoolean(pan.rssiraw_on % 2);
@@ -2354,10 +2350,12 @@ again:
                     } catch (Exception ex) {
 
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
 
                 } else {
                     MessageBox.Show("Failed to talk to bootloader");
+                    return;
                 }
 
                 try {
@@ -2378,6 +2376,8 @@ again:
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
                     toolStripStatusLabel1.Text = "Failed";
+
+                    return;
                 }
             }
 
@@ -2987,9 +2987,9 @@ again:
 
             int OldMax = (int)RSSI_numeric_min.Maximum;
             RSSI_numeric_min.Minimum = 0;
-            RSSI_numeric_min.Maximum = 4096;
+            RSSI_numeric_min.Maximum = 4095;
             RSSI_numeric_max.Minimum = 0;
-            RSSI_numeric_max.Maximum = 4096;
+            RSSI_numeric_max.Maximum = 4095;
             if (cbxRSSIChannel.SelectedIndex == 0 || cbxRSSIChannel.SelectedIndex == 2) { // analog 
                 lblRSSIMin.Text = "Min Value";
                 lblRSSIMax.Text = "Max Value";

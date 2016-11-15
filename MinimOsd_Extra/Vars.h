@@ -319,9 +319,7 @@ struct Params {
     PGM_P name; 	// наименование
     char type;	// тип (f-float, b - byte etc)
     void *value;	// адрес самой переменной
-    PGM_P fmt;	        // формат печати параметра
-    int min;		// диапазон изменения параметра
-    int max;
+    byte fmt_mm;       // формат печати параметра (старш 4) и диапазон изменения параметра (младш 4)
 };
 
 struct Setup_screen {

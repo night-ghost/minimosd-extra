@@ -1,3 +1,7 @@
 [submodule "libraries/SingleSerial"]
 	path = libraries/SingleSerial
 	url = https://github.com/night-ghost/SingleSerial.git
+
+[submodule "libraries/I2c_soft_slave"]
+	path = libraries/I2c_soft_slave
+	url = https://github.com/night-ghost/I2c_soft_slave.git

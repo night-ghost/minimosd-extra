@@ -51,6 +51,7 @@ Figures, harm the development of an idiotic question:
  brat002
  FyreSG
  Gygax
+ lamenace
 
 
 This program is free software: you can redistribute it and/or modify
@@ -141,6 +142,10 @@ mavlink_system_t mavlink_system = {12,1};
  #include  "WalkeraTelemOut.h"
  
  WalkeraTelem walkera;
+#endif
+
+#if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
+ #include RadiolinkTelemOut.h
 #endif
 
 /* **********************************************/
@@ -512,6 +517,10 @@ void loop()
 
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry(); // 2 times in second
+#endif
+
+#if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
+        sendRadiolinkTelemetry(lflags.blinker);
 #endif
 
         lflags.blinker = !lflags.blinker;

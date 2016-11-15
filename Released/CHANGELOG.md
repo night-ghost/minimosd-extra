@@ -411,3 +411,10 @@ v897
 v898
 * fixed bug in Vibrations panel
 
+v899
+* fixed another bug in Vibrations panel
+* warnings on clear screen moved to usable place
+* some memory optimizations
+
+v900
+* fixed RSSI scale

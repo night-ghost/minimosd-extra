@@ -2149,6 +2149,7 @@ static void panVibe(point p) {
     for(i=0;i<3;i++)
         osd_printf_1(f3_0f, vibration[i]);
 
+    osd_nl();
     for(i=0;i<3;i++)
         osd_printi_1(f3i, clipping[i]);
 }
@@ -2258,12 +2259,9 @@ static int NOINLINE channelDiff(byte n){
 struct Params {
     PGM_P name; 	// наименование
     char type;		// тип (f-float, b - byte etc)
-    byte k;		// коэффициент сдвига запятой
     void *value;	// адрес самой переменной
-    fptr cb;		// callback для применения параметра
-    PGM_P fmt;		// формат печати параметра
-    int min;		// диапазон изменения параметра
-    int max;
+    int fmt_id:4;	// формат печати параметра
+    int minmax:4;	// диапазон изменения параметра
 };
 
 struct Setup_screen {
@@ -2324,36 +2322,58 @@ static const PROGMEM char n_k_sensor3[]   = "3 (Current) K";
 static const PROGMEM char n_k_sensor4[]   = "4 (RSSI) K";
 #endif
 
-static const PROGMEM char f_float[]= "%.3f";
 static const PROGMEM char f_batt[] = "%3.1f\x76";
 static const PROGMEM char f_int[]  = "%.0f";
+static const PROGMEM char f_float[]= "%.3f";
 
+typedef struct MIN_MAX {
+    int16_t min;
+    int16_t max;
+} Min_Max;
+
+static const PROGMEM Min_Max min_max[] = {
+    { 0, 255},          // 0 - bytes
+    { 1,   4},          // 1 - screens
+    { 0,   3},          // 2 - contrast
+    { -31, 31},         // 3 - horizontal
+    { -15, 15},         // 4 - vertical
+    { -4,  4},          // 5 - horizon
+    { -8000, 8000},     // 6 - sesnor factor
+    { -100,  100 },      // 7 - sensor add
+};
+
+
+static const PROGMEM char * const s_fmts[] = { // форматы печати параметра
+    f_batt,     // 0
+    f_int,      // 1
+    f_float     // 2
+};
 
 // первый экран настроек
 static const PROGMEM Params params1[] = { 
 	{n_sets,    0,   0,                      0},      // header
-	{n_batt,   'B',  &sets.battv ,           f_batt, 0, 255 },
-	{n_battB,  'B',  &sets.battBv,           f_batt, 0, 255 },
-
-	{n_stall,  'b',  &sets.stall,            f_int,  0, 255 },
-	{n_oversp, 'b',  &sets.overspeed,        f_int,  0, 255 },
-	{n_charge, 'b',  &sets.batt_warn_level,  f_int,  0, 255 },
-	{n_rssi,   'b',  &sets.rssi_warn_level,  f_int,  0, 255 },
+	{n_batt,   'B',  &sets.battv ,           0 },
+	{n_battB,  'B',  &sets.battBv,           0 },
+                                                // format minmax
+	{n_stall,  'b',  &sets.stall,            (1 <<4) | 0 },
+	{n_oversp, 'b',  &sets.overspeed,        (1 <<4) | 0 },
+	{n_charge, 'b',  &sets.batt_warn_level,  (1 <<4) | 0 },
+	{n_rssi,   'b',  &sets.rssi_warn_level,  (1 <<4) | 0 },
 
 	{n_screen,  0,   0,                      0}, // header
-	{n_scr,    'b',  &sets.n_screens,        f_int,  1, 4},
-	{n_contr,  'b',  &sets.OSD_BRIGHTNESS,   f_int,  0, 3},
-	{n_horiz,  'Z',  &sets.horiz_offs,       f_int, -31, 31 },
-	{n_vert,   'z',  &sets.vert_offs,        f_int, -15, 15 },
+	{n_scr,    'b',  &sets.n_screens,        (1 <<4) | 1 },
+	{n_contr,  'b',  &sets.OSD_BRIGHTNESS,   (1 <<4) | 2 },
+	{n_horiz,  'Z',  &sets.horiz_offs,       (1 <<4) | 3 },
+	{n_vert,   'z',  &sets.vert_offs,        (1 <<4) | 4 },
 };
 
 // второй экран - горизонт
 static const PROGMEM Params params2[] = { 
 	{n_horizon,     'h', 0,                    0}, // header with pal/ntsc string
-	{n_k_RollPAL,   'f', &sets.horiz_kRoll,    f_float, -4, 4},
-	{n_k_PitchPAL,  'f', &sets.horiz_kPitch,   f_float, -4, 4},
-	{n_k_RollNTSC,  'f', &sets.horiz_kRoll_a,  f_float, -4, 4},
-	{n_k_PitchNTSC, 'f', &sets.horiz_kPitch_a, f_float, -4, 4},
+	{n_k_RollPAL,   'f', &sets.horiz_kRoll,    (2 <<4) | 5 },
+	{n_k_PitchPAL,  'f', &sets.horiz_kPitch,   (2 <<4) | 5 },
+	{n_k_RollNTSC,  'f', &sets.horiz_kRoll_a,  (2 <<4) | 5 },
+	{n_k_PitchNTSC, 'f', &sets.horiz_kPitch_a, (2 <<4) | 5 },
 };
 
 #if defined(USE_SENSORS)// третий экран - сенсоры
@@ -2362,14 +2382,14 @@ static const PROGMEM Params params2[] = {
 
 static const PROGMEM Params params3[] = {
 	{n_sensors,     0,   0,             0}, 
-	{n_k_sensor1,   's', &SENSOR(0)->K, f_float, -8000, 8000},
-	{n_a_sensor1,   's', &SENSOR(0)->A, f_float, -100, 100},
-	{n_k_sensor2,   's', &SENSOR(1)->K, f_float, -8000, 8000},
-	{n_a_sensor1,   's', &SENSOR(1)->A, f_float, -100, 100},
-	{n_k_sensor3,   's', &SENSOR(2)->K, f_float, -8000, 8000},
-	{n_a_sensor1,   's', &SENSOR(2)->A, f_float, -100, 100},
-	{n_k_sensor4,   's', &SENSOR(3)->K, f_float, -8000, 8000},
-	{n_a_sensor1,   's', &SENSOR(3)->A, f_float, -100, 100},
+	{n_k_sensor1,   's', &SENSOR(0)->K, (2 <<4) | 5 },
+	{n_a_sensor1,   's', &SENSOR(0)->A, (2 <<4) | 7 },
+	{n_k_sensor2,   's', &SENSOR(1)->K, (2 <<4) | 5 },
+	{n_a_sensor1,   's', &SENSOR(1)->A, (2 <<4) | 7 },
+	{n_k_sensor3,   's', &SENSOR(2)->K, (2 <<4) | 6 },
+	{n_a_sensor1,   's', &SENSOR(2)->A, (2 <<4) | 7 },
+	{n_k_sensor4,   's', &SENSOR(3)->K, (2 <<4) | 6 },
+	{n_a_sensor1,   's', &SENSOR(3)->A, (2 <<4) | 7 },
 	
 };
 #endif
@@ -2471,8 +2491,6 @@ static void panSetup(){
 	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
 //	    col=OSD::col;
-	} else {
-	    osd_blank();
 	}
 
 	type=pgm_read_byte((void *)&p->type);
@@ -2530,7 +2548,9 @@ as_char:
 
 	if(i == setup_menu) c_val = v;  // store currently edited value
 
-	osd_printf_1((PGM_P)pgm_read_word((void *)&p->fmt), v);
+        byte f_mm=(pgm_read_byte((void *)&p->fmt_mm) >>4) & 0xf;
+
+	osd_printf_1((PGM_P)pgm_read_word((void *)&s_fmts[f_mm]), v);
     }
 
     {
@@ -2613,10 +2633,12 @@ as_char:
 	    if(fNeg) inc = -inc;
 	    float_add(v, inc);
 
+            byte mm=pgm_read_byte((void *)&p->fmt_mm) & 0xf;
+
             int min, max;
 
-            min =(int)pgm_read_word((void *)&p->min);
-            max =(int)pgm_read_word((void *)&p->max);
+            min =(int)pgm_read_word((void *)&(min_max[mm].min));
+            max =(int)pgm_read_word((void *)&(min_max[mm].max));
 
             if(v<min) v=min;
             if(v>max) v=max;
@@ -2685,12 +2707,12 @@ struct Panels_list {
 
 const Panels_list PROGMEM panels_list[] = {
     { ID_of(horizon),		panHorizon, 	0 },
-    { ID_of(pitch),		panPitch, 	0  },
-    { ID_of(roll),		panRoll, 	0  },
+    { ID_of(pitch),		panPitch, 	0 },
+    { ID_of(roll),		panRoll, 	0 },
     { ID_of(batt_A),		panBatt_A, 	0xbc  },
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
-    { ID_of(GPS),		panGPS, 	0  },
+    { ID_of(GPS),		panGPS, 	0 },
     { ID_of(batteryPercent),	panBatteryPercent, 0 },
     { ID_of(COG),		panCOG, 	0 },
     { ID_of(rose),		panRose, 	0 },
@@ -2865,9 +2887,13 @@ show_fdata:
 #ifdef USE_SETUP
 	if(!lflags.motor_armed) {
 	    panSetup();			// Setup when not armed
-	}  else   // warnings on clear screen
+	}  else  { // warnings on clear screen
 #endif
-	    print_all_panels(&panels_list[sizeof(panels_list)/sizeof(Panels_list)-2]); // warnings only
+	//    print_all_panels(&panels_list[sizeof(panels_list)/sizeof(Panels_list)-2]); // warnings only
+	    point p={3,3};
+	    osd_setPanel(p); // place cursor    
+	    panWarn(p);
+	}
 	
 
     }

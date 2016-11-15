@@ -49,6 +49,9 @@
 // оно может читать PWM по прерываниям!
 #define PWM_PIN PD3 
 
+//#define RADIOLINK_TELEM_SDA RssiPin
+//#define RADIOLINK_TELEM_SCL AmperagePin
+
 //#define WALKERA_TELEM RssiPin // telemetry output
 
 //#define SERIALDEBUG RssiPin // debug output, conflicts with PWM_BY_INTERRUPT

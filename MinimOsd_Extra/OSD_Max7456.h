@@ -115,11 +115,11 @@ class OSD: public BetterStream
     using BetterStream::write;
 
     static INLINE void max7456_off(){
-        PORTD |= _BV(PD6);         //gitalWrite(MAX7456_SELECT,HIGH);
+        PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
     }
 
     static INLINE void max7456_on(){
-        PORTD &= ~_BV(PD6);         //gitalWrite(MAX7456_SELECT,LOW);
+        PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
     }
 
 //  private:
