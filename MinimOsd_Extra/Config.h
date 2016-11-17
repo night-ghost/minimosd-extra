@@ -61,6 +61,12 @@
  #undef USE_SENSORS
 #endif
 
+#if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
+ #undef MAVLINK_CONFIG
+// #undef USE_SENSORS
+// #undef AUTOBAUD 
+ #undef USE_SETUP
+#endif
 
 //#define LEDPIN AmperagePin
 

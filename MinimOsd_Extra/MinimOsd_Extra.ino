@@ -145,7 +145,7 @@ mavlink_system_t mavlink_system = {12,1};
 #endif
 
 #if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
- #include RadiolinkTelemOut.h
+ #include "RadiolinkTelemOut.h"
 #endif
 
 /* **********************************************/
@@ -372,6 +372,12 @@ void setup()     {
 
 #endif
 
+#if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
+    wire.begin(4, NULL, sendRadiolinkTelemetry ); // slave with address 4
+//  Wire.onRequest(onRequestRLTelemetry);
+ 
+#endif
+
     doScreenSwitch(); // set vars for startup screen
 
 } // END of setup();
@@ -517,10 +523,6 @@ void loop()
 
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry(); // 2 times in second
-#endif
-
-#if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
-        sendRadiolinkTelemetry(lflags.blinker);
 #endif
 
         lflags.blinker = !lflags.blinker;

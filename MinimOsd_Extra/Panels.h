@@ -2179,6 +2179,7 @@ static void panVario(point p) {
 
     if(is_alt2(p)) linePosition/=10;
     if(is_alt3(p)) linePosition/=2;
+    if(is_alt4(p)) linePosition/=4;
 
     int8_t  charPosition = linePosition / 9;
     uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
@@ -2887,8 +2888,9 @@ show_fdata:
 #ifdef USE_SETUP
 	if(!lflags.motor_armed) {
 	    panSetup();			// Setup when not armed
-	}  else  { // warnings on clear screen
+	}  else 
 #endif
+         { // warnings on clear screen
 	//    print_all_panels(&panels_list[sizeof(panels_list)/sizeof(Panels_list)-2]); // warnings only
 	    point p={3,3};
 	    osd_setPanel(p); // place cursor    
@@ -2896,8 +2898,7 @@ show_fdata:
 	}
 	
 
-    }
-  
+    } 
 }
 
 

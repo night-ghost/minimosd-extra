@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r900 DV";
+        public const string VERSION = "r901 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -357,7 +357,7 @@ namespace OSD {
                 pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
                 //pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
                 pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
-                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5 m/m", 0, "Twice, so scale 10/100" );
+                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5 m/m", 0, "Twice, so scale 10/100", 0, "*4 -> 20/40/200/400" );
 
                
                 osd_functions_N = a;

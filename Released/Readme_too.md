@@ -1,6 +1,6 @@
-This folder contains Config Toll (OSD_Config.exe) and charsert (MinimOSD_2.4.1.2.mcm) for OSD. 
+This folder contains Config Toll (OSD_Config.exe) and charsert (MinimOSD_2.4.1.5.mcm) for OSD. 
 
-Also it contains sample .TLOG file for testing needs.
+Also it contains sample .TLOG file for testing needs and .OSD files for sample layouts.
 
 
 Ready-to-flash HEX files of firmware are in "FW_&_Char" folder.

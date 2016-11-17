@@ -1,4 +1,8 @@
-#include <i2c_soft.h>
+#include "I2c_soft_slave.h"
+
+
+Soft_I2C wire(RADIOLINK_TELEM_SCL, RADIOLINK_TELEM_SDA);
+
 
 // from https://github.com/cleanflight/cleanflight/issues/1690#issuecomment-234575579
 
@@ -7,70 +11,51 @@
 
 void set1() {
 
-  int  alt = MwAltitude / 10;
+  int  alt = osd_pos.alt / 10;
 
-  int  yaw = MwHeading * 100;
-
-  uint16_t  speed2 =  GPS_speed * 1000;
-
-  int  roll =  MwAngle[0];
-
-  int  pitch =  MwAngle[1];
-
-  int distance = GPS_distanceToHome * 10;
+  uint16_t  speed =  osd_groundspeed * 1000;
 
   byte buffer[16] = {
     0x89, 0xAB, 
-    GPS_numSat, 
+    osd_satellites_visible, 
     BYTE_OF(alt, 1), BYTE_OF(alt, 0),
-    BYTE_OF(yaw, 1), BYTE_OF(yaw, 0),
+    BYTE_OF(osd_heading, 1), BYTE_OF(osd_heading, 0),
     BYTE_OF(speed, 1), BYTE_OF(speed, 0),
-    BYTE_OF(roll, 1), BYTE_OF(roll, 0),
-    BYTE_OF(pitch, 1), BYTE_OF(pitch, 0),
-    BYTE_OF(distance, 1), BYTE_OF(distance, 0),
+    BYTE_OF(osd_att.roll, 1), BYTE_OF(osd_att.roll, 0),
+    BYTE_OF(osd_att.pitch, 1), BYTE_OF(osd_att.pitch, 0),
+    BYTE_OF(osd_home_distance, 1), BYTE_OF(osd_home_distance, 0),
     0x00
   };
-  Wire.write(buffer, 16);
+  wire.write(buffer, 16);
 }
 
 void set2() {
 
-  union u32_tag  {
-    byte         b[4];
-    uint32_t    ui32;
-  } latit, longt;
 
-  int  rise = 10;
-  byte  riseHi = highByte(rise);
-  byte  riseLo =  lowByte(rise);
-
-  int battVoltage = voltage * 100; //15000; // 15V
-  byte voltesHi = highByte(battVoltage);
-  byte voltesLo = lowByte(battVoltage);
-
-  longt.ui32 = GPS_longitude;
-  latit.ui32 = GPS_latitude;
+  int  rise = osd_climb*1000;
 
   byte buffer[16] = {
     0x89, 0xCD, 
-    GPS_numSat, 
+    osd_satellites_visible, 
     BYTE_OF(rise, 1), BYTE_OF(rise, 0),
-    BYTE_OF(voltes, 1), BYTE_OF(voltes, 0),
-    BYTE_OF(lon, 3), BYTE_OF(lon, 2), BYTE_OF(lon, 1), BYTE_OF(lon, 0),
-    BYTE_OF(lat, 3), BYTE_OF(lat, 2), BYTE_OF(lat, 1), BYTE_OF(lat, 0),
+    BYTE_OF(osd_vbat_A, 1), BYTE_OF(osd_vbat_A, 0),
+    BYTE_OF(osd_pos.lon, 3), BYTE_OF(osd_pos.lon, 2), BYTE_OF(osd_pos.lon, 1), BYTE_OF(osd_pos.lon, 0),
+    BYTE_OF(osd_pos.lat, 3), BYTE_OF(osd_pos.lat, 2), BYTE_OF(osd_pos.lat, 1), BYTE_OF(osd_pos.lat, 0),
     0x00
   };
   
-  Wire.write(buffer, 16);
+  wire.write(buffer, 16);
 }
 
 
-void sendRadiolinkTelemetry(bool f) {
+void sendRadiolinkTelemetry() {
+    static bool f=false;
   if (f) {
     set1();
   } else {
     set2();
   }
+  f=!f;
 }
 
 

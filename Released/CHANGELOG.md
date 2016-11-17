@@ -418,3 +418,7 @@ v899
 
 v900
 * fixed RSSI scale
+* a draft to support RadioLink telemetry output
+
+v901
+* added "*4" checkbox to variometer

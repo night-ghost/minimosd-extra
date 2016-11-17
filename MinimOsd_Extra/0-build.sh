@@ -10,7 +10,7 @@ VERS=`version`
 make_one(){
     PROTO=$1
 
-    make PROTO="-DUSE_${PROTO}=1 $2"
+    make PROTO="-DUSE_${PROTO}=1 $2 $3"
 
 }
 
@@ -22,3 +22,7 @@ make_one 'MAVLINK'
 #make_one 'LTM' 
 
 #make_one 'MAVLINK' -DWALKERA_TELEM=RssiPin
+
+
+#make_one 'MAVLINK' -DRADIOLINK_TELEM_SDA=RssiPin -DRADIOLINK_TELEM_SCL=AmperagePin
+

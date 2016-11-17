@@ -145,7 +145,7 @@ static uint16_t     off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)
-static int          dst_x=0,dst_y=0; // расстояние по осям - для радара
+static int          dst_x=0,dst_y=0;    // расстояние по осям - для радара
 
 struct Att {
     int16_t             pitch;                  // pitch from DCM
