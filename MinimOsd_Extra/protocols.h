@@ -13,6 +13,8 @@
 #include "protocols/LTM.h"
 #endif
 
+#define MAX_OVERLOAD_COUNT 10
+#define MAX_FROZEN_COUNT 10
 
 
 union {

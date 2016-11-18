@@ -1248,13 +1248,13 @@ static void panGPS(point p){
 
     if(lflags.blinker) {
         PGM_P str=PSTR("Stream");
-	if(lflags.mav_data_frozen>=5){
+	if(lflags.mav_data_frozen>=MAX_FROZEN_COUNT){
 	    osd_print_S(str);
 	    OSD::write_S(div);
 	    osd_print_S(PSTR("frozen"));
 	    return;
 	}
-	if(lflags.mav_stream_overload>=5){
+	if(lflags.mav_stream_overload>=MAX_OVERLOAD_COUNT){
 	    osd_print_S(str);
 	    OSD::write_S(div);
 	    osd_print_S(PSTR("overload"));

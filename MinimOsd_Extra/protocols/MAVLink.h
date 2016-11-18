@@ -170,9 +170,6 @@ if(apm_mav_system  != msg.m.sysid){
                 // apm_mav_component = msg.m.compid;
 
 
-#define MAX_OVERLOAD_COUNT 10
-#define MAX_FROZEN_COUNT 10
-
 		if(mav_data_count==0){ // there is no data comes to OSD
 		    if(mav_raw_imu_count) { // we has IMU data but not GPS - stream overload
 		        if(lflags.mav_stream_overload < MAX_OVERLOAD_COUNT) 
