@@ -425,3 +425,7 @@ v901
 
 v902
 * added ability to change show time for messages
+
+v903
+* fixed bug with vario zero position
+

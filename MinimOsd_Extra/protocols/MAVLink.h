@@ -235,7 +235,7 @@ if(apm_mav_system  != msg.m.sysid){
 #endif
 		mav_data_count++;
 		lflags.mav_data_frozen=0;
-
+                lflags.mav_stream_overload=0;
                 break; 
 
     // EXTRA_2

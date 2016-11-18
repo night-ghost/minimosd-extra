@@ -55,7 +55,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
 #undef OSD_VERSION
-#define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater " RELEASE
+#define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater " RELEASE_NUM
 
 
 // AVR Includes

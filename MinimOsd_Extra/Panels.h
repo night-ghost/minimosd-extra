@@ -2178,11 +2178,13 @@ static void panVario(point p) {
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
     uint8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
 
-    int linePosition = (int(-vertical_speed*2) + totalNumberOfLines) / 2; // 0 at middle
+    int linePosition = int(-vertical_speed*2) ; // 0 at middle
 
     if(is_alt2(p)) linePosition/=10;
     if(is_alt3(p)) linePosition/=2;
     if(is_alt4(p)) linePosition/=4;
+    
+    linePosition = (linePosition + totalNumberOfLines) / 2;
 
     int8_t  charPosition = linePosition / 9;
     uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
