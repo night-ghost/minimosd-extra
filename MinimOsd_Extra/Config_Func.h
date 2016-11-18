@@ -170,7 +170,7 @@ void hex_dump(byte *p, uint16_t len) {
  uint16_t j;
  
  for(j=0;j<len; j+=8){
-    OSD::write_S('|');
+    OSD::write_S(0xFF);
     print_hex(j,8);
     OSD::write_S(' ');
     for(i=0; i<8; i++){

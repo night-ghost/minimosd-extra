@@ -343,7 +343,7 @@ namespace OSD {
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
                 pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, UI_Mode.UI_Checkbox,0,"Coordinates on top" );
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, UI_Mode.UI_Checkbox, 0, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
+                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, UI_Mode.UI_Combo_Time, 0, "Time to show (s)", -1, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
                 pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
@@ -1357,6 +1357,7 @@ namespace OSD {
                             case UI_Mode.UI_Combo:
                             case UI_Mode.UI_Combo_Cb:
                             case UI_Mode.UI_Combo_Cb_Strings:
+                            case UI_Mode.UI_Combo_Time:
                                 if (pi.Altf >= 0)
                                     pi.Altf = (p.y & 0x40) == 0 ? 0 : 1;
                                 pi.Alt2 = (p.y & 0x20) == 0 ? 0 : 1;                            

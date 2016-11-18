@@ -221,14 +221,13 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
 
 //------------------ write ---------------------------------------------------
 void NOINLINE OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
-    if(c!=0xff && bufpos < sizeof(osdbuf) /* Check added by jussip */)	// 0xFF character is MAX7456's "end of screen"
+    if( /*c!=0xff this check is done in write_S && */  bufpos < sizeof(osdbuf) /* Check added by jussip */)	// 0xFF character is MAX7456's "end of screen"
         osdbuf[bufpos++] = c;
 }
 
 
 void OSD::write_S(uint8_t c){
-  
-  if(c == '|'){
+  if(c == 0xff){
     row++;
     calc_pos();
   } else

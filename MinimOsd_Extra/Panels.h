@@ -9,7 +9,7 @@ static void NOINLINE osd_setPanel(Point p){
 }
 
 static void NOINLINE osd_nl(){
-    OSD::write_S('|');
+    OSD::write_S('\xff');
 }
 
 static void NOINLINE osd_blank(){
@@ -59,7 +59,7 @@ static const PROGMEM char f3i[]="%3i";
 static const PROGMEM char f2i[]="%2i";
 
 static void NOINLINE printTime(uint16_t t, byte blink, byte sec=0){
-    static const PROGMEM char f_02in[]="%02i|";
+    static const PROGMEM char f_02in[]="%02i\xff";
 
     osd_printi_1(f3i,((uint16_t)t/60));
 
@@ -1240,7 +1240,7 @@ static void panGPS(point p){
     
     if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
 
-    byte div = is_alt3(p)?' ':'|'; // row or column
+    byte div = is_alt3(p)?' ':'\xff'; // row or column
 
     byte fLow= is_alt(p)?1:0;      // low precision
 
@@ -1404,7 +1404,7 @@ static void panFdata(point p){ // итоги полета
         OSD::setPanel(p.x + 10,p.y);
     }
 
-    print_gps(gps_f6,'|');
+    print_gps(gps_f6,0xff);
 }
 
 
@@ -1487,7 +1487,7 @@ static void panWaitMAVBeats(){
     osd_groundspeed=0; // to not move with last speed when "no data"
 
     OSD::setPanel(5,3);
-    osd_printi_1(PSTR("No input data! %u|"),seconds - lastMavSeconds);
+    osd_printi_1(PSTR("No input data! %u\xff"),seconds - lastMavSeconds);
 
 #if defined(AUTOBAUD)
     if(serial_speed)
@@ -1503,11 +1503,11 @@ static void panWaitMAVBeats(){
     extern volatile byte nest_count;
 
     OSD::setPanel(1,5);
-    osd.printf_P(PSTR("loop time=%dms crc drops=%u|bytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
-    osd.printf_P(PSTR("|packets got=%u skip=%u"), packets_got, packets_skip);
-    osd.printf_P(PSTR("|stack bottom = %x nest=%d"),stack_bottom, nest_count);
-//    osd.printf_P(PSTR("|wait=%u %u |%lu |%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
-//    osd.printf_P(PSTR("|mav max=%lu sum= %lu |cnt=%u|"), mavlink_dt, mavlink_time, mavlink_cnt );
+    osd.printf_P(PSTR("loop time=%dms crc drops=%u\xffbytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
+    osd.printf_P(PSTR("\xffpackets got=%u skip=%u"), packets_got, packets_skip);
+    osd.printf_P(PSTR("\xffstack bottom = %x nest=%d"),stack_bottom, nest_count);
+//    osd.printf_P(PSTR("\xffwait=%u %u \xff%lu \xff%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
+//    osd.printf_P(PSTR("\xffmav max=%lu sum= %lu \xffcnt=%u\xff"), mavlink_dt, mavlink_time, mavlink_cnt );
     
     lflags.input_active=0;
 #else
@@ -1554,9 +1554,9 @@ static void panRose(point p){
 
     if(has_sign(p) && !is_alt(p)){
         if (is_alt2(p))
-            s=PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20|");
+            s=PSTR("\x20\x20\x20\x24\xcb\xb8\xb9\xcb\x24\x20\x20\x20\xff");
         else
-            s=PSTR("\x20\xc8\xc8\xc8\xc8\x7e\xc8\xc8\xc8\xc8\x20|");
+            s=PSTR("\x20\xc8\xc8\xc8\xc8\x7e\xc8\xc8\xc8\xc8\x20\xff");
             
         osd_print_S(s);
     }
@@ -1577,11 +1577,9 @@ static void panRose(point p){
     
     if(has_sign(p) && is_alt(p)){
         if (is_alt2(p)) {
-            osd_print_S(PSTR("|\x20\x20\x20\x24\xcb"));
-            osd.write_raw(0x7c);
-            s=PSTR("\x40\xcb\x24" /* \x20\x20\x20| */ );
+            s=PSTR("\xff\x20\x20\x20\x24\xcb\x7c\x40\xcb\x24" /* \x20\x20\x20| */ );
         } else
-            s=PSTR("|\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce" /* \x20 */);
+            s=PSTR("\xff\x20\xce\xce\xce\xce\x60\xce\xce\xce\xce" /* \x20 */);
         
         osd_print_S(s);
     }
@@ -1943,7 +1941,7 @@ static void panRadarScale(Point p){
 
 static void panCh(point p){
     for(byte i=0; i<8;i++) {
-	osd_printi_2(PSTR("C%d%5i|"), i+1, chan_raw[i] );
+	osd_printi_2(PSTR("C%d%5i\xff"), i+1, chan_raw[i] );
     }
 }
 
@@ -2143,7 +2141,7 @@ static void panMotor(point p) {
 }*/
 
 static void panVibe(point p) {
-    if(has_sign(p)) osd_print_S(PSTR("  x  y  z|"));
+    if(has_sign(p)) osd_print_S(PSTR("  x  y  z\xff"));
     
     byte i;
     for(i=0;i<3;i++)
@@ -2164,10 +2162,10 @@ static void panVario(point p) {
 
     if(has_sign(p)) {
         if (!is_alt(p)) {
-            f=PSTR("\xb2|\xb2|\xc6|\xb2|\xb2");
+            f=PSTR("\xb2\xff\xb2\xff\xc6\xff\xb2\xff\xb2");
             x+=1;
         } else {
-            f=PSTR(" \xb3| \xb3| \xc5| \xb3| \xb3");
+            f=PSTR(" \xb3\xff \xb3\xff \xc5\xff \xb3\xff \xb3");
         }
         osd_print_S(f);
     } 
@@ -2775,7 +2773,7 @@ static void print_all_panels(const Panels_list *pl ) {
 
     OSD::setPanel(0,0);
     osd.printf_P(PSTR("crc=%u b=%ld bl=%u"), packet_drops, bytes_comes,  lost_bytes);
-    osd.printf_P(PSTR("|pg=%u ps=%u"), packets_got, packets_skip);
+    osd.printf_P(PSTR("\xffpg=%u ps=%u"), packets_got, packets_skip);
     
 #endif
 

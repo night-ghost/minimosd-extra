@@ -241,7 +241,7 @@ ISR(INT1_vect) {
 
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "|" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV|"));
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
 
     osd.print((uint16_t)millis());
 

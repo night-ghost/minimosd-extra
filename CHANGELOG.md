@@ -422,3 +422,6 @@ v900
 
 v901
 * added "*4" checkbox to variometer
+
+v902
+* added ability to change show time for messages

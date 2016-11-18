@@ -48,6 +48,7 @@ namespace OSD
         public System.Windows.Forms.CheckBox chkAlt6;
         public System.Windows.Forms.ComboBox cbNumber;
         public System.Windows.Forms.ComboBox cbFilter;
+        public System.Windows.Forms.ComboBox cbTime;
         public System.Windows.Forms.Label labNumber;
         public System.Windows.Forms.Label labStrings;
         public System.Windows.Forms.TextBox txtStrings;
@@ -89,6 +90,7 @@ namespace OSD
             this.chkAlt6 = new System.Windows.Forms.CheckBox();
             this.cbNumber = new System.Windows.Forms.ComboBox();
             this.cbFilter = new System.Windows.Forms.ComboBox();
+            this.cbTime = new System.Windows.Forms.ComboBox();
             this.labNumber = new System.Windows.Forms.Label();
             this.labStrings = new System.Windows.Forms.Label();
             this.txtStrings = new System.Windows.Forms.TextBox();
@@ -149,6 +151,7 @@ namespace OSD
             this.groupBox.Controls.Add(this.chkAlt6);
             this.groupBox.Controls.Add(this.cbNumber);
             this.groupBox.Controls.Add(this.cbFilter);
+            this.groupBox.Controls.Add(this.cbTime);
             this.groupBox.Controls.Add(this.labNumber);
             this.groupBox.Controls.Add(this.labStrings);
             this.groupBox.Controls.Add(this.txtStrings);
@@ -362,6 +365,27 @@ namespace OSD
             this.cbFilter.SelectedIndexChanged += new System.EventHandler(this.cbFilter_SelectedIndexChanged);
             this.cbFilter.Visible = false;
 
+
+            this.cbTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTime.FormattingEnabled = true;
+            this.cbTime.Items.AddRange(new object[] {
+            "2",
+            "6",
+            "10",
+            "15",
+            "20",
+            "30",
+            "45",
+            "60",
+            });
+            this.cbTime.Location = new System.Drawing.Point(10, 85);
+            this.cbTime.Name = "cbTime";
+            this.cbTime.Size = new System.Drawing.Size(137, 17);
+            this.cbTime.TabIndex = 18;
+            this.cbTime.SelectedIndexChanged += new System.EventHandler(this.cbTime_SelectedIndexChanged);
+            this.cbTime.Visible = false;
+
+
             // labNumber
             // 
             this.labNumber.AutoSize = true;
@@ -550,6 +574,7 @@ namespace OSD
             chkAlt4.Visible = false;
             chkAlt5.Visible = false;
             chkAlt6.Visible = false;
+            cbTime.Visible =false;
 
             labNumber.Location = new System.Drawing.Point(10, 70); // std
             chkAlt3.Location = new System.Drawing.Point(10, 83);
@@ -584,6 +609,19 @@ as_combo_cb:
                 chkAlt.Text = thing.alt2_text;
                 labNumber.Visible = true;
                 break;
+
+            case UI_Mode.UI_Combo_Time:
+                n = osd.getAlt(thing)/2;
+                cbTime.SelectedIndex =n;
+                cbTime.Visible = true;
+                chkAlt.Visible = true;
+                //cbNumber.Text = n.ToString();
+                
+                labNumber.Text = thing.alt_text;
+                chkAlt.Text = thing.alt2_text;
+                labNumber.Visible = true;
+                break;
+
 
             case UI_Mode.UI_Checkbox_1:
                 chkAlt5.Text = thing.alt5_text;
@@ -914,7 +952,24 @@ as_checkbox:
                 }
             }
             osd.Draw(number);
-        }	
+        }
+
+        private void cbTime_SelectedIndexChanged(object sender, EventArgs e) {
+            string item = osd.currentlyselected;
+
+            for (int a = 0; a < panelItems.Length; a++) {
+                if (panelItems[a] != null && panelItems[a].name == item) {
+                    int n = cbNumber.SelectedIndex;
+                    
+                    panelItems[a].Alt2 = (n & 1) != 0 ? 1 : 0;
+                    panelItems[a].Alt3 = (n & 2) != 0 ? 1 : 0;
+                    panelItems[a].Alt4 = (n & 4) != 0 ? 1 : 0;
+                }
+            }
+            osd.Draw(number);
+        }
+
+
 
         private void txtStrings_TextChanged(object sender, EventArgs e) {
             string item = osd.currentlyselected;

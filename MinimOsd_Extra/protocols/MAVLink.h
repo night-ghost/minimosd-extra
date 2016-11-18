@@ -407,7 +407,10 @@ DBG_PRINTF("got rssi=%d\n", osd_rssi );
                         }
                     }
 
-		    mav_message_start(len, 6); // len, time to show
+                    point p = readPanel(ID_of(message));
+                    byte n = get_alt_num(p);
+                    static const PROGMEM byte delays[]= { 2, 6, 10, 15, 20, 30, 45, 60 };
+		    mav_message_start(len, delays[n] ); // len, time to show
                 }
                 break;
 

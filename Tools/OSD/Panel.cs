@@ -10,6 +10,7 @@ namespace OSD {
         UI_Combo_Cb_Strings, // as above plus strings
         UI_Checkbox_1, // all flags as checkboxes plus 1 checkbox as screen flags
         UI_Filter,    // one combo in 4 values
+        UI_Combo_Time, // one combo with times
     };
 
     // проще и лучше чем эти туплы :)
