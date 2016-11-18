@@ -3,18 +3,16 @@
 // sets.model_type plane=0 copter=1
 
 
-
-
 // EEPROM Version number, incrementing this will erase/upload factory settings. Only devs should increment this
 #define VER 79
 
 
-#define VERSION "2.4"
+#define VERSION "2.4" 
 
 //#define DEBUG
 #define STARTUP_SCREEN 0
 #define AUTOBAUD 1
-//#define SHOW_FONT 1
+//#define SHOW_FONT 1 not work
 #define USE_SENSORS 1
 
 #ifndef DEBUG // don't fit
@@ -23,7 +21,7 @@
 #endif
 
 #define PWM_IN_INTERRUPT 1
-//#define PWM_BY_INTERRUPT 1
+//#define PWM_BY_INTERRUPT 1 not work :(
 
 #define MAV_REQUEST 1
 //#define USE_MAVLINK 1
@@ -62,9 +60,8 @@
 #endif
 
 #if defined(RADIOLINK_TELEM_SDA) && defined(RADIOLINK_TELEM_SCL) 
- #undef MAVLINK_CONFIG
-// #undef USE_SENSORS
-// #undef AUTOBAUD 
+ #undef MAVLINK_CONFIG // don't fit :(
+ #undef USE_SENSORS
  #undef USE_SETUP
 #endif
 

@@ -1,7 +1,11 @@
 
+static NOINLINE void serial_print_S(PGM_P f){
+    Serial.print_P(f);
+}
+
 static void uploadFont() {
     
-    SPCR |= (1<<SPR0) | (1<<SPR1);
+    SPCR |= (1<<SPR0) | (1<<SPR1); // slow down SPI
 
     uint8_t byte_count = 0;
     byte bit_count=0;
@@ -13,9 +17,7 @@ static void uploadFont() {
 
     int font_count = 0;
 
-    //osd.clear();
-
-    Serial.print_P(PSTR("RFF\n"));
+    serial_print_S(PSTR("RFF\n"));
 
     byte chk=0;
     while(font_count < 256) { 
@@ -58,12 +60,12 @@ static void uploadFont() {
                 osd.write_NVM(font_count, character_bitmap);
                 byte_count = 0;
                 font_count++;
-                Serial.printf_P(PSTR("CD%d\n"),chk);
+                serial_print_S(PSTR("CD\n"));
                 chk=0;
             }
         }
     }
-    Serial.print_P(PSTR("FD\n"));
+    serial_print_S(PSTR("FD\n"));
 
 #if defined(SHOW_FONT) && 0
     byte n=0;
@@ -71,7 +73,7 @@ static void uploadFont() {
 
     for(byte j=16; j!=0; j--) { // show full font
         for(byte i=16; i!=0; i--)   {
-              osd.write_raw((byte)(n));
+              osd.write_S((byte)(n));
               n++;
         }
         osd.write_S('|');

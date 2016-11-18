@@ -1289,7 +1289,7 @@ struct Formats {
 };
 
 
-static NOINLINE void print_list(const Formats *f){
+static NOINLINE void print_list(const Formats *f, byte cnt){
     PGM_P fmt;
     byte t;
     float *v;
@@ -1354,6 +1354,8 @@ as_f:
 
 	osd_nl();
 	f++;
+	cnt--;
+	if(cnt==0) break;
     }
 
 
@@ -1376,7 +1378,6 @@ static void panFdata(point p){ // итоги полета
 	{fmt7, '\xA0', 'v',  &min_osd_climb       },
 	{fmt1, '\xBD', 'a',  &max_osd_curr_A      },
 	{fmt1, 'W',    'w',  &max_osd_power       },
-	{0}
     };
 
 
@@ -1398,7 +1399,7 @@ static void panFdata(point p){ // итоги полета
 //*/
 
 
-    print_list(fd);
+    print_list(fd, sizeof(fd)/sizeof(Formats));
 
     if(is_alt(p)) {
         OSD::setPanel(p.x + 10,p.y);
@@ -1438,11 +1439,10 @@ static void panTune(point p){
 	{ fmt4, 'A', 'h', &alt_error         },
 	{ fmt5, 'X', 'i', &xtrack_error      },
 	{ fmt6, 'A', 's', &aspd_error        },
-	{ 0 }
     };
 
 
-    print_list(fd);
+    print_list(fd,sizeof(fd)/sizeof(Formats));
 
 /*
         osd.printf_P(PSTR("\x4E\x52%2.0i\x05|\x4E\x50%2.0i\x05|\x4E\x48%4.0i\x05|\x54\x42%4.0i\x05|\x41\x45%3.0f%c|\x58\x45%3.0f\x6D|\x41\x45%3.0f%c"), 
@@ -1622,13 +1622,14 @@ static void panWPDis(point p){
 
         byte h=get_mhigh();
 
-        osd_printi_1(PSTR("%2i "), wp_number);
+        osd_printi_1(f2i, wp_number);
+        osd_blank();
         osd_printf_2(f4_0f, ((float)wp_dist * get_converth()), h);
-        osd_nl(); // 2 byte less flash than "\n" above
+        osd_nl();
     
         showArrow(getTargetBearing());
-
-        osd_printf_2(PSTR("\x20\x58\x65%4.0f"), (err * get_converth()), h);
+        osd_print_S(PSTR("\x20\x58\x65"));
+        osd_printf_2(f4_0f, (err * get_converth()), h);
     }
 }
 
@@ -2014,10 +2015,12 @@ static byte NOINLINE get_chan_pos(byte ch, byte fExt=0){
     return n;
 }
 
+static const char PROGMEM fci[]="C%i ";
+
 static void panState(point p) {
     byte ch = get_alt_num(p) + 4;
 
-    if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
+    if(has_sign(p)) osd_printi_1(fci,ch+1);
 
     byte n = get_chan_pos(ch, is_alt(p));
 
@@ -2043,9 +2046,9 @@ static void panScale(point p) {
 static void panCValue(point p) {
     byte ch = get_alt_num(p) + 4;
 
-    if(has_sign(p)) osd_printi_1(PSTR("C%i "),ch+1);
+    if(has_sign(p)) osd_printi_1(fci,ch+1);
 
-    osd_printi_1(PSTR("%4d"),chan_raw[ch]);
+    osd_printi_1(f4i,chan_raw[ch]);
 
 }
 
@@ -2125,14 +2128,16 @@ static void panDate(point p) {
   tm->tm_year = year;
   tm->tm_wday = dayOfWeek;
 */
+
+    static const PROGMEM char f_02i[]=".%02d";
     if(is_alt(p)) { // yy.m.d
-        osd_printi_1(PSTR("%02d"),  days+1);
-        osd_printi_1(PSTR(".%02d"), month+1);
+        osd_printi_1(f_02i+1,  days+1);
+        osd_printi_1(f_02i, month+1);
         osd_printi_1(PSTR(".%4d"),  year);
     } else {
-        osd_printi_1(PSTR("%4d"),   year);
-        osd_printi_1(PSTR(".%02d"), month+1);
-        osd_printi_1(PSTR(".%02d"), days+1);
+        osd_printi_1(f4i,   year);
+        osd_printi_1(f_02i, month+1);
+        osd_printi_1(f_02i, days+1);
     }
 }
 
@@ -2489,13 +2494,12 @@ static void panSetup(){
 
 	if(i == setup_menu) { // current pos
 	    OSD::write_S('>');
-//	    col=OSD::col;
 	}
 
 	type=pgm_read_byte((void *)&p->type);
 	k=1;
 
-        switch (type & 0x7f){
+        switch(type & 0x7f){
         
         case 'h': {		 // header
             PGM_P f;
@@ -2512,6 +2516,7 @@ static void panSetup(){
         
         case 'B':
             k=10;
+            // no break!
         case 'b': // byte param
 	    { 
 		int l = *((byte *)(pgm_read_word((void *)&p->value) ) ) ;
@@ -2593,7 +2598,7 @@ as_char:
     v    = c_val;
 
     {
-        float inc = 0;
+        float inc = 1.0;
         switch (type & 0x7f){
     	case 'B': // batt voltage
             k=10;
@@ -2603,7 +2608,6 @@ as_char:
     	case 'b': // byte param
     	    size= 1;
 	    if(     diff>300)	inc=10;
-	    else if(diff>150)	inc=1;
 	    
 	    inc /= k;
 	    break;
@@ -2611,42 +2615,35 @@ as_char:
 	case 's': // sensors
         case 'f': // float param
 	    size=4;
-	    static const PROGMEM float incs[]={1, 0.1, 0.01, 0.001 };
+	    //static const PROGMEM float incs[]={1, 0.1, 0.01, 0.001 };
+	    static const PROGMEM uint16_t incs[]={1, 10, 100, 1000 };
 	
-	    inc=incs[(int)(diff/100) - 1];
-/*	    
-	    if(     diff>400) inc=1;
-	    else if(diff>300) inc=0.1;
-	    else if(diff>200) inc=0.01;
-	    else if(diff>100) inc=0.001;
-*/
+	    inc /= incs[(int)(diff/100) - 1];
 	    break;
         }
 
     
     
         if(diff>100){
-//if(diff) Serial.printf_P(PSTR("diff=%d inc=%f\n"), diff,inc); Serial.wait();
-//	if(fNeg) v += inc;
-//	else     v -= inc;
 	    if(fNeg) inc = -inc;
 	    float_add(v, inc);
 
             byte mm=pgm_read_byte((void *)&p->fmt_mm) & 0xf;
 
-            int min, max;
-
-            min =(int)pgm_read_word((void *)&(min_max[mm].min));
-            max =(int)pgm_read_word((void *)&(min_max[mm].max));
-
-            if(v<min) v=min;
-            if(v>max) v=max;
+            {
+                int min =(int)pgm_read_word((void *)&(min_max[mm].min));
+                if(v<min) v=min;
+            }
+            {
+                int max =(int)pgm_read_word((void *)&(min_max[mm].max));
+                if(v>max) v=max;
+            }
         }
     }
 
     if(v != c_val) { // value changed
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
-	int8_t cv=(char)(v * k); // предварительно посчитаем на всякий случай
+	int8_t cv=(int8_t)(v * k); // предварительно посчитаем на всякий случай
         byte add=0;
 
         switch (type & 0x7f){
@@ -2680,10 +2677,7 @@ as_c:		*((char *)pval) = cv + add;
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
 
 no_write:
-/*
-	fptr cb = (fptr) pgm_read_word((void *)&p->cb);
-	if(cb) cb(); // show tail
-*/
+
         if(type & 0x80) renew();
 
     }

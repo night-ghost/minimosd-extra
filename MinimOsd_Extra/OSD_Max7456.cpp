@@ -5,9 +5,6 @@
 #include "Arduino.h"
 
 #include "OSD_Max7456.h"
-// Get the common arduino functions
-
-
 #include "Spi.h"
 #include "Config.h"
 
@@ -135,7 +132,7 @@ void OSD::detectMode()
             FLAGS.PAL_NTSC = 0; // remember in case of camera off
         }
         else if((B00000100 & osdstat_r) != 0){ //loss of sync
-//      setMode(1); // PAL without video 
+
 no_auto:
           if (FLAGS.PAL_NTSC) //NTSC
               setMode(1);

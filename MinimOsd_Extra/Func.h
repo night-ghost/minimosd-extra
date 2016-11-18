@@ -621,15 +621,17 @@ again:
 	// 1000000 / BAUD for 115200 is 8.68uS
 	//  so I has no idea about pulse times - thease simply measured
 
-	long speed;
 	byte rate;
-	if(     pulse < 11) 	{ speed = 115200; rate = 2;  }  // *4 /2
-	else if(pulse < 19) 	{ speed =  57600; rate = 4;  }  // *4 /4
-	else if(pulse < 29) 	{ speed =  38400; rate = 6;  }  // *4 /6
-	else if(pulse < 40) 	{ speed =  28800; rate = 8;  }
-	else if(pulse < 60) 	{ speed =  19200; rate = 16; }
-	else if(pulse < 150)	{ speed =   9600; rate = 32; }
-	else                    { speed =   4800; rate = 64; }
+	byte sp;
+	if(     pulse < 11) 	{ sp = 24; rate = 2;  }  // *4 /2
+	else if(pulse < 19) 	{ sp = 12; rate = 4;  }  // *4 /4
+	else if(pulse < 29) 	{ sp =  8; rate = 6;  }  // *4 /6
+	else if(pulse < 40) 	{ sp =  6; rate = 8;  }
+	else if(pulse < 60) 	{ sp =  4; rate = 16; }
+	else if(pulse < 150)	{ sp =  2; rate = 32; }
+	else                    { sp =  1; rate = 64; }
+
+	long speed = sp*4800;
 
 	stream_rate = rate;
 #ifdef DEBUG

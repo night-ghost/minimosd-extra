@@ -111,20 +111,20 @@ bool read_mavlink(){
 	    if( msg.m.msgid!=MAVLINK_MSG_ID_HEARTBEAT &&                // not heartbeat
 		apm_mav_system && apm_mav_system != msg.m.sysid && msg.m.sysid !='3') {       // another system and not 3D radio
 #ifdef DEBUG
-    packets_skip+=1;
+                    packets_skip+=1;
 //    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
 		    break; // skip packet and exit 
-		}
+	    }
 
 #ifdef DEBUG
-	packets_got+=1;
+	    packets_got+=1;
 #endif
 
 
 	    cnt++;
 
-DBG_PRINTVARLN(msg.m.msgid);
+//DBG_PRINTVARLN(msg.m.msgid);
 	    
             //handle msg
             switch(msg.m.msgid) {
@@ -170,8 +170,8 @@ if(apm_mav_system  != msg.m.sysid){
                 // apm_mav_component = msg.m.compid;
 
 
-#define MAX_OVERLOAD_COUNT 5
-#define MAX_FROZEN_COUNT 5
+#define MAX_OVERLOAD_COUNT 10
+#define MAX_FROZEN_COUNT 10
 
 		if(mav_data_count==0){ // there is no data comes to OSD
 		    if(mav_raw_imu_count) { // we has IMU data but not GPS - stream overload
@@ -344,7 +344,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 chan_raw[6] = mavlink_msg_rc_channels_get_chan7_raw(&msg.m);
                 chan_raw[7] = mavlink_msg_rc_channels_get_chan8_raw(&msg.m);
                 osd_rssi = mavlink_msg_rc_channels_get_rssi(&msg.m);
-DBG_PRINTF("got rssi=%d\n", osd_rssi );
+//DBG_PRINTF("got rssi=%d\n", osd_rssi );
                 break;
 
 
@@ -462,7 +462,7 @@ typedef struct __mavlink_radio_status_t
 		    byte rssi    = mavlink_msg_radio_status_get_rssi(&msg.m);
 		    byte remrssi = mavlink_msg_radio_status_get_remrssi(&msg.m);
 		    telem_rssi = remrssi > rssi ? rssi : remrssi;
-DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
+//DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
 
 		} break;
 
@@ -474,11 +474,11 @@ DBG_PRINTF("\nMAVLINK_MSG_ID_RADIO_STATUS rssi=%d remrssi=%d\n", rssi, remrssi);
 
             case MAVLINK_MSG_ID_SYSTEM_TIME: {
                 uint32_t sys_seconds=mavlink_msg_system_time_get_time_unix_usec(&msg.m) / (1000 * 1000ULL); //uS to UNIX timestamp
-DBG_PRINTF("\ngot time=%ld\n", sys_seconds );
+//DBG_PRINTF("\ngot time=%ld\n", sys_seconds );
                 sys_days    = sys_seconds / (24*60*60uL);
                 day_seconds = sys_seconds % (24*60*60uL);
-DBG_PRINTF("day time=%ld\n", day_seconds );
-DBG_PRINTF("days=%ld\n",     sys_days );
+//DBG_PRINTF("day time=%ld\n", day_seconds );
+//DBG_PRINTF("days=%ld\n",     sys_days );
                 
                 lflags.got_date= (sys_days>0);
     
