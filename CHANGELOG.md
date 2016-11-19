@@ -429,3 +429,5 @@ v902
 v903
 * fixed bug with vario zero position
 
+v904
+* fixed bug with message time
