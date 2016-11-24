@@ -45,6 +45,7 @@ Project received Donations from (in time order)
  Aldoir Ventura
  Dean Berg
  Gavin Williams
+ Daniel Papst
 
 Figures, harm the development of an idiotic question:
  MachVoluM

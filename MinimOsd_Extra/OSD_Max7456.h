@@ -98,6 +98,7 @@ class OSD: public BetterStream
     static void reset(void);
     static void clear(void);
     static void setPanel(uint8_t start_col, uint8_t start_row);
+    static void relPanel(uint8_t c, uint8_t r);
     static void detectMode(void);
     static void setMode(uint8_t mode);
     static void setBrightness();

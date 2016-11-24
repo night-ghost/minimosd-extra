@@ -34,7 +34,7 @@ namespace OSD {
     public partial class OSD : Form {
 
         //*****************************************/		
-        public const string VERSION = "r901 DV";
+        public const string VERSION = "r905 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -341,7 +341,7 @@ namespace OSD {
                 pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
                 pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
                 pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
-                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1);
+                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, UI_Mode.UI_Checkbox,0,"Arrow relative to home, not north");
                 pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, UI_Mode.UI_Checkbox,0,"Coordinates on top" );
                 pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, UI_Mode.UI_Combo_Time, 0, "Time to show (s)", -1, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
                 pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");

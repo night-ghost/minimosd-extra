@@ -115,8 +115,8 @@ void OSD::detectMode()
   //read STAT and auto detect Mode PAL/NTSC
     max7456_on();
     
-    byte osdstat_r;
-
+    byte  osdstat_r;
+    
     if(!FLAGS.mode_auto) {
 	goto no_auto;
     }else {
@@ -208,11 +208,20 @@ void OSD::setPanel(uint8_t st_col, uint8_t st_row){
     row = st_row & 0x0f; // 16 rows - в старших битах флаги, размер экрана все равно мелкий
 
 
-    if(getMode()==0 && row >6) // ntsc after middle
+    if(getMode()==0 && row >6) // ntsc after middle - only once per panel
 	row-=3;
 
     calc_pos();
 }
+
+// place character relative to panel's start point
+void OSD::relPanel(uint8_t _col, uint8_t _row){
+    byte c = col + _col; // left upper corner + shift
+    byte r = row + _row;
+
+    bufpos = r*30 + c;
+}
+
 
 
 
@@ -237,7 +246,7 @@ size_t OSD::write(uint8_t c){
 }
 
 void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
-    setPanel(x,y);
+    relPanel(x,y);
     write_S(c);
 }
 

@@ -455,7 +455,10 @@ namespace OSD
 			}else{
                 if (is_alt3(fAlt)) {
                     vs_ms = 1;
-                    osd.printf("% 4.2f%c",  (double)(osd_climb * converth/60), 0x18);
+                    if (is_alt4(fAlt))
+                        osd.printf("% 4.1f%c", (double)(osd_climb * converth / 60), 0x18);
+                    else 
+                        osd.printf("% 4.2f%c",  (double)(osd_climb * converth/60), 0x18);
                 } else {
                     vs_ms = 0;
                     osd.printf("%4.0f%c", (double)(osd_climb * converth), climbChar);

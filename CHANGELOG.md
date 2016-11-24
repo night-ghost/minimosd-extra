@@ -431,3 +431,8 @@ v903
 
 v904
 * fixed bug with message time
+
+v905
+* fixed NTSC horizon bug
+* added checkbox in RadarScale to select UAV arrow direction
+

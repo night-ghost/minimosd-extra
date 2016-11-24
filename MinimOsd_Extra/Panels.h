@@ -8,6 +8,10 @@ static void NOINLINE osd_setPanel(Point p){
     OSD::setPanel(p.x,p.y);
 }
 
+static void NOINLINE osd_relPanel(Point p){
+    OSD::relPanel(p.x,p.y);
+}
+
 static void NOINLINE osd_nl(){
     OSD::write_S('\xff');
 }
@@ -30,13 +34,15 @@ static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
     return osd_groundspeed * get_converts();
 }
 
-static void NOINLINE osd_printf_1(PGM_P fmt, float f){
-    osd.printf_P(fmt, f);
-}
 
 static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
     osd.printf_P(fmt, f);
-    OSD::write_S(c);
+    if(c) OSD::write_S(c);
+}
+
+static void NOINLINE osd_printf_1(PGM_P fmt, float f){
+    //osd.printf_P(fmt, f);
+    osd_printf_2(fmt, f, 0);
 }
 
 static void NOINLINE osd_printi_1(PGM_P fmt, int f){
@@ -157,7 +163,7 @@ static void NOINLINE showArrow(uint8_t rotate_arrow){
 
 // Calculate and show artificial horizon
 // used formula: y = m * x + n <=> y = tan(a) * x + n
-static void showHorizon(byte start_col, byte start_row) {
+static void showHorizon() {
     byte col, row;
 
     byte line_set = LINE_SET_STRAIGHT__;
@@ -249,7 +255,7 @@ again:
 	    else
 		subval = 0; // raw chars
 	    
-	    OSD::setPanel(start_col + col - 1, start_row + AH_ROWS - row - 1);
+	    OSD::relPanel(col - 1, AH_ROWS - row - 1);
 	    if(shift_angle!=0 && col==(AH_COLS-1)/2){ // time to draw scale
 		osd.print(abs(shift_angle));
 		col++; // skip next
@@ -259,7 +265,7 @@ again:
 	    
 	    // check if we have to print an overflow line char
 	    if ( subval && subval >= subval_overflow && row < 4) {  // only if it is a char which needs overflow and if it is not the upper most row
-                OSD::write_xy(start_col + col - 1, start_row + AH_ROWS - row - 2, line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
+                OSD::write_xy(col - 1, AH_ROWS - row - 2, line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
 	    }
         }
     }
@@ -286,9 +292,7 @@ again:
 }
 
 
-static void showILS(byte start_col, byte start_row) {
-//    OSD::setPanel(start_col, start_row);
-
+static void showILS() {
     // Calculate and shows ILS
     
     //now ILS in dimensions of Horizon
@@ -304,8 +308,8 @@ static void showILS(byte start_col, byte start_row) {
         int8_t charPosition = linePosition / 9;
         uint8_t selectedChar = 8 - (linePosition % 9) + 0xC7;
         if(charPosition >= 0 && charPosition <= AH_ROWS) {
-          OSD::write_xy(start_col + AH_COLS, start_row + charPosition, selectedChar); // в первой и последней колонке
-          OSD::write_xy(start_col + 1,       start_row + charPosition, selectedChar);
+          OSD::write_xy(AH_COLS, charPosition, selectedChar); // в первой и последней колонке
+          OSD::write_xy(1,       charPosition, selectedChar);
         }
       }
       { //Horizontal calculation
@@ -322,16 +326,16 @@ static void showILS(byte start_col, byte start_row) {
             byte cl;
         
             if(charPosition < 0){
-                cl=start_col +1; // в первой и последней строке
+                cl=1; // в первой и последней строке
                 selectedChar='<';
             } else if(charPosition > AH_COLS)  {
-                cl = start_col +AH_COLS; // в первой и последней строке
+                cl = AH_COLS; // в первой и последней строке
                 selectedChar='>';
             } else {
-                cl=start_col + charPosition+1;
+                cl=charPosition+1;
             }
-            OSD::write_xy(cl, start_row + AH_ROWS-1, selectedChar );
-            OSD::write_xy(cl, start_row,             selectedChar );
+            OSD::write_xy(cl, AH_ROWS-1, selectedChar );
+            OSD::write_xy(cl, 0,         selectedChar );
       }
     } else { // copter
     
@@ -341,6 +345,7 @@ static void showILS(byte start_col, byte start_row) {
         char subval_char = 0xCF;
 
         char alt = (osd_alt_mav * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
+        byte row=0;
 
         if((alt < 44) && (alt > 0)){
             //We have 9 possible chars
@@ -351,19 +356,19 @@ static void showILS(byte start_col, byte start_row) {
 
             subval_char = (8 - (alt  % 9)) + 0xC7; // 9 уровней C7-CF
             //Each row represents 9 altitude units
-            start_row += (alt / 9);
+            row += (alt / 9);
         }
         else if(alt >= 44){
             //Copter is too high. Ground is way too low to show on panel, 
             //so show down arrow at the bottom
             subval_char =0x2E; 
-            start_row += 4;
+            row += 4;
         }
 
 //	start_col += AH_COLS / 2; // middle of horizon
 
         //Enough calculations. Let's show the result
-        OSD::write_xy(start_col + AH_COLS / 2, start_row, subval_char);
+        OSD::write_xy(AH_COLS / 2, row, subval_char);
     }
 
 }
@@ -390,9 +395,15 @@ byte NOINLINE radar_char(){
 
 //home - showArrow(osd_home_direction);
 
+    int index;
 
-//    int index = (2 * osd_heading + 45) / 90;
-    int index = (2 * normalize_angle(osd_home_direction+180) + 45) / 90;
+    point p = readPanel(ID_of(RadarScale));
+    if(is_alt(p)) {
+        index = normalize_angle(osd_home_direction+180);
+    } else {
+        index = osd_heading;
+    }
+    index = (2 * index + 45) / 90;
     while(index<0)  index+=8;
     while(index>=8) index-=8;
     
@@ -443,6 +454,61 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
 
 /******* PANELS - DEFINITION *******/
 /* **************************************************************** */
+
+
+/* **************************************************************** */
+// Panel  : panHorizon
+// Needs  : X, Y locations
+// Output : 5 x 12 Horizon line surrounded by 2 cols (left/right rules)
+// Size   : 5 x 14  (rows x chars)
+// Staus  : done
+
+
+static void inline spaces(byte n){
+    while(n-- >0) osd_blank();
+}
+
+static void panHorizon(point p){
+  
+  // сначала нарисуем стрелочки.
+
+    if(is_alt(p)) {
+	byte i;
+	for(i=5;i!=0; i--){ // 30 bytes of flash
+            osd.write_S(i==3 ? '\xc6' : '\xb2');
+            spaces(12);
+            osd.write_S(i==3 ? '\xc5' : '\xb3');
+            osd_nl();
+	}
+    }
+
+    osd.setPanel(p.x + 1, p.y);
+    
+    if(!(screen_flags & scrFlg_hideHorizon))
+        showHorizon();
+
+    if(is_alt3(p))
+       showRADAR(5, 2, is_alt4(p));
+
+    if(has_sign(p)) { // Птичка по центру
+	OSD::relPanel(5, 2);
+	osd_print_S(PSTR("\xb8\xb9"));
+/*        char c=0xb8;
+	OSD::write_S(c);
+	OSD::write_S(++c);
+*/
+
+    }
+
+    //Show ground level on  HUD
+    if(is_alt2(p) && lflags.motor_armed)
+	showILS();
+
+}
+
+
+
+
 
 /* **************************************************************** */
 // Panel  : COG Course Over Ground
@@ -1020,57 +1086,6 @@ static void panHomeDis(point p){
 
 
 /* **************************************************************** */
-// Panel  : panHorizon
-// Needs  : X, Y locations
-// Output : 5 x 12 Horizon line surrounded by 2 cols (left/right rules)
-// Size   : 5 x 14  (rows x chars)
-// Staus  : done
-
-
-static void inline spaces(byte n){
-    while(n-- >0) osd_blank();
-}
-
-static void panHorizon(point p){
-  
-  // сначала нарисуем стрелочки.
-
-    if(is_alt(p)) {
-	byte i;
-	for(i=5;i!=0; i--){ // 30 bytes of flash
-            osd.write_S(i==3 ? '\xc6' : '\xb2');
-            spaces(12);
-            osd.write_S(i==3 ? '\xc5' : '\xb3');
-            osd_nl();
-	}
-    }
-
-    if(!(screen_flags & scrFlg_hideHorizon))
-        showHorizon(p.x + 1, p.y);
-
-    byte mid_x = p.x+6;
-    byte mid_y = p.y+2;
-
-    if(is_alt3(p))
-       showRADAR(mid_x, mid_y, is_alt4(p));
-
-    if(has_sign(p)) { // Птичка по центру
-	OSD::setPanel(mid_x, mid_y);
-	osd_print_S(PSTR("\xb8\xb9"));
-/*        char c=0xb8;
-	OSD::write_S(c);
-	OSD::write_S(++c);
-*/
-
-    }
-
-    //Show ground level on  HUD
-    if(is_alt2(p) && lflags.motor_armed)
-	showILS(p.x, p.y);
-
-}
-
-/* **************************************************************** */
 // Panel  : panPitch
 // Needs  : X, Y locations
 // Output : -+ value of current Pitch from vehicle with degree symbols and pitch symbol
@@ -1381,7 +1396,8 @@ static void panFdata(point p){ // итоги полета
     };
 
 
-    OSD::write_xy(p.x, p.y, 0x08); // this is absolutely needed!
+    osd_setPanel(p);
+    osd.write_S(0x08); // this is absolutely needed!
 
     printTimeCnv(&total_flight_time_milis, 0);
 
@@ -2163,7 +2179,7 @@ static void panVario(point p) {
 
     PGM_P f;
 
-    byte x=p.x;
+    byte x=0;
 
     if(has_sign(p)) {
         if (!is_alt(p)) {
@@ -2197,7 +2213,7 @@ static void panVario(point p) {
         selectedChar = 0x60;
     } 
         
-    OSD::write_xy(x, p.y + charPosition, selectedChar);
+    OSD::write_xy(x, charPosition, selectedChar);
 }
 
 
@@ -2284,7 +2300,8 @@ void renew(){
 
 
 void setup_horiz(){
-    showHorizon(8+1, 6);
+    osd.setPanel(8+1, 6);
+    showHorizon();
 }
 
 #if defined(USE_SENSORS)

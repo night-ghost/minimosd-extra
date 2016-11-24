@@ -959,7 +959,7 @@ as_checkbox:
 
             for (int a = 0; a < panelItems.Length; a++) {
                 if (panelItems[a] != null && panelItems[a].name == item) {
-                    int n = cbNumber.SelectedIndex;
+                    int n = cbTime.SelectedIndex;
                     
                     panelItems[a].Alt2 = (n & 1) != 0 ? 1 : 0;
                     panelItems[a].Alt3 = (n & 2) != 0 ? 1 : 0;
