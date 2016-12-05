@@ -60,8 +60,12 @@ static void NOINLINE eeprom_read_len(byte *p, uint16_t e, uint16_t l){
 }
 
 static NOINLINE void eeprom_write_len(byte *p, uint16_t e, uint16_t l){
-    for(;  l!=0; l--, e++)
-	eeprom_write_byte( (byte *)e, *p++ );
+    byte b;
+    for(;  l!=0; l--, e++) {
+        b = *p++;
+        if(eeprom_read_byte((byte *)e) != b)
+            eeprom_write_byte( (byte *)e, b);
+    }
 
 }
 

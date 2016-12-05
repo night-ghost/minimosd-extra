@@ -631,12 +631,12 @@ again:
 	else if(pulse < 150)	{ sp =  2; rate = 32; }
 	else                    { sp =  1; rate = 64; }
 
-	long speed = sp*4800;
+	long speed = sp*4800L;
 
 	stream_rate = rate;
 #ifdef DEBUG
 	OSD::setPanel(3,2);
-	osd.printf_P(PSTR("pulse=%d speed=%ld"),pulse, speed);
+	osd.printf_P(PSTR("pulse=%d sp=%d speed=%ld"),pulse, sp, speed);
 #endif
 	serial_speed=speed; // store detected port speed for show
 	Serial.flush();	// clear serial buffer from garbage

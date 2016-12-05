@@ -5,8 +5,9 @@
 /******* FROM DATASHEET *******/
 
 // pinout
-#define MAX7456_SELECT 6//SS PD6
-#define MAX7456_VSYNC 2//INT0
+#define MAX7456_SELECT 6        // SS PD6
+#define MAX7456_VSYNC 2         // INT0
+#define MAX7456_RESET_PIN 10    // RESET
 
 #define DATAOUT 11              // MOSI
 #define DATAIN  12              // MISO

@@ -101,6 +101,9 @@ void OSD::init()
 {
     pinMode(MAX7456_SELECT,OUTPUT);
     pinMode(MAX7456_VSYNC, INPUT_PULLUP);
+    pinMode(MAX7456_RESET_PIN, OUTPUT);
+
+    reset();
 
     detectMode();
 

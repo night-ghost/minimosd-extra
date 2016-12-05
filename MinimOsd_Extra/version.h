@@ -1,1 +1,1 @@
-#define RELEASE_NUM 905
+#define RELEASE_NUM 906

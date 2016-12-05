@@ -292,6 +292,10 @@ again:
 }
 
 
+#define totalNumberOfLines  (9 * AH_ROWS)   //9 chars in chartset for horizontal line
+#define totalNumberVertLines  (6 * AH_COLS) //6 chars in chartset for vertical line
+
+
 static void showILS() {
     // Calculate and shows ILS
     
@@ -300,14 +304,14 @@ static void showILS() {
     if(sets.model_type==0) { // plane
 
        { //Vertical calculation
-        int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795) - 10;
+        int currentAngleDisplacement = (int)(atan2(osd_alt_to_home, osd_home_distance) * 57.2957795 * 2) - 10;
         //Calc current char position.
         //int numberOfPixels = CHAR_ROWS * AH_ROWS;
-        int8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
-        int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+
+        int linePosition = (totalNumberOfLines * currentAngleDisplacement / 10 + totalNumberOfLines) / 2; //+-5 degrees
         int8_t charPosition = linePosition / 9;
         uint8_t selectedChar = 8 - (linePosition % 9) + 0xC7;
-        if(charPosition >= 0 && charPosition <= AH_ROWS) {
+        if(charPosition >= 0 && charPosition < AH_ROWS) {
           OSD::write_xy(AH_COLS, charPosition, selectedChar); // в первой и последней колонке
           OSD::write_xy(1,       charPosition, selectedChar);
         }
@@ -319,8 +323,7 @@ static void showILS() {
     
             currentAngleDisplacement-=180; // range -90..90
        
-            int8_t totalNumberOfLines = 6 * AH_COLS; //6 chars in chartset for vertical line
-            int linePosition = totalNumberOfLines * currentAngleDisplacement / 10 + (totalNumberOfLines / 2); //+-5 degrees
+            int linePosition = totalNumberVertLines * currentAngleDisplacement / 10 + (totalNumberVertLines / 2); //+-5 degrees
             int8_t charPosition = linePosition / 6;
             uint8_t selectedChar = (linePosition % 6) + 0xBF;
             byte cl;
@@ -2192,7 +2195,6 @@ static void panVario(point p) {
     } 
 
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
-    uint8_t totalNumberOfLines = 9 * AH_ROWS; //9 chars in chartset for vertical line
 
     int linePosition = int(-vertical_speed*2) ; // 0 at middle
 
@@ -2200,7 +2202,7 @@ static void panVario(point p) {
     if(is_alt3(p)) linePosition/=2;
     if(is_alt4(p)) linePosition/=4;
     
-    linePosition = (linePosition + totalNumberOfLines) / 2;
+    linePosition = (linePosition + totalNumberOfLines) / 2; // linePosition + 
 
     int8_t  charPosition = linePosition / 9;
     uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
