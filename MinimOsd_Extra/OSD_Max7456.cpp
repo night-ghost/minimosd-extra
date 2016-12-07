@@ -58,7 +58,12 @@ void MAX_mode(byte mode){
 void OSD::reset(){
     max7456_on();
 
-    byte cnt=15;
+    byte cnt=3;
+
+    while(cnt--)
+        SPI::transfer(0xff);
+    
+    cnt=15;
 
     while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) );//read status register - sync to soft-only versions
 
@@ -257,17 +262,9 @@ void OSD::write_xy(uint8_t x, uint8_t y, uint8_t c){
 void OSD::update() {
     uint8_t *b = osdbuf;
     uint8_t *end_b = b+sizeof(osdbuf);
-/*
-    uint8_t bit = digitalPinToBitMask(MAX7456_SELECT); // move calculations from critical section
-    uint8_t port = digitalPinToPort(MAX7456_SELECT);
-    volatile uint8_t *out = portOutputRegister(port);
-
-#define SET_LOW()   *out &= ~bit
-#define SET_HIGH()  *out |= bit
-*/
 
 /*
-    wee need to transfer 480 bytes, SPI speed set to 8 MHz so one byte goes in 1uS and all transfer will ends up in ~500uS
+    wee need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
     
 */
 
@@ -278,11 +275,10 @@ void OSD::update() {
     MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
     max7456_off(); 
-
     for(; b < end_b;) {
-        max7456_on();
+        max7456_on(); // strobing each byte with CS is necessary :(
         SPI::transfer(*b);
-        *b++=' ';           // обойдемся без memset
+        *b++=' ';
         max7456_off();
     }
     max7456_on();

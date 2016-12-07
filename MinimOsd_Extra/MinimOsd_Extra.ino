@@ -165,33 +165,26 @@ ISR(INT0_vect) {
     vsync_time=millis(); // и отметим его время
 
 
-    if(nested) {	// вложенное прерывание игнорируем
+//    if(nested) {	// вложенное прерывание игнорируем
 #if defined(DEBUG)
-       nest_count++;	// ... но запишем в тетрадочку
+//       nest_count++;	// ... но запишем в тетрадочку
 #endif
-    } else {
-	byte tmp=SREG;
+//    } else {
+//	byte tmp=SREG;
         if(update_screen) { // there is data for screen
-            nested++;
-            sei(); 			// enable other interrupts 
+//            nested++;
+//            sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
-            update_screen = 0;
-            nested--;
+            update_screen = 0;          //   on 115200 bit time=1/speed = ~87uS so byte time= ~870uS. 
+//            nested--;
         }
 #if defined(PWM_IN_INTERRUPT)
-        sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
-        generate_PWM(false);
+//        sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
+//        generate_PWM(false);
 #endif
-        SREG=tmp;
-    }
-    
-    /* check PC of interrupted code
-    __asm volatile (
-        "in	r28, __SP_L__ \n"
-        "in	r29, __SP_H__ \n"
-        ld 
-    );
-    */
+//        SREG=tmp;
+//    }
+
 #if defined(DEBUG)
     byte sp;
 

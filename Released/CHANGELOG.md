@@ -439,3 +439,7 @@ v905
 v806
 * fixed AutoBaudRate
 * optimized EEPROM usage
+
+v807 - TEST VERSION!
+* removed usage of nested interrupts
+

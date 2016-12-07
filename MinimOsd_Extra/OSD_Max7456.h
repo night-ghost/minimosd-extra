@@ -27,6 +27,7 @@
 
 //MAX7456 reg write addresses
 #define MAX7456_VM0_reg   0x00
+#define MAX7456_VM0_reg_read  0x80
 #define MAX7456_VM1_reg   0x01
 
 #define MAX7456_HOS_reg   0x02 // horisontal offset
