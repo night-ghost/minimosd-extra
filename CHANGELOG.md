@@ -436,10 +436,10 @@ v905
 * fixed NTSC horizon bug
 * added checkbox in RadarScale to select UAV arrow direction
 
-v806
+v906
 * fixed AutoBaudRate
 * optimized EEPROM usage
 
-v807 - TEST VERSION!
+v907 - TEST VERSION!
 * removed usage of nested interrupts
 
