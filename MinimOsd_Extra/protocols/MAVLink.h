@@ -41,6 +41,7 @@ void request_mavlink_rates()
 
 #endif
 
+// fake HEARTBEAT packet for 3DR  rssi generation
 void heartBeat() { //                          type, autopilot, base_mode, custom_mode, system_status)
     mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0,    0,         0,         0,           0);
 }
@@ -54,9 +55,6 @@ union {
 } msg;
 */
 
-/*      allow CLI to be started by hitting enter 3 times, if no
-        heartbeat packets have been received but not more than 3 seconds 
-*/
 
 bool read_mavlink(){
     uint8_t   base_mode=0;
@@ -366,7 +364,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: { // coordinates are here too
                 // height of takeoff point
                 //osd_home_alt = osd_alt_mav*1000 - mavlink_msg_global_position_int_get_relative_alt(&msg.m);  // alt above ground im MM
-                osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground im MM
+                osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msg.m) / 1000;  // alt above ground in MM
 		int16_t vx = mavlink_msg_global_position_int_get_vx(&msg.m); // speed for non-GPS setups
 		int16_t vy = mavlink_msg_global_position_int_get_vy(&msg.m);
 		loc_speed = distance(vx, vy) / 100;
@@ -407,7 +405,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                     point p = readPanel(ID_of(message));
                     byte n = get_alt_num(p);
                     static const PROGMEM byte delays[]= { 2, 6, 10, 15, 20, 30, 45, 60 };
-		    mav_message_start(len, delays[n] ); // len, time to show
+		    mav_message_start(len, pgm_read_byte(&delays[n]) ); // len, time to show
                 }
                 break;
 

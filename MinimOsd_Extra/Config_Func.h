@@ -3,7 +3,6 @@
 
 
 static boolean inline is_on(point p){
-    //return p.x>=0 && p.y >=0 && p.y < 0x80;
     return p.y < 0x80;
 }
 

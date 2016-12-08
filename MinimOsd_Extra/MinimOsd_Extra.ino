@@ -46,6 +46,8 @@ Project received Donations from (in time order)
  Dean Berg
  Gavin Williams
  Daniel Papst
+ Dion Brewington
+ Marchenko Nikolai
 
 Figures, harm the development of an idiotic question:
  MachVoluM

@@ -445,3 +445,6 @@ v907 - TEST VERSION!
 
 v908
 * added support for boards without connected VSYNC
+
+v909
+* fixed bug with MAVlink message
