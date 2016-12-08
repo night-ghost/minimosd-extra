@@ -151,48 +151,77 @@ mavlink_system_t mavlink_system = {12,1};
 
 /* **********************************************/
 
+volatile byte vas_vsync=false;
+
+// обработка прерывания по кадровому синхроимпульсу
+#if 0 // nested interrupts cause hang on some cameras :(
+
 volatile byte nested=0; 
 
 #if defined(DEBUG)
 volatile byte nest_count=0; // only for debugging
 #endif
 
-// обработка прерывания по кадровому синхроимпульсу
 ISR(INT0_vect) {
+    vas_vsync=true;
     vsync_wait=0;	// отметить его наличие
     
     vsync_count++; // считаем кадровые прерывания
     vsync_time=millis(); // и отметим его время
 
 
-//    if(nested) {	// вложенное прерывание игнорируем
-#if defined(DEBUG)
-//       nest_count++;	// ... но запишем в тетрадочку
-#endif
-//    } else {
-//	byte tmp=SREG;
+    if(nested) {	// вложенное прерывание игнорируем
+ #if defined(DEBUG)
+       nest_count++;	// ... но запишем в тетрадочку
+ #endif
+    } else {
+	byte tmp=SREG;
         if(update_screen) { // there is data for screen
-//            nested++;
-//            sei(); 			// enable other interrupts 
+            nested++;
+            sei(); 			// enable other interrupts 
             OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
-            update_screen = 0;          //   on 115200 bit time=1/speed = ~87uS so byte time= ~870uS. 
-//            nested--;
+                                        //   on 115200 bit time=1/speed = ~87uS so byte time= ~870uS. ATmega's datasheet says that 
+                                        //   receive buffer has 2 bytes, so we have time near 3*870uS = ~2500uS before character loss
+            update_screen = 0;          
+            nested--;
         }
-#if defined(PWM_IN_INTERRUPT)
-//        sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
-//        generate_PWM(false);
-#endif
-//        SREG=tmp;
-//    }
+ #if defined(PWM_IN_INTERRUPT)
+        sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
+        generate_PWM(false);
+ #endif
+        SREG=tmp;
+    }
 
-#if defined(DEBUG)
+ #if defined(DEBUG)
     byte sp;
 
     if(((uint16_t)&sp)<stack_bottom)
         stack_bottom=((uint16_t)&sp);
-#endif
+ #endif
 }
+#else
+ISR(INT0_vect) {
+    vas_vsync=true;
+    vsync_wait=0;	// отметить его наличие
+    
+    vsync_count++; // считаем кадровые прерывания
+    vsync_time=millis(); // и отметим его время
 
+    if(update_screen) { // there is data for screen
+        OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
+                                    //   on 115200 bit time=1/speed = ~87uS so byte time= ~870uS. ATmega's datasheet says that 
+                                    //   receive buffer has 2 bytes, so we have time near 3*870uS = ~2500uS before character loss
+        update_screen = 0;          
+    }
+
+ #if defined(DEBUG)
+    byte sp;
+
+    if(((uint16_t)&sp)<stack_bottom)
+        stack_bottom=((uint16_t)&sp);
+ #endif
+}
+#endif
 
 
 // PWM Measurement
@@ -526,9 +555,10 @@ void loop()
             
             if(lflags.got_date) day_seconds++; // if we has GPS time - let it ticks
 
-	    if(vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
+	    if( vas_vsync && vsync_count < 5) { // при частоте кадров их должно быть 25 или 50
+	                                            // но есть платы где эта нога не подключена. Китай...
 	        max7456_err_count++;
-                if(max7456_err_count>3) { // 3 seconds no sync
+                if(max7456_err_count>3) { // 3 seconds bad sync
 #ifdef DEBUG   
                     Serial.printf_P(PSTR("restart MAX! vsync_count=%d\n"),vsync_count);
 #endif

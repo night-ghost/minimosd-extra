@@ -443,3 +443,5 @@ v906
 v907 - TEST VERSION!
 * removed usage of nested interrupts
 
+v908
+* added support for boards without connected VSYNC

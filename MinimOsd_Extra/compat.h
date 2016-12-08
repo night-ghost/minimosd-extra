@@ -36,7 +36,6 @@ typedef char prog_char;
 #define BYTE_OF(v,n) (((byte *)&(v))[n])
 
 #define TO_STRING2(x) #x
-
 #define TO_STRING(x) TO_STRING2(x)
 
 //__extension__ typedef int __guard __attribute__((mode (__DI__)));

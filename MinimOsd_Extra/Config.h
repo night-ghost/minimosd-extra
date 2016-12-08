@@ -20,7 +20,7 @@
 #define MAVLINK_CONFIG 1
 #endif
 
-#define PWM_IN_INTERRUPT 1
+//#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
 #define MAV_REQUEST 1
