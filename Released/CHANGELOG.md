@@ -448,3 +448,6 @@ v908
 
 v909
 * fixed bug with MAVlink message
+
+v910 - THE TEST VERSION!!!
+* a try to work on myairbot's board

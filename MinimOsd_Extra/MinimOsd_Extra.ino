@@ -4,9 +4,13 @@ An Open Source Arduino based OSD and Camera Control project.
 
 Program  : Minim-OSD 
 
-Version  : V8.68, 14 jule 2016
+Version  : V9.09, 09 dec 2016
+by Night Ghost
 
-based on: minimOSD-extra by Sandro Benigno
+based on:
+
+ minimOSD-extra by Sandro Benigno
+
 Coauthor(s):
 Jani Hirvinen   (All the EEPROM routines)
 Michael Oborne  (OSD Configurator)
@@ -46,6 +50,7 @@ Project received Donations from (in time order)
  Dean Berg
  Gavin Williams
  Daniel Papst
+ mai ruliang
  Dion Brewington
  Marchenko Nikolai
 
