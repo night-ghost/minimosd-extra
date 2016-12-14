@@ -2096,6 +2096,29 @@ static void panDayTime(point p) {
         printTime(min, is_alt(p));
 }
 
+#if defined(USE_NMEA)
+static void panDate(point p) {
+    uint32_t date=msg.nmea.date;
+    
+    // 230394 – Дата, 23 марта 1994 года
+    uint8_t day = date / 10000;
+    date -= day*10000;
+    uint8_t mon = date / 100;
+    date -= mon*100 + 2000; 
+
+    static const PROGMEM char f_02i[]=".%02d";
+    if(is_alt(p)) { // yy.m.d
+        osd_printi_1(f_02i+1,  day);
+        osd_printi_1(f_02i, mon);
+        osd_printi_1(PSTR(".%4d"),  date);
+    } else {
+        osd_printi_1(f4i,   date);
+        osd_printi_1(f_02i, mon);
+        osd_printi_1(f_02i, day);
+    }
+
+}    
+#else
 static void panDate(point p) {
   /* Unix time starts in 1970 on a Thursday */
 //  uint16_t dayOfWeek = 4;
@@ -2159,6 +2182,8 @@ static void panDate(point p) {
         osd_printi_1(f_02i, days+1);
     }
 }
+#endif
+
 
 /*
 static void panMotor(point p) {

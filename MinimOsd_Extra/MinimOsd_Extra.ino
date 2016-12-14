@@ -138,6 +138,8 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 #include "protocols/MAVLink.h"
 BetterStream *mavlink_comm_0_port;
 mavlink_system_t mavlink_system = {12,1}; 
+#elif defined(USE_NMEA)
+#include "protocols/NMEA.h"
 #else
 #error "No protocol defined"
 #endif

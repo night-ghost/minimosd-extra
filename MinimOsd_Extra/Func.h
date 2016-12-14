@@ -304,6 +304,14 @@ static void setHomeVars()
 
 #ifdef IS_COPTER
  #ifdef IS_PLANE
+ 
+#if defined(USE_NMEA) // no arming
+
+    if(osd_fix_type >= 3 && osd_satellites_visible >=6)
+        lflags.motor_armed=true;
+
+#else
+ 
     // copter & plane - differ by model_type
     if(sets.model_type == 0){  //plane
 	if(osd_throttle > 50 && takeoff_heading == -400) // lock runway direction
@@ -326,6 +334,7 @@ static void setHomeVars()
             lflags.was_armed = false;   // and clear armed flag
         }
     }
+#endif
  #else // pure copter
   //Check disarm to arm switching.
   if (lflags.motor_armed && !lflags.was_armed){
@@ -586,6 +595,9 @@ again:
 #elif defined(USE_LTM)
 	extern void read_ltm(void);
 	read_ltm();
+#elif defined(USE_NMEA)
+	extern void read_NMEA(void);
+	read_NMEA();
 #else
 #error "No data protocol defined"
 #endif

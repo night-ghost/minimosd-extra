@@ -30,6 +30,23 @@ union {
 #elif defined(USE_LTM)
 #define PROTOCOL "LTM"
     LTM ltm;
+#elif defined(USE_NMEA)
+#define PROTOCOL "NMEA"
+
+#define NMEA_BUF_LENGTH 0x20
+    char string[NMEA_BUF_LENGTH]; // for NMEA parsing
+    struct {
+        int32_t lat;
+        int32_t lon;
+        int16_t alt;
+        uint16_t hdop;
+        int16_t course;
+        uint16_t speed;
+        uint8_t fix;
+        uint8_t sats;
+        uint32_t time;
+        uint32_t date;
+    } nmea;
 #endif
     byte bytes[0x40]; // for font uploading 
 } msg;

@@ -28,6 +28,7 @@
 //#define USE_UAVTALK 1
 //#define USE_MWII 1
 //#define USE_LTM 1
+//#define USE_NMEA 1
 
 
 

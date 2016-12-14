@@ -455,3 +455,6 @@ v910 - THE TEST VERSION!!!
 v911 - THE TEST VERSION!!!
 * another try to work on myairbot's board and not spoil regular boards
 
+v912
+* added NMEA protocol - now this firmware can be used without any FC
+

@@ -17,9 +17,11 @@ make_one(){
 
 #make_one 'UAVTALK'
 #make_one 'MAVLINK' -DDEBUG
-make_one 'MAVLINK'
+#make_one 'MAVLINK'
 #make_one 'MWII'
 #make_one 'LTM' 
+make_one 'NMEA'
+
 
 #make_one 'MAVLINK' -DWALKERA_TELEM=RssiPin
 
