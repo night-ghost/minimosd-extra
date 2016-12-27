@@ -64,8 +64,9 @@ namespace OSD {
         const int fDate_XY = 96;
         const int dayTime_XY = 98;
         const int fVario_XY = 100;
-        //const int fMotor_XY = ;
+        const int fMotor_XY = 102;
         
+
        
     
 		public const int OffsetBITpanel = 128; // размер памяти одного экрана

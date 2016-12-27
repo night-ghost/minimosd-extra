@@ -33,8 +33,9 @@ namespace OSD {
 
     public partial class OSD : Form {
 
+        public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r905 DV";
+        public const string VERSION = "r913 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -355,7 +356,7 @@ namespace OSD {
                 pi[a++] = new Panel("Power", pan.panPower, 1, 5, panPower_XY, 1);
                 pi[a++] = new Panel("Date", pan.panDate, 7, 1, fDate_XY, 1, UI_Mode.UI_Checkbox, 0, " Format dd.mm.yyyy");
                 pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
-                //pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
+                pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
                 pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
                 pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5 m/m", 0, "Twice, so scale 10/100", 0, "*4 -> 20/40/200/400" );
 
@@ -1851,7 +1852,7 @@ as_checkbox:
                         //Config 
                         sw.WriteLine("{0}", "Configuration");
                         sw.WriteLine("{0}\t{1}", "Model Type", (byte)(ModelType)cbxModelType.SelectedItem); //We're just saving what's in the config screen, not the eeprom model type
-                        sw.WriteLine("{0}\t{1}", "Units", pan.converts);
+                        sw.WriteLine("{0}\t{1}", "Units", UNITS_combo.SelectedIndex);
                         sw.WriteLine("{0}\t{1}", "Overspeed", pan.overspeed);
                         sw.WriteLine("{0}\t{1}", "Stall", pan.stall);
                         sw.WriteLine("{0}\t{1}", "Battery", pan.battv);
@@ -1866,7 +1867,7 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "Battery Warning Level", pan.batt_warn_level);
                         sw.WriteLine("{0}\t{1}", "RSSI Warning Level", pan.rssi_warn_level);
                         sw.WriteLine("{0}\t{1}", "OSD Brightness", pan.osd_brightness);
-                        sw.WriteLine("{0}\t{1}", "Call Sign", pan.callsign_str);
+                        sw.WriteLine("{0}\t{1}", "Call Sign", CALLSIGNmaskedText.Text);
                         sw.WriteLine("{0}\t{1}", "flgHUD", pan.flgHUD);
                         sw.WriteLine("{0}\t{1}", "flgTrack", pan.flgTrack);
                         //                        sw.WriteLine("{0}\t{1}", "Sign Air Speed", pan.sign_air_speed);
@@ -2058,11 +2059,12 @@ again:
                         strings = sr.ReadLine().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
                         if (strings[0] == "Units")
-                            try {
-                                pan.converts = byte.Parse(strings[1]) != 0;
+                            try {                                
+                                UNITS_combo.SelectedIndex = byte.Parse(strings[1]) != 0?1:0;
                             } catch {
-                                pan.converts = bool.Parse(strings[1]);
-                            } else if (strings[0] == "Overspeed")
+                                UNITS_combo.SelectedIndex = 0;
+                            } 
+                        else if (strings[0] == "Overspeed")
                             pan.overspeed = byte.Parse(strings[1]);
                         else if (strings[0] == "Stall") pan.stall = byte.Parse(strings[1]);
                         else if (strings[0] == "Battery") pan.battv = byte.Parse(strings[1]);
@@ -2089,7 +2091,8 @@ again:
                             } else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
                         else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                         else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
-                        else if (strings[0] == "Call Sign") pan.callsign_str = strings[1];
+                        else if (strings[0] == "Call Sign") 
+                            CALLSIGNmaskedText.Text = strings[1];
                         else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1])); //we're not overwriting "eeprom" model type
                         else if (strings[0] == "BattB") pan.battBv = byte.Parse(strings[1]);
                         else if (strings[0] == "rssi_k") pan.rssi_koef = float.Parse(strings[1]);
@@ -2144,11 +2147,11 @@ again:
 
                     //Modify units
                     if (!pan.converts) {
-                        UNITS_combo.SelectedIndex = 0; //metric
+                        
                         STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
                         OVERSPEED_label.Text = "Overspeed (km/h)";
                     } else {
-                        UNITS_combo.SelectedIndex = 1; //imperial
+                        
                         STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
                         OVERSPEED_label.Text = "Overspeed (mph)";
                     }
@@ -2207,8 +2210,7 @@ again:
                         pan.vert_offs = 0;
                     }
 
-                    CALLSIGNmaskedText.Text = pan.callsign_str;
-
+                    
                     //                        cbxAirSpeedSign.Checked = pan.sign_air_speed!=0;
                     //                        cbxGroundSpeedSign.Checked = pan.sign_ground_speed!=0;
                     //                        cbxHomeAltitudeSign.Checked = pan.sign_home_altitude!=0 ;
@@ -4280,7 +4282,7 @@ again:
             try {
 
                 comPort.PortName = CurrentCOM;
-                comPort.BaudRate = 57600;
+                comPort.BaudRate = PORT_SPEED;
                 //comPort.BaudRate = 115200;
 
 

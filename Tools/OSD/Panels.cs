@@ -1720,7 +1720,7 @@ const int  ANGLE_2=                25     ;                 // angle above we sw
             osd.setPanel(first_col, first_line);
 
             if (is_alt(fAlt))
-             osd.printf("1230 1345|1330 1267");
+             osd.printf("1530 1545|1430 1467");
             else
             osd.printf("67 68|66 67");
   
