@@ -502,6 +502,14 @@ typedef struct __mavlink_vibration_t {
                 } break;
 
 
+            case MAVLINK_MSG_ID_SERVO_OUTPUT_RAW: {
+                pwm_out[0] = mavlink_msg_servo_output_raw_get_servo1_raw(&msg.m);
+                pwm_out[1] = mavlink_msg_servo_output_raw_get_servo2_raw(&msg.m);
+                pwm_out[2] = mavlink_msg_servo_output_raw_get_servo3_raw(&msg.m);
+                pwm_out[3] = mavlink_msg_servo_output_raw_get_servo4_raw(&msg.m);
+            
+                } break;
+
             default:
                 //Do nothing
                 break;

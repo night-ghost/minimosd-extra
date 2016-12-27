@@ -2096,6 +2096,8 @@ static void panDayTime(point p) {
         printTime(min, is_alt(p));
 }
 
+static const PROGMEM char f_02i[]=".%02d";
+
 #if defined(USE_NMEA)
 static void panDate(point p) {
     uint32_t date=msg.nmea.date;
@@ -2106,7 +2108,6 @@ static void panDate(point p) {
     uint8_t mon = date / 100;
     date -= mon*100 + 2000; 
 
-    static const PROGMEM char f_02i[]=".%02d";
     if(is_alt(p)) { // yy.m.d
         osd_printi_1(f_02i+1,  day);
         osd_printi_1(f_02i, mon);
@@ -2171,7 +2172,7 @@ static void panDate(point p) {
   tm->tm_wday = dayOfWeek;
 */
 
-    static const PROGMEM char f_02i[]=".%02d";
+//    static const PROGMEM char f_02i[]=".%02d";
     if(is_alt(p)) { // yy.m.d
         osd_printi_1(f_02i+1,  days+1);
         osd_printi_1(f_02i, month+1);
@@ -2185,9 +2186,24 @@ static void panDate(point p) {
 #endif
 
 
-/*
+
+
 static void panMotor(point p) {
-}*/
+    if(is_alt(p)) { // absolute values
+        for(byte i=0;i<4;i++){
+            osd_printi_1(f4i, pwm_out[i]);
+            if(i==1) osd_nl();
+            else     osd_blank();
+        }
+    } else { // in percent
+        for(byte i=0;i<4;i++){
+            osd_printi_1(f_02i+1, (pwm_out[i]-1100)/9);
+            if(i==1) osd_nl();
+            else     osd_blank();
+        }
+    
+    }
+}
 
 static void panVibe(point p) {
     if(has_sign(p)) osd_print_S(PSTR("  x  y  z\xff"));
@@ -2792,7 +2808,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(message),		panMessage, 	0 },
     { ID_of(fDate),		panDate, 	0 },
     { ID_of(dayTime),		panDayTime, 	0 },
-//    { ID_of(fMotor),		panMotor, 	0 },
+    { ID_of(pMotor),		panMotor, 	0 },
     { ID_of(fVibe),		panVibe, 	0 },
     { ID_of(fVario),		panVario, 	0 },
 // warnings should be last

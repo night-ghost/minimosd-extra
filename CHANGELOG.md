@@ -458,3 +458,6 @@ v911 - THE TEST VERSION!!!
 v912
 * added NMEA protocol - now this firmware can be used without any FC
 
+v913
+*added new panel - motors output
+

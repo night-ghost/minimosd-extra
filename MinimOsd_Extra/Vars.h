@@ -356,4 +356,6 @@ uint32_t day_seconds; // from midnight
 float vibration[3]; //< Vibration levels
 uint16_t clipping[3];// < first accelerometer clipping count
 
+uint16_t pwm_out[4]; // output values for motors
+
 byte climb_filter=10; // 

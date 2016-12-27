@@ -53,6 +53,9 @@ Project received Donations from (in time order)
  mai ruliang
  Dion Brewington
  Marchenko Nikolai
+ Marc J MERLIN
+ Dean Berg
+ Robert Reynolds
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -217,7 +220,7 @@ ISR(INT0_vect) {
     vsync_time=millis(); // и отметим его время
 
     if(update_screen) { // there is data for screen
-        OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will lose serial bytes
+        OSD::update(); 		// do it in interrupt! execution time is ~500uS so without interrupts we will NOT lose serial bytes because:
                                     //   on 115200 bit time=1/speed = ~87uS so byte time= ~870uS. ATmega's datasheet says that 
                                     //   receive buffer has 2 bytes, so we have time near 3*870uS = ~2500uS before character loss
         update_screen = 0;          
