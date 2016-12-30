@@ -4,7 +4,7 @@ An Open Source Arduino based OSD and Camera Control project.
 
 Program  : Minim-OSD 
 
-Version  : V9.09, 09 dec 2016
+Version  : V9.14, 30 dec 2016
 by Night Ghost
 
 based on:
@@ -163,6 +163,11 @@ mavlink_system_t mavlink_system = {12,1};
 
 /* **********************************************/
 
+void delay_150(){
+    delay(150);
+}
+
+
 volatile byte vas_vsync=false;
 
 // обработка прерывания по кадровому синхроимпульсу
@@ -261,9 +266,6 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
 #endif
 
 
-void delay_150(){
-    delay(150);
-}
 
 /* ***************** SETUP() *******************/
 
@@ -380,9 +382,14 @@ void setup()     {
         PWM_out_port = portOutputRegister(port);
     }
 
+Serial.print_P(PSTR("before init\n"));
+
     osd.init();    // Start display
 
     logo();
+
+Serial.print_P(PSTR("after logo\n"));
+
 
 //    Serial.flush(); без него лучше шрифты грузятся
 
@@ -414,6 +421,9 @@ void setup()     {
 #endif
 
     doScreenSwitch(); // set vars for startup screen
+    
+    Serial.print_P(PSTR("setup done\n"));
+    
 
 } // END of setup();
 
@@ -586,7 +596,7 @@ void loop()
 	    if(seconds % 30 == 0) {
 		extern volatile uint16_t lost_bytes;
 	        Serial.printf_P(PSTR("loop time = %dms lost bytes=%d\n"),max_dly, lost_bytes);
-	        Serial.printf_P(PSTR("stack bottom = %x nest count=%d\n"),stack_bottom, nest_count);
+	        Serial.printf_P(PSTR("stack bottom = %x\n"),stack_bottom);
 //    serial_hex_dump((byte *)0x100, 2048);    // memory 2k, user's from &flags to stack
 	    }
 #endif

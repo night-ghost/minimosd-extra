@@ -10,6 +10,7 @@
 #define VERSION "2.4" 
 
 //#define DEBUG
+
 #define STARTUP_SCREEN 0
 #define AUTOBAUD 1
 //#define SHOW_FONT 1 not work

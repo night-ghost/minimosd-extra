@@ -65,6 +65,8 @@ namespace OSD {
         const int dayTime_XY = 98;
         const int fVario_XY = 100;
         const int fMotor_XY = 102;
+        const int panGPSLAT_XY = 104;
+        const int panGPSLON_XY = 106;
         
 
        

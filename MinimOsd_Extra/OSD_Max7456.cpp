@@ -58,16 +58,17 @@ void MAX_mode(byte mode){
 void OSD::reset(){
     max7456_on();
 
-    
     byte cnt=15;
 
     while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) ) {//read status register - sync to soft-only versions
         byte j=3;
 
         while(cnt--)  SPI::transfer(0xff); // try to sync
+
+        delay_15();
     }
 
-    MAX_mode( MAX7456_RESET );
+    MAX_mode( MAX7456_RESET | video_mode );
 
     delay_15();
 

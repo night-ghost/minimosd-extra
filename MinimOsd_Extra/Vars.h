@@ -7,6 +7,8 @@
 
 Settings sets;	// настройки из EEPROM
 
+volatile byte garbage=0xf4;
+
 
 static byte max7456_err_count=0;
 static byte stream_rate=0; // divider to requested rates 

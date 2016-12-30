@@ -8,7 +8,7 @@
 
 // see http://www.microsmart.co.za/technical/2014/03/01/advanced-arduino-adc/
 
-void adc_setup(){
+inline void adc_setup(){
 
 // set up the ADC
   ADCSRA &= ~PS_128;  // remove bits set by Arduino library

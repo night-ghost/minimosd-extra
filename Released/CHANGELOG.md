@@ -462,3 +462,6 @@ v913
 * added new panel - motors output
 * fixed last CT bugs
 
+v914
+* separated panels for coordinates Lat and Lon
+

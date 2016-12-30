@@ -1228,41 +1228,48 @@ static long NOINLINE coord_frac(float &f, byte fLow){
 }
 
 
-static const PROGMEM char gps_f0[]="%06ld%c%06ld";
-static const PROGMEM char gps_f1[]="%05ld%c%05ld";
-static const PROGMEM char gps_f2[]="\x03%06ld%c\x04%06ld";
-static const PROGMEM char gps_f3[]="\x03%05ld%c\x04%05ld";
+static const PROGMEM char gps_f0[]="%06ld";
+static const PROGMEM char gps_f1[]="%05ld";
 
-static const PROGMEM char gps_f4[]="%10.6f%c%10.6f";
-static const PROGMEM char gps_f5[]="%9.5f%c%9.5f";
-static const PROGMEM char gps_f6[]="\x03%10.6f%c\x04%10.6f";
-static const PROGMEM char gps_f7[]="\x03%9.5f%c\x04%9.5f";
+static const PROGMEM char gps_f4[]="%10.6f";
+static const PROGMEM char gps_f5[]="%9.5f";
 
 static const PROGMEM char * const gps_fmt[]= {
-    gps_f0, gps_f1, gps_f2, gps_f3
+    gps_f0, gps_f1
 };
 
 static const PROGMEM char * const gps_fmtF[]= {
-    gps_f4, gps_f5, gps_f6, gps_f7
+    gps_f4, gps_f5
 };
 
 
-static void NOINLINE print_gps(PGM_P f, byte div){
+//static void NOINLINE print_gps(PGM_P f, byte div){
 
-    osd.printf_P(f, osd_pos.lat, div, osd_pos.lon);
+//}
+
+static void NOINLINE  print_coord(point p, float *v) {
+    PGM_P f;
+
+    byte idx = is_alt(p)?1:0;      // low precision
+
+    if(is_alt2(p)){ // fractional
+	f=(const char *)pgm_read_word(&gps_fmt[idx]);
+        osd.printf_P(f, coord_frac(*v, idx) );
+	return;
+    } 
+
+    f=(const char *)pgm_read_word(&gps_fmtF[idx]);
+    osd_printf_1(f, *v);
 }
 
-static void panGPS(point p){
 
-    PGM_P f;
+
+static void panGPS(point p){
     
     if(!(*((long *)&osd_pos.lon) || *((long *)&osd_pos.lat))) return; // не выводим координат если нету
 
     byte div = is_alt3(p)?' ':'\xff'; // row or column
 
-    byte fLow= is_alt(p)?1:0;      // low precision
-
-    byte idx= fLow | (has_sign(p)?2:0);
 
     if(lflags.blinker) {
         PGM_P str=PSTR("Stream");
@@ -1280,6 +1287,11 @@ static void panGPS(point p){
 	}
     }
 
+/*
+    byte fLow= is_alt(p)?1:0;      // low precision
+
+    byte idx= fLow | (has_sign(p)?2:0);
+
     if(is_alt2(p)){ // fractional
 	f=(const char *)pgm_read_word(&gps_fmt[idx]);
         osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
@@ -1288,8 +1300,23 @@ static void panGPS(point p){
 
     f=(const char *)pgm_read_word(&gps_fmtF[idx]);
     print_gps(f,div);
+*/
+
+    if(has_sign(p)) OSD::write_S(3);
+    print_coord(p, &osd_pos.lat);
+    OSD::write_S(div);
+    if(has_sign(p)) OSD::write_S(4);
+    print_coord(p, &osd_pos.lon);
 }
 
+
+static void panGPS_lat(point p){
+    print_coord(p, &osd_pos.lat);
+}
+
+static void panGPS_lon(point p){
+    print_coord(p, &osd_pos.lon);
+}
 
 /* **************************************************************** */
 // Panel  : panFdata
@@ -1424,7 +1451,13 @@ static void panFdata(point p){ // итоги полета
         OSD::setPanel(p.x + 10,p.y);
     }
 
-    print_gps(gps_f6,0xff);
+    //print_gps(gps_f6,0xff);
+    OSD::write_S(3);
+    print_coord({0,0}, &osd_pos.lat);
+    osd_nl();
+    OSD::write_S(4);
+    print_coord({0,0}, &osd_pos.lon);
+    
 }
 
 
@@ -1519,12 +1552,11 @@ static void panWaitMAVBeats(){
     extern volatile uint16_t lost_bytes;
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
-    extern volatile byte nest_count;
 
     OSD::setPanel(1,5);
     osd.printf_P(PSTR("loop time=%dms crc drops=%u\xffbytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("\xffpackets got=%u skip=%u"), packets_got, packets_skip);
-    osd.printf_P(PSTR("\xffstack bottom = %x nest=%d"),stack_bottom, nest_count);
+    osd.printf_P(PSTR("\xffstack bottom = %x"),stack_bottom);
 //    osd.printf_P(PSTR("\xffwait=%u %u \xff%lu \xff%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );
 //    osd.printf_P(PSTR("\xffmav max=%lu sum= %lu \xffcnt=%u\xff"), mavlink_dt, mavlink_time, mavlink_cnt );
     
@@ -2768,6 +2800,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0 },
+    { ID_of(coordLat),		panGPS_lat, 	3 },
+    { ID_of(coordLon),		panGPS_lon, 	4 },
     { ID_of(batteryPercent),	panBatteryPercent, 0 },
     { ID_of(COG),		panCOG, 	0 },
     { ID_of(rose),		panRose, 	0 },
@@ -2825,7 +2859,6 @@ static void print_all_panels(const Panels_list *pl ) {
     extern volatile uint16_t lost_bytes;
     extern uint16_t packets_skip;
     extern uint16_t packets_got;
-    extern volatile byte nest_count;
 
     OSD::setPanel(0,0);
     osd.printf_P(PSTR("crc=%u b=%ld bl=%u"), packet_drops, bytes_comes,  lost_bytes);

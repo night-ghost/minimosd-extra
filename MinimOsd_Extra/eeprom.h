@@ -92,6 +92,8 @@ struct Panel {
     point dayTime;      // 98
     point fVario;       // 100
     point pMotor;       // 102
+    point coordLat;     // 104
+    point coordLon;     // 106
 };
 
 union _Panel {

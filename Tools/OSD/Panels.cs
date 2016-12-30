@@ -1044,7 +1044,85 @@ namespace OSD
         }
 
 
-		
+        public int panGPS_lat(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+           
+
+            if (sign == 1) {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -= i;
+
+                    if (is_alt(fAlt))
+                        osd.printf("%c%05d", 0x03, (int)(lat * 100000.0));
+                    else
+                        osd.printf("%c%06d", 0x03, (int)(lat * 1000000.0));
+                } else if (is_alt(fAlt))
+                    osd.printf("%c%9.5f", 0x03, (double)osd_lat);
+                else
+                    osd.printf("%c%10.6f", 0x03, (double)osd_lat);
+            } else {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lat = abs(osd_lat), lon = abs(osd_lon);
+                    i = (int)lat; lat -= i;
+                    i = (int)lon; lon -= i;
+
+
+                    if (is_alt(fAlt))
+                        osd.printf("%05d", (int)(lat * 100000.0));
+                    else
+                        osd.printf("%06d", (int)(lat * 1000000.0));
+
+                } else if (is_alt(fAlt))
+                    osd.printf("%9.5f", (double)osd_lat);
+                else
+                    osd.printf("%10.6f", (double)osd_lat);
+            }
+            return 0;
+        }
+
+        public int panGPS_lon(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+            
+
+            if (sign == 1) {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lon = abs(osd_lon);
+                    i = (int)lon; lon -= i;
+
+                    if (is_alt(fAlt))
+                        osd.printf("%c%05d", 0x04, (int)(lon * 100000.0));
+                    else
+                        osd.printf("%c%06d", 0x04, (int)(lon * 1000000.0));
+                } else if (is_alt(fAlt))
+                    osd.printf("%c%9.5f", 0x04, (double)osd_lon);
+                else
+                    osd.printf("%c%10.6f", 0x04, (double)osd_lon);
+            } else {
+                if (is_alt2(fAlt)) {
+                    int i;
+                    double lon = abs(osd_lon);
+                    i = (int)lon; lon -= i;
+                    
+
+
+                    if (is_alt(fAlt))
+                        osd.printf("%05d", (int)(lon * 100000.0));
+                    else
+                        osd.printf("%06d", (int)(lon * 1000000.0));
+
+                } else if (is_alt(fAlt))
+                    osd.printf("%9.5f", (double)osd_lon);
+                else
+                    osd.printf("%10.6f", (double)osd_lon);
+            }
+            return 0;
+        }
+
+
         /* **************************************************************** */
         // Panel  : panHeading
         // Needs  : X, Y locations
