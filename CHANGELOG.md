@@ -465,3 +465,6 @@ v913
 v914
 * separated panels for coordinates Lat and Lon
 
+v915
+* fixed bug with font uploading
+* HomeAlt can use alternate altitude source

@@ -789,7 +789,7 @@ static void panHomeAlt(point p){
 
     float v=osd_alt_to_home;
     
-    if((*(long *)&v)==0) v = osd_alt_mav;
+    if(is_alt(p) || (*(long *)&v)==0) v = osd_alt_mav;
     //printDistCnv(v);
     printFullDist(v);
 }

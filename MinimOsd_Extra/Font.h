@@ -1,13 +1,23 @@
 
 static NOINLINE void serial_print_S(PGM_P f){
-    Serial.print_P(f);
+    Serial.println_P(f);
+}
+
+static void NOINLINE print_rff(){
+    serial_print_S(PSTR("RFF"));
+}
+
+static void font_state(){
+        OSD::setPanel(5, 5);
+        osd_print_S(PSTR("font uploading "));
+        OSD::update();// Show it
 }
 
 static void uploadFont() {
     
     SPCR |= (1<<SPR0) | (1<<SPR1); // slow down SPI
 
-    uint8_t byte_count = 0;
+    byte byte_count = 0;
     byte bit_count=0;
 
 //  move these local to prevent ram usage
@@ -17,33 +27,52 @@ static void uploadFont() {
 
     int font_count = 0;
 
-    serial_print_S(PSTR("RFF\n"));
+    print_rff();
 
     byte chk=0;
-    while(font_count < 256) { 
+    byte got_any_data=0;
+    byte c=0;
+    byte last_c;
+    
+    byte b=0;
+    
+    byte cnt=0;
+    
+    font_state();
+    
+    while(font_count < 256) {
 	if(Serial.available_S()){ // absense of this is not a good
-            uint8_t c = Serial.read_S();
-
+            last_c = c;
+            c = Serial.read_S();
+            
             switch(c){ // parse and decode mcm file
-            case 0x0A: // carridge return, end of line
-                continue;
+            case 0x0A: // line feed - skip
+                if(last_c == 0x0d) continue;
+                // lf without cr cause line end
 
             case 0x0d: // carridge return, end of line
-                //Serial.println("cr");
+                if(!got_any_data) {     // empty CR cause response "RFF"
+                    cnt++;
+                    print_rff();
+                    continue;
+                }
                 if (bit_count == 8)  {
-                    chk ^= character_bitmap[byte_count];
+                    chk ^= b;
+                    character_bitmap[byte_count] = b;
+                    b = 0;
                     byte_count++;
-                    character_bitmap[byte_count] = 0;
                 }
                 bit_count = 0;
                 break;
 
             case 0x30: // ascii '0'
             case 0x31: // ascii '1' 
-                character_bitmap[byte_count] <<= 1;
+                b <<= 1;
                 if(c == 0x31)
-                    character_bitmap[byte_count] += 1;
+                    b += 1;
                 bit_count++;
+                
+                got_any_data=1;
                 break;
 
             case 'r':
@@ -51,6 +80,7 @@ static void uploadFont() {
             break;
 
             default:
+//               Serial.printf_P(PSTR("got bad character: %x\n"),c);
                 break;
             }
 
@@ -60,12 +90,13 @@ static void uploadFont() {
                 osd.write_NVM(font_count, character_bitmap);
                 byte_count = 0;
                 font_count++;
-                serial_print_S(PSTR("CD\n"));
+                serial_print_S(PSTR("CD"));
+            //    font_state(font_count); - мешает загрузке шрифтов
                 chk=0;
             }
         }
     }
-    serial_print_S(PSTR("FD\n"));
+    serial_print_S(PSTR("FD"));
 
 #if defined(SHOW_FONT) && 0
     byte n=0;
@@ -76,7 +107,7 @@ static void uploadFont() {
               osd.write_S((byte)(n));
               n++;
         }
-        osd.write_S('|');
+        osd.write_S('\xff');
     }
 
     osd.update();

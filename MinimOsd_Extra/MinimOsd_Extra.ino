@@ -382,13 +382,13 @@ void setup()     {
         PWM_out_port = portOutputRegister(port);
     }
 
-Serial.print_P(PSTR("before init\n"));
+//Serial.print_P(PSTR("#before init\n"));
 
     osd.init();    // Start display
 
     logo();
 
-Serial.print_P(PSTR("after logo\n"));
+//Serial.print_P(PSTR("#after logo\n"));
 
 
 //    Serial.flush(); без него лучше шрифты грузятся
@@ -422,7 +422,7 @@ Serial.print_P(PSTR("after logo\n"));
 
     doScreenSwitch(); // set vars for startup screen
     
-    Serial.print_P(PSTR("setup done\n"));
+    Serial.print_P(PSTR("#setup done\n"));
     
 
 } // END of setup();
@@ -460,6 +460,11 @@ void loop()
                 }
 
                 if (crlf_count > 3) {
+/*                    OSD::setPanel(5, 5);
+                    osd_print_S(PSTR("font uploading"));
+                    OSD::update();// Show it
+                    delay_150();
+*/
                     uploadFont();
                     return;
                 }

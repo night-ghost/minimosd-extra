@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r914 DV";
+        public const string VERSION = "r915 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -321,7 +321,7 @@ namespace OSD {
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 
                 pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, UI_Mode.UI_Checkbox, 0, "Reset to 0 on arming");
-                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1);
+                pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1,UI_Mode.UI_Checkbox, 0, "Alternate mode");
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value", -1, "", 0, "show in m/s",0,"Less accurate");
                 
                 pi[a++] = new Panel("Battery Percent", pan.panBatteryPercent, 14, 15, panBatteryPercent_XY, 1, UI_Mode.UI_Checkbox, 0, "Show percent, not used mAH");
@@ -2601,6 +2601,21 @@ again:
             });
         }
 
+        private string myReadLine(){
+            string s="";
+            int n=500;
+            do {
+                while (comPort.BytesToRead != 0) {
+                    char c= (char)comPort.ReadByte();
+                    if(c=='\n' || (c=='\r' && s.Length !=0)) return s;                    
+                    s+=c;
+                }
+                System.Threading.Thread.Sleep(10);
+                Application.DoEvents();
+            } while(n-- > 0);
+            return s;
+        }
+
         private void sub_updateCharset() {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             toolStripStatusLabel1.Text = "";
@@ -2667,12 +2682,10 @@ again:
 
                     comPort.WriteLine("");
                     comPort.WriteLine("");
-                    //comPort.WriteLine("");
-                    //comPort.WriteLine("");
-                    // comPort.WriteLine("");
 
+again:
                     int timeout = 0;
-
+    
                     while (comPort.BytesToRead == 0) {
                         System.Threading.Thread.Sleep(100);
                         comPort.WriteLine("");
@@ -2687,7 +2700,15 @@ again:
                             return;
                         }
                     }
-                    string readFont = comPort.ReadLine();
+                    string readFont = myReadLine();
+                    Console.WriteLine("< "+readFont);
+                    if(readFont[0]=='#') goto again; // debug comment
+
+                    if (readFont.Length == 0 ) {
+                        comPort.WriteLine("");
+                        goto again;
+                    }
+
                     if (!readFont.Contains("RFF")) {
                         MessageBox.Show("Error entering CharSet upload mode - invalid data: " + readFont);
                         comPort.Close();
@@ -2696,6 +2717,12 @@ again:
                     }
 
                 } catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+                System.Threading.Thread.Sleep(100);
+                while (comPort.BytesToRead != 0){ // read out all 
+                    string resp = comPort.ReadExisting(); //CDn
+                    Console.WriteLine("< " + resp);
+                }
 
                 using (var stream = ofd.OpenFile()) {
 
@@ -2715,6 +2742,8 @@ again:
                     toolStripStatusLabel1.Text = "CharSet Uploading";
 
                     long length = br.BaseStream.Length;
+                    byte[] skip = br.ReadBytes(9);
+                    length -= 9;
                     while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed) {
                         try {
                             toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
@@ -2726,8 +2755,8 @@ again:
                             }
                             length -= read;
                             byte[] buffer = br.ReadBytes(read);
-                            Console.WriteLine("write " + buffer.ToString());
-                            comPort.Write(buffer, 0, buffer.Length);
+                            //Console.WriteLine("write " + buffer.ToString());
+                            comPort.Write(buffer,  0, buffer.Length);
                             int timeout = 0;
 
                             while (comPort.BytesToRead == 0 && read == 768) {
@@ -2744,7 +2773,7 @@ again:
                             }
 
                             string resp = comPort.ReadExisting(); //CDn
-                            //Console.WriteLine("responce "+resp );
+                            Console.WriteLine("responce "+resp );
                             //parseInputData(resp);
                             //if (length < 1000) {
                             //    lblFWModelType.Text = lblFWModelType.Text;
@@ -2764,7 +2793,7 @@ again:
                         Application.DoEvents();
                         t++;
 
-                        if (t > 10) {
+                        if (t > 100) {
                             MessageBox.Show("No end");
                             start_clear_timeout();
                             comPort.Close();
@@ -2772,8 +2801,10 @@ again:
                         }
                     }
                     //CparseInputData(comPort.ReadExisting());
-                    if (comPort.BytesToRead != 0)
-                        comPort.ReadLine();
+                    while (comPort.BytesToRead != 0) {
+                        Console.Write((char)comPort.ReadByte());
+                    }
+
 
                     comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 /*
