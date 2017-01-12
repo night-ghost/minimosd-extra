@@ -367,6 +367,7 @@ static void setHomeVars()
     if(!lflags.osd_got_home && osd_fix_type >= 3 ) { // first home lock on GPS 3D fix - ну или если фикс пришел уже после арма
         osd_home = osd_pos; // lat, lon & alt
         lflags.osd_got_home = 1;
+        home_alt_mav=osd_alt_mav; // store this altitude too
     } 
     
     if(lflags.osd_got_home){

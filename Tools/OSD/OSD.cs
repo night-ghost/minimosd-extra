@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r915 DV";
+        public const string VERSION = "r916 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -320,7 +320,7 @@ namespace OSD {
                 pi[a++] = new Panel("WP Direction", pan.panWPDir, 4, 9, panWPDir_XY);
                 pi[a++] = new Panel("WP Distance", pan.panWPDis, 1, 11, panWPDis_XY, 1);
 
-                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, UI_Mode.UI_Checkbox, 0, "Reset to 0 on arming");
+                pi[a++] = new Panel("Altitude", pan.panAlt, 22, 3, panAlt_XY, 1, UI_Mode.UI_Checkbox, 0, "Reset to 0 on arming",0,"Alternate mode");
                 pi[a++] = new Panel("Home Altitude", pan.panHomeAlt, 22, 2, panHomeAlt_XY, 1,UI_Mode.UI_Checkbox, 0, "Alternate mode");
                 pi[a++] = new Panel("Vertical Speed", pan.panClimb, 1, 8, panClimb_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value", -1, "", 0, "show in m/s",0,"Less accurate");
                 

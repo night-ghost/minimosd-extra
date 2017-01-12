@@ -771,10 +771,15 @@ static void panWindSpeed(point p){
 
 static void panAlt(point p){
 
-    long v=osd_pos.alt;
-    if(is_alt(p)) v-=osd_home.alt;
-
-    printFullDist(f_div1000(v));
+    if(is_alt2(p)){
+        float f=osd_alt_mav;
+        if(is_alt(p)) f -= home_alt_mav;
+        printFullDist(f);
+    }else {
+        long v=osd_pos.alt;
+        if(is_alt(p)) v-=osd_home.alt;
+        printFullDist(f_div1000(v));
+    }
 }
 
 

@@ -468,3 +468,6 @@ v914
 v915
 * fixed bug with font uploading
 * HomeAlt can use alternate altitude source
+
+v916
+* panAlt can use alternate altitude source

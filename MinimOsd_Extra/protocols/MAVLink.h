@@ -254,7 +254,7 @@ float airspeed; ///< Current airspeed in m/s
                 osd_heading = mavlink_msg_vfr_hud_get_heading(&msg.m); // 0..360 deg, 0=north
                 osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg.m);
                 osd_alt_mav = mavlink_msg_vfr_hud_get_alt(&msg.m);  //  Current altitude (MSL), in meters
-                osd_climb = mavlink_msg_vfr_hud_get_climb(&msg.m);
+                osd_climb   = mavlink_msg_vfr_hud_get_climb(&msg.m);
                 break;
 
 /*

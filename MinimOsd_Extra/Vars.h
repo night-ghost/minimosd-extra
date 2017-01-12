@@ -158,6 +158,7 @@ struct Att {
 static int /* float*/  osd_heading = 0;                // ground course heading from GPS
 
 static float        osd_alt_mav = 0;                    // altitude - float from MAVlink!
+static float        home_alt_mav = 0;                    // home altitude fixed on arm
 
 static float        osd_airspeed = 0;                   // airspeed
 static float        osd_windspeed = 0;
