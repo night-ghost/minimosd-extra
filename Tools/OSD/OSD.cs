@@ -358,7 +358,7 @@ namespace OSD {
                 pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
                 pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
                 pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
-                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox, 0, "Scale at right", 0, "Scale 50 instead of 5 m/m", 0, "Twice, so scale 10/100", 0, "*4 -> 20/40/200/400" );
+                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox_1, 0, "Scale at right", 0, "*10, scale 50 instead of 5", 0, "*2, scale 10/100", 0, "*4 -> 20/40/200/400", 0, 0, "", (1 << scrFlg_Vario_MS), "m/s instead of m/m");
                 pi[a++] = new Panel("GPS Coord Lat", pan.panGPS_lat, 1, 11, panGPSLAT_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
                 pi[a++] = new Panel("GPS Coord Lon", pan.panGPS_lon, 1, 12, panGPSLON_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
 

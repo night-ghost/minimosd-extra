@@ -471,3 +471,8 @@ v915
 
 v916
 * panAlt can use alternate altitude source
+
+v917
+* Variometer speed can be in m/s
+* fixed variometer's 0-pos bug
+* built-in font uploader can be disabled

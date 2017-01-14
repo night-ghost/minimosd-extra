@@ -101,8 +101,9 @@ namespace OSD {
 
 
         // Экранные флаги
-        public const int scrFlg_russianHUD = 0;
+        public const int scrFlg_russianHUD  = 0;
         public const int scrFlg_hideHorizon = 1;
+        public const int scrFlg_Vario_MS    = 2;
        	
 	}
 }

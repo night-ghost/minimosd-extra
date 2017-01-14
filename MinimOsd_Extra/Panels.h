@@ -2270,12 +2270,15 @@ static void panVario(point p) {
             f=PSTR(" \xb3\xff \xb3\xff \xc5\xff \xb3\xff \xb3");
         }
         osd_print_S(f);
+        osd_setPanel(p);
     } 
 
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
 
     int linePosition = int(-vertical_speed*2) ; // 0 at middle
 
+    if(screen_flags & scrFlg_Vario_MS) linePosition/=60;
+    
     if(is_alt2(p)) linePosition/=10;
     if(is_alt3(p)) linePosition/=2;
     if(is_alt4(p)) linePosition/=4;

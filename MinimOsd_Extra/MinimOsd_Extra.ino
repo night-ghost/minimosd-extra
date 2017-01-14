@@ -147,7 +147,10 @@ mavlink_system_t mavlink_system = {12,1};
 #error "No protocol defined"
 #endif
 
+#if defined(FONT_UPLOAD)
 #include "Font.h"
+#endif
+
 #include "Panels.h"
 
 
@@ -448,7 +451,7 @@ void loop()
     
     if(pt < BOOTTIME || lflags.bad_config){ // startup delay for fonts or EEPROM error
 //if((pt & 0xf0) == 0)   { Serial.printf_P(PSTR("boot time=%ld\n"),pt); Serial.wait(); }
-
+#if defined(FONT_UPLOAD)
             while(Serial.available_S()) {
                 byte c=Serial.read_S();
 
@@ -469,6 +472,7 @@ void loop()
                     return;
                 }
             }
+#endif
             logo();
             return;
     }
