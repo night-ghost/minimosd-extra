@@ -476,3 +476,6 @@ v917
 * Variometer speed can be in m/s
 * fixed variometer's 0-pos bug
 * built-in font uploader can be disabled
+
+v918
+* a try to run on airbot's board - thanks vierfuffzig!
