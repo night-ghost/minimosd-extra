@@ -81,9 +81,6 @@ void OSD::hw_init(){
 //read black level register
     byte osdbl_r = MAX_read(MAX7456_OSDBL_reg_read); //black level read register
   
-//    MAX_mode( MAX7456_RESET | video_mode); try to sync with AB7456
-//    delay_150();
-
 //set black level
     MAX_write(MAX7456_OSDBL_reg, (osdbl_r & 0xef)); //black level write register - Set bit 4 to zero 11101111 - Enable automatic OSD black level control
 

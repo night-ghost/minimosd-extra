@@ -479,3 +479,6 @@ v917
 
 v918
 * a try to run on airbot's board - thanks vierfuffzig!
+
+v919
+* added "used mAh" to Flight Data screen

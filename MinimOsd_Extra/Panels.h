@@ -41,7 +41,6 @@ static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
 }
 
 static void NOINLINE osd_printf_1(PGM_P fmt, float f){
-    //osd.printf_P(fmt, f);
     osd_printf_2(fmt, f, 0);
 }
 
@@ -1428,6 +1427,7 @@ static void panFdata(point p){ // итоги полета
 	{fmt7, '\xA0', 'v',  &min_osd_climb       },
 	{fmt1, '\xBD', 'a',  &max_osd_curr_A      },
 	{fmt1, 'W',    'w',  &max_osd_power       },
+	{fmt1, '\x01', 'f',  &mah_used            },
     };
 
 
@@ -1543,7 +1543,7 @@ static void panWaitMAVBeats(){
 #endif
     osd_groundspeed=0; // to not move with last speed when "no data"
 
-    OSD::setPanel(5,3);
+    OSD::setPanel(5,2);
     osd_printi_1(PSTR("No input data! %u\xff"),seconds - lastMavSeconds);
 
 #if defined(AUTOBAUD)
@@ -1567,7 +1567,7 @@ static void panWaitMAVBeats(){
     
     lflags.input_active=0;
 #else
-    panFdata(do_alt({3,5}));
+    panFdata(do_alt({3,4}));
 #endif
 }
 
