@@ -1016,7 +1016,8 @@ namespace OSD
             this.cbOutMode.FormattingEnabled = true;
             this.cbOutMode.Items.AddRange(new object[] {
             "PWM",
-            "On-Off"});
+            "On-Off",
+            "Off-On"});
             this.cbOutMode.Location = new System.Drawing.Point(60, 62);
             this.cbOutMode.Name = "cbOutMode";
             this.cbOutMode.Size = new System.Drawing.Size(77, 21);

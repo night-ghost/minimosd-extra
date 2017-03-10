@@ -2097,8 +2097,11 @@ again:
                             } else if (strings[0] == "Battery Warning Level") pan.batt_warn_level = byte.Parse(strings[1]);
                         else if (strings[0] == "RSSI Warning Level") pan.rssi_warn_level = byte.Parse(strings[1]);
                         else if (strings[0] == "OSD Brightness") pan.osd_brightness = byte.Parse(strings[1]);
-                        else if (strings[0] == "Call Sign") 
-                            CALLSIGNmaskedText.Text = strings[1];
+                        else if (strings[0] == "Call Sign") {
+                            try {
+                                CALLSIGNmaskedText.Text = strings[1];
+                            } catch{}
+                        }
                         else if (strings[0] == "Model Type") cbxModelType.SelectedItem = (ModelType)(pan.model_type = byte.Parse(strings[1])); //we're not overwriting "eeprom" model type
                         else if (strings[0] == "BattB") pan.battBv = byte.Parse(strings[1]);
                         else if (strings[0] == "rssi_k") pan.rssi_koef = float.Parse(strings[1]);

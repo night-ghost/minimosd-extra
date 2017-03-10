@@ -482,3 +482,7 @@ v918
 
 v919
 * added "used mAh" to Flight Data screen
+
+v920
+* added ability to use output pin PWM_OUT as negative 
+

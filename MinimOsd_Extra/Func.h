@@ -753,6 +753,12 @@ void generate_PWM(bool nointerrupt) {
             else
                 SET_LOW();		//digitalWrite(PWM_out_pin,0);
             break;
+        case 2: // off-on
+            if(pwm < 1500)
+                SET_HIGH(); 		//digitalWrite(PWM_out_pin,1);
+            else
+                SET_LOW();		//digitalWrite(PWM_out_pin,0);
+            break;
         }
 #if !defined(PWM_IN_INTERRUPT)
 	SREG=tmp; //	if(nointerrupt)    interrupts();

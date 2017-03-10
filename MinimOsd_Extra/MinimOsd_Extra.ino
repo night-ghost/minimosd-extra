@@ -56,6 +56,9 @@ Project received Donations from (in time order)
  Marc J MERLIN
  Dean Berg
  Robert Reynolds
+ Roi Shriki
+ Chan Lofland
+ Eddi Maevski
 
 Figures, harm the development of an idiotic question:
  MachVoluM
@@ -378,12 +381,12 @@ void setup()     {
 
 	byte PWM_out_pin = pgm_read_byte(&alt_pins[sets.pwm_dst-1]);
 
-	pinMode(PWM_out_pin,  OUTPUT);
-	digitalWrite(PWM_out_pin, 0);
-
         uint8_t port = digitalPinToPort(PWM_out_pin);
         PWM_out_bit  = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
         PWM_out_port = portOutputRegister(port);
+
+        generate_PWM(0); // set pin to initial state
+	pinMode(PWM_out_pin,  OUTPUT);
     }
 
 //Serial.print_P(PSTR("#before init\n"));
