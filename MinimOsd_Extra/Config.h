@@ -11,13 +11,14 @@
 
 //#define DEBUG
 
-#define FONT_UPLOAD 1
+
 #define STARTUP_SCREEN 0
 #define AUTOBAUD 1
 //#define SHOW_FONT 1 not work
 #define USE_SENSORS 1
 
 #ifndef DEBUG // don't fit
+#define FONT_UPLOAD 1
 #define USE_SETUP 1
 #define MAVLINK_CONFIG 1
 #endif

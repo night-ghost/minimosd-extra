@@ -486,3 +486,5 @@ v919
 v920
 * added ability to use output pin PWM_OUT as negative 
 
+v921
+*fixed bug in MAV_BATERRY2 message parsing
