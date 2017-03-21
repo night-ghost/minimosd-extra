@@ -488,3 +488,6 @@ v920
 
 v921
 *fixed bug in MAV_BATERRY2 message parsing
+
+v922
+* fixed bug with negative TZ shift

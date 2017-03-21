@@ -2124,8 +2124,12 @@ static void panDayTime(point p) {
 */
 
     if(!lflags.got_date) return;
+    
+    int dt = (int8_t)sets.timeOffset; /* local time */
+    dt -= 20;
+    dt *= 60; // in minutes
 
-    uint16_t min=day_seconds / 60 + /* local time */  (sets.timeOffset - 20) * 60;
+    uint16_t min=day_seconds / 60 + dt;
 
     if(is_alt2(p)) { // show seconds
         printTime(min, false, (day_seconds % 60) | 0x80);
