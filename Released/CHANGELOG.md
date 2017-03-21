@@ -491,3 +491,6 @@ v921
 
 v922
 * fixed bug with negative TZ shift
+
+v923
+fixed size issue

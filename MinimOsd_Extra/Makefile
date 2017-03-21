@@ -65,7 +65,6 @@ OPT += -fassociative-math -freciprocal-math -fno-signed-zeros -fno-trapping-math
 #OPT += -fno-partial-inlining 
 #OPT += -fno-inline-small-functions
 
-
 OPT +=  -fno-caller-saves
 OPT +=  -funsigned-bitfields
 
@@ -105,7 +104,7 @@ MCU=atmega328p
 ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += GCS_MAVLink
 ARDUINO_LIBS += TimerSerial
-ARDUINO_LIBS += I2c_soft_slave
+#ARDUINO_LIBS += I2c_soft_slave
 
 include /usr/share/arduino/Arduino.mk
 
