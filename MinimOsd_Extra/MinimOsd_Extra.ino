@@ -294,7 +294,7 @@ NOINLINE void logo(){
 
     if(lflags.bad_config) {
         OSD::setPanel(1,1);
-        osd_printi_1(PSTR("Missing/Old Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
+        osd_printi_1(PSTR("Bad Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
     }
 
     OSD::update();// Show sign bar
