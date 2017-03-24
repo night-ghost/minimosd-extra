@@ -963,11 +963,11 @@ static inline void check_warn(point p)
 // Staus  : done
 
 
-const char PROGMEM w1[]="\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS fix!
-const char PROGMEM w2[]="\x20\x20\x20\x53\x74\x61\x6c\x6c\x21";             //   Stall!
-const char PROGMEM w3[]="\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     // Over Speed!
+const char PROGMEM w1[]="\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS fix!
+const char PROGMEM w2[]="\x20\x20\x53\x74\x61\x6c\x6c\x21";             //   Stall!
+const char PROGMEM w3[]="\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     // Over Speed!
 const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
-const char PROGMEM w5[]="\x20\x20\x4c\x6f\x77\x20\x52\x73\x73\x69!";        // Low Rssi!
+const char PROGMEM w5[]="\x20\x4c\x6f\x77\x20\x52\x73\x73\x69!";        // Low Rssi!
 const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
 const char PROGMEM w7[]="Batt B low!"; 
 const char PROGMEM w8[]="Fence Low!";
