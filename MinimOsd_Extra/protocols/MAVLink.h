@@ -5,6 +5,8 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+void parse_osd_packet(byte *p);
+
 typedef struct _Stream_params {
     byte stream;
     byte rate;
@@ -468,7 +470,12 @@ typedef struct __mavlink_radio_status_t
 */
 
             case MAVLINK_MSG_ID_SYSTEM_TIME: {
-                uint32_t sys_seconds=mavlink_msg_system_time_get_time_unix_usec(&msg.m) / (1000 * 1000ULL); //uS to UNIX timestamp
+                int dt = (int8_t)sets.timeOffset; /* local time */
+                dt -= 20; // sign correction
+                dt *= 60 * 60; // in seconds
+
+                uint32_t sys_seconds=mavlink_msg_system_time_get_time_unix_usec(&msg.m) / (1000 * 1000ULL) + dt; //uS to UNIX timestamp
+                
 //DBG_PRINTF("\ngot time=%ld\n", sys_seconds );
                 sys_days    = sys_seconds / (24*60*60uL);
                 day_seconds = sys_seconds % (24*60*60uL);

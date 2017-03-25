@@ -79,7 +79,7 @@ static inline void readSettings() {
 
 
 // rean one point from current screen
-static point NOINLINE readPanel(byte n) {
+point NOINLINE readPanel(byte n) {
     point p; //                     shift to current screen     selected point
     eeprom_read_len((byte *)&p,  OffsetBITpanel * (int)panelN + n * sizeof(Point),  sizeof(Point) );
     return p;
@@ -102,45 +102,6 @@ static void print_eeprom_string(byte n){
     }
 
 }
-
-#ifdef MAVLINK_CONFIG
-
-struct Mav_conf { // needs to fit in 253 bytes
-    byte magick[4]; // = 0xee 'O' 'S' 'D'
-    byte cmd;		// command
-    byte id;		// number of 128-bytes block
-    byte len;		// real length
-    byte data[128];
-    byte crc; 		// may be
-};
-
-static void parse_osd_packet(byte *p){
-    struct Mav_conf *c = (struct Mav_conf *)p;
-
-    if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
-	switch(c->cmd){
-	case 'w':
-	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  c->len );
-	    lflags.was_mav_config=1;
-	    break;
-	
-	
-	case 'b':
-	    if(c->len==0 && lflags.was_mav_config) {
-	        __asm__ __volatile__ (    // Jump to RST vector
-	            "clr r30\n"
-	            "clr r31\n"
-	            "ijmp\n"
-	        );
-	    }
-	    break;
-	default:
-	    break;
-	}
-    }
-
-}
-#endif
 
 
 #ifdef DEBUG

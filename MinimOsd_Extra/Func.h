@@ -69,6 +69,8 @@ byte get_switch_time(byte n){
     }
 }
 
+point NOINLINE readPanel(byte n);
+
 void doScreenSwitch(){
 	lflags.got_data=1; // redraw even no news
 	

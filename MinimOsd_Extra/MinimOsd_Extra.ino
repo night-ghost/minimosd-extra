@@ -128,9 +128,10 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 
 // program parts
 #include "adc_setup.h"
-#include "Config_Func.h"
 
 #include "protocols.h"
+
+#include "Config_Func.h"
 
 #include "Func.h"
 
@@ -150,6 +151,8 @@ mavlink_system_t mavlink_system = {12,1};
 #else
 #error "No protocol defined"
 #endif
+
+#include "misc.h"
 
 #if defined(FONT_UPLOAD)
 #include "Font.h"

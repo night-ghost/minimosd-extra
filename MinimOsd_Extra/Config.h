@@ -18,9 +18,10 @@
 #define USE_SENSORS 1
 
 #ifndef DEBUG // don't fit
-#define FONT_UPLOAD 1
+//#define FONT_UPLOAD 1
 #define USE_SETUP 1
 #define MAVLINK_CONFIG 1
+#define MAVLINK_READ_EEPROM 1
 #endif
 
 //#define PWM_IN_INTERRUPT 1
