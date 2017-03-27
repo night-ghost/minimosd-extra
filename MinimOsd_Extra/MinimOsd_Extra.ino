@@ -356,6 +356,9 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
+Serial.print_P(PSTR("#1\n"));
+
+
     // Prepare OSD for displaying 
     unplugSlaves();
     OSD::update();// clear memory
@@ -392,7 +395,7 @@ void setup()     {
 	pinMode(PWM_out_pin,  OUTPUT);
     }
 
-//Serial.print_P(PSTR("#before init\n"));
+Serial.print_P(PSTR("#2\n"));
 
     osd.init();    // Start display
 
@@ -400,12 +403,7 @@ void setup()     {
 
 //Serial.print_P(PSTR("#after logo\n"));
 
-
-//    Serial.flush(); без него лучше шрифты грузятся
-
     LED_OFF;  // turn off on init done
-
-//    crlf_count=0;
 
 #ifdef DEBUG
 /*    OSD::setPanel(0,0);
@@ -432,7 +430,7 @@ void setup()     {
 
     doScreenSwitch(); // set vars for startup screen
     
-    Serial.print_P(PSTR("#setup done\n"));
+//    Serial.print_P(PSTR("#setup done\n"));
     
 
 } // END of setup();
@@ -481,10 +479,12 @@ void loop()
             }
 #endif
             logo();
+            LED_BLINK;
             return;
     }
 
     
+    LED_OFF;  // turn off on init done
 
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
 
