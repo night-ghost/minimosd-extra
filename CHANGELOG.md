@@ -497,3 +497,7 @@ fixed size issue
 
 v924
 fixed size issue again. Flash is full :(
+
+v925
+* font uploader moved out from main firmware. Use Character_Updater_FW.hex instead.
+* HeartBeat packets generated only if 3DR RSSI selected

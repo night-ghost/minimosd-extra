@@ -45,7 +45,9 @@ void request_mavlink_rates()
 
 // fake HEARTBEAT packet for 3DR  rssi generation
 void heartBeat() { //                          type, autopilot, base_mode, custom_mode, system_status)
-    mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0,    0,         0,         0,           0);
+    if( (sets.RSSI_raw / 2) == 3) { // 3DR rssi
+        mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0,    0,         0,         0,           0);
+    }
 }
 
 /* in  protocols.h
