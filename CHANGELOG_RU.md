@@ -502,3 +502,6 @@ v926
 v927
 * добавлена загрузка EEPROM через MAVlink
 * исправлен баг с "Reading params 12" в MissionPlanner
+
+v928
+* выключен забытый DEBUG

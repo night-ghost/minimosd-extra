@@ -508,3 +508,6 @@ v926
 v927
 * added EEPROM reading via MAVlink
 * fixed bug with "Reading param 12" in MP
+
+v928
+*turned off forgotten DEBUG
