@@ -504,3 +504,7 @@ v925
 
 v926
 * fixed startup hang after removing font uploader
+
+v927
+* added EEPROM reading via MAVlink
+* fixed bug with "Reading param 12" in MP

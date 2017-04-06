@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r916 DV";
+        public const string VERSION = "r927 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -179,6 +179,9 @@ namespace OSD {
         bool batt2_used = false;
 
         bool fListen=false;
+
+        bool flag_EEPROM_read=false;
+        private bool[] mav_blocks = new bool[4096 / 128];
 
         string CurrentCOM;
 
@@ -1311,7 +1314,12 @@ namespace OSD {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
             comBusy = true;
-            bool fail = conf.readEEPROM(Config.EEPROM_SIZE);
+            bool fail=true;
+            if(MavlinkModeMenuItem.Checked){
+                fail = MavReadEEprom(0, Config.EEPROM_SIZE) == 0;
+            } else {
+                fail = conf.readEEPROM(Config.EEPROM_SIZE);
+            }
             comBusy = false;
 
             if (fail)
@@ -4517,7 +4525,7 @@ typedef struct __mavlink_radio_status_t
 
 
         private void MavlinkModeMenuItem_Click(object sender, EventArgs e) {
-            BUT_ReadOSD.Enabled = ! MavlinkModeMenuItem.Checked;
+            //BUT_ReadOSD.Enabled = ! MavlinkModeMenuItem.Checked;
             updateFontToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
             updateFirmwareToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
             resetEepromToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
@@ -4570,7 +4578,16 @@ typedef struct __mavlink_radio_status_t
             Marshal.FreeHGlobal(ptr);
             return arr;
         }
+        
 
+        static T ByteArrayToStructureGC<T>(byte[] bytearray, int startoffset) where T : struct {
+            GCHandle gch = GCHandle.Alloc(bytearray, GCHandleType.Pinned);
+            try {
+                return (T)Marshal.PtrToStructure(new IntPtr(gch.AddrOfPinnedObject().ToInt64() + startoffset), typeof(T));
+            } finally {
+                gch.Free();
+            }
+        }
 
         public void sendPacket(object indata) {
             bool validPacket = false;
@@ -4598,7 +4615,9 @@ typedef struct __mavlink_radio_status_t
             lock (objlock) {
                 byte[] data;
 
-                parseInputData(comPort.ReadExisting());
+                if(!flag_EEPROM_read) {
+                    parseInputData(comPort.ReadExisting());
+                }
 
                 data = StructureToByteArray(indata);
 
@@ -4629,8 +4648,191 @@ typedef struct __mavlink_radio_status_t
                 comPort.Write(packet, 0, i);
 
                 delay(100); 
-                parseInputData(comPort.ReadExisting());
+                if(!flag_EEPROM_read) {
+                    parseInputData(comPort.ReadExisting());
+                }
             }
+        }
+
+        void com_mavlink_proc() {
+            const int Block_Size = 128;
+            bool binMode=false;
+            int cnt=0;
+
+            while (flag_EEPROM_read) {
+                try {
+                    if (comPort.IsOpen && comPort.BytesToRead > 0) {
+                        byte c = (byte)comPort.ReadByte();
+
+                        if(binMode){
+        /*
+                            string hexOutput = String.Format("{0:X}", c);
+                            Console.Write(hexOutput+" ");
+                            cnt++;
+                            if(cnt>=16){
+                                cnt=0;
+                                Console.WriteLine();
+                            }
+         */
+                        } else {
+                            Console.Write((char)c);
+                            cnt=0;
+                        }
+
+                        switch (mavlink_parse_char(c)) {
+                        case 3: // error
+                            binMode = false;
+                            Console.WriteLine("got error packet");
+                            break;
+                        case 1: // got STX
+                            binMode = true;
+                            break;
+                        case 2: // got packet
+                            binMode = false;
+                            if (rxmsg.msgid == (byte)MAVLink.MAVLINK_MSG_ID.ENCAPSULATED_DATA && rxmsg.sysid == 12 /* OSD */ && rxmsg.compid == (byte)MAVLink.MAV_COMPONENT.MAV_COMP_ID_CAMERA) { //reply                                  
+                                Mav_conf packet = ByteArrayToStructureGC<Mav_conf>(rxmsg.payload, 2);
+                                if( packet.magick0 == (byte)0xEE &&
+                                    packet.magick1 == (byte)'O' &&
+                                    packet.magick2 == (byte)'S' &&
+                                    packet.magick3 == (byte)'D' )
+                                {
+                                    byte block = packet.id;
+
+                                    int addr = Block_Size * block;
+
+                                    for(int k=0; k<Block_Size; k++){
+                                        conf.eeprom[addr + k] = packet.data[k];
+                                    }
+
+                                    mav_blocks[block] = true;
+                                    Console.WriteLine("got data block " + block);
+                                } else {
+                                    Console.WriteLine("got bad data block");
+                                }
+
+                            }else {
+                                Console.WriteLine("got message id=" + rxmsg.msgid + " sysid=" + rxmsg.sysid + " compid=" + rxmsg.compid );               
+                            }
+                            break;
+                        } // switch
+
+                    }
+                } catch { }
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+
+        private int MavReadEEprom(int pos, int length){
+            Mav_conf packet = new Mav_conf();
+
+            packet.data = new byte[128];
+            packet.pad = new byte[117];
+
+            if (comPort.IsOpen)
+                comPort.Close();
+
+            try {
+
+                comPort.PortName = CMB_ComPort.Text;
+                comPort.BaudRate = 57600;
+
+                comPort.Open();
+
+                // delay 1s to  OSD boot up
+                for (int i = 0; i < 100; i++) {
+                    System.Threading.Thread.Sleep(10);
+                    Application.DoEvents();
+                    parseInputData(comPort.ReadExisting());
+                }
+
+                MAVLink.mavlink_heartbeat_t htb = new MAVLink.mavlink_heartbeat_t() {
+                    type = (byte)MAVLink.MAV_TYPE.GCS,
+                    autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
+                    mavlink_version = 3// MAVLink.MAVLINK_VERSION
+                };
+
+                sendPacket(htb); // lets AutoBaud will be happy
+                sendPacket(htb);
+                sendPacket(htb);
+                sendPacket(htb);
+
+                for(int i=0; i<mav_blocks.Length; i++){
+                    mav_blocks[i]=false;
+                }
+
+                int seq = 0; // reset on each heartbeat
+                
+                const int Block_Size = 128;
+
+                flag_EEPROM_read = true;
+
+                com_thread = new System.Threading.Thread(com_mavlink_proc);
+                com_thread.Start();
+                bool was_read = false;
+
+                int n=0;
+                int nTry = 50; // 5s per block
+                do {
+                    was_read = false;
+                    int bytes = 0;
+                    for (n = 0; n < length / Block_Size; n++) {
+                        int sz = Block_Size;
+                        bytes = n*Block_Size;
+                        if(mav_blocks[n]) continue; // block already got
+
+                        was_read = true;
+
+                        if (bytes + sz > length)
+                            sz = length - bytes;
+
+                        this.toolStripStatusLabel1.Text = "Reading block "+n;
+
+                        packet.magick0 = (byte)0xEE; // = 0xee 'O' 'S' 'D'
+                        packet.magick1 = (byte)'O';
+                        packet.magick2 = (byte)'S';
+                        packet.magick3 = (byte)'D';
+                            
+                        packet.cmd = (byte)'r';         // command Read
+                        packet.id = (byte)n;            // number of 128-bytes block
+                        packet.len = (byte)Block_Size;  // real length
+                            
+                        bytes += sz;
+
+
+                        MAVLink.mavlink_encapsulated_data_t ed = new MAVLink.mavlink_encapsulated_data_t() {
+                            seqnr = (ushort)(++seq),
+                            data = StructureToByteArray(packet)
+                        };
+
+                        sendPacket(ed);
+                        for (int i = 0; i < 10; i++) {
+                            System.Threading.Thread.Sleep(10);
+                            Application.DoEvents();
+                        }
+                    }
+                    if (--nTry <= 0) {
+                        MessageBox.Show("Timeout reading EEPROM block " + n, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flag_EEPROM_read = false;
+                        return 0; // failed to get packet
+                    }
+                } while (was_read);
+
+                
+                for (int i = 0; i < 100; i++) {
+                    System.Threading.Thread.Sleep(10);
+                    Application.DoEvents();
+                }
+
+                flag_EEPROM_read = false;
+                
+                
+                return 1;
+            } catch (Exception ex) {
+                MessageBox.Show("Error reading data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flag_EEPROM_read = false;
+                return 0;
+            }
+        
         }
 
         private int MavWriteEEprom(int pos, int length) {
@@ -4861,7 +5063,7 @@ typedef struct __mavlink_radio_status_t
         void com_thread_proc(){
             fDone=false;
             while (!fDone) {
-                if (!comBusy) {
+                if (!comBusy && !flag_EEPROM_read) {
                     try {
                         if (comPort.IsOpen && comPort.BytesToRead > 0) {
                             string s = comPort.ReadExisting();
@@ -4907,13 +5109,7 @@ typedef struct __mavlink_radio_status_t
             txtBattB_k.Enabled = pan.flgBattB;
         }
 
-        private void CALLSIGNmaskedText_MaskInputRejected(object sender, MaskInputRejectedEventArgs e) {
-
-        }
-
-        private void chkFlightResults_CheckedChanged(object sender, EventArgs e) {
-
-        }
+        
 
         
 

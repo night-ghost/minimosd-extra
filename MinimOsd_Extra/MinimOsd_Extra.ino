@@ -145,7 +145,7 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 #elif defined(USE_MAVLINK)
 #include "protocols/MAVLink.h"
 BetterStream *mavlink_comm_0_port;
-mavlink_system_t mavlink_system = {12,1}; 
+mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 #elif defined(USE_NMEA)
 #include "protocols/NMEA.h"
 #else

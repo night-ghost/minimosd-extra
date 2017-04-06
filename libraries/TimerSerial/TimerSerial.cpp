@@ -77,12 +77,13 @@ void TimerSerial::begin(long speed){
 
     switch(speed) {
     case 115200:
-	prescaler= (1<<CS10); // prescaler = 8, 2MHz, T=0.5
+    case 100000:
+	prescaler= (1<<CS10); // prescaler = 1, 16MHz
 	div=1;
 	break; // ~138
     
     case 57600:
-	prescaler= (1<<CS10); // prescaler = 8, 2MHz, T=0.5
+	prescaler= (1<<CS10); // prescaler = 1, 16MHz
 	div=1;
 	break; // 278
 
@@ -100,13 +101,13 @@ void TimerSerial::begin(long speed){
 	break;
     
     default:
-	prescaler= (1<<CS20); // prescaler = 8, 2MHz, T=0.5
+	prescaler= (1<<CS20); // prescaler = 1, 16MHz
 	div=1;
 	break;
     }
 
     // Precalculate the various delays, in number of 4-cycle delays
-    _tx_delay = (F_CPU / speed) / div;
+    _tx_delay = ((F_CPU+speed/2) / speed + div/2) / div;
 }
 
 
@@ -164,8 +165,9 @@ void TimerSerial::write_S(uint8_t b){
 
     fInt=0; while(!fInt); // wait for interrupt - finish of stop bit
 
-    TIMSK1 = 0; // выключить таймер
-    TCCR1B = 0;
+    //TIMSK1 = 0; // выключить таймер
+    TIMSK1 &= ~(1<<OCIE1A);  // запретим compare interrupt - все время передачи байта пусть тикает
+//    TCCR1B = 0;
 }
 
 size_t TimerSerial::write(uint8_t b){

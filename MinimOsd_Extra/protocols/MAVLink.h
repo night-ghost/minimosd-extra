@@ -46,7 +46,10 @@ void request_mavlink_rates()
 // fake HEARTBEAT packet for 3DR  rssi generation
 void heartBeat() { //                          type, autopilot, base_mode, custom_mode, system_status)
     if( (sets.RSSI_raw / 2) == 3) { // 3DR rssi
+        uint8_t tmp=mavlink_system.sysid;
+        mavlink_system.sysid=apm_mav_system; // as it was sent by FC
         mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0,    0,         0,         0,           0);
+        mavlink_system.sysid = tmp;
     }
 }
 

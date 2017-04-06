@@ -1559,7 +1559,7 @@ static void panWaitMAVBeats(){
     extern uint16_t packets_got;
 
     OSD::setPanel(1,5);
-    osd.printf_P(PSTR("loop time=%dms crc drops=%u\xffbytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
+    osd.printf_P(PSTR("loop time=%dms crc drops=%u\xff bytes=%ld lost=%u"),max_dly, packet_drops, bytes_comes,  lost_bytes);
     osd.printf_P(PSTR("\xffpackets got=%u skip=%u"), packets_got, packets_skip);
     osd.printf_P(PSTR("\xffstack bottom = %x"),stack_bottom);
 //    osd.printf_P(PSTR("\xffwait=%u %u \xff%lu \xff%lu"), time_since(&lastMAVBeat), millis() - lastMAVBeat ,  lastMAVBeat, millis() );

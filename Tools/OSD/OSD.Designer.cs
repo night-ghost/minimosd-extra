@@ -497,6 +497,7 @@ namespace OSD
             this.MavlinkModeMenuItem.Size = new System.Drawing.Size(233, 22);
             this.MavlinkModeMenuItem.Text = "MAVlink mode";
             this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
+           
             // 
             // getFwFromOSDToolStripMenuItem
             // 
@@ -604,7 +605,6 @@ namespace OSD
             this.CALLSIGNmaskedText.Name = "CALLSIGNmaskedText";
             this.CALLSIGNmaskedText.Size = new System.Drawing.Size(109, 20);
             this.CALLSIGNmaskedText.TabIndex = 24;
-            this.CALLSIGNmaskedText.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.CALLSIGNmaskedText_MaskInputRejected);
             this.CALLSIGNmaskedText.Validating += new System.ComponentModel.CancelEventHandler(this.CALLSIGNmaskedText_Validating);
             this.CALLSIGNmaskedText.Validated += new System.EventHandler(this.CALLSIGNmaskedText_Validated);
             // 
@@ -677,7 +677,7 @@ namespace OSD
             this.chkFlightResults.TabIndex = 0;
             this.chkFlightResults.Text = "Show results after flight";
             this.chkFlightResults.UseVisualStyleBackColor = true;
-            this.chkFlightResults.CheckedChanged += new System.EventHandler(this.chkFlightResults_CheckedChanged);
+           
             // 
             // groupBox14
             // 
