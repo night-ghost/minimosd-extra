@@ -1,8 +1,6 @@
 ﻿using System;
-namespace OSD
-{
-    partial class OSD
-    {
+namespace OSD {
+    partial class OSD {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -12,10 +10,8 @@ namespace OSD
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -27,8 +23,7 @@ namespace OSD
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OSD));
             this.CMB_ComPort = new System.Windows.Forms.ComboBox();
@@ -73,8 +68,6 @@ namespace OSD
             this.label44 = new System.Windows.Forms.Label();
             this.timeOffset = new System.Windows.Forms.NumericUpDown();
             this.label42 = new System.Windows.Forms.Label();
-            this.chkILS = new System.Windows.Forms.CheckBox();
-            this.chkTrack = new System.Windows.Forms.CheckBox();
             this.chkFlightResults = new System.Windows.Forms.CheckBox();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.txtCurr_k = new System.Windows.Forms.TextBox();
@@ -198,6 +191,7 @@ namespace OSD
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.chkRefrence = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -473,7 +467,6 @@ namespace OSD
             this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
             this.updateCharsetDevToolStripMenuItem.Visible = false;
-            this.updateCharsetDevToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetDevToolStripMenuItem_Click);
             // 
             // updateCharsetcustomFwToolStripMenuItem
             // 
@@ -481,7 +474,6 @@ namespace OSD
             this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.updateCharsetcustomFwToolStripMenuItem.Text = "Update Charset (custom fw)...";
             this.updateCharsetcustomFwToolStripMenuItem.Visible = false;
-            this.updateCharsetcustomFwToolStripMenuItem.Click += new System.EventHandler(this.updateCharsetcustomFwToolStripMenuItem_Click);
             // 
             // presentCustomCharsetToolStripMenuItem
             // 
@@ -497,7 +489,6 @@ namespace OSD
             this.MavlinkModeMenuItem.Size = new System.Drawing.Size(233, 22);
             this.MavlinkModeMenuItem.Text = "MAVlink mode";
             this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
-           
             // 
             // getFwFromOSDToolStripMenuItem
             // 
@@ -505,7 +496,6 @@ namespace OSD
             this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.getFwFromOSDToolStripMenuItem.Text = "GetFwFromOSD...";
             this.getFwFromOSDToolStripMenuItem.Visible = false;
-            this.getFwFromOSDToolStripMenuItem.Click += new System.EventHandler(this.getFwFromOSDToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -543,14 +533,13 @@ namespace OSD
             // 
             // tabPageConfig
             // 
+            this.tabPageConfig.Controls.Add(this.chkRefrence);
             this.tabPageConfig.Controls.Add(this.label45);
             this.tabPageConfig.Controls.Add(this.UNITS_combo);
             this.tabPageConfig.Controls.Add(this.CALLSIGNmaskedText);
             this.tabPageConfig.Controls.Add(this.label44);
             this.tabPageConfig.Controls.Add(this.timeOffset);
             this.tabPageConfig.Controls.Add(this.label42);
-            this.tabPageConfig.Controls.Add(this.chkILS);
-            this.tabPageConfig.Controls.Add(this.chkTrack);
             this.tabPageConfig.Controls.Add(this.chkFlightResults);
             this.tabPageConfig.Controls.Add(this.groupBox14);
             this.tabPageConfig.Controls.Add(this.groupBox2);
@@ -574,7 +563,7 @@ namespace OSD
             // label45
             // 
             this.label45.AutoSize = true;
-            this.label45.Location = new System.Drawing.Point(492, 337);
+            this.label45.Location = new System.Drawing.Point(492, 339);
             this.label45.Name = "label45";
             this.label45.Size = new System.Drawing.Size(31, 13);
             this.label45.TabIndex = 26;
@@ -587,7 +576,7 @@ namespace OSD
             this.UNITS_combo.Items.AddRange(new object[] {
             "Metric",
             "Imperial"});
-            this.UNITS_combo.Location = new System.Drawing.Point(553, 334);
+            this.UNITS_combo.Location = new System.Drawing.Point(553, 336);
             this.UNITS_combo.Margin = new System.Windows.Forms.Padding(2);
             this.UNITS_combo.Name = "UNITS_combo";
             this.UNITS_combo.Size = new System.Drawing.Size(109, 21);
@@ -619,7 +608,7 @@ namespace OSD
             // 
             // timeOffset
             // 
-            this.timeOffset.Location = new System.Drawing.Point(615, 305);
+            this.timeOffset.Location = new System.Drawing.Point(613, 312);
             this.timeOffset.Maximum = new decimal(new int[] {
             12,
             0,
@@ -638,46 +627,22 @@ namespace OSD
             // label42
             // 
             this.label42.AutoSize = true;
-            this.label42.Location = new System.Drawing.Point(492, 307);
+            this.label42.Location = new System.Drawing.Point(490, 314);
             this.label42.Name = "label42";
             this.label42.Size = new System.Drawing.Size(109, 13);
             this.label42.TabIndex = 21;
             this.label42.Text = "Time offset from GMT";
             // 
-            // chkILS
-            // 
-            this.chkILS.AutoSize = true;
-            this.chkILS.Location = new System.Drawing.Point(632, 292);
-            this.chkILS.Name = "chkILS";
-            this.chkILS.Size = new System.Drawing.Size(70, 17);
-            this.chkILS.TabIndex = 1;
-            this.chkILS.Text = "show ILS";
-            this.chkILS.UseVisualStyleBackColor = true;
-            this.chkILS.Visible = false;
-            this.chkILS.CheckedChanged += new System.EventHandler(this.chkILS_CheckedChanged);
-            // 
-            // chkTrack
-            // 
-            this.chkTrack.AutoSize = true;
-            this.chkTrack.Location = new System.Drawing.Point(613, 315);
-            this.chkTrack.Name = "chkTrack";
-            this.chkTrack.Size = new System.Drawing.Size(72, 17);
-            this.chkTrack.TabIndex = 4;
-            this.chkTrack.Text = "with track";
-            this.chkTrack.UseVisualStyleBackColor = true;
-            this.chkTrack.Visible = false;
-            this.chkTrack.CheckedChanged += new System.EventHandler(this.chkTrack_CheckedChanged);
-            // 
             // chkFlightResults
             // 
             this.chkFlightResults.AutoSize = true;
-            this.chkFlightResults.Location = new System.Drawing.Point(491, 284);
+            this.chkFlightResults.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkFlightResults.Location = new System.Drawing.Point(490, 272);
             this.chkFlightResults.Name = "chkFlightResults";
             this.chkFlightResults.Size = new System.Drawing.Size(135, 17);
             this.chkFlightResults.TabIndex = 0;
             this.chkFlightResults.Text = "Show results after flight";
             this.chkFlightResults.UseVisualStyleBackColor = true;
-           
             // 
             // groupBox14
             // 
@@ -1740,14 +1705,14 @@ namespace OSD
             this.groupBoxRSSI.Controls.Add(this.RSSI_numeric_min);
             this.groupBoxRSSI.Location = new System.Drawing.Point(490, 119);
             this.groupBoxRSSI.Name = "groupBoxRSSI";
-            this.groupBoxRSSI.Size = new System.Drawing.Size(181, 159);
+            this.groupBoxRSSI.Size = new System.Drawing.Size(181, 147);
             this.groupBoxRSSI.TabIndex = 3;
             this.groupBoxRSSI.TabStop = false;
             this.groupBoxRSSI.Text = "RSSI";
             // 
             // txtRSSI_k
             // 
-            this.txtRSSI_k.Location = new System.Drawing.Point(125, 128);
+            this.txtRSSI_k.Location = new System.Drawing.Point(125, 117);
             this.txtRSSI_k.Name = "txtRSSI_k";
             this.txtRSSI_k.Size = new System.Drawing.Size(47, 20);
             this.txtRSSI_k.TabIndex = 23;
@@ -1759,7 +1724,7 @@ namespace OSD
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(33, 131);
+            this.label20.Location = new System.Drawing.Point(33, 120);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(82, 13);
             this.label20.TabIndex = 22;
@@ -1794,7 +1759,7 @@ namespace OSD
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(5, 89);
+            this.label8.Location = new System.Drawing.Point(5, 79);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(93, 13);
             this.label8.TabIndex = 11;
@@ -1802,7 +1767,7 @@ namespace OSD
             // 
             // RSSI_WARNnumeric
             // 
-            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(111, 85);
+            this.RSSI_WARNnumeric.Location = new System.Drawing.Point(111, 75);
             this.RSSI_WARNnumeric.Name = "RSSI_WARNnumeric";
             this.RSSI_WARNnumeric.Size = new System.Drawing.Size(61, 20);
             this.RSSI_WARNnumeric.TabIndex = 10;
@@ -1813,7 +1778,7 @@ namespace OSD
             // RSSI_RAW
             // 
             this.RSSI_RAW.AutoSize = true;
-            this.RSSI_RAW.Location = new System.Drawing.Point(8, 106);
+            this.RSSI_RAW.Location = new System.Drawing.Point(8, 95);
             this.RSSI_RAW.Margin = new System.Windows.Forms.Padding(2);
             this.RSSI_RAW.Name = "RSSI_RAW";
             this.RSSI_RAW.Size = new System.Drawing.Size(102, 17);
@@ -1825,7 +1790,7 @@ namespace OSD
             // lblRSSIMax
             // 
             this.lblRSSIMax.AutoSize = true;
-            this.lblRSSIMax.Location = new System.Drawing.Point(4, 65);
+            this.lblRSSIMax.Location = new System.Drawing.Point(4, 57);
             this.lblRSSIMax.Name = "lblRSSIMax";
             this.lblRSSIMax.Size = new System.Drawing.Size(57, 13);
             this.lblRSSIMax.TabIndex = 3;
@@ -1834,7 +1799,7 @@ namespace OSD
             // lblRSSIMin
             // 
             this.lblRSSIMin.AutoSize = true;
-            this.lblRSSIMin.Location = new System.Drawing.Point(4, 37);
+            this.lblRSSIMin.Location = new System.Drawing.Point(4, 34);
             this.lblRSSIMin.Name = "lblRSSIMin";
             this.lblRSSIMin.Size = new System.Drawing.Size(54, 13);
             this.lblRSSIMin.TabIndex = 2;
@@ -1842,7 +1807,7 @@ namespace OSD
             // 
             // RSSI_numeric_max
             // 
-            this.RSSI_numeric_max.Location = new System.Drawing.Point(81, 61);
+            this.RSSI_numeric_max.Location = new System.Drawing.Point(81, 53);
             this.RSSI_numeric_max.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -1861,7 +1826,7 @@ namespace OSD
             // 
             // RSSI_numeric_min
             // 
-            this.RSSI_numeric_min.Location = new System.Drawing.Point(81, 35);
+            this.RSSI_numeric_min.Location = new System.Drawing.Point(81, 32);
             this.RSSI_numeric_min.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -2060,6 +2025,17 @@ namespace OSD
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
+            // chkRefence
+            // 
+            this.chkRefrence.AutoSize = true;
+            this.chkRefrence.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkRefrence.Location = new System.Drawing.Point(490, 291);
+            this.chkRefrence.Name = "chkRefence";
+            this.chkRefrence.Size = new System.Drawing.Size(105, 17);
+            this.chkRefrence.TabIndex = 27;
+            this.chkRefrence.Text = "5v ADC refrence";
+            this.chkRefrence.UseVisualStyleBackColor = true;
+            // 
             // OSD
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2133,7 +2109,7 @@ namespace OSD
 
         #endregion
 
-        
+
         private System.Windows.Forms.Button BUT_WriteOSD;
         public System.Windows.Forms.ComboBox CMB_ComPort;
 
@@ -2144,7 +2120,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem videoModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem CHK_ntsc;
         private System.Windows.Forms.ToolStripMenuItem CHK_pal;
-		private System.Windows.Forms.ToolStripMenuItem CHK_auto;
+        private System.Windows.Forms.ToolStripMenuItem CHK_auto;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadFromFileToolStripMenuItem;
@@ -2163,7 +2139,7 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem updateFontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.TabControl PANEL_tabs;
- 
+
         private System.Windows.Forms.TabPage tabPageConfig;
         private System.Windows.Forms.GroupBox groupBoxRSSI;
         private System.Windows.Forms.Label lblRSSIMax;
@@ -2190,12 +2166,12 @@ namespace OSD
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gettingStartedToolStripMenuItem;
-//        private System.Windows.Forms.RadioButton rbtBatterymAh;
-//        private System.Windows.Forms.RadioButton rbtBatteryPercent;
+        //        private System.Windows.Forms.RadioButton rbtBatterymAh;
+        //        private System.Windows.Forms.RadioButton rbtBatteryPercent;
         private System.Windows.Forms.Label lblModelType;
         private System.Windows.Forms.ComboBox cbxModelType;
         private System.Windows.Forms.Label lblFWModelType;
-        
+
         private System.Windows.Forms.GroupBox grpTLog;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ToolStripMenuItem MavlinkModeMenuItem;
@@ -2212,14 +2188,14 @@ namespace OSD
         private System.Windows.Forms.ToolStripMenuItem getFwFromOSDToolStripMenuItem;
         private System.Windows.Forms.CheckBox cbxAutoUpdate;
         private System.Windows.Forms.CheckBox cbxShowUpdateDialog;
-        
+
         private System.Windows.Forms.CheckBox chkFlightResults;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown numMinVoltB;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.ComboBox cbBattA_source;		
+        private System.Windows.Forms.ComboBox cbBattA_source;
         private System.Windows.Forms.TextBox txtRSSI_k;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.GroupBox groupBox16;
@@ -2227,7 +2203,6 @@ namespace OSD
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.TextBox txtRollPal;
         private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.CheckBox chkILS;
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.TextBox txtPitchNtsc;
         private System.Windows.Forms.Label label25;
@@ -2240,9 +2215,9 @@ namespace OSD
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label OVERSPEED_label;
         private System.Windows.Forms.NumericUpDown OVERSPEED_numeric;
-		private System.Windows.Forms.Label lblTLog;
+        private System.Windows.Forms.Label lblTLog;
         private System.Windows.Forms.Button btnTLog;
-		private System.Windows.Forms.NumericUpDown numHOS;
+        private System.Windows.Forms.NumericUpDown numHOS;
         private System.Windows.Forms.NumericUpDown numVOS;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label label30;
@@ -2254,7 +2229,6 @@ namespace OSD
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbNscreens;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.CheckBox chkTrack;
         private System.Windows.Forms.GroupBox groupBox2;
         public System.Windows.Forms.TextBox txtFormat1;
         private System.Windows.Forms.Label label32;
@@ -2307,6 +2281,7 @@ namespace OSD
         private System.Windows.Forms.ComboBox UNITS_combo;
         private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
         private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.CheckBox chkRefrence;
     }
 
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #define IS_PLANE 1  // plane functions
 #define IS_COPTER 1 // copter functions
 // sets.model_type plane=0 copter=1
@@ -133,3 +135,10 @@
 
 
 
+static INLINE void max7456_off(){
+    PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
+}
+
+static INLINE void max7456_on(){
+    PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
+}

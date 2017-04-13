@@ -511,3 +511,6 @@ v927
 
 v928
 *turned off forgotten DEBUG
+
+v929
+* added ability to choose ADC refrence voltage - Vcc or 1.1v internal

@@ -35,24 +35,6 @@ static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 }
 
 
-static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
-    osd.printf_P(fmt, f);
-    if(c) OSD::write_S(c);
-}
-
-static void NOINLINE osd_printf_1(PGM_P fmt, float f){
-    osd_printf_2(fmt, f, 0);
-}
-
-static void NOINLINE osd_printi_1(PGM_P fmt, int f){
-    osd.printf_P(fmt, f);
-}
-
-static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
-    osd.printf_P(fmt,i1,i2);
-}
-
-
 /*static void NOINLINE osd_printi_xy(Point p, PGM_P fmt, int f){
     osd_setPanel(p);
     osd_printi_1(fmt, f);
@@ -2080,7 +2062,7 @@ static void panState(point p) {
 
     byte n = get_chan_pos(ch, is_alt(p));
 
-    print_eeprom_string(PANSTATE_STR_ID + n);
+    print_eeprom_string(PANSTATE_STR_ID + n, OSD::write_S);
 }
 
 static void panScale(point p) {

@@ -5,10 +5,9 @@
 #include "Arduino.h"
 
 #include "OSD_Max7456.h"
-#include "Spi.h"
-#include "Config.h"
 
 #include "prototypes.h"
+#include "Spi.h"
 
 extern Settings sets;
 
@@ -22,16 +21,6 @@ OSD::OSD()
 }
 
 //------------------ init ---------------------------------------------------
-void MAX_write(byte addr, byte data){
-    register byte d=data;
-    SPI::transfer(addr);
-    SPI::transfer(d);
-}
-
-byte MAX_read(byte addr){
-  SPI::transfer(addr);
-  return SPI::transfer(0xff);
-}
 
 
 void OSD::adjust(){
@@ -93,7 +82,7 @@ void OSD::hw_init(){
 
     MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  // and then switch to auto mode
 
- // max7456_off();
+ // max7456_off(); - in adjust();
 
     adjust();
 }
@@ -266,7 +255,9 @@ void OSD::update() {
     wee need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
     
 */
-
+#ifdef SLAVE_BUILD 
+//  internal Ardupilot build should use DMA to transfer
+#else
     max7456_on(); 
 
     MAX_write(MAX7456_DMAH_reg, 0);
@@ -283,12 +274,12 @@ void OSD::update() {
     max7456_on();
 
     SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
-
+#endif
     max7456_off();
 }
 
 
-void  OSD::write_NVM(int font_count, uint8_t *character_bitmap)
+void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
 {
   byte x;
   byte char_address_hi;

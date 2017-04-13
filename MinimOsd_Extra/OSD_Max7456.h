@@ -87,7 +87,7 @@
   #define MAX7456_screen_rows 0x0D
 #endif
 
-
+#include "Config.h"
 
 //------------------ the OSD class -----------------------------------------------
 
@@ -112,18 +112,10 @@ class OSD: public BetterStream
     virtual byte     peek(void);
     virtual void    flush(void);
     virtual size_t write(uint8_t c);
-    static void write_NVM(int font_count, uint8_t *character_bitmap);
+    static void write_NVM(uint16_t font_count, uint8_t *character_bitmap);
     static void write_xy(uint8_t x, uint8_t y, uint8_t c);
     static void adjust();
     using BetterStream::write;
-
-    static INLINE void max7456_off(){
-        PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
-    }
-
-    static INLINE void max7456_on(){
-        PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
-    }
 
 //  private:
     static uint8_t col, row, video_mode;
@@ -143,9 +135,11 @@ class OSD: public BetterStream
 
 
 static INLINE void unplugSlaves(){   //Unplug list of SPI
-    OSD::max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 
+extern void MAX_write(byte addr, byte data);
+extern byte MAX_read(byte addr);
 
 
 #endif

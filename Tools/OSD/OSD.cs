@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r927 DV";
+        public const string VERSION = "r929 DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -510,7 +510,7 @@ namespace OSD {
             CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
             //            chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
-            chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
+         //   chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
             BATT_WARNnumeric.Value = pan.batt_warn_level;
             RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -543,6 +543,7 @@ namespace OSD {
 
             chkByTime.Checked = pan.flgTimedSwitch;
             chkFlightResults.Checked=true;
+            chkRefrence.Checked =false;
 
         }
 
@@ -1004,6 +1005,7 @@ namespace OSD {
                 conf.eeprom.flags[useExtCurr] = pan.flgCurrent;
                 conf.eeprom.flags[AutoScreenSwitch] = pan.flgTimedSwitch;
                 conf.eeprom.flags[results_on] = chkFlightResults.Checked;
+                conf.eeprom.flags[ref_5v] = chkRefrence.Checked;
 
                 //conf.eeprom.flags[flgTrack] = pan.flgTrack;
                 //conf.eeprom.flags[flgHUD] = pan.flgHUD;
@@ -1564,7 +1566,7 @@ as_checkbox:
                 //pan.flgTrack = conf.eeprom.flags[flgTrack];
                 //pan.flgHUD = conf.eeprom.flags[flgHUD];
 
-                chkTrack.Checked = pan.flgTrack;
+                //chkTrack.Checked = pan.flgTrack;
                 //chkHUD.Checked = pan.flgHUD;
 
                 try {
@@ -1667,6 +1669,7 @@ as_checkbox:
                 chkByTime.Checked = pan.flgTimedSwitch;
 
                 chkFlightResults.Checked = conf.eeprom.flags[results_on];
+                chkRefrence.Checked = conf.eeprom.flags[ref_5v];
                 
 
                 pan.pwm_src = conf.eeprom.sets.pwm_src;
@@ -1953,6 +1956,8 @@ as_checkbox:
 
                         sw.WriteLine("{0}\t{1}", "fResults", chkFlightResults.Checked);
                         sw.WriteLine("{0}\t{1}", "timeOffset", timeOffset.Value);
+                        sw.WriteLine("{0}\t{1}", "ref5v", chkRefrence.Checked );
+                        
                         
                         sw.Close();
                     }
@@ -2157,7 +2162,8 @@ again:
                         else if (strings[0] == "fResults") chkFlightResults.Checked = bool.Parse(strings[1]);
                         else if (strings[0] == "timeOffset") timeOffset.Value = int.Parse(strings[1]);
                         else if (strings[0] == "pwm_mode") cbOutMode.SelectedIndex = int.Parse(strings[1]);
-
+                        else if (strings[0] == "ref5v") chkRefrence.Checked = bool.Parse(strings[1]);
+                        
                     }
 
                     //pan.model_type = (byte)cbxModelType.SelectedItem;
@@ -2212,7 +2218,7 @@ again:
                     CHK_auto.Checked = Convert.ToBoolean(pan.mode_auto);
 
                     //chkHUD.Checked = Convert.ToBoolean(pan.flgHUD);
-                    chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
+                    //chkTrack.Checked = Convert.ToBoolean(pan.flgTrack);
 
                     BATT_WARNnumeric.Value = pan.batt_warn_level;
                     RSSI_WARNnumeric.Value = pan.rssi_warn_level;
@@ -2646,6 +2652,12 @@ again:
 
             Application.DoEvents();
 
+            if(MavlinkModeMenuItem.Checked){
+                MavUploadFont(ofd);
+                return;
+            }
+
+
             //Get file version
             string fileVersion = "000";
             string tempFileName = ofd.SafeFileName.ToUpper();
@@ -2663,6 +2675,7 @@ again:
                     }
                 }
             }
+
 
             Application.DoEvents();
 
@@ -3147,189 +3160,6 @@ again:
             Draw(screen_number);
         }
 
-        private void updateCharsetDevToolStripMenuItem_Click(object sender, EventArgs e) {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-            toolStripStatusLabel1.Text = "";
-
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "mcm|*.mcm";
-
-            DialogResult dialogResp = ofd.ShowDialog();
-            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
-                return;
-
-            if (!IsValidCharsetFile(ofd))
-                return;
-
-            //Get file version
-            string fileVersion = "000";
-            string tempFileName = ofd.SafeFileName.ToUpper();
-            if (tempFileName.StartsWith("MINIMOSD_")) {
-                tempFileName = tempFileName.Remove(0, 9);
-                if (tempFileName.EndsWith(".MCM")) {
-                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
-                    string[] versionArray = tempFileName.Split('.');
-                    Int16 version1, version2, version3;
-                    if (versionArray.Length > 2) {
-                        if (Int16.TryParse(versionArray[0], out version1) &&
-                           Int16.TryParse(versionArray[1], out version2) &&
-                           Int16.TryParse(versionArray[2], out version3))
-                            fileVersion = version1.ToString().Substring(0, 1).Trim() + version2.ToString().Substring(0, 1).Trim() + version3.ToString().Substring(0, 1).Trim();
-                    }
-                }
-            }
-
-            if (ofd.FileName != "") {
-                if (comPort.IsOpen)
-                    comPort.Close();
-
-                try {
-
-                    comPort.PortName = CMB_ComPort.Text;
-                    comPort.BaudRate = 57600;
-
-                    comPort.Open();
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    System.Threading.Thread.Sleep(2);
-
-                    comPort.DtrEnable = true;
-                    comPort.RtsEnable = true;
-
-                    System.Threading.Thread.Sleep(2000);
-
-                    comPort.ReadExisting();
-
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-
-                    int timeout = 0;
-
-                    while (comPort.BytesToRead == 0) {
-                        System.Threading.Thread.Sleep(500);
-                        Console.WriteLine("Waiting...");
-                        timeout++;
-
-                        if (timeout > 6) {
-                            MessageBox.Show("Error entering font mode - No Data");
-                            comPort.Close();
-                            start_clear_timeout();
-                            return;
-                        }
-                    }
-                    if (!comPort.ReadLine().Contains("RFF")) {
-                        MessageBox.Show("Error entering CharSet upload mode - invalid data");
-                        comPort.Close();
-                        start_clear_timeout();
-                        return;
-                    }
-
-                } catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
-
-                using (var stream = ofd.OpenFile()) {
-
-                    BinaryReader br = new BinaryReader(stream);
-                    StreamReader sr2 = new StreamReader(br.BaseStream);
-
-                    string device = sr2.ReadLine();
-
-                    if (device != "MAX7456") {
-                        MessageBox.Show("Invalid MCM");
-                        comPort.Close();
-                        start_clear_timeout();
-                        return;
-                    }
-
-                    br.BaseStream.Seek(0, SeekOrigin.Begin);
-
-                    long length = br.BaseStream.Length;
-                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed) {
-                        try {
-                            toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
-                            toolStripStatusLabel1.Text = "CharSet Uploading";
-
-
-                            int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
-                            if ((br.BaseStream.Position + read) > br.BaseStream.Length) {
-                                read = (int)(br.BaseStream.Length - br.BaseStream.Position);
-                            }
-                            length -= read;
-                            byte[] buffer = br.ReadBytes(read);
-                            comPort.Write(buffer, 0, buffer.Length);
-                            int timeout = 0;
-
-                            while (comPort.BytesToRead == 0 && read == 768) {
-                                System.Threading.Thread.Sleep(10);
-                                timeout++;
-
-                                if (timeout > 10) {
-                                    MessageBox.Show("CharSet upload failed - no response");
-                                    comPort.Close();
-                                    start_clear_timeout();
-                                    return;
-                                }
-                            }
-
-                            comPort.ReadExisting();
-                            if (length < 1000) {
-                                lblFWModelType.Text = lblFWModelType.Text;
-                            }
-
-                        } catch {
-                            break;
-                        }
-
-                        Application.DoEvents();
-                    }
-                    comPort.WriteLine("\r\n");
-                    //Wait for last char acknowledge
-                    int t = 0;
-                    while (comPort.BytesToRead == 0) {
-                        System.Threading.Thread.Sleep(10);
-                        t++;
-
-                        if (t > 10) {
-                            MessageBox.Show("No end");
-                            comPort.Close();
-                            start_clear_timeout();
-                            return;
-                        }
-                    }
-                    //parseInputData(comPort.ReadExisting());
-                    if (comPort.BytesToRead != 0)
-                        comPort.ReadLine();
-
-                    comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    System.Threading.Thread.Sleep(50);
-
-                    comPort.DtrEnable = true;
-                    comPort.RtsEnable = true;
-
-                    System.Threading.Thread.Sleep(50);
-
-                    comPort.Close();
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    toolStripProgressBar1.Value = 100;
-                    toolStripStatusLabel1.Text = "CharSet Done";
-                }
-
-                conf.WriteCharsetVersion(fileVersion);
-                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
-                start_clear_timeout();
-            }
-        }
 
         private bool UploadFirmware(string fileName) {
             if (string.IsNullOrEmpty(fileName))
@@ -3391,188 +3221,7 @@ again:
         }
 
 
-        private bool UploadFont(OpenFileDialog ofd) {
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-            toolStripStatusLabel1.Text = "";
-
-
-            if (!IsValidCharsetFile(ofd))
-                return false;
-
-            //Get file version
-            string fileVersion = "000";
-            string tempFileName = ofd.SafeFileName.ToUpper();
-            if (tempFileName.StartsWith("MINIMOSD_")) {
-                tempFileName = tempFileName.Remove(0, 9);
-                if (tempFileName.EndsWith(".MCM")) {
-                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
-                    string[] versionArray = tempFileName.Split('.');
-                    Int16 version1, version2, version3;
-                    if (versionArray.Length > 2) {
-                        if (Int16.TryParse(versionArray[0], out version1) &&
-                           Int16.TryParse(versionArray[1], out version2) &&
-                           Int16.TryParse(versionArray[2], out version3))
-                            fileVersion = version1.ToString().Substring(0, 1).Trim() + version2.ToString().Substring(0, 1).Trim() + version3.ToString().Substring(0, 1).Trim();
-                    }
-                }
-            }
-
-            if (ofd.FileName != "") {
-                if (comPort.IsOpen)
-                    comPort.Close();
-
-                try {
-
-                    comPort.PortName = CMB_ComPort.Text;
-                    comPort.BaudRate = 57600;
-
-                    comPort.Open();
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    //System.Threading.Thread.Sleep(2);
-
-                    comPort.DtrEnable = true;
-                    comPort.RtsEnable = true;
-
-                    System.Threading.Thread.Sleep(1000);
-
-                    comPort.ReadExisting();
-
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-                    comPort.WriteLine("");
-
-                    int timeout = 0;
-
-                    while (comPort.BytesToRead == 0) {
-                        System.Threading.Thread.Sleep(500);
-                        Console.WriteLine("Waiting...");
-                        timeout++;
-
-                        if (timeout > 6) {
-                            MessageBox.Show("Error entering font mode - No Data");
-                            comPort.Close();
-                            start_clear_timeout();
-                            return false;
-                        }
-                    }
-                    if (!comPort.ReadLine().Contains("RFF")) {
-                        MessageBox.Show("Error entering CharSet upload mode - invalid data");
-                        start_clear_timeout();
-                        comPort.Close();
-                        start_clear_timeout();
-                        return false;
-                    }
-
-                } catch { MessageBox.Show("Error opening com port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return false; }
-
-                using (var stream = ofd.OpenFile()) {
-
-                    BinaryReader br = new BinaryReader(stream);
-                    StreamReader sr2 = new StreamReader(br.BaseStream);
-
-                    string device = sr2.ReadLine();
-
-                    if (device != "MAX7456") {
-                        MessageBox.Show("Invalid MCM");
-                        comPort.Close();
-                        start_clear_timeout();
-                        return false;
-                    }
-
-                    br.BaseStream.Seek(0, SeekOrigin.Begin);
-
-                    long length = br.BaseStream.Length;
-                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed) {
-                        try {
-                            toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
-                            toolStripStatusLabel1.Text = "CharSet Uploading";
-
-
-                            int read = 256 * 3;// 163847 / 256 + 1; // 163,847 font file
-                            if ((br.BaseStream.Position + read) > br.BaseStream.Length) {
-                                read = (int)(br.BaseStream.Length - br.BaseStream.Position);
-                            }
-                            length -= read;
-                            byte[] buffer = br.ReadBytes(read);
-                            comPort.Write(buffer, 0, buffer.Length);
-                            int timeout = 0;
-
-                            while (comPort.BytesToRead == 0 && read == 768) {
-                                System.Threading.Thread.Sleep(10);
-                                timeout++;
-
-                                if (timeout > 10) {
-                                    MessageBox.Show("CharSet upload failed - no response");
-                                    comPort.Close();
-                                    start_clear_timeout();
-                                    return false;
-                                    
-                                }
-                            }
-
-                            comPort.ReadExisting();
-                            if (length < 1000) {
-                                lblFWModelType.Text = lblFWModelType.Text;
-                            }
-
-                        } catch {
-                            break;
-                        }
-
-                        Application.DoEvents();
-                    }
-                    comPort.WriteLine("\r\n");
-                    //Wait for last char acknowledge
-                    int t = 0;
-                    while (comPort.BytesToRead == 0) {
-                        System.Threading.Thread.Sleep(10);
-                        t++;
-
-                        if (t > 10) {
-                            MessageBox.Show("No end");
-                            comPort.Close();
-                            start_clear_timeout();
-                            return false;
-                        }
-
-
-                    }
-                    //parseInputData(comPort.ReadExisting());
-                    if (comPort.BytesToRead != 0)
-                        comPort.ReadLine();
-
-                    comPort.WriteLine("\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    System.Threading.Thread.Sleep(50);
-
-                    comPort.DtrEnable = true;
-                    comPort.RtsEnable = true;
-
-                    System.Threading.Thread.Sleep(50);
-
-                    comPort.Close();
-
-                    comPort.DtrEnable = false;
-                    comPort.RtsEnable = false;
-
-                    toolStripProgressBar1.Value = 100;
-                    toolStripStatusLabel1.Text = "CharSet Done";
-                }
-
-                conf.WriteCharsetVersion(fileVersion);
-                lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
-                start_clear_timeout();
-            }
-            return true;
-        }
+ 
 
         private bool GetLatestFW(ModelType modelType) {
             try {
@@ -3609,114 +3258,10 @@ again:
             return true;
         }
 
-        private void updateCharsetcustomFwToolStripMenuItem_Click(object sender, EventArgs e) {
-            #region Get and validate font file
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "mcm|*.mcm";
-
-            DialogResult dialogResp = ofd.ShowDialog();
-            if ((dialogResp != System.Windows.Forms.DialogResult.OK) || (ofd.FileName.Trim() == ""))
-                return;
-
-            if (!IsValidCharsetFile(ofd))
-                return;
-            #endregion
-
-            //Get current fw version (plane, copter...)
-            ModelType modelType = conf.GetModelType();
-            modelType = ModelType.Copter;
-            string modelFileName = "MinimOSD_" + modelType.ToString() + ".hex";
-            if (modelType == ModelType.Unknown) {
-                if (MessageBox.Show("Unknown current fw." + Environment.NewLine +
-                                   "If you proceed you'll need to upload  the fw manually after charset upload." + Environment.NewLine +
-                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
-                    return;
-            }
-
-            //Get latest fw from ftp
-            if (!GetLatestFW(modelType)) {
-                if (MessageBox.Show("Unable to get latest fw from internet." + Environment.NewLine +
-                                   "If you proceed you'll need to upload the fw manually after charset upload." + Environment.NewLine +
-                                   "Do you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
-                    return;
-            }
-
-            //Upload font fw
-            if (!UploadFirmware("charuploader.hex")) {
-                MessageBox.Show("Unable to write character uploader!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            //Upload font
-            if (!UploadFont(ofd))
-                return;
-
-            //Upload fw
-            if (modelType != ModelType.Unknown)
-                UploadFirmware(modelFileName);
-            else
-                MessageBox.Show("Wrong ModelType!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-            start_clear_timeout();
-        }
 
 
 
-        private void GetFwFromOSD() {
-            byte[] FLASH = new byte[32 * 1024];
-            //byte[] FLASH = new byte[30382];
-
-            ArduinoSTK sp = OpenArduino();
-
-
-            if (sp != null && sp.connectAP()) {
-                try {
-                    int start = 0;
-                    short length = 0x100;
-
-                    while (start < FLASH.Length) {
-                        sp.setaddress(start);
-                        sp.downloadflash(length).CopyTo(FLASH, start);
-                        start += length;
-                    }
-
-                    StreamWriter sw = new StreamWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "FW" + Path.DirectorySeparatorChar + @"flash.bin", false);
-                    BinaryWriter bw = new BinaryWriter(sw.BaseStream);
-                    bw.Write(FLASH, 0, FLASH.Length);
-                    bw.Close();
-
-                    sw = new StreamWriter(Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "FW" + Path.DirectorySeparatorChar + @"flash.hex", false);
-                    for (int i = 0; i < FLASH.Length; i += 16) {
-                        string add = string.Format("{0:X4}", i);
-                        if (i % (0x1000 << 4) == 0) {
-                            if (i != 0)
-                                sw.WriteLine(":02000002{0:X4}{1:X2}", ((i >> 4) & 0xf000), 0x100 - (2 + 2 + (((i >> 4) & 0xf000) >> 8) & 0xff));
-                        }
-                        if (add.Length == 5) {
-                            add = add.Substring(1);
-                        }
-                        sw.Write(":{0:X2}{1}00", 16, add);
-                        byte ck = (byte)(16 + (i & 0xff) + ((i >> 8) & 0xff));
-                        for (int a = 0; a < 16; a++) {
-                            ck += FLASH[i + a];
-                            sw.Write("{0:X2}", FLASH[i + a]);
-                        }
-                        sw.WriteLine("{0:X2}", (byte)(0x100 - ck));
-                    }
-
-                    sw.Close();
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message);
-                }
-
-            }
-            start_clear_timeout();
-            sp.Close();
-        }
-
-        private void getFwFromOSDToolStripMenuItem_Click(object sender, EventArgs e) {
-            GetFwFromOSD();
-        }
+ 
 
         private void CALLSIGNmaskedText_Validating(object sender, CancelEventArgs e) {
             string validString = "";
@@ -3885,7 +3430,7 @@ again:
        
 
         private void chkILS_CheckedChanged(object sender, EventArgs e) {
-            pan.flgILS = chkILS.Checked;
+            //pan.flgILS = chkILS.Checked;
         }
 
 /*
@@ -4172,7 +3717,7 @@ again:
         }
 */
         private void chkTrack_CheckedChanged(object sender, EventArgs e) {
-            pan.flgTrack = chkTrack.Checked;
+            //pan.flgTrack = chkTrack.Checked;
         }
 
         public string convertChars(string s){
@@ -4526,7 +4071,7 @@ typedef struct __mavlink_radio_status_t
 
         private void MavlinkModeMenuItem_Click(object sender, EventArgs e) {
             //BUT_ReadOSD.Enabled = ! MavlinkModeMenuItem.Checked;
-            updateFontToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
+            //updateFontToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
             updateFirmwareToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
             resetEepromToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
         }
@@ -4658,6 +4203,8 @@ typedef struct __mavlink_radio_status_t
             const int Block_Size = 128;
             bool binMode=false;
             int cnt=0;
+            
+            int blockCount=0;
 
             while (flag_EEPROM_read) {
                 try {
@@ -4697,6 +4244,12 @@ typedef struct __mavlink_radio_status_t
                                     packet.magick3 == (byte)'D' )
                                 {
                                     byte block = packet.id;
+                                    blockCount++;
+
+                                    this.Invoke((MethodInvoker)delegate {
+                                        toolStripProgressBar1.Value = (blockCount * 25) / 2;
+                                    });
+                                    
 
                                     int addr = Block_Size * block;
 
@@ -4813,23 +4366,26 @@ typedef struct __mavlink_radio_status_t
                     if (--nTry <= 0) {
                         MessageBox.Show("Timeout reading EEPROM block " + n, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flag_EEPROM_read = false;
+                        toolStripProgressBar1.Value =0;
                         return 0; // failed to get packet
                     }
                 } while (was_read);
 
-                
+                this.toolStripStatusLabel1.Text = "Done.";
+
                 for (int i = 0; i < 100; i++) {
                     System.Threading.Thread.Sleep(10);
                     Application.DoEvents();
                 }
 
                 flag_EEPROM_read = false;
-                
+                toolStripProgressBar1.Value = 0;
                 
                 return 1;
             } catch (Exception ex) {
                 MessageBox.Show("Error reading data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flag_EEPROM_read = false;
+                toolStripProgressBar1.Value = 0;
                 return 0;
             }
         
@@ -4927,6 +4483,196 @@ typedef struct __mavlink_radio_status_t
                 return 0;
             }
         }
+
+        void MavUploadFont(OpenFileDialog ofd) {
+            //Get file version
+            string fileVersion = "000";
+            string tempFileName = ofd.SafeFileName.ToUpper();
+            if (tempFileName.StartsWith("MINIMOSD_")) {
+                tempFileName = tempFileName.Remove(0, 9);
+                if (tempFileName.EndsWith(".MCM")) {
+                    tempFileName = tempFileName.Remove(tempFileName.Length - 4, 3);
+                    string[] versionArray = tempFileName.Split('.');
+                    Int16 version1, version2, version3;
+                    if (versionArray.Length > 2) {
+                        if (Int16.TryParse(versionArray[0], out version1) &&
+                           Int16.TryParse(versionArray[1], out version2) &&
+                           Int16.TryParse(versionArray[2], out version3))
+                            fileVersion = version1.ToString().Substring(0, 1).Trim() + version2.ToString().Substring(0, 1).Trim() + version3.ToString().Substring(0, 1).Trim();
+                    }
+                }
+            }
+
+            Mav_conf packet = new Mav_conf();
+
+            packet.data = new byte[128];
+            packet.pad = new byte[117];
+
+            if (comPort.IsOpen)
+                comPort.Close();
+
+            byte[] character_bitmap = new byte[64];
+
+            int font_count = 0;
+
+            byte chk=0;
+            bool got_any_data=false;
+            byte last_c=0;
+            byte b=0;
+
+            int cnt=0;
+            int bit_count=0;
+            int byte_count=0;
+
+            try {
+
+                comPort.PortName = CMB_ComPort.Text;
+                comPort.BaudRate = 57600;
+
+                comPort.Open();
+
+                parseInputData(comPort.ReadExisting());
+
+                MAVLink.mavlink_heartbeat_t htb = new MAVLink.mavlink_heartbeat_t() {
+                    type = (byte)MAVLink.MAV_TYPE.GCS,
+                    autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
+                    mavlink_version = 3// MAVLink.MAVLINK_VERSION
+                };
+
+                sendPacket(htb); // lets AutoBaud will be happy
+                sendPacket(htb);
+                sendPacket(htb);
+                sendPacket(htb);
+
+                int seq = 0; // reset on each heartbeat
+                int bytes = 0;
+                const int Block_Size = 128;
+
+
+                 using (var stream = ofd.OpenFile()) {
+
+                    BinaryReader br = new BinaryReader(stream);
+                    StreamReader sr2 = new StreamReader(br.BaseStream);
+
+                    string device = sr2.ReadLine();
+
+                    if (device != "MAX7456") {
+                        MessageBox.Show("Invalid MCM");
+                        return;
+                    }
+
+                    br.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                    toolStripStatusLabel1.Text = "CharSet Uploading";
+
+                    long length = br.BaseStream.Length;
+                    byte[] skip = br.ReadBytes(9);
+            
+                    length -= 9;
+                    while (br.BaseStream.Position < br.BaseStream.Length && !this.IsDisposed) {
+                        try {
+                            toolStripProgressBar1.Value = (int)((br.BaseStream.Position / (float)br.BaseStream.Length) * 100);
+
+
+                            int read =1;
+                            length -= read;
+                            byte[] buffer = br.ReadBytes(read);
+                        
+                            /////////// TODO
+                            byte c = buffer[0];
+
+                            switch (c) { // parse and decode mcm file
+                            case 0x0A: // line feed - skip
+                                if (last_c == 0x0d) continue;
+                            // lf without cr cause line end
+                                goto case_d;
+
+                            case 0x0d: // carridge return, end of line
+                            case_d:
+                                if (bit_count == 8) {
+                                    chk ^= b;
+                                    character_bitmap[byte_count] = b;
+                                    b = 0;
+                                    byte_count++;
+                                }
+                                bit_count = 0;
+                                break;
+
+                            case 0x30: // ascii '0'
+                            case 0x31: // ascii '1' 
+                                b <<= 1;
+                                if (c == 0x31)
+                                    b += 1;
+                                bit_count++;
+
+                                got_any_data = true;
+                                break;
+
+                            default:
+                                break;
+                            }
+
+                            // we have one completed character
+                            // write the character to NVM 
+                            if (byte_count == 64) {
+                                int sz = 64;
+                                packet.magick0 = (byte)0xEE; // = 0xee 'O' 'S' 'D'
+                                packet.magick1 = (byte)'O';
+                                packet.magick2 = (byte)'S';
+                                packet.magick3 = (byte)'D';
+
+                                packet.cmd = (byte)'f';          // command
+                                packet.id = (byte)font_count;    // number of data block
+                                packet.len = (byte)sz;           // real length
+
+                                packet.data[0] = (byte)(font_count & 0xff);
+                                packet.data[1] = (byte)(font_count >>8);
+                                for (int k = 0; k < sz; k++)
+                                    packet.data[k + 2] = character_bitmap[k];
+
+
+                                bytes += sz;
+
+                                MAVLink.mavlink_encapsulated_data_t ed = new MAVLink.mavlink_encapsulated_data_t() {
+                                    seqnr = (ushort)(++seq),
+                                    data = StructureToByteArray(packet)
+                                };
+
+                                sendPacket(ed);
+                                sendPacket(ed);
+                                sendPacket(ed);
+
+                                byte_count = 0;
+                                font_count++;                            
+                                
+                                chk = 0;
+                                for (int i = 0; i < 100; i++) {
+                                    System.Threading.Thread.Sleep(1);
+                                    Application.DoEvents();
+                                }
+
+                            }
+
+                        } catch { // one byte read
+                            break;
+                        }
+
+                        Application.DoEvents();
+                    }
+ 
+                    toolStripProgressBar1.Value = 100;
+                    toolStripStatusLabel1.Text = "CharSet Done";
+                }
+
+            } catch{} // com port
+
+            conf.WriteCharsetVersion(fileVersion, false);
+            lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
+            toolStripStatusLabel1.Text = "CharSet Done!!!";
+            start_clear_timeout();        
+        }
+
+        
 
         void loadDefaultOsd(){
             string fn = Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "default.osd";
@@ -5107,6 +4853,10 @@ typedef struct __mavlink_radio_status_t
 
             update_used_pins();
             txtBattB_k.Enabled = pan.flgBattB;
+        }
+
+        private void toolStripProgressBar1_Click(object sender, EventArgs e) {
+
         }
 
         

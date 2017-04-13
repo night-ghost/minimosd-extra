@@ -96,8 +96,10 @@ namespace OSD {
 		public const int AutoScreenSwitch       = 7;
 		public const int results_on     		= 8;
 		public const int mode_auto              = 9;
-        public const int battB_is_on            = 10;
-        public const int flgTrack               = 11;
+        public const int battB_is_on            = 10; // not used
+        public const int flgTrack               = 11; // not used
+        public const int ref_5v                 = 12;
+
 
 
         // Экранные флаги

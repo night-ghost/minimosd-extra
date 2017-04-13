@@ -1,3 +1,5 @@
+#pragma once
+
 // EEPROM Stepping,
 /* *********************************************** */
 // EEPROM Storage addresses
@@ -119,6 +121,7 @@ struct Flags { // 4 байта
     bool mode_auto:1; 		// 9
     bool xx:1;			// 10 - not used
     bool flgTrack:1;    	// 11 - not used, use panel.al2
+    bool ref_5v:1;              // 12 - analog refrence 5v, 1.1 default
 };
 
 union _Flags {

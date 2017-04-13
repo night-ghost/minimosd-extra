@@ -5,6 +5,8 @@
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
+extern bool mavlink_one_byte(char c);
+
 void parse_osd_packet(byte *p);
 
 typedef struct _Stream_params {
@@ -64,9 +66,6 @@ union {
 
 
 bool read_mavlink(){
-    uint8_t   base_mode=0;
-    mavlink_status_t status;
-    byte cnt=0;
 
 #ifdef DEBUG
     long mav_time = millis();
@@ -79,11 +78,44 @@ bool read_mavlink(){
     //grabing data 
     while(Serial.available_S()) {
         uint8_t c = Serial.read_S();
-        byte apm_mav_type;
 
 #ifdef DEBUG
 	bytes_comes+=1;
 #endif
+        if(mavlink_one_byte(c)) return true; // got packet
+
+        delay_byte();
+
+#ifdef DEBUG
+    // Update global packet drops counter
+    packet_drops += status.packet_rx_drop_count;
+#endif
+
+    }
+
+#ifdef DEBUG
+    long dt = (millis() - mav_time) -2;
+    if(dt>0) {
+        mavlink_time += dt-2; 		// sum, 2ms when no stream
+	if(dt>mavlink_dt) mavlink_dt = dt; // and max
+    }
+    
+    if(cnt>mavlink_cnt) mavlink_cnt=cnt;
+#endif
+
+    return false;
+}
+
+
+
+
+bool mavlink_one_byte(char c){
+    uint8_t   base_mode=0;
+    mavlink_status_t status;
+    byte cnt=0;
+    byte apm_mav_type;
+
+
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
 
@@ -119,7 +151,7 @@ bool read_mavlink(){
                     packets_skip+=1;
 //    Serial.printf_P(PSTR("\npacket skip want=%d got %d\n"), apm_mav_system, msg.m.sysid);
 #endif
-		    break; // skip packet and exit 
+		    return true; // skip packet and exit 
 	    }
 
 #ifdef DEBUG
@@ -527,27 +559,8 @@ typedef struct __mavlink_vibration_t {
                 break;
             }
     	//    if(timeToScreen())  // если надо перерисовать экран 
-                return true; // задержка на прием одного 64-байт пакета 8.8мс а кадрового гасящего - 1.6мс
+            return true; // задержка на прием одного 64-байт пакета 8.8мс а кадрового гасящего - 1.6мс
         }
-        delay_byte();
-
-#ifdef DEBUG
-    // Update global packet drops counter
-    packet_drops += status.packet_rx_drop_count;
-#endif
-
-    }
-
-#ifdef DEBUG
-    long dt = (millis() - mav_time) -2;
-    if(dt>0) {
-        mavlink_time += dt-2; 		// sum, 2ms when no stream
-	if(dt>mavlink_dt) mavlink_dt = dt; // and max
-    }
-    
-    if(cnt>mavlink_cnt) mavlink_cnt=cnt;
-#endif
 
     return false;
 }
-

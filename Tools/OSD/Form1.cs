@@ -43,7 +43,7 @@ namespace OSD {
         string readBuf="";
 
         private void readOut(){
-             string s;
+             
              while (parent.comPort.BytesToRead != 0 && loop) {
 
                  //parent.comPort.Write(s);

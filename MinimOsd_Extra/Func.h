@@ -2,6 +2,72 @@
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
 
+static boolean inline is_on(point p){
+    return p.y < 0x80;
+}
+
+static boolean inline has_sign(point p){
+    return !(p.x & 0x80);
+}
+
+
+static boolean inline is_alt(point p){
+    return (p.y & 0x40);
+}
+
+static point inline do_alt(point p){
+    p.y |= 0x40;
+    return p;
+}
+
+static boolean inline is_alt2(point p){
+    return (p.y & 0x20);
+}
+
+static boolean inline is_alt3(point p){
+    return (p.y & 0x10);
+}
+
+static boolean inline is_alt4(point p){
+    return (p.x & 0x40);
+}
+
+byte get_alt_num(point p){
+    return (is_alt2(p)?1:0) | (is_alt3(p)?2:0) | (is_alt4(p)?4:0);
+}
+
+
+byte get_alt_filter(point p){
+    switch( (is_alt(p)?1:0) | (is_alt2(p)?2:0)) {
+    
+    case 1:
+	return 10;
+    case 2:
+	return 30;
+    case 3:
+	return 100;
+    default: 
+	return 0;
+    }
+}
+
+static inline void readSettings() {
+//    eeprom_read_len((byte *)&flags, EEPROM_offs(flags), sizeof(Flags) );
+    eeprom_read_len((byte *)&sets,  EEPROM_offs(sets),  sizeof(Settings) );
+
+// сразу настроим системы измерения
+    measure = FLAGS.measure ? &imper :  &metr;
+
+}
+
+
+// rean one point from current screen
+point NOINLINE readPanel(byte n) {
+    point p; //                     shift to current screen     selected point
+    eeprom_read_len((byte *)&p,  OffsetBITpanel * (int)panelN + n * sizeof(Point),  sizeof(Point) );
+    return p;
+}
+
 void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
     *dst = millis() + inc;
 }
@@ -770,3 +836,123 @@ void generate_PWM(bool nointerrupt) {
 
 
 #endif // PWM_BY_INTERRUPT
+
+
+void delay_150(){
+    delay(150);
+}
+
+static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
+    osd.printf_P(fmt, f);
+    if(c) OSD::write_S(c);
+}
+
+static void NOINLINE osd_printf_1(PGM_P fmt, float f){
+    osd_printf_2(fmt, f, 0);
+}
+
+static void NOINLINE osd_printi_1(PGM_P fmt, int f){
+    osd.printf_P(fmt, f);
+}
+
+static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
+    osd.printf_P(fmt,i1,i2);
+}
+
+NOINLINE void logo(){
+    OSD::setPanel(2, 5);
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+
+    osd.print((uint16_t)millis());
+
+    // Check EEPROM to see if we have initialized it already or not
+    // also checks if we have new version that needs EEPROM reset
+
+    if(lflags.bad_config) {
+        OSD::setPanel(1,1);
+        osd_printi_1(PSTR("Bad Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
+    }
+
+    OSD::update();// Show sign bar
+    delay_150();
+}
+
+#ifdef DEBUG
+/* prints hex numbers with leading zeroes */
+// copyright, Peter H Anderson, Baltimore, MD, Nov, '07
+// source: http://www.phanderson.com/arduino/arduino_display.html
+void print_hex(uint16_t v, byte num_places)
+{
+  uint16_t mask=0;
+  byte num_nibbles, digit, n;
+ 
+  for (n=1; n<=num_places; n++) {
+    mask = (mask << 1) | 0x0001;
+  }
+  v = v & mask; // truncate v to specified number of places
+ 
+  num_nibbles = num_places / 4;
+  if ((num_places % 4) != 0) {
+    ++num_nibbles;
+  }
+  do {
+    digit = ((v >> (num_nibbles-1) * 4)) & 0x0f;
+    osd.print(digit, HEX);
+  } 
+  while(--num_nibbles);
+}
+
+void hex_dump(byte *p, uint16_t len) {
+ byte i; 
+ uint16_t j;
+ 
+ for(j=0;j<len; j+=8){
+    OSD::write_S(0xFF);
+    print_hex(j,8);
+    OSD::write_S(' ');
+    for(i=0; i<8; i++){
+	OSD::write_S(' ');
+	print_hex(p[i+j],8);
+    }
+ }
+}
+
+void serial_print_hex(uint16_t v, byte num_places)
+{
+  uint16_t mask=0;
+  byte num_nibbles, digit, n;
+ 
+  for (n=1; n<=num_places; n++) {
+    mask = (mask << 1) | 0x0001;
+  }
+  v = v & mask; // truncate v to specified number of places
+ 
+  num_nibbles = num_places / 4;
+  if ((num_places % 4) != 0) {
+    ++num_nibbles;
+  }
+  do {
+    digit = ((v >> (num_nibbles-1) * 4)) & 0x0f;
+    Serial.print(digit, HEX);
+  } 
+  while(--num_nibbles);
+}
+
+void serial_hex_dump(byte *p, uint16_t len) {
+ uint8_t i; 
+ uint16_t j;
+ 
+ for(j=0;j<len; j+=16){
+    Serial.write_S('\n'); Serial.wait();
+    serial_print_hex(j,16);
+    Serial.write_S(' ');
+    for(i=0; i<16; i++){
+	Serial.write_S(' ');
+	serial_print_hex(p[i+j],8);
+	Serial.wait();
+    }
+ }
+}
+#else
+void serial_hex_dump(byte *p, uint16_t len) {}
+#endif

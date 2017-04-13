@@ -42,6 +42,14 @@ void parse_osd_packet(byte *p){
             break;
             
 #endif
+
+
+#ifdef MAVLINK_FONT_UPLOAD
+        case 'f': // font via MAVlink
+            osd.write_NVM(*((uint16_t *)data), data+2); // first 2 byte is number, all another is bitmap
+            break;
+#endif
+
 	default:
 	    break;
 	}

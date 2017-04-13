@@ -131,7 +131,6 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 
 #include "protocols.h"
 
-#include "Config_Func.h"
 
 #include "Func.h"
 
@@ -160,6 +159,8 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 
 #include "Panels.h"
 
+#include "Config_Func.h"
+
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
@@ -172,10 +173,6 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 #endif
 
 /* **********************************************/
-
-void delay_150(){
-    delay(150);
-}
 
 
 volatile byte vas_vsync=false;
@@ -286,23 +283,6 @@ ISR(INT1_vect) {
 
 
 
-NOINLINE void logo(){
-    OSD::setPanel(2, 5);
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
-
-    osd.print((uint16_t)millis());
-
-    // Check EEPROM to see if we have initialized it already or not
-    // also checks if we have new version that needs EEPROM reset
-
-    if(lflags.bad_config) {
-        OSD::setPanel(1,1);
-        osd_printi_1(PSTR("Bad Config: %d my " TO_STRING(VER) ), sets.CHK1_VERSION); 
-    }
-
-    OSD::update();// Show sign bar
-    delay_150();
-}
 
 void setup()     {
     wdt_disable(); 
@@ -333,7 +313,11 @@ void setup()     {
     // wiring настраивает таймер в режим 3 (FastPWM), в котором регистры компаратора буферизованы. Выключим, пусть будет NORMAL
     TCCR0A &= ~( (1<<WGM01) | (1<<WGM00) );
 
-    analogReference(INTERNAL);  // INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
+    if(FLAGS.ref_5v) {
+        analogReference(DEFAULT);  // VCC as refrence
+    } else {
+        analogReference(INTERNAL);  // INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
+    }
 
 //    wdt_enable(WDTO_2S); - bootloader don't supports WDT
     
