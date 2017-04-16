@@ -514,3 +514,7 @@ v928
 
 v929
 * added ability to choose ADC refrence voltage - Vcc or 1.1v internal
+
+v930
+* fixed startup hang from v929
+

@@ -15,10 +15,27 @@
 //#define DEBUG
 
 
+/*
+    0 - usual minimOSD/microMinimOSD board
+    1 - board on ATmega644 and AB7456
+
+*/
+
+#ifndef HARDWARE_TYPE
+#define HARDWARE_TYPE 0
+#endif
+
 #define STARTUP_SCREEN 0
+
+#define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
+
+#define BOOTTIME         1500   // Time in milliseconds that we show boot loading bar and wait user input
+
 
 #define MAVLINK_CONFIG 1
 #define MAVLINK_READ_EEPROM 1
+
+#if HARDWARE_TYPE == 0
 
 
 #ifndef DEBUG // don't fit
@@ -39,10 +56,7 @@
 //#define USE_NMEA 1
 
 
-
-#define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
-
-#define BOOTTIME         1500   // Time in milliseconds that we show boot loading bar and wait user input
+#define VSYNC_VECT INT0_vect
 
 
 // additional pins
@@ -75,6 +89,54 @@
 #endif
 
 //#define LEDPIN AmperagePin
+
+#elif HARDWARE_TYPE == 1 // ----------------------      settings for 644 board
+
+#define FONT_UPLOAD 1
+#define USE_SETUP 1
+#define AUTOBAUD 1
+#define USE_SENSORS 1
+
+//#define PWM_IN_INTERRUPT 1
+//#define PWM_BY_INTERRUPT 1 not work :(
+
+#define MAV_REQUEST 1
+//#define USE_MAVLINK 1
+//#define USE_UAVTALK 1
+//#define USE_MWII 1
+//#define USE_LTM 1
+//#define USE_NMEA 1
+
+#define VSYNC_VECT INT2_vect
+
+
+
+// additional pins
+#define VoltagePin A2
+#define VidvoltagePin A0
+#define AmperagePin A1
+#define RssiPin A3
+#define PWMrssiPin A3           // PWM RSSI uses same pin of analog RSSI A3
+
+// #define PWM_PIN PD3 - АТМЕЛ враги, совместили выводы int0-int1 и UART2, так что прерывание только одно :(
+
+
+//********   board has hardware UART2 and I2C
+
+
+//#define RADIOLINK_TELEM_SDA RssiPin
+//#define RADIOLINK_TELEM_SCL AmperagePin
+
+//#define WALKERA_TELEM RssiPin // telemetry output
+
+//#define SERIALDEBUG RssiPin // debug output, conflicts with PWM_BY_INTERRUPT
+
+
+//#define LEDPIN AmperagePin
+
+
+#endif
+
 
 /*****************      END of configuration ******************************************************/
 

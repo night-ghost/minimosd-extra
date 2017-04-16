@@ -186,7 +186,7 @@ volatile byte nested=0;
 volatile byte nest_count=0; // only for debugging
 #endif
 
-ISR(INT0_vect) {
+ISR(VSYNC_VECT) {
     vas_vsync=true;
     vsync_wait=0;	// отметить его наличие
     
@@ -270,6 +270,10 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
         }
     }
 }
+
+ISR(INT1_vect) {
+    ReadINT_PIN();
+}
 #endif
 
 
@@ -277,9 +281,6 @@ void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
 /* ***************** SETUP() *******************/
 
 
-ISR(INT1_vect) {
-    ReadINT_PIN();
-}
 
 
 
@@ -340,7 +341,7 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
-Serial.print_P(PSTR("#1\n"));
+Serial.print_P(PSTR("#1zzzzz\n"));
 
 
     // Prepare OSD for displaying 
@@ -379,7 +380,7 @@ Serial.print_P(PSTR("#1\n"));
 	pinMode(PWM_out_pin,  OUTPUT);
     }
 
-Serial.print_P(PSTR("#2\n"));
+//Serial.print_P(PSTR("#2\n"));
 
     osd.init();    // Start display
 
