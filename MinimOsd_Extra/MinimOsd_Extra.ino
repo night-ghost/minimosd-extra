@@ -228,7 +228,7 @@ ISR(VSYNC_VECT) {
  #endif
 }
 #else
-ISR(INT0_vect) {
+ISR(VSYNC_VECT) {
     vas_vsync=true;
     vsync_wait=0;	// отметить его наличие
     
