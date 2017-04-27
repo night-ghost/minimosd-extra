@@ -14,6 +14,8 @@
 #include "protocols/cleanflight.h"
 #elif defined(USE_LTM)
 #include "protocols/LTM.h"
+#elif defined(USE_NMEA)
+// nothing to do
 #else
 
 #warning "No protocol defined, compiling for MAVlink"

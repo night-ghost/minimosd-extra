@@ -369,6 +369,12 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 	eeprom_write_len( sets.FW_VERSION,  EEPROM_offs(sets) + ((byte *)sets.FW_VERSION - (byte *)&sets),  sizeof(sets.FW_VERSION) );
     }
 
+    if(sets.hw_version!=HARDWARE_TYPE){
+        sets.hw_version=HARDWARE_TYPE;
+
+	eeprom_write_len( &sets.hw_version,  EEPROM_offs(sets) + ((byte *)&sets.hw_version - (byte *)&sets),  sizeof(sets.hw_version) );    
+    }
+
 
     static const byte PROGMEM alt_pins[]= { VoltagePin, VidvoltagePin, AmperagePin, RssiPin };
 

@@ -3,16 +3,6 @@
 
 /******* FROM DATASHEET *******/
 
-// pinout - moved to config.h
-/*
-#define MAX7456_SELECT 6        // SS PD6
-#define MAX7456_VSYNC 2         // INT0
-#define MAX7456_RESET_PIN 10    // RESET
-
-#define DATAOUT 11              // MOSI
-#define DATAIN  12              // MISO
-#define SPICLOCK  13            // sck
-*/
 
 #define NTSC 0
 #define PAL 1
@@ -144,4 +134,3 @@ extern byte MAX_read(byte addr);
 
 
 #endif
-

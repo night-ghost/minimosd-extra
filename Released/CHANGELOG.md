@@ -518,3 +518,5 @@ v929
 v930
 * fixed startup hang from v929
 
+v931
+* added baudrate setting for NMEA protocol

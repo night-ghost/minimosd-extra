@@ -330,7 +330,79 @@ void read_NMEA(){
 }
 
 
+static void send_gps_command(PGM_P cp){
+    Serial.print_P(cp);
+    delay_150();
+}
+
+
+static void init_gps(){
+//--- SiRF  --------------------------------------------------------------
+// Select / Change the Baud Rates using the NMEA Protocol for SiRF modules
+// $PSRF100,Proto,Baudrate,DataBits,StopBits,Parity,C heckSum*CS<cr><lf>
+
+//send_gps_command("$PSRF100,1,4800,8,1,0*0E\n"); //  =,NNEA,4800/8/1/None*CS
+//send_gps_command( "$PSRF100,1,9600,8,1,0*0D\n"); //  =,NNEA,9600/8/1/None*CS
+//send_gps_command( "$PSRF100,1,19200,8,1,0*38\n"); //  =,NNEA,19200/8/1/None*CS
+//send_gps_command( "$PSRF100,1,38400,8,1,0*3D\n"); //  =,NNEA,38400/8/1/None*CS
+send_gps_command( "$PSRF100,1,57600,8,1,0*36\n"); //  =,NNEA,57600/8/1/None*CS
+//send_gps_command( "$PSRF100,1,115200,8,1,0*05\n"); //  =,NMEA,115200/8/1/None*CS
+//---
+//$PSRF100,0,57600,8,1,0*37 =,SiRF,57600/8/1/N*CS
+//$PSRF100,0,115200,8,1,0*04 =,SiRF,115200/8/1/N*CS
+
+//--- u-Blox -----------------------------------------------------------
+//# Select / Change the Baud Rates using the NMEA Protocol for u-Blox modules
+//# $PUBX,41,portID,inProto,outProto,Baudrate,autoBaud rate*CS<cr><lf>
+
+//send_gps_command("$PUBX,41,1,0003,0002,4800,0*16\n"); // =,1,UBX+NMEA,NMEA,4800,0*CS
+//send_gps_command( "$PUBX,41,1,0003,0002,9600,0*15\n");
+//send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\n");
+//send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\n");
+send_gps_command( "$PUBX,41,1,0003,0002,57600,0*2E\n");
+//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\n");
+
+//--- MTK --------------------------------------------------------------
+//# Select / Change the Baud Rates using the NMEA Protocol for MTK modules
+//# $PMTK51,Baudrate*CS<cr><lf>
+
+//send_gps_command("$PMTK251,4800*14\n");// =,4800*CS<cr><lf>
+//send_gps_command("$PMTK251,9600*17\n");
+//send_gps_command("$PMTK251,19200*22\n");
+//send_gps_command("$PMTK251,38400*27\n");
+send_gps_command("$PMTK251,57600*2C\n");
+//send_gps_command("$PMTK251,115200*1F\n");
+
+//--- MTK --------------------------------------------------------------
+//# Select / Change rate for MTK modules
+//# $PMTK20,Period*CS<cr><lf>
+
+//send_gps_command("$PMTK220,100*2F\n"); =set 10Hz rate
+send_gps_command("$PMTK220,200*2C\n");  //=set 5Hz rate
+//send_gps_command($PMTK220,1000*1F\n"); =set 1Hz rate
+
+//--- NemeriX ----------------------------------------------------------
+//# Select / Change Baud Rate using NMEA Protocol for NemeriX modules
+//# $PNMRX100,Protocol,Baudrate,Parity*CS<cr><lf>
+
+//send_gps_command("$PNMRX100,0,4800,0*48\n");  // =,NMEA,4800,None*CS
+//send_gps_command("$PNMRX100,0,9600,0*4B\n");  // ...
+//send_gps_command("$PNMRX100,0,19200,0*7E\n");  //
+//send_gps_command("$PNMRX100,0,38400,0*7B\n");  //
+send_gps_command("$PNMRX100,0,57600,0*70\n");  //
+//send_gps_command("$PNMRX100,0,115200,0*43\n");  //
+
+    lflags.data_mode=false;
+    lflags.input_active=false; // reset flags - activate auto-baud
+}
+
+
+
 void heartBeat() {
+
+    if(!lflags.input_active)
+        init_gps();
+
 }
 
 #if 0 
@@ -422,6 +494,7 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
   *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
   if (*bearing < 0) *bearing += 36000;
 }
+
 
 
 #endif
