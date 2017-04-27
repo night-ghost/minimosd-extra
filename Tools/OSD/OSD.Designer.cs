@@ -62,6 +62,7 @@ namespace OSD {
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PANEL_tabs = new System.Windows.Forms.TabControl();
             this.tabPageConfig = new System.Windows.Forms.TabPage();
+            this.chkRefrence = new System.Windows.Forms.CheckBox();
             this.label45 = new System.Windows.Forms.Label();
             this.UNITS_combo = new System.Windows.Forms.ComboBox();
             this.CALLSIGNmaskedText = new System.Windows.Forms.MaskedTextBox();
@@ -191,7 +192,7 @@ namespace OSD {
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
-            this.chkRefrence = new System.Windows.Forms.CheckBox();
+            this.aTmega644ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -397,7 +398,8 @@ namespace OSD {
             this.updateCharsetcustomFwToolStripMenuItem,
             this.presentCustomCharsetToolStripMenuItem,
             this.MavlinkModeMenuItem,
-            this.getFwFromOSDToolStripMenuItem});
+            this.getFwFromOSDToolStripMenuItem,
+            this.aTmega644ToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.optionsToolStripMenuItem.ShowShortcutKeys = false;
@@ -559,6 +561,17 @@ namespace OSD {
             this.tabPageConfig.TabIndex = 1;
             this.tabPageConfig.Text = "Config";
             this.tabPageConfig.UseVisualStyleBackColor = true;
+            // 
+            // chkRefrence
+            // 
+            this.chkRefrence.AutoSize = true;
+            this.chkRefrence.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkRefrence.Location = new System.Drawing.Point(490, 291);
+            this.chkRefrence.Name = "chkRefrence";
+            this.chkRefrence.Size = new System.Drawing.Size(105, 17);
+            this.chkRefrence.TabIndex = 27;
+            this.chkRefrence.Text = "5v ADC refrence";
+            this.chkRefrence.UseVisualStyleBackColor = true;
             // 
             // label45
             // 
@@ -2025,16 +2038,12 @@ namespace OSD {
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
-            // chkRefence
+            // aTmega644ToolStripMenuItem
             // 
-            this.chkRefrence.AutoSize = true;
-            this.chkRefrence.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkRefrence.Location = new System.Drawing.Point(490, 291);
-            this.chkRefrence.Name = "chkRefence";
-            this.chkRefrence.Size = new System.Drawing.Size(105, 17);
-            this.chkRefrence.TabIndex = 27;
-            this.chkRefrence.Text = "5v ADC refrence";
-            this.chkRefrence.UseVisualStyleBackColor = true;
+            this.aTmega644ToolStripMenuItem.Name = "aTmega644ToolStripMenuItem";
+            this.aTmega644ToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.aTmega644ToolStripMenuItem.Text = "ATmega644";
+            this.aTmega644ToolStripMenuItem.Click += new System.EventHandler(this.aTmega644ToolStripMenuItem_Click);
             // 
             // OSD
             // 
@@ -2282,6 +2291,7 @@ namespace OSD {
         private System.Windows.Forms.MaskedTextBox CALLSIGNmaskedText;
         private System.Windows.Forms.Label label44;
         private System.Windows.Forms.CheckBox chkRefrence;
+        private System.Windows.Forms.ToolStripMenuItem aTmega644ToolStripMenuItem;
     }
 
 }

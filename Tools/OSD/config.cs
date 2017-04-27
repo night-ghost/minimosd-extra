@@ -96,6 +96,7 @@ namespace OSD {
         internal uint16_t RSSI_16_high;
 
         internal byte pwm_mode; // mode of output pin
+        internal byte hw_version; // hardware type
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

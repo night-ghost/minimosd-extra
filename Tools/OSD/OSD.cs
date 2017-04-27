@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r929 DV";
+        public const string VERSION = "r931DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -1348,6 +1348,9 @@ namespace OSD {
 
             StringArray = conf.eeprom.strings; // read strings for panels            
 
+
+            aTmega644ToolStripMenuItem.Checked = (conf.eeprom.sets.hw_version==1);
+
             int last_panel_number = screen_number;
             for (int k = 0; k < npanel; k++) {
                 screen_number = k; // used globally
@@ -2316,7 +2319,9 @@ again:
                     return;
                 }
 
-                if(FLASH.Length >= 30720) {
+                int maxsize = (aTmega644ToolStripMenuItem.Checked)? 64512 :30720;
+
+                if(FLASH.Length >= maxsize) {
                     MessageBox.Show("File too big!");
                     return;
                 }
@@ -4856,6 +4861,10 @@ typedef struct __mavlink_radio_status_t
         }
 
         private void toolStripProgressBar1_Click(object sender, EventArgs e) {
+
+        }
+
+        private void aTmega644ToolStripMenuItem_Click(object sender, EventArgs e) {
 
         }
 
