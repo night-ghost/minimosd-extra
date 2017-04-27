@@ -148,7 +148,7 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 #elif defined(USE_NMEA)
 #include "protocols/NMEA.h"
 #else
-#error "No protocol defined"
+#warning "No protocol defined, compiling for MAVlink"
 #endif
 
 #include "misc.h"
@@ -172,6 +172,10 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
  #include "RadiolinkTelemOut.h"
 #endif
 
+
+#if ! defined(INTERNAL) && defined(INTERNAL1V1)
+#define INTERNAL INTERNAL1V1
+#endif
 /* **********************************************/
 
 

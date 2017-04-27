@@ -10,8 +10,8 @@
 #F_CPU = 168000000
 #VARIANT    = standard
 
-BOARD_TAG    = atmega328
-VARIANT    = standard
+BOARD_TAG  ?= atmega328
+VARIANT     = standard
 F_CPU = 16000000
 
 
@@ -98,7 +98,7 @@ CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--
 CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
 LDFLAGS = $(OPT) 
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref -fwhole-program
-MCU=atmega328p
+MCU ?= atmega328p
 #ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
 
 ARDUINO_LIBS = SingleSerial

@@ -1,3 +1,4 @@
+#pragma once
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
 
@@ -168,8 +169,10 @@ static void pan_toggle(){
 
     if(sets.ch_toggle <= 2) // disabled
 	return;
+#ifdef PWM_PIN
     else if(sets.ch_toggle == 3) 
 	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
+#endif
     else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
 	ch_raw = chan_raw[sets.ch_toggle-1];
     else 
@@ -668,7 +671,7 @@ again:
 	extern void read_NMEA(void);
 	read_NMEA();
 #else
-#error "No data protocol defined"
+#warning "No data protocol defined, compiling for MAVlink"
 #endif
 
 	lflags.data_mode=lflags.input_active; // if not received any then flag clears

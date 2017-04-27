@@ -1,3 +1,4 @@
+#pragma once
 
 /*Panels variables*/
 //Will come from APM telem port

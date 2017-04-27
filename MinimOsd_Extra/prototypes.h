@@ -1,3 +1,5 @@
+#pragma once
+
 typedef void (*cb_putc)(byte c);
 
 bool read_mavlink();

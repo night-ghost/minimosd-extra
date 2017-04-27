@@ -54,8 +54,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define membug 
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
-#undef OSD_VERSION
-#define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater " RELEASE_NUM
 
 
 // AVR Includes
@@ -72,18 +70,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 
+
 #include "prototypes.h"
-#include "compat.h"
+
+#include "Config_Func.h"
+
+#include "protocols.h"
 
 #include <GCS_MAVLink.h>
 
+#include "OSD_Max7456.h"
 
+
+OSD osd; //OSD object
 
 // Configurations
-#include "ArduCam_Max7456.h"
 #include "Vars.h"
 #include "Func.h"
 
+
+//#undef OSD_VERSION
+#define OSD_VERSION "MinimOSD-Extra " VERSION "|Character updater "
 
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
@@ -93,20 +100,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define MinimOSD
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
-#define BOOTTIME         1000   // Time in milliseconds that we show boot loading bar and wait user input
+
+
 
 // Objects and Serial definitions
 SingleSerialPort(Serial);
-OSD osd; //OSD object 
 
+
+BetterStream *mavlink_comm_0_port;
 
 #include "Font.h"
 
-//SimpleTimer  mavlinkTimer;
 
-void delay_150(){
-    delay(150);
-}
 
 void isr_VSYNC(){
     vsync_wait=0; // единственное что нам надо - отметить его наличие
@@ -146,10 +151,10 @@ void setup()
 
     for(byte j=16; j!=0; j--) { // show full font
         for(byte i=16; i!=0; i--)   {
-              osd.write(n=='|'?' ':(byte)(n));
+              osd.write(n=='\xFF'?' ':(byte)(n));
               n++;
         }
-        osd.write('|');
+        osd.write('\xFF');
 
     }
 
@@ -181,7 +186,7 @@ void loop()
 //osd.printf_P(PSTR("no crlf! count was %d char=%d|"), crlf_count, c);
                 crlf_count = 0;
             }
-            if (crlf_count == 3) {
+            if (crlf_count >= 3) {
 //osd.print_P(PSTR("fonts!|"));
                 uploadFont();
             }

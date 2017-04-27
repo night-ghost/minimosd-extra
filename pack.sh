@@ -7,7 +7,6 @@ version(){
 RELEASE='Released/FW_+_Char'
 BUILD='MinimOsd_Extra/build-atmega328'
 
-#[ -f $BUILD/MinimOsd_Extra.hex ] && mv $BUILD/MinimOsd_Extra.hex $RELEASE/MinimOsd_Extra_Uni.`version`DV-release.hex
 
 cp -f README.md CHANGELOG.md CHANGELOG_RU.md ./Released
 rm -rf $BUILD

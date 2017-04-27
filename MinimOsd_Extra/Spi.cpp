@@ -1,12 +1,6 @@
 // Get the common arduino functions
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "wiring.h"
-#endif
-
+#include "Arduino.h"
 #include "compat.h"
-
 #include "Spi.h"
 
 //---------- constructor ----------------------------------------------------
