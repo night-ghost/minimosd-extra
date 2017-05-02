@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r931DV";
+        public const string VERSION = "r932DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char

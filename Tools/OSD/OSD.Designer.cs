@@ -52,11 +52,9 @@ namespace OSD {
             this.sendTLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectComPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateCharsetDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateCharsetcustomFwToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.presentCustomCharsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MavlinkModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.getFwFromOSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aTmega644ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gettingStartedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -192,7 +190,6 @@ namespace OSD {
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
-            this.aTmega644ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -394,11 +391,8 @@ namespace OSD {
             this.sendTLogToolStripMenuItem,
             this.connectComPortToolStripMenuItem,
             this.updateFontToolStripMenuItem,
-            this.updateCharsetDevToolStripMenuItem,
-            this.updateCharsetcustomFwToolStripMenuItem,
             this.presentCustomCharsetToolStripMenuItem,
             this.MavlinkModeMenuItem,
-            this.getFwFromOSDToolStripMenuItem,
             this.aTmega644ToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
@@ -412,14 +406,14 @@ namespace OSD {
             this.checkBox1.CheckOnClick = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(233, 22);
+            this.checkBox1.Size = new System.Drawing.Size(203, 22);
             this.checkBox1.Text = "Show Grid";
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // resetEepromToolStripMenuItem
             // 
             this.resetEepromToolStripMenuItem.Name = "resetEepromToolStripMenuItem";
-            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.resetEepromToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.resetEepromToolStripMenuItem.Text = "Reset EEPROM";
             this.resetEepromToolStripMenuItem.ToolTipText = "Initialize EEPROM with default values";
             this.resetEepromToolStripMenuItem.Click += new System.EventHandler(this.BUT_ResetOSD_EEPROM_click);
@@ -427,7 +421,7 @@ namespace OSD {
             // updateFirmwareToolStripMenuItem
             // 
             this.updateFirmwareToolStripMenuItem.Name = "updateFirmwareToolStripMenuItem";
-            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateFirmwareToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.updateFirmwareToolStripMenuItem.Text = "Update Firmware...";
             this.updateFirmwareToolStripMenuItem.ToolTipText = "Re-Flash the OSD with a new firmware image";
             this.updateFirmwareToolStripMenuItem.Click += new System.EventHandler(this.updateFirmwareToolStripMenuItem_Click);
@@ -435,14 +429,14 @@ namespace OSD {
             // customBGPictureToolStripMenuItem
             // 
             this.customBGPictureToolStripMenuItem.Name = "customBGPictureToolStripMenuItem";
-            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.customBGPictureToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.customBGPictureToolStripMenuItem.Text = "Background Image...";
             this.customBGPictureToolStripMenuItem.Click += new System.EventHandler(this.customBGPictureToolStripMenuItem_Click);
             // 
             // sendTLogToolStripMenuItem
             // 
             this.sendTLogToolStripMenuItem.Name = "sendTLogToolStripMenuItem";
-            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.sendTLogToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.sendTLogToolStripMenuItem.Text = "Load TLog.";
             this.sendTLogToolStripMenuItem.ToolTipText = "Load a Mavlink transmission log to play into the OSD to test the layout";
             this.sendTLogToolStripMenuItem.Click += new System.EventHandler(this.sendTLogToolStripMenuItem_Click);
@@ -450,7 +444,7 @@ namespace OSD {
             // connectComPortToolStripMenuItem
             // 
             this.connectComPortToolStripMenuItem.Name = "connectComPortToolStripMenuItem";
-            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.connectComPortToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.connectComPortToolStripMenuItem.Text = "Connect to COM port";
             this.connectComPortToolStripMenuItem.ToolTipText = "Transmit all data from selected port to OSD to test how it works";
             this.connectComPortToolStripMenuItem.Click += new System.EventHandler(this.connectComPortToolStripMenuItem_Click);
@@ -458,29 +452,15 @@ namespace OSD {
             // updateFontToolStripMenuItem
             // 
             this.updateFontToolStripMenuItem.Name = "updateFontToolStripMenuItem";
-            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.updateFontToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.updateFontToolStripMenuItem.Text = "Update CharSet...";
             this.updateFontToolStripMenuItem.ToolTipText = "Update the font file on the OSD";
             this.updateFontToolStripMenuItem.Click += new System.EventHandler(this.updateFontToolStripMenuItem_Click);
             // 
-            // updateCharsetDevToolStripMenuItem
-            // 
-            this.updateCharsetDevToolStripMenuItem.Name = "updateCharsetDevToolStripMenuItem";
-            this.updateCharsetDevToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.updateCharsetDevToolStripMenuItem.Text = "Update Charset (Dev)...";
-            this.updateCharsetDevToolStripMenuItem.Visible = false;
-            // 
-            // updateCharsetcustomFwToolStripMenuItem
-            // 
-            this.updateCharsetcustomFwToolStripMenuItem.Name = "updateCharsetcustomFwToolStripMenuItem";
-            this.updateCharsetcustomFwToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.updateCharsetcustomFwToolStripMenuItem.Text = "Update Charset (custom fw)...";
-            this.updateCharsetcustomFwToolStripMenuItem.Visible = false;
-            // 
             // presentCustomCharsetToolStripMenuItem
             // 
             this.presentCustomCharsetToolStripMenuItem.Name = "presentCustomCharsetToolStripMenuItem";
-            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.presentCustomCharsetToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.presentCustomCharsetToolStripMenuItem.Text = "Show Custom Charset...";
             this.presentCustomCharsetToolStripMenuItem.Click += new System.EventHandler(this.presentCustomCharsetToolStripMenuItem_Click);
             // 
@@ -488,16 +468,17 @@ namespace OSD {
             // 
             this.MavlinkModeMenuItem.CheckOnClick = true;
             this.MavlinkModeMenuItem.Name = "MavlinkModeMenuItem";
-            this.MavlinkModeMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.MavlinkModeMenuItem.Size = new System.Drawing.Size(203, 22);
             this.MavlinkModeMenuItem.Text = "MAVlink mode";
             this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
             // 
-            // getFwFromOSDToolStripMenuItem
+            // aTmega644ToolStripMenuItem
             // 
-            this.getFwFromOSDToolStripMenuItem.Name = "getFwFromOSDToolStripMenuItem";
-            this.getFwFromOSDToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.getFwFromOSDToolStripMenuItem.Text = "GetFwFromOSD...";
-            this.getFwFromOSDToolStripMenuItem.Visible = false;
+            this.aTmega644ToolStripMenuItem.CheckOnClick = true;
+            this.aTmega644ToolStripMenuItem.Name = "aTmega644ToolStripMenuItem";
+            this.aTmega644ToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this.aTmega644ToolStripMenuItem.Text = "ATmega644";
+            this.aTmega644ToolStripMenuItem.Click += new System.EventHandler(this.aTmega644ToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -2038,13 +2019,6 @@ namespace OSD {
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
             // 
-            // aTmega644ToolStripMenuItem
-            // 
-            this.aTmega644ToolStripMenuItem.Name = "aTmega644ToolStripMenuItem";
-            this.aTmega644ToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.aTmega644ToolStripMenuItem.Text = "ATmega644";
-            this.aTmega644ToolStripMenuItem.Click += new System.EventHandler(this.aTmega644ToolStripMenuItem_Click);
-            // 
             // OSD
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2192,9 +2166,6 @@ namespace OSD {
         private System.Windows.Forms.Label lblLatestCharsetUploaded;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.GroupBox groupBox12;
-        private System.Windows.Forms.ToolStripMenuItem updateCharsetDevToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem updateCharsetcustomFwToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem getFwFromOSDToolStripMenuItem;
         private System.Windows.Forms.CheckBox cbxAutoUpdate;
         private System.Windows.Forms.CheckBox cbxShowUpdateDialog;
 

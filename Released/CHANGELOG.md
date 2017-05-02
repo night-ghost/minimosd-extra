@@ -520,3 +520,6 @@ v930
 
 v931
 * added baudrate setting for NMEA protocol
+
+v932
+* debug version
