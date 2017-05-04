@@ -8,8 +8,10 @@
 #ifndef walkeratelemout_h
 #define walkeratelemout_h
 
+#if HARDWARE_TYPE==0
 #include "TimerSerial.h"
 //#include "gSoftSerial.h"
+#endif
 
 /*
  * DEVO-M Dataframe

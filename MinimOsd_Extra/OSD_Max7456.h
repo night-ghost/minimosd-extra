@@ -1,8 +1,11 @@
 #ifndef OSD_Max7456_h
 #define OSD_Max7456_h
 
-/******* FROM DATASHEET *******/
 
+#include "compat.h"
+#include "Config.h"
+
+/******* FROM DATASHEET *******/
 
 #define NTSC 0
 #define PAL 1
@@ -78,14 +81,15 @@
   #define MAX7456_screen_rows 0x0D
 #endif
 
-#include "Config.h"
 
 //------------------ the OSD class -----------------------------------------------
 
 class OSD: public BetterStream
 {
   public:
-    OSD(void);
+//    OSD(void);
+    OSD(void){}
+    
     static void init(void);
     static void hw_init(void);
     static void reset(void);
@@ -98,11 +102,22 @@ class OSD: public BetterStream
     static void update(void);
     static void write_S(uint8_t c);
     static void write_raw(uint8_t c);
-    virtual byte     available(void);
-    virtual byte     read(void);
+    virtual byte_32  available(void);
+    virtual byte_16  read(void);
     virtual byte     peek(void);
-    virtual void    flush(void);
-    virtual size_t write(uint8_t c);
+    virtual void     flush(void);
+    virtual size_t   write(uint8_t c);
+#ifdef SLAVE_BUILD
+    virtual size_t write(const uint8_t *buffer, size_t size) { size_t sz=size;  while(size--) write(*buffer++); return sz; }
+    virtual byte_32 txspace() { return 255; }
+    virtual void printf(const char *, ...) /* FMT_PRINTF(2, 3)*/ {}// not supported
+    virtual void vprintf(const char *, va_list) {}            // not supported
+    void printf_P(const char *fmt, float f) { printf(fmt,f); }
+    void printf_P(const char *fmt, uint16_t f) { printf(fmt,f); }
+    void printf_P(const char *fmt, int f) { printf(fmt,f); }
+    void printf_P(const char *fmt, uint16_t i1, uint16_t i2) { printf(fmt,i1,i2); }
+#endif
+
     static void write_NVM(uint16_t font_count, uint8_t *character_bitmap);
     static void write_xy(uint8_t x, uint8_t y, uint8_t c);
     static void adjust();
@@ -123,7 +138,7 @@ class OSD: public BetterStream
     
 };
 
-
+extern OSD osd; //OSD object
 
 static INLINE void unplugSlaves(){   //Unplug list of SPI
     max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD

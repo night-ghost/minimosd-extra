@@ -96,18 +96,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 // AVR Includes
 #include <SingleSerial.h> // MUST be first
 
-#include "compat.h"
 
-// Configurations
-#include "Config.h"
+// Get the common arduino functions
+#include "Arduino.h"
 
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 
-// Get the common arduino functions
-#include "Arduino.h"
+#include "compat.h"
+#include "Defs.h"
+
+// Configurations
+#include "Config.h"
+
 
 #include "OSD_Max7456.h"
 #include "Vars.h"
@@ -131,6 +134,8 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 
 #include "protocols.h"
 
+
+#include "Config_Func.h"
 
 #include "Func.h"
 
@@ -159,7 +164,6 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 
 #include "Panels.h"
 
-#include "Config_Func.h"
 
 
 #ifdef WALKERA_TELEM
@@ -213,7 +217,7 @@ ISR(VSYNC_VECT) {
             update_screen = 0;          
             nested--;
         }
- #if defined(PWM_IN_INTERRUPT)
+ #if defined(PWM_IN_INTERRUPT) && !defined(SLAVE_BUILD)
         sei(); 			// enable other interrupts - jitter is small because no big calculations in ANOTHER interrupts
         generate_PWM(false);
  #endif
@@ -386,8 +390,10 @@ Serial.print_P(PSTR("#1zzzzz\n"));
         PWM_out_bit  = digitalPinToBitMask(PWM_out_pin); // move out calculations from critical section
         PWM_out_port = portOutputRegister(port);
 
+#if !defined(SLAVE_BUILD)
         generate_PWM(0); // set pin to initial state
 	pinMode(PWM_out_pin,  OUTPUT);
+#endif
     }
 
 //Serial.print_P(PSTR("#2\n"));
@@ -807,7 +813,7 @@ case_4:
 // loop time can be up to 75ms so 20ms is too optimistic 8)
 // but mean looptime is 8..12ms so...
 void On20ms(){ // 50Hz
-#if !defined(PWM_IN_INTERRUPT)
+#if !defined(PWM_IN_INTERRUPT) && !defined(SLAVE_BUILD)
     generate_PWM(true);
 #endif
 

@@ -8,7 +8,9 @@
 
 DevoMPacket WalkeraTelem::devoPacket = {DEVOM_SYNC_BYTE, 0};
 
+#if HARDWARE_TYPE==0
 TimerSerial WalkeraTelem::DevoSerial(0, WALKERA_TELEM); // only tx and no RSSI in DEVO
+#endif
 
 WalkeraTelem::WalkeraTelem(){
     DevoSerial.begin(38400);

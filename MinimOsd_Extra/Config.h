@@ -22,7 +22,7 @@
 */
 
 #ifndef HARDWARE_TYPE
-#define HARDWARE_TYPE 0
+#define HARDWARE_TYPE 0 // for 328 by default
 #endif
 
 #define STARTUP_SCREEN 0
@@ -251,3 +251,7 @@ static INLINE void max7456_off(){
 static INLINE void max7456_on(){
     PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
 }
+
+
+typedef byte byte_32;
+typedef byte byte_16;

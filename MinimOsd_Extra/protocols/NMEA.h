@@ -345,7 +345,7 @@ static void init_gps(){
 //send_gps_command( "$PSRF100,1,9600,8,1,0*0D\n"); //  =,NNEA,9600/8/1/None*CS
 //send_gps_command( "$PSRF100,1,19200,8,1,0*38\n"); //  =,NNEA,19200/8/1/None*CS
 //send_gps_command( "$PSRF100,1,38400,8,1,0*3D\n"); //  =,NNEA,38400/8/1/None*CS
-send_gps_command( "$PSRF100,1,57600,8,1,0*36\n"); //  =,NNEA,57600/8/1/None*CS
+send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\n")); //  =,NNEA,57600/8/1/None*CS
 //send_gps_command( "$PSRF100,1,115200,8,1,0*05\n"); //  =,NMEA,115200/8/1/None*CS
 //---
 //$PSRF100,0,57600,8,1,0*37 =,SiRF,57600/8/1/N*CS
@@ -359,7 +359,7 @@ send_gps_command( "$PSRF100,1,57600,8,1,0*36\n"); //  =,NNEA,57600/8/1/None*CS
 //send_gps_command( "$PUBX,41,1,0003,0002,9600,0*15\n");
 //send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\n");
 //send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\n");
-send_gps_command( "$PUBX,41,1,0003,0002,57600,0*2E\n");
+send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\n"));
 //send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\n");
 
 //--- MTK --------------------------------------------------------------
@@ -370,7 +370,7 @@ send_gps_command( "$PUBX,41,1,0003,0002,57600,0*2E\n");
 //send_gps_command("$PMTK251,9600*17\n");
 //send_gps_command("$PMTK251,19200*22\n");
 //send_gps_command("$PMTK251,38400*27\n");
-send_gps_command("$PMTK251,57600*2C\n");
+send_gps_command(PSTR("$PMTK251,57600*2C\n"));
 //send_gps_command("$PMTK251,115200*1F\n");
 
 //--- MTK --------------------------------------------------------------
@@ -378,7 +378,7 @@ send_gps_command("$PMTK251,57600*2C\n");
 //# $PMTK20,Period*CS<cr><lf>
 
 //send_gps_command("$PMTK220,100*2F\n"); =set 10Hz rate
-send_gps_command("$PMTK220,200*2C\n");  //=set 5Hz rate
+send_gps_command(PSTR("$PMTK220,200*2C\n"));  //=set 5Hz rate
 //send_gps_command($PMTK220,1000*1F\n"); =set 1Hz rate
 
 //--- NemeriX ----------------------------------------------------------
@@ -389,7 +389,7 @@ send_gps_command("$PMTK220,200*2C\n");  //=set 5Hz rate
 //send_gps_command("$PNMRX100,0,9600,0*4B\n");  // ...
 //send_gps_command("$PNMRX100,0,19200,0*7E\n");  //
 //send_gps_command("$PNMRX100,0,38400,0*7B\n");  //
-send_gps_command("$PNMRX100,0,57600,0*70\n");  //
+send_gps_command(PSTR("$PNMRX100,0,57600,0*70\n"));  //
 //send_gps_command("$PNMRX100,0,115200,0*43\n");  //
 
     lflags.data_mode=false;

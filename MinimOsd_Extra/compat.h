@@ -7,6 +7,9 @@ typedef char prog_char;
 #define INLINE __attribute__ ((always_inline)) inline
 #define WEAK __attribute__((weak))
 
+typedef byte byte_32;
+typedef byte byte_16;
+
 
 #if 0
 #undef PSTR

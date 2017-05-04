@@ -523,3 +523,7 @@ v931
 
 v932
 * debug version
+
+v933
+* fixed bug in baudrate setting for NMEA protocol
+

@@ -1,13 +1,18 @@
-#include "compat.h"
 
+#ifndef SLAVE_BUILD
 #include <SingleSerial.h>
-
 #include "Arduino.h"
+#include "compat.h"
+#include "Spi.h"
+#else
+    extern AP_HAL::OwnPtr<REVOMINI::SPIDevice> osd_spi;
+
+#endif
 
 #include "OSD_Max7456.h"
 
+
 #include "prototypes.h"
-#include "Spi.h"
 
 extern Settings sets;
 
@@ -16,9 +21,6 @@ uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда вывод
 uint16_t OSD::bufpos;
 
 
-OSD::OSD()
-{
-}
 
 //------------------ init ---------------------------------------------------
 
@@ -52,7 +54,11 @@ void OSD::reset(){
     while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) ) {//read status register - sync to soft-only versions
         byte j=3;
 
-        while(cnt--)  SPI::transfer(0xff); // try to sync
+#ifdef SLAVE_BUILD
+        while(j--)  osd_spi->transfer(0xff); // try to sync
+#else
+        while(j--)  SPI::transfer(0xff); // try to sync
+#endif
 
         delay_15();
     }
@@ -91,10 +97,12 @@ void OSD::hw_init(){
 
 void OSD::init()
 {
+#ifndef SLAVE_BUILD
     pinMode(MAX7456_SELECT,OUTPUT);
     pinMode(MAX7456_VSYNC, INPUT_PULLUP);
     pinMode(MAX7456_RESET_PIN, OUTPUT);
     digitalWrite(MAX7456_RESET_PIN, HIGH);
+#endif
     
     reset();
 
@@ -257,6 +265,8 @@ void OSD::update() {
 */
 #ifdef SLAVE_BUILD 
 //  internal Ardupilot build should use DMA to transfer
+    max7456_on(); 
+
 #else
     max7456_on(); 
 
@@ -327,10 +337,10 @@ void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
 
 //------------------ pure virtual ones (just overriding) ---------------------
 
-byte  OSD::available(void){
+byte_32  OSD::available(void){
 	return 0;
 }
-byte  OSD::read(void){
+byte_16  OSD::read(void){
 	return 0;
 }
 byte  OSD::peek(void){
