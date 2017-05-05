@@ -93,13 +93,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 /* **********************************************/
 /* ***************** INCLUDES *******************/
 
-// AVR Includes
-#include <SingleSerial.h> // MUST be first
+// Configurations
+#include "Config.h"
+
+
+#if HARDWARE_TYPE == 0
+ #include <SingleSerial.h> // MUST be first
+#elif HARDWARE_TYPE == 1
+ #include <FastSerial.h> 
+#endif
 
 
 // Get the common arduino functions
 #include "Arduino.h"
 
+// AVR Includes
 #include <math.h>
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -108,9 +116,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "compat.h"
 #include "Defs.h"
 
-// Configurations
-#include "Config.h"
-
+#include "eeprom.h"
 
 #include "OSD_Max7456.h"
 #include "Vars.h"
@@ -120,23 +126,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 OSD osd; //OSD object 
 
+
+#if HARDWARE_TYPE == 0
+
 // Objects and Serial definitions
 SingleSerialPort(Serial);
+#elif HARDWARE_TYPE == 1
+FastSerialPort0(Serial);
+FastSerialPort1(Serial1);
+#endif
 
 
-#if defined(SERIALDEBUG)
+#if defined(SERIALDEBUG) && HARDWARE_TYPE == 0
 #include "TimerSerial.h"
 TimerSerial dbgSerial(0, SERIALDEBUG);
 #endif
 
 // program parts
 #include "adc_setup.h"
-
 #include "protocols.h"
 
-
 #include "Config_Func.h"
-
 #include "Func.h"
 
 
@@ -168,7 +178,7 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 
 #ifdef WALKERA_TELEM
  #include  "WalkeraTelemOut.h"
- 
+
  WalkeraTelem walkera;
 #endif
 
@@ -353,6 +363,7 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 
 
     // Prepare OSD for displaying 
+    extern  void unplugSlaves();
     unplugSlaves();
     OSD::update();// clear memory
 

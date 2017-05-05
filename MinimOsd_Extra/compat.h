@@ -1,12 +1,15 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+#include <inttypes.h>
+
 typedef char prog_char;
 
 #define NOINLINE __attribute__ ((noinline))
 #define INLINE __attribute__ ((always_inline)) inline
 #define WEAK __attribute__((weak))
 
+typedef uint8_t byte;
 typedef byte byte_32;
 typedef byte byte_16;
 

@@ -102,6 +102,7 @@ MCU ?= atmega328p
 #ARFLAGS=--plugin=/usr/share/arduino/hardware/tools/avr/libexec/gcc/avr/5.3.0/liblto_plugin.so
 
 ARDUINO_LIBS = SingleSerial
+ARDUINO_LIBS += FastSerial
 ARDUINO_LIBS += GCS_MAVLink
 ARDUINO_LIBS += TimerSerial
 #ARDUINO_LIBS += I2c_soft_slave

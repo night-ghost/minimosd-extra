@@ -69,7 +69,9 @@ public:
 	static long gpsDdToDmsFormat(float &ddm);
 private:
 	static DevoMPacket devoPacket;
+#if HARDWARE_TYPE==0
 	static TimerSerial DevoSerial;
+#endif
 };
 
 #include "WalkeraTelemOut_core.h"

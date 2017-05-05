@@ -1,15 +1,35 @@
 
-#ifndef SLAVE_BUILD
-#include <SingleSerial.h>
+#ifdef SLAVE_BUILD
+    extern AP_HAL::OwnPtr<REVOMINI::SPIDevice> osd_spi;
+#else
+
+#if HARDWARE_TYPE == 0
+ #include <SingleSerial.h> // MUST be first
+#elif HARDWARE_TYPE == 1
+ #include <FastSerial.h> 
+#endif
+
 #include "Arduino.h"
 #include "compat.h"
 #include "Spi.h"
-#else
-    extern AP_HAL::OwnPtr<REVOMINI::SPIDevice> osd_spi;
+#include "eeprom.h"
+
+
+static INLINE void max7456_off(){
+    PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
+}
+
+static INLINE void max7456_on(){
+    PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
+}
 
 #endif
 
 #include "OSD_Max7456.h"
+
+void unplugSlaves(){   //Unplug list of SPI
+    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
+}
 
 
 #include "prototypes.h"

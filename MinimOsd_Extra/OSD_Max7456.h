@@ -140,9 +140,6 @@ class OSD: public BetterStream
 
 extern OSD osd; //OSD object
 
-static INLINE void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
-}
 
 extern void MAX_write(byte addr, byte data);
 extern byte MAX_read(byte addr);

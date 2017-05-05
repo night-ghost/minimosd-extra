@@ -174,12 +174,13 @@
 //#define RADIOLINK_TELEM_SDA RssiPin
 //#define RADIOLINK_TELEM_SCL AmperagePin
 
-//#define WALKERA_TELEM RssiPin // telemetry output
+//#define WALKERA_TELEM 1 // telemetry output
+//#define DevoSerial Serial1
 
-//#define SERIALDEBUG RssiPin // debug output, conflicts with PWM_BY_INTERRUPT
+//#define SERIALDEBUG 1 // debug output
+//#define dbgSerial Serial1
 
-
-//#define LEDPIN AmperagePin
+#define LEDPIN 27
 
 
 #endif
@@ -220,10 +221,8 @@
 
 #define RC_NEUTRAL 1500     // PWM pulse width for center stick
 
-#include "compat.h"
-#include "eeprom.h"
 #include "version.h"
-
+#include "compat.h"
 
 #ifdef DEBUG
   #define DBG_PRINTLN(x)     { Serial.print_P(PSTR(x)); Serial.println();  Serial.wait();  }
@@ -244,14 +243,6 @@
 
 
 
-static INLINE void max7456_off(){
-    PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
-}
 
-static INLINE void max7456_on(){
-    PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
-}
-
-
-typedef byte byte_32;
-typedef byte byte_16;
+typedef uint8_t byte_32;
+typedef uint8_t byte_16;

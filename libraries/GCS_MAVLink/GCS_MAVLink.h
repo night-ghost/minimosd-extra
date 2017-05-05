@@ -6,14 +6,20 @@
 #ifndef GCS_MAVLink_h
 #define GCS_MAVLink_h
 
-//#define HardwareSerial_h
-#include "../SingleSerial/SingleSerial.h"
-
+#define HardwareSerial_h
+/*
+// AVR Includes
+#if HARDWARE_TYPE == 0
+ #include <SingleSerial.h> // MUST be first
+#elif HARDWARE_TYPE == 1
+ #include <FastSerial.h> 
+#endif
+*/
 #include "compat.h"
 
 #include "Arduino.h"
 
-extern SingleSerial Serial;
+//extern SingleSerial Serial;
 
 // we have separate helpers disabled to make it possible
 // to select MAVLink 1.0 in the arduino GUI build
