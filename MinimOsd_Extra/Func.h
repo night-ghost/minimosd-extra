@@ -152,7 +152,7 @@ void doScreenSwitch(){
 
 }
 
-#define USE_AUTOSWITCH 1
+//#define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
     byte old_panel=panelN;
@@ -210,13 +210,30 @@ static void pan_toggle(){
         }
       } else{ 			 //Rotation switch
         byte ch_on=0;
-//*
         if(FLAGS.chkSwitch200) {
-    	    if(last_chan_raw)
-        	ch_on = (ch_raw - last_chan_raw) > 200;
-            last_chan_raw = ch_raw;
+
+          // Switch changed from its last position
+          if (abs (ch_raw - ch_raw_prev1) > 200) {
+            // but is the same than 2 positions ago
+            if (abs (ch_raw - ch_raw_prev2) < 200) {
+              // and it's been less than 1 sec since the position switch and back
+              if (osd_switch_time + 1000 > millis()) {
+                // then rotate
+                lflags.rotatePanel = 1;
+              }
+              // stop continuous rotation, forcing a switch flip to restart the process
+              // or if the flip didn't happen because it happened too slowly, reset too.
+              ch_raw_prev2 = 0;
+            } else {
+              osd_switch_time = millis();
+              // If position changed and is different from what it was 2 positions ago
+              // record the new state
+              ch_raw_prev2 = ch_raw_prev1;
+              ch_raw_prev1 = ch_raw;
+            }
+	  }
+
         } else
-//*/
             ch_on = (ch_raw > (ch_min+ch_max)/2);
 
         if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
@@ -855,7 +872,7 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " MM\xff"));
 
     osd.print((uint16_t)millis());
 
