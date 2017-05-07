@@ -152,7 +152,7 @@ void doScreenSwitch(){
 
 }
 
-//#define USE_AUTOSWITCH 1
+#define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
     byte old_panel=panelN;
@@ -872,7 +872,7 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " MM\xff"));
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
 
     osd.print((uint16_t)millis());
 
