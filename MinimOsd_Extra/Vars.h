@@ -253,7 +253,8 @@ const Params *params; // указатель на текущий набор па�
 
 uint32_t autoswitch_time=0;
 
-static uint16_t last_chan_raw=0;
+static uint16_t ch_raw_prev1=0;
+static uint16_t ch_raw_prev2=0;
 
 #define GPS_MUL 10000000.0f
 
