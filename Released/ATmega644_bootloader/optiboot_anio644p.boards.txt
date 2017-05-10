@@ -1,24 +1,21 @@
 ##################################################
-# anio644p: 1.0.8 /w atmega644p (optiboot.c)
+# anio644p: 1.0.8 /w atmega644p (ATmegaBOOT_168.c)
 ##################################################
-anio644p.name=1.0.8 w/ atmega644p (optiboot.c)
+anio644p.name=1.0.8 w/ atmega644p (ATmegaBOOT_168.c)
 anio644p.build.mcu=atmega644p
 anio644p.build.f_cpu=16000000L
 anio644p.build.core=1.0.8
 anio644p.build.variant=avrnetio
 anio644p.upload.protocol=arduino
-anio644p.upload.maximum_size=64512
+anio644p.upload.maximum_size=63488
 anio644p.upload.speed=57600
 anio644p.bootloader.path=optiboot_flash
-anio644p.bootloader.file=optiboot_anio644p.hex
+anio644p.bootloader.file=boot_osd.hex
 #    text	   data	    bss	    dec	    hex	filename
 #     574	      0	      0	    574	    23e	optiboot_anio644p.elf
 anio644p.bootloader.low_fuses=0xFF
-anio644p.bootloader.high_fuses=0xDE
+anio644p.bootloader.high_fuses=0xD4
 anio644p.bootloader.extended_fuses=0xFD 
 anio644p.bootloader.unlock_bits=0x0f
 anio644p.bootloader.lock_bits=0x3f
-### for ChipKit mpide:
-# anio644p.platform=avr
-# anio644p.board=AVR_NET_IO
 ##################################################
