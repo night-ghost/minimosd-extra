@@ -152,7 +152,7 @@ void doScreenSwitch(){
 
 }
 
-#define USE_AUTOSWITCH 1
+//#define USE_AUTOSWITCH 1
 
 static void pan_toggle(){
     byte old_panel=panelN;
@@ -162,7 +162,6 @@ static void pan_toggle(){
     
 
     uint16_t ch_raw;
-//    static uint16_t last_chan_raw=0; in vars.h
 
     if(sets.ch_toggle <= 2) // disabled
 	return;
@@ -210,11 +209,36 @@ static void pan_toggle(){
         }
       } else{ 			 //Rotation switch
         byte ch_on=0;
-//*
+//* // allows to comment out all "by 200" code
         if(FLAGS.chkSwitch200) {
+/*
     	    if(last_chan_raw)
         	ch_on = (ch_raw - last_chan_raw) > 200;
             last_chan_raw = ch_raw;
+*/
+//[[ @MM
+          // Switch changed from its last position
+          if (abs (ch_raw - ch_raw_prev1) > 200) {
+            // but is the same than 2 positions ago
+            if (abs (ch_raw - ch_raw_prev2) < 200) {
+              // and it's been less than 1 sec since the position switch and back
+              if ( time_since(&osd_switch_time) > 1000){ // if (osd_switch_time + 1000 > millis()) {
+                // then rotate
+                lflags.rotatePanel = 1;
+              }
+              // stop continuous rotation, forcing a switch flip to restart the process
+              // or if the flip didn't happen because it happened too slowly, reset too.
+              ch_raw_prev2 = 0;
+            } else {
+              millis_plus(&osd_switch_time,0); //osd_switch_time = millis();
+              // If position changed and is different from what it was 2 positions ago
+              // record the new state
+              ch_raw_prev2 = ch_raw_prev1;
+              ch_raw_prev1 = ch_raw;
+            }
+         }
+//]] @MM
+
         } else
 //*/
             ch_on = (ch_raw > (ch_min+ch_max)/2);

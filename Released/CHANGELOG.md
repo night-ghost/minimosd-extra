@@ -527,3 +527,5 @@ v932
 v933
 * fixed bug in baudrate setting for NMEA protocol
 
+v934
+* code for "by 200" screen switch by Marc Merlin
