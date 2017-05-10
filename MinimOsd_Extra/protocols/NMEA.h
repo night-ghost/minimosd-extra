@@ -341,12 +341,12 @@ static void init_gps(){
 // Select / Change the Baud Rates using the NMEA Protocol for SiRF modules
 // $PSRF100,Proto,Baudrate,DataBits,StopBits,Parity,C heckSum*CS<cr><lf>
 
-//send_gps_command("$PSRF100,1,4800,8,1,0*0E\n"); //  =,NNEA,4800/8/1/None*CS
-//send_gps_command( "$PSRF100,1,9600,8,1,0*0D\n"); //  =,NNEA,9600/8/1/None*CS
-//send_gps_command( "$PSRF100,1,19200,8,1,0*38\n"); //  =,NNEA,19200/8/1/None*CS
-//send_gps_command( "$PSRF100,1,38400,8,1,0*3D\n"); //  =,NNEA,38400/8/1/None*CS
-send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\n")); //  =,NNEA,57600/8/1/None*CS
-//send_gps_command( "$PSRF100,1,115200,8,1,0*05\n"); //  =,NMEA,115200/8/1/None*CS
+//send_gps_command("$PSRF100,1,4800,8,1,0*0E\r\n"); //  =,NNEA,4800/8/1/None*CS
+//send_gps_command( "$PSRF100,1,9600,8,1,0*0D\r\n"); //  =,NNEA,9600/8/1/None*CS
+//send_gps_command( "$PSRF100,1,19200,8,1,0*38\r\n"); //  =,NNEA,19200/8/1/None*CS
+//send_gps_command( "$PSRF100,1,38400,8,1,0*3D\r\n"); //  =,NNEA,38400/8/1/None*CS
+send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\r\n")); //  =,NNEA,57600/8/1/None*CS
+//send_gps_command( "$PSRF100,1,115200,8,1,0*05\r\n"); //  =,NMEA,115200/8/1/None*CS
 //---
 //$PSRF100,0,57600,8,1,0*37 =,SiRF,57600/8/1/N*CS
 //$PSRF100,0,115200,8,1,0*04 =,SiRF,115200/8/1/N*CS
@@ -355,42 +355,42 @@ send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\n")); //  =,NNEA,57600/8/1/Non
 //# Select / Change the Baud Rates using the NMEA Protocol for u-Blox modules
 //# $PUBX,41,portID,inProto,outProto,Baudrate,autoBaud rate*CS<cr><lf>
 
-//send_gps_command("$PUBX,41,1,0003,0002,4800,0*16\n"); // =,1,UBX+NMEA,NMEA,4800,0*CS
-//send_gps_command( "$PUBX,41,1,0003,0002,9600,0*15\n");
-//send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\n");
-//send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\n");
-send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\n"));
-//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\n");
+//send_gps_command("$PUBX,41,1,0003,0002,4800,0*16\r\n"); // =,1,UBX+NMEA,NMEA,4800,0*CS
+//send_gps_command( "$PUBX,41,1,0003,0002,9600,0*15\r\n");
+//send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\r\n");
+//send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\r\n");
+send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\r\n"));
+//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\r\n");
 
 //--- MTK --------------------------------------------------------------
 //# Select / Change the Baud Rates using the NMEA Protocol for MTK modules
 //# $PMTK51,Baudrate*CS<cr><lf>
 
-//send_gps_command("$PMTK251,4800*14\n");// =,4800*CS<cr><lf>
-//send_gps_command("$PMTK251,9600*17\n");
-//send_gps_command("$PMTK251,19200*22\n");
-//send_gps_command("$PMTK251,38400*27\n");
-send_gps_command(PSTR("$PMTK251,57600*2C\n"));
-//send_gps_command("$PMTK251,115200*1F\n");
+//send_gps_command("$PMTK251,4800*14\r\n"); // =,4800*CS<cr><lf>
+//send_gps_command("$PMTK251,9600*17\r\n");
+//send_gps_command("$PMTK251,19200*22\r\n");
+//send_gps_command("$PMTK251,38400*27\r\n");
+send_gps_command(PSTR("$PMTK251,57600*2C\r\n"));
+//send_gps_command("$PMTK251,115200*1F\r\n");
 
 //--- MTK --------------------------------------------------------------
 //# Select / Change rate for MTK modules
 //# $PMTK20,Period*CS<cr><lf>
 
-//send_gps_command("$PMTK220,100*2F\n"); =set 10Hz rate
-send_gps_command(PSTR("$PMTK220,200*2C\n"));  //=set 5Hz rate
-//send_gps_command($PMTK220,1000*1F\n"); =set 1Hz rate
+//send_gps_command("$PMTK220,100*2F\r\n"); // =set 10Hz rate
+send_gps_command(PSTR("$PMTK220,200*2C\r\n")); // =set 5Hz rate
+//send_gps_command($PMTK220,1000*1F\r\n"); // =set 1Hz rate
 
 //--- NemeriX ----------------------------------------------------------
 //# Select / Change Baud Rate using NMEA Protocol for NemeriX modules
 //# $PNMRX100,Protocol,Baudrate,Parity*CS<cr><lf>
 
-//send_gps_command("$PNMRX100,0,4800,0*48\n");  // =,NMEA,4800,None*CS
-//send_gps_command("$PNMRX100,0,9600,0*4B\n");  // ...
-//send_gps_command("$PNMRX100,0,19200,0*7E\n");  //
-//send_gps_command("$PNMRX100,0,38400,0*7B\n");  //
-send_gps_command(PSTR("$PNMRX100,0,57600,0*70\n"));  //
-//send_gps_command("$PNMRX100,0,115200,0*43\n");  //
+//send_gps_command("$PNMRX100,0,4800,0*48\r\n");  // =,NMEA,4800,None*CS
+//send_gps_command("$PNMRX100,0,9600,0*4B\r\n");
+//send_gps_command("$PNMRX100,0,19200,0*7E\r\n");
+//send_gps_command("$PNMRX100,0,38400,0*7B\r\n");
+send_gps_command(PSTR("$PNMRX100,0,57600,0*70\r\n"));
+//send_gps_command("$PNMRX100,0,115200,0*43\r\n");
 
     lflags.data_mode=false;
     lflags.input_active=false; // reset flags - activate auto-baud
