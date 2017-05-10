@@ -1652,7 +1652,7 @@ static void panWPDir(point p){
 // Staus  : OK
 
 static void panWPDis(point p){
-    if (osd_mode == 10){ // auto
+//    if (osd_mode == 10){ // auto
 
 	int err=xtrack_error;
         if (err > 999)  err = 999;
@@ -1666,9 +1666,9 @@ static void panWPDis(point p){
         osd_nl();
     
         showArrow(getTargetBearing());
-        osd_print_S(PSTR("\x20\x58\x65"));
+        osd_print_S(PSTR("\x20\x58\x65")); //Xe
         osd_printf_2(f4_0f, (err * get_converth()), h);
-    }
+//    }
 }
 
 /* **************************************************************** */
