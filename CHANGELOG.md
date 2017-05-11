@@ -529,3 +529,6 @@ v933
 
 v934
 * code for "by 200" screen switch by Marc Merlin
+
+v935
+* fixed \r\n for NMEA protocol
