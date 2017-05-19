@@ -1,27 +1,28 @@
+#include "Config.h"
 
 #ifdef SLAVE_BUILD
     extern AP_HAL::OwnPtr<REVOMINI::SPIDevice> osd_spi;
 #else
 
-#if HARDWARE_TYPE == 0
- #include <SingleSerial.h> // MUST be first
-#elif HARDWARE_TYPE == 1
- #include <FastSerial.h> 
-#endif
+ #if HARDWARE_TYPE == 0
+  #include <SingleSerial.h> // MUST be first
+ #elif HARDWARE_TYPE == 1
+  #include <FastSerial.h> 
+ #endif
 
-#include "Arduino.h"
-#include "compat.h"
-#include "Spi.h"
-#include "eeprom.h"
+ #include "Arduino.h"
+ #include "compat.h"
+ #include "Spi.h"
+ #include "eeprom.h"
 
 
-static INLINE void max7456_off(){
+ static INLINE void max7456_off(){
     PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
-}
+ }
 
-static INLINE void max7456_on(){
+ static INLINE void max7456_on(){
     PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
-}
+ }
 
 #endif
 
@@ -31,13 +32,13 @@ void unplugSlaves(){   //Unplug list of SPI
     max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
 }
 
-
 #include "prototypes.h"
 
 extern Settings sets;
 
 uint8_t  OSD::col, OSD::row, OSD::video_mode;
-uint8_t  OSD::osdbuf[16*30]; // основной буфер, куда выводится все-все и во время прерывания по VSYNC переносится в OSD - 480 байт, четверть всей памяти
+uint8_t  OSD::osdbuf[16*30+1]; // основной буфер, куда выводится все-все и во время прерывания по VSYNC переносится в OSD - 480 байт, четверть всей памяти
+                                // плюс байт "конец экрана"
 uint16_t OSD::bufpos;
 
 
@@ -279,13 +280,15 @@ void OSD::update() {
     uint8_t *b = osdbuf;
     uint8_t *end_b = b+sizeof(osdbuf);
 
+    osdbuf[sizeof(osdbuf)-1] = MAX7456_END_string; // 0xFF - "end of screen" character
 /*
     wee need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
     
 */
 #ifdef SLAVE_BUILD 
 //  internal Ardupilot build should use DMA to transfer
-    max7456_on(); 
+    extern void update_max_buffer(const char *cp, uint16_t len);
+    update_max_buffer(osdbuf, sizeof(osdbuf));
 
 #else
     max7456_on(); 
@@ -303,9 +306,9 @@ void OSD::update() {
     }
     max7456_on();
 
-    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
-#endif
+//    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
     max7456_off();
+#endif
 }
 
 

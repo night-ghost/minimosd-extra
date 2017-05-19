@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r932DV";
+        public const string VERSION = "r935DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -3313,7 +3313,7 @@ again:
                 sp.DataBits = 8;
                 sp.StopBits = StopBits.One;
                 sp.Parity = Parity.None;
-                //				sp.DtrEnable = true;
+                sp.DtrEnable = true;
                 //				sp.RtsEnable = false; //added
 
                 sp.Open();
@@ -3606,7 +3606,7 @@ again:
                 //*
                    if (c != (rxmsg.checksum >> 8)) {// Check second checksum byte
 
-                       Console.WriteLine("\nCRC2 err! want={0} got={1}", rxmsg.checksum >> 8, c);
+//                       Console.WriteLine("\nCRC2 err! want={0} got={1}", rxmsg.checksum >> 8, c);
                        status.msg_error = 1;
                         status.parse_error++;
                            status.msg_received = 0;

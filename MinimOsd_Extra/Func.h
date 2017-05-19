@@ -660,7 +660,7 @@ void NOINLINE set_data_got() {
 
 
 
-
+#ifndef SLAVE_BUILD
 // чтение пакетов нужного протокола
 static void getData(){
 //LED_BLINK;
@@ -746,6 +746,7 @@ again:
     }
 
 }
+#endif
 
 bool NOINLINE timeToScreen(){ // we should renew screen 
     return lflags.need_redraw && !vsync_wait;
@@ -881,7 +882,11 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
+#ifdef SLAVE_BUILD
+    osd_print_S("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
+#else
     osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+#endif
 
     osd.print((uint16_t)millis());
 

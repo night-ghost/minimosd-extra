@@ -88,7 +88,7 @@ class OSD: public BetterStream
 {
   public:
 //    OSD(void);
-    OSD(void){}
+    OSD(void){ }
     
     static void init(void);
     static void hw_init(void);
@@ -114,6 +114,7 @@ class OSD: public BetterStream
     virtual void vprintf(const char *, va_list) {}            // not supported
     void printf_P(const char *fmt, float f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t f) { printf(fmt,f); }
+    void printf_P(const char *fmt, uint32_t f) { printf(fmt,f); }
     void printf_P(const char *fmt, int f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t i1, uint16_t i2) { printf(fmt,i1,i2); }
 #endif
@@ -125,7 +126,8 @@ class OSD: public BetterStream
 
 //  private:
     static uint8_t col, row, video_mode;
-    static uint8_t osdbuf[16*30]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+    static uint8_t osdbuf[16*30+1]; // основной буфер, куда выодится все-все и во время VSYNC переносится в OSD - 480 байт, четверть всей памяти
+                                //      плюс 1 байт конца экрана
     static uint16_t bufpos;
     
     static void NOINLINE calc_pos();

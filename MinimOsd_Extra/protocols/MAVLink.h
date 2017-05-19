@@ -1,6 +1,8 @@
 #include "../compat.h"
 
+#ifndef ToDeg
 #define ToDeg(x) (x*57.2957795131) // *180/pi
+#endif
 
 
 extern struct loc_flags lflags;  // все булевые флаги кучей
@@ -65,6 +67,7 @@ union {
 */
 
 
+#ifndef SLAVE_BUILD
 bool read_mavlink(){
 
 #ifdef DEBUG
@@ -105,7 +108,7 @@ bool read_mavlink(){
 
     return false;
 }
-
+#endif
 
 
 
@@ -431,9 +434,9 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
 
                     char *cp = (char *)&mav_message[len]; // remove tail spaces
                     for(;;) {
-                        byte c = *(--cp);
+                        byte b = *(--cp);
 
-                        if(c==0 || c==0x20){
+                        if(b==0 || b==0x20){
                             len--;
                         } else {
                             cp[1]=0;

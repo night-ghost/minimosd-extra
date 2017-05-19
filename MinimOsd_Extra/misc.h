@@ -27,11 +27,15 @@ void parse_osd_packet(byte *p){
 	
 	case 'b':
 	    if(c->len==0 && lflags.was_mav_config) {
+#if defined(SLAVE_BUILD)
+// nothing to do
+#else 
 	        __asm__ __volatile__ (    // Jump to RST vector
 	            "clr r30\n"
 	            "clr r31\n"
 	            "ijmp\n"
 	        );
+#endif
 	    }
 	    break;
 #ifdef MAVLINK_READ_EEPROM
@@ -46,7 +50,7 @@ void parse_osd_packet(byte *p){
 
 #ifdef MAVLINK_FONT_UPLOAD
         case 'f': // font via MAVlink
-            osd.write_NVM(*((uint16_t *)data), data+2); // first 2 byte is number, all another is bitmap
+            osd.write_NVM(*((uint16_t *)(&c->data)), (uint8_t *)(&c->data)+2); // first 2 byte is number, all another is bitmap
             break;
 #endif
 

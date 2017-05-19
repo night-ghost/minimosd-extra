@@ -1207,7 +1207,7 @@ static void panGPSats(point p){
 // Staus  : done
 
 
-static long NOINLINE coord_frac(float &f, byte fLow){
+static uint32_t NOINLINE coord_frac(float &f, byte fLow){
     float v=abs(f);
     
     return (v-(int)v) * (fLow?100000.0:1000000.0);

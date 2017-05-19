@@ -18,11 +18,20 @@
 /*
     0 - usual minimOSD/microMinimOSD board
     1 - board on ATmega644 and AB7456
-
+    2 - a try to compile to STM32
 */
 
 #ifndef HARDWARE_TYPE
+#if defined(MCU_STM32F103C8) || defined(MCU_STM32F103CB)
+#define HARDWARE_TYPE 2 // for STM32
+#elif defined(MCU_atmega644p)
+#define HARDWARE_TYPE 1 // for 644
+#else
 #define HARDWARE_TYPE 0 // for 328 by default
+#endif
+
+#warning "HARDWARE_TYPE set to " HARDWARE_TYPE
+
 #endif
 
 #define STARTUP_SCREEN 0
@@ -63,7 +72,7 @@
 //#define USE_MWII 1
 //#define USE_LTM 1
 //#define USE_NMEA 1
-
+#define MAVLINK_FONT_UPLOAD
 
 #define VSYNC_VECT INT0_vect
 
@@ -147,6 +156,63 @@
 //#define PWM_BY_INTERRUPT 1 not work :(
 
 #define MAV_REQUEST 1
+#define MAVLINK_FONT_UPLOAD 1
+
+//#define USE_MAVLINK 1
+//#define USE_UAVTALK 1
+//#define USE_MWII 1
+//#define USE_LTM 1
+//#define USE_NMEA 1
+
+#define VSYNC_VECT INT2_vect
+
+
+
+// additional pins
+#define VoltagePin A2
+#define VidvoltagePin A0
+#define AmperagePin A1
+#define RssiPin A3
+#define PWMrssiPin A3           // PWM RSSI uses same pin of analog RSSI A3
+
+// #define PWM_PIN PD3 - АТМЕЛ враги, совместили выводы int0-int1 и UART2, так что прерывание только одно :(
+
+
+//********   board has hardware UART2 and I2C
+
+
+//#define RADIOLINK_TELEM_SDA RssiPin
+//#define RADIOLINK_TELEM_SCL AmperagePin
+
+//#define WALKERA_TELEM 1 // telemetry output
+//#define DevoSerial Serial1
+
+//#define SERIALDEBUG 1 // debug output
+//#define dbgSerial Serial1
+
+#define LEDPIN 27
+
+#elif HARDWARE_TYPE == 2 // ----------------------      settings for stm32 board
+
+#define MAX7456_SELECT 14      // SS PD6
+#define MAX7456_VSYNC 2        // INT0
+#define MAX7456_RESET_PIN 3    // RESET
+
+#define DATAOUT 5              // MOSI
+#define DATAIN  6              // MISO
+#define SPICLOCK  7            // sck
+
+
+
+#define FONT_UPLOAD 1
+#define USE_SETUP 1
+#define AUTOBAUD 1
+#define USE_SENSORS 1
+
+//#define PWM_IN_INTERRUPT 1
+//#define PWM_BY_INTERRUPT 1 not work :(
+
+#define MAV_REQUEST 1
 
 //#define USE_MAVLINK 1
 //#define USE_UAVTALK 1
@@ -183,7 +249,7 @@
 #define LEDPIN 27
 
 
-#endif
+#endif // HARDWARE_TYPE
 
 
 /*****************      END of configuration ******************************************************/

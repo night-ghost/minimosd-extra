@@ -734,7 +734,6 @@ namespace OSD {
             this.txtSAdd4.TabIndex = 33;
             this.txtSAdd4.Text = "0";
             this.txtSAdd4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtSAdd4.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtSAdd3
             // 
@@ -744,7 +743,6 @@ namespace OSD {
             this.txtSAdd3.TabIndex = 32;
             this.txtSAdd3.Text = "0";
             this.txtSAdd3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtSAdd3.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtSAdd2
             // 
@@ -754,7 +752,6 @@ namespace OSD {
             this.txtSAdd2.TabIndex = 31;
             this.txtSAdd2.Text = "0";
             this.txtSAdd2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtSAdd2.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // txtSAdd1
             // 
@@ -764,7 +761,6 @@ namespace OSD {
             this.txtSAdd1.TabIndex = 30;
             this.txtSAdd1.Text = "0";
             this.txtSAdd1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtSAdd1.Leave += new System.EventHandler(this.txtFactor1_TextChanged);
             // 
             // label41
             // 
