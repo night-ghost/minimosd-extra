@@ -37,9 +37,6 @@
 /* From: Id: printf_p_new.c,v 1.1.1.9 2002/10/15 20:10:28 joerg_wunsch Exp */
 /* $Id: vfprintf.c,v 1.18.2.1 2009/04/01 23:12:06 arcanum Exp $ */
 
-//#include "SingleSerial.h"
-#define HardwareSerial_h
-
 #include "BetterStream.h"
 
 #include <avr/pgmspace.h>
@@ -100,7 +97,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
         }
         vasprintf(&str, fmt2, ap);
         for (i=0; str[i]; i++) {
-                _write(str[i]);
+                write(str[i]);
         }
         free(str);
         free(fmt2);
@@ -129,8 +126,8 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         }
                         /* emit cr before lf to make most terminals happy */
                         if (c == '\n')
-                                _write('\r');
-                        _write(c);
+                                write('\r');
+                        write(c);
                 }
 
                 flags = 0;
@@ -189,7 +186,6 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         break;
                 } while ( (c = GETBYTE (in_progmem, 1, fmt)) != 0);
 
-#if !defined( SKIP_FLOAT )
                 /*
                  * Handle floating-point formats E, F, G, e, f, g.
                  */
@@ -245,21 +241,21 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                         width -= ndigs;
                                         if (!(flags & FL_LPAD)) {
                                                 do {
-                                                        _write(' ');
+                                                        write(' ');
                                                 } while (--width);
                                         }
                                 } else {
                                         width = 0;
                                 }
                                 if (sign)
-                                        _write(sign);
+                                        write(sign);
                                 p = PSTR("inf");
                                 if (vtype & FTOA_NAN)
                                         p = PSTR("nan");
                                 while ( (ndigs = pgm_read_byte((const prog_char *)p)) != 0) {
                                         if (flags & FL_FLTUPP)
                                                 ndigs += 'I' - 'i';
-                                        _write(ndigs);
+                                        write(ndigs);
                                         p++;
                                 }
                                 goto tail;
@@ -298,14 +294,14 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         /* Output before first digit    */
                         if (!(flags & (FL_LPAD | FL_ZFILL))) {
                                 while (width) {
-                                        _write(' ');
+                                        write(' ');
                                         width--;
                                 }
                         }
-                        if (sign) _write(sign);
+                        if (sign) write(sign);
                         if (!(flags & FL_LPAD)) {
                                 while (width) {
-                                        _write('0');
+                                        write('0');
                                         width--;
                                 }
                         }
@@ -315,12 +311,12 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                 n = exp > 0 ? exp : 0;          /* exponent of left digit */
                                 do {
                                         if (n == -1)
-                                                _write('.');
+                                                write('.');
                                         flags = (n <= exp && n > exp - ndigs)
                                                 ? buf[exp - n + 1] : '0';
                                         if (--n < -prec)
                                                 break;
-                                        _write(flags);
+                                        write(flags);
                                 } while (1);
                                 if (n == exp
                                     && (buf[1] > '5'
@@ -328,39 +324,39 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                         {
                                                 flags = '1';
                                         }
-                                _write(flags);
+                                write(flags);
         
                         } else {                                /* 'e(E)' format        */
 
                                 /* mantissa     */
                                 if (buf[1] != '1')
                                         vtype &= ~FTOA_CARRY;
-                                _write(buf[1]);
+                                write(buf[1]);
                                 if (prec) {
-                                        _write('.');
+                                        write('.');
                                         sign = 2;
                                         do {
-                                                _write(buf[sign++]);
+                                                write(buf[sign++]);
                                         } while (--prec);
                                 }
 
                                 /* exponent     */
-                                _write(flags & FL_FLTUPP ? 'E' : 'e');
+                                write(flags & FL_FLTUPP ? 'E' : 'e');
                                 ndigs = '+';
                                 if (exp < 0 || (exp == 0 && (vtype & FTOA_CARRY) != 0)) {
                                         exp = -exp;
                                         ndigs = '-';
                                 }
-                                _write(ndigs);
+                                write(ndigs);
                                 for (ndigs = '0'; exp >= 10; exp -= 10)
                                         ndigs += 1;
-                                _write(ndigs);
-                                _write('0' + exp);
+                                write(ndigs);
+                                write('0' + exp);
                         }
 
                         goto tail;
                 }
-#endif
+
                 /*
                  * Handle string formats c, s, S.
                  */
@@ -392,12 +388,12 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         str_lpad:
                                 if (!(flags & FL_LPAD)) {
                                         while (size < width) {
-                                                _write(' ');
+                                                write(' ');
                                                 width--;
                                         }
                                 }
                                 while (size) {
-                                        _write(GETBYTE (flags, FL_PGMSTRING, pnt));
+                                        write(GETBYTE (flags, FL_PGMSTRING, pnt));
                                         if (width) width -= 1;
                                         size -= 1;
                                 }
@@ -493,7 +489,7 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                                         }
                                 }
                                 while (len < width) {
-                                        _write(' ');
+                                        write(' ');
                                         len++;
                                 }
                         }
@@ -501,30 +497,30 @@ BetterStream::_vprintf (unsigned char in_progmem, const char *fmt, va_list ap)
                         width =  (len < width) ? width - len : 0;
 
                         if (flags & FL_ALT) {
-                                _write('0');
+                                write('0');
                                 if (flags & FL_ALTHEX)
-                                        _write(flags & FL_ALTUPP ? 'X' : 'x');
+                                        write(flags & FL_ALTUPP ? 'X' : 'x');
                         } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
                                 unsigned char z = ' ';
                                 if (flags & FL_PLUS) z = '+';
                                 if (flags & FL_NEGATIVE) z = '-';
-                                _write(z);
+                                write(z);
                         }
                 
                         while (prec > c) {
-                                _write('0');
+                                write('0');
                                 prec--;
                         }
         
                         do {
-                                _write(buf[--c]);
+                                write(buf[--c]);
                         } while (c);
                 }
         
         tail:
                 /* Tail is possible.    */
                 while (width) {
-                        _write(' ');
+                        write(' ');
                         width--;
                 }
         } /* for (;;) */

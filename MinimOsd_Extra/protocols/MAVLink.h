@@ -74,7 +74,7 @@ bool read_mavlink(){
     long mav_time = millis();
 
     // Update global packet drops counter
-    status.packet_rx_drop_count = 0;
+//    status.packet_rx_drop_count = 0;
 
 #endif
 
@@ -91,7 +91,7 @@ bool read_mavlink(){
 
 #ifdef DEBUG
     // Update global packet drops counter
-    packet_drops += status.packet_rx_drop_count;
+//    packet_drops += status.packet_rx_drop_count;
 #endif
 
     }
@@ -103,7 +103,7 @@ bool read_mavlink(){
 	if(dt>mavlink_dt) mavlink_dt = dt; // and max
     }
     
-    if(cnt>mavlink_cnt) mavlink_cnt=cnt;
+//    if(cnt>mavlink_cnt) mavlink_cnt=cnt;
 #endif
 
     return false;

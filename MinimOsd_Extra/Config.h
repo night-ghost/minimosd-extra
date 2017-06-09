@@ -12,7 +12,7 @@
 #define VERSION "2.4" 
 
 // **************************
-//#define DEBUG
+#define DEBUG
 
 
 /*
@@ -43,21 +43,17 @@
 
 #define MAVLINK_CONFIG 1
 #define MAVLINK_READ_EEPROM 1
+#define MAV_REQUEST 1
+#define MAVLINK_FONT_UPLOAD
 
 #if HARDWARE_TYPE == 0
 
 
-#define MAX7456_SELECT 6        // SS PD6
-#define MAX7456_VSYNC 2         // INT0
-#define MAX7456_RESET_PIN 10    // RESET
 
-#define DATAOUT 11              // MOSI
-#define DATAIN  12              // MISO
-#define SPICLOCK  13            // sck
 
 
 #ifndef DEBUG // don't fit
-//#define FONT_UPLOAD 1
+//#define FONT_UPLOAD 1 - don't fit :(
 #define USE_SETUP 1
 #define AUTOBAUD 1
 #define USE_SENSORS 1
@@ -66,13 +62,11 @@
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
-#define MAV_REQUEST 1
 //#define USE_MAVLINK 1
 //#define USE_UAVTALK 1
 //#define USE_MWII 1
 //#define USE_LTM 1
 //#define USE_NMEA 1
-#define MAVLINK_FONT_UPLOAD
 
 #define VSYNC_VECT INT0_vect
 
@@ -108,6 +102,17 @@
 
 //#define LEDPIN AmperagePin
 
+#define SCK_PIN   13
+#define MISO_PIN  12
+#define MOSI_PIN  11
+#define SS_PIN    10  // <------- !!! (Remember! without this pin OSD not works)
+
+
+#define MAX7456_SELECT 6        // SS PD6
+#define MAX7456_VSYNC 2         // INT0
+#define MAX7456_RESET_PIN 10    // RESET
+
+
 #elif HARDWARE_TYPE == 1 // ----------------------      settings for 644 board
 
 
@@ -138,12 +143,14 @@
 
 */
 #define MAX7456_SELECT 14      // SS PD6
-#define MAX7456_VSYNC 2        // INT0
+#define MAX7456_VSYNC 2        // INT2
 #define MAX7456_RESET_PIN 3    // RESET
 
-#define DATAOUT 5              // MOSI
-#define DATAIN  6              // MISO
-#define SPICLOCK  7            // sck
+#define SCK_PIN   7
+#define MISO_PIN  6
+#define MOSI_PIN  5
+#define SS_PIN    4  // <------- !!! (Remember! without this pin SPI don't works)
+
 
 
 
@@ -155,9 +162,6 @@
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
-#define MAV_REQUEST 1
-#define MAVLINK_FONT_UPLOAD 1
-
 //#define USE_MAVLINK 1
 //#define USE_UAVTALK 1
 //#define USE_MWII 1
@@ -167,13 +171,15 @@
 #define VSYNC_VECT INT2_vect
 
 
-
 // additional pins
 #define VoltagePin A2
 #define VidvoltagePin A0
 #define AmperagePin A1
 #define RssiPin A3
 #define PWMrssiPin A3           // PWM RSSI uses same pin of analog RSSI A3
+
+#define LEDPIN 27 // A3
+
 
 // #define PWM_PIN PD3 - АТМЕЛ враги, совместили выводы int0-int1 и UART2, так что прерывание только одно :(
 
@@ -198,9 +204,6 @@
 #define MAX7456_VSYNC 2        // INT0
 #define MAX7456_RESET_PIN 3    // RESET
 
-#define DATAOUT 5              // MOSI
-#define DATAIN  6              // MISO
-#define SPICLOCK  7            // sck
 
 
 

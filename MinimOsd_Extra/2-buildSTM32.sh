@@ -10,7 +10,7 @@ VERS=`version`
 make_one(){
     PROTO=$1
 
-    make PROTO="-DUSE_${PROTO}=1 -DHARDWARE_TYPE=1 $2 $3" MCU=atmega644p BOARD_TAG=atmega644
+    make PROTO="-DUSE_${PROTO}=1 -DHARDWARE_TYPE=2 $2 $3" MCU=STM32F103C8T6 BOARD_TAG=STM32F103
 
 }
 

@@ -42,5 +42,5 @@ byte SPI::transfer(byte value, byte period){
 
 //---------- preinstantiate SPI object --------------------------------------
 
-SPI Spi = SPI();
+extern SPI Spi;
 

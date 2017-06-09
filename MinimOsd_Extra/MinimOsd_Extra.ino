@@ -101,6 +101,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
  #include <SingleSerial.h> // MUST be first
 #elif HARDWARE_TYPE == 1
  #include <FastSerial.h> 
+ //#include <SingleSerial.h> 
 #endif
 
 
@@ -137,6 +138,7 @@ SingleSerialPort(Serial);
 #elif HARDWARE_TYPE == 1
 FastSerialPort0(Serial);
 FastSerialPort1(Serial1);
+//SingleSerialPort(Serial);
 #endif
 
 
@@ -206,6 +208,8 @@ volatile byte nested=0;
 #if defined(DEBUG)
 volatile byte nest_count=0; // only for debugging
 #endif
+
+SPI Spi = SPI();
 
 ISR(VSYNC_VECT) {
     vas_vsync=true;
@@ -298,12 +302,54 @@ ISR(INT1_vect) {
 #endif
 
 
+#define SERIAL_BUFSIZE 80
 
-/* ***************** SETUP() *******************/
+void getSerialLine(char *cp, void(cb)() ){      // получение строки
+    byte cnt=0; // строка не длиннее 256 байт
+//    unsigned long t=millis()+60000; //  макс 60 секунд ожидания - мы ж не руками в терминале а WDT выключен
+
+//    while(t>millis()){
+    while(true){
+        if(!Serial.available_S()){
+            if(cb)
+                cb();   // если есть callback то вызовем
+            continue;
+        }
+        
+        byte c=Serial.read_S();
+// uses .available      if(c==0) continue; // пусто
+
+        if(c==0x0d || (cnt && c==0x0a)){
+//          Serial.println();
+            cp[cnt]=0;
+            return;
+        }
+        if(c==0x0a) continue; // skip unneeded LF
+
+/*      if(c==0x08){   no manual editing
+            if(cnt) cnt--;
+            continue;
+        }
+*/
+        cp[cnt]=c;
+        if(cnt<SERIAL_BUFSIZE) cnt++;
+
+    }
+
+}
 
 
+uint8_t pin_to_touch;
+uint32_t last_touch;
 
-
+void touchPins(){
+    uint32_t t = millis();
+    if(t-last_touch > 500){
+        last_touch=t;
+        
+        digitalWrite(pin_to_touch, !digitalRead(pin_to_touch) );
+    }
+}
 
 
 void setup()     {
@@ -313,8 +359,11 @@ void setup()     {
     pinMode(LEDPIN,OUTPUT); // led
     LED_ON; 		    // turn on for full light
 #endif
+
     Serial.begin(TELEMETRY_SPEED);
 
+    DBG_PRINTLN("#boot");
+    
 #if defined(SERIALDEBUG)
     dbgSerial.begin(38400);
 #endif
@@ -362,17 +411,38 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
-Serial.print_P(PSTR("#1zzzzz\n"));
+Serial.print_P(PSTR("#1zzzzz\n")); 
+
+    DBG_PRINTF("time=%ld\n",millis());
 
 
     // Prepare OSD for displaying 
     extern  void unplugSlaves();
     unplugSlaves();
+
+    DBG_PRINTLN("# unplugSlaves"); DBG_PRINTF("time=%ld\n",millis());
+
+#if 1 // test pins
+
+    while(1) {
+        char buf[SERIAL_BUFSIZE];
+        
+        getSerialLine(buf, touchPins);
+        
+        pin_to_touch = atoi(buf);
+    
+    }
+#endif
+
     OSD::update();// clear memory
+    
+    DBG_PRINTLN("# update"); DBG_PRINTF("time=%ld\n",millis());
 
-    sei();
+
+    sei();                  
 
 
+    DBG_PRINTLN("# sei"); DBG_PRINTF("time=%ld\n",millis());
 
     
 #define REL_1 int(RELEASE_NUM/100)
@@ -445,8 +515,7 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 
     doScreenSwitch(); // set vars for startup screen
     
-//    Serial.print_P(PSTR("#setup done\n"));
-    
+    DBG_PRINTLN("#setup done");
 
 } // END of setup();
 
@@ -461,6 +530,10 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 void loop() 
 {
     unsigned long pt;
+
+
+//    DBG_PRINTLN("# loop");
+
 
     wdt_reset();
     sei(); // на случай если глючит
@@ -600,6 +673,7 @@ void loop()
 #ifdef WALKERA_TELEM
         walkera.sendTelemetry(); // 2 times in second
 #endif
+        LED_BLINK;
 
         lflags.blinker = !lflags.blinker;
         if(lflags.blinker) {

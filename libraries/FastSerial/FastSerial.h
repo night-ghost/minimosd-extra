@@ -1,6 +1,4 @@
 // -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: t -*-
-// 
-// optimized version of:
 //
 // Interrupt-driven serial transmit/receive library.
 //
@@ -100,14 +98,6 @@ extern class FastSerial Serial2;
 extern class FastSerial Serial3;
 //@}
 
-
-#if !defined(SERIAL_TX_BUFFER_SIZE)
-#define SERIAL_TX_BUFFER_SIZE 4
-#endif
-#if !defined(SERIAL_RX_BUFFER_SIZE)
-#define SERIAL_RX_BUFFER_SIZE 128 // 64 loses packets in 115200
-#endif
-
 /// The FastSerial class definition
 ///
 class FastSerial: public BetterStream {
@@ -128,10 +118,11 @@ public:
 	virtual void flush(void);
 	virtual size_t write(uint8_t c);
 
-        uint8_t read_S(void) { return read(); } 
+        void wait();
+        uint8_t read_S(void) { return read(); }
         uint8_t available_S(void) { return available(); }
         void write_S(uint8_t c) { write(c); }
-        
+
 	using BetterStream::write;
 	//@}
 
@@ -155,13 +146,14 @@ public:
 	///						is open, or set to ::_default_tx_buffer_size if it
 	///						is currently closed.
 	///
+	virtual void begin(long baud, unsigned int rxSpace, unsigned int txSpace);
 
 	/// Transmit/receive buffer descriptor.
 	///
 	/// Public so the interrupt handlers can see it
 	struct Buffer {
-		volatile uint8_t head, tail;	///< head and tail pointers
-		uint8_t mask;
+		volatile uint16_t head, tail;	///< head and tail pointers
+		uint16_t mask;					///< buffer size mask for pointer wrap
 		uint8_t *bytes;					///< pointer to allocated buffer
 	};
 
@@ -206,9 +198,32 @@ private:
 	// for enough space to appear
 	bool			_nonblocking_writes;
 
-        uint8_t  _rxBytes[SERIAL_RX_BUFFER_SIZE];
-        uint8_t  _txBytes[SERIAL_TX_BUFFER_SIZE];
+	/// Allocates a buffer of the given size
+	///
+	/// @param	buffer		The buffer descriptor for which the buffer will
+	///						will be allocated.
+	/// @param	size		The desired buffer size.
+	/// @returns			True if the buffer was allocated successfully.
+	///
+	static bool _allocBuffer(Buffer *buffer, unsigned int size);
 
+	/// Frees the allocated buffer in a descriptor
+	///
+	/// @param	buffer		The descriptor whose buffer should be freed.
+	///
+	static void _freeBuffer(Buffer *buffer);
+
+	/// default receive buffer size
+	static const unsigned int	_default_rx_buffer_size = 128;
+
+	/// default transmit buffer size
+	static const unsigned int	_default_tx_buffer_size = 16;
+
+	/// maxium tx/rx buffer size
+	/// @note if we could bring the max size down to 256, the mask and head/tail
+	///       pointers in the buffer could become uint8_t.
+	///
+	static const unsigned int	_max_buffer_size = 512;
 };
 
 // Used by the per-port interrupt vectors

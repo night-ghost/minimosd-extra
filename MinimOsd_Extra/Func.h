@@ -386,7 +386,7 @@ static float NOINLINE diff_coord(float &c1, float &c2){
 
 
 static float /* NOINLINE */ distance(float x, float y){
-    return sqrt(sq(x) + sq(y));
+    return sqrt(x*x + y*y);
 }
 
 static void setHomeVars()

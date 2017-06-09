@@ -89,7 +89,7 @@ class OSD: public BetterStream
   public:
 //    OSD(void);
     OSD(void){ }
-    
+
     static void init(void);
     static void hw_init(void);
     static void reset(void);

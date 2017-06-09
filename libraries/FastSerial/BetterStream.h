@@ -11,22 +11,14 @@
 #ifndef __BETTERSTREAM_H
 #define __BETTERSTREAM_H
 
-#define HardwareSerial_h
-
-
-//#define SKIP_FLOAT // printf without float
-
-#include "MyStream.h"
+#include <MyStream.h>
 #include <avr/pgmspace.h>
 
-// prog_char_t is used as a wrapper type for prog_char, which is
-// a character stored in flash. By using this wrapper type we can
-// auto-detect at compile time if a call to a string function is using
-// a flash-stored string or not
 typedef struct {
     char c;
 } prog_char_t;
 typedef char prog_char;
+
 
 class BetterStream : public MyStream {
 public:
@@ -38,12 +30,13 @@ public:
         void            println_P(const prog_char_t *);
         void            print_P(const prog_char *);
         void            println_P(const prog_char *);
+
         void            printf(const char *, ...)
                 __attribute__ ((format(__printf__, 2, 3)));
         void            _printf_P(const prog_char *, ...);
                 __attribute__ ((format(__printf__, 2, 3)));
 
-//        virtual uint8_t     txspace(void);
+        virtual uint8_t     txspace(void);
 
 #define printf_P(fmt, ...) _printf_P((const prog_char *)fmt, ## __VA_ARGS__)
 

@@ -12,16 +12,8 @@
 // Enhancements to the Arduino Stream class.
 //
 
-//#include "SingleSerial.h"
-#define HardwareSerial_h
 #include <limits.h>
 #include "BetterStream.h"
-
-
-// prog_char_t is used as a wrapper type for prog_char, which is
-// a character stored in flash. By using this wrapper type we can
-// auto-detect at compile time if a call to a string function is using
-// a flash-stored string or not
 
 // Stream extensions////////////////////////////////////////////////////////////
 
@@ -31,7 +23,7 @@ BetterStream::print_P(const prog_char_t *s)
         char    c;
 
         while ('\0' != (c = pgm_read_byte((const prog_char *)s++)))
-                _write(c);
+                write(c);
 }
 
 void
@@ -77,12 +69,9 @@ BetterStream::_printf_P(const prog_char *fmt, ...)
         va_end(ap);
 }
 
-/*
 uint8_t
 BetterStream::txspace(void)
 {
         // by default claim that there is always space in transmit buffer
         return(255);
 }
-
-*/

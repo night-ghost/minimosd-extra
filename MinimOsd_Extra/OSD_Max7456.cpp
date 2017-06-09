@@ -297,17 +297,24 @@ void OSD::update() {
     MAX_write(MAX7456_DMAL_reg, 0);
     MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
 
+uint32_t cnt=0;
+
     max7456_off(); 
     for(; b < end_b;) {
         max7456_on(); // strobing each byte with CS is necessary :(
         SPI::transfer(*b);
         *b++=' ';
         max7456_off();
+        
+        
+        cnt++;
     }
-    max7456_on();
 
+DBG_PRINTVARLN(cnt); DBG_PRINTF("time=%ld\n",millis());
+
+//    max7456_on();
 //    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
-    max7456_off();
+//    max7456_off();
 #endif
 }
 
