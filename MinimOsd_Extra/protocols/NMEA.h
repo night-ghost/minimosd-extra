@@ -54,17 +54,18 @@ uint32_t GPS_coord_to_degrees(char* s) {
     min += DIGIT_TO_VAL(*q++);
   }
   // convert fractional minutes
-  // expect up to four digits, result is in
+  // expect up to four (five) digits, result is in
   // ten-thousandths of a minute
   if (*p == '.') {
     q = p + 1;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
       frac_min *= 10;
       if (isdigit(*q))
         frac_min += *q++ - '0';
     }
   }
-  return deg * 10000000UL + (min * 1000000UL + frac_min*100UL) / 6;
+//  return deg * 10000000UL + (min * 1000000UL + frac_min*100UL) / 6; //this is wrong
+  return deg * 10000000UL + (min * 10000000UL + frac_min * 100UL) / 60;
 }
 
 // helper functions 
@@ -150,23 +151,22 @@ bool parse_NMEA_char(char c, char *string) {
         switch(param) { // words in sentence
         case 0:    //frame identification
             frame = 0;
-            if (string[0] == 'G' && string[2] == 'G' && string[3] == 'G' && string[4] == 'A') frame = FRAME_GGA;
-            if (string[0] == 'G' && string[2] == 'R' && string[3] == 'M' && string[4] == 'C') frame = FRAME_RMC;
+            if (string[0] == 'G' && string[1] == 'P' && string[2] == 'G' && string[3] == 'G' && string[4] == 'A') frame = FRAME_GGA;
+            if (string[0] == 'G' && string[1] == 'P' && string[2] == 'R' && string[3] == 'M' && string[4] == 'C') frame = FRAME_RMC;
             break;
 
 /*
- $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+ $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47 //this is wrong string because:
+ - Parameter Time have decimal dot and 2 decimal digits, not only HHMMSS
+ - Parameter Lat have 5 fractional digits, not 3
+ - Parameter Lon have 5 fractional digits, not 3
 
 где:
 
 0  GGA – NMEA Заговолок
-
 1  123519 –UTC время 12:35:19
-
 2 3  4807.038, N – Широта, 48 градусов 7.038 минуты северной широты
-
 4 5  01131.000, Е – Долгота, 11 градусов 31.000 минуты восточной долготы
-
 6   - тип решение
     0 – нет решения,
     1 – StandAlone,
@@ -179,45 +179,29 @@ bool parse_NMEA_char(char c, char *string) {
     8 – режим симуляции
 
 7  08 – количество используемых спутников
-
 8  0.9 – геометрический фактор, HDOP
-
 9 10  545.4, М – высота над уровнем моря в метрах
-
 11 12  46.9, М – высота геоида над эллипсоидом WGS 84
-
 13  [пустое поле] – время прошедшее с момента получения последней DGPS поправки. Заполняется при активизации DGPS режима
-
 14  [пустое поле] – идентификационный номер базовой станции. Заполняется при активизации DGPS режима. 
 
 
-
-
-
-
-$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A //this is wrong string because:
+ - Parameter Time have decimal dot and 2 decimal digits, not only HHMMSS
+ - Parameter Lat have 5 fractional digits, not 3
+ - Parameter Lon have 5 fractional digits, not 3
 
 где:
 
 0    RMC – NMEA заголовок
-
 1    123419 – UTC время, 12:34:59
-
 2    А – статус (А- активный, V- игнорировать)
-
 3 4    4807.038,N – Широта, 48 градусов 07.038 минут северной широты
-
 5 6    01131.000,Е – Долгота, 11 градусов 31.000 минута восточной долготы
-
 7    022.4 – Скорость, в узлах
-
 8    084.4 – Направление движения, в градусах
-
 9    230394 – Дата, 23 марта 1994 года
-
 10    003.1,W – Магнитные вариации
-
-
 
 
 store to msg.nmea.lat
@@ -249,7 +233,7 @@ store to msg.nmea.lat
             break;
 
         case 6:
-            if (frame == FRAME_GGA) {  msg.nmea.fix = (string[0] - '0');         }
+            if (frame == FRAME_GGA) {  msg.nmea.fix = (string[0] - '0');}
             if (frame == FRAME_RMC && string[0] == 'W') msg.nmea.lon = -msg.nmea.lon;
             break;
 
@@ -261,12 +245,12 @@ store to msg.nmea.lat
 
         case 8:
             if (frame == FRAME_GGA) {msg.nmea.hdop  = grab_fields(string,1);}
-            if (frame == FRAME_RMC) {msg.nmea.course = grab_fields(string, 0); }                 //ground course deg
+            if (frame == FRAME_RMC) {msg.nmea.course = grab_fields(string, 0);}   //ground course deg
             break;
 
         case 9:
             if (frame == FRAME_GGA) {msg.nmea.alt = grab_fields(string,1);}  // altitude in meters added by Mis
-            if (frame == FRAME_RMC) {msg.nmea.date = grab_fields(string,0); }
+            if (frame == FRAME_RMC) {msg.nmea.date = grab_fields(string,0);}
             break;
             
       } 
@@ -303,7 +287,7 @@ store to msg.nmea.lat
       break;
 
     default:
-        if (offset < NMEA_BUF_LENGTH) 
+        if (offset < 15) // offset reset to 0 for every param so never be longer tnen 15
             string[offset++] = c;
         
         if (!checksum_param) parity ^= c;
@@ -360,7 +344,7 @@ send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\r\n")); //  =,NNEA,57600/8/1/N
 //send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\r\n");
 //send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\r\n");
 send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\r\n"));
-//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\r\n");
+//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1D\r\n"); //fixed CS 
 
 //--- MTK --------------------------------------------------------------
 //# Select / Change the Baud Rates using the NMEA Protocol for MTK modules
@@ -395,8 +379,6 @@ send_gps_command(PSTR("$PNMRX100,0,57600,0*70\r\n"));
     lflags.data_mode=false;
     lflags.input_active=false; // reset flags - activate auto-baud
 }
-
-
 
 void heartBeat() {
 
@@ -476,8 +458,8 @@ void GPS_reset_home_position() {
   }
 }
 
-
-void GPS_calc_longitude_scaling(int32_t lat) {
+GPS_calc_longitude_scaling
+void (int32_t lat) {
   float rads       = (abs((float)lat) / 10000000.0) * 0.0174532925;
   GPS_scaleLonDown = cos(rads);
 }
@@ -494,7 +476,6 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
   *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
   if (*bearing < 0) *bearing += 36000;
 }
-
 
 
 #endif
