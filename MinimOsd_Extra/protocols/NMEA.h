@@ -54,17 +54,17 @@ uint32_t GPS_coord_to_degrees(char* s) {
     min += DIGIT_TO_VAL(*q++);
   }
   // convert fractional minutes
-  // expect up to four digits, result is in
+  // expect up to four (five) digits, result is in
   // ten-thousandths of a minute
   if (*p == '.') {
     q = p + 1;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
       frac_min *= 10;
       if (isdigit(*q))
         frac_min += *q++ - '0';
     }
   }
-  return deg * 10000000UL + (min * 1000000UL + frac_min*100UL) / 6;
+  return deg * 10000000UL + (min * 10000000UL + frac_min*100UL) / 60;
 }
 
 // helper functions 
@@ -125,7 +125,6 @@ int32_t parseTime(const char *term)
 }
 
 
-
 #define FRAME_GGA  1
 #define FRAME_RMC  2
   
@@ -160,13 +159,9 @@ bool parse_NMEA_char(char c, char *string) {
 где:
 
 0  GGA – NMEA Заговолок
-
 1  123519 –UTC время 12:35:19
-
 2 3  4807.038, N – Широта, 48 градусов 7.038 минуты северной широты
-
 4 5  01131.000, Е – Долгота, 11 градусов 31.000 минуты восточной долготы
-
 6   - тип решение
     0 – нет решения,
     1 – StandAlone,
@@ -177,22 +172,12 @@ bool parse_NMEA_char(char c, char *string) {
     6 – использование данных инерциальных систем,
     7 – ручной режим,
     8 – режим симуляции
-
 7  08 – количество используемых спутников
-
 8  0.9 – геометрический фактор, HDOP
-
 9 10  545.4, М – высота над уровнем моря в метрах
-
 11 12  46.9, М – высота геоида над эллипсоидом WGS 84
-
 13  [пустое поле] – время прошедшее с момента получения последней DGPS поправки. Заполняется при активизации DGPS режима
-
 14  [пустое поле] – идентификационный номер базовой станции. Заполняется при активизации DGPS режима. 
-
-
-
-
 
 
 $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
@@ -200,25 +185,24 @@ $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 где:
 
 0    RMC – NMEA заголовок
-
 1    123419 – UTC время, 12:34:59
-
 2    А – статус (А- активный, V- игнорировать)
-
 3 4    4807.038,N – Широта, 48 градусов 07.038 минут северной широты
-
 5 6    01131.000,Е – Долгота, 11 градусов 31.000 минута восточной долготы
-
 7    022.4 – Скорость, в узлах
-
 8    084.4 – Направление движения, в градусах
-
 9    230394 – Дата, 23 марта 1994 года
-
 10    003.1,W – Магнитные вариации
 
-
-
+          Time         Lat         N/S         Lon          E/W          Fix     #Sat    Hdop      Alt     Unit    Geoid  Unit  ...  *CS
+ ---0--|----1-------|----2------|----3------|----4-------|----5-------|----6---|---7---|---8----|--9-----|--10---|-11----|12-|13|-14--|-
+ $GPGGA, 123519     , 4807.038  , N / S     , 01131.000  , E / W      , 1      , 08    , 0.9    , 545.4  , M     , 46.9  , M ,  , *47
+ $GPGGA, 002153.000 , 3342.6618 , S / N     , 11751.3858 , W / W      , 1      , 10    , 1.2    , 27.0   , M     , -34.2 , M ,  , 0000 *5E
+ -- 0 -|--- 1 ------|--- 2 -----|--- 3 -----|--- 4 ------|--- 5 ------|--- 6 --|-- 7 --|-- 8 ---|--9-----|--10---|-11----|12-|13|-14--|-
+ $GPRMC, 123519     , A         , 4807.038  , S / N      , 01131.000  , E / W  , 022.4 , 084.4  , 230394 , 003.1 , W *6A
+ $GPRMC, 161229.487 , A         , 3723.2475 , N / S      , 12158.3416 , W / E  , 0.13  , 309.62 , 120598 ,       , *10
+ ---0--|----1-------|----2------|----3------|----4-------|----5-------|----6---|---7---|---8----|--9-----|--10---|-11----|12-|13|-14--|-
+          Time         Status      Lat         N/S          Lon          E/W     Speed   Course    Date     M.V  ...  *CS
 
 store to msg.nmea.lat
 
@@ -316,6 +300,7 @@ store to msg.nmea.lat
 
 
 void read_NMEA(){
+    char string[NMEA_BUF_LENGTH];
     while (Serial.available_S()) {
             uint8_t c = Serial.read_S();
                 
@@ -323,7 +308,7 @@ void read_NMEA(){
             bytes_comes+=1;
 #endif
             // parse data to msg
-            if (parse_NMEA_char(c, &msg.string[0])) {
+            if (parse_NMEA_char(c, &string[0])) {
                 set_data_got();
             }
     }
@@ -360,7 +345,7 @@ send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\r\n")); //  =,NNEA,57600/8/1/N
 //send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\r\n");
 //send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\r\n");
 send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\r\n"));
-//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\r\n");
+//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1D\r\n");
 
 //--- MTK --------------------------------------------------------------
 //# Select / Change the Baud Rates using the NMEA Protocol for MTK modules
@@ -397,12 +382,9 @@ send_gps_command(PSTR("$PNMRX100,0,57600,0*70\r\n"));
 }
 
 
-
 void heartBeat() {
-
     if(!lflags.input_active)
         init_gps();
-
 }
 
 #if 0 
@@ -466,6 +448,12 @@ void GPS_NewData() {
 }
 
 
+void GPS_calc_longitude_scaling(int32_t lat) {
+  float rads       = (abs((float)lat) / 10000000.0) * 0.0174532925;
+  GPS_scaleLonDown = cos(rads);
+}
+
+
 void GPS_reset_home_position() {
   if (msg.nmea.fix && msg.nmea.sats >= MINSATFIX) {
       GPS_home[LAT] = msg.nmea.lat;
@@ -474,12 +462,6 @@ void GPS_reset_home_position() {
       GPS_calc_longitude_scaling(msg.nmea.lat);  //need an initial value for distance and bearing calc
       msg.nmea.fix_HOME = 1;
   }
-}
-
-
-void GPS_calc_longitude_scaling(int32_t lat) {
-  float rads       = (abs((float)lat) / 10000000.0) * 0.0174532925;
-  GPS_scaleLonDown = cos(rads);
 }
 
 
@@ -494,7 +476,6 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
   *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
   if (*bearing < 0) *bearing += 36000;
 }
-
 
 
 #endif
