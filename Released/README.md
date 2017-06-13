@@ -6,12 +6,13 @@ Quickstart Guide (c) Johnex
 2. Run the OSD_Config.exe
 3. Connect your MinimOSD to your pc making sure you are using an FTDI that has 5V and not 3.3V.
 4. After the usb driver is installed, select your COM port in OSD_Config.
-5. Click Options -> Update Firmware. Select the latest MinimOsd_Extra_Uni.8XXDV-release.hex file from the "FW_+_Char" folder.
-6. This firmware has a built in character set uploader, so just click Options -> Update CharSet. Select the latest character set MinimOSD_2.4.1.X.mcm from the "FW_+_Char" folder. Notice that this MimimOSD-Extra has a custom character set and must be updated if coming from another fork or the original, and some newer versions might require a new version, always check the "FW_+_Char" folder.
-7. Set your video mode to Auto if you have different cam types, or select NTSC or PAL if you have just 1 cam and you know it's type or had issues with Auto.
-8. Connect your OSD directly to a monitor or to a video transmitter so you can see the OSD output, making sure you don't forget to connect the antenna to the video transmitter before powering it on if you are using that. Click Options -> Load TLog. Select 2015-09-06 18-40-55.tlog from the "FW_+_Char" folder.
-9. Set up the screens as you want. Click "Save Tab to OSD" and then click "Start" to run a simulation so you can see how everything looks without having to set up a copter. If something is not right, click "Stop", do the changes, save the config again and click "Start" again to see the new changes.
-10. If you encounter that your screen is not centered, change the "Offsets", Left and Top from the config page. You can also move panels away from the edge if your screen gets cropped.
+5. Click Options -> Update Firmware. Select the Character_Updater_FW.hex file from the "FW_+_Char" folder.
+6. This is a character set uploader, so just click Options -> Update CharSet. Select the latest character set MinimOSD_2.4.1.X.mcm from the "FW_+_Char" folder. Notice that this MimimOSD-Extra has a custom character set and must be updated if coming from another fork or the original, and some newer versions might require a new version, always check the "FW_+_Char" folder.
+7. Click Options -> Update Firmware again. Select the latest MinimOsd_Extra_Uni.9XXDV-release.hex file from the "FW_+_Char" folder.
+8. Set your video mode to Auto if you have different cam types, or select NTSC or PAL if you have just 1 cam and you know it's type or had issues with Auto.
+9. Connect your OSD directly to a monitor or to a video transmitter so you can see the OSD output, making sure you don't forget to connect the antenna to the video transmitter before powering it on if you are using that. Click Options -> Load TLog. Select 2015-09-06 18-40-55.tlog from the "FW_+_Char" folder.
+10. Set up the screens as you want. Click "Save Tab to OSD" and then click "Start" to run a simulation so you can see how everything looks without having to set up a copter. If something is not right, click "Stop", do the changes, save the config again and click "Start" again to see the new changes.
+11. If you encounter that your screen is not centered, change the "Offsets", Left and Top from the config page. You can also move panels away from the edge if your screen gets cropped.
 
 
 
@@ -80,17 +81,17 @@ Discussion forum - http://www.rcgroups.com/forums/showthread.php?t=2591835 (aban
 
 Быстрый старт
 
-
 1. Загрузите последнюю версию MinimOSD-Extra отсюда: https://github.com/night-ghost/minimosd-extra/blob/master/osd_latest.zip?raw=true
 2. Запустите OSD_Config.exe
 3. Подключите MinimOSD на ваш компьютер, убедившись, что вы используете FTDI с напряжением 5V, а не 3.3V.
 4. После установки драйвера USB, выберите COM-порт в OSD_Config.
-5. Нажмите кнопку Options -> Update Firmware. Выберите последнюю версию файла MinimOsd_Extra_Uni.8XXDV-release.hex из папки "FW_+_Char".
-6. Эта прошивка имеет встроенный загрузчик знакогенератора, так что просто нажмите кнопку Options -> Renew CharSet. Выберите последний набор символов MinimOSD_2.4.1.X.mcm из папки "FW_+_Char". Обратите внимание на то, что этот MimimOSD-Extra имеет свой набор символов, и не будет работать с символами из других версий. Поэтому знакогенератор модуля должен быть обновлен, так что всегда проверяйте папку "FW_+_Char".
-7. Установите режим видео на Auto, если у вас одновременно различные типы камер, или выбрать NTSC или PAL, если у вас есть только один камера, и вы знаете ее тип.
-8. Подключите OSD непосредственно к монитору или видео передатчик, так чтобы увидеть вывод OSD, убедившись, что вы не забыли подключить антенну к видеопередатчику перед включением его. Нажмите кнопку Options -> Load TLOG. Выберите 2015-09-06 18-40-55.tlog из папки "FW_+_Char".
-9. Настройте экраны, как вы хотите. Нажмите кнопку "Save Tab to OSD", а затем нажмите кнопку "Start", чтобы запустить моделирование. Теперь вы сможете увидеть как все выглядит на самом деле без необходимости подключать коптер/самолет. Если что-то не так, нажмите кнопку "Stop", сделайте изменения, сохраните конфигурацию и нажмите кнопку "Пуск" снова, чтобы увидеть новые изменения.
-10. Если вы обнаружите, что ваш экран не по центру, то можете изменить "Offsets", слева и сверху, на вкладке конфигурации. Можно также перемещать панели подальше от края, если ваш экран обрезан.
+5. Нажмите кнопку Options -> Update Firmware. Выберите файл Character_Updater_FW.hex из папки "FW_+_Char".
+6. Этот файл - загрузчик знакогенератора, так что теперь нажмите кнопку Options -> Renew CharSet. Выберите последний набор символов MinimOSD_2.4.1.X.mcm из папки "FW_+_Char". Обратите внимание на то, что этот MimimOSD-Extra имеет свой набор символов, и не будет работать с символами из других версий. Поэтому знакогенератор модуля должен быть обновлен, так что всегда проверяйте папку "FW_+_Char".
+7. снова нажмите кнопку Options -> Update Firmware. Выберите последнюю версию файла MinimOsd_Extra_Uni.8XXDV-release.hex из папки "FW_+_Char".
+8. Установите режим видео на Auto, если у вас одновременно различные типы камер, или выбрать NTSC или PAL, если у вас есть только один камера, и вы знаете ее тип.
+9. Подключите OSD непосредственно к монитору или видео передатчик, так чтобы увидеть вывод OSD, убедившись, что вы не забыли подключить антенну к видеопередатчику перед включением его. Нажмите кнопку Options -> Load TLOG. Выберите 2015-09-06 18-40-55.tlog из папки "FW_+_Char".
+10. Настройте экраны, как вы хотите. Нажмите кнопку "Save Tab to OSD", а затем нажмите кнопку "Start", чтобы запустить моделирование. Теперь вы сможете увидеть как все выглядит на самом деле без необходимости подключать коптер/самолет. Если что-то не так, нажмите кнопку "Stop", сделайте изменения, сохраните конфигурацию и нажмите кнопку "Пуск" снова, чтобы увидеть новые изменения.
+11. Если вы обнаружите, что ваш экран не по центру, то можете изменить "Offsets", слева и сверху, на вкладке конфигурации. Можно также перемещать панели подальше от края, если ваш экран обрезан.
 
 
 

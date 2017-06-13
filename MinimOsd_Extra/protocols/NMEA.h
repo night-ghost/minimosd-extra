@@ -54,7 +54,7 @@ uint32_t GPS_coord_to_degrees(char* s) {
     min += DIGIT_TO_VAL(*q++);
   }
   // convert fractional minutes
-  // expect up to four digits, result is in
+  // expect up to five digits, result is in
   // ten-thousandths of a minute
   if (*p == '.') {
     q = p + 1;
@@ -360,7 +360,7 @@ send_gps_command(PSTR( "$PSRF100,1,57600,8,1,0*36\r\n")); //  =,NNEA,57600/8/1/N
 //send_gps_command( "$PUBX,41,1,0003,0002,19200,0*20\r\n");
 //send_gps_command( "$PUBX,41,1,0003,0002,38400,0*25\r\n");
 send_gps_command(PSTR( "$PUBX,41,1,0003,0002,57600,0*2E\r\n"));
-//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1C\r\n");
+//send_gps_command("$PUBX,41,1,0003,0002,115200,0*1D\r\n");
 
 //--- MTK --------------------------------------------------------------
 //# Select / Change the Baud Rates using the NMEA Protocol for MTK modules

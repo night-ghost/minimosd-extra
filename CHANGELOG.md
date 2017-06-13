@@ -532,3 +532,6 @@ v934
 
 v935
 * fixed \r\n for NMEA protocol
+
+v936
+* added fix from MarcMerlin - https://github.com/night-ghost/minimosd-extra/issues/202

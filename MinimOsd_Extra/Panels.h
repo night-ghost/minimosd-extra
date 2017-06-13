@@ -2923,7 +2923,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
 //  if (!lflags.motor_armed && (((pt / 10000) % 2) == 0) && (trip_distance > 50)){
 //  if (!lflags.motor_armed && (((seconds / 10) % 2) == 0) && (trip_distance > 50)){
 //  if (!lflags.motor_armed && ( pt - landed < 10000 ) && ((int)trip_distance > 5)){ // 10 seconds after disarm
-        if ( !lflags.motor_armed && landed /* not 0! */ && time_since(&landed) < 3000 
+        if ( !lflags.motor_armed && landed /* not 0! */ /* && time_since(&landed) < 3000 MarcMerlin fix */ 
 #if !defined(DEBUG) || 1
           && ((int)trip_distance > 5) // show always in debug mode
 #endif
