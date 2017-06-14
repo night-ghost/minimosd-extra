@@ -535,3 +535,6 @@ v935
 
 v936
 * added fix from MarcMerlin - https://github.com/night-ghost/minimosd-extra/issues/202
+
+v937
+* all calculations in NMEA mode are doing in float

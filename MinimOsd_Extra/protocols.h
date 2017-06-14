@@ -54,12 +54,12 @@ union {
 #define NMEA_BUF_LENGTH 0x20
     char string[NMEA_BUF_LENGTH]; // for NMEA parsing
     struct {
-        int32_t lat;
-        int32_t lon;
-        int16_t alt;
-        uint16_t hdop;
+        float lat;
+        float lon;
+        float alt;
+        float hdop;
         int16_t course;
-        uint16_t speed;
+        float speed;
         uint8_t fix;
         uint8_t sats;
         uint32_t time;

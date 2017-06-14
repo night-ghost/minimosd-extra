@@ -29,9 +29,19 @@
 // Utilities
 //
 
-
+#if 1 
+float GPS_coord_to_degrees(char* s) {
+    float v=atof(s);
+    
+    // can't be negative
+    int16_t deg = (int16_t)(v / 100); //01131.000,Е – Долгота, 11 градусов 31.000 минута восточной долготы
+    v-=deg;
+    
+    return (deg + v/60) * 10000000.0;
+}
+#else
 #define DIGIT_TO_VAL(_x)        (_x - '0')
-uint32_t GPS_coord_to_degrees(char* s) {
+float GPS_coord_to_degrees(char* s) {
   char *p, *q;
   uint8_t deg = 0, min = 0;
   unsigned int frac_min = 0;
@@ -58,15 +68,18 @@ uint32_t GPS_coord_to_degrees(char* s) {
   // ten-thousandths of a minute
   if (*p == '.') {
     q = p + 1;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
       frac_min *= 10;
       if (isdigit(*q))
         frac_min += *q++ - '0';
     }
   }
-  return deg * 10000000UL + (min * 1000000UL + frac_min*100UL) / 6;
+  return deg * 10000000.0 + (min * 10000000.0 + frac_min*100.0) / 60.0; // to float to not loose precision
 }
 
+#endif
+
+/*
 // helper functions 
 uint16_t grab_fields(char* src, uint8_t mult) {  // convert string to uint16
   uint8_t i;
@@ -83,7 +96,7 @@ uint16_t grab_fields(char* src, uint8_t mult) {  // convert string to uint16
   }
   return tmp;
 }
-
+*/
 uint8_t hex_c(uint8_t n) {    // convert '0'..'9','A'..'F' to 0..15
   n -= '0';
   if(n>9)  n -= 7;
@@ -92,6 +105,7 @@ uint8_t hex_c(uint8_t n) {    // convert '0'..'9','A'..'F' to 0..15
 } 
 
 
+/*
 // Parse a (potentially negative) number with up to 2 decimal digits -xxxx.yy
 int32_t parseDecimal(const char *term)
 {
@@ -109,7 +123,7 @@ int32_t parseDecimal(const char *term)
   }
   return negative ? -ret : ret;
 }
-
+*/
 
 int32_t parseTime(const char *term)
 {
@@ -163,7 +177,7 @@ bool parse_NMEA_char(char c, char *string) {
 
 1  123519 –UTC время 12:35:19
 
-2 3  4807.038, N – Широта, 48 градусов 7.038 минуты северной широты
+2 3  4807.038, N – Широта, 48 градусов 07.038 минуты северной широты
 
 4 5  01131.000, Е – Долгота, 11 градусов 31.000 минуты восточной долготы
 
@@ -218,7 +232,15 @@ $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 10    003.1,W – Магнитные вариации
 
 
-
+          Time         Lat         N/S         Lon          E/W          Fix     #Sat    Hdop      Alt     Unit    Geoid  Unit  ...  *CS
+ ---0--|----1-------|----2------|----3------|----4-------|----5-------|----6---|---7---|---8----|--9-----|--10---|-11----|12-|13|-14--|-
+ $GPGGA, 123519     , 4807.038  , N / S     , 01131.000  , E / W      , 1      , 08    , 0.9    , 545.4  , M     , 46.9  , M ,  , *47
+ $GPGGA, 002153.000 , 3342.6618 , S / N     , 11751.3858 , W / W      , 1      , 10    , 1.2    , 27.0   , M     , -34.2 , M ,  , 0000 *5E
+ -- 0 -|--- 1 ------|--- 2 -----|--- 3 -----|--- 4 ------|--- 5 ------|--- 6 --|-- 7 --|-- 8 ---|--9-----|--10---|-11----|12-|13|-14--|-
+ $GPRMC, 123519     , A         , 4807.038  , S / N      , 01131.000  , E / W  , 022.4 , 084.4  , 230394 , 003.1 , W *6A
+ $GPRMC, 161229.487 , A         , 3723.2475 , N / S      , 12158.3416 , W / E  , 0.13  , 309.62 , 120598 ,       , *10
+ ---0--|----1-------|----2------|----3------|----4-------|----5-------|----6---|---7---|---8----|--9-----|--10---|-11----|12-|13|-14--|-
+          Time         Status      Lat         N/S          Lon          E/W     Speed   Course    Date     M.V  ...  *CS
 
 store to msg.nmea.lat
 
@@ -254,19 +276,19 @@ store to msg.nmea.lat
             break;
 
         case 7:
-            if (frame == FRAME_GGA) {msg.nmea.sats = grab_fields(string,0);}
-            if (frame == FRAME_RMC) {msg.nmea.speed = ((uint32_t)grab_fields(string,1)*5144L)/1000L;}  //gps speed in cm/s will be used for navigation
+            if (frame == FRAME_GGA) {msg.nmea.sats = atof(string);}
+            if (frame == FRAME_RMC) {msg.nmea.speed = atof(string);}  
             break;
             
 
         case 8:
-            if (frame == FRAME_GGA) {msg.nmea.hdop  = grab_fields(string,1);}
-            if (frame == FRAME_RMC) {msg.nmea.course = grab_fields(string, 0); }                 //ground course deg
+            if (frame == FRAME_GGA) {msg.nmea.hdop  = atof(string);}
+            if (frame == FRAME_RMC) {msg.nmea.course = atof(string); }                 //ground course deg
             break;
 
         case 9:
-            if (frame == FRAME_GGA) {msg.nmea.alt = grab_fields(string,1);}  // altitude in meters added by Mis
-            if (frame == FRAME_RMC) {msg.nmea.date = grab_fields(string,0); }
+            if (frame == FRAME_GGA) {msg.nmea.alt = atof(string);}  // altitude in meters added by Mis
+            if (frame == FRAME_RMC) {msg.nmea.date = atof(string); }
             break;
             
       } 
@@ -289,10 +311,10 @@ store to msg.nmea.lat
             // move GPS data to OSD data
             osd_pos.lat            = msg.nmea.lat;
             osd_pos.lon            = msg.nmea.lon;
-            osd_pos.alt = osd_alt_mav = msg.nmea.alt * 10;
-            eph                    = msg.nmea.hdop * 10;
+            osd_pos.alt = osd_alt_mav = msg.nmea.alt;
+            eph                    = msg.nmea.hdop * 100;
             osd_heading            = msg.nmea.course;
-            osd_groundspeed        = msg.nmea.speed;
+            osd_groundspeed        = msg.nmea.speed *5144L/100L; //gps speed in cm/s will be used for navigation
             osd_fix_type           = msg.nmea.fix;
             osd_satellites_visible = msg.nmea.sats;
             day_seconds            = msg.nmea.time;
