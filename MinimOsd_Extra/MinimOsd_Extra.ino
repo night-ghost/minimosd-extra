@@ -422,7 +422,7 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 
     DBG_PRINTLN("# unplugSlaves"); DBG_PRINTF("time=%ld\n",millis());
 
-#if 1 // test pins
+#if HARDWARE_TYPE == 1 // test pins
 
     while(1) {
         char buf[SERIAL_BUFSIZE];
