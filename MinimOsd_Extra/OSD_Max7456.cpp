@@ -1,8 +1,7 @@
+#include "compat.h"
 #include "Config.h"
 
-#ifdef SLAVE_BUILD
-    extern AP_HAL::OwnPtr<REVOMINI::SPIDevice> osd_spi;
-#else
+#ifndef SLAVE_BUILD
 
  #if HARDWARE_TYPE == 0
   #include <SingleSerial.h> // MUST be first
@@ -23,6 +22,12 @@
  static INLINE void max7456_on(){
     PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
  }
+
+#else
+namespace OSDns {
+
+ extern void max7456_off();
+ extern void max7456_on();
 
 #endif
 
@@ -75,11 +80,7 @@ void OSD::reset(){
     while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) ) {//read status register - sync to soft-only versions
         byte j=3;
 
-#ifdef SLAVE_BUILD
-        while(j--)  osd_spi->transfer(0xff); // try to sync
-#else
-        while(j--)  SPI::transfer(0xff); // try to sync
-#endif
+        while(j--)  MAX_rw(0xff); // try to sync
 
         delay_15();
     }
@@ -287,7 +288,7 @@ void OSD::update() {
 */
 #ifdef SLAVE_BUILD 
 //  internal Ardupilot build should use DMA to transfer
-    extern void update_max_buffer(const char *cp, uint16_t len);
+    extern void update_max_buffer(const uint8_t *cp, uint16_t len);
     update_max_buffer(osdbuf, sizeof(osdbuf));
 
 #else
@@ -379,4 +380,6 @@ byte  OSD::peek(void){
 void OSD::flush(void){
 }
 
-
+#ifdef SLAVE_BUILD
+} // namespace
+#endif

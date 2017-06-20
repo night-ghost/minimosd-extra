@@ -898,7 +898,7 @@ static inline void check_warn(point p)
     if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
         wmask |= (1<<6);
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
   if(is_alt(p)) {
 //8
     if(mav_fence_status == FENCE_BREACH_MINALT)
@@ -1695,7 +1695,7 @@ static void panMessage(point p){
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
 	char sign=0;
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
         if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
 #endif
 
@@ -1752,34 +1752,98 @@ static void panMessage(point p){
 // Status : done
 
 //#ifdef IS_COPTER
-const char PROGMEM s_mode00[] = "stab"; //Stabilize	0
-const char PROGMEM s_mode01[] = "acro"; //Acrobatic	1
-const char PROGMEM s_mode02[] = "alth"; //Alt Hold	2
-const char PROGMEM s_mode03[] = "auto"; //Auto		3
-const char PROGMEM s_mode04[] = "guid"; //Guided	4
-const char PROGMEM s_mode05[] = "loit"; //Loiter	5
-const char PROGMEM s_mode06[] = "rtl";  //Return to Launch 6
-const char PROGMEM s_mode07[] = "circ"; //Circle	7
-const char PROGMEM s_mode08[] = "posh"; //Position Hold (Old) 8
-const char PROGMEM s_mode09[] = "land"; //Land		9
-const char PROGMEM s_mode10[] = "oflo"; //OF_Loiter 	10
-const char PROGMEM s_mode11[] = "drif"; //Drift		11
+const char PROGMEM s_m_stab[] = "stab"; //Stabilize	0
+const char PROGMEM s_m_acro[] = "acro"; //Acrobatic	1
+const char PROGMEM s_m_alth[] = "alth"; //Alt Hold	2
+const char PROGMEM s_m_auto[] = "auto"; //Auto		3
+const char PROGMEM s_m_guid[] = "guid"; //Guided	4
+const char PROGMEM s_m_loit[] = "loit"; //Loiter	5
+const char PROGMEM s_m__rtl[] = "rtl";  //Return to Launch 6
+const char PROGMEM s_m_circ[] = "circ"; //Circle	7
+const char PROGMEM s_m_posh[] = "posh"; //Position Hold (Old) 8
+const char PROGMEM s_m_land[] = "land"; //Land		9
+const char PROGMEM s_m_oflo[] = "oflo"; //OF_Loiter 	10
+const char PROGMEM s_m_drif[] = "drif"; //Drift		11
 const char PROGMEM s_mode_n[] = "m_%d"; //              12
-const char PROGMEM s_mode13[] = "sprt"; //Sport		13
-const char PROGMEM s_mode14[] = "flip"; //Flip		14
-const char PROGMEM s_mode15[] = "tune"; //Tune		15
-const char PROGMEM s_mode16[] = "hold"; //Position Hold (Earlier called Hybrid) 16
-const char PROGMEM s_mode17[] = "brk";  //brake 17
-const char PROGMEM s_mode18[] = "thrw";  //throw 18
+const char PROGMEM s_m_sprt[] = "sprt"; //Sport		13
+const char PROGMEM s_m_flip[] = "flip"; //Flip		14
+const char PROGMEM s_m_tune[] = "tune"; //Tune		15
+const char PROGMEM s_m_hold[] = "hold"; //Position Hold (Earlier called Hybrid) 16
+const char PROGMEM s_m__brk[] = "brk";  //brake 17
+const char PROGMEM s_m_thrw[] = "thrw";  //throw 18
 
-#ifdef IS_COPTER
-char const * const mode_c_strings[] PROGMEM ={ 
-    s_mode00, s_mode01, s_mode02, s_mode03, s_mode04, 
-    s_mode05, s_mode06, s_mode07, s_mode08, s_mode09, 
-    s_mode10, s_mode11, s_mode_n, s_mode13, s_mode14,
-    s_mode15, s_mode16, s_mode17, s_mode18
-};
-#endif
+
+const char PROGMEM p_m_manu[] = "manu"; //Manual
+const char PROGMEM p_mode03[] = "trai"; //Training
+const char PROGMEM p_mode05[] = "fbwa"; //FLY_BY_WIRE_A
+const char PROGMEM p_mode06[] = "fbwb"; //FLY_BY_WIRE_B
+const char PROGMEM p_mode07[] = "cruz"; //Cruise
+const char PROGMEM p_mode08[] = "atun"; //autotune
+//const char PROGMEM p_mode10[] = "auto"; //AUTO
+//const char PROGMEM p_mode11[] = "rtl "; //Return to Launch
+//const char PROGMEM p_mode12[] = "loit"; //Loiter
+//const char PROGMEM p_mode13[] = "m_13"; 
+//const char PROGMEM p_mode14[] = "m_14"; 
+//const char PROGMEM p_mode15[] = "guid"; //GUIDED
+const char PROGMEM p_mode16[] = "init"; //initializing
+const char PROGMEM p_mode17[] = "qstb"; //quad-stabilize
+const char PROGMEM p_mode18[] = "qhov"; //quad-hover (alt-hold)
+const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
+
+
+#if defined(USE_MAVLINKPX4)
+/*
+    
+    enum PX4_CUSTOM_MAIN_MODE {
+        PX4_CUSTOM_MAIN_MODE_MANUAL = 1,
+        PX4_CUSTOM_MAIN_MODE_ALTCTL,
+        PX4_CUSTOM_MAIN_MODE_POSCTL,
+        PX4_CUSTOM_MAIN_MODE_AUTO,
+        PX4_CUSTOM_MAIN_MODE_ACRO,
+        PX4_CUSTOM_MAIN_MODE_OFFBOARD,
+        PX4_CUSTOM_MAIN_MODE_STABILIZED
+    };
+
+    enum PX4_CUSTOM_SUB_MODE_AUTO {
+        PX4_CUSTOM_SUB_MODE_AUTO_READY = 1,
+        PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,
+        PX4_CUSTOM_SUB_MODE_AUTO_LOITER,
+        PX4_CUSTOM_SUB_MODE_AUTO_MISSION,
+        PX4_CUSTOM_SUB_MODE_AUTO_RTL,
+        PX4_CUSTOM_SUB_MODE_AUTO_LAND,
+        PX4_CUSTOM_SUB_MODE_AUTO_RTGS
+    };
+
+
+*/
+
+ const char PROGMEM p_m_offb[] = "offb"; // OFFBOARD
+ const char PROGMEM p_m__rdy[] = "rdy"; 
+ const char PROGMEM p_m_tkof[] = "tkof"; // OFFBOARD
+ const char PROGMEM p_m_miss[] = "miss";
+ const char PROGMEM p_m_rtgs[] = "rtgs";
+
+ char const * const mode_c_strings[] PROGMEM ={ 
+    s_mode_n, p_m_manu, s_m_alth, s_m_posh,
+    s_m_auto, s_m_acro, p_m_offb, s_m_stab
+ };
+
+ char const * const subm_c_strings[] PROGMEM ={ 
+    p_m__rdy, p_m_tkof, s_m_loit, p_m_miss,
+    s_m__rtl, s_m_land, p_m_rtgs    
+ };
+
+#else
+
+
+ #ifdef IS_COPTER
+ char const * const mode_c_strings[] PROGMEM ={ 
+    s_m_stab, s_m_acro, s_m_alth, s_m_auto, s_m_guid, 
+    s_m_loit, s_m__rtl, s_m_circ, s_m_posh, s_m_land, 
+    s_m_oflo, s_m_drif, s_mode_n, s_m_sprt, s_m_flip,
+    s_m_tune, s_m_hold, s_m__brk, s_m_thrw
+ };
+ #endif
 
 /*
 plane modes
@@ -1798,35 +1862,16 @@ plane modes
     GUIDED        = 15,
     INITIALISING  = 16
 */
-const char PROGMEM p_mode00[] = "manu"; //Manual
-//const char PROGMEM p_mode01[] = "circ"; //CIRCLE
-//const char PROGMEM p_mode02[] = "stab"; //Stabilize
-const char PROGMEM p_mode03[] = "trai"; //Training
-//const char PROGMEM p_mode04[] = "acro"; //ACRO
-const char PROGMEM p_mode05[] = "fbwa"; //FLY_BY_WIRE_A
-const char PROGMEM p_mode06[] = "fbwb"; //FLY_BY_WIRE_B
-const char PROGMEM p_mode07[] = "cruz"; //Cruise
-const char PROGMEM p_mode08[] = "atun"; //autotune
-//const char PROGMEM p_mode10[] = "auto"; //AUTO
-//const char PROGMEM p_mode11[] = "rtl "; //Return to Launch
-//const char PROGMEM p_mode12[] = "loit"; //Loiter
-//const char PROGMEM p_mode13[] = "m_13"; 
-//const char PROGMEM p_mode14[] = "m_14"; 
-//const char PROGMEM p_mode15[] = "guid"; //GUIDED
-const char PROGMEM p_mode16[] = "init"; //initializing
-const char PROGMEM p_mode17[] = "qstb"; //quad-stabilize
-const char PROGMEM p_mode18[] = "qhov"; //quad-hover (alt-hold)
-const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
-
-#ifdef IS_PLANE
-const char * const mode_p_strings[] PROGMEM ={ 
-    p_mode00, s_mode07, s_mode00, p_mode03, s_mode01, 
+ #ifdef IS_PLANE
+ const char * const mode_p_strings[] PROGMEM ={ 
+    p_m_manu, s_m_circ, s_m_stab, p_mode03, s_m_acro, 
     p_mode05, p_mode06, p_mode07, p_mode08, s_mode_n,
-    s_mode03, s_mode06, s_mode05, s_mode_n, s_mode_n, 
-    s_mode04, p_mode16, p_mode17, p_mode18, p_mode19
-};
-
+    s_m_auto, s_m__rtl, s_m_loit, s_mode_n, s_mode_n, 
+    s_m_guid, p_mode16, p_mode17, p_mode18, p_mode19
+ };
+ #endif
 #endif
+
 
 #if defined(USE_UAVTALK)
 //const char PROGMEM u_mode00[] = "manu";    // MANUAL
@@ -1849,9 +1894,9 @@ const char PROGMEM u_mode15[] = "poi";    // POI
 const char PROGMEM u_mode17[] = "atof";    // AUTOTAKEOFF
 
 char const * const mode_u_strings[] PROGMEM ={ 
-    p_mode00, u_mode01, u_mode02, u_mode03, u_mode04, 
-    u_mode05, u_mode06, s_mode08, u_mode08, u_mode09, 
-    u_mode10, u_mode11, s_mode06, s_mode09, u_mode14,
+    p_m_manu, u_mode01, u_mode02, u_mode03, u_mode04, 
+    u_mode05, u_mode06, s_m_posh, u_mode08, u_mode09, 
+    u_mode10, u_mode11, s_m__rtl, s_m_land, u_mode14,
     u_mode15, p_mode07, u_mode17
 };
 #endif
@@ -1867,7 +1912,7 @@ const char PROGMEM aq_mode5[] = "miss";
 const char PROGMEM aq_mode8[] = "init";
 
 char const * const mode_aq_strings[] PROGMEM ={ 
-    aq_mode0, p_mode00, s_mode02, s_mode08,
+    aq_mode0, p_m_manu, s_m_alth, s_m_posh,
     s_mode_n, aq_mode5, s_mode_n, s_mode_n,
     aq_mode8, 
 };
@@ -1878,52 +1923,78 @@ const char PROGMEM mw_mode1[] = "angl";
 const char PROGMEM mw_mode2[] = "hori";
 
 char const * const mode_mw_strings[] PROGMEM ={
-    s_mode01, // acro
+    s_m_acro, // acro
     mw_mode1, 
     mw_mode2, 
-    s_mode02, // alth
-    s_mode06, // rtl
-    s_mode08, // posh
+    s_m_alth, // alth
+    s_m__rtl, // rtl
+    s_m_posh, // posh
 };
 
 
 #endif
 
 static void panFlightMode(point p){
+    uint8_t mode;
 
     //PGM_P mode_str;
     const char * const *ptr;
     byte len;
     
 #if defined(USE_UAVTALK)
+        mode = osd_mode;
 	ptr = mode_u_strings;
 	len = sizeof(mode_u_strings)/sizeof(char *);
 #endif
 
 #if defined(USE_MWII)
+        mode = osd_mode;
 	ptr = mode_mw_strings;
 	len = sizeof(mode_mw_strings)/sizeof(char *);
+#endif
+
+#if defined(USE_MAVLINKPX4)
+    typedef struct {
+            uint16_t reserved;
+            uint8_t main_mode;
+            uint8_t sub_mode;
+    } PX4_mode;
+    
+    union { 
+        PX4_mode m;
+        uint32_t u;
+    } pm = { .u=osd_mode };
+
+    len = sizeof(subm_c_strings)/sizeof(char *);
+    
+    if(pm.m.main_mode == 4 && pm.m.sub_mode < len){
+        ptr = subm_c_strings;
+    }else{
+        len = sizeof(mode_c_strings)/sizeof(char *);
+        ptr = mode_c_strings;
+    }
 #endif
 
 #if defined(USE_MAVLINK)
 
     {
-
+        mode = osd_mode;
         if(osd_autopilot == 14) { // autoquad
+            
 	    int8_t bc;
 	    for(bc=7;bc>=0;) {
-		if(osd_mode & (1<<bc) ) break;
+		if(mode & (1<<bc) ) break;
 		--bc;
 	    }
 	    if(bc<0) bc=8;
 
-	    osd_mode = bc;
+	    mode = bc;
 	    ptr = mode_aq_strings;
 	    len = sizeof(mode_aq_strings)/sizeof(char *);
-	} else {
+	} else {    
 
-#ifdef IS_COPTER
- #ifdef IS_PLANE
+ #ifdef IS_COPTER
+  #ifdef IS_PLANE
             if(sets.model_type==0) {
                 ptr = mode_p_strings;
                 len = sizeof(mode_p_strings)/sizeof(char *);
@@ -1932,27 +2003,28 @@ static void panFlightMode(point p){
                 len = sizeof(mode_c_strings)/sizeof(char *);
             }
 
- #else
+  #else
             ptr = mode_c_strings;
             len = sizeof(mode_c_strings)/sizeof(char *);
- #endif    
-#else
- #ifdef IS_PLANE
+  #endif    
+ #else
+  #ifdef IS_PLANE
             ptr = mode_p_strings;
             len = sizeof(mode_p_strings)/sizeof(char *);
- #endif    
-#endif
+  #endif    
+ #endif
         }
     }
 #endif
     
+
     PGM_P str;
-    if(osd_mode >= len) {
+    if(mode >= len) {
 	str=s_mode_n;
     } else
-	str=(PGM_P)pgm_read_word(&ptr[osd_mode]);
+	str=(PGM_P)pgm_read_word(&ptr[mode]);
 
-    osd_printi_1(str,osd_mode);
+    osd_printi_1(str,mode);
     
 
     if(lflags.motor_armed)

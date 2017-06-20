@@ -21,6 +21,7 @@ make_one(){
 
 make_one 'UAVTALK' &&
 make_one 'MAVLINK' &&
+make_one 'MAVLINKPX4' &&
 make_one 'MWII' &&
 make_one 'NMEA' &&
 make_one 'LTM' 

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK) || defined(USE_MAVLINKPX4)
 #define MAVLINK_EXTERNAL_RX_BUFFER 1
 #define m_mavlink_message 1
 
@@ -36,8 +36,11 @@
 
 
 union {
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK) 
 #define PROTOCOL "MAVLink"
+    mavlink_message_t m;
+#elif defined(USE_MAVLINKPX4)
+#define PROTOCOL "MAVLink-PX4"
     mavlink_message_t m;
 #elif defined(USE_UAVTALK)
 #define PROTOCOL "UAVTalk"
@@ -71,7 +74,7 @@ union {
 } msg;
 
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
 #define  m_mavlink_buffer (&msg.m)
 #include <GCS_MAVLink.h>
 //#include "../GCS_MAVLink/GCS_MAVLink.h"

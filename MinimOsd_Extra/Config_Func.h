@@ -56,6 +56,9 @@ byte MAX_read(byte addr){
   return SPI::transfer(0xff);
 }
 
+byte MAX_rw(byte b){
+    return SPI::transfer(b);
+}
 
 void NOINLINE delay_telem(){
         delayMicroseconds((1000000/TELEMETRY_SPEED*10)); //время приема 1 байта

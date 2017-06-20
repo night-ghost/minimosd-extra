@@ -162,12 +162,6 @@
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
-//#define USE_MAVLINK 1
-//#define USE_UAVTALK 1
-//#define USE_MWII 1
-//#define USE_LTM 1
-//#define USE_NMEA 1
-
 #define VSYNC_VECT INT2_vect
 
 
@@ -315,3 +309,6 @@
 
 typedef uint8_t byte_32;
 typedef uint8_t byte_16;
+
+#define NAMESPACE_END
+

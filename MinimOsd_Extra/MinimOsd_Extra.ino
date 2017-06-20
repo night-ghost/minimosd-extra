@@ -161,7 +161,7 @@ TimerSerial dbgSerial(0, SERIALDEBUG);
 #include "protocols/cleanflight_core.h"
 #elif defined(USE_LTM)
 #include "protocols/LTM_core.h"
-#elif defined(USE_MAVLINK)
+#elif defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
 #include "protocols/MAVLink.h"
 BetterStream *mavlink_comm_0_port;
 mavlink_system_t mavlink_system = {12,1};  // sysid, compid
@@ -339,7 +339,7 @@ void getSerialLine(char *cp, void(cb)() ){      // получение строк
 }
 
 
-uint8_t pin_to_touch;
+uint8_t pin_to_touch = 0;
 uint32_t last_touch;
 
 void touchPins(){
@@ -347,7 +347,8 @@ void touchPins(){
     if(t-last_touch > 500){
         last_touch=t;
         
-        digitalWrite(pin_to_touch, !digitalRead(pin_to_touch) );
+        if(pin_to_touch) 
+            digitalWrite(pin_to_touch, !digitalRead(pin_to_touch) );
     }
 }
 
@@ -407,7 +408,7 @@ void setup()     {
     }
 #endif
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK) || defined(USE_MAVLINKPX4)
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
@@ -429,8 +430,16 @@ Serial.print_P(PSTR("#1zzzzz\n"));
         
         getSerialLine(buf, touchPins);
         
+        if(pin_to_touch) 
+            pinMode(pin_to_touch, INPUT);
+            
         pin_to_touch = atoi(buf);
-    
+
+        if(pin_to_touch) 
+            pinMode(pin_to_touch, OUTPUT);
+
+        Serial.print_P(PSTR("pin=")); 
+        Serial.println(pin_to_touch);
     }
 #endif
 
@@ -576,7 +585,7 @@ void loop()
 
 //if((pt & 0xf8) == 0)  DBG_PRINTF("time=%ld\n",pt);
 
-#if defined(MAV_REQUEST) && defined(USE_MAVLINK)
+#if defined(MAV_REQUEST) && (defined(USE_MAVLINK) || defined(USE_MAVLINKPX4))
     if(apm_mav_system && !lflags.mav_request_done){ // we got HEARTBEAT packet and still don't send requests
         for(byte n = 3; n >0; n--){
             request_mavlink_rates();//Three times to certify it will be readed
@@ -909,5 +918,6 @@ void On20ms(){ // 50Hz
     doMSPrequests();
 #endif
 }
+
 
 

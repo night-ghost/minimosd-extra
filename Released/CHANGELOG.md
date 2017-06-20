@@ -538,3 +538,7 @@ v936
 
 v937
 * all calculations in NMEA mode are doing in float
+
+v938
+* Preliminary support for PX4 firmware
+

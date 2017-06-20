@@ -670,7 +670,7 @@ static void getData(){
 again:
     if(lflags.input_active || lflags.data_mode || lflags.blinker) {
 
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
 	read_mavlink();
 #elif defined(USE_UAVTALK)
 	extern bool uavtalk_read(void);

@@ -1,26 +1,29 @@
-#if defined(USE_MAVLINK)
+#if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
 
 #ifdef MAVLINK_CONFIG
 
 
 void mavlink_return_packet(uint8_t id, uint8_t len, uint8_t crc);
 
-struct Mav_conf { // needs to fit in 253 bytes
-    byte magick[4]; // = 0xee 'O' 'S' 'D'
-    byte cmd;		// command
-    byte id;		// number of 128-bytes block
-    byte len;		// real length
-    byte data[128];
-    byte crc; 		// may be
-};
+#pragma pack(push,1)
+typedef struct MAV_conf { // needs to fit in 253 bytes
+    uint16_t gap; // frame number
+    uint8_t magick[4]; // = 0xee 'O' 'S' 'D'
+    uint8_t cmd;		// command
+    uint8_t id;		// number of 128-bytes block
+    uint8_t len;		// real length
+    uint8_t data[128];
+    uint8_t crc; 		// may be
+} Mav_conf;
+#pragma pack(pop)
 
-void parse_osd_packet(byte *p){
-    struct Mav_conf *c = (struct Mav_conf *)p;
+void parse_osd_packet(uint8_t *p){
+    Mav_conf *c = (Mav_conf *)p;
 
     if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
 	switch(c->cmd){
 	case 'w':
-	    eeprom_write_len((byte *)&c->data, (uint16_t)(c->id) * 128,  c->len );
+	    eeprom_write_len((uint8_t *)&c->data, (uint16_t)(c->id) * 128,  c->len );
 	    lflags.was_mav_config=1;
 	    break;
 	
@@ -40,7 +43,7 @@ void parse_osd_packet(byte *p){
 	    break;
 #ifdef MAVLINK_READ_EEPROM
         case 'r':
-            eeprom_read_len((byte *)&c->data, (uint16_t)(c->id) * 128,  c->len );
+            eeprom_read_len((uint8_t *)&c->data, (uint16_t)(c->id) * 128,  c->len );
 
             mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
             break;
@@ -86,7 +89,7 @@ void mavlink_return_packet(uint8_t id, uint8_t len, uint8_t crc) {
 #if MAVLINK_CRC_EXTRA
     crc_accumulate(crc, &checksum);
 #endif
-//    serial_hex_dump((byte *)&msg.m.magic, MAVLINK_NUM_HEADER_BYTES + len);
+//    serial_hex_dump((uint8_t *)&msg.m.magic, MAVLINK_NUM_HEADER_BYTES + len);
 
     _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msg.m.magic, MAVLINK_NUM_HEADER_BYTES);
     _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msg.m.payload64, len );

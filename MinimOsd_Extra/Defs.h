@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma pack(push,1)
+
 struct Measure {
     float        converts;
     float        converth;
@@ -90,3 +92,5 @@ struct Setup_screen {
     fptr tail;	// функция отображения остального
 };
 
+
+#pragma pack(pop)

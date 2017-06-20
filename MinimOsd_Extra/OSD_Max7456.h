@@ -145,6 +145,7 @@ extern OSD osd; //OSD object
 
 extern void MAX_write(byte addr, byte data);
 extern byte MAX_read(byte addr);
+extern byte MAX_rw(byte b);
 
 
 #endif

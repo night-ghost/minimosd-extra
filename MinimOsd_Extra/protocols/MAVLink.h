@@ -9,12 +9,16 @@ extern struct loc_flags lflags;  // все булевые флаги кучей
 
 extern bool mavlink_one_byte(char c);
 
-void parse_osd_packet(byte *p);
+void parse_osd_packet(uint8_t *p);
 
+
+#pragma pack(push,1)
 typedef struct _Stream_params {
-    byte stream;
-    byte rate;
+    uint8_t stream;
+    uint8_t rate;
 } Stream_params;
+
+#pragma pack(pop)
 
 #if defined(MAV_REQUEST)
 void request_mavlink_rates()
@@ -31,8 +35,8 @@ void request_mavlink_rates()
     };
 
 
-    for (byte i=0; i < sizeof(MAVStreams)/sizeof(Stream_params); i++) {
-	byte rate = pgm_read_byte(&(MAVStreams[i].rate));
+    for (uint8_t i=0; i < sizeof(MAVStreams)/sizeof(Stream_params); i++) {
+	uint8_t rate = pgm_read_byte(&(MAVStreams[i].rate));
 	if(stream_rate){
 	    rate *= 4;
 	    rate /= stream_rate; // нормируем на скорость соединения
@@ -115,13 +119,16 @@ bool read_mavlink(){
 bool mavlink_one_byte(char c){
     uint8_t   base_mode=0;
     mavlink_status_t status;
-    byte cnt=0;
-    byte apm_mav_type;
+    uint8_t cnt=0;
+    uint8_t apm_mav_type;
 
-
+#ifdef SLAVE_BUILD
+        // full MAVlink library
+        if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg.m, &status)) {
+#else
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
-
+#endif
             set_data_got(); //lastMAVBeat = millis();
 
 //   DBG_PRINTF("\ngot id=%d\n", msg.m.msgid);
@@ -140,9 +147,9 @@ bool mavlink_one_byte(char c){
 
 		if(seq!=last_seq_n) {
 		    last_seq_n = seq;
-        	    parse_osd_packet(((byte *)&msg.m) + sizeof(uint16_t)+8 ); // direct access to message buffer - no memory for copy
+		    uint8_t *ptr = (uint8_t *)(&(msg.m.payload64[0]));
+        	    parse_osd_packet(ptr); // direct access to message buffer - no memory for copy
         	}
-
 	    // mavlink_msg_encapsulated_data_get_data
 	       
 	    }
@@ -205,7 +212,7 @@ if(apm_mav_system  != msg.m.sysid){
 
                 lflags.motor_armed = getBit(base_mode,7);
 
-                osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg.m);
+                osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg.m);
                 apm_mav_system    = msg.m.sysid; // store ID to filter out alien messages
                 // apm_mav_component = msg.m.compid;
 
@@ -526,6 +533,7 @@ typedef struct __mavlink_radio_status_t
     
                 } break;
 
+#if !defined(MODE_PX4)
             case MAVLINK_MSG_ID_VIBRATION: {
 /*
 typedef struct __mavlink_vibration_t {
@@ -556,7 +564,7 @@ typedef struct __mavlink_vibration_t {
                 pwm_out[3] = mavlink_msg_servo_output_raw_get_servo4_raw(&msg.m);
             
                 } break;
-
+#endif
             default:
                 //Do nothing
                 break;
