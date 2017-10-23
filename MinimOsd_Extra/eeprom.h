@@ -94,6 +94,7 @@ struct Panel {
     point pMotor;       // 102
     point coordLat;     // 104
     point coordLon;     // 106
+    point fADSB;        // 108
 };
 
 union _Panel {

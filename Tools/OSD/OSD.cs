@@ -181,7 +181,8 @@ namespace OSD {
         bool fListen=false;
 
         bool flag_EEPROM_read=false;
-        private bool[] mav_blocks = new bool[4096 / 128];
+        private bool[] mav_blocks = new bool[512]; // 32 for EEPROM and 512 for charset
+        bool got_osd_packet=false;
 
         string CurrentCOM;
 
@@ -899,8 +900,8 @@ namespace OSD {
         private void Sub_WriteOSD() {
             toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             this.toolStripStatusLabel1.Text = "";
-            int wr_start = 0;
-            int wr_length = 0;
+            uint16_t wr_start = 0;
+            uint16_t wr_length = 0;
             ModelType fwModelType;
 
             TabPage current = PANEL_tabs.SelectedTab;
@@ -1042,7 +1043,7 @@ namespace OSD {
             } else if (screen_number >= 0 && screen_number < npanel) {
                 //First Panel 
 
-                wr_start = screen_number * OffsetBITpanel;
+                wr_start = (uint16_t)(screen_number * OffsetBITpanel);
                 wr_length = OffsetBITpanel;
 
                 // все что мы тут делаем это задаем	ПОЛНЫЙ список всех существующих	панелей на всех экранах		
@@ -1081,7 +1082,11 @@ namespace OSD {
             if (current.Text == "Config") {
                 if(MavlinkModeMenuItem.Checked){
                     err = MavWriteEEprom(wr_start, wr_length);
-                    toolStripStatusLabel1.Text = "Done sending configuration data!";
+                    if (got_osd_packet) { // OSD confirms receiving so we can check packets
+                        toolStripStatusLabel1.Text = "OK sending configuration data!";
+                    }else {
+                        toolStripStatusLabel1.Text = "Done sending configuration data!";
+                    }
                 } else {
                     err = conf.writeEEPROM(wr_start, wr_length);
                     if (err > 0)
@@ -1272,19 +1277,37 @@ namespace OSD {
             conf.eeprom.sets.autoswitch_times = convertTimes();
             conf.eeprom.sets.timeOffset = (uint8_t)(20 + timeOffset.Value);
 
-            comBusy = true;
-            int err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
-            comBusy = false;
+            int err=0;
+            if(MavlinkModeMenuItem.Checked){
+                err = MavWriteEEprom(0, Config.EEPROM_SIZE);
+                
+                if (err < 0) {
+                    MessageBox.Show("Failed to send configuration data");
+                    return 1;
+                } else if (err == 0) {
+                    //MessageBox.Show("Done writing configuration data!");
+                    toolStripStatusLabel1.Text = "Done sending data!";
+                    start_clear_timeout();
+                    return 0;
+                }
+            } else {
+                comBusy = true;
+                err = conf.writeEEPROM(0, Config.EEPROM_SIZE);
+                comBusy = false;
+                if (err > 0) {
+                    MessageBox.Show("Failed to upload configuration data");
+                    return 1;
+                } else if (err == 0) {
+                    //MessageBox.Show("Done writing configuration data!");
+                    toolStripStatusLabel1.Text = "EEPROM write done";
+                    start_clear_timeout();
+                    return 0;
+                }
 
-            if (err > 0) {
-                MessageBox.Show("Failed to upload configuration data");
-                return 1;
-            } else if (err == 0) {
-                //MessageBox.Show("Done writing configuration data!");
-                toolStripStatusLabel1.Text = "EEPROM write done";
-                start_clear_timeout();
-                return 0;
             }
+
+
+
             return -err;
 
         }
@@ -2343,7 +2366,7 @@ again:
 
                             sp.Open();
                             sp.connectAP ();
-                            result = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+                            result = sp.uploadflash(FLASH, 0, (uint16_t)FLASH.Length, 0);
                             if (!result) {
                                 if (sp.keepalive())
                                     Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -2360,7 +2383,7 @@ again:
                                     fOK = true;
                                     toolStripStatusLabel1.Text = "Reading flash "+(j>0?" try "+ (j+1).ToString():"");
                                     Application.DoEvents();
-                                    byte[] test=sp.downloadflash((short)FLASH.Length);
+                                    byte[] test = sp.downloadflash((uint16_t)FLASH.Length);
                                     
                                     for(int k=0;k<FLASH.Length;k++){
                                         if(test[k]!=FLASH[k]){
@@ -2381,6 +2404,7 @@ again:
                     } catch (Exception ex) {
 
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        sp.Close();
                         return;
                     }
 
@@ -2519,6 +2543,7 @@ again:
                     xmlwriter.WriteElementString("comport", CMB_ComPort.Text);
 
                     xmlwriter.WriteElementString("Pal", CHK_pal.Checked.ToString());
+                    xmlwriter.WriteElementString("MAVlink", MavlinkModeMenuItem.Checked.ToString());
 
                     //xmlwriter.WriteElementString("ArduinoIDEPath", arduinoIDEPath);
 
@@ -2552,6 +2577,9 @@ again:
                                     //string temp2 = xmlreader.ReadString();
                                     //CHK_pal.Checked = (temp2 == "True");
                                     break;
+                                case "MAVlink":
+                                    MavlinkModeMenuItem.Checked = (xmlreader.ReadString().ToUpper() == "TRUE");
+                                    break;
                        //         case "ArduinoIDEPath":
                        //             arduinoIDEPath = xmlreader.ReadString();
                        //             break;
@@ -2561,6 +2589,7 @@ again:
                       ///          case "CopterSketchPath":
 //copterSketchPath = xmlreader.ReadString();
                        //             break;
+                                /*
                                 case "AutoUpdate":
                                     autoUpdate = (xmlreader.ReadString().ToUpper() == "TRUE");
                                     cbxShowUpdateDialog.Checked = !autoUpdate;
@@ -2569,6 +2598,7 @@ again:
                                     checkForUpdates = (xmlreader.ReadString().ToUpper() == "TRUE");
                                     cbxAutoUpdate.Checked = checkForUpdates;
                                     break;
+                                 */
                                 case "xml":
                                     break;
                                 default:
@@ -3191,7 +3221,7 @@ again:
                 sp.Progress += new ArduinoSTK.ProgressEventHandler(sp_Progress);
                 try {
                     for (int i = 0; i < 3; i++) { //try to upload 3 times  //try to upload n times if it fail
-                        spuploadflash_flag = sp.uploadflash(FLASH, 0, FLASH.Length, 0);
+                        spuploadflash_flag = sp.uploadflash(FLASH, 0, (uint16_t)FLASH.Length, 0);
                         if (!spuploadflash_flag) {
                             if (sp.keepalive()) Console.WriteLine("keepalive successful (iter " + i + ")");
                             else Console.WriteLine("keepalive fail (iter " + i + ")");
@@ -4077,8 +4107,9 @@ typedef struct __mavlink_radio_status_t
         private void MavlinkModeMenuItem_Click(object sender, EventArgs e) {
             //BUT_ReadOSD.Enabled = ! MavlinkModeMenuItem.Checked;
             //updateFontToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
+            //resetEepromToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
             updateFirmwareToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
-            resetEepromToolStripMenuItem.Enabled = !MavlinkModeMenuItem.Checked;
+            
         }
 
         
@@ -4255,13 +4286,14 @@ typedef struct __mavlink_radio_status_t
                                         toolStripProgressBar1.Value = (blockCount * 25) / 2;
                                     });
                                     
+                                    if(packet.cmd == 'r') { // read EEPROM
+                                        int addr = Block_Size * block;
 
-                                    int addr = Block_Size * block;
-
-                                    for(int k=0; k<Block_Size; k++){
-                                        conf.eeprom[addr + k] = packet.data[k];
+                                        for(int k=0; k<Block_Size; k++){
+                                            conf.eeprom[addr + k] = packet.data[k];
+                                        }
                                     }
-
+                                    got_osd_packet=true;
                                     mav_blocks[block] = true;
                                     Console.WriteLine("got data block " + block);
                                 } else {
@@ -4317,6 +4349,7 @@ typedef struct __mavlink_radio_status_t
                 for(int i=0; i<mav_blocks.Length; i++){
                     mav_blocks[i]=false;
                 }
+                got_osd_packet=false;
 
                 int seq = 0; // reset on each heartbeat
                 
@@ -4426,7 +4459,12 @@ typedef struct __mavlink_radio_status_t
                 sendPacket(htb);
                 sendPacket(htb);
                 sendPacket(htb);
-                
+
+                for (int i = 0; i < mav_blocks.Length; i++) {
+                    mav_blocks[i] = false;
+                }
+                got_osd_packet = false;
+
                 int seq=0; // reset on each heartbeat
                 int bytes=0;
                 const int Block_Size=128;
@@ -4460,10 +4498,47 @@ typedef struct __mavlink_radio_status_t
                     };
 
                     sendPacket(ed);
-                    sendPacket(ed);
-                    sendPacket(ed);
+                    if(!mav_blocks[n])  sendPacket(ed);
+                    if (!mav_blocks[n]) sendPacket(ed);
+                    System.Threading.Thread.Sleep(100);
+                }
+                if (got_osd_packet) { // OSD confirms receiving so we can check packets
+                    bool need_send=false;
+                    int n_try=50;
+                    do {
+                        need_send=false;
+                        for (int n = pos / Block_Size; bytes < length; n++) {
+                            int sz = Block_Size;
+                        
+                            if(bytes+sz > length)                     
+                                sz=length-bytes;
+                            if (!mav_blocks[n]) {
+                                need_send=true;
 
-                    System.Threading.Thread.Sleep(100); 
+                                packet.magick0 = (byte) 0xEE; // = 0xee 'O' 'S' 'D'
+                                packet.magick1 = (byte) 'O';
+                                packet.magick2 = (byte) 'S';
+                                packet.magick3 = (byte) 'D';
+
+                                packet.cmd = (byte) 'w';           // command
+                                packet.id = (byte) n;            // number of 128-bytes block
+                                packet.len = (byte) sz;           // real length
+            
+                                for(int k=0; k<sz; k++)
+                                    packet.data[k] = conf.eeprom[pos + bytes + k];
+
+                                
+                                MAVLink.mavlink_encapsulated_data_t ed = new MAVLink.mavlink_encapsulated_data_t(){
+                                    seqnr=(ushort)(++seq),
+                                    data = StructureToByteArray(packet)
+                                };
+
+                                sendPacket(ed);
+                            }
+
+                            bytes+=sz;
+                        }
+                    } while(need_send && n_try-- > 0);
                 }
 
                 packet.cmd = (byte)'b';         // command  "Reboot"
@@ -4482,10 +4557,10 @@ typedef struct __mavlink_radio_status_t
                     parseInputData(comPort.ReadExisting());
                     Application.DoEvents();
                 }
-                return 1;
+                return 0;
             } catch (Exception ex) {
                 MessageBox.Show("Error sending data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
-                return 0;
+                return 1;
             }
         }
 
@@ -4537,6 +4612,10 @@ typedef struct __mavlink_radio_status_t
                 comPort.Open();
 
                 parseInputData(comPort.ReadExisting());
+
+                for (int i = 0; i < mav_blocks.Length; i++) {
+                    mav_blocks[i] = false;
+                }
 
                 MAVLink.mavlink_heartbeat_t htb = new MAVLink.mavlink_heartbeat_t() {
                     type = (byte)MAVLink.MAV_TYPE.GCS,
@@ -4644,8 +4723,12 @@ typedef struct __mavlink_radio_status_t
                                 };
 
                                 sendPacket(ed);
-                                sendPacket(ed);
-                                sendPacket(ed);
+                                if (!mav_blocks[font_count]) sendPacket(ed);
+                                if (!mav_blocks[font_count]) sendPacket(ed);
+                                if (!mav_blocks[font_count]) sendPacket(ed);
+                                if (!mav_blocks[font_count]) sendPacket(ed);
+                                if (!mav_blocks[font_count]) sendPacket(ed);
+                                
 
                                 byte_count = 0;
                                 font_count++;                            
@@ -4666,14 +4749,18 @@ typedef struct __mavlink_radio_status_t
                     }
  
                     toolStripProgressBar1.Value = 100;
-                    toolStripStatusLabel1.Text = "CharSet Done";
+                    if (got_osd_packet) { // OSD confirms receiving so we can check packets
+                        toolStripStatusLabel1.Text = "CharSet Done OK";
+                    }else {
+                        toolStripStatusLabel1.Text = "CharSet Done";
+                    }
                 }
 
             } catch{} // com port
 
             conf.WriteCharsetVersion(fileVersion, false);
             lblLatestCharsetUploaded.Text = "Last charset uploaded to OSD: " + ofd.SafeFileName;
-            toolStripStatusLabel1.Text = "CharSet Done!!!";
+            
             start_clear_timeout();        
         }
 
@@ -4867,6 +4954,8 @@ typedef struct __mavlink_radio_status_t
         private void aTmega644ToolStripMenuItem_Click(object sender, EventArgs e) {
 
         }
+
+        
 
         
 

@@ -506,10 +506,10 @@ Serial.print_P(PSTR("#1zzzzz\n"));
     delay(10000); 
 */
 /*
-    eeprom_read_len((byte *)&msg,  768,  128 );
+    eeprom_read_len((byte *)&msgbuf,  768,  128 );
 
     OSD::setPanel(0,0);
-    hex_dump((byte *)&msg,0x70);
+    hex_dump((byte *)&msgbuf,0x70);
     OSD::update();
     delay(10000); 
 */

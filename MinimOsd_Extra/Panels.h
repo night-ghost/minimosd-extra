@@ -616,6 +616,9 @@ static void panEff(point p){
     if(!lflags.motor_armed) return;
 
     if(is_alt(p)){
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+
         if (osd_groundspeed != 0) { // no efficiency at 0 speed
 	    calc_energy();
 	    print_energy(p);
@@ -658,6 +661,8 @@ static void panEff(point p){
                 }
             }
         }
+
+#pragma GCC diagnostic pop
 
 #endif
     } else { // copter
@@ -2191,7 +2196,7 @@ static const PROGMEM char f_02i[]=".%02d";
 
 #if defined(USE_NMEA)
 static void panDate(point p) {
-    uint32_t date=msg.nmea.date;
+    uint32_t date=msgbuf.nmea.date;
     
     // 230394 – Дата, 23 марта 1994 года
     uint8_t day = date / 10000;
@@ -2337,7 +2342,7 @@ static void panVario(point p) {
     if(is_alt3(p)) linePosition/=2;
     if(is_alt4(p)) linePosition/=4;
     
-    linePosition = (linePosition + totalNumberOfLines) / 2; // linePosition + 
+    linePosition = (linePosition + totalNumberOfLines) / 2; // move to middle
 
     int8_t  charPosition = linePosition / 9;
     uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
@@ -2353,7 +2358,13 @@ static void panVario(point p) {
     OSD::write_xy(x, charPosition, selectedChar);
 }
 
-
+#if HARDWARE_TYPE > 0
+// features for big boards
+static void panADSB(point p) {
+// show up to 4 rows of pointers to nearest aircrafts with optional distances
+ 
+}
+#endif
 
 #if 0
 uint16_t readVCC() { // in mv
@@ -2578,7 +2589,7 @@ void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 */
-static NOINLINE void move_menu(char dir){
+static NOINLINE void move_menu(int8_t dir){
 
     const Setup_screen *pscreen;
 
@@ -2595,7 +2606,7 @@ again:
     if(!pgm_read_word((void *)&params[setup_menu].value) ) goto again; // если нет связанной переменной то еще шаг - пропускаем заголовок
 }
 
-static void /*NOINLINE*/ move_screen(char dir){
+static void /*NOINLINE*/ move_screen(int8_t dir){
 
     setup_menu=1;
 
@@ -2797,6 +2808,9 @@ as_char:
         }
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+
     if(v != c_val) { // value changed
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
 	int8_t cv=(int8_t)(v * k); // предварительно посчитаем на всякий случай
@@ -2831,13 +2845,13 @@ as_c:		*((char *)pval) = cv + add;
 
 
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
-
+#if defined(USE_SENSORS)
 no_write:
-
+#endif
         if(type & 0x80) renew();
 
     }
-
+#pragma GCC diagnostic pop
 }
 #endif
 
@@ -2907,6 +2921,9 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(pMotor),		panMotor, 	0 },
     { ID_of(fVibe),		panVibe, 	0 },
     { ID_of(fVario),		panVario, 	0 },
+#if HARDWARE_TYPE > 0
+    { ID_of(fADSB),		panADSB, 	0 },
+#endif
 // warnings should be last
     { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}

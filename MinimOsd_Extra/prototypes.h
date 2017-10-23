@@ -41,7 +41,7 @@ void setFdataVars();
 void NOINLINE gps_norm(float &dst, long f);
 bool NOINLINE timeToScreen();
 NOINLINE void logo();
-void parse_osd_packet(byte *p);
+bool parse_osd_packet(byte *p);
 void NOINLINE millis_plus(uint32_t *dst, uint16_t inc);
 void request_mavlink_rates();
 void heartBeat();

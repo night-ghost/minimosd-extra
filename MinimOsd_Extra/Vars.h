@@ -159,7 +159,7 @@ static uint8_t      osd_autopilot=0;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
 #ifdef MAVLINK_CONFIG
-static byte         mav_gcs_id=0;
+static byte         mav_gcs_id=0xff; // 255 by default
 static uint16_t     last_seq_n=0;
 #endif
 

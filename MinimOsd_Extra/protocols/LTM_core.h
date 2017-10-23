@@ -44,19 +44,17 @@ uint32_t ltmread_u32() {
 }
 */
 
-//static uint8_t msg.ltm.ok = 0;
-//static uint32_t msg.ltm.last_packet;
 
 
 static inline uint8_t ltm_read_byte(byte pos)  {
-    return msg.ltm.serialBuffer[pos];
+    return msgbuf.ltm.serialBuffer[pos];
 }
 
 
 static inline uint16_t ltm_read_uint(byte pos) {
     uint16_t t;
     
-    memcpy(&t, msg.ltm.serialBuffer+pos, sizeof(uint16_t));
+    memcpy(&t, msgbuf.ltm.serialBuffer+pos, sizeof(uint16_t));
 
     return t;
 }
@@ -64,12 +62,12 @@ static inline uint16_t ltm_read_uint(byte pos) {
 static inline  uint32_t ltm_read_ulong(byte pos) {
     uint32_t t;
     
-    memcpy(&t, &msg.ltm.serialBuffer + pos, sizeof(uint32_t));
+    memcpy(&t, &msgbuf.ltm.serialBuffer + pos, sizeof(uint32_t));
     return t;
 }
 
 static inline void ltm_read_len(void *dst, byte pos, byte sz) {
-    memcpy(dst, &msg.ltm.serialBuffer + pos, sz);
+    memcpy(dst, &msgbuf.ltm.serialBuffer + pos, sz);
 }
 
 // --------------------------------------------------------------------------------------
@@ -78,7 +76,7 @@ static void ltm_check() {
 
     set_data_got();
 
-    switch(msg.ltm.cmd) {
+    switch(msgbuf.ltm.cmd) {
     case LIGHTTELEMETRY_GFRAME:{
         gps_norm(osd_pos.lat,ltm_read_ulong(offsetof(LTM_G, lat) ) );
         gps_norm(osd_pos.lon,ltm_read_ulong(offsetof(LTM_G, lon) ) );
@@ -192,10 +190,10 @@ void read_ltm() {
 
     enum LTM_serial_state state;
 
-//    uavData.flagTelemetryOk = ((millis() - msg.ltm.last_packet) < 500) ? 1 : 0;
+//    uavData.flagTelemetryOk = ((millis() - msgbuf.ltm.last_packet) < 500) ? 1 : 0;
 
     while (Serial.available()) {
-        state=msg.ltm.state;
+        state=msgbuf.ltm.state;
         c = Serial.read();
 
 again:
@@ -232,18 +230,18 @@ again:
             default:
                 goto retry;
             }
-            msg.ltm.framelength=l;
+            msgbuf.ltm.framelength=l;
             state = HEADER_MSGTYPE;
-            msg.ltm.cmd = c;
-            msg.ltm.receiverIndex = 0;
-            msg.ltm.rcvChecksum = 0;
+            msgbuf.ltm.cmd = c;
+            msgbuf.ltm.receiverIndex = 0;
+            msgbuf.ltm.rcvChecksum = 0;
             break;
         
         case HEADER_MSGTYPE:
-            msg.ltm.rcvChecksum ^= c;
+            msgbuf.ltm.rcvChecksum ^= c;
 
-            if (msg.ltm.receiverIndex == msg.ltm.framelength - 4) { // received checksum byte
-                if (msg.ltm.rcvChecksum == 0) {
+            if (msgbuf.ltm.receiverIndex == msgbuf.ltm.framelength - 4) { // received checksum byte
+                if (msgbuf.ltm.rcvChecksum == 0) {
                     ltm_check();       // packet got OK
                     if(timeToScreen())  // если надо перерисовать экран
                         return;
@@ -253,12 +251,12 @@ retry:
             	    goto again;                                                   // wrong checksum, drop packet
             	}
             }else  {
-        	msg.ltm.serialBuffer[msg.ltm.receiverIndex++] = c;
+        	msgbuf.ltm.serialBuffer[msgbuf.ltm.receiverIndex++] = c;
     	    }
             break;
         }
     }
-    msg.ltm.state = state;
+    msgbuf.ltm.state = state;
 }
 
 

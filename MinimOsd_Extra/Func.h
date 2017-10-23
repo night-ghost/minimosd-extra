@@ -499,6 +499,9 @@ void NOINLINE calc_max(float &dst, float src){
 #define USE_FILTER 1 
 
 #if defined(USE_FILTER)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+
 void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
     if(dst==0 || k==0 || k==1) dst=val;
     else
@@ -507,6 +510,7 @@ void NOINLINE filter( float &dst, float val, const byte k){ // комплиме�
         //dst = (val-dst)*k + dst;
         dst+=(val-dst)/k;
 }
+#pragma GCC diagnostic pop
 
 void filter( float &dst, float val){ // комплиментарный фильтр 1/10
     filter(dst,val,10);
@@ -692,7 +696,7 @@ again:
 
     } else {
 
-	memset( &msg.bytes[0], 0, sizeof(msg.bytes)); // clear packet buffer to initial state
+	memset( &msgbuf.bytes[0], 0, sizeof(msgbuf.bytes)); // clear packet buffer to initial state
     
 #if defined(AUTOBAUD)
 	Serial.end();
@@ -760,7 +764,7 @@ inline uint16_t freeRam () {
 }
 #endif
 
-#if !defined(SLAVE_BUILD)
+#if !defined(SLAVE_BUILD) // if code integrated to HAL
 
 // трансляция PWM на внешний вывод если заданы источник и приемник
 #define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
@@ -857,11 +861,30 @@ void generate_PWM(bool nointerrupt) {
 
 #endif // PWM_BY_INTERRUPT
 
-#endif // SLAVE_BUILD
+void delay_150(){
+    delay(150); 
+}
+
+void delay_15(){
+    delay(15);
+}
+
+#else // SLAVE_BUILD true
 
 void delay_150(){
-    delay(150);
+    delayMicroseconds(65000); 
+    delayMicroseconds(65000); 
+    delayMicroseconds(20000); 
+    
 }
+
+void delay_15(){
+    delayMicroseconds(15000); 
+}
+
+
+#endif // SLAVE_BUILD
+
 
 static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
     osd.printf_P(fmt, f);
