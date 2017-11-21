@@ -619,8 +619,8 @@ typedef struct {
 */
 //	r_struct((uint8_t*)&MW_ATT,6);
 	osd_heading = mwii_read_uint(offsetof(MW_ATTITUDE_t, Heading) );
-	osd_att.roll = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) );
-	osd_att.pitch  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) );
+	osd_att.roll = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
+	osd_att.pitch  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
 //	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att)); // opposite direction
 DBG_PRINTF("got attitude roll=%d pitch=%d head=%d\n",osd_heading, osd_att.roll, osd_att.pitch);
 	break;

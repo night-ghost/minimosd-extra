@@ -7,10 +7,11 @@ extern struct loc_flags lflags;  // все булевые флаги кучей
 static void NOINLINE osd_setPanel(Point p){
     OSD::setPanel(p.x,p.y);
 }
-
+/*
 static void NOINLINE osd_relPanel(Point p){
     OSD::relPanel(p.x,p.y);
 }
+*/
 
 static void NOINLINE osd_nl(){
     OSD::write_S('\xff');
@@ -848,7 +849,7 @@ static void panAirSpeed(point p){
 
 /* **************************************************************** */
 
-#define WARNINGS 10
+#define WARNINGS 11
 
 uint8_t warning;
 
@@ -919,6 +920,10 @@ static inline void check_warn(point p)
   }
 #endif
 
+    if(sets.halfThrottleCurrent && osd_throttle >70 && (uint8_t)filteredCurrent < sets.halfThrottleCurrent){
+        wmask |= (1<<10);
+    }
+
     if(wmask == 0) {
         warning = 0;
     }else {
@@ -950,17 +955,17 @@ static inline void check_warn(point p)
 // Staus  : done
 
 
-const char PROGMEM w1[]="\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS fix!
-const char PROGMEM w2[]="\x20\x20\x53\x74\x61\x6c\x6c\x21";             //   Stall!
-const char PROGMEM w3[]="\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     // Over Speed!
-const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
-const char PROGMEM w5[]="\x20\x4c\x6f\x77\x20\x52\x73\x73\x69!";        // Low Rssi!
-const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
-const char PROGMEM w7[]="Batt B low!"; 
-const char PROGMEM w8[]="Fence Low!";
-const char PROGMEM w9[]="Fence High!";
-const char PROGMEM w10[]="Fence Far!";
-
+const char PROGMEM w1[]="\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78"; // No GPS fix
+const char PROGMEM w2[]="\x20\x20\x53\x74\x61\x6c\x6c";             //   Stall
+const char PROGMEM w3[]="\x4f\x76\x65\x72\x53\x70\x65\x65\x64";     // Over Speed
+const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77"; //Battery Low
+const char PROGMEM w5[]="\x20\x4c\x6f\x77\x20\x52\x73\x73\x69";        // Low Rssi!
+const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64"; //Hi VSpeed
+const char PROGMEM w7[]="Batt B low"; 
+const char PROGMEM w8[]="Fence Low";
+const char PROGMEM w9[]="Fence High";
+const char PROGMEM w10[]="Fence Far";
+const char PROGMEM w11[]="Motor dead";
 const char * const PROGMEM warn_str[] = {
     w1,
     w2,
@@ -979,8 +984,10 @@ static void panWarn(point p){
 
     check_warn(p);
 
-    if(warning) 
-       osd_print_S((char *)pgm_read_word(&warn_str[warning-1]) );
+    if(warning) {
+        osd_print_S((char *)pgm_read_word(&warn_str[warning-1]) );
+        OSD::write_S('!');
+    }
 
 }
 
@@ -1109,10 +1116,10 @@ static void panRoll(point p){
 // Staus  : done
 
 static void panCur_A(point p){
+// filtered current for warning and panel
+    filter(filteredCurrent,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
 
-    static float curr=0;
-
-    filter(curr,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    if(!is_on(p)) return;
 
     PGM_P fmt;    
 
@@ -1121,7 +1128,7 @@ static void panCur_A(point p){
     else
         fmt=f5_2f;
 
-    osd_printf_2(fmt, curr * 0.01, 0x0E); // in amps
+    osd_printf_2(fmt, filteredCurrent * 0.01, 0x0E); // in amps
 }
 
 /* **************************************************************** */
@@ -1524,9 +1531,7 @@ static void panTune(point p){
 static void panWaitMAVBeats(){
 
 #if 0 // testintg things
-
-    OSD::setPanel(3,3);
-    
+    OSD::setPanel(0,0);
 #endif
     osd_groundspeed=0; // to not move with last speed when "no data"
 
@@ -1945,6 +1950,8 @@ static void panFlightMode(point p){
     //PGM_P mode_str;
     const char * const *ptr;
     byte len;
+    PGM_P str;
+
     
 #if defined(USE_UAVTALK)
         mode = osd_mode;
@@ -1974,9 +1981,11 @@ static void panFlightMode(point p){
     
     if(pm.m.main_mode == 4 && pm.m.sub_mode < len){
         ptr = subm_c_strings;
+        mode=pm.m.sub_mode;
     }else{
         len = sizeof(mode_c_strings)/sizeof(char *);
         ptr = mode_c_strings;
+        mode = pm.m.main_mode;
     }
 #endif
 
@@ -2023,7 +2032,6 @@ static void panFlightMode(point p){
 #endif
     
 
-    PGM_P str;
     if(mode >= len) {
 	str=s_mode_n;
     } else
@@ -2893,7 +2901,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(airSpeed),		panAirSpeed, 	0x13 },
     { ID_of(throttle),		panThr, 	0x02 },
     { ID_of(FMod),		panFlightMode,	0x7f },
-    { ID_of(curr_A),		panCur_A, 	0xbd },
+    { ID_of(curr_A) | 0x80,     panCur_A, 	0xbd },
     { ID_of(Power),		panPower, 	'W'  },
     { ID_of(windSpeed),		panWindSpeed, 	0x1d },
     { ID_of(climb) | 0x80,	panClimb, 	0x15 },

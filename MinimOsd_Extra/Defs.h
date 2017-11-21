@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef SLAVE_BUILD
 #pragma pack(push,1)
+#endif
 
 struct Measure {
     float        converts;
@@ -21,6 +23,11 @@ struct Coords {
     long alt; // altitude GPS
 };
 
+#ifndef SLAVE_BUILD
+#pragma pack(pop)
+#endif
+
+#pragma pack(push,1)
 
 struct Att {
     int16_t             pitch;                  // pitch from DCM
@@ -30,7 +37,7 @@ struct Att {
 
 
 struct loc_flags {
-//    bool update_screen:1; 		// есть данные для показа
+//    bool update_screen:1; 	// есть данные для показа
     bool got_data;		// флаг получения пакета
     bool need_redraw;         // надо перерисовать экран
 

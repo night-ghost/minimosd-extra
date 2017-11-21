@@ -3,8 +3,9 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-
+#ifndef SLAVE_BUILD
 #pragma pack(push,1)
+#endif
 
 Settings sets;	// настройки из EEPROM
 
@@ -78,7 +79,7 @@ const struct Measure PROGMEM
      };
 
 
-static const struct Measure *measure; // переключаемая ссылка
+const struct Measure *measure; // переключаемая ссылка
 
 
 static uint16_t     osd_vbat_A = 0;                 // Battery A voltage in milivolt
@@ -257,7 +258,6 @@ uint32_t autoswitch_time=0;
 static uint16_t ch_raw_prev1=0;
 static uint16_t ch_raw_prev2=0;
 
-#define GPS_MUL 10000000.0f
 
 static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
@@ -269,6 +269,8 @@ static float        max_osd_climb=0;
 static float        min_osd_climb=0;
 static float        max_osd_power=0;
 
+float filteredCurrent=0;
+
 uint32_t sys_days;    // from unix epoch
 uint32_t day_seconds; // from midnight
 
@@ -278,3 +280,7 @@ uint16_t clipping[3];// < first accelerometer clipping count
 uint16_t pwm_out[4]; // output values for motors
 
 byte climb_filter=10; // 
+
+#ifndef SLAVE_BUILD
+#pragma pack(pop)
+#endif

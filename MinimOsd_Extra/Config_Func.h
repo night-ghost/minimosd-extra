@@ -41,6 +41,34 @@ void print_eeprom_string(byte n, cb_putc cb){
 
 }
 
+void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
+    *dst = millis() + inc;
+}
+
+
+void NOINLINE long_plus(uint32_t *dst, uint16_t inc) {
+    *dst +=  inc;
+}
+
+int NOINLINE long_diff(uint32_t *l1, uint32_t *l2) {
+    return (int)(l1-l2);
+}
+float NOINLINE get_converth(){
+    return pgm_read_float(&measure->converth);
+}
+
+float NOINLINE get_converts(){
+    return pgm_read_float(&measure->converts);
+}
+
+float NOINLINE f_div1000(float f){
+    return f/1000;
+}
+uint16_t NOINLINE time_since(uint32_t *t){
+    return (uint16_t)(millis() - *t); // loop time no more 1000 ms
+
+}
+
 void NOINLINE osd_print_S(PGM_P f){
     osd.print_P(f);
 }
@@ -158,3 +186,17 @@ void serial_hex_dump(byte *p, uint16_t len) {
 #else
 void serial_hex_dump(byte *p, uint16_t len) {}
 #endif
+
+void NOINLINE float_add(float &dst, float val){
+    dst+=val;
+}
+void NOINLINE calc_max(float &dst, float src){
+    if (dst < src) dst = src;
+
+}
+void NOINLINE gps_norm(float &dst, long f){
+    dst = f / GPS_MUL;
+}
+bool NOINLINE timeToScreen(){ // we should renew screen 
+    return lflags.need_redraw && !vsync_wait;
+}

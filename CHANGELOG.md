@@ -542,3 +542,5 @@ v937
 v938
 * Preliminary support for PX4 firmware
 
+v939
+* "Motor Dead" warning from Marc Merlin

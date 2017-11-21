@@ -7,8 +7,20 @@ static boolean inline is_on(point p){
     return p.y < 0x80;
 }
 
+static point inline do_on(point p, bool v){
+    if(v) p.y &=~0x80;
+    else  p.y |= 0x80;
+    return p;
+}
+
 static boolean inline has_sign(point p){
     return !(p.x & 0x80);
+}
+
+static point inline do_sign(point p, bool v){
+    if(v) p.x &= ~0x80;
+    else  p.x |=  0x80;
+    return p;
 }
 
 
@@ -32,6 +44,22 @@ static boolean inline is_alt3(point p){
 static boolean inline is_alt4(point p){
     return (p.x & 0x40);
 }
+
+static point inline do_alt2(point p){
+    p.y |= 0x20;
+    return p;
+}
+
+static point inline do_alt3(point p){
+    p.y |= 0x10;
+    return p;
+}
+
+static point inline do_alt4(point p){
+    p.x |= 0x40;
+    return p;
+}
+
 
 byte get_alt_num(point p){
     return (is_alt2(p)?1:0) | (is_alt3(p)?2:0) | (is_alt4(p)?4:0);
@@ -69,35 +97,11 @@ point NOINLINE readPanel(byte n) {
     return p;
 }
 
-void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
-    *dst = millis() + inc;
-}
-
-
-void NOINLINE long_plus(uint32_t *dst, uint16_t inc) {
-    *dst +=  inc;
-}
-
-int NOINLINE long_diff(uint32_t *l1, uint32_t *l2) {
-    return (int)(l1-l2);
-}
-
 
 static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
-float NOINLINE get_converth(){
-    return pgm_read_float(&measure->converth);
-}
-
-float NOINLINE get_converts(){
-    return pgm_read_float(&measure->converts);
-}
-
-float NOINLINE f_div1000(float f){
-    return f/1000;
-}
 
 void NOINLINE mav_message_start(byte len, byte time){
     mav_msg_ttl=seconds + time;// time to show
@@ -113,10 +117,6 @@ int NOINLINE normalize_angle(int a){
     return a;
 }
 
-uint16_t NOINLINE time_since(uint32_t *t){
-    return (uint16_t)(millis() - *t); // loop time no more 1000 ms
-
-}
 
 static void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
@@ -489,10 +489,6 @@ static void setHomeVars()
   }
 }
 
-void NOINLINE calc_max(float &dst, float src){
-    if (dst < src) dst = src;
-
-}
 
 
 
@@ -517,9 +513,6 @@ void filter( float &dst, float val){ // комплиментарный филь�
 }
 #endif
 
-void NOINLINE float_add(float &dst, float val){
-    dst+=val;
-}
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -643,11 +636,6 @@ void setFdataVars()
 
 
 
-void NOINLINE gps_norm(float &dst, long f){
-    dst = f / GPS_MUL;
-}
-
-
 void NOINLINE set_data_got() {
     lastMAVBeat = millis();
     //millis_plus(&lastMAVBeat, 0);
@@ -752,9 +740,6 @@ again:
 }
 #endif
 
-bool NOINLINE timeToScreen(){ // we should renew screen 
-    return lflags.need_redraw && !vsync_wait;
-}
 
 #if defined(DEBUG)
 inline uint16_t freeRam () {
@@ -907,11 +892,12 @@ NOINLINE void logo(){
     OSD::setPanel(2, 5);
 #ifdef SLAVE_BUILD
     osd_print_S("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
+    osd.print(millis());
 #else
     osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+    osd.print((uint16_t)millis());
 #endif
 
-    osd.print((uint16_t)millis());
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset

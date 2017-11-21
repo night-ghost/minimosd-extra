@@ -77,6 +77,8 @@ OPT +=  -fipa-pta  -fwrapv
 #-fisolate-erroneous-paths-attribute -ftree-loop-distribute-patterns -fivopts -fpredictive-commoning -fstrict-aliasing
 #-fdevirtualize-at-ltrans
 
+OPT +=  -fno-strict-aliasing
+
 OPT +=  -fverbose-asm
 
 OPT += $(PROTO)
@@ -94,7 +96,7 @@ OPT +=  -Wl,--relax
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
-CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x -fconserve-space -fno-enforce-eh-specs -fno-rtti -fvisibility-inlines-hidden
+CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x -fconserve-space -fno-enforce-eh-specs -fno-rtti -fvisibility-inlines-hidden -fno-use-cxa-atexit
 CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
 LDFLAGS = $(OPT) 
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref -fwhole-program

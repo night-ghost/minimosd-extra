@@ -132,7 +132,6 @@ OSD osd; //OSD object
 
 
 #if HARDWARE_TYPE == 0
-
 // Objects and Serial definitions
 SingleSerialPort(Serial);
 #elif HARDWARE_TYPE == 1
@@ -326,11 +325,6 @@ void getSerialLine(char *cp, void(cb)() ){      // получение строк
         }
         if(c==0x0a) continue; // skip unneeded LF
 
-/*      if(c==0x08){   no manual editing
-            if(cnt) cnt--;
-            continue;
-        }
-*/
         cp[cnt]=c;
         if(cnt<SERIAL_BUFSIZE) cnt++;
 

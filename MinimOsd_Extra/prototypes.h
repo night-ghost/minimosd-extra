@@ -1,6 +1,6 @@
 #pragma once
 
-typedef void (*cb_putc)(byte c);
+typedef void (*cb_putc)(char c);
 
 bool read_mavlink();
 
@@ -54,3 +54,5 @@ void writePanels(unsigned long pt);
 void unplugSlaves();
 void delay_15();
 void MAX_mode(byte mode);
+
+#define GPS_MUL 10000000.0f
