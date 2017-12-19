@@ -1,6 +1,6 @@
 #pragma once
 
-typedef void (*cb_putc)(char c);
+typedef void (*cb_putc)(uint8_t c);
 
 bool read_mavlink();
 
@@ -51,7 +51,6 @@ void setup_horiz();
 uint16_t uidiff(uint16_t, uint16_t);
 void writePanels(unsigned long pt);
 
-void unplugSlaves();
 void delay_15();
 void MAX_mode(byte mode);
 

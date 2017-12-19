@@ -56,15 +56,14 @@ bool parse_osd_packet(uint8_t *p){
             
 #endif
 
-
-#ifdef MAVLINK_FONT_UPLOAD
+#if HARDWARE_TYPE >0
+ #ifdef MAVLINK_FONT_UPLOAD
         case 'f': // font via MAVlink
             osd.write_NVM(*((uint16_t *)(&c->data)), (uint8_t *)(&c->data)+2); // first 2 byte is number, all another is bitmap
- #if HARDWARE_TYPE >0
             c->cmd='!'; // confirm
             mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
- #endif
             return true;
+ #endif
 #endif
 
 	default:

@@ -12,7 +12,7 @@
 #define VERSION "2.4" 
 
 // **************************
-#define DEBUG
+//#define DEBUG
 
 
 /*
@@ -22,15 +22,15 @@
 */
 
 #ifndef HARDWARE_TYPE
-#if defined(MCU_STM32F103C8) || defined(MCU_STM32F103CB)
-#define HARDWARE_TYPE 2 // for STM32
-#elif defined(MCU_atmega644p)
-#define HARDWARE_TYPE 1 // for 644
-#else
-#define HARDWARE_TYPE 0 // for 328 by default
+ #if defined(MCU_STM32F103C8) || defined(MCU_STM32F103CB)
+  #define HARDWARE_TYPE 2 // for STM32
+ #elif defined(MCU_atmega644p)
+  #define HARDWARE_TYPE 1 // for 644
+ #else
+  #define HARDWARE_TYPE 0 // for 328 by default
 #endif
 
-#warning "HARDWARE_TYPE set to " HARDWARE_TYPE
+ #warning "HARDWARE_TYPE set to " HARDWARE_TYPE
 
 #endif
 

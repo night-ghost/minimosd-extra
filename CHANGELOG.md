@@ -544,3 +544,6 @@ v938
 
 v939
 * "Motor Dead" warning from Marc Merlin
+
+v940
+* filly working binaries: fixed strange GCC bug in osd::write_S

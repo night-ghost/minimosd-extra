@@ -126,7 +126,7 @@ Coords              osd_pos = {0,0,0};			// current coordinates
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0=no GPS 1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog=0;                      // Course over ground
-static uint16_t     off_course=0;
+static int16_t      off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)

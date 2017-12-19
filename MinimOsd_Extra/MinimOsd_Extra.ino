@@ -196,6 +196,7 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 #endif
 /* **********************************************/
 
+extern void unplug_slaves();
 
 volatile byte vas_vsync=false;
 
@@ -208,7 +209,6 @@ volatile byte nested=0;
 volatile byte nest_count=0; // only for debugging
 #endif
 
-SPI Spi = SPI();
 
 ISR(VSYNC_VECT) {
     vas_vsync=true;
@@ -357,7 +357,7 @@ void setup()     {
 
     Serial.begin(TELEMETRY_SPEED);
 
-    DBG_PRINTLN("#boot");
+//    DBG_PRINTLN("#boot");
     
 #if defined(SERIALDEBUG)
     dbgSerial.begin(38400);
@@ -406,19 +406,17 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
-Serial.print_P(PSTR("#1zzzzz\n")); 
+//Serial.print_P(PSTR("#1zzzz\n"));
 
-    DBG_PRINTF("time=%ld\n",millis());
 
 
     // Prepare OSD for displaying 
-    extern  void unplugSlaves();
-    unplugSlaves();
+    unplug_slaves();   // unplug OSD
 
-    DBG_PRINTLN("# unplugSlaves"); DBG_PRINTF("time=%ld\n",millis());
 
-#if HARDWARE_TYPE == 1 // test pins
+#if 0 && HARDWARE_TYPE == 1 // test pins
 
+/*
     while(1) {
         char buf[SERIAL_BUFSIZE];
         
@@ -435,9 +433,11 @@ Serial.print_P(PSTR("#1zzzzz\n"));
         Serial.print_P(PSTR("pin=")); 
         Serial.println(pin_to_touch);
     }
+*/
 #endif
 
-    OSD::update();// clear memory
+
+    //OSD::update();// clear memory - too early! Don't call it before SPI init
     
     DBG_PRINTLN("# update"); DBG_PRINTF("time=%ld\n",millis());
 
@@ -483,9 +483,14 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 #endif
     }
 
-//Serial.print_P(PSTR("#2\n"));
 
     osd.init();    // Start display
+
+
+    OSD::update();// clear memory 
+    //memset(OSD::osdbuf,0x20,sizeof(OSD::osdbuf)); +26 bytes
+
+//Serial.print_P(PSTR("#3\n"));
 
     logo();
 

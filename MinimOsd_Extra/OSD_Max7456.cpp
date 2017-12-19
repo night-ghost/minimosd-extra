@@ -35,11 +35,12 @@ static void max7456_on();
 
 #endif
 
+void unplug_slaves() {
+    max7456_off();
+}
+
 #include "OSD_Max7456.h"
 
-void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();   // unplug OSD
-}
 
 #include "prototypes.h"
 
@@ -276,13 +277,23 @@ void OSD::relPanel(uint8_t _col, uint8_t _row){
 
 //------------------ write ---------------------------------------------------
 void NOINLINE OSD::write_raw(uint8_t c){ 
-    if(bufpos < sizeof(osdbuf) /* Check added by jussip */)
+    if(bufpos < sizeof(osdbuf) /* && c!=0xff */ ){
         osdbuf[bufpos++] = c;
+    }
 }
 
+/*
+    sometimes this compiles to
+    
+00000fc8 <_ZN3OSD7write_SEc>:
+     fc8:       e4 cf           rjmp    .-56            ; 0xf92 <_ZN3OSD9write_rawEh>
+     fca:       08 95           ret
 
-void OSD::write_S(char c){
-  if(c == 0xff){
+so all checks are moved out
+*/
+
+void OSD::write_S(uint8_t c){
+  if(c == (uint8_t)0xff){
     row++;
     calc_pos();
   } else
@@ -369,7 +380,7 @@ void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
     delay_telem(); // some delay
   }
 
-  MAX_mode( MAX7456_ENABLE_display_vert);// turn on screen next vertical sync
+  MAX_mode(MAX7456_ENABLE_display_vert);// turn on screen next vertical sync
 
   max7456_off();
 

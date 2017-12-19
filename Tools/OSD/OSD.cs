@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r935DV";
+        public const string VERSION = "r939DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -177,8 +177,6 @@ namespace OSD {
         bool curr_used = false;
         bool batt1_used = false;
         bool batt2_used = false;
-
-        bool fListen=false;
 
         bool flag_EEPROM_read=false;
         private bool[] mav_blocks = new bool[512]; // 32 for EEPROM and 512 for charset
@@ -836,8 +834,10 @@ namespace OSD {
 
             Draw(screen_number);
 
-            if(System.Diagnostics.Debugger.IsAttached)
-                btnListen.Visible =true ;
+            if(System.Diagnostics.Debugger.IsAttached) {
+                startListen();
+                //btnListen.Visible =true ;
+            }
 
         }
 
@@ -1277,6 +1277,8 @@ namespace OSD {
             conf.eeprom.sets.autoswitch_times = convertTimes();
             conf.eeprom.sets.timeOffset = (uint8_t)(20 + timeOffset.Value);
 
+            conf.eeprom.sets.halfThrottleCurrent = (byte)tHalfThrottleCurrent.Value;
+
             int err=0;
             if(MavlinkModeMenuItem.Checked){
                 err = MavWriteEEprom(0, Config.EEPROM_SIZE);
@@ -1517,6 +1519,14 @@ as_checkbox:
                 } catch {
                     MINVOLT_numeric.Value = 0;
                 }
+
+                try {
+                    tHalfThrottleCurrent.Value = conf.eeprom.sets.halfThrottleCurrent;                    
+                } catch {
+                    tHalfThrottleCurrent.Value = 0;
+                }
+
+                
 
                 pan.rssical = conf.eeprom.sets.RSSI_16_high;
                 //RSSI_numeric_max.Value = pan.rssical;
@@ -1983,6 +1993,7 @@ as_checkbox:
                         sw.WriteLine("{0}\t{1}", "fResults", chkFlightResults.Checked);
                         sw.WriteLine("{0}\t{1}", "timeOffset", timeOffset.Value);
                         sw.WriteLine("{0}\t{1}", "ref5v", chkRefrence.Checked );
+                        sw.WriteLine("{0}\t{1}", "halfThrottleCurrent", tHalfThrottleCurrent.Value );
                         
                         
                         sw.Close();
@@ -2189,7 +2200,9 @@ again:
                         else if (strings[0] == "timeOffset") timeOffset.Value = int.Parse(strings[1]);
                         else if (strings[0] == "pwm_mode") cbOutMode.SelectedIndex = int.Parse(strings[1]);
                         else if (strings[0] == "ref5v") chkRefrence.Checked = bool.Parse(strings[1]);
-                        
+                        else if (strings[0] == "halfThrottleCurrent") tHalfThrottleCurrent.Value = int.Parse(strings[1]);
+
+
                     }
 
                     //pan.model_type = (byte)cbxModelType.SelectedItem;
@@ -2338,6 +2351,7 @@ again:
                     FLASH = readIntelHEXv2(new StreamReader(ofd.FileName));
                 } catch {
                     MessageBox.Show("Bad Hex File");
+                    toolStripStatusLabel1.Text = "Failed";
                     start_clear_timeout();
                     return;
                 }
@@ -2346,6 +2360,8 @@ again:
 
                 if(FLASH.Length >= maxsize) {
                     MessageBox.Show("File too big!");
+                    toolStripStatusLabel1.Text = "Failed";
+                    start_clear_timeout();
                     return;
                 }
 
@@ -2404,12 +2420,16 @@ again:
                     } catch (Exception ex) {
 
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        toolStripStatusLabel1.Text = "Failed";
+                        start_clear_timeout();
                         sp.Close();
                         return;
                     }
 
                 } else {
                     MessageBox.Show("Failed to talk to bootloader");
+                    toolStripStatusLabel1.Text = "Failed";
+                    start_clear_timeout();
                     return;
                 }
 
@@ -2431,7 +2451,7 @@ again:
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
                     toolStripStatusLabel1.Text = "Failed";
-
+                    start_clear_timeout();
                     return;
                 }
             }
@@ -4924,8 +4944,7 @@ typedef struct __mavlink_radio_status_t
         }
 
         private void btnListen_Click(object sender, EventArgs e) {
-           fListen = true;
-            startListen();
+             startListen();
         }
 
         private void chkByTime_CheckedChanged(object sender, EventArgs e) {

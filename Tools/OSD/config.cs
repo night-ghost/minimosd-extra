@@ -97,6 +97,7 @@ namespace OSD {
 
         internal byte pwm_mode; // mode of output pin
         internal byte hw_version; // hardware type
+        internal byte halfThrottleCurrent;
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -486,7 +487,7 @@ namespace OSD {
             return fail;
         }
 
-        public int writeEEPROM(int start, int length) {
+        public int writeEEPROM(uint16_t start, uint16_t length) {
             ArduinoSTK sp = osd.OpenArduino();
             int err = 0;
 
@@ -495,7 +496,7 @@ namespace OSD {
                     bool spupload_flag = false;
 
                     for (int i = 0; i < 10; i++) { //try to upload two times if it fail
-                        spupload_flag = sp.upload(eeprom.data, (short)start, (short)length, (short)start);
+                        spupload_flag = sp.upload(eeprom.data, start, length, start);
                         if (!spupload_flag) {
                             if (sp.keepalive())
                                 Console.WriteLine("keepalive successful (iter " + i + ")");
@@ -630,7 +631,7 @@ namespace OSD {
                     bool spupload_flag = false;
                     for (int i = 0; i < 10; i++) { //try to upload two times if it fail
                         //						spupload_flag = sp.upload(tempEeprom, (short)0, (short)tempEeprom.Length, (short)CS_VERSION1_ADDR);
-                        spupload_flag = sp.upload(tempEeprom.data, (short)Settings_offset, (short)Settings_size, (short)Settings_offset);
+                        spupload_flag = sp.upload(tempEeprom.data, (uint16_t)Settings_offset, (uint16_t)Settings_size, (uint16_t)Settings_offset);
                         if (!spupload_flag) {
                             if (sp.keepalive())
                                 Console.WriteLine("keepalive successful (iter " + i + ")");

@@ -243,7 +243,7 @@ static void pan_toggle(){
 
         } else
 //*/
-            ch_on = (ch_raw > (ch_min+ch_max)/2);
+            ch_on = (ch_raw > (ch_min+ch_max)/2 + 100); // 100 to not switch in middle
 
         if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
             if (ch_on) { // in HIGH range
@@ -891,10 +891,10 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
 #ifdef SLAVE_BUILD
-    osd_print_S("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
+    osd_print_S(     "MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
     osd.print(millis());
 #else
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff\0#1zzzz\n"));
     osd.print((uint16_t)millis());
 #endif
 
