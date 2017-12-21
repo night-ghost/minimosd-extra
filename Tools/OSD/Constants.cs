@@ -67,6 +67,7 @@ namespace OSD {
         const int fMotor_XY = 102;
         const int panGPSLAT_XY = 104;
         const int panGPSLON_XY = 106;
+        const int panADSB_XY  = 108;
         
 
        

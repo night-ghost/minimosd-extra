@@ -192,6 +192,9 @@ namespace OSD {
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.label47 = new System.Windows.Forms.Label();
+            this.txtLogOffset = new System.Windows.Forms.TextBox();
+            this.label48 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -1869,13 +1872,16 @@ namespace OSD {
             // 
             // grpTLog
             // 
+            this.grpTLog.Controls.Add(this.label48);
+            this.grpTLog.Controls.Add(this.txtLogOffset);
+            this.grpTLog.Controls.Add(this.label47);
             this.grpTLog.Controls.Add(this.lblTime);
             this.grpTLog.Controls.Add(this.lblTLog);
             this.grpTLog.Controls.Add(this.btnTLog);
             this.grpTLog.Controls.Add(this.label14);
             this.grpTLog.Location = new System.Drawing.Point(478, 27);
             this.grpTLog.Name = "grpTLog";
-            this.grpTLog.Size = new System.Drawing.Size(206, 64);
+            this.grpTLog.Size = new System.Drawing.Size(206, 86);
             this.grpTLog.TabIndex = 8;
             this.grpTLog.TabStop = false;
             this.grpTLog.Text = "TLog player";
@@ -2041,6 +2047,34 @@ namespace OSD {
             this.BUT_ClearScreen.Text = "Clear Screen";
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.Location = new System.Drawing.Point(13, 56);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(47, 13);
+            this.label47.TabIndex = 19;
+            this.label47.Text = "Skip first";
+            // 
+            // txtLogOffset
+            // 
+            this.txtLogOffset.Location = new System.Drawing.Point(76, 53);
+            this.txtLogOffset.MaxLength = 4;
+            this.txtLogOffset.Name = "txtLogOffset";
+            this.txtLogOffset.Size = new System.Drawing.Size(46, 20);
+            this.txtLogOffset.TabIndex = 20;
+            this.txtLogOffset.Text = "0";
+            this.txtLogOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(125, 56);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(47, 13);
+            this.label48.TabIndex = 21;
+            this.label48.Text = "seconds";
             // 
             // OSD
             // 
@@ -2289,6 +2323,9 @@ namespace OSD {
         private System.Windows.Forms.Label label46;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.NumericUpDown tHalfThrottleCurrent;
+        private System.Windows.Forms.Label label48;
+        private System.Windows.Forms.TextBox txtLogOffset;
+        private System.Windows.Forms.Label label47;
     }
 
 }

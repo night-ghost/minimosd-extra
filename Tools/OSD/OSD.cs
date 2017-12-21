@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r939DV";
+        public const string VERSION = "r941DV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -194,6 +194,8 @@ namespace OSD {
         bool fDone=false;
         bool comBusy=false;
 
+        float logOffset;
+
         public OSD() {
 
             conf = new Config(this); // конфиг по умолчанию
@@ -334,35 +336,36 @@ namespace OSD {
                 pi[a++] = new Panel("Throttle", pan.panThr, 1, 3, panThr_XY, 1);
                 pi[a++] = new Panel("Flight Mode", pan.panFlightMode, 1, 13, panFMod_XY, 1);
 
-                pi[a++] = new Panel("Wind Speed", pan.panWindSpeed, 24, 7, panWindSpeed_XY, 1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
-                pi[a++] = new Panel("Warnings", pan.panWarn, 9, 4, panWarn_XY, -1, UI_Mode.UI_Checkbox, 1, "Enable GeoFence warning");
-                pi[a++] = new Panel("Time", pan.panTime, 23, 4, panTime_XY,-1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
-                pi[a++] = new Panel("RSSI", pan.panRSSI, 7, 13, panRSSI_XY, 1, UI_Mode.UI_Filter, 0, "Smooth value",-1,"", 0, "Show sign '%'");
-                pi[a++] = new Panel("Tune", pan.panTune, 21, 10, panTune_XY, 1);
-                pi[a++] = new Panel("Efficiency", pan.panEff, 1, 11, panEff_XY, 1, UI_Mode.UI_Checkbox,0,"Show only mAh/km");
-                pi[a++] = new Panel("Call Sign", pan.panCALLSIGN, 1, 12, panCALLSIGN_XY, -1, UI_Mode.UI_Checkbox, 0, "Do not blink");
-                pi[a++] = new Panel("Channel Raw", pan.panCh, 21, 1, panCh_XY);
-                pi[a++] = new Panel("Temperature", pan.panTemp, 1, 13, panTemp_XY);
-                pi[a++] = new Panel("Trip Distance", pan.panDistance, 22, 2, panDistance_XY, 1);
-                pi[a++] = new Panel("Radar Scale", pan.panRadarScale, 23, 9, panRadarScale_XY, 1, UI_Mode.UI_Checkbox,0,"Arrow relative to home, not north");
-                pi[a++] = new Panel("Flight Data", pan.panFData, 1, 2, panFdata_XY, -1, UI_Mode.UI_Checkbox,0,"Coordinates on top" );
-                pi[a++] = new Panel("Message", pan.panMessage, 2, 10, panMessage_XY, 1, UI_Mode.UI_Combo_Time, 0, "Time to show (s)", -1, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
-                pi[a++] = new Panel("Sensor 1", pan.panSenor1, 0, 4, panSenor1_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
-                pi[a++] = new Panel("Sensor 2", pan.panSenor2, 0, 5, panSenor2_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
-                pi[a++] = new Panel("Sensor 3", pan.panSenor3, 0, 6, panSenor3_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");
-                pi[a++] = new Panel("Sensor 4", pan.panSenor4, 0, 7, panSenor4_XY, -1, UI_Mode.UI_Checkbox, 1, "PWM input");                
-                pi[a++] = new Panel("GPS HDOP", pan.panHdop, 1, 6, panHdop_XY, 1);
-                pi[a++] = new Panel("Channel state", pan.panState, 1, 5, panState_XY, 1, UI_Mode.UI_Combo_Cb_Strings, 0, "Select channel", -1, "Extended range (800-2200)", str_id: 0, str_count: 5, strings: "Off|Low|Mid|Hi!|On!" );
-                pi[a++] = new Panel("Channel Scale", pan.panScale, 1, 5, panScale_XY, 1, UI_Mode.UI_Combo_Cb, 0, "Select channel",-1, "Extended range (800-2200)");
-                pi[a++] = new Panel("Channel Value", pan.panCvlaue, 1, 5, panCvalue_XY, 1, UI_Mode.UI_Combo, 0, "Select channel");
-                pi[a++] = new Panel("Power", pan.panPower, 1, 5, panPower_XY, 1);
-                pi[a++] = new Panel("Date", pan.panDate, 7, 1, fDate_XY, 1, UI_Mode.UI_Checkbox, 0, " Format dd.mm.yyyy");
-                pi[a++] = new Panel("Time of day", pan.panDayTime, 19, 1, dayTime_XY, 1, UI_Mode.UI_Checkbox, 0, "Blinking", 0, "Show seconds");
-                pi[a++] = new Panel("Motors", pan.panMotor, 7, 4, fMotor_XY, 1, UI_Mode.UI_Checkbox, 0, "Absolute PWM values");
-                pi[a++] = new Panel("Vibrations", pan.panVibe, 5, 5, fVibe_XY, 1, UI_Mode.UI_Checkbox, 0);
-                pi[a++] = new Panel("Variometer", pan.panVario, 22, 4, fVario_XY, 0, UI_Mode.UI_Checkbox_1, 0, "Scale at right", 0, "*10, scale 50 instead of 5", 0, "*2, scale 10/100", 0, "*4 -> 20/40/200/400", 0, 0, "", (1 << scrFlg_Vario_MS), "m/s instead of m/m");
-                pi[a++] = new Panel("GPS Coord Lat", pan.panGPS_lat, 1, 11, panGPSLAT_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
-                pi[a++] = new Panel("GPS Coord Lon", pan.panGPS_lon, 1, 12, panGPSLON_XY, 1, UI_Mode.UI_Checkbox, 0, "use less precision (5 digits)", 0, "Show only fractional");
+                pi[a++] = new Panel("Wind Speed",    pan.panWindSpeed, 24, 7,  panWindSpeed_XY,1, UI_Mode.UI_Checkbox, 0, "Show in m/s",  0, "Point to source");
+                pi[a++] = new Panel("Warnings",      pan.panWarn,       9, 4,  panWarn_XY,    -1, UI_Mode.UI_Checkbox, 1, "Enable GeoFence warning");
+                pi[a++] = new Panel("Time",          pan.panTime,      23, 4,  panTime_XY,    -1, UI_Mode.UI_Checkbox, 0,"Blinking semicolon");
+                pi[a++] = new Panel("RSSI",          pan.panRSSI,       7, 13, panRSSI_XY,     1, UI_Mode.UI_Filter, 0, "Smooth value",-1,"", 0, "Show sign '%'");
+                pi[a++] = new Panel("Tune",          pan.panTune,      21, 10, panTune_XY,     1);
+                pi[a++] = new Panel("Efficiency",    pan.panEff,        1, 11, panEff_XY,      1, UI_Mode.UI_Checkbox,0,"Show only mAh/km");
+                pi[a++] = new Panel("Call Sign",     pan.panCALLSIGN,   1, 12, panCALLSIGN_XY,-1, UI_Mode.UI_Checkbox, 0, "Do not blink");
+                pi[a++] = new Panel("Channel Raw",   pan.panCh,        21, 1,  panCh_XY);
+                pi[a++] = new Panel("Temperature",   pan.panTemp,       1, 13, panTemp_XY);
+                pi[a++] = new Panel("Trip Distance", pan.panDistance,  22, 2,  panDistance_XY, 1);
+                pi[a++] = new Panel("Radar Scale",   pan.panRadarScale,23, 9,  panRadarScale_XY, 1, UI_Mode.UI_Checkbox,0,"Arrow relative to home, not north");
+                pi[a++] = new Panel("Flight Data",   pan.panFData,      1, 2,  panFdata_XY,   -1, UI_Mode.UI_Checkbox,0,"Coordinates on top" );
+                pi[a++] = new Panel("Message",       pan.panMessage,    2, 10, panMessage_XY,  1, UI_Mode.UI_Combo_Time, 0, "Time to show (s)", -1, "Not scroll if not fit" /*,0,"Not show screen number"*/ );
+                pi[a++] = new Panel("Sensor 1",      pan.panSenor1,     0, 4,  panSenor1_XY,  -1, UI_Mode.UI_Checkbox, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 2",      pan.panSenor2,     0, 5,  panSenor2_XY,  -1, UI_Mode.UI_Checkbox, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 3",      pan.panSenor3,     0, 6,  panSenor3_XY,  -1, UI_Mode.UI_Checkbox, 1, "PWM input");
+                pi[a++] = new Panel("Sensor 4",      pan.panSenor4,     0, 7,  panSenor4_XY,  -1, UI_Mode.UI_Checkbox, 1, "PWM input");                
+                pi[a++] = new Panel("GPS HDOP",      pan.panHdop,       1, 6,  panHdop_XY,     1);
+                pi[a++] = new Panel("Channel state", pan.panState,      1, 5,  panState_XY,    1, UI_Mode.UI_Combo_Cb_Strings, 0, "Select channel", -1, "Extended range (800-2200)", str_id: 0, str_count: 5, strings: "Off|Low|Mid|Hi!|On!" );
+                pi[a++] = new Panel("Channel Scale", pan.panScale,      1, 5,  panScale_XY,    1, UI_Mode.UI_Combo_Cb,         0, "Select channel",-1, "Extended range (800-2200)");
+                pi[a++] = new Panel("Channel Value", pan.panCvlaue,     1, 5,  panCvalue_XY,   1, UI_Mode.UI_Combo,            0, "Select channel");
+                pi[a++] = new Panel("Power",         pan.panPower,      1, 5,  panPower_XY,    1);
+                pi[a++] = new Panel("Date",          pan.panDate,       7, 1,  fDate_XY,       1, UI_Mode.UI_Checkbox,         0, " Format dd.mm.yyyy");
+                pi[a++] = new Panel("Time of day",   pan.panDayTime,   19, 1,  dayTime_XY,     1, UI_Mode.UI_Checkbox,         0, "Blinking", 0, "Show seconds");
+                pi[a++] = new Panel("Motors",        pan.panMotor,      7, 4,  fMotor_XY,      1, UI_Mode.UI_Checkbox,         0, "Absolute PWM values");
+                pi[a++] = new Panel("Vibrations",    pan.panVibe,       5, 5,  fVibe_XY,       1, UI_Mode.UI_Checkbox,         0);
+                pi[a++] = new Panel("Variometer",    pan.panVario,     22, 4,  fVario_XY,      0, UI_Mode.UI_Checkbox_1,       0, "Scale at right", 0, "*10, scale 50 instead of 5", 0, "*2, scale 10/100", 0, "*4 -> 20/40/200/400", 0, 0, "", (1 << scrFlg_Vario_MS), "m/s instead of m/m");
+                pi[a++] = new Panel("GPS Coord Lat", pan.panGPS_lat,    1, 11, panGPSLAT_XY,   1, UI_Mode.UI_Checkbox,         0, "use less precision (5 digits)", 0, "Show only fractional");
+                pi[a++] = new Panel("GPS Coord Lon", pan.panGPS_lon,    1, 12, panGPSLON_XY,   1, UI_Mode.UI_Checkbox,         0, "use less precision (5 digits)", 0, "Show only fractional");
+                pi[a++] = new Panel("ADSB",          pan.panADSB,       1, 11, panADSB_XY,     1, UI_Mode.UI_Checkbox,         0);
 
                
                 osd_functions_N = a;
@@ -436,6 +439,8 @@ namespace OSD {
                                 tn.Checked = false;
                             } else if (thing.name == "GPS Coord Lon") {
                                 tn.Checked = false;
+                            } else if (thing.name == "ADSB") {
+                                tn.Checked = false;                            
                             } else {
                                 tn.Checked = true;
                             }
@@ -619,6 +624,7 @@ namespace OSD {
                 print_row = 0;
                 return;
             }
+            if(ch==0x20) ch='\0';
             write_raw(ch);
         }
 
@@ -3711,7 +3717,8 @@ again:
 
 
         private void btnTLog_Click(object sender, EventArgs e) {
-            
+            logOffset = myConvert(txtLogOffset.Text);
+            txtLogOffset.Text = logOffset.ToString();
 
             if (!tlog_run) {
                 CurrentCOM = CMB_ComPort.Text;
@@ -3912,7 +3919,7 @@ again:
             int[] last_seq = new int[256];
             string message;
             MAVLink mv=new MAVLink();
-
+            
 
             status.packet_rx_drop_count = 0;
             status.parse_state = mavlink_parse_state_t.MAVLINK_PARSE_STATE_IDLE;
@@ -3949,6 +3956,7 @@ again:
                 DateTime localtime = DateTime.Now;
                 DateTime tlog_start_time = DateTime.Now;
                 UInt64 stamp = (UInt64)(millis() * 1000);
+                bool playOn = false;
 
                 int byteIndex;
                 try {
@@ -3982,36 +3990,41 @@ again:
                             frameIndex++;
                             frEnd = byteIndex;
 
-                            while(comPort.BytesToWrite!=0) // подождем передачи пакета
-                                System.Threading.Thread.Sleep(1); 
-
-                            byte[] packet=new byte[256];
-
-                            for(int i=0, j=frStart; i<256 && j<frEnd +1; i++, j++){
-                                packet[i]=bytes[j];
+                            if (!playOn && (time - start_time) / 1000000 >= logOffset) {
+                                playOn =true;
+                                tlog_start_time = DateTime.Now;
                             }
+                            if (playOn) {
+                                while(comPort.BytesToWrite!=0) // подождем передачи пакета
+                                    System.Threading.Thread.Sleep(1); 
 
-                            //0 - STX
-                            // 1 - len
-                            // 2 - seq
-                            // 3 - sysid
-                            // 4 - compid
-                            // 5 - msgid
-                            //
-                            comPort.Write(bytes, frStart, frEnd - frStart + 1);
+                                byte[] packet=new byte[256];
 
-                            if(packet[5]==  168 ) { // MAVLINK_MSG_ID_WIND
-                                //Console.WriteLine ("wind !");
-                                byte bb=packet[6];// float direction
-                                // float speed
-                                // float speed_Z
-                            }
+                                for(int i=0, j=frStart; i<256 && j<frEnd +1; i++, j++){
+                                    packet[i]=bytes[j];
+                                }
 
-                            Console.WriteLine(MAVLink.MAVLINK_NAMES[packet[5]] + "\n");
+                                //0 - STX
+                                // 1 - len
+                                // 2 - seq
+                                // 3 - sysid
+                                // 4 - compid
+                                // 5 - msgid
+                                //
+                                comPort.Write(bytes, frStart, frEnd - frStart + 1);
 
-                            if(packet[5]==  109 ) { //MAVLINK_MSG_ID_RADIO_STATUS
-                                byte rssi=packet[11];
-                                byte remrssi = packet[12];
+                                if(packet[5]==  168 ) { // MAVLINK_MSG_ID_WIND
+                                    //Console.WriteLine ("wind !");
+                                    byte bb=packet[6];// float direction
+                                    // float speed
+                                    // float speed_Z
+                                }
+
+                                Console.WriteLine(MAVLink.MAVLINK_NAMES[packet[5]] + "\n");
+
+                                if(packet[5]==  109 ) { //MAVLINK_MSG_ID_RADIO_STATUS
+                                    byte rssi=packet[11];
+                                    byte remrssi = packet[12];
                                 /*
 typedef struct __mavlink_radio_status_t
 {
@@ -4026,44 +4039,48 @@ typedef struct __mavlink_radio_status_t
                                  */
                             }
 
-                            if(packet[5]==  65 ) { // rc_channels
-                                byte b=packet[7];
+                                if(packet[5]==  65 ) { // rc_channels
+                                    byte b=packet[7];
+                                }
+                                try {
+                                    this.Invoke((MethodInvoker)delegate {
+                                        lblTLog.Text = np.ToString(); // runs on UI thread
+                                        lblTime.Text = (DateTime.Now - tlog_start_time).ToString();
+                                    });
+
+                                } catch { };
+
                             }
                             if (((last_seq[rxmsg.sysid] + 1) & 0xff) == rxmsg.seq) { // поймали синхронизацию
-                                time = get_timestamp(bytes, byteIndex+1);  // skip parsed CRC2                              
+                                time = get_timestamp(bytes, byteIndex+1); // skip CRC2                         
                                 byteIndex += 8; // skip timestamp
                             }
                             last_seq[rxmsg.sysid] = rxmsg.seq;
                             np++;
-                            try {
-                                this.Invoke((MethodInvoker)delegate {
-                                    lblTLog.Text = np.ToString(); // runs on UI thread
-                                    lblTime.Text = (DateTime.Now - tlog_start_time).ToString ();
-                                });
 
-                            } catch { };
+                            if (playOn) {
+                                double time_w = millis();
 
-                            double time_w = millis();
-                            while(true){
-                                UInt64 diff_log=(time - start_time);
-                                UInt64 diff_real = ((UInt64)(millis() * 1000)) - stamp; // если время лога опережает реальное - задерживаемся
-                                if(diff_log < diff_real) {
-                                    //Console.WriteLine("go");
-                                    break;
-                                }
+                                while(true){
+                                    UInt64 diff_log=(time - start_time);
+                                    UInt64 diff_real = ((UInt64)(millis() * 1000)) - stamp; // если время лога опережает реальное - задерживаемся
+                                    if(diff_log < diff_real) {
+                                        //Console.WriteLine("go");
+                                        break;
+                                    }
 
-                                if ((millis() - time_w) > 100) { // но не реже 10 раз в секунду
-                                    start_time=time; // ждали слишком долго, сместим метку времени в логе
-                                    break;
+                                    if ((millis() - time_w) > 100) { // но не реже 10 раз в секунду
+                                        start_time=time; // ждали слишком долго, сместим метку времени в логе
+                                        break;
+                                    }
+                                    if (need_stop_tlog) {
+                                        tlog_run = false;
+                                        return;
+                                    }
+                                    //Console.WriteLine("wait");
+                                    System.Threading.Thread.Sleep(1); 
                                 }
-                                if (need_stop_tlog) {
-                                    tlog_run = false;
-                                    return;
-                                }
-                                //Console.WriteLine("wait");
-                                System.Threading.Thread.Sleep(1); 
                             }
-
 
                             message = "";
                             message += "Payload length: " + rxmsg.len.ToString();
@@ -4936,7 +4953,11 @@ typedef struct __mavlink_radio_status_t
             if (!comPort.IsOpen) {
                 comPort.PortName = CMB_ComPort.Text; ;
                 comPort.BaudRate = 57600;
-                comPort.Open();
+                try {
+                    comPort.Open();
+                } catch{
+                    //nothing
+                }
             }
 
             com_thread = new System.Threading.Thread(com_thread_proc);
