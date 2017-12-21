@@ -59,6 +59,9 @@
 #define USE_SENSORS 1
 #endif
 
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
@@ -252,9 +255,9 @@
 /*****************      END of configuration ******************************************************/
 
 #ifdef LEDPIN
- #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
- #define LED_ON digitalWrite(LEDPIN, HIGH)
- #define LED_OFF digitalWrite(LEDPIN, LOW)
+ #define LED_BLINK digitalWriteFast(LEDPIN, !digitalReadFast(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+ #define LED_ON digitalWriteFast(LEDPIN, HIGH)
+ #define LED_OFF digitalWriteFast(LEDPIN, LOW)
 #else
  #define LED_BLINK {}
  #define LED_ON {}

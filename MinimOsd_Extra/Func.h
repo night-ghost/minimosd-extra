@@ -389,6 +389,31 @@ static float /* NOINLINE */ distance(float x, float y){
     return sqrt(x*x + y*y);
 }
 
+float dstlon, dstlat;
+
+float coord_dist(Coords *c1, Coords *c2, bool useAlt){
+    float scaleLongDown = cos(abs(c1->lat) * 0.0174532925);
+    dstlat = diff_coord(c1->lat, c2->lat);
+    dstlon = diff_coord(c1->lon, c2->lon) * scaleLongDown;
+
+    float d = distance(dstlat, dstlon);
+    if(useAlt) d = distance(f_div1000(labs(c1->alt - c2->alt)), d);
+    return d;
+}
+
+int coord_bearing(){
+    int bearing;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+    bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
+#pragma GCC diagnostic pop
+
+    bearing=normalize_angle(90 + bearing - 180 - osd_heading); //relative home direction
+
+    return grad_to_sect(bearing); 
+}
+
 static void setHomeVars()
 {
     float dstlon, dstlat;
@@ -465,6 +490,7 @@ static void setHomeVars()
     } 
     
     if(lflags.osd_got_home){
+    /*
 	{
             float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
             //DST to Home
@@ -473,9 +499,13 @@ static void setHomeVars()
         }
 
         osd_home_distance = distance(dstlat, dstlon);
+    */
+    
+        osd_home_distance = coord_dist(&osd_home, &osd_pos, false);
+    
 	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
 	dst_y=(int)fabs(dstlon);
-
+/*
         { //DIR to Home
             int bearing;
 
@@ -486,6 +516,8 @@ static void setHomeVars()
 
             osd_home_direction = grad_to_sect(bearing); 
         }
+*/
+        osd_home_direction = coord_bearing();
   }
 }
 

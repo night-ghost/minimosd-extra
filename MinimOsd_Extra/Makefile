@@ -16,7 +16,7 @@ F_CPU = 16000000
 
 
 
-OPT  = -ffast-math 
+OPT  = -ffast-math
 #OPT += -floop-strip-mine
 OPT += -finline-functions-called-once 
 OPT += -finline-small-functions
@@ -69,7 +69,6 @@ OPT +=  -fno-caller-saves
 OPT +=  -funsigned-bitfields
 
 #OPT +=   -fno-keep-static-consts -fgcse-sm -fgcse-las -fgcse-after-reload -fdelete-null-pointer-checks
-
 #OPT +=   -fdevirtualize-speculatively -free -fira-region=one -fira-loop-pressure -fconserve-stack -ftree-partial-pre 
 
 OPT +=  -fipa-pta  -fwrapv
@@ -79,9 +78,16 @@ OPT +=  -fipa-pta  -fwrapv
 
 OPT +=  -fno-strict-aliasing
 
-OPT +=  -fverbose-asm
+OPT +=  -fverbose-asm 
+
+#OPT +=  --with-avrlibc=yes  -- this flag claimed as supported in NEWS for GCC 5.4.0 but indeed not
 
 OPT += $(PROTO)
+
+#OPT += -maccumulate-args +60 bytes
+#OPT += -mbranch-cost=1 +70 bytes
+
+OPT += -mrelax
 
 OPT += -mcall-prologues 
 # http://www.nongnu.org/avr-libc/user-manual/FAQ.html
@@ -96,8 +102,9 @@ OPT +=  -Wl,--relax
 
 ARDUINO_HEADER = dummy_header.h
 USER_LIB_PATH =  ../libraries
-CXXFLAGS_STD = -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics $(OPT) -felide-constructors -std=c++0x -fconserve-space -fno-enforce-eh-specs -fno-rtti -fvisibility-inlines-hidden -fno-use-cxa-atexit
-CFLAGS_STD =  -fno-exceptions  -Wl,--gc-sections  $(OPT) 
+CXXFLAGS_STD =  -Wno-deprecated-declarations -std=gnu++11  -fno-exceptions -Wl,--gc-sections -fno-threadsafe-statics -felide-constructors 
+CXXFLAGS_STD += -fconserve-space -fno-enforce-eh-specs -fno-rtti -fvisibility-inlines-hidden -fno-use-cxa-atexit $(OPT) 
+CFLAGS_STD =  -fno-exceptions -Wl,--gc-sections $(OPT)  -Waddr-space-convert
 LDFLAGS = $(OPT) 
 LDFLAGS += -Wl,-Map -Wl,$(OBJDIR)/map.map -Wl,--cref -fwhole-program
 MCU ?= atmega328p
@@ -107,6 +114,7 @@ ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += FastSerial
 ARDUINO_LIBS += GCS_MAVLink
 ARDUINO_LIBS += TimerSerial
+ARDUINO_LIBS += fast_io
 #ARDUINO_LIBS += I2c_soft_slave
 
 include /usr/share/arduino/Arduino.mk

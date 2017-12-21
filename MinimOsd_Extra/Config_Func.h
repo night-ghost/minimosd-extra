@@ -97,16 +97,6 @@ void NOINLINE delay_byte(){
         delay_telem();
 }
 
-/*
-static INLINE void max7456_off(){
-    PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
-}
-
-static INLINE void max7456_on(){
-    PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
-}
-*/
-
 #ifdef DEBUG
 /* prints hex numbers with leading zeroes */
 // copyright, Peter H Anderson, Baltimore, MD, Nov, '07

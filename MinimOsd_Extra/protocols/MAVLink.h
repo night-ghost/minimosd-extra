@@ -131,7 +131,7 @@ bool mavlink_one_byte(char c){
         //trying to grab msg  Mavlink library patched and buffer is static
         if(mavlink_parse_char(MAVLINK_COMM_0, c, NULL, &status)) {
 #endif
-            set_data_got(); //lastMAVBeat = millis();
+            set_data_got();
 
 //   DBG_PRINTF("\ngot id=%d\n", msgbuf.m.msgid);
 
@@ -565,9 +565,81 @@ typedef struct __mavlink_vibration_t {
                 pwm_out[1] = mavlink_msg_servo_output_raw_get_servo2_raw(&msgbuf.m);
                 pwm_out[2] = mavlink_msg_servo_output_raw_get_servo3_raw(&msgbuf.m);
                 pwm_out[3] = mavlink_msg_servo_output_raw_get_servo4_raw(&msgbuf.m);
-            
+
                 } break;
 #endif
+
+#ifdef USE_ADSB
+            case MAVLINK_MSG_ID_ADSB_VEHICLE:{ // info about aircrafts in field of view
+/*
+typedef struct __mavlink_adsb_vehicle_t {
+ uint32_t ICAO_address; //< ICAO address
+ int32_t lat;           //< Latitude, expressed as degrees * 1E7
+ int32_t lon;           //< Longitude, expressed as degrees * 1E7
+ int32_t altitude;      //< Altitude(ASL) in millimeters
+ uint16_t heading;      //< Course over ground in centidegrees
+ uint16_t hor_velocity; //< The horizontal velocity in centimeters/second
+ int16_t ver_velocity;  //< The vertical velocity in centimeters/second, positive is up
+ uint16_t flags;        //< Flags to indicate various statuses including valid data fields
+ uint16_t squawk;       //< Squawk code
+ uint8_t altitude_type; //< Type from ADSB_ALTITUDE_TYPE enum
+ char callsign[9];      //< The callsign, 8+null
+ uint8_t emitter_type;  //< Type from ADSB_EMITTER_TYPE enum
+ uint8_t tslc;          //< Time since last communication in seconds
+}) mavlink_adsb_vehicle_t;
+
+
+typedef struct ADSB_INFO {
+    struct Coords coord;
+    uint32_t id;
+    uint8_t cnt;
+} ADSB_Info;
+
+
+ADSB_Info adsb[MAX_ADSB];
+            
+*/
+                    Coords pos;
+
+                    gps_norm(pos.lat,mavlink_msg_adsb_vehicle_get_lat(&msgbuf.m));
+                    gps_norm(pos.lon,mavlink_msg_adsb_vehicle_get_lon(&msgbuf.m));
+                    pos.alt = mavlink_msg_adsb_vehicle_get_altitude(&msgbuf.m);
+                    
+                    float dist = coord_dist(&pos, &osd_pos, true);
+//                    float min_dist=1e12;
+//                    float max_dist=0;
+                    
+                    uint32_t id = mavlink_msg_adsb_vehicle_get_ICAO_address(&msgbuf.m);
+                    
+                    int8_t f_id=-1;
+                    
+                    for(uint8_t i=0; i<MAX_ADSB; i++) {
+
+
+                        if(adsb[i].cnt == 0 || adsb[i].id == id) {
+                            f_id=i;
+                            break;
+                        }
+                    }
+                    if(f_id < 0){
+                        for(uint8_t i=0; i<MAX_ADSB; i++) {
+                            float d = coord_dist(&adsb[i].coord, &osd_pos, true);
+                            if(d>dist) {
+                                f_id=i;
+                                break;                            
+                            }
+                        }
+                    }
+                    if(f_id >=0){
+                        adsb[f_id].coord = pos;
+                        adsb[f_id].id = id;
+                        adsb[f_id].cnt = 15; // seconds after last message
+                    }
+                    
+                } break;
+#endif
+
+
             default:
                 //Do nothing
                 break;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Defs.h"
 typedef void (*cb_putc)(uint8_t c);
 
 bool read_mavlink();
@@ -49,7 +50,7 @@ byte NOINLINE radar_char();
 void renew();
 void setup_horiz();
 uint16_t uidiff(uint16_t, uint16_t);
-void writePanels(unsigned long pt);
+float coord_dist(Coords *c1, Coords *c2);
 
 void delay_15();
 void MAX_mode(byte mode);

@@ -547,3 +547,10 @@ v939
 
 v940
 * filly working binaries: fixed strange GCC bug in osd::write_S
+
+v941
+* fixed bug in "Motor Dead" warning
+* refusal from the Arduino's digitalWrite/pinMode gives ~600 free bytes of flash.
+* added new ADSB panel, requires font update to 2.4.1.6 (experimental)
+
+

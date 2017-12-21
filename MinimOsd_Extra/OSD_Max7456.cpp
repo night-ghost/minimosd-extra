@@ -17,6 +17,10 @@ namespace OSDns {
  #endif
 
  #include "Arduino.h"
+ 
+ #define DIGITALIO_NO_MIX_ANALOGWRITE
+ #include <fast_io.h>
+ 
  #include "compat.h"
  #include "Spi.h"
  #include "eeprom.h"
@@ -31,7 +35,6 @@ static void max7456_on();
  static INLINE void max7456_on(){
     PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
  }
-
 
 #endif
 
@@ -143,10 +146,10 @@ void OSD::hw_init(){
 void OSD::init()
 {
 #ifndef SLAVE_BUILD
-    pinMode(MAX7456_SELECT,OUTPUT);
-    pinMode(MAX7456_VSYNC, INPUT_PULLUP);
-    pinMode(MAX7456_RESET_PIN, OUTPUT);
-    digitalWrite(MAX7456_RESET_PIN, HIGH);
+    pinModeFast(MAX7456_SELECT,OUTPUT);
+    pinModeFast(MAX7456_VSYNC, INPUT_PULLUP);
+    pinModeFast(MAX7456_RESET_PIN, OUTPUT);
+    digitalWriteFast(MAX7456_RESET_PIN, HIGH);
 #endif
     
     reset();
@@ -293,10 +296,15 @@ so all checks are moved out
 */
 
 void OSD::write_S(uint8_t c){
-  if(c == (uint8_t)0xff){
-    row++;
-    calc_pos();
-  } else
+    if(c == (uint8_t)0xff){
+        row++;
+        calc_pos();
+        return;
+    }
+  
+    if(c == 0x20){
+        c=0;
+    }
     write_raw(c);
 }
 
@@ -317,7 +325,7 @@ void OSD::update() {
 
     osdbuf[sizeof(osdbuf)-1] = MAX7456_END_string; // 0xFF - "end of screen" character
 #ifdef SLAVE_BUILD 
-//  internal Ardupilot build should use DMA to transfer
+//  internal Ardupilot build
     extern void update_max_buffer(const uint8_t *cp, uint16_t len);
     update_max_buffer(osdbuf, sizeof(osdbuf));
     memset(osdbuf, ' ', sizeof(osdbuf)); // clean out screen
@@ -326,12 +334,11 @@ void OSD::update() {
 /*
     we need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
     time of VBI is 1600uS so we have a 3x 
-    
 */
 
     MAX_write(MAX7456_DMAH_reg, 0);
     MAX_write(MAX7456_DMAL_reg, 0);
-    MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
+    MAX_write(MAX7456_DMM_reg,  1); // автоинкремент адреса
 
     max7456_off(); 
     for(; b < end_b;) {

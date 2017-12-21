@@ -17,11 +17,11 @@ struct Measure {
     byte         climbchar;
 };
 
-struct Coords {
+typedef struct COORDS {
     float lat;
     float lon;
     long alt; // altitude GPS
-};
+} Coords;
 
 #ifndef SLAVE_BUILD
 #pragma pack(pop)
@@ -50,20 +50,20 @@ struct loc_flags {
 
     bool motor_armed;
     bool last_armed_status;
-    bool was_armed:1;
+    bool was_armed;  // :1 adds 2 byte
     bool throttle_on;
-    bool in_air:1;
+    bool in_air:1; //+
 
     bool blinker;
-    bool flgMessage:1;
+    bool flgMessage:1; //+
     
-    bool mode_switch:1;
+    bool mode_switch:1; //+
     bool osd_got_home; // tels if got home position or not
     
     bool flag_05s; // sets each 0.5s for setup
     bool flag_01s;
 
-    bool show_screnN:4;
+//    bool show_screnN:4;
     bool gps_active; // было что-то с GPS
     bool vs_ms; // vertical speed in m/s;
     bool was_mav_config; // was EEPROM write via MAVlink
@@ -99,5 +99,11 @@ struct Setup_screen {
     fptr tail;	// функция отображения остального
 };
 
+
+typedef struct ADSB_INFO {
+    Coords coord;
+    uint32_t id;
+    uint8_t cnt;
+} ADSB_Info;
 
 #pragma pack(pop)

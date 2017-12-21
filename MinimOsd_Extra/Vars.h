@@ -9,7 +9,7 @@
 
 Settings sets;	// настройки из EEPROM
 
-volatile byte garbage=0xf4;
+//volatile byte garbage=0xf4;
 
 
 static byte max7456_err_count=0;
@@ -217,13 +217,14 @@ struct   loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 volatile byte vsync_wait = 0;
 volatile uint8_t vsync_count=0;
 volatile uint32_t vsync_time=0;
+volatile byte vas_vsync=false;
 
 uint16_t screen_flags;
 
 #ifdef PWM_PIN
-volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+//volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
 volatile uint16_t      PWM_IN=0;              // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
-volatile unsigned long int_Timer = 0;         // set in the INT1
+unsigned long int_Timer = 0;         // set in the INT1
 #endif
 
 //byte   PWM_out_pin=0;
@@ -280,6 +281,10 @@ uint16_t clipping[3];// < first accelerometer clipping count
 uint16_t pwm_out[4]; // output values for motors
 
 byte climb_filter=10; // 
+
+#define MAX_ADSB 2
+
+ADSB_Info adsb[MAX_ADSB];
 
 #ifndef SLAVE_BUILD
 #pragma pack(pop)

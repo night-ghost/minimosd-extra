@@ -5,18 +5,18 @@
 MAVPACKED(
 typedef struct __mavlink_adsb_vehicle_t {
  uint32_t ICAO_address; /*< ICAO address*/
- int32_t lat; /*< Latitude, expressed as degrees * 1E7*/
- int32_t lon; /*< Longitude, expressed as degrees * 1E7*/
- int32_t altitude; /*< Altitude(ASL) in millimeters*/
- uint16_t heading; /*< Course over ground in centidegrees*/
+ int32_t lat;           /*< Latitude, expressed as degrees * 1E7*/
+ int32_t lon;           /*< Longitude, expressed as degrees * 1E7*/
+ int32_t altitude;      /*< Altitude(ASL) in millimeters*/
+ uint16_t heading;      /*< Course over ground in centidegrees*/
  uint16_t hor_velocity; /*< The horizontal velocity in centimeters/second*/
- int16_t ver_velocity; /*< The vertical velocity in centimeters/second, positive is up*/
- uint16_t flags; /*< Flags to indicate various statuses including valid data fields*/
- uint16_t squawk; /*< Squawk code*/
+ int16_t ver_velocity;  /*< The vertical velocity in centimeters/second, positive is up*/
+ uint16_t flags;        /*< Flags to indicate various statuses including valid data fields*/
+ uint16_t squawk;       /*< Squawk code*/
  uint8_t altitude_type; /*< Type from ADSB_ALTITUDE_TYPE enum*/
- char callsign[9]; /*< The callsign, 8+null*/
- uint8_t emitter_type; /*< Type from ADSB_EMITTER_TYPE enum*/
- uint8_t tslc; /*< Time since last communication in seconds*/
+ char callsign[9];      /*< The callsign, 8+null*/
+ uint8_t emitter_type;  /*< Type from ADSB_EMITTER_TYPE enum*/
+ uint8_t tslc;          /*< Time since last communication in seconds*/
 }) mavlink_adsb_vehicle_t;
 
 #define MAVLINK_MSG_ID_ADSB_VEHICLE_LEN 38

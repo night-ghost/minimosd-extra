@@ -976,7 +976,8 @@ const char * const PROGMEM warn_str[] = {
     w7,
     w8,
     w9,
-    w10
+    w10,
+    w11,
 };
 
 static void panWarn(point p){
@@ -2366,12 +2367,26 @@ static void panVario(point p) {
     OSD::write_xy(x, charPosition, selectedChar);
 }
 
-#if HARDWARE_TYPE > 0
-// features for big boards
+#ifdef USE_ADSB
 static void panADSB(point p) {
 // show up to 4 rows of pointers to nearest aircrafts with optional distances
  
+    for(uint8_t i=0; i<MAX_ADSB; i++) {
+        if(adsb[i].cnt) {
+            if(has_sign(p)) OSD::write_raw(0x20);
+
+            float distance = coord_dist(&adsb[i].coord, &osd_pos, true);
+    
+            int direction = coord_bearing();
+            showArrow(direction);
+            printFullDist(distance);
+        }
+    }
 }
+#endif
+
+#if HARDWARE_TYPE > 0
+// features for big boards
 #endif
 
 #if 0
@@ -2398,6 +2413,7 @@ uint16_t readVCC() { // in mv
     }
     
     return (118645531UL /* * VCC_AVGB / 100 */ ) / sum; // in mv, calibrated
+}
 #endif
 
 
@@ -2929,7 +2945,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(pMotor),		panMotor, 	0 },
     { ID_of(fVibe),		panVibe, 	0 },
     { ID_of(fVario),		panVario, 	0 },
-#if HARDWARE_TYPE > 0
+#ifdef USE_ADSB
     { ID_of(fADSB),		panADSB, 	0 },
 #endif
 // warnings should be last
@@ -2981,8 +2997,9 @@ uint16_t uidiff(uint16_t a, uint16_t b){
 
 }
 
-void writePanels(unsigned long pt){  // текущее время - функция инлайнится и это просто удаляет лишний вызов millis()
+void writePanels(){ 
 
+    unsigned long pt = millis();
     osd.detectMode(); // PAL/NTSC live
 
 // если выбран самолет
@@ -3006,6 +3023,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
 
 //DBG_PRINTF("time_since(&lastMAVBeat)=%d\n", time_since(&lastMAVBeat));
 
+#ifdef SHOW_NO_DATA
 //    if(pt > (lastMAVBeat + 2500)){
     {
 	uint16_t t=time_since(&lastMAVBeat);
@@ -3014,6 +3032,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
             return;
         }
     }
+#endif
 
     if(FLAGS.results_on){
  //Only show flight summary 10 seconds after landing and if throttle < 15
@@ -3070,8 +3089,6 @@ show_fdata:
 	    osd_setPanel(p); // place cursor    
 	    panWarn(p);
 	}
-	
-
     } 
 }
 

@@ -108,6 +108,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 // Get the common arduino functions
 #include "Arduino.h"
 
+//#include "from_arduino.h"
+#include "compat.h"
+
+#define DIGITALIO_NO_MIX_ANALOGWRITE
+#include <fast_io.h>
+
+
 // AVR Includes
 #include <math.h>
 #include <inttypes.h>
@@ -117,7 +124,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <avr/wdt.h>
 #endif
 
-#include "compat.h"
 #include "Defs.h"
 
 #include "eeprom.h"
@@ -198,8 +204,6 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 
 extern void unplug_slaves();
 
-volatile byte vas_vsync=false;
-
 // обработка прерывания по кадровому синхроимпульсу
 #if 0 // nested interrupts cause hang on some cameras :(
 
@@ -275,23 +279,19 @@ ISR(VSYNC_VECT) {
 // PWM Measurement
 #if defined(PWM_PIN)
 void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
-    uint32_t time=micros(); // the 1st place to exclude jitter
+    uint32_t time=micros();
 
     // We will start to read when signal goes HIGH
-    if(digitalRead(PWM_PIN) == HIGH) {
+    if(digitalReadFast(PWM_PIN) == HIGH) {
 
         // PWM Signal is HIGH, so measure it's length.
         int_Timer = time;
 
     } else {        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-        uint32_t t= int_Timer; 
-        if( t /* && !New_PWM_Frame */){
-            time -= t;
-            PWM_IN = (int)(time);
-            int_Timer = 0;
+        PWM_IN = (int)(time - int_Timer);
+        int_Timer = 0;
 
-            New_PWM_Frame = true;
-        }
+//        New_PWM_Frame = true;
     }
 }
 
@@ -300,7 +300,7 @@ ISR(INT1_vect) {
 }
 #endif
 
-
+#if 0
 #define SERIAL_BUFSIZE 80
 
 void getSerialLine(char *cp, void(cb)() ){      // получение строки
@@ -345,13 +345,13 @@ void touchPins(){
             digitalWrite(pin_to_touch, !digitalRead(pin_to_touch) );
     }
 }
-
+#endif
 
 void setup()     {
     wdt_disable(); 
 
 #ifdef LEDPIN
-    pinMode(LEDPIN,OUTPUT); // led
+    pinModeFast(LEDPIN,OUTPUT); // led
     LED_ON; 		    // turn on for full light
 #endif
 
@@ -395,7 +395,7 @@ void setup()     {
 
 #if defined(PWM_PIN)
     if(sets.ch_toggle == 1) { // only if used
-	pinMode(PWM_PIN, INPUT_PULLUP);
+	pinModeFast(PWM_PIN, INPUT_PULLUP);
 	//attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 	EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (CHANGE << ISC10);
         EIMSK |= (1 << INT1);
@@ -479,7 +479,32 @@ void setup()     {
 
 #if !defined(SLAVE_BUILD)
         generate_PWM(0); // set pin to initial state
-	pinMode(PWM_out_pin,  OUTPUT);
+	//pinMode(PWM_out_pin,  OUTPUT);
+	
+        volatile uint8_t *reg;
+
+        // JWS: can I let the optimizer do this?
+        reg = portModeRegister(port);
+/*
+        if (mode == INPUT) {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg &= ~PWM_out_bit;
+                *PWM_out_port &= ~PWM_out_bit;
+                SREG = oldSREG;
+        } else if (mode == INPUT_PULLUP) {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg &= ~PWM_out_bit;
+                *PWM_out_port |= PWM_out_bit;
+                SREG = oldSREG;
+        } else */ {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg |= PWM_out_bit;
+                SREG = oldSREG;
+        }
+
 #endif
     }
 
@@ -611,13 +636,13 @@ void loop()
     }
 
     if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания дабы успеть закончить расчет к следующему
-        lflags.need_redraw=0; // экран перерисован
+        lflags.need_redraw=0; // экран сформирован
 
         setHomeVars();   // calculate and set Distance from home and Direction to home
 
         setFdataVars();  // накопление статистики и рекордов
 
-        writePanels(pt);   // writing enabled panels (check OSD_Panels Tab)
+        writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
 //	LED_BLINK;
 
@@ -704,6 +729,10 @@ void loop()
 	    vsync_count=0;
             
             heartBeat();
+
+            for(uint8_t i=0; i<MAX_ADSB; i++) {
+                if(adsb[i].cnt) adsb[i].cnt--;
+            }
 
 #ifdef DEBUG
 	    if(seconds % 30 == 0) {
