@@ -57,8 +57,18 @@ float NOINLINE get_converth(){
     return pgm_read_float(&measure->converth);
 }
 
+
+float NOINLINE mul_converth(float f){
+    return get_converth() * f;
+}
+
+
 float NOINLINE get_converts(){
     return pgm_read_float(&measure->converts);
+}
+
+float NOINLINE mul_converts(float &f){
+    return f * get_converts();
 }
 
 float NOINLINE f_div1000(float f){
@@ -176,6 +186,15 @@ void serial_hex_dump(byte *p, uint16_t len) {
 #else
 void serial_hex_dump(byte *p, uint16_t len) {}
 #endif
+
+void NOINLINE move4(void *_dst, void *_src){
+    uint8_t *dst = (uint8_t *)_dst;
+    uint8_t *src = (uint8_t *)_src;
+    uint8_t i=4;
+    do {
+        *dst++ = *src++;
+    } while(--i);
+}
 
 void NOINLINE float_add(float &dst, float val){
     dst+=val;

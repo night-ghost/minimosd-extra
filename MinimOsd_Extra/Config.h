@@ -61,6 +61,7 @@
 
 #define USE_ADSB 1
 #define SHOW_NO_DATA 1
+#define USE_VIBE 1
 
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
@@ -162,6 +163,11 @@
 #define AUTOBAUD 1
 #define USE_SENSORS 1
 
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+#define USE_VIBE 1
+
+
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
@@ -206,8 +212,13 @@
 
 #define FONT_UPLOAD 1
 #define USE_SETUP 1
-#define AUTOBAUD 1
-#define USE_SENSORS 1
+//#define AUTOBAUD 1 no need
+//#define USE_SENSORS 1 no pins
+
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+#define USE_VIBE 1
+
 
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(

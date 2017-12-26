@@ -33,7 +33,7 @@ int NOINLINE normalize_angle(int a);
 uint16_t NOINLINE time_since(uint32_t *t);
 byte get_switch_time(byte n);
 void doScreenSwitch();
-int NOINLINE grad_to_sect(int grad);
+uint8_t NOINLINE grad_to_sect(int grad);
 void NOINLINE calc_max(float &dst, float src);
 void NOINLINE filter( float &dst, float val, const byte k);
 void filter( float &dst, float val);

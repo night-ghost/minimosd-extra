@@ -419,7 +419,7 @@ Serial.printf_P(PSTR("MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE x=%f y=%f\n"),vx,vy);
                 osd_alt_to_home = mavlink_msg_global_position_int_get_relative_alt(&msgbuf.m) / 1000;  // alt above ground in MM
 		int16_t vx = mavlink_msg_global_position_int_get_vx(&msgbuf.m); // speed for non-GPS setups
 		int16_t vy = mavlink_msg_global_position_int_get_vy(&msgbuf.m);
-		loc_speed = distance(vx, vy) / 100;
+		loc_speed = (int)(distance(vx, vy)) / 100;
             } break; 
 
 
@@ -633,10 +633,32 @@ ADSB_Info adsb[MAX_ADSB];
                     if(f_id >=0){
                         adsb[f_id].coord = pos;
                         adsb[f_id].id = id;
+                        //move4(&adsb[f_id].id,&id);
                         adsb[f_id].cnt = 15; // seconds after last message
                     }
                     
                 } break;
+#endif
+
+#ifdef SLAVE_BUILD
+            case MAVLINK_MSG_ID_PARAM_VALUE:
+/*
+typedef struct __mavlink_param_value_t
+{
+ float param_value;    ///< Onboard parameter value
+ uint16_t param_count; ///< Total number of onboard parameters
+ uint16_t param_index; ///< Index of this onboard parameter
+ char param_id[16];    ///< Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) b
+ uint8_t param_type;   ///< Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
+} mavlink_param_value_t;
+                
+*/
+                mavlink_param_value_t param;
+                
+                mavlink_msg_param_value_decode(&msgbuf.m, &param);
+                
+                push_parameter(&param); // store parameter to it's place in array
+                break;
 #endif
 
 
