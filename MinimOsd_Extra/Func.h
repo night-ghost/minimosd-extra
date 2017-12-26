@@ -67,6 +67,7 @@ byte NOINLINE get_alt_num(point p){
 
 
 byte NOINLINE get_alt_filter(point p){
+/*
     switch( (is_alt(p)?1:0) | (is_alt2(p)?2:0)) {
     
     case 1:
@@ -78,6 +79,17 @@ byte NOINLINE get_alt_filter(point p){
     default: 
 	return 0;
     }
+*/
+
+    if(is_alt2(p)) {
+        if(is_alt(p)) return 100;
+        else          return 30;
+    } else {
+        if(is_alt(p)) return 10;
+        else          return 0;    
+    }
+
+
 }
 
 static inline void readSettings() {
@@ -576,7 +588,7 @@ void setFdataVars()
             
             uint16_t diap = h-l;
             uint16_t val  = rssi_v - l;
-            rssi_v = (int16_t)(((float)val)/diap*100.0f);
+            rssi_v = (val * 100L) /diap;
             //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
             if(rssi_v > 100) rssi_v = 100;

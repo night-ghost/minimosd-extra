@@ -553,4 +553,8 @@ v941
 * refusal from the Arduino's digitalWrite/pinMode gives ~600 free bytes of flash.
 * added new ADSB panel, requires font update to 2.4.1.6 (experimental)
 
+v942
+* fixed bug with empty screen
+* fixed bug in climbRate
+* changed variometer's scale
 

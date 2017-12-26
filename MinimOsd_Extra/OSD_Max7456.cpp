@@ -345,7 +345,7 @@ void OSD::update() {
         max7456_on(); // strobing each byte with CS is necessary - MAX7456 datasheet figure 21
         SPI::transfer(*b);
         max7456_off();        
-        *b++=' ';
+        *b++=0;
     }
 
 //DBG_PRINTF("time=%ld\n",millis());

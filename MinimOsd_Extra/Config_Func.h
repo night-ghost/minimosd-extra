@@ -74,6 +74,12 @@ float NOINLINE mul_converts(float &f){
 float NOINLINE f_div1000(float f){
     return f/1000;
 }
+
+float NOINLINE f_div100(float f){
+    return f/100;
+}
+
+
 uint16_t NOINLINE time_since(uint32_t *t){
     return (uint16_t)(millis() - *t); // loop time no more 1000 ms
 

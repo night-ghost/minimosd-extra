@@ -175,6 +175,9 @@ namespace OSD {
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.grpTLog = new System.Windows.Forms.GroupBox();
+            this.label48 = new System.Windows.Forms.Label();
+            this.txtLogOffset = new System.Windows.Forms.TextBox();
+            this.label47 = new System.Windows.Forms.Label();
             this.lblTime = new System.Windows.Forms.Label();
             this.lblTLog = new System.Windows.Forms.Label();
             this.btnTLog = new System.Windows.Forms.Button();
@@ -192,9 +195,6 @@ namespace OSD {
             this.BUT_CopyScreen = new System.Windows.Forms.Button();
             this.BUT_ClearScreen = new System.Windows.Forms.Button();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
-            this.label47 = new System.Windows.Forms.Label();
-            this.txtLogOffset = new System.Windows.Forms.TextBox();
-            this.label48 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.PANEL_tabs.SuspendLayout();
@@ -1057,10 +1057,11 @@ namespace OSD {
             this.groupBox16.Controls.Add(this.label21);
             this.groupBox16.Location = new System.Drawing.Point(6, 119);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(172, 116);
+            this.groupBox16.Size = new System.Drawing.Size(156, 116);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "Horizon Angle adjust";
+            this.groupBox16.Enter += new System.EventHandler(this.groupBox16_Enter);
             // 
             // label24
             // 
@@ -1073,7 +1074,7 @@ namespace OSD {
             // 
             // txtPitchNtsc
             // 
-            this.txtPitchNtsc.Location = new System.Drawing.Point(113, 90);
+            this.txtPitchNtsc.Location = new System.Drawing.Point(101, 89);
             this.txtPitchNtsc.Name = "txtPitchNtsc";
             this.txtPitchNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtPitchNtsc.TabIndex = 30;
@@ -1084,7 +1085,7 @@ namespace OSD {
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(78, 93);
+            this.label25.Location = new System.Drawing.Point(70, 92);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(31, 13);
             this.label25.TabIndex = 29;
@@ -1092,7 +1093,7 @@ namespace OSD {
             // 
             // txtRollNtsc
             // 
-            this.txtRollNtsc.Location = new System.Drawing.Point(113, 68);
+            this.txtRollNtsc.Location = new System.Drawing.Point(101, 67);
             this.txtRollNtsc.Name = "txtRollNtsc";
             this.txtRollNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtRollNtsc.TabIndex = 28;
@@ -1103,7 +1104,7 @@ namespace OSD {
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(78, 71);
+            this.label26.Location = new System.Drawing.Point(70, 70);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(25, 13);
             this.label26.TabIndex = 27;
@@ -1120,7 +1121,7 @@ namespace OSD {
             // 
             // txtPitchPal
             // 
-            this.txtPitchPal.Location = new System.Drawing.Point(113, 39);
+            this.txtPitchPal.Location = new System.Drawing.Point(101, 38);
             this.txtPitchPal.Name = "txtPitchPal";
             this.txtPitchPal.Size = new System.Drawing.Size(50, 20);
             this.txtPitchPal.TabIndex = 25;
@@ -1131,7 +1132,7 @@ namespace OSD {
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(78, 42);
+            this.label22.Location = new System.Drawing.Point(70, 41);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 13);
             this.label22.TabIndex = 24;
@@ -1139,7 +1140,7 @@ namespace OSD {
             // 
             // txtRollPal
             // 
-            this.txtRollPal.Location = new System.Drawing.Point(113, 17);
+            this.txtRollPal.Location = new System.Drawing.Point(101, 16);
             this.txtRollPal.Name = "txtRollPal";
             this.txtRollPal.Size = new System.Drawing.Size(50, 20);
             this.txtRollPal.TabIndex = 23;
@@ -1150,7 +1151,7 @@ namespace OSD {
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(78, 20);
+            this.label21.Location = new System.Drawing.Point(73, 19);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(25, 13);
             this.label21.TabIndex = 22;
@@ -1636,9 +1637,9 @@ namespace OSD {
             this.groupBox3.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(180, 119);
+            this.groupBox3.Location = new System.Drawing.Point(163, 119);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(144, 116);
+            this.groupBox3.Size = new System.Drawing.Size(161, 116);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Warnings";
@@ -1663,14 +1664,14 @@ namespace OSD {
             // 
             // tHalfThrottleCurrent
             // 
-            this.tHalfThrottleCurrent.Location = new System.Drawing.Point(97, 71);
+            this.tHalfThrottleCurrent.Location = new System.Drawing.Point(99, 70);
             this.tHalfThrottleCurrent.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.tHalfThrottleCurrent.Name = "tHalfThrottleCurrent";
-            this.tHalfThrottleCurrent.Size = new System.Drawing.Size(40, 20);
+            this.tHalfThrottleCurrent.Size = new System.Drawing.Size(55, 20);
             this.tHalfThrottleCurrent.TabIndex = 5;
             this.tHalfThrottleCurrent.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.hint.SetToolTip(this.tHalfThrottleCurrent, "Allows to warn about motor damage");
@@ -1686,14 +1687,14 @@ namespace OSD {
             // 
             // OVERSPEED_numeric
             // 
-            this.OVERSPEED_numeric.Location = new System.Drawing.Point(97, 40);
+            this.OVERSPEED_numeric.Location = new System.Drawing.Point(99, 39);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.OVERSPEED_numeric.Name = "OVERSPEED_numeric";
-            this.OVERSPEED_numeric.Size = new System.Drawing.Size(40, 20);
+            this.OVERSPEED_numeric.Size = new System.Drawing.Size(55, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
@@ -1710,14 +1711,14 @@ namespace OSD {
             // 
             // STALL_numeric
             // 
-            this.STALL_numeric.Location = new System.Drawing.Point(97, 18);
+            this.STALL_numeric.Location = new System.Drawing.Point(99, 17);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.STALL_numeric.Name = "STALL_numeric";
-            this.STALL_numeric.Size = new System.Drawing.Size(40, 20);
+            this.STALL_numeric.Size = new System.Drawing.Size(55, 20);
             this.STALL_numeric.TabIndex = 0;
             this.STALL_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.STALL_numeric.ValueChanged += new System.EventHandler(this.STALL_numeric_ValueChanged);
@@ -1886,6 +1887,34 @@ namespace OSD {
             this.grpTLog.TabStop = false;
             this.grpTLog.Text = "TLog player";
             // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(125, 56);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(47, 13);
+            this.label48.TabIndex = 21;
+            this.label48.Text = "seconds";
+            // 
+            // txtLogOffset
+            // 
+            this.txtLogOffset.Location = new System.Drawing.Point(76, 53);
+            this.txtLogOffset.MaxLength = 4;
+            this.txtLogOffset.Name = "txtLogOffset";
+            this.txtLogOffset.Size = new System.Drawing.Size(46, 20);
+            this.txtLogOffset.TabIndex = 20;
+            this.txtLogOffset.Text = "0";
+            this.txtLogOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.Location = new System.Drawing.Point(13, 56);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(47, 13);
+            this.label47.TabIndex = 19;
+            this.label47.Text = "Skip first";
+            // 
             // lblTime
             // 
             this.lblTime.Location = new System.Drawing.Point(125, 21);
@@ -2047,34 +2076,6 @@ namespace OSD {
             this.BUT_ClearScreen.Text = "Clear Screen";
             this.BUT_ClearScreen.UseVisualStyleBackColor = true;
             this.BUT_ClearScreen.Click += new System.EventHandler(this.BUT_ClearScreen_Click);
-            // 
-            // label47
-            // 
-            this.label47.AutoSize = true;
-            this.label47.Location = new System.Drawing.Point(13, 56);
-            this.label47.Name = "label47";
-            this.label47.Size = new System.Drawing.Size(47, 13);
-            this.label47.TabIndex = 19;
-            this.label47.Text = "Skip first";
-            // 
-            // txtLogOffset
-            // 
-            this.txtLogOffset.Location = new System.Drawing.Point(76, 53);
-            this.txtLogOffset.MaxLength = 4;
-            this.txtLogOffset.Name = "txtLogOffset";
-            this.txtLogOffset.Size = new System.Drawing.Size(46, 20);
-            this.txtLogOffset.TabIndex = 20;
-            this.txtLogOffset.Text = "0";
-            this.txtLogOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label48
-            // 
-            this.label48.AutoSize = true;
-            this.label48.Location = new System.Drawing.Point(125, 56);
-            this.label48.Name = "label48";
-            this.label48.Size = new System.Drawing.Size(47, 13);
-            this.label48.TabIndex = 21;
-            this.label48.Text = "seconds";
             // 
             // OSD
             // 

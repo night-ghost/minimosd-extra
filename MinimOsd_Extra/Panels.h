@@ -412,9 +412,7 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
     byte x = (int)(dst_x / (radar_zoom / SCALE_X) + 0.5);	// for even grid correction
 
 
-
     if(fTrack){
-//	static Point trk[4];
 	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
 	    for(byte i=4; i!=1;){
 		i--;
@@ -576,9 +574,6 @@ static float        eff = 0; //Efficiency
 
 static void calc_energy(){
 #define EFF_FILTER 0.01
-
-// calculate mean even if throttle==0
-
             filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, 1/EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
 }
 
@@ -599,20 +594,23 @@ static void panEff(point p){
 
     if(!lflags.motor_armed) return;
 
-    if(is_alt(p)){
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+    
+    bool is_0 = (osd_groundspeed == 0); // no efficiency at 0 speed
+#pragma GCC diagnostic pop
 
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
-	    calc_energy();
-	    print_energy(p);
-	}
+    
+    if(is_alt(p)){
+
+        calc_energy();
+        print_energy(p);
 	return;
     }
 
     if(sets.model_type==0){ // plane
 #ifdef IS_PLANE
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+        if (!is_0) { // no efficiency at 0 speed
 
 	    calc_energy();
 
@@ -639,7 +637,7 @@ static void panEff(point p){
                             OSD::write_S(0xee);
                         osd_printf_2(f4_0f, glide, get_mhigh()); // аэродинамическое качество
                     }
-                }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
+                }else if (/*osd_climb >= -0.05 &&*/ osd_att.pitch < 0) {
                     PGM_P f = PSTR("\x20\x90\x91");
                     if(lflags.blinker) f++;
                     osd_print_S(f); //термик
@@ -647,7 +645,6 @@ static void panEff(point p){
             }
         }
 
-#pragma GCC diagnostic pop
 
 #endif
     } else { // copter
@@ -796,7 +793,8 @@ static void panClimb(point p){
             osd_printf_2(fmt, v, 0x18);
         } else {
             lflags.vs_ms=0;
-            osd_printf_2(f_4_0f, vertical_speed, pgm_read_byte(&measure->climbchar));
+            float f = vertical_speed*60;
+            osd_printf_2(f_4_0f, f, pgm_read_byte(&measure->climbchar));
         }
     }
 }
@@ -870,7 +868,7 @@ static inline void check_warn(point p)
     if (!(sets.RSSI_raw%2) && rssi_norm < sets.rssi_warn_level )
         wmask |= (1<<4);
 
-    int iVs = (int)abs(vertical_speed) /10;
+    int iVs = (int)abs(vertical_speed*60)/10;
 
 //6
     if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
@@ -991,13 +989,6 @@ static void panThr(point p){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
-static NOINLINE void osd_print_bat(){
-    OSD::write_S(0x88); // донышко батарейки не зависит от
-    OSD::write_S(osd_battery_pic_A[0]);
-    OSD::write_S(osd_battery_pic_A[1]);
-    OSD::write_S(0x8e);
-//    osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
-}
 
 static /*NOINLINE */ byte guessMaxVolt(){
     if(max_battery_reading >=95 && max_battery_reading <=100) 
@@ -1022,7 +1013,10 @@ static void panBatteryPercent(point p){
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
     if(has_sign(p)) {
-        osd_print_bat();
+        OSD::write_S(0x88); // донышко батарейки не зависит от
+        OSD::write_S(osd_battery_pic_A[0]);
+        OSD::write_S(osd_battery_pic_A[1]);
+        OSD::write_S(0x8e);
     }
 
     if (is_alt(p)) {
@@ -1264,21 +1258,6 @@ static void panGPS(point p){
 	}
     }
 
-/*
-    byte fLow= is_alt(p)?1:0;      // low precision
-
-    byte idx= fLow | (has_sign(p)?2:0);
-
-    if(is_alt2(p)){ // fractional
-	f=(const char *)pgm_read_word(&gps_fmt[idx]);
-        osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
-	return;
-    } 
-
-    f=(const char *)pgm_read_word(&gps_fmtF[idx]);
-    print_gps(f,div);
-*/
-
     if(has_sign(p)) OSD::write_S(3);
     print_coord(p, &osd_pos.lat);
     OSD::write_S(div);
@@ -1499,7 +1478,7 @@ static void panTune(point p){
     osd_nl();
     if(has_sign(p)) 
         OSD::write_S(0x13);
-    printSpeed(aspd_error / 100.0);
+    printSpeed(aspd_error/100.0);
  #endif
 #endif
 }
@@ -1616,23 +1595,9 @@ static void panRose(point p){
 static int getTargetBearing(){
     int a=normalize_angle(wp_target_bearing);
 
-    return a - osd_heading; //Convert to int 1-16 
+    return a - osd_heading; 
 }
 
-/* **************************************************************** */
-// Panel  : panWPDir
-// Needs  : X, Y locations
-// Output : 2 symbols that are combined as one arrow, shows direction to next waypoint
-// Size   : 1 x 2  (rows x chars)
-// Staus  : not ready
-/*
-static void panWPDir(point p){
-    if(wp_number > 0 ){
-   
-	showArrow(getTargetBearing());
-    }
-}
-*/
 /* **************************************************************** */
 // Panel  : panWPDis
 // Needs  : X, Y locations
@@ -1683,26 +1648,25 @@ static void panMessage(point p){
 
 #define MAX_MSG_SIZE 26
 
-//    lflags.show_screnN = !is_alt2(p);
-
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
 	char sign=0;
 
 #if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
-        if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
+        if(has_sign(p) && mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
 #endif
 
 
 	int8_t diff = MAX_MSG_SIZE - mav_msg_len; // can it fit to screen?
 	if( diff >= 0) { 		// yes! message less than screen
-	    OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
-	    if(has_sign(p) && sign) OSD::write_S(sign);
+	    //OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
+	    OSD::relPanel(((byte)diff)/2,0); // show it centered
+	    if(sign) OSD::write_S(sign);
 	    osd.print((char *)mav_message);
 
 	} else {				// message don't fit
 	    int pos;
 	    
-	    if(has_sign(p) && sign) OSD::write_S(sign);
+	    if(sign) OSD::write_S(sign);
 	    if(is_alt(p)){
 		pos = 0;  // show only first chars
 	    } else {  /// else - animate
@@ -2159,8 +2123,8 @@ static void panCValue(point p) {
     if(has_sign(p)) osd_printi_1(fci,ch+1);
 
     osd_printi_1(f_4i+1,chan_raw[ch]);
-
 }
+
 
 static void panDayTime(point p) {
 /*
@@ -2218,7 +2182,7 @@ static void panDate(point p) {
   uint8_t month;
 
   uint32_t days = sys_days;
-  uint16_t y_day;
+//  uint16_t y_day;
 
     if(!lflags.got_date) return;
 
@@ -2233,7 +2197,7 @@ static void panDate(point p) {
 //      if (dayOfWeek >= 7) dayOfWeek -= 7;
       ++year;
     } else {
-      y_day = days;
+//      y_day = days;
 //      dayOfWeek  += days;
 //      dayOfWeek  %= 7;
 
@@ -2330,9 +2294,9 @@ static void panVario(point p) {
 
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
 
-    int linePosition = int(-vertical_speed*2) ; // 0 at middle
+    int linePosition = int(-vertical_speed*9) ; // 0 at middle, 9 points bwtween scale
 
-    if(screen_flags & scrFlg_Vario_MS) linePosition/=60;
+    if(!(screen_flags & scrFlg_Vario_MS)) linePosition*=60;
     
     if(is_alt2(p)) linePosition/=10;
     if(is_alt3(p)) linePosition/=2;

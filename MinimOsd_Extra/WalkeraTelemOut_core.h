@@ -22,7 +22,7 @@ long WalkeraTelem::gpsDdToDmsFormat(float &ddm){
     int deg = (int)ddm;
     float mm = (ddm - deg) * 60.0f;
 
-    mm = ((float)deg * 100.0f + mm) /100.0;
+    mm = f_div100((float)deg * 100.0f + mm);
 
     deg = (int) mm;
 

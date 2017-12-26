@@ -1,4 +1,4 @@
 #pragma once
 
-#define RELEASE_NUM 941
+#define RELEASE_NUM 942
 

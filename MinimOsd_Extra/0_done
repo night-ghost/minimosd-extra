@@ -1,1 +1,0 @@
-refusal from the Arduino's digitalWrite/pinMode gives another ~ 600 bytes of flash.

@@ -35,7 +35,7 @@ namespace OSD {
 
         public const int PORT_SPEED = 57600; 
         //*****************************************/		
-        public const string VERSION = "r941DV";
+        public const string VERSION = "r941aDV";
 
         //max 7456 datasheet pg 10
         //pal  = 16r 30 char
@@ -1046,6 +1046,9 @@ namespace OSD {
                 conf.eeprom.sets.autoswitch_times =convertTimes();
                 conf.eeprom.sets.timeOffset =  (uint8_t)(20 + timeOffset.Value);
 
+                conf.eeprom.sets.halfThrottleCurrent = (byte)tHalfThrottleCurrent.Value;
+                tHalfThrottleCurrent.Value = conf.eeprom.sets.halfThrottleCurrent;
+
             } else if (screen_number >= 0 && screen_number < npanel) {
                 //First Panel 
 
@@ -1284,6 +1287,7 @@ namespace OSD {
             conf.eeprom.sets.timeOffset = (uint8_t)(20 + timeOffset.Value);
 
             conf.eeprom.sets.halfThrottleCurrent = (byte)tHalfThrottleCurrent.Value;
+            tHalfThrottleCurrent.Value = conf.eeprom.sets.halfThrottleCurrent;
 
             int err=0;
             if(MavlinkModeMenuItem.Checked){
@@ -3033,11 +3037,11 @@ again:
 
             if (UNITS_combo.SelectedIndex == 0) {
                 pan.converts = false; //metric
-                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (m/min) / 10" : "Stall Speed (km/h)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS(m/min)/10" : "Stall Speed (km/h)";
                 OVERSPEED_label.Text = "Overspeed (km/h)";
             } else if (UNITS_combo.SelectedIndex == 1) {
                 pan.converts = true; //imperial
-                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS (ft/min) / 10" : "Stall Speed (mph)";
+                STALL_label.Text = cbxModelType.SelectedItem.ToString() == "Copter" ? "Max VS(ft/min)/10" : "Stall Speed (mph)";
                 OVERSPEED_label.Text = "Overspeed (mph)";
             }
 
@@ -4992,6 +4996,10 @@ typedef struct __mavlink_radio_status_t
         }
 
         private void aTmega644ToolStripMenuItem_Click(object sender, EventArgs e) {
+
+        }
+
+        private void groupBox16_Enter(object sender, EventArgs e) {
 
         }
 
