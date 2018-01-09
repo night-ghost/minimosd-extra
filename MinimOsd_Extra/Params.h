@@ -31,13 +31,13 @@ uint16_t param_remains;
 
 void push_parameter(mavlink_param_value_t *param){
     if(params_list == NULL) { // the first parameter so allocate memory
-        param_list = (mavlink_param_value_t *)malloc(param->param_count * sizeof(mavlink_param_value_t));
+        params_list = (mavlink_param_value_t *)malloc(param->param_count * sizeof(mavlink_param_value_t));
         if(params_list == NULL) return; // no memory
         
         param_remains = param->param_count - 1; // remember
     }
     
-    memmove(&params_list[param_index], param, sizeof(mavlink_param_value_t) );
+    memmove(&params_list[param->param_index], param, sizeof(mavlink_param_value_t) );
     
     param_remains--;
 }

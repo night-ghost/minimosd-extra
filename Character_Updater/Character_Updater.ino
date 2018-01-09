@@ -42,6 +42,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #undef PROGMEM 
 #define PROGMEM __attribute__(( section(".progmem.data") )) 
 
+#define HARDWARE_TYPE 0
+#define USE_MAVLINK 1
+
 #undef PSTR 
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
 
@@ -73,6 +76,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 #include "prototypes.h"
 
+#include "Defs.h"
+
 #include "Config_Func.h"
 
 #include "protocols.h"
@@ -80,6 +85,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <GCS_MAVLink.h>
 
 #include "OSD_Max7456.h"
+
+#include "eeprom.h"
 
 
 OSD osd; //OSD object

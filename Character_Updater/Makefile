@@ -17,6 +17,7 @@ MCU=atmega328p
 
 ARDUINO_LIBS = SingleSerial
 ARDUINO_LIBS += GCS_MAVLink
+ARDUINO_LIBS += fast_io
 
 include /usr/share/arduino/Arduino.mk
 

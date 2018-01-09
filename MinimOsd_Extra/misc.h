@@ -58,11 +58,17 @@ bool parse_osd_packet(uint8_t *p){
 
 #if HARDWARE_TYPE >0
  #ifdef MAVLINK_FONT_UPLOAD
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align" // yes I know
+
         case 'f': // font via MAVlink
             osd.write_NVM(*((uint16_t *)(&c->data)), (uint8_t *)(&c->data)+2); // first 2 byte is number, all another is bitmap
             c->cmd='!'; // confirm
             mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
             return true;
+
+#pragma GCC diagnostic pop
+
  #endif
 #endif
 

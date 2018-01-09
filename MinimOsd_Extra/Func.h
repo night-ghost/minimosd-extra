@@ -900,6 +900,8 @@ NOINLINE void logo(){
     osd_print_S(     "MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
     osd.print(millis());
 #else
+// There is some odd issue with alignment in the compilation that will cause non-working binaries.
+// If you get a blank screen after changing code, try to change the number of z's in the string below from 1 to 16
     osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff\0#1zzzz\n"));
     osd.print((uint16_t)millis());
 #endif

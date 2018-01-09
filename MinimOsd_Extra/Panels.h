@@ -2578,7 +2578,7 @@ void inline reset_setup_data(){ // called on any screen change
 }
 */
 #ifdef SLAVE_BUILD
-    static top_offset=0;
+    static uint8_t top_offset=0;
 #endif
 
 
@@ -2667,16 +2667,16 @@ static void panSetup(){
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
 
 #ifdef SLAVE_BUILD
-    uint16_t n= pscreen->size;
+    uint16_t size = pscreen->size;
     
-    if(n==0){ // special case, do it per-screen
-        uint8_t sel_row;
+    if(size==0){ // special case, do it per-screen
+        uint8_t sel_row=0;
     
         switch(setup_screen){
         case 3: // parameters
         // first draw current state
-            size=params_list[0].param_count+1;
-            for(byte i=0; i < size; i++) {
+            uint16_t psize=params_list[0].param_count+1;
+            for(byte i=0; i < psize; i++) {
                 byte row = SETUP_START_ROW + i;
 
                 
@@ -2691,7 +2691,7 @@ static void panSetup(){
         	    OSD::setPanel(1, row);
         	    char buf[20];
         	    
-        	    strncpy(buf,16, params_list[i-1].param_id);
+        	    strncpy(buf, params_list[i-1].param_id, 16);
         	    osd_print_S(buf);
         	}    
         
@@ -2706,7 +2706,7 @@ static void panSetup(){
 	        k=1;
 	        v = params_list[i-1].param_value;
 
-                const char fmt;
+                const char *fmt="";
                 switch(params_list[i-1].param_type){
                 case MAV_PARAM_TYPE_UINT8:  /* 8-bit unsigned integer | */
                     fmt="%3.0f";
@@ -2775,7 +2775,7 @@ static void panSetup(){
             k    = 1;
             v    = c_val;
 
-            mavlink_param_value_t &cur_param = params_list[i-1];
+            mavlink_param_value_t &cur_param = params_list[sel_row - SETUP_START_ROW -1];
 
             {
                 float inc = 1.0;

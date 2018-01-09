@@ -157,8 +157,8 @@ static uint16_t     lastMavSeconds=0;
 static uint32_t     lastMAVBeat = 0;
 
 
-static uint8_t      apm_mav_system = 0;
-static uint8_t      apm_mav_component=0;
+uint8_t      apm_mav_system = 0;
+uint8_t      apm_mav_component=0;
 static uint8_t      osd_autopilot=0;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 

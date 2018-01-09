@@ -347,12 +347,6 @@ void OSD::update() {
         max7456_off();        
         *b++=0;
     }
-
-//DBG_PRINTF("time=%ld\n",millis());
-
-//    max7456_on();
-//    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
-//    max7456_off();
 #endif
 }
 
