@@ -249,7 +249,7 @@ if(apm_mav_system  != msgbuf.m.sysid){
         	break;
                 
     // MAV_DATA_STREAM_POSITION,
-            case MAVLINK_MSG_ID_SYS_STATUS:
+            case MAVLINK_MSG_ID_SYS_STATUS: {
                 if(!FLAGS.useExtVbattA){
                     osd_vbat_A = mavlink_msg_sys_status_get_voltage_battery(&msgbuf.m) ; //Battery voltage, in millivolts (1 = 1 millivolt)
                     osd_battery_remaining_A = mavlink_msg_sys_status_get_battery_remaining(&msgbuf.m); //Remaining battery energy: (0%: 0, 100%: 100)
@@ -258,7 +258,11 @@ if(apm_mav_system  != msgbuf.m.sysid){
                     osd_curr_A = mavlink_msg_sys_status_get_current_battery(&msgbuf.m); //Battery current, in 10*milliamperes (1 = 10 milliampere)
 
                 //osd_mode = apm_mav_component;//Debug
-                break;
+                
+                // see https://github.com/DuraCopter/ardupilot/commit/c26fa868cf528606887068dbca95b7630ffcac95
+                uint16_t motor_error = mavlink_msg_sys_status_get_errors_count1(&msgbuf.m);
+                motor_state = (uint8_t)motor_error;
+                } break;
 
             case MAVLINK_MSG_ID_BATTERY2:
                 if(!FLAGS.useExtVbattB){
@@ -640,7 +644,7 @@ ADSB_Info adsb[MAX_ADSB];
                 } break;
 #endif
 
-#ifdef SLAVE_BUILD
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS)
             case MAVLINK_MSG_ID_PARAM_VALUE:
 /*
 typedef struct __mavlink_param_value_t
@@ -653,10 +657,11 @@ typedef struct __mavlink_param_value_t
 } mavlink_param_value_t;
                 
 */
+                extern void push_parameter(mavlink_param_value_t *param);
+
                 mavlink_param_value_t param;
                 
                 mavlink_msg_param_value_decode(&msgbuf.m, &param);
-                
                 push_parameter(&param); // store parameter to it's place in array
                 break;
 #endif
