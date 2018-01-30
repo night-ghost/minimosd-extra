@@ -2555,7 +2555,7 @@ static const PROGMEM Setup_screen screens[] = {
 #if defined(USE_SENSORS)
     {params3, (sizeof(params3)/sizeof(Params)), setup_sens },
 #endif
-#ifdef SLAVE_BUILD // internal OSD of Omnibus board
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS) // internal OSD of Omnibus board
 
     {params4, 0, setup_params },
 #endif
@@ -2590,7 +2590,7 @@ static NOINLINE void move_menu(int8_t dir){
     pscreen = &screens[setup_screen];
 
 
-#ifdef SLAVE_BUILD
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS)
     uint16_t n= pscreen->size;
     
     if(n==0){ // special case, do it per-screen
@@ -2666,7 +2666,7 @@ static void panSetup(){
 
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
 
-#ifdef SLAVE_BUILD
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS)
     uint16_t size = pscreen->size;
     
     if(size==0){ // special case, do it per-screen
@@ -2708,28 +2708,28 @@ static void panSetup(){
 
                 const char *fmt="";
                 switch(params_list[i-1].param_type){
-                case MAV_PARAM_TYPE_UINT8:  /* 8-bit unsigned integer | */
+                case MAV_PARAM_TYPE_UINT8:  /* 8-bit unsigned integer  */
                     fmt="%3.0f";
                     break;
-                case MAV_PARAM_TYPE_INT8:   /* 8-bit signed integer | */
+                case MAV_PARAM_TYPE_INT8:   /* 8-bit signed integer  */
                     fmt="%3.0f";
                     break;
-                case MAV_PARAM_TYPE_UINT16: /* 16-bit unsigned integer | */
+                case MAV_PARAM_TYPE_UINT16: /* 16-bit unsigned integer  */
                     fmt="%5.0f";
                     break;
-                case MAV_PARAM_TYPE_INT16:  /* 16-bit signed integer | */
+                case MAV_PARAM_TYPE_INT16:  /* 16-bit signed integer  */
                     fmt="%5.0f";
                     break;
-                case MAV_PARAM_TYPE_UINT32: /* 32-bit unsigned integer | */
-                case MAV_PARAM_TYPE_UINT64: /* 64-bit unsigned integer | */
+                case MAV_PARAM_TYPE_UINT32: /* 32-bit unsigned integer  */
+                case MAV_PARAM_TYPE_UINT64: /* 64-bit unsigned integer  */
                     fmt="%10.0f";
                     break;
-                case MAV_PARAM_TYPE_INT32:  /* 32-bit signed integer | */
-                case MAV_PARAM_TYPE_INT64:  /* 64-bit signed integer | */
+                case MAV_PARAM_TYPE_INT32:  /* 32-bit signed integer  */
+                case MAV_PARAM_TYPE_INT64:  /* 64-bit signed integer  */
                     fmt="%10.0f";
                     break;
-                case MAV_PARAM_TYPE_REAL32: /* 32-bit floating-point | */
-                case MAV_PARAM_TYPE_REAL64: /* 64-bit floating-point | */
+                case MAV_PARAM_TYPE_REAL32: /* 32-bit floating-point  */
+                case MAV_PARAM_TYPE_REAL64: /* 64-bit floating-point  */
                     fmt="%f";
                     break;
                 }

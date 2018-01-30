@@ -595,9 +595,9 @@ void setFdataVars()
             if(rssi_v < 0)   rssi_v = 0;
             
             if(rev) rssi_v=100-rssi_v;
-            rssi_norm=rssi_v;
-        } else 
             rssi_norm = rssi_v;
+        } else 
+            rssi_norm = rssi_v; // show raw value
     }
 
   //Set max data

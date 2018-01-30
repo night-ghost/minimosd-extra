@@ -289,6 +289,8 @@ byte climb_filter=10; //
 
 ADSB_Info adsb[MAX_ADSB];
 
+uint8_t motor_state;
+
 #ifndef SLAVE_BUILD
 #pragma pack(pop)
 #endif
