@@ -261,6 +261,7 @@ if(apm_mav_system  != msgbuf.m.sysid){
                 
                 // see https://github.com/DuraCopter/ardupilot/commit/c26fa868cf528606887068dbca95b7630ffcac95
                 uint16_t motor_error = mavlink_msg_sys_status_get_errors_count1(&msgbuf.m);
+                extern uint8_t motor_state;
                 motor_state = (uint8_t)motor_error;
                 } break;
 
