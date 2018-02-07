@@ -805,8 +805,11 @@ void On100ms(){ // периодические события, не связан�
         if( FLAGS.useExtVbattA ) {
         
             voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
-	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
+/*	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
 	    else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
+*/
+	    osd_vbat_A = voltageRaw;
+
 	    lflags.got_data=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
 	    byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
@@ -833,8 +836,11 @@ void On100ms(){ // периодические события, не связан�
 	if(FLAGS.useExtVbattB){
             voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // in mv - 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
+/*	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
 	    else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
+*/
+
+	    osd_vbat_B = voltageRaw;
     
 // 		вычислить osd_battery_remaining_B по напряжению!
 	    byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее

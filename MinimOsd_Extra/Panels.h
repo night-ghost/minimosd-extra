@@ -841,7 +841,7 @@ static inline void check_warn(point p)
 
 
     int iAirspeed =  mul_converts(osd_airspeed);
-    int iVolt = osd_vbat_A/100; // in 0.1v as sets.battv is
+    int iVolt = batt_a_volt_filtered/100; // in 0.1v as sets.battv is
 
 
 //1
@@ -874,7 +874,7 @@ static inline void check_warn(point p)
     if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
         wmask |= (1<<5);
 
-    iVolt = osd_vbat_B/100; // in 0.1v as sets.battBv is
+    iVolt = batt_b_volt_filtered/100; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
     if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
@@ -1121,6 +1121,7 @@ static void NOINLINE printVolt(uint16_t v,byte f) {
         fmt=f5_2f;
     
     float d = f_div1000(v);
+
     osd_printf_2(fmt,d, 0x0D);
 }
 
@@ -1129,7 +1130,9 @@ static void panBatt_A(point p){
     // should be here to use panel's settings
     filter(batt_a_volt_filtered,  osd_vbat_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
-    printVolt(batt_a_volt_filtered, is_alt3(p));
+    if(is_on(p)) {
+        printVolt(batt_a_volt_filtered, is_alt3(p));
+    }
 }
 
 
@@ -1141,11 +1144,12 @@ static void panBatt_A(point p){
 // Staus  : done
 
 static void panBatt_B(point p){
+    // should be here to use panel's settings
+    filter(batt_b_volt_filtered,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+
     if(is_on(p)) {
 	lflags.battB_is_on=1; // отобразить состояние панели во ФЛАГЕ
 
-        // should be here to use panel's settings
-        filter(batt_b_volt_filtered,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
         printVolt(batt_b_volt_filtered, is_alt3(p));
     } else
@@ -3056,7 +3060,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(horizon),		panHorizon, 	0 },
     { ID_of(pitch),		panPitch, 	0 },
     { ID_of(roll),		panRoll, 	0 },
-    { ID_of(batt_A),		panBatt_A, 	0xbc  },
+    { ID_of(batt_A) | 0x80,	panBatt_A, 	0xbc  },
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0 },

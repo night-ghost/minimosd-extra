@@ -558,3 +558,7 @@ v942
 * fixed bug in climbRate
 * changed variometer's scale
 
+v943
+* removed integer filtration of voltage in favor of built-in filtering in float
+* used filtered voltages for warnings
+
