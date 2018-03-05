@@ -1732,7 +1732,11 @@ const char PROGMEM s_m_tune[] = "tune"; //Tune		15
 const char PROGMEM s_m_hold[] = "hold"; //Position Hold (Earlier called Hybrid) 16
 const char PROGMEM s_m__brk[] = "brk";  //brake 17
 const char PROGMEM s_m_thrw[] = "thrw"; //throw 18
-
+const char PROGMEM s_m_adsb[] = "adsb"; //19:Avoid_ADSB
+const char PROGMEM s_m_thrw[] = "nGPS"; //20:Guided_NoGPS
+const char PROGMEM s_m_srtl[] = "srtl"; //21:Smart_RTL
+const char PROGMEM s_m_flow[] = "flow"; //22:flow hold
+const char PROGMEM s_m_foll[] = "foll"; //23:Follow
 
 const char PROGMEM p_m_manu[] = "manu"; //Manual
 const char PROGMEM p_mode03[] = "trai"; //Training
@@ -1802,7 +1806,8 @@ const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
     s_m_stab, s_m_acro, s_m_alth, s_m_auto, s_m_guid, 
     s_m_loit, s_m__rtl, s_m_circ, s_m_posh, s_m_land, 
     s_m_oflo, s_m_drif, s_mode_n, s_m_sprt, s_m_flip,
-    s_m_tune, s_m_hold, s_m__brk, s_m_thrw
+    s_m_tune, s_m_hold, s_m__brk, s_m_thrw, s_m_adsb,
+    s_m_thrw, s_m_srtl, s_m_flow, s_m_foll
  };
  #endif
 
