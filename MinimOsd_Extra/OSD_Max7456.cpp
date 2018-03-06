@@ -328,7 +328,7 @@ void OSD::update() {
 //  internal Ardupilot build
     extern void update_max_buffer(const uint8_t *cp, uint16_t len);
     update_max_buffer(osdbuf, sizeof(osdbuf));
-    memset(osdbuf, ' ', sizeof(osdbuf)); // clean out screen
+    memset(osdbuf, 0, sizeof(osdbuf)); // clean out screen
 #else
     max7456_on(); 
 /*
