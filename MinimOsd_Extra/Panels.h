@@ -3076,8 +3076,6 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(rose),		panRose, 	0 },
     { ID_of(heading),		panHeading, 	0 },
     { ID_of(Fdata),		panFdata, 	0 },
-    { ID_of(homeDist) | 0x80,	panHomeDis, 	0x0b },
-    { ID_of(homeDir), 		panHomeDir, 	0 },
     { ID_of(time),		panTime, 	0 },
     { ID_of(WP_dist),		panWPDis,	0x5c },
     { ID_of(alt),		panAlt, 	0x11 },
@@ -3116,6 +3114,8 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(fVibe),		panVibe, 	0 },
 #endif
     { ID_of(fVario),		panVario, 	0 },
+    { ID_of(homeDir), 		panHomeDir, 	0 },
+    { ID_of(homeDist) | 0x80,	panHomeDis, 	0x0b },
 #ifdef USE_ADSB
     { ID_of(fADSB),		panADSB, 	0 },
 #endif
