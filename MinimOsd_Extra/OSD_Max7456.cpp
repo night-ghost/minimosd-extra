@@ -8,6 +8,7 @@ namespace OSDns {
  extern void max7456_on();
 
 
+
 #else
 
  #if HARDWARE_TYPE == 0
@@ -68,6 +69,26 @@ void OSD::printf(const char *fmt, ...)
 void OSD::vprintf(const char *fmt, va_list ap)
 {
     print_vprintf(this, fmt, ap);
+}
+
+size_t OSD::printNumber(unsigned long n, uint8_t base)
+{
+  char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+  char *str = &buf[sizeof(buf) - 1];
+
+  *str = '\0';
+  
+  // prevent crash if called with base == 1
+  if (base < 2) base = 10;
+    
+  do {
+    char c = n % base;
+    n /= base;
+  
+    *--str = c < 10 ? c + '0' : c + 'A' - 10;
+  } while(n);
+
+  return write(str);
 }
 
 #endif

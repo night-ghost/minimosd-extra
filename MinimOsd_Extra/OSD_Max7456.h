@@ -113,11 +113,14 @@ class OSD: public BetterStream
     virtual byte_32 txspace() { return 255; }
     virtual void printf(const char *, ...) /*  FMT_PRINTF(2, 3) */ ;
     virtual void vprintf(const char *, va_list);
+    size_t printNumber(unsigned long n, uint8_t base);
     void printf_P(const char *fmt, float f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint32_t f) { printf(fmt,f); }
     void printf_P(const char *fmt, int f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t i1, uint16_t i2) { printf(fmt,i1,i2); }
+    void print(unsigned long n) { printNumber(n, 10); }
+    void print(const char str[]){ write(str); }
 #endif
 
     static void write_NVM(uint16_t font_count, uint8_t *character_bitmap);
