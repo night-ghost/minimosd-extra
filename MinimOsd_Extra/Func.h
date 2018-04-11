@@ -691,7 +691,7 @@ again:
 
 	memset( &msgbuf.bytes[0], 0, sizeof(msgbuf.bytes)); // clear packet buffer to initial state
     
-#if defined(AUTOBAUD)
+#if defined(AUTOBAUD) && !defined(USE_MWII)
 	Serial.end();
 	static uint8_t last_pulse = 15; // 57600 by default
 	uint8_t pulse=255;

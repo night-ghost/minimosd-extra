@@ -618,9 +618,9 @@ typedef struct {
 } MW_ATTITUDE_t;
 */
 //	r_struct((uint8_t*)&MW_ATT,6);
+	osd_att.roll = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
+	osd_att.pitch  = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
 	osd_heading = mwii_read_uint(offsetof(MW_ATTITUDE_t, Heading) );
-	osd_att.roll = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
-	osd_att.pitch  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
 //	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att)); // opposite direction
 DBG_PRINTF("got attitude roll=%d pitch=%d head=%d\n",osd_heading, osd_att.roll, osd_att.pitch);
 	break;
@@ -650,7 +650,7 @@ typedef struct {
 */
 //	r_struct((uint8_t*)&MW_ANALOG,7);
 	if(!FLAGS.useExtVbattA){
-	    osd_vbat_A              = mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
+	    osd_vbat_A              = 100u * (uint16_t)mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
 	    osd_battery_remaining_A = mwii_read_uint(offsetof(MW_ANALOG_t, pMeterSum) );
 	}
 	if (!FLAGS.useExtCurr)
