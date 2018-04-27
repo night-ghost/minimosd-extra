@@ -607,7 +607,7 @@ typedef struct {
     case MSP_COMP_GPS:
 	//r_struct((uint8_t*)&GPS.distanceToHome,4);
 	osd_home_distance  = mwii_read_uint(0 );
-	osd_home_direction = grad_to_sect(mwii_read_uint(2) );
+	osd_home_direction = mwii_read_uint(2);
 	break;
 
     case MSP_ATTITUDE:
