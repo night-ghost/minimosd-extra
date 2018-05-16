@@ -103,7 +103,7 @@ class OSD: public BetterStream
     static void update(void);
     static void write_S(uint8_t c);
     static void write_raw(uint8_t c);
-    virtual byte_32  available(void);
+    virtual byte_32  available(void) const override;
     virtual byte_16  read(void);
     virtual byte     peek(void);
     virtual void     flush(void);

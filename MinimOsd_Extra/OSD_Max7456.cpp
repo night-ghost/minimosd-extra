@@ -410,7 +410,7 @@ void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
 
 //------------------ pure virtual ones (just overriding) ---------------------
 
-byte_32  OSD::available(void){
+byte_32  OSD::available(void) const {
 	return 0;
 }
 byte_16  OSD::read(void){
