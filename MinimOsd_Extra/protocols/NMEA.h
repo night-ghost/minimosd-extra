@@ -105,25 +105,6 @@ uint8_t hex_c(uint8_t n) {    // convert '0'..'9','A'..'F' to 0..15
 } 
 
 
-/*
-// Parse a (potentially negative) number with up to 2 decimal digits -xxxx.yy
-int32_t parseDecimal(const char *term)
-{
-  bool negative = *term == '-';
-  if (negative) ++term;
-  
-  int32_t ret = 100 * (int32_t)atol(term);
-  
-  while (isdigit(*term)) ++term;
-  if (*term == '.' && isdigit(term[1]))
-  {
-    ret += 10 * (term[1] - '0');
-    if (isdigit(term[2]))
-      ret += term[2] - '0';
-  }
-  return negative ? -ret : ret;
-}
-*/
 
 int32_t parseTime(const char *term)
 {
@@ -242,53 +223,53 @@ $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
  ---0--|----1-------|----2------|----3------|----4-------|----5-------|----6---|---7---|---8----|--9-----|--10---|-11----|12-|13|-14--|-
           Time         Status      Lat         N/S          Lon          E/W     Speed   Course    Date     M.V  ...  *CS
 
-store to msg.nmea.lat
+store to msgbuf.nmea.lat
 
 */
         case 1:
             if (frame !=0 ) { // time at 1st pos
-                msg.nmea.time= parseTime(string);
+                msgbuf.nmea.time= parseTime(string);
             }
             break;
             
         case 2:    
-            if (frame == FRAME_GGA) {msg.nmea.lat = GPS_coord_to_degrees(string);}
+            if (frame == FRAME_GGA) {msgbuf.nmea.lat = GPS_coord_to_degrees(string);}
             break;
             
         case 3:
-            if (frame == FRAME_GGA && string[0] == 'S') msg.nmea.lat = -msg.nmea.lat;
-            if (frame == FRAME_RMC) {msg.nmea.lat = GPS_coord_to_degrees(string);}
+            if (frame == FRAME_GGA && string[0] == 'S') msgbuf.nmea.lat = -msgbuf.nmea.lat;
+            if (frame == FRAME_RMC) {msgbuf.nmea.lat = GPS_coord_to_degrees(string);}
             break;
 
         case 4:
-            if (frame == FRAME_GGA) {msg.nmea.lon = GPS_coord_to_degrees(string);}
-            if (frame == FRAME_RMC  && string[0] == 'S') msg.nmea.lat = -msg.nmea.lat;
+            if (frame == FRAME_GGA) {msgbuf.nmea.lon = GPS_coord_to_degrees(string);}
+            if (frame == FRAME_RMC  && string[0] == 'S') msgbuf.nmea.lat = -msgbuf.nmea.lat;
             break;
 
         case 5:
-            if (frame == FRAME_GGA && string[0] == 'W') msg.nmea.lon = -msg.nmea.lon;
-            if (frame == FRAME_RMC) {msg.nmea.lon = GPS_coord_to_degrees(string);}
+            if (frame == FRAME_GGA && string[0] == 'W') msgbuf.nmea.lon = -msgbuf.nmea.lon;
+            if (frame == FRAME_RMC) {msgbuf.nmea.lon = GPS_coord_to_degrees(string);}
             break;
 
         case 6:
-            if (frame == FRAME_GGA) {  msg.nmea.fix = (string[0] - '0');         }
-            if (frame == FRAME_RMC && string[0] == 'W') msg.nmea.lon = -msg.nmea.lon;
+            if (frame == FRAME_GGA) {  msgbuf.nmea.fix = (string[0] - '0');         }
+            if (frame == FRAME_RMC && string[0] == 'W') msgbuf.nmea.lon = -msgbuf.nmea.lon;
             break;
 
         case 7:
-            if (frame == FRAME_GGA) {msg.nmea.sats = atof(string);}
-            if (frame == FRAME_RMC) {msg.nmea.speed = atof(string);}  
+            if (frame == FRAME_GGA) {msgbuf.nmea.sats = atof(string);}
+            if (frame == FRAME_RMC) {msgbuf.nmea.speed = atof(string);}  
             break;
             
 
         case 8:
-            if (frame == FRAME_GGA) {msg.nmea.hdop  = atof(string);}
-            if (frame == FRAME_RMC) {msg.nmea.course = atof(string); }                 //ground course deg
+            if (frame == FRAME_GGA) {msgbuf.nmea.hdop  = atof(string);}
+            if (frame == FRAME_RMC) {msgbuf.nmea.course = atof(string); }                 //ground course deg
             break;
 
         case 9:
-            if (frame == FRAME_GGA) {msg.nmea.alt = atof(string);}  // altitude in meters added by Mis
-            if (frame == FRAME_RMC) {msg.nmea.date = atof(string); }
+            if (frame == FRAME_GGA) {msgbuf.nmea.alt = atof(string);}  // altitude in meters added by Mis
+            if (frame == FRAME_RMC) {msgbuf.nmea.date = atof(string); }
             break;
             
       } 
@@ -309,16 +290,16 @@ store to msg.nmea.lat
             frameOK = 1;
             
             // move GPS data to OSD data
-            osd_pos.lat            = msg.nmea.lat;
-            osd_pos.lon            = msg.nmea.lon;
-            osd_pos.alt = osd_alt_mav = msg.nmea.alt;
-            eph                    = msg.nmea.hdop * 100;
-            osd_heading            = msg.nmea.course;
-            osd_groundspeed        = msg.nmea.speed *5144L/100L; //gps speed in cm/s will be used for navigation
-            osd_fix_type           = msg.nmea.fix;
-            osd_satellites_visible = msg.nmea.sats;
-            day_seconds            = msg.nmea.time;
-//            msg.nmea.date;
+            osd_pos.lat            = msgbuf.nmea.lat;
+            osd_pos.lon            = msgbuf.nmea.lon;
+            osd_pos.alt = osd_alt_mav = msgbuf.nmea.alt;
+            eph                    = msgbuf.nmea.hdop * 100;
+            osd_heading            = msgbuf.nmea.course;
+            osd_groundspeed        = msgbuf.nmea.speed *5144L/100L; //gps speed in cm/s will be used for navigation
+            osd_fix_type           = msgbuf.nmea.fix;
+            osd_satellites_visible = msgbuf.nmea.sats;
+            day_seconds            = msgbuf.nmea.time;
+//            msgbuf.nmea.date;
         }
       }
       checksum_param=0;
@@ -345,7 +326,7 @@ void read_NMEA(){
             bytes_comes+=1;
 #endif
             // parse data to msg
-            if (parse_NMEA_char(c, &msg.string[0])) {
+            if (parse_NMEA_char(c, &msgbuf.string[0])) {
                 set_data_got();
             }
     }
@@ -427,96 +408,3 @@ void heartBeat() {
 
 }
 
-#if 0 
-void GPS_NewData() {
-  GPS_SerialInitialised=0;
-  if (GPS_active>0)
-    GPS_active--;
-  if (msg.nmea.fix && (msg.nmea.sats >= MINSATFIX)) {
-    if (msg.nmea.fix_HOME == 0){
-      GPS_reset_home_position();
-      msg.nmea.fix_HOME=1;
-      if (!msg.nmea.fix_HOME) {
-        GPS_distanceToHome = 0;
-        GPS_directionToHome = 0;
-        msg.nmea.alt = 0 ;
-        MwAltitude = 0 ;
-      }  
-    }
-
-    //calculate distance. bearings etc
-    uint32_t dist;
-    int32_t  dir;
-    GPS_distance_cm_bearing(&msg.nmea.lat,&msg.nmea.lon,&GPS_home[LAT],&GPS_home[LON],&dist,&dir);
-    GPS_distanceToHome = dist/100;
-    GPS_directionToHome = dir/100;
-    msg.nmea.alt =  msg.nmea.alt- msg.nmea.alt_home;
-    MwAltitude = msg.nmea.alt *100;
-    GPS_latitude = msg.nmea.lat;
-    GPS_longitude = msg.nmea.lon;
-    int16_t MwHeading360=msg.nmea.course/10;
-    if (MwHeading360>180)
-    MwHeading360 = MwHeading360-360;
-    MwHeading   = MwHeading360;
-    
-    if (GPS_armedangleset==0)  
-      armedangle=MwHeading;
-    if (GPS_distanceToHome>20){
-      GPS_armedangleset = 1;
-      armed=1;
-    }
-  
-    if (GPS_armedangleset==1){
-      if ((GPS_distanceToHome<20)&&(msg.nmea.speed<75)){
-        if ((GPS_home_timer+5000)>millis()){
-        }
-        else if((GPS_home_timer+15000)>millis()){
-          configPage=0;
-          armed=0;
-        }      
-        else{
-           configMode=0;
-           GPS_armedangleset=0;
-           previousarmedstatus=0;
-        }      
-      }
-      else {
-        GPS_home_timer=millis();
-      }    
-    }
-  }
-}
-
-
-void GPS_reset_home_position() {
-  if (msg.nmea.fix && msg.nmea.sats >= MINSATFIX) {
-      GPS_home[LAT] = msg.nmea.lat;
-      GPS_home[LON] = msg.nmea.lon;
-      msg.nmea.alt_home = msg.nmea.alt;
-      GPS_calc_longitude_scaling(msg.nmea.lat);  //need an initial value for distance and bearing calc
-      msg.nmea.fix_HOME = 1;
-  }
-}
-
-
-void GPS_calc_longitude_scaling(int32_t lat) {
-  float rads       = (abs((float)lat) / 10000000.0) * 0.0174532925;
-  GPS_scaleLonDown = cos(rads);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////
-// Get distance between two points in cm
-// Get bearing from pos1 to pos2, returns an 1deg = 100 precision
-void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_t* lon2,uint32_t* dist, int32_t* bearing) {
-  float dLat = *lat2 - *lat1;                                    // difference of latitude in 1/10 000 000 degrees
-  float dLon = (float)(*lon2 - *lon1) * GPS_scaleLonDown;
-  *dist = sqrt(sq(dLat) + sq(dLon)) * 1.113195;
-  
-  *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
-  if (*bearing < 0) *bearing += 36000;
-}
-
-
-
-#endif

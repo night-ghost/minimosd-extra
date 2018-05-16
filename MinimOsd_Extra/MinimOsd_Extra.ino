@@ -108,6 +108,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 // Get the common arduino functions
 #include "Arduino.h"
 
+//#include "from_arduino.h"
+#include "compat.h"
+
+#define DIGITALIO_NO_MIX_ANALOGWRITE
+#include <fast_io.h>
+
+
 // AVR Includes
 #include <math.h>
 #include <inttypes.h>
@@ -117,7 +124,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include <avr/wdt.h>
 #endif
 
-#include "compat.h"
 #include "Defs.h"
 
 #include "eeprom.h"
@@ -132,7 +138,6 @@ OSD osd; //OSD object
 
 
 #if HARDWARE_TYPE == 0
-
 // Objects and Serial definitions
 SingleSerialPort(Serial);
 #elif HARDWARE_TYPE == 1
@@ -197,8 +202,7 @@ mavlink_system_t mavlink_system = {12,1};  // sysid, compid
 #endif
 /* **********************************************/
 
-
-volatile byte vas_vsync=false;
+extern void unplug_slaves();
 
 // обработка прерывания по кадровому синхроимпульсу
 #if 0 // nested interrupts cause hang on some cameras :(
@@ -209,7 +213,6 @@ volatile byte nested=0;
 volatile byte nest_count=0; // only for debugging
 #endif
 
-SPI Spi = SPI();
 
 ISR(VSYNC_VECT) {
     vas_vsync=true;
@@ -276,23 +279,19 @@ ISR(VSYNC_VECT) {
 // PWM Measurement
 #if defined(PWM_PIN)
 void ReadINT_PIN() {	// прерывание по ноге внешнего PWM
-    uint32_t time=micros(); // the 1st place to exclude jitter
+    uint32_t time=micros();
 
     // We will start to read when signal goes HIGH
-    if(digitalRead(PWM_PIN) == HIGH) {
+    if(digitalReadFast(PWM_PIN) == HIGH) {
 
         // PWM Signal is HIGH, so measure it's length.
         int_Timer = time;
 
     } else {        // If PWM signal is getting LOW and timer is running, it must be falling edge and then we stop timer
-        uint32_t t= int_Timer; 
-        if( t /* && !New_PWM_Frame */){
-            time -= t;
-            PWM_IN = (int)(time);
-            int_Timer = 0;
+        PWM_IN = (int)(time - int_Timer);
+        int_Timer = 0;
 
-            New_PWM_Frame = true;
-        }
+//        New_PWM_Frame = true;
     }
 }
 
@@ -301,7 +300,7 @@ ISR(INT1_vect) {
 }
 #endif
 
-
+#if 0
 #define SERIAL_BUFSIZE 80
 
 void getSerialLine(char *cp, void(cb)() ){      // получение строки
@@ -326,11 +325,6 @@ void getSerialLine(char *cp, void(cb)() ){      // получение строк
         }
         if(c==0x0a) continue; // skip unneeded LF
 
-/*      if(c==0x08){   no manual editing
-            if(cnt) cnt--;
-            continue;
-        }
-*/
         cp[cnt]=c;
         if(cnt<SERIAL_BUFSIZE) cnt++;
 
@@ -351,19 +345,19 @@ void touchPins(){
             digitalWrite(pin_to_touch, !digitalRead(pin_to_touch) );
     }
 }
-
+#endif
 
 void setup()     {
     wdt_disable(); 
 
 #ifdef LEDPIN
-    pinMode(LEDPIN,OUTPUT); // led
+    pinModeFast(LEDPIN,OUTPUT); // led
     LED_ON; 		    // turn on for full light
 #endif
 
     Serial.begin(TELEMETRY_SPEED);
 
-    DBG_PRINTLN("#boot");
+//    DBG_PRINTLN("#boot");
     
 #if defined(SERIALDEBUG)
     dbgSerial.begin(38400);
@@ -401,7 +395,7 @@ void setup()     {
 
 #if defined(PWM_PIN)
     if(sets.ch_toggle == 1) { // only if used
-	pinMode(PWM_PIN, INPUT_PULLUP);
+	pinModeFast(PWM_PIN, INPUT_PULLUP);
 	//attachInterrupt(INT1, ReadINT_PIN, CHANGE);  // Attach Reading function to INTERRUPT
 	EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (CHANGE << ISC10);
         EIMSK |= (1 << INT1);
@@ -412,19 +406,17 @@ void setup()     {
     mavlink_comm_0_port = &Serial; // setup mavlink port
 #endif
 
-Serial.print_P(PSTR("#1zzzzz\n")); 
+//Serial.print_P(PSTR("#1zzzz\n"));
 
-    DBG_PRINTF("time=%ld\n",millis());
 
 
     // Prepare OSD for displaying 
-    extern  void unplugSlaves();
-    unplugSlaves();
+    unplug_slaves();   // unplug OSD
 
-    DBG_PRINTLN("# unplugSlaves"); DBG_PRINTF("time=%ld\n",millis());
 
-#if HARDWARE_TYPE == 1 // test pins
+#if 0 && HARDWARE_TYPE == 1 // test pins
 
+/*
     while(1) {
         char buf[SERIAL_BUFSIZE];
         
@@ -441,9 +433,11 @@ Serial.print_P(PSTR("#1zzzzz\n"));
         Serial.print_P(PSTR("pin=")); 
         Serial.println(pin_to_touch);
     }
+*/
 #endif
 
-    OSD::update();// clear memory
+
+    //OSD::update();// clear memory - too early! Don't call it before SPI init
     
     DBG_PRINTLN("# update"); DBG_PRINTF("time=%ld\n",millis());
 
@@ -485,13 +479,43 @@ Serial.print_P(PSTR("#1zzzzz\n"));
 
 #if !defined(SLAVE_BUILD)
         generate_PWM(0); // set pin to initial state
-	pinMode(PWM_out_pin,  OUTPUT);
+	//pinMode(PWM_out_pin,  OUTPUT);
+	
+        volatile uint8_t *reg;
+
+        // JWS: can I let the optimizer do this?
+        reg = portModeRegister(port);
+/*
+        if (mode == INPUT) {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg &= ~PWM_out_bit;
+                *PWM_out_port &= ~PWM_out_bit;
+                SREG = oldSREG;
+        } else if (mode == INPUT_PULLUP) {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg &= ~PWM_out_bit;
+                *PWM_out_port |= PWM_out_bit;
+                SREG = oldSREG;
+        } else */ {
+                uint8_t oldSREG = SREG;
+                cli();
+                *reg |= PWM_out_bit;
+                SREG = oldSREG;
+        }
+
 #endif
     }
 
-//Serial.print_P(PSTR("#2\n"));
 
     osd.init();    // Start display
+
+
+    OSD::update();// clear memory 
+    //memset(OSD::osdbuf,0x20,sizeof(OSD::osdbuf)); +26 bytes
+
+//Serial.print_P(PSTR("#3\n"));
 
     logo();
 
@@ -506,10 +530,10 @@ Serial.print_P(PSTR("#1zzzzz\n"));
     delay(10000); 
 */
 /*
-    eeprom_read_len((byte *)&msg,  768,  128 );
+    eeprom_read_len((byte *)&msgbuf,  768,  128 );
 
     OSD::setPanel(0,0);
-    hex_dump((byte *)&msg,0x70);
+    hex_dump((byte *)&msgbuf,0x70);
     OSD::update();
     delay(10000); 
 */
@@ -612,13 +636,13 @@ void loop()
     }
 
     if( lflags.need_redraw &&  !vsync_wait) { // сразу после прерывания дабы успеть закончить расчет к следующему
-        lflags.need_redraw=0; // экран перерисован
+        lflags.need_redraw=0; // экран сформирован
 
         setHomeVars();   // calculate and set Distance from home and Direction to home
 
         setFdataVars();  // накопление статистики и рекордов
 
-        writePanels(pt);   // writing enabled panels (check OSD_Panels Tab)
+        writePanels();   // writing enabled panels (check OSD_Panels Tab)
 
 //	LED_BLINK;
 
@@ -706,6 +730,10 @@ void loop()
             
             heartBeat();
 
+            for(uint8_t i=0; i<MAX_ADSB; i++) {
+                if(adsb[i].cnt) adsb[i].cnt--;
+            }
+
 #ifdef DEBUG
 	    if(seconds % 30 == 0) {
 		extern volatile uint16_t lost_bytes;
@@ -777,8 +805,11 @@ void On100ms(){ // периодические события, не связан�
         if( FLAGS.useExtVbattA ) {
         
             voltageRaw = float(voltageRaw) * sets.evBattA_koef  * ( 1000.0 * 5.115/0.29 /1023.0 / 8.0); // 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
-	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
+/*	    if(osd_vbat_A ==0) osd_vbat_A = voltageRaw;
 	    else               osd_vbat_A = (osd_vbat_A*3 +  voltageRaw +2)/4; // комплиментарный фильтр 1/4
+*/
+	    osd_vbat_A = voltageRaw;
+
 	    lflags.got_data=1;
 // 	вычислить osd_battery_remaining_A по напряжению!
 	    byte n=sets.battv / 33; //( 10* 3.3) number of elements in battery - limit assumed as 3.3v/cell. 10s=35v will not produce error
@@ -805,8 +836,11 @@ void On100ms(){ // периодические события, не связан�
 	if(FLAGS.useExtVbattB){
             voltageRaw = float(voltageRaw) * sets.evBattB_koef * (1000.0 * 5.11/0.292113 /1023.0 / 8.0) ; // in mv - 8 элементов, коэффициент домножен на 10, 10 бит АЦП + калибровка
 
-	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
+/*	    if(osd_vbat_B ==0) osd_vbat_B = voltageRaw;
 	    else               osd_vbat_B = (osd_vbat_B *3 +  voltageRaw +2)/4;
+*/
+
+	    osd_vbat_B = voltageRaw;
     
 // 		вычислить osd_battery_remaining_B по напряжению!
 	    byte n=sets.battBv / 33;  // 3.3*10 количество элементов в батарее

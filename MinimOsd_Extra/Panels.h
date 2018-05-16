@@ -7,10 +7,11 @@ extern struct loc_flags lflags;  // все булевые флаги кучей
 static void NOINLINE osd_setPanel(Point p){
     OSD::setPanel(p.x,p.y);
 }
-
+/*
 static void NOINLINE osd_relPanel(Point p){
     OSD::relPanel(p.x,p.y);
 }
+*/
 
 static void NOINLINE osd_nl(){
     OSD::write_S('\xff');
@@ -29,9 +30,9 @@ static /*NOINLINE*/ byte get_mhigh(){
     return pgm_read_byte(&measure->high);
 }
 
-static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
+static float /* NOINLINE */ cnvGroundSpeed() { // вынос инварианта
 
-    return osd_groundspeed * get_converts();
+    return  mul_converts(osd_groundspeed);
 }
 
 
@@ -41,7 +42,7 @@ static float /*NOINLINE*/ cnvGroundSpeed() { // вынос инварианта
 }*/
 
 static const PROGMEM char f3_0f[]="%3.0f";
-static const PROGMEM char f4i[]="%4i";
+static const PROGMEM char f_4i[]=".%4i";
 static const PROGMEM char f3i[]="%3i";
 static const PROGMEM char f2i[]="%2i";
 
@@ -68,7 +69,7 @@ static void NOINLINE printTimeCnv(uint32_t *t, byte blink){
 }
 
 
-static void printSpeed(PGM_P fmt, float s, byte alt){
+static void /* NOINLINE */  printSpeed(PGM_P fmt, float s, byte alt){
     byte c;
     
     if(alt){
@@ -82,18 +83,21 @@ static void printSpeed(PGM_P fmt, float s, byte alt){
 }
 
 static void NOINLINE printSpeedCnv(PGM_P fmt, float *s, byte alt){
-    printSpeed(fmt, *s * get_converts(), alt);
+    printSpeed(fmt, mul_converts(*s), alt);
 }
-static void printSpeedCnv(float *s, byte alt){
+static  NOINLINE  void printSpeedCnv(float *s, byte alt){
     printSpeedCnv(f3_0f, s, alt);
 }
 
 
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
-static void NOINLINE showArrow(uint8_t rotate_arrow){
+static void NOINLINE showArrow(int16_t grad){
     char arrow_set1 = 0x90;
 
+    uint8_t rotate_arrow;
+
+    rotate_arrow = grad_to_sect(grad);
 
     while(rotate_arrow>16) rotate_arrow -= 16;
     while(rotate_arrow<1)  rotate_arrow += 16;
@@ -328,7 +332,7 @@ static void showILS() {
 
         char subval_char = 0xCF;
 
-        char alt = (osd_alt_mav * get_converth() + 5) * 4.4; //44 possible position 5 rows times 9 chars
+        char alt = ( mul_converth(osd_alt_mav) + 5) * 4.4; //44 possible position 5 rows times 9 chars
         byte row=0;
 
         if((alt < 44) && (alt > 0)){
@@ -377,7 +381,6 @@ byte NOINLINE radar_char(){
 // символы квадрика с ориентацией
     static const byte arr[] PROGMEM = {0xb0, 0xb1, 0xb4, 0xb5, 0xb6, 0xb7, 0x7b, 0x7d };
 
-//home - showArrow(osd_home_direction);
 
     int index;
 
@@ -409,9 +412,7 @@ static void showRADAR(byte center_col, byte center_line, byte fTrack) {
     byte x = (int)(dst_x / (radar_zoom / SCALE_X) + 0.5);	// for even grid correction
 
 
-
     if(fTrack){
-//	static Point trk[4];
 	if(trk[0].x !=x || trk[0].y !=y){	// положение изменилось
 	    for(byte i=4; i!=1;){
 		i--;
@@ -507,7 +508,7 @@ static void panCOG(point p){
 
     off_course = normalize_angle(cog_100)-180;   // -180..180
 
-    showArrow(grad_to_sect(off_course)+8); 
+    showArrow(off_course+180); 
     osd_printi_1(PSTR("%4i\x05"), off_course);
 
 }
@@ -519,7 +520,7 @@ static const PROGMEM char f4_0f[]="%4.0f";
 
 static NOINLINE void printFullDist(float dd){
 
-    float f =  get_converth() * dd;
+    float f =  mul_converth(dd);
     if (f <= 9999) { // in meters
 	osd_printf_2(f4_0f, f, get_mhigh());
 
@@ -557,7 +558,8 @@ static void panDistance(point p){
 // Staus  : done
 
 static void panTemp(point p){
-    osd_printf_2(PSTR("%5.1f"), ((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100), pgm_read_byte(&measure->temps));    
+    float f=((temperature / 10.0 * pgm_read_byte(&measure->tempconv) + pgm_read_word(&measure->tempconvAdd)) / 100);
+    osd_printf_2(PSTR("%5.1f"),f, pgm_read_byte(&measure->temps));    
 }
 
 /* **************************************************************** */
@@ -572,30 +574,7 @@ static float        eff = 0; //Efficiency
 
 static void calc_energy(){
 #define EFF_FILTER 0.01
-
-// calculate mean even if throttle==0
-
-#if defined(USE_FILTER)
             filter(eff, (((float)osd_curr_A ) / cnvGroundSpeed())*10.0, 1/EFF_FILTER); // ток в 10ма, поэтому умножаем на 10
-#else
-
-// скорость у нас км/ч, ток в ма, получаем ма/км * ч = ма*ч / км, то есть сколько ма/ч надо затратить на километр полета
-            float raw_eff = ((float)osd_curr_A ) / cnvGroundSpeed() * 10.0;
-//DBG_PRINTF("raw eff=%f\n", raw_eff );
-
-	    if(eff==0)	eff = raw_eff;
-        
-//            eff = raw_eff * EFF_FILTER + eff * (1-EFF_FILTER); // комплиментарный фильтр 1/10
-            eff += (raw_eff  - eff) * EFF_FILTER; // комплиментарный фильтр 1/10
-        	
-            //eff = (((float)osd_curr_A * 10.0 ) / cnvGroundSpeed())*0.1  + eff * 0.9;
-            //dst+=(val-dst)*k;
-            //eff += ((((float)osd_curr_A ) / cnvGroundSpeed())* 10.0  - eff) * 0.1; // комплиментарный фильтр 1/10
-    	
-            //float e0=(((float)osd_curr_A ) / cnvGroundSpeed())* 10.0;
-            //eff += (e0  - eff) * 0.1; // комплиментарный фильтр 1/10
-#endif
-
 }
 
 static void print_energy(point p){
@@ -615,17 +594,23 @@ static void panEff(point p){
 
     if(!lflags.motor_armed) return;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+    
+    bool is_0 = (osd_groundspeed == 0); // no efficiency at 0 speed
+#pragma GCC diagnostic pop
+
+    
     if(is_alt(p)){
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
-	    calc_energy();
-	    print_energy(p);
-	}
+
+        calc_energy();
+        print_energy(p);
 	return;
     }
 
     if(sets.model_type==0){ // plane
 #ifdef IS_PLANE
-        if (osd_groundspeed != 0) { // no efficiency at 0 speed
+        if (!is_0) { // no efficiency at 0 speed
 
 	    calc_energy();
 
@@ -643,7 +628,8 @@ static void panEff(point p){
                 }
 
                 if (osd_climb < -0.05){
-                    float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (trip_distance - ddistance)) * get_converth();
+                    float glide = ((osd_alt_to_home / (palt - osd_alt_to_home)) * (trip_distance - ddistance));
+                    glide = mul_converth(glide);
                     int iGlide=glide;
                     if (iGlide > 9999) glide = 9999.0;
                     if (iGlide > 0){
@@ -651,13 +637,14 @@ static void panEff(point p){
                             OSD::write_S(0xee);
                         osd_printf_2(f4_0f, glide, get_mhigh()); // аэродинамическое качество
                     }
-                }else if (osd_climb >= -0.05 && osd_att.pitch < 0) {
+                }else if (/*osd_climb >= -0.05 &&*/ osd_att.pitch < 0) {
                     PGM_P f = PSTR("\x20\x90\x91");
                     if(lflags.blinker) f++;
                     osd_print_S(f); //термик
                 }
             }
         }
+
 
 #endif
     } else { // copter
@@ -724,20 +711,14 @@ static void panWindSpeed(point p){
 
     int dir=normalize_angle(osd_winddirection);
 
-#if defined(USE_FILTER)
     filter(nor_osd_windspeed,  osd_windspeed, 100 ); // комплиментарный фильтр 1/100 
-#else
-    //nor_osd_windspeed = osd_windspeed * 0.01 + nor_osd_windspeed * 0.99; // комплиментарный фильтр 1/100 
-    //dst+=(val-dst)*k;
-    nor_osd_windspeed += (osd_windspeed - nor_osd_windspeed) * 0.01; // комплиментарный фильтр 1/100 
-#endif
 
     bool alt=is_alt(p);
 
     printSpeedCnv(&osd_windspeed, alt);
     osd_nl();
 
-    showArrow(grad_to_sect(dir - osd_heading) + (is_alt2(p)?8:0) ); //print data to OSD
+    showArrow(dir - osd_heading + (is_alt2(p)?180:0) ); //print data to OSD
     printSpeedCnv(PSTR("%2.0f"), &nor_osd_windspeed, alt);
 
 }
@@ -800,8 +781,8 @@ static void panClimb(point p){
         if(is_alt3(p)) { 	// in m/s
             lflags.vs_ms=1;
             PGM_P fmt;
-            float v= vertical_speed/60; // multiplied by filter in func.h
-            int as = abs((int)v);
+            float v= vertical_speed; // filtered in func.h
+            int as = abs(v);
 	
             if(as<10 && !is_alt4(p))
                 fmt=PSTR("% 4.2f");
@@ -812,7 +793,8 @@ static void panClimb(point p){
             osd_printf_2(fmt, v, 0x18);
         } else {
             lflags.vs_ms=0;
-            osd_printf_2(f_4_0f, vertical_speed, pgm_read_byte(&measure->climbchar));
+            float f = vertical_speed*60;
+            osd_printf_2(f_4_0f, f, pgm_read_byte(&measure->climbchar));
         }
     }
 }
@@ -843,7 +825,7 @@ static void panAirSpeed(point p){
 
 /* **************************************************************** */
 
-#define WARNINGS 10
+#define WARNINGS 11
 
 uint8_t warning;
 
@@ -858,8 +840,8 @@ static inline void check_warn(point p)
     lflags.one_sec_timer_switch=0;
 
 
-    int iAirspeed = osd_airspeed * get_converts();
-    int iVolt = osd_vbat_A/100; // in 0.1v as sets.battv is
+    int iAirspeed =  mul_converts(osd_airspeed);
+    int iVolt = batt_a_volt_filtered/100; // in 0.1v as sets.battv is
 
 
 //1
@@ -886,13 +868,13 @@ static inline void check_warn(point p)
     if (!(sets.RSSI_raw%2) && rssi_norm < sets.rssi_warn_level )
         wmask |= (1<<4);
 
-    int iVs = (int)abs(vertical_speed) /10;
+    int iVs = (int)abs(vertical_speed*60)/10;
 
 //6
     if (sets.model_type==1 && sets.stall >0 && iVs > sets.stall ) // copter - vertical speed
         wmask |= (1<<5);
 
-    iVolt = osd_vbat_B/100; // in 0.1v as sets.battBv is
+    iVolt = batt_b_volt_filtered/100; // in 0.1v as sets.battBv is
 
 //7    voltage limit set and less                   capacity limit set and less
     if (sets.battBv !=0 && iVolt!=0 && (iVolt < sets.battBv) )
@@ -913,6 +895,10 @@ static inline void check_warn(point p)
         wmask |= (1<<9);
   }
 #endif
+
+    if(sets.halfThrottleCurrent && osd_throttle >70 && (uint8_t)filteredCurrent < sets.halfThrottleCurrent){
+        wmask |= (1<<10);
+    }
 
     if(wmask == 0) {
         warning = 0;
@@ -945,17 +931,17 @@ static inline void check_warn(point p)
 // Staus  : done
 
 
-const char PROGMEM w1[]="\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"; // No GPS fix!
-const char PROGMEM w2[]="\x20\x20\x53\x74\x61\x6c\x6c\x21";             //   Stall!
-const char PROGMEM w3[]="\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21";     // Over Speed!
-const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"; //Battery Low!
-const char PROGMEM w5[]="\x20\x4c\x6f\x77\x20\x52\x73\x73\x69!";        // Low Rssi!
-const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64\x21"; //Hi VSpeed!
-const char PROGMEM w7[]="Batt B low!"; 
-const char PROGMEM w8[]="Fence Low!";
-const char PROGMEM w9[]="Fence High!";
-const char PROGMEM w10[]="Fence Far!";
-
+const char PROGMEM w1[]="\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78"; // No GPS fix
+const char PROGMEM w2[]="\x20\x20\x53\x74\x61\x6c\x6c";             //   Stall
+const char PROGMEM w3[]="\x4f\x76\x65\x72\x53\x70\x65\x65\x64";     // Over Speed
+const char PROGMEM w4[]="\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77"; //Battery Low
+const char PROGMEM w5[]="\x20\x4c\x6f\x77\x20\x52\x73\x73\x69";        // Low Rssi!
+const char PROGMEM w6[]="\x48\x69\x67\x68\x20\x56\x53\x70\x65\x65\x64"; //Hi VSpeed
+const char PROGMEM w7[]="Batt B low"; 
+const char PROGMEM w8[]="Fence Low";
+const char PROGMEM w9[]="Fence High";
+const char PROGMEM w10[]="Fence Far";
+const char PROGMEM w11[]="Motor dead";
 const char * const PROGMEM warn_str[] = {
     w1,
     w2,
@@ -966,7 +952,8 @@ const char * const PROGMEM warn_str[] = {
     w7,
     w8,
     w9,
-    w10
+    w10,
+    w11,
 };
 
 static void panWarn(point p){
@@ -974,8 +961,10 @@ static void panWarn(point p){
 
     check_warn(p);
 
-    if(warning) 
-       osd_print_S((char *)pgm_read_word(&warn_str[warning-1]) );
+    if(warning) {
+        osd_print_S((char *)pgm_read_word(&warn_str[warning-1]) );
+        OSD::write_S('!');
+    }
 
 }
 
@@ -1000,13 +989,6 @@ static void panThr(point p){
 // Size   : 1 x 7  (rows x chars)
 // Staus  : done
 
-static NOINLINE void osd_print_bat(){
-    OSD::write_S(0x88); // донышко батарейки не зависит от
-    OSD::write_S(osd_battery_pic_A[0]);
-    OSD::write_S(osd_battery_pic_A[1]);
-    OSD::write_S(0x8e);
-//    osd.printf_P(fmt, osd_battery_pic_A[0], osd_battery_pic_A[1], f);
-}
 
 static /*NOINLINE */ byte guessMaxVolt(){
     if(max_battery_reading >=95 && max_battery_reading <=100) 
@@ -1031,14 +1013,17 @@ static void panBatteryPercent(point p){
 //    setBatteryPic(osd_battery_remaining_B, osd_battery_pic_B);     // battery B remaning picture
 
     if(has_sign(p)) {
-        osd_print_bat();
+        OSD::write_S(0x88); // донышко батарейки не зависит от
+        OSD::write_S(osd_battery_pic_A[0]);
+        OSD::write_S(osd_battery_pic_A[1]);
+        OSD::write_S(0x8e);
     }
 
     if (is_alt(p)) {
 	osd_printi_1(f2i,val);        
         osd_percent();
     } else {
-	osd_printi_1(f4i,mah_used);
+	osd_printi_1(f_4i+1,mah_used);
         osd.write_S(0x01);
     }
 
@@ -1104,10 +1089,10 @@ static void panRoll(point p){
 // Staus  : done
 
 static void panCur_A(point p){
+// filtered current for warning and panel
+    filter(filteredCurrent,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
 
-    static float curr=0;
-
-    filter(curr,  osd_curr_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    if(!is_on(p)) return;
 
     PGM_P fmt;    
 
@@ -1116,7 +1101,8 @@ static void panCur_A(point p){
     else
         fmt=f5_2f;
 
-    osd_printf_2(fmt, curr * 0.01, 0x0E); // in amps
+    float f = filteredCurrent * 0.01;
+    osd_printf_2(fmt, f, 0x0E); // in amps
 }
 
 /* **************************************************************** */
@@ -1133,15 +1119,20 @@ static void NOINLINE printVolt(uint16_t v,byte f) {
         fmt=f4_1f;
     else
         fmt=f5_2f;
-    osd_printf_2(fmt, f_div1000(v), 0x0D);
+    
+    float d = f_div1000(v);
+
+    osd_printf_2(fmt,d, 0x0D);
 }
 
 static void panBatt_A(point p){
-    static float volt=0;
 
-    filter(volt,  osd_vbat_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+    // should be here to use panel's settings
+    filter(batt_a_volt_filtered,  osd_vbat_A, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
-    printVolt(volt, is_alt3(p));
+    if(is_on(p)) {
+        printVolt(batt_a_volt_filtered, is_alt3(p));
+    }
 }
 
 
@@ -1153,13 +1144,14 @@ static void panBatt_A(point p){
 // Staus  : done
 
 static void panBatt_B(point p){
+    // should be here to use panel's settings
+    filter(batt_b_volt_filtered,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
+
     if(is_on(p)) {
 	lflags.battB_is_on=1; // отобразить состояние панели во ФЛАГЕ
-        static float volt=0;
 
-        filter(volt,  osd_vbat_B, get_alt_filter(p) ); // комплиментарный фильтр 1/n.
     
-        printVolt(volt, is_alt3(p));
+        printVolt(batt_b_volt_filtered, is_alt3(p));
     } else
         lflags.battB_is_on = ( sets.battBv!=0 ); // включено если есть надобность контроля
 }
@@ -1229,9 +1221,6 @@ static const PROGMEM char * const gps_fmtF[]= {
 };
 
 
-//static void NOINLINE print_gps(PGM_P f, byte div){
-
-//}
 
 static void NOINLINE  print_coord(point p, float *v) {
     PGM_P f;
@@ -1272,21 +1261,6 @@ static void panGPS(point p){
 	    return;
 	}
     }
-
-/*
-    byte fLow= is_alt(p)?1:0;      // low precision
-
-    byte idx= fLow | (has_sign(p)?2:0);
-
-    if(is_alt2(p)){ // fractional
-	f=(const char *)pgm_read_word(&gps_fmt[idx]);
-        osd.printf_P(f, coord_frac(osd_pos.lat, fLow), div, coord_frac(osd_pos.lon, fLow));
-	return;
-    } 
-
-    f=(const char *)pgm_read_word(&gps_fmtF[idx]);
-    print_gps(f,div);
-*/
 
     if(has_sign(p)) OSD::write_S(3);
     print_coord(p, &osd_pos.lat);
@@ -1501,14 +1475,14 @@ static void panTune(point p){
     if(has_sign(p)) 
 	OSD::write_S(0x11);
     
-    float err = alt_error * get_converth();
+    float err = -mul_converth(alt_error);
 
-    osd_printf_2(f3_0f, -err, get_mhigh());
+    osd_printf_2(f3_0f, err, get_mhigh());
     
     osd_nl();
     if(has_sign(p)) 
         OSD::write_S(0x13);
-    printSpeed(aspd_error / 100.0);
+    printSpeed(aspd_error/100.0);
  #endif
 #endif
 }
@@ -1519,9 +1493,7 @@ static void panTune(point p){
 static void panWaitMAVBeats(){
 
 #if 0 // testintg things
-
-    OSD::setPanel(3,3);
-    
+    OSD::setPanel(0,0);
 #endif
     osd_groundspeed=0; // to not move with last speed when "no data"
 
@@ -1627,23 +1599,9 @@ static void panRose(point p){
 static int getTargetBearing(){
     int a=normalize_angle(wp_target_bearing);
 
-    return grad_to_sect(a - osd_heading); //Convert to int 1-16 
+    return a - osd_heading; 
 }
 
-/* **************************************************************** */
-// Panel  : panWPDir
-// Needs  : X, Y locations
-// Output : 2 symbols that are combined as one arrow, shows direction to next waypoint
-// Size   : 1 x 2  (rows x chars)
-// Staus  : not ready
-/*
-static void panWPDir(point p){
-    if(wp_number > 0 ){
-   
-	showArrow(getTargetBearing());
-    }
-}
-*/
 /* **************************************************************** */
 // Panel  : panWPDis
 // Needs  : X, Y locations
@@ -1662,12 +1620,16 @@ static void panWPDis(point p){
 
         osd_printi_1(f2i, wp_number);
         osd_blank();
-        osd_printf_2(f4_0f, ((float)wp_dist * get_converth()), h);
+        float f = (float)wp_dist;
+        f=mul_converth(f);
+        osd_printf_2(f4_0f, f, h);
         osd_nl();
     
         showArrow(getTargetBearing());
         osd_print_S(PSTR("\x20\x58\x65")); //Xe
-        osd_printf_2(f4_0f, (err * get_converth()), h);
+        f=err;
+        f = mul_converth(f);
+        osd_printf_2(f4_0f, f, h);
 //    }
 }
 
@@ -1690,26 +1652,25 @@ static void panMessage(point p){
 
 #define MAX_MSG_SIZE 26
 
-//    lflags.show_screnN = !is_alt2(p);
-
     if(mav_message[0] && mav_msg_ttl != seconds) { // вызывается не реже 2 раз в секунду поэтому точное сравнение будет работать
 	char sign=0;
 
 #if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
-        if(mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
+        if(has_sign(p) && mav_msg_severity <= MAV_SEVERITY_CRITICAL) sign='!';
 #endif
 
 
 	int8_t diff = MAX_MSG_SIZE - mav_msg_len; // can it fit to screen?
 	if( diff >= 0) { 		// yes! message less than screen
-	    OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
-	    if(has_sign(p) && sign) OSD::write_S(sign);
+	    //OSD::setPanel(p.x + ((byte)diff)/2,p.y); // show it centered
+	    OSD::relPanel(((byte)diff)/2,0); // show it centered
+	    if(sign) OSD::write_S(sign);
 	    osd.print((char *)mav_message);
 
 	} else {				// message don't fit
 	    int pos;
 	    
-	    if(has_sign(p) && sign) OSD::write_S(sign);
+	    if(sign) OSD::write_S(sign);
 	    if(is_alt(p)){
 		pos = 0;  // show only first chars
 	    } else {  /// else - animate
@@ -1770,8 +1731,12 @@ const char PROGMEM s_m_flip[] = "flip"; //Flip		14
 const char PROGMEM s_m_tune[] = "tune"; //Tune		15
 const char PROGMEM s_m_hold[] = "hold"; //Position Hold (Earlier called Hybrid) 16
 const char PROGMEM s_m__brk[] = "brk";  //brake 17
-const char PROGMEM s_m_thrw[] = "thrw";  //throw 18
-
+const char PROGMEM s_m_thrw[] = "thrw"; //throw 18
+const char PROGMEM s_m_adsb[] = "adsb"; //19:Avoid_ADSB
+const char PROGMEM s_m_ngps[] = "nGPS"; //20:Guided_NoGPS
+const char PROGMEM s_m_srtl[] = "srtl"; //21:Smart_RTL
+const char PROGMEM s_m_flow[] = "flow"; //22:flow hold
+const char PROGMEM s_m_foll[] = "foll"; //23:Follow
 
 const char PROGMEM p_m_manu[] = "manu"; //Manual
 const char PROGMEM p_mode03[] = "trai"; //Training
@@ -1841,7 +1806,8 @@ const char PROGMEM p_mode19[] = "qloi"; //quad-loiter
     s_m_stab, s_m_acro, s_m_alth, s_m_auto, s_m_guid, 
     s_m_loit, s_m__rtl, s_m_circ, s_m_posh, s_m_land, 
     s_m_oflo, s_m_drif, s_mode_n, s_m_sprt, s_m_flip,
-    s_m_tune, s_m_hold, s_m__brk, s_m_thrw
+    s_m_tune, s_m_hold, s_m__brk, s_m_thrw, s_m_adsb,
+    s_m_ngps, s_m_srtl, s_m_flow, s_m_foll
  };
  #endif
 
@@ -1940,6 +1906,8 @@ static void panFlightMode(point p){
     //PGM_P mode_str;
     const char * const *ptr;
     byte len;
+    PGM_P str;
+
     
 #if defined(USE_UAVTALK)
         mode = osd_mode;
@@ -1969,9 +1937,11 @@ static void panFlightMode(point p){
     
     if(pm.m.main_mode == 4 && pm.m.sub_mode < len){
         ptr = subm_c_strings;
+        mode=pm.m.sub_mode;
     }else{
         len = sizeof(mode_c_strings)/sizeof(char *);
         ptr = mode_c_strings;
+        mode = pm.m.main_mode;
     }
 #endif
 
@@ -2018,7 +1988,6 @@ static void panFlightMode(point p){
 #endif
     
 
-    PGM_P str;
     if(mode >= len) {
 	str=s_mode_n;
     } else
@@ -2033,11 +2002,14 @@ static void panFlightMode(point p){
 
 
 static void panRadarScale(Point p){
-    float dd= radar_zoom * STEP_WIDTH * get_converth();
+    float dd= STEP_WIDTH * radar_zoom;
     
-    if(radar_zoom >=40) // 10 000 
-        osd_printf_2(f4_2f, f_div1000(dd), pgm_read_byte(&measure->distchar));
-    else
+    dd = mul_converth(dd);
+    
+    if(radar_zoom >=40) {// 10 000 
+        dd = f_div1000(dd);
+        osd_printf_2(f4_2f, dd , pgm_read_byte(&measure->distchar));
+    } else
         osd_printf_2(f4_0f, dd, get_mhigh());
 }
 
@@ -2064,7 +2036,7 @@ static void printSensor(byte n){
 
     float v=s.K * sensorData[n] + s.A;
 
-    osd.printf(s.format,v);
+    osd.printf(s.format,v); // format in RAM!
 }
 
 static void NOINLINE panSensor(point p, byte n) {
@@ -2099,7 +2071,8 @@ static void  panSensor4(point p) {
 
 
 static void panHdop(point p) {
-    osd_printf_1(f4_2f,eph/100.0);
+    float f = eph/100.0;
+    osd_printf_1(f4_2f, f);
 }
 
 
@@ -2158,9 +2131,9 @@ static void panCValue(point p) {
 
     if(has_sign(p)) osd_printi_1(fci,ch+1);
 
-    osd_printi_1(f4i,chan_raw[ch]);
-
+    osd_printi_1(f_4i+1,chan_raw[ch]);
 }
+
 
 static void panDayTime(point p) {
 /*
@@ -2191,7 +2164,7 @@ static const PROGMEM char f_02i[]=".%02d";
 
 #if defined(USE_NMEA)
 static void panDate(point p) {
-    uint32_t date=msg.nmea.date;
+    uint32_t date=msgbuf.nmea.date;
     
     // 230394 – Дата, 23 марта 1994 года
     uint8_t day = date / 10000;
@@ -2202,9 +2175,9 @@ static void panDate(point p) {
     if(is_alt(p)) { // yy.m.d
         osd_printi_1(f_02i+1,  day);
         osd_printi_1(f_02i, mon);
-        osd_printi_1(PSTR(".%4d"),  date);
+        osd_printi_1(f_4i,  date);
     } else {
-        osd_printi_1(f4i,   date);
+        osd_printi_1(f_4i+1,   date);
         osd_printi_1(f_02i, mon);
         osd_printi_1(f_02i, day);
     }
@@ -2218,7 +2191,7 @@ static void panDate(point p) {
   uint8_t month;
 
   uint32_t days = sys_days;
-  uint16_t y_day;
+//  uint16_t y_day;
 
     if(!lflags.got_date) return;
 
@@ -2233,7 +2206,7 @@ static void panDate(point p) {
 //      if (dayOfWeek >= 7) dayOfWeek -= 7;
       ++year;
     } else {
-      y_day = days;
+//      y_day = days;
 //      dayOfWeek  += days;
 //      dayOfWeek  %= 7;
 
@@ -2267,9 +2240,9 @@ static void panDate(point p) {
     if(is_alt(p)) { // yy.m.d
         osd_printi_1(f_02i+1,  days+1);
         osd_printi_1(f_02i, month+1);
-        osd_printi_1(PSTR(".%4d"),  year);
+        osd_printi_1(f_4i,  year);
     } else {
-        osd_printi_1(f4i,   year);
+        osd_printi_1(f_4i+1,   year);
         osd_printi_1(f_02i, month+1);
         osd_printi_1(f_02i, days+1);
     }
@@ -2282,7 +2255,7 @@ static void panDate(point p) {
 static void panMotor(point p) {
     if(is_alt(p)) { // absolute values
         for(byte i=0;i<4;i++){
-            osd_printi_1(f4i, pwm_out[i]);
+            osd_printi_1(f_4i+1, pwm_out[i]);
             if(i==1) osd_nl();
             else     osd_blank();
         }
@@ -2296,6 +2269,7 @@ static void panMotor(point p) {
     }
 }
 
+#ifdef USE_VIBE
 static void panVibe(point p) {
     if(has_sign(p)) osd_print_S(PSTR("  x  y  z\xff"));
     
@@ -2307,7 +2281,7 @@ static void panVibe(point p) {
     for(i=0;i<3;i++)
         osd_printi_1(f3i, clipping[i]);
 }
-
+#endif
 
 
 static void panVario(point p) {
@@ -2329,15 +2303,15 @@ static void panVario(point p) {
 
     // calculate climb char - 9 pos in 5 chars = 45 points, chars C7-D0
 
-    int linePosition = int(-vertical_speed*2) ; // 0 at middle
+    int linePosition = int(-vertical_speed*9) ; // 0 at middle, 9 points bwtween scale
 
-    if(screen_flags & scrFlg_Vario_MS) linePosition/=60;
+    if(!(screen_flags & scrFlg_Vario_MS)) linePosition*=60;
     
     if(is_alt2(p)) linePosition/=10;
     if(is_alt3(p)) linePosition/=2;
     if(is_alt4(p)) linePosition/=4;
     
-    linePosition = (linePosition + totalNumberOfLines) / 2; // linePosition + 
+    linePosition = (linePosition + totalNumberOfLines) / 2; // move to middle
 
     int8_t  charPosition = linePosition / 9;
     uint8_t selectedChar = 0xC7 + 8 - (linePosition % 9);
@@ -2353,7 +2327,26 @@ static void panVario(point p) {
     OSD::write_xy(x, charPosition, selectedChar);
 }
 
+#ifdef USE_ADSB
+static void panADSB(point p) {
+// show up to 4 rows of pointers to nearest aircrafts with optional distances
+ 
+    for(uint8_t i=0; i<MAX_ADSB; i++) {
+        if(adsb[i].cnt) {
+            if(has_sign(p)) OSD::write_raw(0x20);
 
+            float distance = coord_dist(&adsb[i].coord, &osd_pos, true);
+    
+            showArrow(coord_bearing());
+            printFullDist(distance);
+        }
+    }
+}
+#endif
+
+#if HARDWARE_TYPE > 0
+// features for big boards
+#endif
 
 #if 0
 uint16_t readVCC() { // in mv
@@ -2379,6 +2372,7 @@ uint16_t readVCC() { // in mv
     }
     
     return (118645531UL /* * VCC_AVGB / 100 */ ) / sum; // in mv, calibrated
+}
 #endif
 
 
@@ -2554,11 +2548,25 @@ static const PROGMEM Params params3[] = {
 };
 #endif
 
+#ifdef SLAVE_BUILD // internal OSD of Omnibus board
+
+static const  char n_Parameters[]     = "   Full Parameter list";
+
+static const PROGMEM Params params4[] = {
+	{n_Parameters,     0,   0,             0}, 
+};
+
+#endif
+
 static const PROGMEM Setup_screen screens[] = {
     {params1, (sizeof(params1)/sizeof(Params)), 0 },
     {params2, (sizeof(params2)/sizeof(Params)), setup_horiz },
 #if defined(USE_SENSORS)
     {params3, (sizeof(params3)/sizeof(Params)), setup_sens },
+#endif
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS) // internal OSD of Omnibus board
+
+    {params4, 0, setup_params },
 #endif
     {0,0} // end marker
 };
@@ -2578,13 +2586,47 @@ void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
 }
 */
-static NOINLINE void move_menu(char dir){
+#ifdef SLAVE_BUILD
+    static uint8_t top_offset=0;
+#endif
+
+
+// переходы вверх-вниз в пределах экрана
+static NOINLINE void move_menu(int8_t dir){
 
     const Setup_screen *pscreen;
 
     pscreen = &screens[setup_screen];
 
+
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS)
+    uint16_t n= pscreen->size;
+    
+    if(n==0){ // special case, do it per-screen
+        switch(setup_screen){
+        case 3: // parameters
+            n=params_list[0].param_count+1;
+
+again2:
+    
+            if(      dir < 0 && setup_menu == 0) setup_menu = n;	// цикл по параметрам,
+            else if( dir > 0 && setup_menu == n) setup_menu = 0;
+            else setup_menu +=dir;
+            
+            if(      dir < 0 && setup_menu < top_offset) top_offset--;
+            else if( dir > 0 && setup_menu - top_offset > (MAX7456_screen_rows-1)) top_offset++;
+        
+
+            if(setup_menu==0) goto again2;          // пропускаем заголовок                
+            break;
+        }
+        return;
+    
+    } else n--;
+    
+#else
     byte n= pgm_read_byte((void *)&pscreen->size) -1;
+#endif
 
 again:
     
@@ -2595,7 +2637,8 @@ again:
     if(!pgm_read_word((void *)&params[setup_menu].value) ) goto again; // если нет связанной переменной то еще шаг - пропускаем заголовок
 }
 
-static void /*NOINLINE*/ move_screen(char dir){
+// переходы по экранам настройки
+static void /*NOINLINE*/ move_screen(int8_t dir){
 
     setup_menu=1;
 
@@ -2611,12 +2654,12 @@ static void /*NOINLINE*/ move_screen(char dir){
 
 
 static void panSetup(){
+    //static const PROGMEM float incs[]={1, 0.1, 0.01, 0.001 };
+    static const PROGMEM uint16_t incs[]={1, 10, 100, 1000 };
 
     const Params *p;
     float v = 0;
-    byte size;
     byte type;
-//    byte col = 0;
     char *nm;
     byte k;
 
@@ -2626,13 +2669,175 @@ static void panSetup(){
 
     const Setup_screen *pscreen;
 
+    storeChannels(); // save channels values on first entry to screen (clears on screen switch)
+
     pscreen = &screens[setup_screen];
 
     params = (const Params *)pgm_read_word((void *)&pscreen->ptr);
-    size = pgm_read_byte((void *)&pscreen->size);
 
-    storeChannels(); // save channels values on first entry to screen (clears on screen switch)
+#if defined(SLAVE_BUILD) && defined(MAVLINK_PARAMS)
+    uint16_t size = pscreen->size;
+    
+    if(size==0){ // special case, do it per-screen
+        uint8_t sel_row=0;
+    
+        switch(setup_screen){
+        case 3: // parameters
+        // first draw current state
+            uint16_t psize=params_list[0].param_count+1;
+            for(byte i=0; i < psize; i++) {
+                byte row = SETUP_START_ROW + i;
 
+                
+                if(i==0) {
+    	            OSD::setPanel(1, row);
+        	    p = &params[i];
+	            nm=(char *)pgm_read_word((void *)&p->name);
+    
+        	    osd_print_S(nm);
+        	} else {
+        	    row-=top_offset;
+        	    OSD::setPanel(1, row);
+        	    char buf[20];
+        	    
+        	    strncpy(buf, params_list[i-1].param_id, 16);
+        	    osd_print_S(buf);
+        	}    
+        
+	        //            x    y
+                OSD::setPanel(19, row);
+            
+
+	        if(i == setup_menu) { // current pos
+	            OSD::write_S('>');
+	        }
+
+	        k=1;
+	        v = params_list[i-1].param_value;
+
+                const char *fmt="";
+                switch(params_list[i-1].param_type){
+                case MAV_PARAM_TYPE_UINT8:  /* 8-bit unsigned integer  */
+                    fmt="%3.0f";
+                    break;
+                case MAV_PARAM_TYPE_INT8:   /* 8-bit signed integer  */
+                    fmt="%3.0f";
+                    break;
+                case MAV_PARAM_TYPE_UINT16: /* 16-bit unsigned integer  */
+                    fmt="%5.0f";
+                    break;
+                case MAV_PARAM_TYPE_INT16:  /* 16-bit signed integer  */
+                    fmt="%5.0f";
+                    break;
+                case MAV_PARAM_TYPE_UINT32: /* 32-bit unsigned integer  */
+                case MAV_PARAM_TYPE_UINT64: /* 64-bit unsigned integer  */
+                    fmt="%10.0f";
+                    break;
+                case MAV_PARAM_TYPE_INT32:  /* 32-bit signed integer  */
+                case MAV_PARAM_TYPE_INT64:  /* 64-bit signed integer  */
+                    fmt="%10.0f";
+                    break;
+                case MAV_PARAM_TYPE_REAL32: /* 32-bit floating-point  */
+                case MAV_PARAM_TYPE_REAL64: /* 64-bit floating-point  */
+                    fmt="%f";
+                    break;
+                }
+
+                if(i == setup_menu) {
+                    c_val = v;  // store currently edited value
+                    sel_row = row;
+                }
+
+                osd_printf_1(fmt, v);
+        
+            }
+        
+            if(!lflags.flag_05s) return;
+            lflags.flag_05s=0;
+
+            lflags.got_data=1;   // renew screen
+
+            {
+	        int cd;
+
+        	cd=channelDiff(1);
+	        if ( cd >  150){  move_menu(1);   return; } // переходы по строкам по верх-низ
+                if ( cd < -150){  move_menu(-1);  return; }
+        
+                cd=channelDiff(3);
+                if (cd >  150){  move_screen(1);  return; } // переходы по экранам - левый дж лево-право
+                if (cd < -150){  move_screen(-1); return; }
+            }
+
+
+            OSD::setPanel(/*col*/ 20, sel_row); // в строку с выбранным параметром
+
+            p = &params[setup_menu];
+
+            bool fNeg=false;
+            int diff = channelDiff(0); // ( chan_raw_middle[0] - chan_raw[0] );
+            if(diff<0) {
+        	diff = -diff;
+        	fNeg=true;
+            }
+
+            k    = 1;
+            v    = c_val;
+
+            mavlink_param_value_t &cur_param = params_list[sel_row - SETUP_START_ROW -1];
+
+            {
+                float inc = 1.0;
+                int min, max;
+
+                switch(cur_param.param_type){
+                case MAV_PARAM_TYPE_UINT8:  /* 8-bit unsigned integer | */
+                case MAV_PARAM_TYPE_INT8:   /* 8-bit signed integer | */
+                case MAV_PARAM_TYPE_UINT16: /* 16-bit unsigned integer | */
+                case MAV_PARAM_TYPE_INT16:  /* 16-bit signed integer | */
+                case MAV_PARAM_TYPE_UINT32: /* 32-bit unsigned integer | */
+                case MAV_PARAM_TYPE_UINT64: /* 64-bit unsigned integer | */
+                case MAV_PARAM_TYPE_INT32:  /* 32-bit signed integer | */
+                case MAV_PARAM_TYPE_INT64:  /* 64-bit signed integer | */
+            	    if(     diff>300)	inc=10;	    
+        	    break;
+
+                case MAV_PARAM_TYPE_REAL32: /* 32-bit floating-point | */
+                case MAV_PARAM_TYPE_REAL64: /* 64-bit floating-point | */
+        	    inc /= incs[(int)(diff/100) - 1];
+        	    break;
+                }
+    
+                if(diff>100){
+        	    if(fNeg) inc = -inc;
+    	            v+= inc;
+
+//                    if(v<min) v=min;
+//                    if(v>max) v=max;
+                }
+            }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+
+            if(v != c_val) { // value changed
+        	cur_param.param_value = v;
+                
+                // send parameter back
+                mavlink_msg_param_set_send(MAVLINK_COMM_0, apm_mav_system, apm_mav_component,
+                    cur_param.param_id, cur_param.param_value, cur_param.param_type);
+            }
+#pragma GCC diagnostic pop
+            break;
+        }
+        return;
+
+    }
+#else
+    byte size = pgm_read_byte((void *)&pscreen->size);
+#endif
+
+// first draw current state
     for(byte i=0; i < size; i++) {
 	{
 	    byte row = SETUP_START_ROW + i;
@@ -2771,8 +2976,6 @@ as_char:
 	case 's': // sensors
         case 'f': // float param
 	    size=4;
-	    //static const PROGMEM float incs[]={1, 0.1, 0.01, 0.001 };
-	    static const PROGMEM uint16_t incs[]={1, 10, 100, 1000 };
 	
 	    inc /= incs[(int)(diff/100) - 1];
 	    break;
@@ -2796,6 +2999,9 @@ as_char:
             }
         }
     }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
 
     if(v != c_val) { // value changed
 //Serial.printf_P(PSTR("write new=%f old=%f\n"), v, value_old);;
@@ -2831,13 +3037,13 @@ as_c:		*((char *)pval) = cv + add;
 
 
 	eeprom_write_len( (byte *)pval,  EEPROM_offs(sets) + ((byte *)pval - (byte *)&sets),  size );
-
+#if defined(USE_SENSORS)
 no_write:
-
+#endif
         if(type & 0x80) renew();
 
     }
-
+#pragma GCC diagnostic pop
 }
 #endif
 
@@ -2855,10 +3061,11 @@ struct Panels_list {
 // ids - max 127 so bit 0x80 is a flag of "always call"
 
 const Panels_list PROGMEM panels_list[] = {
+//    id                        func           sign
     { ID_of(horizon),		panHorizon, 	0 },
     { ID_of(pitch),		panPitch, 	0 },
     { ID_of(roll),		panRoll, 	0 },
-    { ID_of(batt_A),		panBatt_A, 	0xbc  },
+    { ID_of(batt_A) | 0x80,	panBatt_A, 	0xbc  },
     { ID_of(batt_B) | 0x80,	panBatt_B, 	0x26  },
     { ID_of(GPS_sats),		panGPSats, 	0 },
     { ID_of(GPS),		panGPS, 	0 },
@@ -2869,8 +3076,6 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(rose),		panRose, 	0 },
     { ID_of(heading),		panHeading, 	0 },
     { ID_of(Fdata),		panFdata, 	0 },
-    { ID_of(homeDist) | 0x80,	panHomeDis, 	0x0b },
-    { ID_of(homeDir), 		panHomeDir, 	0 },
     { ID_of(time),		panTime, 	0 },
     { ID_of(WP_dist),		panWPDis,	0x5c },
     { ID_of(alt),		panAlt, 	0x11 },
@@ -2879,7 +3084,7 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(airSpeed),		panAirSpeed, 	0x13 },
     { ID_of(throttle),		panThr, 	0x02 },
     { ID_of(FMod),		panFlightMode,	0x7f },
-    { ID_of(curr_A),		panCur_A, 	0xbd },
+    { ID_of(curr_A) | 0x80,     panCur_A, 	0xbd },
     { ID_of(Power),		panPower, 	'W'  },
     { ID_of(windSpeed),		panWindSpeed, 	0x1d },
     { ID_of(climb) | 0x80,	panClimb, 	0x15 },
@@ -2905,8 +3110,15 @@ const Panels_list PROGMEM panels_list[] = {
     { ID_of(fDate),		panDate, 	0 },
     { ID_of(dayTime),		panDayTime, 	0 },
     { ID_of(pMotor),		panMotor, 	0 },
+#ifdef USE_VIBE
     { ID_of(fVibe),		panVibe, 	0 },
+#endif
     { ID_of(fVario),		panVario, 	0 },
+    { ID_of(homeDir), 		panHomeDir, 	0 },
+    { ID_of(homeDist) | 0x80,	panHomeDis, 	0x0b },
+#ifdef USE_ADSB
+    { ID_of(fADSB),		panADSB, 	0 },
+#endif
 // warnings should be last
     { ID_of(warn) | 0x80,       panWarn,	0 }, // show warnings even if screen is disabled
     {0, 0}
@@ -2928,7 +3140,6 @@ static void print_all_panels(const Panels_list *pl ) {
     
 #endif
 
-
     for(;;){
 	byte n = pgm_read_byte(&pl->n); // номер панели в массиве
 	fPan_ptr f = (fPan_ptr)pgm_read_word(&pl->f);
@@ -2943,7 +3154,7 @@ static void print_all_panels(const Panels_list *pl ) {
 		if(s) OSD::write_S(s);
 	    }
 	    f(p);
-	} else if(n & 0x80) { // call even if not visible - w/o sign
+	} else if(n & 0x80) { // call even if not visible - w/o sign (usually for calculations)
 	    f(p);
 	}
 	pl++;
@@ -2956,8 +3167,9 @@ uint16_t uidiff(uint16_t a, uint16_t b){
 
 }
 
-void writePanels(unsigned long pt){  // текущее время - функция инлайнится и это просто удаляет лишний вызов millis()
+void writePanels(){ 
 
+    unsigned long pt = millis();
     osd.detectMode(); // PAL/NTSC live
 
 // если выбран самолет
@@ -2981,6 +3193,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
 
 //DBG_PRINTF("time_since(&lastMAVBeat)=%d\n", time_since(&lastMAVBeat));
 
+#ifdef SHOW_NO_DATA
 //    if(pt > (lastMAVBeat + 2500)){
     {
 	uint16_t t=time_since(&lastMAVBeat);
@@ -2989,6 +3202,7 @@ void writePanels(unsigned long pt){  // текущее время - функци
             return;
         }
     }
+#endif
 
     if(FLAGS.results_on){
  //Only show flight summary 10 seconds after landing and if throttle < 15
@@ -3045,8 +3259,6 @@ show_fdata:
 	    osd_setPanel(p); // place cursor    
 	    panWarn(p);
 	}
-	
-
     } 
 }
 

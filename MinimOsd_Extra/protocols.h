@@ -71,11 +71,11 @@ union {
 #endif
 
     byte bytes[0x40]; // for font uploading 
-} msg;
+} msgbuf;
 
 
 #if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
-#define  m_mavlink_buffer (&msg.m)
+#define  m_mavlink_buffer (&msgbuf.m)
 #include <GCS_MAVLink.h>
 //#include "../GCS_MAVLink/GCS_MAVLink.h"
 #endif

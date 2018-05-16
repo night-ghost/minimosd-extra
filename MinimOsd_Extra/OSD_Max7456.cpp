@@ -1,7 +1,15 @@
 #include "compat.h"
 #include "Config.h"
 
-#ifndef SLAVE_BUILD
+#ifdef SLAVE_BUILD
+namespace OSDns {
+
+ extern void max7456_off();
+ extern void max7456_on();
+
+
+
+#else
 
  #if HARDWARE_TYPE == 0
   #include <SingleSerial.h> // MUST be first
@@ -10,10 +18,16 @@
  #endif
 
  #include "Arduino.h"
+ 
+ #define DIGITALIO_NO_MIX_ANALOGWRITE
+ #include <fast_io.h>
+ 
  #include "compat.h"
  #include "Spi.h"
  #include "eeprom.h"
 
+static void max7456_off();
+static void max7456_on();
 
  static INLINE void max7456_off(){
     PORTD |= _BV(PD6);         //digitalWrite(MAX7456_SELECT,HIGH);
@@ -23,19 +37,14 @@
     PORTD &= ~_BV(PD6);         //digitalWrite(MAX7456_SELECT,LOW);
  }
 
-#else
-namespace OSDns {
-
- extern void max7456_off();
- extern void max7456_on();
-
 #endif
+
+void unplug_slaves() {
+    max7456_off();
+}
 
 #include "OSD_Max7456.h"
 
-void unplugSlaves(){   //Unplug list of SPI
-    max7456_off();  //digitalWrite(MAX7456_SELECT,  HIGH); // unplug OSD
-}
 
 #include "prototypes.h"
 
@@ -47,6 +56,43 @@ uint8_t  OSD::osdbuf[16*30+1]; // основной буфер, куда выво
 uint16_t OSD::bufpos;
 
 
+#ifdef SLAVE_BUILD
+
+void OSD::printf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+}
+
+void OSD::vprintf(const char *fmt, va_list ap)
+{
+    print_vprintf(this, fmt, ap);
+}
+
+size_t OSD::printNumber(unsigned long n, uint8_t base)
+{
+  char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+  char *str = &buf[sizeof(buf) - 1];
+
+  *str = '\0';
+  
+  // prevent crash if called with base == 1
+  if (base < 2) base = 10;
+    
+  do {
+    char c = n % base;
+    n /= base;
+  
+    *--str = c < 10 ? c + '0' : c + 'A' - 10;
+  } while(n);
+
+  return write(str);
+}
+
+#endif
+
 
 //------------------ init ---------------------------------------------------
 
@@ -55,17 +101,12 @@ void OSD::adjust(){
   max7456_on();
   setBrightness();
 
-//Serial.printf_P(PSTR("adjust bright=%d horiz=%d vert=%d\n"),sets.OSD_BRIGHTNESS,sets.horiz_offs, sets.vert_offs);
-
   MAX_write(MAX7456_HOS_reg, /* 0x20 + */  sets.horiz_offs); // 0x20 default - already shifted
   MAX_write(MAX7456_VOS_reg, /* 0x10 + */  sets.vert_offs); // 0x10 default
 
   max7456_off();
 }
 
-void delay_15(){
-    delay(15);
-}
 
 void MAX_mode(byte mode){
     MAX_write(MAX7456_VM0_reg,  mode);
@@ -77,7 +118,8 @@ void OSD::reset(){
 
     byte cnt=15;
 
-    while(cnt-- && !( MAX_read(MAX7456_STAT_reg_read) & 0x7) ) {//read status register - sync to soft-only versions
+    uint8_t sts;
+    while(cnt-- && !(sts=(MAX_read(MAX7456_STAT_reg_read) & 0x7)) && sts!=7 ) {//read status register - sync to soft-only versions
         byte j=3;
 
         while(j--)  MAX_rw(0xff); // try to sync
@@ -89,7 +131,17 @@ void OSD::reset(){
 
     delay_15();
 
+  // define sync (auto,int,ext)
+    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_internal | MAX7456_CLEAR_display);  // first time on internal sync
+
+    delay_150();
+
     hw_init();
+}
+
+void OSD::set_current_mode(){
+//    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  
+    MAX_mode( MAX7456_ENABLE_display | video_mode | MAX7456_SYNC_autosync);  
 }
 
 void OSD::hw_init(){
@@ -103,12 +155,7 @@ void OSD::hw_init(){
 
     MAX_write(MAX7456_OSDM_reg, 0b00010010); // 0x00011011 default
 
-  // define sync (auto,int,ext)
-    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_internal);  // first time on internal sync
-
-    delay_150();
-
-    MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync);  // and then switch to auto mode
+    set_current_mode(); // and then switch to auto mode
 
  // max7456_off(); - in adjust();
 
@@ -120,10 +167,10 @@ void OSD::hw_init(){
 void OSD::init()
 {
 #ifndef SLAVE_BUILD
-    pinMode(MAX7456_SELECT,OUTPUT);
-    pinMode(MAX7456_VSYNC, INPUT_PULLUP);
-    pinMode(MAX7456_RESET_PIN, OUTPUT);
-    digitalWrite(MAX7456_RESET_PIN, HIGH);
+    pinModeFast(MAX7456_SELECT,OUTPUT);
+    pinModeFast(MAX7456_VSYNC, INPUT_PULLUP);
+    pinModeFast(MAX7456_RESET_PIN, OUTPUT);
+    digitalWriteFast(MAX7456_RESET_PIN, HIGH);
 #endif
     
     reset();
@@ -188,7 +235,8 @@ void OSD::setMode(uint8_t themode){
     if(video_mode != mode){
 	video_mode = mode;
         max7456_on();
-        MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync); 
+        //MAX_mode( MAX7456_ENABLE_display_vert | video_mode | MAX7456_SYNC_autosync); 
+        set_current_mode();
         max7456_off();
     }
 }
@@ -252,17 +300,32 @@ void OSD::relPanel(uint8_t _col, uint8_t _row){
 
 
 //------------------ write ---------------------------------------------------
-void NOINLINE OSD::write_raw(uint8_t c){ // the only way to write 0x7c to memory
-    if( /*c!=0xff this check is done in write_S && */  bufpos < sizeof(osdbuf) /* Check added by jussip */)	// 0xFF character is MAX7456's "end of screen"
+void NOINLINE OSD::write_raw(uint8_t c){ 
+    if(bufpos < sizeof(osdbuf) /* && c!=0xff */ ){
         osdbuf[bufpos++] = c;
+    }
 }
 
+/*
+    sometimes this compiles to
+    
+00000fc8 <_ZN3OSD7write_SEc>:
+     fc8:       e4 cf           rjmp    .-56            ; 0xf92 <_ZN3OSD9write_rawEh>
+     fca:       08 95           ret
+
+so all checks are moved out
+*/
 
 void OSD::write_S(uint8_t c){
-  if(c == 0xff){
-    row++;
-    calc_pos();
-  } else
+    if(c == (uint8_t)0xff){
+        row++;
+        calc_pos();
+        return;
+    }
+  
+    if(c == 0x20){
+        c=0;
+    }
     write_raw(c);
 }
 
@@ -282,40 +345,29 @@ void OSD::update() {
     uint8_t *end_b = b+sizeof(osdbuf);
 
     osdbuf[sizeof(osdbuf)-1] = MAX7456_END_string; // 0xFF - "end of screen" character
-/*
-    wee need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
-    
-*/
 #ifdef SLAVE_BUILD 
-//  internal Ardupilot build should use DMA to transfer
+//  internal Ardupilot build
     extern void update_max_buffer(const uint8_t *cp, uint16_t len);
     update_max_buffer(osdbuf, sizeof(osdbuf));
-
+    memset(osdbuf, 0, sizeof(osdbuf)); // clean out screen
 #else
     max7456_on(); 
+/*
+    we need to transfer 480 bytes, SPI speed set to 8 MHz (MAX requires min 100ns SCK period) so one byte goes in 1uS and all transfer will ends up in ~500uS
+    time of VBI is 1600uS so we have a 3x 
+*/
 
     MAX_write(MAX7456_DMAH_reg, 0);
     MAX_write(MAX7456_DMAL_reg, 0);
-    MAX_write(MAX7456_DMM_reg, 1); // автоинкремент адреса
-
-uint32_t cnt=0;
+    MAX_write(MAX7456_DMM_reg,  1); // автоинкремент адреса
 
     max7456_off(); 
     for(; b < end_b;) {
-        max7456_on(); // strobing each byte with CS is necessary :(
+        max7456_on(); // strobing each byte with CS is necessary - MAX7456 datasheet figure 21
         SPI::transfer(*b);
-        *b++=' ';
-        max7456_off();
-        
-        
-        cnt++;
+        max7456_off();        
+        *b++=0;
     }
-
-DBG_PRINTVARLN(cnt); DBG_PRINTF("time=%ld\n",millis());
-
-//    max7456_on();
-//    SPI::transfer(MAX7456_END_string); // 0xFF - "end of screen" character
-//    max7456_off();
 #endif
 }
 
@@ -327,13 +379,10 @@ void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
   byte screen_char;
 
   char_address_hi = font_count;
-//  byte char_address_lo = 0;  - autoincrement mode
-
-//    cli(); - нет смысла 
 
   max7456_on();
 
-  MAX_mode( MAX7456_DISABLE_display);
+  MAX_mode( MAX7456_DISABLE_display); // required to access EEPROM
 
   MAX_write(MAX7456_CMAH_reg, char_address_hi);// set start address high
 
@@ -347,20 +396,13 @@ void  OSD::write_NVM(uint16_t font_count, uint8_t *character_bitmap)
   MAX_write(MAX7456_CMM_reg, WRITE_nvr);
 
   // wait until bit 5 in the status register returns to 0 (12ms)
-#if 0
-  while (1) {
-    Spi.transfer(MAX7456_STAT_reg_read);
-    if(!(Spi.transfer(0xff) & STATUS_reg_nvr_busy)) break;
-  }
-#else
   while (1) {
     if(!(MAX_read(MAX7456_STAT_reg_read) & STATUS_reg_nvr_busy)) break;
     extern void delay_telem();
     delay_telem(); // some delay
   }
-#endif
 
-  MAX_mode( MAX7456_ENABLE_display_vert);// turn on screen next vertical
+  MAX_mode(MAX7456_ENABLE_display_vert);// turn on screen next vertical sync
 
   max7456_off();
 

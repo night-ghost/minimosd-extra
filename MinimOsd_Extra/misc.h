@@ -17,7 +17,7 @@ typedef struct MAV_conf { // needs to fit in 253 bytes
 } Mav_conf;
 #pragma pack(pop)
 
-void parse_osd_packet(uint8_t *p){
+bool parse_osd_packet(uint8_t *p){
     Mav_conf *c = (Mav_conf *)p;
 
     if(c->magick[0] == 0xEE && c->magick[1] == 'O' && c->magick[2] == 'S' && c->magick[3] == 'D') {
@@ -25,13 +25,19 @@ void parse_osd_packet(uint8_t *p){
 	case 'w':
 	    eeprom_write_len((uint8_t *)&c->data, (uint16_t)(c->id) * 128,  c->len );
 	    lflags.was_mav_config=1;
-	    break;
+ #if HARDWARE_TYPE >0
+            c->cmd='!'; // confirm
+            mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
+ #endif
+	    return true;
 	
 	
 	case 'b':
 	    if(c->len==0 && lflags.was_mav_config) {
 #if defined(SLAVE_BUILD)
-// nothing to do
+// just reload new values
+                readSettings();
+
 #else 
 	        __asm__ __volatile__ (    // Jump to RST vector
 	            "clr r30\n"
@@ -40,21 +46,30 @@ void parse_osd_packet(uint8_t *p){
 	        );
 #endif
 	    }
-	    break;
+	    return true;
 #ifdef MAVLINK_READ_EEPROM
         case 'r':
             eeprom_read_len((uint8_t *)&c->data, (uint16_t)(c->id) * 128,  c->len );
 
             mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
-            break;
+            return true;
             
 #endif
 
+#if HARDWARE_TYPE >0
+ #ifdef MAVLINK_FONT_UPLOAD
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align" // yes I know
 
-#ifdef MAVLINK_FONT_UPLOAD
         case 'f': // font via MAVlink
             osd.write_NVM(*((uint16_t *)(&c->data)), (uint8_t *)(&c->data)+2); // first 2 byte is number, all another is bitmap
-            break;
+            c->cmd='!'; // confirm
+            mavlink_return_packet(MAVLINK_MSG_ID_ENCAPSULATED_DATA, MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN, MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC); // send packet back
+            return true;
+
+#pragma GCC diagnostic pop
+
+ #endif
 #endif
 
 	default:
@@ -62,6 +77,7 @@ void parse_osd_packet(uint8_t *p){
 	}
     }
 
+    return false;
 }
 
 // sending in manual mode - calculate CRC and send to UART
@@ -79,20 +95,20 @@ void parse_osd_packet(uint8_t *p){
 void mavlink_return_packet(uint8_t id, uint8_t len, uint8_t crc) {
     uint16_t checksum;
     
-    msg.m.magic  = MAVLINK_STX;
-    msg.m.len    = len;
-    msg.m.msgid  = id;
-    msg.m.sysid  = mavlink_system.sysid;
-    msg.m.compid = MAV_COMP_ID_CAMERA; // stole this id
+    msgbuf.m.magic  = MAVLINK_STX;
+    msgbuf.m.len    = len;
+    msgbuf.m.msgid  = id;
+    msgbuf.m.sysid  = mavlink_system.sysid;
+    msgbuf.m.compid = MAV_COMP_ID_CAMERA; // stole this id
 
-    checksum = crc_calculate(((const uint8_t*)&msg.m.len), MAVLINK_CORE_HEADER_LEN + len);
+    checksum = crc_calculate(((const uint8_t*)&msgbuf.m.len), MAVLINK_CORE_HEADER_LEN + len);
 #if MAVLINK_CRC_EXTRA
     crc_accumulate(crc, &checksum);
 #endif
-//    serial_hex_dump((uint8_t *)&msg.m.magic, MAVLINK_NUM_HEADER_BYTES + len);
+//    serial_hex_dump((uint8_t *)&msgbuf.m.magic, MAVLINK_NUM_HEADER_BYTES + len);
 
-    _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msg.m.magic, MAVLINK_NUM_HEADER_BYTES);
-    _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msg.m.payload64, len );
+    _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msgbuf.m.magic, MAVLINK_NUM_HEADER_BYTES);
+    _mavlink_send_uart((mavlink_channel_t)0, (const char *)&msgbuf.m.payload64, len );
     _mavlink_send_uart((mavlink_channel_t)0, (const char *)&checksum, 2);    
 }
 

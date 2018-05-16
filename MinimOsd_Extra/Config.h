@@ -12,7 +12,7 @@
 #define VERSION "2.4" 
 
 // **************************
-#define DEBUG
+//#define DEBUG
 
 
 /*
@@ -22,15 +22,15 @@
 */
 
 #ifndef HARDWARE_TYPE
-#if defined(MCU_STM32F103C8) || defined(MCU_STM32F103CB)
-#define HARDWARE_TYPE 2 // for STM32
-#elif defined(MCU_atmega644p)
-#define HARDWARE_TYPE 1 // for 644
-#else
-#define HARDWARE_TYPE 0 // for 328 by default
+ #if defined(MCU_STM32F103C8) || defined(MCU_STM32F103CB)
+  #define HARDWARE_TYPE 2 // for STM32
+ #elif defined(MCU_atmega644p)
+  #define HARDWARE_TYPE 1 // for 644
+ #else
+  #define HARDWARE_TYPE 0 // for 328 by default
 #endif
 
-#warning "HARDWARE_TYPE set to " HARDWARE_TYPE
+ #warning "HARDWARE_TYPE set to " HARDWARE_TYPE
 
 #endif
 
@@ -58,6 +58,10 @@
 #define AUTOBAUD 1
 #define USE_SENSORS 1
 #endif
+
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+#define USE_VIBE 1
 
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
@@ -159,6 +163,11 @@
 #define AUTOBAUD 1
 #define USE_SENSORS 1
 
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+#define USE_VIBE 1
+
+
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
 
@@ -203,8 +212,13 @@
 
 #define FONT_UPLOAD 1
 #define USE_SETUP 1
-#define AUTOBAUD 1
-#define USE_SENSORS 1
+//#define AUTOBAUD 1 no need
+//#define USE_SENSORS 1 no pins
+
+#define USE_ADSB 1
+#define SHOW_NO_DATA 1
+#define USE_VIBE 1
+
 
 //#define PWM_IN_INTERRUPT 1
 //#define PWM_BY_INTERRUPT 1 not work :(
@@ -252,9 +266,9 @@
 /*****************      END of configuration ******************************************************/
 
 #ifdef LEDPIN
- #define LED_BLINK digitalWrite(LEDPIN, !digitalRead(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
- #define LED_ON digitalWrite(LEDPIN, HIGH)
- #define LED_OFF digitalWrite(LEDPIN, LOW)
+ #define LED_BLINK digitalWriteFast(LEDPIN, !digitalReadFast(LEDPIN)) // Эта строка мигает светодиодом на плате. Удобно и прикольно :)
+ #define LED_ON digitalWriteFast(LEDPIN, HIGH)
+ #define LED_OFF digitalWriteFast(LEDPIN, LOW)
 #else
  #define LED_BLINK {}
  #define LED_ON {}

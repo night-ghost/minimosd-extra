@@ -1,6 +1,7 @@
 #pragma once
 
-typedef void (*cb_putc)(byte c);
+#include "Defs.h"
+typedef void (*cb_putc)(uint8_t c);
 
 bool read_mavlink();
 
@@ -32,7 +33,7 @@ int NOINLINE normalize_angle(int a);
 uint16_t NOINLINE time_since(uint32_t *t);
 byte get_switch_time(byte n);
 void doScreenSwitch();
-int NOINLINE grad_to_sect(int grad);
+uint8_t NOINLINE grad_to_sect(int grad);
 void NOINLINE calc_max(float &dst, float src);
 void NOINLINE filter( float &dst, float val, const byte k);
 void filter( float &dst, float val);
@@ -41,7 +42,7 @@ void setFdataVars();
 void NOINLINE gps_norm(float &dst, long f);
 bool NOINLINE timeToScreen();
 NOINLINE void logo();
-void parse_osd_packet(byte *p);
+bool parse_osd_packet(byte *p);
 void NOINLINE millis_plus(uint32_t *dst, uint16_t inc);
 void request_mavlink_rates();
 void heartBeat();
@@ -49,8 +50,9 @@ byte NOINLINE radar_char();
 void renew();
 void setup_horiz();
 uint16_t uidiff(uint16_t, uint16_t);
-void writePanels(unsigned long pt);
+float coord_dist(Coords *c1, Coords *c2);
 
-void unplugSlaves();
 void delay_15();
 void MAX_mode(byte mode);
+
+#define GPS_MUL 10000000.0f

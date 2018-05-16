@@ -134,27 +134,27 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 
 
 static inline int8_t uavtalk_get_int8(int pos) {
-	return msg.u.Data[pos];
+	return msgbuf.u.Data[pos];
 }
 
 
 static inline int16_t uavtalk_get_int16(int pos) {
 	int16_t i;
-	memcpy(&i, msg.u.Data+pos, sizeof(int16_t));
+	memcpy(&i, msgbuf.u.Data+pos, sizeof(int16_t));
 	return i;
 }
 
 
 static inline int32_t uavtalk_get_int32(int pos) {
 	int32_t i;
-	memcpy(&i, msg.u.Data+pos, sizeof(int32_t));
+	memcpy(&i, msgbuf.u.Data+pos, sizeof(int32_t));
 	return i;
 }
 
 
 static inline float uavtalk_get_float(int pos) {
 	float f;
-	memcpy(&f, msg.u.Data+pos, sizeof(float));
+	memcpy(&f, msgbuf.u.Data+pos, sizeof(float));
 	return f;
 }
 
@@ -223,20 +223,20 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 
 
 void uavtalk_respond_object(byte id, uint8_t type) {
-	msg.u.MsgType	= type;
-	msg.u.Length	= RESPOND_OBJ_LEN;
-	msg.u.ObjID	= id; // msg_to_respond->ObjID;
+	msgbuf.u.MsgType	= type;
+	msgbuf.u.Length	= RESPOND_OBJ_LEN;
+	msgbuf.u.ObjID	= id; // msg_to_respond->ObjID;
 	
-	uavtalk_send_msg(&msg.u);
+	uavtalk_send_msg(&msgbuf.u);
 }
 
 
 void uavtalk_request_object(uint8_t id) {
-	msg.u.MsgType	= UAVTALK_TYPE_OBJ_REQ;
-	msg.u.Length	= REQUEST_OBJ_LEN;
-	msg.u.ObjID	= id;
+	msgbuf.u.MsgType	= UAVTALK_TYPE_OBJ_REQ;
+	msgbuf.u.Length	= REQUEST_OBJ_LEN;
+	msgbuf.u.ObjID	= id;
 	
-	uavtalk_send_msg(&msg.u);
+	uavtalk_send_msg(&msgbuf.u);
 }
 
 
@@ -244,31 +244,31 @@ void uavtalk_send_gcstelemetrystats(void) {
 	uint8_t *d;
 	uint8_t i;
 
-	msg.u.MsgType	= UAVTALK_TYPE_OBJ_ACK;
-	msg.u.Length	= gcstelemetrystats_obj_len + HEADER_LEN;
-	msg.u.ObjID	= gcstelemetrystats_objid;
+	msgbuf.u.MsgType	= UAVTALK_TYPE_OBJ_ACK;
+	msgbuf.u.Length	= gcstelemetrystats_obj_len + HEADER_LEN;
+	msgbuf.u.ObjID	= gcstelemetrystats_objid;
 
-	d = msg.u.Data;
+	d = msgbuf.u.Data;
 	for (i=0; i<gcstelemetrystats_obj_len; i++) {
 		*d++ = 0;
 	}
 
-	msg.u.Data[gcstelemetrystats_obj_status] = gcstelemetrystatus;
+	msgbuf.u.Data[gcstelemetrystats_obj_status] = gcstelemetrystatus;
 	// remaining data unused and unset
 	
-	uavtalk_send_msg(&msg.u);
+	uavtalk_send_msg(&msgbuf.u);
 	last_gcstelemetrystats_send = millis();
 }
 
 
 void NOINLINE set_crc(byte c){
-    msg.u.Crc = CRC_VAL(msg.u.Crc ^ c);
+    msgbuf.u.Crc = CRC_VAL(msgbuf.u.Crc ^ c);
 }
 
 
 static inline uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *umsg) {
 
-	byte state=msg.u.state;
+	byte state=msgbuf.u.state;
 
 	switch (state) {
 	case UAVTALK_PARSE_STATE_NOINIT:
@@ -281,7 +281,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			umsg->Crc = 0;
 			set_crc(c); //	msg->Crc = CRC_VAL(0 ^ c);
 			
-			msg.u.f_length = HEADER_LEN;
+			msgbuf.u.f_length = HEADER_LEN;
 		} else
 		    state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		break;
@@ -291,8 +291,8 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 		if ((c & UAVTALK_TYPE_MASK) == UAVTALK_TYPE_VER) {
 			state = UAVTALK_PARSE_STATE_GOT_MSG_TYPE;
 			umsg->MsgType = c;
-			if(c & 0x80) msg.u.f_length +=2; // timestamp too
-			msg.u.cnt = 0;
+			if(c & 0x80) msgbuf.u.f_length +=2; // timestamp too
+			msgbuf.u.cnt = 0;
 		} else {
 			state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 			
@@ -302,40 +302,40 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 
 	case UAVTALK_PARSE_STATE_GOT_MSG_TYPE:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		if (++msg.u.cnt < 2) {
+		if (++msgbuf.u.cnt < 2) {
 			//msg->Length = ((uint16_t) c);
 			BYTE_OF(umsg->Length,0) = c;
 		} else {
 			//msg->Length += ((uint16_t) c) << 8;
 			BYTE_OF(umsg->Length,1) = c;
 			
-                        if ((umsg->Length < msg.u.f_length) || (umsg->Length > 255 + msg.u.f_length)) {
+                        if ((umsg->Length < msgbuf.u.f_length) || (umsg->Length > 255 + msgbuf.u.f_length)) {
                                // Drop corrupted messages:
-                               // Minimal length is msg.u.f_length
-                               // Maximum is msg.u.f_length + 255 (Data) + 2 (Optional Instance Id)
+                               // Minimal length is msgbuf.u.f_length
+                               // Maximum is msgbuf.u.f_length + 255 (Data) + 2 (Optional Instance Id)
                                // As we are not parsing Instance Id, 255 is a hard maximum. 
 			       state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 			       if (c == UAVTALK_SYNC_VAL) goto again;
                         } else {
 			       state = UAVTALK_PARSE_STATE_GOT_LENGTH;
-			       msg.u.cnt = 0;
+			       msgbuf.u.cnt = 0;
                         }
 		}
 		break;
 		
 	case UAVTALK_PARSE_STATE_GOT_LENGTH:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		switch (++msg.u.cnt) {
+		switch (++msgbuf.u.cnt) {
 		case 1:
 		case 2:
 		case 3:
-			BYTE_OF(umsg->ObjID,msg.u.cnt-1) = c;
+			BYTE_OF(umsg->ObjID,msgbuf.u.cnt-1) = c;
 			break;
 		case 4:
 			//msg->ObjID += ((uint32_t) c) << 24;
 			BYTE_OF(umsg->ObjID,3) = c;
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
-			if (umsg->Length == msg.u.f_length) { // no data exists
+			if (umsg->Length == msgbuf.u.f_length) { // no data exists
 				state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
 				state = UAVTALK_PARSE_STATE_GOT_INSTID;
@@ -343,14 +343,14 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 #else
 			state = UAVTALK_PARSE_STATE_GOT_OBJID;
 #endif
-			msg.u.cnt = 0;
+			msgbuf.u.cnt = 0;
 			break;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_OBJID:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		switch (++msg.u.cnt) {
+		switch (++msgbuf.u.cnt) {
 		case 1:
 			//msg->InstID = ((uint32_t) c);
 			BYTE_OF(umsg->InstID,0) = c;
@@ -359,7 +359,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			//msg->InstID += ((uint32_t) c) << 8;
 			BYTE_OF(umsg->InstID,1) = c;
 			
-			if (umsg->Length == msg.u.f_length) { // no data exists
+			if (umsg->Length == msgbuf.u.f_length) { // no data exists
 				state = UAVTALK_PARSE_STATE_GOT_DATA;
 			} else {
 			    if(umsg->MsgType & 0x80)
@@ -367,15 +367,15 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			    else
 				state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP; // no timestamp
 			}
-			msg.u.cnt = 0;
+			msgbuf.u.cnt = 0;
 			break;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_INSTID:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
-		msg.u.cnt++;
-		switch (msg.u.cnt) {
+		msgbuf.u.cnt++;
+		switch (msgbuf.u.cnt) {
 		case 1:
 			//msg->timestamp = ((uint32_t) c);
 			BYTE_OF(umsg->timestamp,0) = c;
@@ -385,7 +385,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 			BYTE_OF(umsg->timestamp,1) = c;
 			
 			state = UAVTALK_PARSE_STATE_GOT_TIMESTAMP;
-			msg.u.cnt = 0;
+			msgbuf.u.cnt = 0;
 			break;
 		}
 		break;
@@ -393,19 +393,19 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 	case UAVTALK_PARSE_STATE_GOT_TIMESTAMP:
 		set_crc(c); //msg->Crc = CRC_VAL(msg->Crc ^ c);
 		
-		umsg->Data[msg.u.cnt++] = c;
-		if (msg.u.cnt >= umsg->Length - msg.u.f_length) {
+		umsg->Data[msgbuf.u.cnt++] = c;
+		if (msgbuf.u.cnt >= umsg->Length - msgbuf.u.f_length) {
 			state = UAVTALK_PARSE_STATE_GOT_DATA;
-			msg.u.cnt = 0;
+			msgbuf.u.cnt = 0;
 		}
 		break;
 
 	case UAVTALK_PARSE_STATE_GOT_DATA:
-		//msg.u.state = UAVTALK_PARSE_STATE_GOT_CRC;
+		//msgbuf.u.state = UAVTALK_PARSE_STATE_GOT_CRC;
 		state = UAVTALK_PARSE_STATE_WAIT_SYNC;
 		//msg->Crc = c;
 		if (c == umsg->Crc) {
-		    msg.u.state = state;
+		    msgbuf.u.state = state;
 		    return umsg->Length;
 		} else {
 #ifdef DEBUG
@@ -418,7 +418,7 @@ again:			state = UAVTALK_PARSE_STATE_GOT_SYNC;
 	
 	}
 
-	msg.u.state = state;
+	msgbuf.u.state = state;
 
 	return 0;
 }
@@ -443,16 +443,16 @@ bool uavtalk_read(void) {
 	        bytes_comes+=1;
 #endif
 		// parse data to msg
-		if (uavtalk_parse_char(c, &msg.u)) {
+		if (uavtalk_parse_char(c, &msgbuf.u)) {
 
 			set_data_got(); 
 
 			// consume msg
-			switch (msg.u.ObjID) {
+			switch (msgbuf.u.ObjID) {
 
 			case FLIGHTTELEMETRYSTATS_OBJID_000:
 			case FLIGHTTELEMETRYSTATS_OBJID_001:
-				switch (msg.u.Data[flighttelemetrystats_obj_status]) {
+				switch (msgbuf.u.Data[flighttelemetrystats_obj_status]) {
 				case TELEMETRYSTATS_STATE_DISCONNECTED:
 					gcstelemetrystatus = TELEMETRYSTATS_STATE_HANDSHAKEREQ;
 					uavtalk_send_gcstelemetrystats();
@@ -468,7 +468,7 @@ bool uavtalk_read(void) {
 			break;
 #if FLIGHTTELEMETRYSTATS_OBJID != FLIGHTTELEMETRYSTATS_OBJID_001 && FLIGHTTELEMETRYSTATS_OBJID != FLIGHTTELEMETRYSTATS_OBJID_000
 			case FLIGHTTELEMETRYSTATS_OBJID:
-				switch (msg.u.Data[flighttelemetrystats_obj_status]) {
+				switch (msgbuf.u.Data[flighttelemetrystats_obj_status]) {
 				case TELEMETRYSTATS_STATE_DISCONNECTED:
 					gcstelemetrystatus = TELEMETRYSTATS_STATE_HANDSHAKEREQ;
 					uavtalk_send_gcstelemetrystats();
@@ -687,9 +687,9 @@ DBG_PRINTF("got2 throttle=%f\n", t);
                         case SYSTEMALARMS_OBJID_003:
                         case SYSTEMALARMS_OBJID_004:
                         case SYSTEMALARMS_OBJID_005:
-                                op_alarm  = msg.u.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
-//                                op_alarm += msg.u.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
-                                op_alarm += msg.u.Data[SYSTEMALARMS_ALARM_MANUALCONTROL] * 0x10;
+                                op_alarm  = msgbuf.u.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
+//                                op_alarm += msgbuf.u.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
+                                op_alarm += msgbuf.u.Data[SYSTEMALARMS_ALARM_MANUALCONTROL] * 0x10;
                                 break;
 #endif
                                 
@@ -714,8 +714,8 @@ DBG_PRINTF("got2 throttle=%f\n", t);
                             break;
                         }
                         
-                        if (msg.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
-                                uavtalk_respond_object(msg.u.ObjID, UAVTALK_TYPE_ACK);
+                        if (msgbuf.u.MsgType == UAVTALK_TYPE_OBJ_ACK) {
+                                uavtalk_respond_object(msgbuf.u.ObjID, UAVTALK_TYPE_ACK);
                         }
                         
                         if(timeToScreen())  // если надо перерисовать экран

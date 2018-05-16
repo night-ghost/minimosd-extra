@@ -3,12 +3,13 @@
 /*Panels variables*/
 //Will come from APM telem port
 
-
+#ifndef SLAVE_BUILD
 #pragma pack(push,1)
+#endif
 
 Settings sets;	// настройки из EEPROM
 
-volatile byte garbage=0xf4;
+//volatile byte garbage=0xf4;
 
 
 static byte max7456_err_count=0;
@@ -78,7 +79,7 @@ const struct Measure PROGMEM
      };
 
 
-static const struct Measure *measure; // переключаемая ссылка
+const struct Measure *measure; // переключаемая ссылка
 
 
 static uint16_t     osd_vbat_A = 0;                 // Battery A voltage in milivolt
@@ -86,6 +87,9 @@ static uint16_t     osd_vbat_B = 0;                 // voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static uint8_t      osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
 static uint8_t      osd_battery_remaining_B = 0;    // 0 to 100 <=> 0 to 1000
+
+static float batt_a_volt_filtered=0;
+static float batt_b_volt_filtered=0;
 
 float power=0; 
 
@@ -125,7 +129,7 @@ Coords              osd_pos = {0,0,0};			// current coordinates
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0=no GPS 1=no fix, 2=2D, 3=3D
 static uint16_t     osd_cog=0;                      // Course over ground
-static uint16_t     off_course=0;
+static int16_t      off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)
@@ -153,13 +157,13 @@ static uint16_t     lastMavSeconds=0;
 static uint32_t     lastMAVBeat = 0;
 
 
-static uint8_t      apm_mav_system = 0;
-static uint8_t      apm_mav_component=0;
+uint8_t      apm_mav_system = 0;
+uint8_t      apm_mav_component=0;
 static uint8_t      osd_autopilot=0;	// system type: 3 - apm 14 - autoquad
 static byte         mav_fence_status = 0; // from mavlink_msg_fence_status_get_breach_type
 
 #ifdef MAVLINK_CONFIG
-static byte         mav_gcs_id=0;
+static byte         mav_gcs_id=0xff; // 255 by default
 static uint16_t     last_seq_n=0;
 #endif
 
@@ -216,13 +220,14 @@ struct   loc_flags lflags = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 volatile byte vsync_wait = 0;
 volatile uint8_t vsync_count=0;
 volatile uint32_t vsync_time=0;
+volatile byte vas_vsync=false;
 
 uint16_t screen_flags;
 
 #ifdef PWM_PIN
-volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
+//volatile boolean       New_PWM_Frame = false; // Flag marker for new and changed PWM value
 volatile uint16_t      PWM_IN=0;              // Value to hold PWM signal width. Exact value of it. Normally between 1000 - 2000ms while 1500 is center
-volatile unsigned long int_Timer = 0;         // set in the INT1
+unsigned long int_Timer = 0;         // set in the INT1
 #endif
 
 //byte   PWM_out_pin=0;
@@ -257,7 +262,6 @@ uint32_t autoswitch_time=0;
 static uint16_t ch_raw_prev1=0;
 static uint16_t ch_raw_prev2=0;
 
-#define GPS_MUL 10000000.0f
 
 static float        max_home_distance = 0;
 static float        max_osd_airspeed = 0;
@@ -269,6 +273,8 @@ static float        max_osd_climb=0;
 static float        min_osd_climb=0;
 static float        max_osd_power=0;
 
+float filteredCurrent=0;
+
 uint32_t sys_days;    // from unix epoch
 uint32_t day_seconds; // from midnight
 
@@ -278,3 +284,13 @@ uint16_t clipping[3];// < first accelerometer clipping count
 uint16_t pwm_out[4]; // output values for motors
 
 byte climb_filter=10; // 
+
+#define MAX_ADSB 2
+
+ADSB_Info adsb[MAX_ADSB];
+
+uint8_t motor_state;
+
+#ifndef SLAVE_BUILD
+#pragma pack(pop)
+#endif

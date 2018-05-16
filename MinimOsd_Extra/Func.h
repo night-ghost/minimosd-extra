@@ -7,8 +7,20 @@ static boolean inline is_on(point p){
     return p.y < 0x80;
 }
 
+static point inline do_on(point p, bool v){
+    if(v) p.y &=~0x80;
+    else  p.y |= 0x80;
+    return p;
+}
+
 static boolean inline has_sign(point p){
     return !(p.x & 0x80);
+}
+
+static point inline do_sign(point p, bool v){
+    if(v) p.x &= ~0x80;
+    else  p.x |=  0x80;
+    return p;
 }
 
 
@@ -33,12 +45,29 @@ static boolean inline is_alt4(point p){
     return (p.x & 0x40);
 }
 
-byte get_alt_num(point p){
+static point inline do_alt2(point p){
+    p.y |= 0x20;
+    return p;
+}
+
+static point inline do_alt3(point p){
+    p.y |= 0x10;
+    return p;
+}
+
+static point inline do_alt4(point p){
+    p.x |= 0x40;
+    return p;
+}
+
+
+byte NOINLINE get_alt_num(point p){
     return (is_alt2(p)?1:0) | (is_alt3(p)?2:0) | (is_alt4(p)?4:0);
 }
 
 
-byte get_alt_filter(point p){
+byte NOINLINE get_alt_filter(point p){
+/*
     switch( (is_alt(p)?1:0) | (is_alt2(p)?2:0)) {
     
     case 1:
@@ -50,6 +79,17 @@ byte get_alt_filter(point p){
     default: 
 	return 0;
     }
+*/
+
+    if(is_alt2(p)) {
+        if(is_alt(p)) return 100;
+        else          return 30;
+    } else {
+        if(is_alt(p)) return 10;
+        else          return 0;    
+    }
+
+
 }
 
 static inline void readSettings() {
@@ -69,35 +109,11 @@ point NOINLINE readPanel(byte n) {
     return p;
 }
 
-void NOINLINE millis_plus(uint32_t *dst, uint16_t inc) {
-    *dst = millis() + inc;
-}
-
-
-void NOINLINE long_plus(uint32_t *dst, uint16_t inc) {
-    *dst +=  inc;
-}
-
-int NOINLINE long_diff(uint32_t *l1, uint32_t *l2) {
-    return (int)(l1-l2);
-}
-
 
 static inline boolean getBit(byte Reg, byte whichBit) {
     return  Reg & (1 << whichBit);
 }
 
-float NOINLINE get_converth(){
-    return pgm_read_float(&measure->converth);
-}
-
-float NOINLINE get_converts(){
-    return pgm_read_float(&measure->converts);
-}
-
-float NOINLINE f_div1000(float f){
-    return f/1000;
-}
 
 void NOINLINE mav_message_start(byte len, byte time){
     mav_msg_ttl=seconds + time;// time to show
@@ -113,13 +129,16 @@ int NOINLINE normalize_angle(int a){
     return a;
 }
 
-uint16_t NOINLINE time_since(uint32_t *t){
-    return (uint16_t)(millis() - *t); // loop time no more 1000 ms
-
-}
 
 static void inline reset_setup_data(){ // called on any screen change
     memset((byte *)chan_raw_middle, 0, sizeof(chan_raw_middle)); // clear channels middle
+/*
+    uint8_t *dst = (uint8_t *)chan_raw_middle;
+    uint8_t cnt = sizeof(chan_raw_middle);
+    do {
+        *dst++=0;
+    } while(--cnt);
+*/
 }
 
 
@@ -136,20 +155,17 @@ byte get_switch_time(byte n){
 point NOINLINE readPanel(byte n);
 
 void doScreenSwitch(){
-	lflags.got_data=1; // redraw even no news
+    lflags.got_data=1; // redraw even no news
 	
-	reset_setup_data(); // clear channels middle values
+    reset_setup_data(); // clear channels middle values
 	
-	union {
-	    point p;
-	    uint16_t i;
-	} upi;
+    union {
+        point p;
+        uint16_t i;
+    } upi;
 	
-	upi.p = readPanel(0); // read flags for new screen
-	screen_flags = upi.i;
-//	screen_flags = (upi.i & 0xff)<<8 | (upi.i>>8) ;
-//DBG_PRINTF("screen flags %x\n", screen_flags);
-
+    upi.p = readPanel(0); // read flags for new screen
+    screen_flags = upi.i;
 }
 
 #if HARDWARE_TYPE > 0
@@ -165,17 +181,18 @@ static void pan_toggle(){
 
     uint16_t ch_raw;
 
-    if(sets.ch_toggle <= 2) // disabled
+    if(sets.ch_toggle <= 2){ // disabled
 	return;
 #ifdef PWM_PIN
-    else if(sets.ch_toggle == 3) 
+    } else if(sets.ch_toggle == 3) {
 	ch_raw = PWM_IN;	// 1 - используем внешний PWM для переключения экранов
 #endif
-    else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8)
+    } else if(sets.ch_toggle >= 5 && sets.ch_toggle <= 8){
 	ch_raw = chan_raw[sets.ch_toggle-1];
-    else 
+    } else {
         ch_raw = chan_raw[7]; // в случае мусора - канал 8
-
+    }
+    
     if(ch_raw < 800 || ch_raw > 3000) return; // not in valid range - no switch
 
 // autoscale
@@ -243,7 +260,7 @@ static void pan_toggle(){
 
         } else
 //*/
-            ch_on = (ch_raw > (ch_min+ch_max)/2);
+            ch_on = (ch_raw > (ch_min+ch_max)/2 + 100); // 100 to not switch in middle
 
         if(FLAGS.chkSwitchOnce) { // once at 1 -> 0
             if (ch_on) { // in HIGH range
@@ -330,7 +347,7 @@ next_panel:
 
 //------------------ Battery Remaining Picture ----------------------------------
 
-static char setBatteryPic(uint16_t bat_level,byte *bp)
+static /* NOINLINE */ void setBatteryPic(uint16_t bat_level, byte *bp)
 {
 
     if(bat_level>128) {
@@ -340,8 +357,8 @@ static char setBatteryPic(uint16_t bat_level,byte *bp)
 	bp[1] = 0x8d; // верхняя пустая, работаем с нижней
 	if(bat_level <= 17 && lflags.blinker){
 	    *bp   = 0x20;
-	    bp[1] = 0x20;
-	    return 1;	// если совсем мало то пробел вместо батареи - мигаем
+	    bp[1] = 0x20;	    // если совсем мало то пробел вместо батареи - мигаем
+	    return;
 	}
     }
 
@@ -365,17 +382,12 @@ static char setBatteryPic(uint16_t bat_level,byte *bp)
     byte n = bat_level / 26;
     
     *bp   = 0x8d - n;
-
 #endif
-
-    return 0;
 }
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
 
-int NOINLINE grad_to_sect(int grad){
-    //return round(grad/360.0 * 16.0)+1; //Convert to int 1-16.
-    
+uint8_t /* NOINLINE */ grad_to_sect(int grad){
     return (grad*16 + 180)/360 + 1; //Convert to int 1-16.
 }
 
@@ -385,8 +397,33 @@ static float NOINLINE diff_coord(float &c1, float &c2){
 }
 
 
-static float /* NOINLINE */ distance(float x, float y){
+static  float  /* NOINLINE */ distance(float x, float y){
     return sqrt(x*x + y*y);
+}
+
+float dstlon, dstlat;
+
+float NOINLINE coord_dist(Coords *c1, Coords *c2, bool useAlt){
+    float scaleLongDown = cos(abs(c1->lat) * 0.0174532925);
+    dstlat = diff_coord(c1->lat, c2->lat);
+    dstlon = diff_coord(c1->lon, c2->lon) * scaleLongDown;
+
+    float d = distance(dstlat, dstlon);
+    if(useAlt) d = distance(f_div1000(labs(c1->alt - c2->alt)), d);
+    return d;
+}
+
+int NOINLINE  coord_bearing(){
+    int bearing;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+    bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
+#pragma GCC diagnostic pop
+
+    bearing=normalize_angle(90 + bearing - 180 - osd_heading); //relative home direction
+
+    return bearing;
 }
 
 static void setHomeVars()
@@ -465,40 +502,22 @@ static void setHomeVars()
     } 
     
     if(lflags.osd_got_home){
-	{
-            float scaleLongDown = cos(abs(osd_home.lat) * 0.0174532925);
-            //DST to Home
-            dstlat = diff_coord(osd_home.lat, osd_pos.lat);
-            dstlon = diff_coord(osd_home.lon, osd_pos.lon) * scaleLongDown;
-        }
-
-        osd_home_distance = distance(dstlat, dstlon);
+        osd_home_distance = coord_dist(&osd_home, &osd_pos, false);
+    
 	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
 	dst_y=(int)fabs(dstlon);
 
-        { //DIR to Home
-            int bearing;
-
-            bearing = atan2(dstlat, -dstlon) * 57.295775; //absolute home direction
-        
-    //        bearing += ;//absolut return direction  //relative home direction
-            bearing=normalize_angle(90 + bearing - 180 - osd_heading);
-
-            osd_home_direction = grad_to_sect(bearing); 
-        }
-  }
-}
-
-void NOINLINE calc_max(float &dst, float src){
-    if (dst < src) dst = src;
-
+        osd_home_direction = coord_bearing();
+    }
 }
 
 
 
-#define USE_FILTER 1 
 
-#if defined(USE_FILTER)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal" // yes I know
+
 void NOINLINE filter( float &dst, float val, const byte k){ // комплиментарный фильтр 1/k
     if(dst==0 || k==0 || k==1) dst=val;
     else
@@ -507,15 +526,12 @@ void NOINLINE filter( float &dst, float val, const byte k){ // комплиме�
         //dst = (val-dst)*k + dst;
         dst+=(val-dst)/k;
 }
+#pragma GCC diagnostic pop
 
 void filter( float &dst, float val){ // комплиментарный фильтр 1/10
     filter(dst,val,10);
 }
-#endif
 
-void NOINLINE float_add(float &dst, float val){
-    dst+=val;
-}
 
 // вычисление нужных переменных
 // накопление статистики и рекордов
@@ -531,26 +547,12 @@ void setFdataVars()
     time_1000 = f_div1000(time_lapse); // in seconds
 
 
-#if defined(USE_FILTER)
                           // voltage in mV, current in 10mA
         filter(power, (osd_vbat_A / (1000 * 100.0) * osd_curr_A )); // комплиментарный фильтр 1/10
-#else
-	{
-            float pow= (osd_vbat_A / (1000 * 100.0) * osd_curr_A );
-            power += (pow - power) * 0.1; // комплиментарный фильтр 1/10
-        }
-#endif
 
 
     //Moved from panel because warnings also need this var and panClimb could be off
-#if defined(USE_FILTER)
-        filter(vertical_speed, (osd_climb * get_converth() ) *  60, climb_filter); // комплиментарный фильтр 1/10..100
-#else
-	{
-            float speed_raw= (osd_climb * get_converth() ) *  60;
-            vertical_speed += (speed_raw - vertical_speed) * 0.1; // комплиментарный фильтр 1/10
-        }
-#endif
+        filter(vertical_speed, mul_converth(osd_climb), climb_filter); // комплиментарный фильтр 1/10..100
 
         if(max_battery_reading < osd_battery_remaining_A) // мы запомним ее еще полной
             max_battery_reading = osd_battery_remaining_A;
@@ -586,16 +588,16 @@ void setFdataVars()
             
             uint16_t diap = h-l;
             uint16_t val  = rssi_v - l;
-            rssi_v = (int16_t)(((float)val)/diap*100.0f);
+            rssi_v = (val * 100L) /diap;
             //rssi = map(rssi_v, l, h, 0, 100); +200 bytes
 
             if(rssi_v > 100) rssi_v = 100;
             if(rssi_v < 0)   rssi_v = 0;
             
             if(rev) rssi_v=100-rssi_v;
-            rssi_norm=rssi_v;
-        } else 
             rssi_norm = rssi_v;
+        } else 
+            rssi_norm = rssi_v; // show raw value
     }
 
   //Set max data
@@ -637,11 +639,6 @@ void setFdataVars()
   }
 }
 
-
-
-void NOINLINE gps_norm(float &dst, long f){
-    dst = f / GPS_MUL;
-}
 
 
 void NOINLINE set_data_got() {
@@ -692,7 +689,7 @@ again:
 
     } else {
 
-	memset( &msg.bytes[0], 0, sizeof(msg.bytes)); // clear packet buffer to initial state
+	memset( &msgbuf.bytes[0], 0, sizeof(msgbuf.bytes)); // clear packet buffer to initial state
     
 #if defined(AUTOBAUD)
 	Serial.end();
@@ -700,16 +697,16 @@ again:
 	uint8_t pulse=255;
 
 	{ // isolate PT and SPEED
-		uint32_t pt = millis() + 100; // не более 0.1 секунды
+	    uint32_t pt = millis() + 100; // не более 0.1 секунды
 	
-	        for(byte i=250; i!=0; i--){
-	            if(millis()>pt) break; // not too long
-	            long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
-	            if(t>255) continue;   // too long - not single bit
-	            uint8_t tb = t;       // it less than 255 so convert to byte
-	            if(tb==0) continue;   // no pulse at all
-	            if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
-	        }
+	    for(byte i=250; i!=0; i--){
+	        if(millis()>pt) break; // not too long
+	        long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
+	        if(t>255) continue;   // too long - not single bit
+	        uint8_t tb = t;       // it less than 255 so convert to byte
+	        if(tb==0) continue;   // no pulse at all
+	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
+	    }
 	}
 	
 	if(pulse == 255)    pulse = last_pulse; // no input at all - use last
@@ -748,9 +745,6 @@ again:
 }
 #endif
 
-bool NOINLINE timeToScreen(){ // we should renew screen 
-    return lflags.need_redraw && !vsync_wait;
-}
 
 #if defined(DEBUG)
 inline uint16_t freeRam () {
@@ -760,7 +754,7 @@ inline uint16_t freeRam () {
 }
 #endif
 
-#if !defined(SLAVE_BUILD)
+#if !defined(SLAVE_BUILD) // if code integrated to HAL
 
 // трансляция PWM на внешний вывод если заданы источник и приемник
 #define SET_LOW()   *PWM_out_port &= ~PWM_out_bit
@@ -857,20 +851,40 @@ void generate_PWM(bool nointerrupt) {
 
 #endif // PWM_BY_INTERRUPT
 
-#endif // SLAVE_BUILD
-
 void delay_150(){
-    delay(150);
+    delay(150); 
 }
 
-static void NOINLINE osd_printf_2(PGM_P fmt, float f, byte c){
+void delay_15(){
+    delay(15);
+}
+
+#else // SLAVE_BUILD true
+
+void delay_150(){
+    delayMicroseconds(65000); 
+    delayMicroseconds(65000); 
+    delayMicroseconds(20000); 
+    
+}
+
+void delay_15(){
+    delayMicroseconds(15000); 
+}
+
+#endif // SLAVE_BUILD
+
+
+
+static void NOINLINE osd_printf_1(PGM_P fmt, float &f){
     osd.printf_P(fmt, f);
+}
+
+static void NOINLINE osd_printf_2(PGM_P fmt, float &f, byte c){
+    osd_printf_1(fmt, f);
     if(c) OSD::write_S(c);
 }
 
-static void NOINLINE osd_printf_1(PGM_P fmt, float f){
-    osd_printf_2(fmt, f, 0);
-}
 
 static void NOINLINE osd_printi_1(PGM_P fmt, int f){
     osd.printf_P(fmt, f);
@@ -883,12 +897,15 @@ static void NOINLINE osd_printi_2(PGM_P fmt, uint16_t i1, uint16_t i2){
 NOINLINE void logo(){
     OSD::setPanel(2, 5);
 #ifdef SLAVE_BUILD
-    osd_print_S("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
+    osd_print_S(     "MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff");
+    osd.print(millis());
 #else
-    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff"));
+// There is some odd issue with alignment in the compilation that will cause non-working binaries.
+// If you get a blank screen after changing code, try to change the number of z's in the string below from 1 to 16
+    osd_print_S(PSTR("MinimOSD-Extra " PROTOCOL " " VERSION "\xff" OSD_MODEL " r" TO_STRING(RELEASE_NUM) " DV\xff\0#1zzzz\n"));
+    osd.print((uint16_t)millis());
 #endif
 
-    osd.print((uint16_t)millis());
 
     // Check EEPROM to see if we have initialized it already or not
     // also checks if we have new version that needs EEPROM reset

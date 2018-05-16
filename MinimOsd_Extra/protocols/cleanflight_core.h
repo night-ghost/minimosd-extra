@@ -4,18 +4,18 @@
 
 
 static  /*INLINE*/  inline uint8_t mwii_get_byte()  {
-	return msg.mwii.buf[msg.mwii.read_idx++];
+	return msgbuf.mwii.buf[msgbuf.mwii.read_idx++];
 }
 
 static inline uint8_t mwii_read_byte(byte pos)  {
-	return msg.mwii.buf[msg.mwii.read_idx + pos];
+	return msgbuf.mwii.buf[msgbuf.mwii.read_idx + pos];
 }
 
 
 static inline uint16_t mwii_read_uint(byte pos) {
 	uint16_t t;
 	
-	memcpy(&t, &msg.mwii.buf[msg.mwii.read_idx]+pos, sizeof(uint16_t));
+	memcpy(&t, &msgbuf.mwii.buf[msgbuf.mwii.read_idx]+pos, sizeof(uint16_t));
 
 	return t;
 }
@@ -23,19 +23,19 @@ static inline uint16_t mwii_read_uint(byte pos) {
 static inline  uint32_t mwii_read_ulong(byte pos) {
 	uint32_t t;
 	
-	memcpy(&t, &msg.mwii.buf[msg.mwii.read_idx] + pos, sizeof(uint32_t));
+	memcpy(&t, &msgbuf.mwii.buf[msgbuf.mwii.read_idx] + pos, sizeof(uint32_t));
 	return t;
 }
 
 static inline void mwii_read_len(void *dst, byte pos, byte sz) {
 	
-	memcpy(dst, &msg.mwii.buf[msg.mwii.read_idx] + pos, sz);
+	memcpy(dst, &msgbuf.mwii.buf[msgbuf.mwii.read_idx] + pos, sz);
 }
 
 
 void serialize8(uint8_t a) {
 	Serial.write_S(a);
-	msg.mwii.chk ^= a;
+	msgbuf.mwii.chk ^= a;
 }
 
 
@@ -60,9 +60,9 @@ void headSerialResponse(uint8_t err, uint8_t s) {
 	serialize8('$');
 	serialize8('M');
 	serialize8(err ? '!' : '<');
-	msg.mwii.chk = 0; // start calculating a new checksum
+	msgbuf.mwii.chk = 0; // start calculating a new checksum
 	serialize8(s);
-	serialize8(msg.mwii.cmd);
+	serialize8(msgbuf.mwii.cmd);
 }
 
 void headSerialReply(uint8_t s) {
@@ -74,7 +74,7 @@ void inline headSerialError(uint8_t s) {
 }
 
 void tailSerialReply() {
-	serialize8(msg.mwii.chk);
+	serialize8(msgbuf.mwii.chk);
 }
 
 void  s_struct(uint8_t *cb,uint8_t siz) {
@@ -89,22 +89,22 @@ void s_struct_w(uint8_t *cb,uint8_t siz) {
 
 
 int16_t nextCharToRequest() {
-	if(msg.mwii.nextCharToRequest != msg.mwii.lastCharToRequest) {	// Not at last char
-		if(msg.mwii.retransmitQueue & 0x02) {                // Missed char at curr-6. Need retransmit!
-			return msg.mwii.nextCharToRequest-6;
+	if(msgbuf.mwii.nextCharToRequest != msgbuf.mwii.lastCharToRequest) {	// Not at last char
+		if(msgbuf.mwii.retransmitQueue & 0x02) {                // Missed char at curr-6. Need retransmit!
+			return msgbuf.mwii.nextCharToRequest-6;
 		}
 
-		if((msg.mwii.retransmitQueue & 0x11) == 0x10) {      // Missed char at curr-3. First chance retransmit
-			msg.mwii.retransmitQueue |= 0x01;                // Mark first chance as used
-			return msg.mwii.nextCharToRequest-3;
+		if((msgbuf.mwii.retransmitQueue & 0x11) == 0x10) {      // Missed char at curr-3. First chance retransmit
+			msgbuf.mwii.retransmitQueue |= 0x01;                // Mark first chance as used
+			return msgbuf.mwii.nextCharToRequest-3;
 		}
 
-		msg.mwii.retransmitQueue = (msg.mwii.retransmitQueue >> 1) | 0x80; // Add next to queue
-		return msg.mwii.nextCharToRequest++;                      // Notice post-increment!
+		msgbuf.mwii.retransmitQueue = (msgbuf.mwii.retransmitQueue >> 1) | 0x80; // Add next to queue
+		return msgbuf.mwii.nextCharToRequest++;                      // Notice post-increment!
 	}
 
-	uint8_t temp1 = msg.mwii.retransmitQueue & ~0x01;
-	uint8_t temp2 = msg.mwii.nextCharToRequest - 6;
+	uint8_t temp1 = msgbuf.mwii.retransmitQueue & ~0x01;
+	uint8_t temp2 = msgbuf.mwii.nextCharToRequest - 6;
 
 	if(temp1 == 0) {
 		fontMode = 0;                            // Exit font mode
@@ -140,15 +140,15 @@ uint8_t safeMode() {
 
 // Font upload queue implementation.
 // Implement a window for curr + the previous 6 requests.
-// First-chance to retransmit at curr-3 (msg.mwii.retransmitQueue & 0x10)
-// First-chance retransmit marked as used at msg.mwii.retransmitQueue |= 0x01
-// 2 to N-chance retransmit marked at curr-6 (msg.mwii.retransmitQueue & 0x02)
+// First-chance to retransmit at curr-3 (msgbuf.mwii.retransmitQueue & 0x10)
+// First-chance retransmit marked as used at msgbuf.mwii.retransmitQueue |= 0x01
+// 2 to N-chance retransmit marked at curr-6 (msgbuf.mwii.retransmitQueue & 0x02)
 /*
 void initFontMode() {
 	if(armed || configMode || fontMode|| !safeMode())
 	return;
 	// queue first char for transmission.
-	msg.mwii.retransmitQueue = 0x80;
+	msgbuf.mwii.retransmitQueue = 0x80;
 
 	fontMode = 1;
 	setMspRequests();
@@ -158,12 +158,12 @@ void fontCharacterReceived(uint8_t cindex) {
 	if(!fontMode)
 	return;
 
-	uint8_t bit = (0x80 >> (msg.mwii.nextCharToRequest-cindex));
+	uint8_t bit = (0x80 >> (msgbuf.mwii.nextCharToRequest-cindex));
 
 	// Just received a char..
-	if(msg.mwii.retransmitQueue & bit) {
+	if(msgbuf.mwii.retransmitQueue & bit) {
 		// this char war requested and now received for the first time
-		msg.mwii.retransmitQueue &= ~bit;  // mark as already received
+		msgbuf.mwii.retransmitQueue &= ~bit;  // mark as already received
 		MAX7456_writeNVM(cindex);       // Write to MVRam
 	}
 }
@@ -198,13 +198,13 @@ void saveExit()
 	//uint8_t txSize;
 
 	if (configPage==1){
-		msg.mwii.cmd = MSP_SET_PID;
+		msgbuf.mwii.cmd = MSP_SET_PID;
 		s_struct((uint8_t*)&conf.pid[0].P8,3*PIDITEMS);
 		tailSerialReply();
 	}
 
 	if (configPage==2){
-		msg.mwii.cmd = MSP_SET_RC_TUNING;
+		msgbuf.mwii.cmd = MSP_SET_RC_TUNING;
 		s_struct((uint8_t*)&conf.rcRate8,7);
 		tailSerialReply();
 	}
@@ -487,19 +487,19 @@ struct Mwii_bits {
 
 
 static const Mwii_bits PROGMEM bits[] ={
-    { 0, 1,  &msg.mwii.mode.armed},
-    { 1, 2, &msg.mwii.mode.stable},
-    { 2, 3, &msg.mwii.mode.horizon},
-    { 3, 4, &msg.mwii.mode.baro},
-    { 5, 0, &msg.mwii.mode.mag},
-    { 10,6, &msg.mwii.mode.gpshome},
-    { 11,7, &msg.mwii.mode.gpshold},
-    { 19,0, &msg.mwii.mode.osd_switch},
+    { 0, 1,  &msgbuf.mwii.mode.armed},
+    { 1, 2, &msgbuf.mwii.mode.stable},
+    { 2, 3, &msgbuf.mwii.mode.horizon},
+    { 3, 4, &msgbuf.mwii.mode.baro},
+    { 5, 0, &msgbuf.mwii.mode.mag},
+    { 10,6, &msgbuf.mwii.mode.gpshome},
+    { 11,7, &msgbuf.mwii.mode.gpshold},
+    { 19,0, &msgbuf.mwii.mode.osd_switch},
 };
 
 /*
-        msg.mwii.sensorActive & mode_horizon -> HORIZON
-        msg.mwii.sensorActive & mode_stable  -> angle
+        msgbuf.mwii.sensorActive & mode_horizon -> HORIZON
+        msgbuf.mwii.sensorActive & mode_stable  -> angle
         else                        -> acro
 */
 static void mwii_check_mode() {
@@ -513,7 +513,7 @@ static void mwii_check_mode() {
 	
 	v= (uint32_t *)pgm_read_word(&bp->v);
 
-	if(*v & msg.mwii.sensorActive) osd_mode = b-1;
+	if(*v & msgbuf.mwii.sensorActive) osd_mode = b-1;
 	
 	
 	bp++;
@@ -525,17 +525,17 @@ static void mwii_check_mode() {
 // --------------------------------------------------------------------------------------
 // Here are decoded received commands from MultiWii
 static inline void mwii_parse_data() {
-    msg.mwii.read_idx = 0;
+    msgbuf.mwii.read_idx = 0;
 
     set_data_got(); 
 
 
-    switch(msg.mwii.cmd) {
+    switch(msgbuf.mwii.cmd) {
   
 
     case MSP_IDENT:
         apm_mav_system = mwii_get_byte();                                  // MultiWii Firmware version
-        msg.mwii.modeMSPRequests &=~ REQ_MSP_IDENT;
+        msgbuf.mwii.modeMSPRequests &=~ REQ_MSP_IDENT;
 	break;
 
     case MSP_STATUS:
@@ -549,8 +549,8 @@ typedef struct {
 } MW_status_t;
 */
 	//r_struct((uint8_t*)&MW_STATUS,10);
-	msg.mwii.sensorActive = mwii_read_ulong(offsetof(MW_status_t, sensorActive) );
-	lflags.motor_armed = (msg.mwii.sensorActive & msg.mwii.mode.armed) != 0;
+	msgbuf.mwii.sensorActive = mwii_read_ulong(offsetof(MW_status_t, sensorActive) );
+	lflags.motor_armed = (msgbuf.mwii.sensorActive & msgbuf.mwii.mode.armed) != 0;
 	break;
 
 #if 0 // only in setup
@@ -607,7 +607,7 @@ typedef struct {
     case MSP_COMP_GPS:
 	//r_struct((uint8_t*)&GPS.distanceToHome,4);
 	osd_home_distance  = mwii_read_uint(0 );
-	osd_home_direction = grad_to_sect(mwii_read_uint(2) );
+	osd_home_direction = mwii_read_uint(2);
 	break;
 
     case MSP_ATTITUDE:
@@ -618,9 +618,9 @@ typedef struct {
 } MW_ATTITUDE_t;
 */
 //	r_struct((uint8_t*)&MW_ATT,6);
+	osd_att.roll = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
+	osd_att.pitch  = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
 	osd_heading = mwii_read_uint(offsetof(MW_ATTITUDE_t, Heading) );
-	osd_att.roll = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) );
-	osd_att.pitch  = mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) );
 //	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att)); // opposite direction
 DBG_PRINTF("got attitude roll=%d pitch=%d head=%d\n",osd_heading, osd_att.roll, osd_att.pitch);
 	break;
@@ -650,7 +650,7 @@ typedef struct {
 */
 //	r_struct((uint8_t*)&MW_ANALOG,7);
 	if(!FLAGS.useExtVbattA){
-	    osd_vbat_A              = mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
+	    osd_vbat_A              = 100u * (uint16_t)mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
 	    osd_battery_remaining_A = mwii_read_uint(offsetof(MW_ANALOG_t, pMeterSum) );
 	}
 	if (!FLAGS.useExtCurr)
@@ -673,7 +673,7 @@ typedef struct {
 }conf_t;
 */
 //	r_struct((uint8_t*)&conf.rcRate8,7);
-        msg.mwii.modeMSPRequests &=~ REQ_MSP_RC_TUNING;
+        msgbuf.mwii.modeMSPRequests &=~ REQ_MSP_RC_TUNING;
 	break;
 
     case MSP_PID:
@@ -685,27 +685,27 @@ struct pid_ {
 };
 */
 //	r_struct((uint8_t*)&conf.pid[0].P8,3*PIDITEMS);
-	msg.mwii.modeMSPRequests &=~ REQ_MSP_PID;
+	msgbuf.mwii.modeMSPRequests &=~ REQ_MSP_PID;
 	break;
 
 
 // use MSP_BOXIDS
     case MSP_BOXIDS:
         uint32_t bit = 1;
-        uint8_t remaining = msg.mwii.size;
+        uint8_t remaining = msgbuf.mwii.size;
         //byte bc = 0;
 
 	/*
-        msg.mwii.mode.armed = 0;
-        msg.mwii.mode.stable = 0;
-        msg.mwii.mode.horizon = 0;
-        msg.mwii.mode.baro = 0;
-        msg.mwii.mode.mag = 0;
-        msg.mwii.mode.gpshome = 0;
-        msg.mwii.mode.gpshold = 0;
-        msg.mwii.mode.osd_switch = 0;
+        msgbuf.mwii.mode.armed = 0;
+        msgbuf.mwii.mode.stable = 0;
+        msgbuf.mwii.mode.horizon = 0;
+        msgbuf.mwii.mode.baro = 0;
+        msgbuf.mwii.mode.mag = 0;
+        msgbuf.mwii.mode.gpshome = 0;
+        msgbuf.mwii.mode.gpshold = 0;
+        msgbuf.mwii.mode.osd_switch = 0;
         */
-        memset(&msg.mwii.mode, 0, sizeof(msg.mwii.mode));
+        memset(&msgbuf.mwii.mode, 0, sizeof(msgbuf.mwii.mode));
 
 
         while(remaining > 0) {
@@ -727,11 +727,11 @@ struct pid_ {
          bit <<= 1;
           --remaining;
         }
-        msg.mwii.modeMSPRequests &=~ REQ_MSP_BOX;
+        msgbuf.mwii.modeMSPRequests &=~ REQ_MSP_BOX;
         
 /*        
-        msg.mwii.sensorActive & mode_horizon -> HORIZON
-        msg.mwii.sensorActive & mode_stable  -> angle
+        msgbuf.mwii.sensorActive & mode_horizon -> HORIZON
+        msgbuf.mwii.sensorActive & mode_stable  -> angle
         else                        -> acro
 */
 
@@ -763,7 +763,7 @@ bool mwii_read() {
 	        bytes_comes+=1;
 #endif
 
-		byte state = msg.mwii.state;
+		byte state = msgbuf.mwii.state;
 
 		switch(state++) {
 		case IDLE:
@@ -783,24 +783,24 @@ again:			if(c!='$') state = IDLE;
 				state = IDLE;
 			} else {
 				//state = HEADER_SIZE;
-				msg.mwii.size = c;
-				msg.mwii.crc = c;
+				msgbuf.mwii.size = c;
+				msgbuf.mwii.crc = c;
 			}
 			break;
 			
 		case HEADER_SIZE:
 			//state = HEADER_CMD;
-			msg.mwii.cmd = c;
-			msg.mwii.crc ^= c;
-			msg.mwii.idx=0;
+			msgbuf.mwii.cmd = c;
+			msgbuf.mwii.crc ^= c;
+			msgbuf.mwii.idx=0;
 			break;
 			
 		case HEADER_CMD:
-			msg.mwii.crc ^= c;
+			msgbuf.mwii.crc ^= c;
 			state = HEADER_CMD;
 			
-			if(msg.mwii.idx == msg.mwii.size) {// received checksum byte
-			    if(msg.mwii.crc == 0) {
+			if(msgbuf.mwii.idx == msgbuf.mwii.size) {// received checksum byte
+			    if(msgbuf.mwii.crc == 0) {
 				mwii_parse_data(); // HERE!!!
 				
 				if(timeToScreen())  // если надо перерисовать экран
@@ -815,14 +815,14 @@ again:			if(c!='$') state = IDLE;
 			    
 			    state = IDLE;
 			} else {
-			    msg.mwii.buf[msg.mwii.idx++]=c;
+			    msgbuf.mwii.buf[msgbuf.mwii.idx++]=c;
 			    
 			}
 			
 			break;
 		}
 
-		msg.mwii.state = state;
+		msgbuf.mwii.state = state;
 		delay_byte();
 	}
 	
@@ -841,7 +841,7 @@ void blankserialRequest(uint8_t requestMSP)
 
 
 void setMspRequests() {
-    msg.mwii.modeMSPRequests = 
+    msgbuf.mwii.modeMSPRequests = 
       REQ_MSP_IDENT|
       REQ_MSP_STATUS|
       REQ_MSP_RAW_GPS|
@@ -851,7 +851,7 @@ void setMspRequests() {
       REQ_MSP_ALTITUDE | REQ_MSP_RC | REQ_MSP_ANALOG;;
 
     if(apm_mav_system == 0)
-     msg.mwii.modeMSPRequests |= REQ_MSP_IDENT;
+     msgbuf.mwii.modeMSPRequests |= REQ_MSP_IDENT;
 
 /*    if(mode_armed == 0) {
         modeMSPRequests |= REQ_MSP_BOX;
@@ -860,7 +860,7 @@ void setMspRequests() {
 
 
   // so we do not send requests that are not needed.
-   msg.mwii.queuedMSPRequests &= msg.mwii.modeMSPRequests;
+   msgbuf.mwii.queuedMSPRequests &= msgbuf.mwii.modeMSPRequests;
 }
 
 void doMSPrequests(){
@@ -881,11 +881,11 @@ void doMSPrequests(){
 
     setMspRequests();
 
-    if(msg.mwii.queuedMSPRequests == 0)
-        msg.mwii.queuedMSPRequests = msg.mwii.modeMSPRequests;
+    if(msgbuf.mwii.queuedMSPRequests == 0)
+        msgbuf.mwii.queuedMSPRequests = msgbuf.mwii.modeMSPRequests;
 
-    uint32_t req = msg.mwii.queuedMSPRequests & -msg.mwii.queuedMSPRequests;
-    msg.mwii.queuedMSPRequests &= ~req;
+    uint32_t req = msgbuf.mwii.queuedMSPRequests & -msgbuf.mwii.queuedMSPRequests;
+    msgbuf.mwii.queuedMSPRequests &= ~req;
     
     switch(req) {
       case REQ_MSP_IDENT:

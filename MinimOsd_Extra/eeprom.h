@@ -94,6 +94,7 @@ struct Panel {
     point pMotor;       // 102
     point coordLat;     // 104
     point coordLon;     // 106
+    point fADSB;        // 108
 };
 
 union _Panel {
@@ -124,6 +125,7 @@ struct Flags { // 4 байта
 union _Flags {
     byte pad[4];
     Flags flags;
+    uint32_t dw;
 };
 
 
@@ -188,6 +190,8 @@ struct Settings {
 //0x45
     byte pwm_mode; // 0-pwm 1-in/off
     byte hw_version; // written by firmware for CT
+
+    byte halfThrottleCurrent;
     
 };
 

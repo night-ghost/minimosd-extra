@@ -21,8 +21,9 @@
 
 //MAX7456 reg write addresses
 #define MAX7456_VM0_reg   0x00
-#define MAX7456_VM0_reg_read  0x80
 #define MAX7456_VM1_reg   0x01
+
+#define MAX7456_reg_read  0x80
 
 #define MAX7456_HOS_reg   0x02 // horisontal offset
 #define MAX7456_VOS_reg   0x03 // vertical offset
@@ -110,13 +111,16 @@ class OSD: public BetterStream
 #ifdef SLAVE_BUILD
     virtual size_t write(const uint8_t *buffer, size_t size) { size_t sz=size;  while(size--) write(*buffer++); return sz; }
     virtual byte_32 txspace() { return 255; }
-    virtual void printf(const char *, ...) /* FMT_PRINTF(2, 3)*/ {}// not supported
-    virtual void vprintf(const char *, va_list) {}            // not supported
+    virtual void printf(const char *, ...) /*  FMT_PRINTF(2, 3) */ ;
+    virtual void vprintf(const char *, va_list);
+    size_t printNumber(unsigned long n, uint8_t base);
     void printf_P(const char *fmt, float f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint32_t f) { printf(fmt,f); }
     void printf_P(const char *fmt, int f) { printf(fmt,f); }
     void printf_P(const char *fmt, uint16_t i1, uint16_t i2) { printf(fmt,i1,i2); }
+    void print(unsigned long n) { printNumber(n, 10); }
+    void print(const char str[]){ write(str); }
 #endif
 
     static void write_NVM(uint16_t font_count, uint8_t *character_bitmap);
@@ -131,6 +135,8 @@ class OSD: public BetterStream
     static uint16_t bufpos;
     
     static void NOINLINE calc_pos();
+
+    static void set_current_mode();
 
     //static uint8_t getMode(void);
     static uint8_t inline getMode(){

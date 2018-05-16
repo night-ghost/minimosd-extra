@@ -155,6 +155,9 @@ namespace OSD {
             this.label7 = new System.Windows.Forms.Label();
             this.MINVOLT_numeric = new System.Windows.Forms.NumericUpDown();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label46 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.tHalfThrottleCurrent = new System.Windows.Forms.NumericUpDown();
             this.OVERSPEED_label = new System.Windows.Forms.Label();
             this.OVERSPEED_numeric = new System.Windows.Forms.NumericUpDown();
             this.STALL_label = new System.Windows.Forms.Label();
@@ -172,8 +175,10 @@ namespace OSD {
             this.RSSI_numeric_max = new System.Windows.Forms.NumericUpDown();
             this.RSSI_numeric_min = new System.Windows.Forms.NumericUpDown();
             this.grpTLog = new System.Windows.Forms.GroupBox();
+            this.label48 = new System.Windows.Forms.Label();
+            this.txtLogOffset = new System.Windows.Forms.TextBox();
+            this.label47 = new System.Windows.Forms.Label();
             this.lblTime = new System.Windows.Forms.Label();
-            this.btnListen = new System.Windows.Forms.Button();
             this.lblTLog = new System.Windows.Forms.Label();
             this.btnTLog = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
@@ -209,6 +214,7 @@ namespace OSD {
             ((System.ComponentModel.ISupportInitialize)(this.BATT_WARNnumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).BeginInit();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tHalfThrottleCurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OVERSPEED_numeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.STALL_numeric)).BeginInit();
             this.groupBoxRSSI.SuspendLayout();
@@ -471,6 +477,7 @@ namespace OSD {
             this.MavlinkModeMenuItem.Size = new System.Drawing.Size(203, 22);
             this.MavlinkModeMenuItem.Text = "MAVlink mode";
             this.MavlinkModeMenuItem.CheckedChanged += new System.EventHandler(this.MavlinkModeMenuItem_Click);
+            this.MavlinkModeMenuItem.Click += new System.EventHandler(this.MavlinkModeMenuItem_Click);
             // 
             // aTmega644ToolStripMenuItem
             // 
@@ -1050,10 +1057,11 @@ namespace OSD {
             this.groupBox16.Controls.Add(this.label21);
             this.groupBox16.Location = new System.Drawing.Point(6, 119);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(172, 116);
+            this.groupBox16.Size = new System.Drawing.Size(156, 116);
             this.groupBox16.TabIndex = 2;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "Horizon Angle adjust";
+            this.groupBox16.Enter += new System.EventHandler(this.groupBox16_Enter);
             // 
             // label24
             // 
@@ -1066,7 +1074,7 @@ namespace OSD {
             // 
             // txtPitchNtsc
             // 
-            this.txtPitchNtsc.Location = new System.Drawing.Point(113, 90);
+            this.txtPitchNtsc.Location = new System.Drawing.Point(101, 89);
             this.txtPitchNtsc.Name = "txtPitchNtsc";
             this.txtPitchNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtPitchNtsc.TabIndex = 30;
@@ -1077,7 +1085,7 @@ namespace OSD {
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(78, 93);
+            this.label25.Location = new System.Drawing.Point(70, 92);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(31, 13);
             this.label25.TabIndex = 29;
@@ -1085,7 +1093,7 @@ namespace OSD {
             // 
             // txtRollNtsc
             // 
-            this.txtRollNtsc.Location = new System.Drawing.Point(113, 68);
+            this.txtRollNtsc.Location = new System.Drawing.Point(101, 67);
             this.txtRollNtsc.Name = "txtRollNtsc";
             this.txtRollNtsc.Size = new System.Drawing.Size(50, 20);
             this.txtRollNtsc.TabIndex = 28;
@@ -1096,7 +1104,7 @@ namespace OSD {
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(78, 71);
+            this.label26.Location = new System.Drawing.Point(70, 70);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(25, 13);
             this.label26.TabIndex = 27;
@@ -1113,7 +1121,7 @@ namespace OSD {
             // 
             // txtPitchPal
             // 
-            this.txtPitchPal.Location = new System.Drawing.Point(113, 39);
+            this.txtPitchPal.Location = new System.Drawing.Point(101, 38);
             this.txtPitchPal.Name = "txtPitchPal";
             this.txtPitchPal.Size = new System.Drawing.Size(50, 20);
             this.txtPitchPal.TabIndex = 25;
@@ -1124,7 +1132,7 @@ namespace OSD {
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(78, 42);
+            this.label22.Location = new System.Drawing.Point(70, 41);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 13);
             this.label22.TabIndex = 24;
@@ -1132,7 +1140,7 @@ namespace OSD {
             // 
             // txtRollPal
             // 
-            this.txtRollPal.Location = new System.Drawing.Point(113, 17);
+            this.txtRollPal.Location = new System.Drawing.Point(101, 16);
             this.txtRollPal.Name = "txtRollPal";
             this.txtRollPal.Size = new System.Drawing.Size(50, 20);
             this.txtRollPal.TabIndex = 23;
@@ -1143,7 +1151,7 @@ namespace OSD {
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(78, 20);
+            this.label21.Location = new System.Drawing.Point(73, 19);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(25, 13);
             this.label21.TabIndex = 22;
@@ -1622,21 +1630,56 @@ namespace OSD {
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label46);
+            this.groupBox3.Controls.Add(this.label10);
+            this.groupBox3.Controls.Add(this.tHalfThrottleCurrent);
             this.groupBox3.Controls.Add(this.OVERSPEED_label);
             this.groupBox3.Controls.Add(this.OVERSPEED_numeric);
             this.groupBox3.Controls.Add(this.STALL_label);
             this.groupBox3.Controls.Add(this.STALL_numeric);
-            this.groupBox3.Location = new System.Drawing.Point(180, 119);
+            this.groupBox3.Location = new System.Drawing.Point(163, 119);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(144, 116);
+            this.groupBox3.Size = new System.Drawing.Size(161, 116);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Warnings";
             // 
+            // label46
+            // 
+            this.label46.AutoSize = true;
+            this.label46.Location = new System.Drawing.Point(4, 77);
+            this.label46.Name = "label46";
+            this.label46.Size = new System.Drawing.Size(52, 13);
+            this.label46.TabIndex = 7;
+            this.label46.Text = "throttle, A";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(4, 64);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(73, 13);
+            this.label10.TabIndex = 6;
+            this.label10.Text = "Current at half";
+            // 
+            // tHalfThrottleCurrent
+            // 
+            this.tHalfThrottleCurrent.Location = new System.Drawing.Point(99, 70);
+            this.tHalfThrottleCurrent.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.tHalfThrottleCurrent.Name = "tHalfThrottleCurrent";
+            this.tHalfThrottleCurrent.Size = new System.Drawing.Size(55, 20);
+            this.tHalfThrottleCurrent.TabIndex = 5;
+            this.tHalfThrottleCurrent.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hint.SetToolTip(this.tHalfThrottleCurrent, "Allows to warn about motor damage");
+            // 
             // OVERSPEED_label
             // 
             this.OVERSPEED_label.AutoSize = true;
-            this.OVERSPEED_label.Location = new System.Drawing.Point(6, 68);
+            this.OVERSPEED_label.Location = new System.Drawing.Point(4, 40);
             this.OVERSPEED_label.Name = "OVERSPEED_label";
             this.OVERSPEED_label.Size = new System.Drawing.Size(90, 13);
             this.OVERSPEED_label.TabIndex = 4;
@@ -1644,14 +1687,14 @@ namespace OSD {
             // 
             // OVERSPEED_numeric
             // 
-            this.OVERSPEED_numeric.Location = new System.Drawing.Point(74, 82);
+            this.OVERSPEED_numeric.Location = new System.Drawing.Point(99, 39);
             this.OVERSPEED_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.OVERSPEED_numeric.Name = "OVERSPEED_numeric";
-            this.OVERSPEED_numeric.Size = new System.Drawing.Size(63, 20);
+            this.OVERSPEED_numeric.Size = new System.Drawing.Size(55, 20);
             this.OVERSPEED_numeric.TabIndex = 3;
             this.OVERSPEED_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.OVERSPEED_numeric.ValueChanged += new System.EventHandler(this.OVERSPEED_numeric_ValueChanged);
@@ -1659,7 +1702,7 @@ namespace OSD {
             // STALL_label
             // 
             this.STALL_label.AutoSize = true;
-            this.STALL_label.Location = new System.Drawing.Point(6, 20);
+            this.STALL_label.Location = new System.Drawing.Point(4, 18);
             this.STALL_label.Name = "STALL_label";
             this.STALL_label.Size = new System.Drawing.Size(92, 13);
             this.STALL_label.TabIndex = 2;
@@ -1668,14 +1711,14 @@ namespace OSD {
             // 
             // STALL_numeric
             // 
-            this.STALL_numeric.Location = new System.Drawing.Point(74, 37);
+            this.STALL_numeric.Location = new System.Drawing.Point(99, 17);
             this.STALL_numeric.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.STALL_numeric.Name = "STALL_numeric";
-            this.STALL_numeric.Size = new System.Drawing.Size(63, 20);
+            this.STALL_numeric.Size = new System.Drawing.Size(55, 20);
             this.STALL_numeric.TabIndex = 0;
             this.STALL_numeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.STALL_numeric.ValueChanged += new System.EventHandler(this.STALL_numeric_ValueChanged);
@@ -1830,17 +1873,47 @@ namespace OSD {
             // 
             // grpTLog
             // 
+            this.grpTLog.Controls.Add(this.label48);
+            this.grpTLog.Controls.Add(this.txtLogOffset);
+            this.grpTLog.Controls.Add(this.label47);
             this.grpTLog.Controls.Add(this.lblTime);
-            this.grpTLog.Controls.Add(this.btnListen);
             this.grpTLog.Controls.Add(this.lblTLog);
             this.grpTLog.Controls.Add(this.btnTLog);
             this.grpTLog.Controls.Add(this.label14);
             this.grpTLog.Location = new System.Drawing.Point(478, 27);
             this.grpTLog.Name = "grpTLog";
-            this.grpTLog.Size = new System.Drawing.Size(206, 74);
+            this.grpTLog.Size = new System.Drawing.Size(206, 86);
             this.grpTLog.TabIndex = 8;
             this.grpTLog.TabStop = false;
             this.grpTLog.Text = "TLog player";
+            // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(125, 56);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(47, 13);
+            this.label48.TabIndex = 21;
+            this.label48.Text = "seconds";
+            // 
+            // txtLogOffset
+            // 
+            this.txtLogOffset.Location = new System.Drawing.Point(76, 53);
+            this.txtLogOffset.MaxLength = 4;
+            this.txtLogOffset.Name = "txtLogOffset";
+            this.txtLogOffset.Size = new System.Drawing.Size(46, 20);
+            this.txtLogOffset.TabIndex = 20;
+            this.txtLogOffset.Text = "0";
+            this.txtLogOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.Location = new System.Drawing.Point(13, 56);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(47, 13);
+            this.label47.TabIndex = 19;
+            this.label47.Text = "Skip first";
             // 
             // lblTime
             // 
@@ -1848,17 +1921,6 @@ namespace OSD {
             this.lblTime.Name = "lblTime";
             this.lblTime.Size = new System.Drawing.Size(73, 18);
             this.lblTime.TabIndex = 18;
-            // 
-            // btnListen
-            // 
-            this.btnListen.Location = new System.Drawing.Point(9, 44);
-            this.btnListen.Name = "btnListen";
-            this.btnListen.Size = new System.Drawing.Size(47, 20);
-            this.btnListen.TabIndex = 17;
-            this.btnListen.Text = "Listen";
-            this.btnListen.UseVisualStyleBackColor = true;
-            this.btnListen.Visible = false;
-            this.btnListen.Click += new System.EventHandler(this.btnListen_Click);
             // 
             // lblTLog
             // 
@@ -2069,6 +2131,7 @@ namespace OSD {
             ((System.ComponentModel.ISupportInitialize)(this.MINVOLT_numeric)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tHalfThrottleCurrent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OVERSPEED_numeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.STALL_numeric)).EndInit();
             this.groupBoxRSSI.ResumeLayout(false);
@@ -2244,7 +2307,6 @@ namespace OSD {
         private System.Windows.Forms.TextBox txtTime0;
         private System.Windows.Forms.CheckBox chkDiap;
         private System.Windows.Forms.ToolTip hint;
-        private System.Windows.Forms.Button btnListen;
         private System.Windows.Forms.Label lblTime;
         private System.Windows.Forms.Label lblTimes;
         private System.Windows.Forms.CheckBox chkByTime;
@@ -2259,6 +2321,12 @@ namespace OSD {
         private System.Windows.Forms.Label label44;
         private System.Windows.Forms.CheckBox chkRefrence;
         private System.Windows.Forms.ToolStripMenuItem aTmega644ToolStripMenuItem;
+        private System.Windows.Forms.Label label46;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown tHalfThrottleCurrent;
+        private System.Windows.Forms.Label label48;
+        private System.Windows.Forms.TextBox txtLogOffset;
+        private System.Windows.Forms.Label label47;
     }
 
 }

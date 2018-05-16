@@ -1123,6 +1123,17 @@ namespace OSD
         }
 
 
+        public int panADSB(int first_col, int first_line, int sign, int fAlt, Panel p) {
+            osd.setPanel(first_col, first_line);
+            for(int i=0; i<2;i++){
+                if (sign != 0) osd.write_raw(0x20);
+
+                osd.printf("%c%c", 0xA4 + (6 * i), 0xA5 + (6 * i));
+                osd.printf("%3i%c|", (Int16)250+100*i, 0x0c);
+            }
+            return 0;
+        }
+
         /* **************************************************************** */
         // Panel  : panHeading
         // Needs  : X, Y locations

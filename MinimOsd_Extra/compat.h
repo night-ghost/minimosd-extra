@@ -58,6 +58,8 @@ void WEAK __cxa_guard_abort (__guard *) {};
 void WEAK __cxa_pure_virtual(void) {};
 */
 
+#define DIGITALIO_MANUAL
+
 template<typename T> void ZeroIt(T& value)
 {
     memset(&value,0,sizeof(value));
