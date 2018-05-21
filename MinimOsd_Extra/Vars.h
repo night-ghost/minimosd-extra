@@ -132,7 +132,7 @@ static uint16_t     osd_cog=0;                      // Course over ground
 static int16_t      off_course=0;
 Coords              osd_home = {0,0,0};             // home coordinates
 static long         osd_home_distance = 0;          // distance from home
-static uint8_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)
+static int16_t      osd_home_direction=0;           // Arrow direction pointing to home (1-16 to CW loop)
 static int          dst_x=0,dst_y=0;    // расстояние по осям - для радара
 
 struct Att osd_att = {0,0,0};

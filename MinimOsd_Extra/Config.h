@@ -36,7 +36,11 @@
 
 #define STARTUP_SCREEN 0
 
-#define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
+#if defined(USE_MWII)
+ #define TELEMETRY_SPEED  115200 // hard-coded 
+#else
+ #define TELEMETRY_SPEED  57600  // initial speed of Serial port for CT
+#endif
 
 #define BOOTTIME         1500   // Time in milliseconds that we show boot loading bar and wait user input
 

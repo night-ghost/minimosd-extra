@@ -2335,7 +2335,7 @@ static void panADSB(point p) {
         if(adsb[i].cnt) {
             if(has_sign(p)) OSD::write_raw(0x20);
 
-            float distance = coord_dist(&adsb[i].coord, &osd_pos, true);
+            float distance = coord_dist(&adsb[i].coord, &osd_pos, true); // also sets
     
             showArrow(coord_bearing());
             printFullDist(distance);

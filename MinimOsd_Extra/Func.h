@@ -403,7 +403,7 @@ static  float  /* NOINLINE */ distance(float x, float y){
 
 float dstlon, dstlat;
 
-float NOINLINE coord_dist(Coords *c1, Coords *c2, bool useAlt){
+float NOINLINE coord_dist(Coords *c1, Coords *c2, bool useAlt){ // also sets dstlat, dstlon
     float scaleLongDown = cos(abs(c1->lat) * 0.0174532925);
     dstlat = diff_coord(c1->lat, c2->lat);
     dstlon = diff_coord(c1->lon, c2->lon) * scaleLongDown;
@@ -413,7 +413,8 @@ float NOINLINE coord_dist(Coords *c1, Coords *c2, bool useAlt){
     return d;
 }
 
-int NOINLINE  coord_bearing(){
+
+int NOINLINE  coord_bearing(){ // returns angle in grad, coord_dist should be called first
     int bearing;
 
 #pragma GCC diagnostic push
@@ -428,9 +429,6 @@ int NOINLINE  coord_bearing(){
 
 static void setHomeVars()
 {
-    float dstlon, dstlat;
-
-
     if(osd_fix_type!=0) lflags.gps_active=1; // если что-то появилось то запомним что было
 
 #ifdef IS_COPTER
@@ -502,7 +500,7 @@ static void setHomeVars()
     } 
     
     if(lflags.osd_got_home){
-        osd_home_distance = coord_dist(&osd_home, &osd_pos, false);
+        osd_home_distance = coord_dist(&osd_home, &osd_pos, false); // also sets dstlat, dstlon
     
 	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
 	dst_y=(int)fabs(dstlon);
@@ -572,9 +570,9 @@ void setFdataVars()
 
     { // isolate RSSI calc
         int16_t rssi_v = rssi_in;
+        int16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
 
-        if((sets.RSSI_raw % 2 == 0))  {
-            int16_t l=sets.RSSI_16_low, h=sets.RSSI_16_high;
+        if((sets.RSSI_raw % 2 == 0) &&  l!=h)  {
             bool rev=false;
 
             if(l > h) {
@@ -584,7 +582,7 @@ void setFdataVars()
             }
 
             if(rssi_v < l) rssi_v = l;
-            if(rssi_v > h) rssi_v = h; // all rssi values is limited to 4096 so we can multiply it only by 16
+            if(rssi_v > h) rssi_v = h; 
             
             uint16_t diap = h-l;
             uint16_t val  = rssi_v - l;
@@ -673,6 +671,9 @@ again:
 	extern bool uavtalk_read(void);
 	uavtalk_read();
 #elif defined(USE_MWII)
+ #undef AUTOBAUD
+ #define AUTOBAUD 0 // always 115200
+ 
 	extern bool mwii_read(void);
 	mwii_read();
 #elif defined(USE_LTM)
