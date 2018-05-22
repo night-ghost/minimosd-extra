@@ -513,7 +513,7 @@ static void mwii_check_mode() {
 	
 	v= (uint32_t *)pgm_read_word(&bp->v);
 
-	if(*v & msgbuf.mwii.sensorActive) osd_mode = b-1;
+	if(*v & msgbuf.mwii.flag) osd_mode = b-1;
 	
 	
 	bp++;
@@ -544,19 +544,20 @@ typedef struct {
 <------>uint16_t cycleTime;
 <------>int16_t I2CError;
 <------>uint16_t  sensorPresent;
-<------>uint32_t  sensorActive;
+<------>uint32_t  flag;
 <------>uint8_t version;
 } MW_status_t;
 */
 	//r_struct((uint8_t*)&MW_STATUS,10);
-	msgbuf.mwii.sensorActive = mwii_read_ulong(offsetof(MW_status_t, sensorActive) );
+	msgbuf.mwii.flag = mwii_read_ulong(offsetof(MW_status_t, flag) );
 	//lflags.motor_armed = (msgbuf.mwii.sensorActive & msgbuf.mwii.mode.armed) != 0;
-	lflags.motor_armed = (msgbuf.mwii.sensorActive & 1) != 0;
+	
+	lflags.motor_armed = (msgbuf.mwii.flag & MSP_FLAG_ARMED) != 0;
 	
 	
-    if( (msgbuf.mwii.sensorActive & (1 << 1)) != 0) osd_mode = 1;
-	if( (msgbuf.mwii.sensorActive & (1 << 2)) != 0) osd_mode = 2;
-	if( (msgbuf.mwii.sensorActive & (1 << 4)) != 0) osd_mode = 0;
+    if( (msgbuf.mwii.flag & MSP_FLAG_ANGLE) != 0) osd_mode = 1;//shit hardcode. osd_mode from panels.h:2042 
+	if( (msgbuf.mwii.flag & MSP_FLAG_HORIZ) != 0) osd_mode = 2;
+	if( (msgbuf.mwii.flag & MSP_FLAG_PASSTHR) != 0) osd_mode = 0;
 
 //OSD::setPanel(10,1);
 //osd_printi_2(PSTR("mode:%d-%d"), (uint16_t)osd_mode, (uint16_t)(osd_mode >> 16));

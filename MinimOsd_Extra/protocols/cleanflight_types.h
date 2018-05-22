@@ -5,7 +5,7 @@ typedef struct {
 	uint16_t cycleTime;
 	int16_t I2CError;
 	uint16_t  sensorPresent;
-	uint32_t  sensorActive;
+	uint32_t  flag;
 	uint8_t version;
 } MW_status_t;
 
