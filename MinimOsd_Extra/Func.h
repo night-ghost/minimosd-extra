@@ -566,7 +566,7 @@ void setFdataVars()
 #endif
 
 
-#if !defined USE_UAVTALK
+#if !defined USE_UAVTALK && !defined USE_MWII
     float_add(mah_used, (float)osd_curr_A * time_1000 / (3600.0 / 10.0));
 #endif
 
@@ -668,78 +668,85 @@ again:
     if(lflags.input_active || lflags.data_mode || lflags.blinker) {
 
 #if defined(USE_MAVLINK)  || defined(USE_MAVLINKPX4)
-	read_mavlink();
+      read_mavlink();
 #elif defined(USE_UAVTALK)
-	extern bool uavtalk_read(void);
-	uavtalk_read();
+    	extern bool uavtalk_read(void);
+    	uavtalk_read();
 #elif defined(USE_MWII)
-	extern bool mwii_read(void);
-	mwii_read();
+    	extern bool mwii_read(void);
+    	mwii_read();
 #elif defined(USE_LTM)
-	extern void read_ltm(void);
-	read_ltm();
+    	extern void read_ltm(void);
+    	read_ltm();
 #elif defined(USE_NMEA)
-	extern void read_NMEA(void);
-	read_NMEA();
+    	extern void read_NMEA(void);
+    	read_NMEA();
 #else
 #warning "No data protocol defined, compiling for MAVlink"
 #endif
 
-	lflags.data_mode=lflags.input_active; // if not received any then flag clears
+      	lflags.data_mode=lflags.input_active; // if not received any then flag clears
 
     } else {
 
-	memset( &msgbuf.bytes[0], 0, sizeof(msgbuf.bytes)); // clear packet buffer to initial state
+    	memset( &msgbuf.bytes[0], 0, sizeof(msgbuf.bytes)); // clear packet buffer to initial state
+
+      Serial.end();
+      
+#if defined(AUTOBAUD) && !defined(USE_MWII)  	
+    	static uint8_t last_pulse = 15; // 57600 by default
+    	uint8_t pulse=255;
     
-#if defined(AUTOBAUD)
-	Serial.end();
-	static uint8_t last_pulse = 15; // 57600 by default
-	uint8_t pulse=255;
-
-	{ // isolate PT and SPEED
-	    uint32_t pt = millis() + 100; // не более 0.1 секунды
-	
-	    for(byte i=250; i!=0; i--){
-	        if(millis()>pt) break; // not too long
-	        long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
-	        if(t>255) continue;   // too long - not single bit
-	        uint8_t tb = t;       // it less than 255 so convert to byte
-	        if(tb==0) continue;   // no pulse at all
-	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
-	    }
-	}
-	
-	if(pulse == 255)    pulse = last_pulse; // no input at all - use last
-	else                last_pulse = pulse; // remember last correct time
-	
-	// F_CPU   / BAUD for 115200 is 138
-	// 1000000 / BAUD for 115200 is 8.68uS
-	//  so I has no idea about pulse times - thease simply measured
-
-	byte rate;
-	byte sp;
-	if(     pulse < 11) 	{ sp = 24; rate = 2;  }  // *4 /2
-	else if(pulse < 19) 	{ sp = 12; rate = 4;  }  // *4 /4
-	else if(pulse < 29) 	{ sp =  8; rate = 6;  }  // *4 /6
-	else if(pulse < 40) 	{ sp =  6; rate = 8;  }
-	else if(pulse < 60) 	{ sp =  4; rate = 16; }
-	else if(pulse < 150)	{ sp =  2; rate = 32; }
-	else                    { sp =  1; rate = 64; }
-
-	long speed = sp*4800L;
-
-	stream_rate = rate;
-#ifdef DEBUG
-	OSD::setPanel(3,2);
-	osd.printf_P(PSTR("pulse=%d sp=%d speed=%ld"),pulse, sp, speed);
-#endif
-	serial_speed=speed; // store detected port speed for show
-	Serial.flush();	// clear serial buffer from garbage
-	Serial.begin(speed);
+    	{ // isolate PT and SPEED
+    	    uint32_t pt = millis() + 100; // не более 0.1 секунды
+    	
+    	    for(byte i=250; i!=0; i--){
+    	        if(millis()>pt) break; // not too long
+    	        long t=pulseIn(PD0, 0, 2500); // 2500uS * 250 = 
+    	        if(t>255) continue;   // too long - not single bit
+    	        uint8_t tb = t;       // it less than 255 so convert to byte
+    	        if(tb==0) continue;   // no pulse at all
+    	        if(tb<pulse) pulse=tb;// find minimal possible - it will be bit time
+    	    }
+    	}
+    	
+    	if(pulse == 255)    pulse = last_pulse; // no input at all - use last
+    	else                last_pulse = pulse; // remember last correct time
+    	
+    	// F_CPU   / BAUD for 115200 is 138
+    	// 1000000 / BAUD for 115200 is 8.68uS
+    	//  so I has no idea about pulse times - thease simply measured
+    
+    	byte rate;
+    	byte sp;
+    	if(     pulse < 11) 	{ sp = 24; rate = 2;  }  // *4 /2
+    	else if(pulse < 19) 	{ sp = 12; rate = 4;  }  // *4 /4
+    	else if(pulse < 29) 	{ sp =  8; rate = 6;  }  // *4 /6
+    	else if(pulse < 40) 	{ sp =  6; rate = 8;  }
+    	else if(pulse < 60) 	{ sp =  4; rate = 16; }
+    	else if(pulse < 150)	{ sp =  2; rate = 32; }
+    	else                    { sp =  1; rate = 64; }
+    
+    	long speed = sp*4800L;
+    
+    	stream_rate = rate;
+    	serial_speed=speed; // store detected port speed for show
+    
+#elif defined(USE_MWII)// MWII is only 115200
+      stream_rate = 2;
+      serial_speed = 115200L;
 #endif    
-	
-	lflags.data_mode=true; // пробуем почитать данные
-	goto again;
+    
+      Serial.flush(); // clear serial buffer from garbage
+      Serial.begin(serial_speed);
+      
+#ifdef DEBUG
+      OSD::setPanel(3,2);
+      osd.printf_P(PSTR("pulse=%d sp=%d speed=%ld"),pulse, sp, speed);
+#endif
+      
+      lflags.data_mode=true; // пробуем почитать данные
+    	goto again;
     }
 
 }

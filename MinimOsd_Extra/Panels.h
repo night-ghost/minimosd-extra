@@ -1101,7 +1101,12 @@ static void panCur_A(point p){
     else
         fmt=f5_2f;
 
+#ifdef USE_MWII
+    float f = filteredCurrent * 0.1; // MWII in [100ma]
+#else
     float f = filteredCurrent * 0.01;
+#endif
+ 
     osd_printf_2(fmt, f, 0x0E); // in amps
 }
 
