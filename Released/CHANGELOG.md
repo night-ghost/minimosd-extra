@@ -562,3 +562,10 @@ v943
 * removed integer filtration of voltage in favor of built-in filtering in float
 * used filtered voltages for warnings
 
+v944
+*increased priority of Home_Dir and Home_Dist panels
+
+v945 
+* fixed bug in HomeDir panel
+* constant speed 115200 for MWII protocol
+* fixed RADAR (mric3412)

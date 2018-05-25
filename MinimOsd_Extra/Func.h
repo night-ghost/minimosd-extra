@@ -502,8 +502,8 @@ static void setHomeVars()
     if(lflags.osd_got_home){
         osd_home_distance = coord_dist(&osd_home, &osd_pos, false); // also sets dstlat, dstlon
     
-	dst_x=(int)fabs(dstlat); 		// prepare for RADAR
-	dst_y=(int)fabs(dstlon);
+	dst_x=(int)dstlat; 		// prepare for RADAR
+	dst_y=(int)dstlon;
 
         osd_home_direction = coord_bearing();
     }
