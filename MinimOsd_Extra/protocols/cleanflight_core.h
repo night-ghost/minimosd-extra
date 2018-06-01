@@ -550,7 +550,12 @@ typedef struct {
 */
 	//r_struct((uint8_t*)&MW_STATUS,10);
 	msgbuf.mwii.sensorActive = mwii_read_ulong(offsetof(MW_status_t, sensorActive) );
-	lflags.motor_armed = (msgbuf.mwii.sensorActive & msgbuf.mwii.mode.armed) != 0;
+	lflags.motor_armed = (msgbuf.mwii.sensorActive & MSP_FLAG_ARMED) != 0;
+       
+       
+        if((msgbuf.mwii.sensorActive & MSP_FLAG_ANGLE)) osd_mode = 1;
+        if((msgbuf.mwii.sensorActive & MSP_FLAG_HORIZ)) osd_mode = 2;
+        if((msgbuf.mwii.sensorActive & MSP_FLAG_PASSTHR)) osd_mode = 0;
 	break;
 
 #if 0 // only in setup
@@ -651,10 +656,10 @@ typedef struct {
 //	r_struct((uint8_t*)&MW_ANALOG,7);
 	if(!FLAGS.useExtVbattA){
 	    osd_vbat_A              = 100u * (uint16_t)mwii_read_uint(offsetof(MW_ANALOG_t, VBat) );
-	    osd_battery_remaining_A = mwii_read_uint(offsetof(MW_ANALOG_t, pMeterSum) );
+	    mah_used                = mwii_read_uint(offsetof(MW_ANALOG_t, pMeterSum) );
 	}
 	if (!FLAGS.useExtCurr)
-	    osd_curr_A = mwii_read_uint(offsetof(MW_ANALOG_t, Amperage) );
+	    osd_curr_A = mwii_read_uint(offsetof(MW_ANALOG_t, Amperage) ) * 10;  // MWII in [100ma]
 
 	osd_rssi       = mwii_read_uint(offsetof(MW_ANALOG_t, Rssi) );
 	break;
@@ -842,11 +847,9 @@ void blankserialRequest(uint8_t requestMSP)
 
 void setMspRequests() {
     msgbuf.mwii.modeMSPRequests = 
-      REQ_MSP_IDENT|
       REQ_MSP_STATUS|
       REQ_MSP_RAW_GPS|
       REQ_MSP_COMP_GPS|
-      REQ_MSP_ATTITUDE|
       REQ_MSP_RAW_IMU|      
       REQ_MSP_ALTITUDE | REQ_MSP_RC | REQ_MSP_ANALOG;;
 
@@ -875,7 +878,10 @@ void doMSPrequests(){
 
     flg = !flg;
     
-    if(flg) return; // skip half of req
+    if(flg) { // fast horizon
+        blankserialRequest(MSP_ATTITUDE);
+        return;
+    }
 
     uint8_t MSPcmdsend=0;
 

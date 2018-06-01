@@ -569,3 +569,6 @@ v945
 * fixed bug in HomeDir panel
 * constant speed 115200 for MWII protocol
 * fixed RADAR (mric3412)
+
+v946
+* fixes for MWII protocol from BondarenkoA

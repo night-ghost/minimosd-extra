@@ -91,6 +91,11 @@ news in https://github.com/ShikOfTheRa/scarab-osd/tree/master/MW_OSD
 #define REQ_MSP_BOX       (1 << 11)
 #define REQ_MSP_FONT      (1 << 12)
 
+#define MSP_FLAG_ARMED 0x01UL
+#define MSP_FLAG_ANGLE 0x02UL
+#define MSP_FLAG_HORIZ 0x04UL
+#define MSP_FLAG_PASSTHR 0x10UL
+
 
 	void setMspRequests();
 	void blankserialRequest(uint8_t requestMSP);
