@@ -845,7 +845,7 @@ static inline void check_warn(point p)
 
 
 //1
-    if (lflags.gps_active && osd_fix_type < 2) // GPS был но сейчас плохой
+    if (lflags.gps_active && osd_fix_type < GPS_STATE_OK) // GPS был но сейчас плохой
         wmask |= 1; //0
  
 //2    

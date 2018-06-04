@@ -352,4 +352,6 @@ typedef struct __uavtalk_message {
 bool uavtalk_read(void);
 
 
+#define GPS_STATE_OK 2
+
 #endif /* UAVTALK_H_ */

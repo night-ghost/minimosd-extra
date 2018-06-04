@@ -678,3 +678,6 @@ typedef struct __mavlink_param_value_t
 
     return false;
 }
+
+
+#define GPS_STATE_OK 1

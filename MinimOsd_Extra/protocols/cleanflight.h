@@ -139,6 +139,6 @@ struct MWII_buffer {
 };
 
 
-
+#define GPS_STATE_OK 1
 
 #endif /* PROTOCOL_H_ */

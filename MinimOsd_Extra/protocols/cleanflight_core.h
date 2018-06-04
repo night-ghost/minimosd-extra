@@ -580,6 +580,7 @@ uint16_t MwRcData[8]
 //	r_struct((uint8_t*)&MwRcData,16);
 //	handleRawRC();
 	mwii_read_len(chan_raw,0, sizeof(chan_raw));
+	osd_throttle = (uint8_t)( (chan_raw[3] - 1000) / 10); // convert to 0..100 range
 
 	break;
 
@@ -623,8 +624,8 @@ typedef struct {
 } MW_ATTITUDE_t;
 */
 //	r_struct((uint8_t*)&MW_ATT,6);
-	osd_att.roll = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
-	osd_att.pitch  = (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
+	osd_att.roll   =  (int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[0]) ) / 10;  // in centidegrees, thanks pwbecker
+	osd_att.pitch  = -(int16_t)mwii_read_uint(offsetof(MW_ATTITUDE_t, Angle[1]) ) / 10;
 	osd_heading = mwii_read_uint(offsetof(MW_ATTITUDE_t, Heading) );
 //	mwii_read_len(&osd_att,offsetof(MW_ATTITUDE_t, Angle), sizeof(osd_att)); // opposite direction
 DBG_PRINTF("got attitude roll=%d pitch=%d head=%d\n",osd_heading, osd_att.roll, osd_att.pitch);

@@ -408,3 +408,4 @@ void heartBeat() {
 
 }
 
+#define GPS_STATE_OK 2

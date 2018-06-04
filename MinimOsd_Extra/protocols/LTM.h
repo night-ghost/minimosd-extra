@@ -152,5 +152,7 @@ struct LTM_N {
 };
 
 
+#define GPS_STATE_OK 2
+
 #endif
 
