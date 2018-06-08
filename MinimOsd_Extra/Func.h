@@ -672,8 +672,6 @@ again:
 	uavtalk_read();
 #elif defined(USE_MWII)
  #undef AUTOBAUD
- #define AUTOBAUD 0 // always 115200
- 
 	extern bool mwii_read(void);
 	mwii_read();
 #elif defined(USE_LTM)
